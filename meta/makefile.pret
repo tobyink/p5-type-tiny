@@ -1,0 +1,8 @@
+# This file provides instructions for packaging.
+
+`Type-Tiny`
+	perl_version_from m`Type::Tiny`;
+	version_from      m`Type::Tiny`;
+	readme_from       m`Type::Tiny` ;
+	.
+

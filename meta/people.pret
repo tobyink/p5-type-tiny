@@ -1,0 +1,8 @@
+# This file contains data about the project developers.
+
+@prefix : <http://xmlns.com/foaf/0.1/>.
+
+cpan:TOBYINK
+	:name  "Toby Inkster";
+	:mbox  <mailto:tobyink@cpan.org>.
+
