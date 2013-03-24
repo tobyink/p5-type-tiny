@@ -1,0 +1,7 @@
+- coercions
+- lots of tests
+- make it possible to export assert_String functions
+- inlinable type checks
+- sanity check type names
+- class_type, role_type, enum, union, intersection
+- documentation
