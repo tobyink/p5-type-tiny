@@ -77,27 +77,49 @@ sub is_anon
 	$self->name eq "__ANON__";
 }
 
+sub _get_failure_level
+{
+	my $self = shift;
+	
+	if ($self->has_parent)
+	{
+		my $failed_at = $self->parent->_get_failure_level(@_);
+		return $failed_at if defined $failed_at;
+	}
+	
+	local $_ = $_[0];
+	return if $self->constraint->($_[0]);
+	return $self;
+}
+
 sub check
 {
 	my $self = shift;
 	return if $self->has_parent && !$self->parent->check($_[0]);
-	local $_ = $_[0];
-	return !!1 if $self->constraint->($_[0]);
-	return;
+	return if $self->_get_failure_level;
+	return !!1;
 }
 
 sub validate
 {
 	my $self = shift;
-	return undef if $self->check($_[0]);
-	return $self->message->($_[0]);
+	
+	my $failed_at = $self->_get_failure_level($_[0]);
+	return undef unless defined $failed_at;
+	
+	local $_ = $_[0];
+	return $failed_at->message->($_[0]);
 }
 
 sub assert_valid
 {
 	my $self = shift;
-	return !!1 if $self->check($_[0]);
-	_confess $self->message->($_[0]);
+	
+	my $failed_at = $self->_get_failure_level($_[0]);
+	return !!1 unless defined $failed_at;
+	
+	local $_ = $_[0];
+	_confess $failed_at->message->($_[0]);
 }
 
 sub coerce
