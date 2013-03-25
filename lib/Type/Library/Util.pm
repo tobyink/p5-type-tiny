@@ -53,6 +53,8 @@ sub declare
 			or _confess "could not find parent type";
 	}
 	
+	$opts{library} = blessed($caller) || $caller;
+	
 	my $type = "Type::Tiny"->new(%opts);
 	$caller->add_type($type) unless $type->is_anon;
 	return $type;

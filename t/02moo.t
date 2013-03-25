@@ -30,7 +30,7 @@ like(
 
 like(
 	exception { "Local::Class"->new(small => 5.5) },
-	qr{^isa check for "small" failed: value "5.5" did not pass type constraint "Integer"},
+	qr{^isa check for "small" failed: value "5.5" did not pass type constraint "DemoLib::Integer"},
 	"violation of parent type constraint",
 );
 

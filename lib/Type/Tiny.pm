@@ -19,7 +19,7 @@ sub _confess ($;@)
 }
 
 use overload
-	q("")      => sub { $_[0]->name },
+	q("")      => sub { $_[0]->qualified_name },
 	q(bool)    => sub { 1 },
 	q(&{})     => sub { my $t = shift; sub { $t->assert_valid(@_) } },
 	fallback   => 1,
@@ -35,8 +35,15 @@ sub new
 		_confess "parent must be an instance of %s", __PACKAGE__
 			unless blessed($params{parent}) && $params{parent}->isa(__PACKAGE__);
 	}
-		
-	bless \%params, $class;
+	
+	my $self = bless \%params, $class;
+	
+	if ($self->has_library and not $self->is_anon)
+	{
+		$Moo::HandleMoose::TYPE_MAP{"$self"} = sub { $self->as_moose };
+	}
+	
+	return $self;
 }
 
 sub name        { $_[0]{name} }
@@ -45,8 +52,10 @@ sub constraint  { $_[0]{constraint} ||= $_[0]->_build_constraint }
 sub coercion    { $_[0]{coercion} }
 sub message     { $_[0]{message}    ||= $_[0]->_build_message }
 sub inlined     { $_[0]{coercion} }
+sub library     { $_[0]{library} }
 sub has_parent  { exists $_[0]{parent} }
 sub has_inlined { exists $_[0]{inlined} }
+sub has_library { exists $_[0]{library} }
 
 sub _build_constraint
 {
@@ -59,6 +68,18 @@ sub _build_message
 	return sub { sprintf 'value "%s" did not pass type constraint', $_[0] } if $self->is_anon;
 	my $name = "$self";
 	return sub { sprintf 'value "%s" did not pass type constraint "%s"', $_[0], $name };
+}
+
+sub qualified_name
+{
+	my $self = shift;
+	
+	if ($self->has_library and not $self->is_anon)
+	{
+		return sprintf("%s::%s", $self->library, $self->name);
+	}
+	
+	return $self->name;
 }
 
 sub is_anon
@@ -126,10 +147,10 @@ sub as_moose
 {	
 	my $self = shift;
 	
-	my %options = (name => $self->name);
+	my %options = (name => $self->qualified_name);
 	$options{parent}     = $self->parent->as_moose if $self->has_parent;
-	$options{constraint} = $self->constraint       if $self->has_constraint;
-	$options{message}    = $self->message          if $self->has_message;
+	$options{constraint} = $self->constraint;
+	$options{message}    = $self->message;
 	# ... coerce
 	
 	require Moose::Meta::TypeConstraint;
