@@ -22,14 +22,14 @@ sub as ($;@)
 	parent => @_;
 }
 
-sub where (&)
+sub where (&;@)
 {
-	constraint => $_[0];
+	constraint => @_;
 }
 
-sub message (&)
+sub message (&;@)
 {
-	message => $_[0];
+	message => @_;
 }
 
 sub declare
@@ -61,9 +61,8 @@ sub declare
 sub extends
 {
 	my $caller = caller->meta;
-	my @libs;
 	
-	foreach my $lib (@libs)
+	foreach my $lib (@_)
 	{
 		eval "require $lib" or _confess "could not load library '$lib': $@";
 		$caller->add_type($lib->get_type($_)) for $lib->meta->type_names;
