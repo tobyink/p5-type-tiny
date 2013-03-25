@@ -12,7 +12,8 @@ BEGIN {
 use Scalar::Util qw< blessed >;
 use Type::Tiny;
 
-sub _confess ($;@) {
+sub _confess ($;@)
+{
 	require Carp;
 	@_ = sprintf($_[0], @_[1..$#_]) if @_ > 1;
 	goto \&Carp::confess;
@@ -57,7 +58,7 @@ sub _export
 	my $class = blessed($meta);
 	
 	no strict "refs";
-	if ($subname =~ /^(is|to)_/ and my $coderef = $class->can($subname))
+	if ($subname =~ /^(is|to|assert)_/ and my $coderef = $class->can($subname))
 	{
 		*{join("::", $opts->{caller}, $subname)} = $coderef;
 		return;
