@@ -37,6 +37,8 @@ sub _process_tags
 			{ $opts->{moose} = 1 }
 		elsif ($arg =~ /^[:-]all$/i)
 			{ push @exports, map { $_, "is_$_", "to_$_", "assert_$_" } $meta->type_names }
+		elsif ($arg =~ /^[:-](assert|is|to)$/i)
+			{ push @exports, map "$1\_$_", $meta->type_names }
 		elsif ($arg =~ /^\+(.+)$/i)
 			{ push @exports, map { $_, "is_$_", "to_$_", "assert_$_" } $1 }
 		else
