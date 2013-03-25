@@ -36,9 +36,9 @@ sub _process_tags
 		if ($arg =~ /^[:-]moose$/i)
 			{ $opts->{moose} = 1 }
 		elsif ($arg =~ /^[:-]all$/i)
-			{ push @exports, map { $_, "is_$_", "to_$_" } $meta->type_names }
+			{ push @exports, map { $_, "is_$_", "to_$_", "assert_$_" } $meta->type_names }
 		elsif ($arg =~ /^\+(.+)$/i)
-			{ push @exports, map { $_, "is_$_", "to_$_" } $1 }
+			{ push @exports, map { $_, "is_$_", "to_$_", "assert_$_" } $1 }
 		else
 			{ push @exports, $arg }
 	}
@@ -90,9 +90,10 @@ sub add_type
 	
 	no strict "refs";
 	my $class = blessed($meta);
-	*{"$class\::$name"   } = sub (;$) { $type };
-	*{"$class\::is_$name"} = sub { $type->check($_[0]) };
-	*{"$class\::to_$name"} = sub { $type->coerce($_[0]) };
+	*{"$class\::$name"   }     = sub (;$) { $type };
+	*{"$class\::is_$name"}     = sub { $type->check($_[0]) };
+	*{"$class\::to_$name"}     = sub { $type->coerce($_[0]) };
+	*{"$class\::assert_$name"} = sub { $type->assert_valid($_[0]) };
 	return $type;
 }
 
