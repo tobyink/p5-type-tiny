@@ -15,7 +15,7 @@ use Type::Library;
 use Type::Tiny;
 
 use Exporter qw< import >;
-our @EXPORT = qw< declare as where message >;
+our @EXPORT = qw< declare as where message extends >;
 
 sub as ($;@)
 {
@@ -56,6 +56,18 @@ sub declare
 	my $type = "Type::Tiny"->new(%opts);
 	$caller->add_type($type) unless $type->is_anon;
 	return $type;
+}
+
+sub extends
+{
+	my $caller = caller->meta;
+	my @libs;
+	
+	foreach my $lib (@libs)
+	{
+		eval "require $lib" or _confess "could not load library '$lib': $@";
+		$caller->add_type($lib->get_type($_)) for $lib->meta->type_names;
+	}
 }
 
 1;
