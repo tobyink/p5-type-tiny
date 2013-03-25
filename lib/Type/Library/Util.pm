@@ -35,8 +35,17 @@ sub message (&)
 sub declare
 {
 	my $caller = caller->meta;
-	my ($name, %opts) = @_;
-	$opts{name} = $name;
+	my %opts;
+	if (@_ % 2 == 0)
+	{
+		%opts = @_;
+	}
+	else
+	{
+		(my($name), %opts) = @_;
+		_confess "cannot provide two names for type" if exists $opts{name};
+		$opts{name} = $name;
+	}
 	
 	if (defined $opts{parent} and not blessed $opts{parent})
 	{
@@ -44,7 +53,9 @@ sub declare
 			or _confess "could not find parent type";
 	}
 	
-	$caller->add_type(%opts);
+	my $type = "Type::Tiny"->new(%opts);
+	$caller->add_type($type) unless $type->is_anon;
+	return $type;
 }
 
 1;

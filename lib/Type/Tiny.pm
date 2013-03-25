@@ -71,6 +71,12 @@ for my $attr (@attributes)
 		unless __PACKAGE__->can("_assert_$attr");
 }
 
+sub is_anon
+{
+	my $self = shift;
+	$self->name eq "__ANON__";
+}
+
 sub check
 {
 	my $self = shift;

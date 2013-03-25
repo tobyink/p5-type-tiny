@@ -85,6 +85,7 @@ sub add_type
 	
 	$meta->{types} ||= {};
 	_confess 'type %s already exists in this library', $name if exists $meta->{types}{$name};
+	_confess 'cannot add anonymous type to a library' if $type->is_anon;
 	$meta->{types}{$name} = $type;
 	
 	no strict "refs";

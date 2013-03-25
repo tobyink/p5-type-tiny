@@ -5,4 +5,3 @@
 - sanity check type names
 - class_type, role_type, duck_type, enum, union, intersection
 - documentation
-- anonymous types
