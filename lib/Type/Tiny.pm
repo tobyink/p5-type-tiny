@@ -36,6 +36,8 @@ sub new
 			unless blessed($params{parent}) && $params{parent}->isa(__PACKAGE__);
 	}
 	
+	$params{name} = "__ANON__" unless exists $params{name};
+	
 	my $self = bless \%params, $class;
 	
 	if ($self->has_library and not $self->is_anon)
@@ -51,8 +53,9 @@ sub parent      { $_[0]{parent} }
 sub constraint  { $_[0]{constraint} ||= $_[0]->_build_constraint }
 sub coercion    { $_[0]{coercion} }
 sub message     { $_[0]{message}    ||= $_[0]->_build_message }
-sub inlined     { $_[0]{coercion} }
+sub inlined     { $_[0]{inlined} }
 sub library     { $_[0]{library} }
+
 sub has_parent  { exists $_[0]{parent} }
 sub has_inlined { exists $_[0]{inlined} }
 sub has_library { exists $_[0]{library} }
@@ -171,7 +174,125 @@ Type::Tiny - tiny, yet Moo(se)-compatible type constraint
 
 =head1 SYNOPSIS
 
+	use Scalar::Util qw(looks_like_number);
+	use Type::Tiny;
+	
+	my $NUM = "Type::Tiny"->new(
+		name       => "Number",
+		constraint => sub { looks_like_number($_) },
+		message    => sub { "$_ ain't a number" },
+	);
+	
+	package Ermintrude {
+		use Moo;
+		has favourite_number => (is => "ro", isa => $NUM);
+	}
+	
+	package Bullwinkle {
+		use Moose;
+		has favourite_number => (is => "ro", isa => $NUM->as_moose);
+	}
+
 =head1 DESCRIPTION
+
+L<Type::Tiny> is a tiny class for creating Moose-like type constraint
+objects which are compatible with Moo and Moose.
+
+Maybe now we won't need to have separate MooseX and MooX versions of
+everything? We can but hope...
+
+If you're reading this because you want to create a type library, then
+you're probably better off reading L<Type::Tiny::Intro>.
+
+=head2 Constructor
+
+=over
+
+=item C<< new(%attributes) >>
+
+Moose-style constructor function.
+
+=back
+
+=head2 Attributes
+
+=over
+
+=item C<< name >>
+
+The name of the type constraint.
+
+=item C<< parent >>
+
+Optional attribute; parent type constraint. For example, an "Integer"
+type constraint might have a parent "Number".
+
+If provided, must be a Type::Tiny object.
+
+=item C<< constraint >>
+
+Coderef to validate a value (C<< $_ >>) against the type constraint. The
+coderef will not be called unless the value is known to pass any parent
+type constraint. Defaults to C<< sub { 1 } >> - i.e. a coderef that passes
+all values.
+
+=item C<< coercion >>
+
+(Not implemented yet.)
+
+=item C<< message >>
+
+Coderef that returns an error message when C<< $_ >> does not validate
+against the type constraint. Optional (there's a vaguely sensible default.)
+
+=item C<< inlined >>
+
+(Not implemented yet.)
+
+=item C<< library >>
+
+The package name of the type library this type is associated with.
+Optional. Informational only: setting this attribute does not install
+the type into the package.
+
+=back
+
+=head2 Methods
+
+=over
+
+=item C<< has_parent >>, C<< has_inlined >>, C<< has_library >>
+
+Predicate methods.
+
+=item C<< is_anon >>
+
+Returns true iff the type constraint does not have a name.
+
+=item C<< qualified_name >>
+
+For non-anonymous type constraints that have a library, returns a qualified
+C<< "Library::Type" >> sort of name. Otherwise, returns the same as
+C<< name >>.
+
+=item C<< check($value) >>
+
+Returns true iff the value passes the type constraint.
+
+=item C<< validate($value) >>
+
+Returns the error message for the value; returns an explicit undef if the
+value passes the type constraint.
+
+=item C<< assert_valid($value) >>
+
+Like C<< check($value) >> but dies if the value does not pass the type
+constraint.
+
+Yes, that's three very similar methods. Blame L<Moose::Meta::TypeConstraint>
+whose API I'm attempting to emulate. :-)
+
+=back
 
 =head1 BUGS
 
@@ -179,6 +300,10 @@ Please report any bugs to
 L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
 
 =head1 SEE ALSO
+
+L<Type::Tiny::Intro>, L<Type::Library>, L<Type::Library::Util>.
+
+L<Moose::Meta::TypeConstraint>.
 
 =head1 AUTHOR
 
