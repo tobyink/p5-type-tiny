@@ -11,7 +11,8 @@ BEGIN {
 
 use Scalar::Util qw< blessed >;
 
-sub _confess ($;@) {
+sub _confess ($;@)
+{
 	require Carp;
 	@_ = sprintf($_[0], @_[1..$#_]) if @_ > 1;
 	goto \&Carp::confess;
@@ -24,51 +25,40 @@ use overload
 	fallback   => 1,
 ;
 
-my @attributes = qw<
-	name parent constraint coercion message inlined
->;
-
 sub new
 {
 	my $class  = shift;
 	my %params = (@_==1) ? %{$_[0]} : @_;
-	my $self   = bless {} => $class;	
-	exists($params{$_}) && $self->${\"_set_$_"}(delete $params{$_}) for @attributes; # self-documenting ;-)
-	_confess 'unknown parameters (%s) passed to constructor for %s', join(q[, ], sort keys %params), $class if keys %params;
-	$self->BUILD;
-	return $self;
-}
-
-sub BUILD
-{
-	my $self = shift;
 	
-	my $name;
-	defined($name = $self->name)
-		? $self->_set_message(sub { sprintf 'value "%s" did not pass type constraint "%s"', $_[0], $name })
-		: $self->_set_message(sub { sprintf 'value "%s" did not pass type constraint', $_[0] })
-		unless $self->has_message;
+	if (exists $params{parent})
+	{
+		_confess "parent must be an instance of %s", __PACKAGE__
+			unless blessed($params{parent}) && $params{parent}->isa(__PACKAGE__);
+	}
+		
+	bless \%params, $class;
 }
 
-sub _set_parent
+sub name        { $_[0]{name} }
+sub parent      { $_[0]{parent} }
+sub constraint  { $_[0]{constraint} ||= $_[0]->_build_constraint }
+sub coercion    { $_[0]{coercion} }
+sub message     { $_[0]{message}    ||= $_[0]->_build_message }
+sub inlined     { $_[0]{coercion} }
+sub has_parent  { exists $_[0]{parent} }
+sub has_inlined { exists $_[0]{inlined} }
+
+sub _build_constraint
+{
+	return sub { !!1 };
+}
+
+sub _build_message
 {
 	my $self = shift;
-	my ($parent) = @_;
-	_confess "parent must be an instance of %s", __PACKAGE__
-		unless blessed($parent) && $parent->isa(__PACKAGE__);
-	$self->{parent} = $parent;
-}
-
-for my $attr (@attributes)
-{
-	eval "sub $attr { \$_[0]{'$attr'} }"
-		unless __PACKAGE__->can("$attr");
-	eval "sub _set_$attr { \$_[0]{'$attr'} = \$_[1] }"
-		unless __PACKAGE__->can("_set_$attr");
-	eval "sub has_$attr { exists \$_[0]{'$attr'} }"
-		unless __PACKAGE__->can("has_$attr");
-	eval "sub _assert_$attr { return \$_[0]{'$attr'} if exists \$_[0]{'$attr'}; _confess '%s is not defined', '$attr'; }"
-		unless __PACKAGE__->can("_assert_$attr");
+	return sub { sprintf 'value "%s" did not pass type constraint', $_[0] } if $self->is_anon;
+	my $name = "$self";
+	return sub { sprintf 'value "%s" did not pass type constraint "%s"', $_[0], $name };
 }
 
 sub is_anon
