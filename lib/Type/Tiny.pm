@@ -112,9 +112,7 @@ sub _get_failure_level
 sub check
 {
 	my $self = shift;
-	return if $self->has_parent && !$self->parent->check($_[0]);
-	return if $self->_get_failure_level;
-	return !!1;
+	return !$self->_get_failure_level;
 }
 
 sub validate

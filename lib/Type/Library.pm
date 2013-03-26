@@ -96,9 +96,9 @@ sub add_type
 	no strict "refs";
 	my $class = blessed($meta);
 	*{"$class\::$name"   }     = sub (;$) { $type };
-	*{"$class\::is_$name"}     = sub { $type->check($_[0]) };
-	*{"$class\::to_$name"}     = sub { $type->coerce($_[0]) };
-	*{"$class\::assert_$name"} = sub { $type->assert_valid($_[0]) };
+	*{"$class\::is_$name"}     = sub ($)  { $type->check($_[0]) };
+	*{"$class\::to_$name"}     = sub ($)  { $type->coerce($_[0]) };
+	*{"$class\::assert_$name"} = sub ($)  { $type->assert_valid($_[0]) };
 	return $type;
 }
 
