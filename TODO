@@ -6,3 +6,4 @@
 - documentation
 - standard type library of types, based on Moose built-ins, plus MooseX::Types::Structured
 - Sub::Exporter-style renaming of exports from type libraries
+- Mouse compat?
