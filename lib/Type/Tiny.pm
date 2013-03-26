@@ -293,6 +293,19 @@ constraint.
 Yes, that's three very similar methods. Blame L<Moose::Meta::TypeConstraint>
 whose API I'm attempting to emulate. :-)
 
+=item C<< coerce($value) >>
+
+Not implemented yet.
+
+=item C<< assert_coerce($value) >>
+
+Not implemented yet.
+
+=item C<< as_moose >>
+
+Returns a L<Moose::Meta::TypeConstraint> object equivalent to this Type::Tiny
+object.
+
 =back
 
 =head2 Overloading
