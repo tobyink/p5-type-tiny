@@ -1,6 +1,7 @@
 - coercions
 - inlinable type checks
+- parameterizable types
 - sanity check type names
 - class_type, role_type, duck_type, enum, union, intersection
 - documentation
-- standard type library of types, based on Moose built-ins
+- standard type library of types, based on Moose built-ins, plus MooseX::Types::Structured
