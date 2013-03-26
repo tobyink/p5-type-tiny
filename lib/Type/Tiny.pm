@@ -115,6 +115,12 @@ sub check
 	return !$self->_get_failure_level;
 }
 
+sub get_message
+{
+	my $self = shift;
+	$self->message->(@_);
+}
+
 sub validate
 {
 	my $self = shift;
@@ -123,7 +129,7 @@ sub validate
 	return undef unless defined $failed_at;
 	
 	local $_ = $_[0];
-	return $failed_at->message->($_[0]);
+	return $failed_at->get_message($_[0]);
 }
 
 sub assert_valid
@@ -134,7 +140,7 @@ sub assert_valid
 	return !!1 unless defined $failed_at;
 	
 	local $_ = $_[0];
-	_confess $failed_at->message->($_[0]);
+	_confess $failed_at->get_message($_[0]);
 }
 
 sub coerce
