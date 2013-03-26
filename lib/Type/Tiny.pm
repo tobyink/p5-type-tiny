@@ -119,7 +119,7 @@ sub _get_failure_level
 sub check
 {
 	my $self = shift;
-	return !$self->_get_failure_level;
+	return !$self->_get_failure_level(@_);
 }
 
 sub get_message
