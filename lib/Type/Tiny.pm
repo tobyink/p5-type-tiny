@@ -24,6 +24,9 @@ use overload
 	q(&{})     => sub { my $t = shift; sub { $t->assert_valid(@_) } },
 	fallback   => 1,
 ;
+use if ($] >= 5.010001), overload =>
+	q(~~)      => sub { $_[0]->check($_[1]) },
+;
 
 sub new
 {
@@ -291,6 +294,28 @@ constraint.
 
 Yes, that's three very similar methods. Blame L<Moose::Meta::TypeConstraint>
 whose API I'm attempting to emulate. :-)
+
+=back
+
+=head2 Overloading
+
+=over
+
+=item *
+
+Stringification is overloaded to return the qualified name.
+
+=item *
+
+Boolification is overloaded to always return true.
+
+=item *
+
+Coderefification is overloaded to call C<assert_value>.
+
+=item *
+
+On Perl 5.10.1 and above, smart match is overloaded to call C<check>.
 
 =back
 
