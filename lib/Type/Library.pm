@@ -122,3 +122,137 @@ sub type_names
 
 1;
 
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Type::Library - tiny, yet Moo(se)-compatible type libraries
+
+=head1 SYNOPSIS
+
+	package MyTypes {
+		use Scalar::Util qw(looks_like_number);
+		use base "Type::Library";
+		use Type::Tiny;
+		
+		my $NUM = "Type::Tiny"->new(
+			name       => "Number",
+			constraint => sub { looks_like_number($_) },
+			message    => sub { "$_ ain't a number" },
+		);
+		
+		__PACKAGE__->meta->add_type($NUM);
+	}
+		
+	package Ermintrude {
+		use Moo;
+		use MyTypes qw(Number);
+		has favourite_number => (is => "ro", isa => Number);
+	}
+	
+	# Note the "-moose" flag when importing!
+	package Bullwinkle {
+		use Moose;
+		use MyTypes -moose, qw(Number);
+		has favourite_number => (is => "ro", isa => Number);
+	}
+
+=head1 DESCRIPTION
+
+L<Type::Library> is a tiny class for creating MooseX::Types-like type
+libraries which are compatible with Moo and Moose.
+
+If you're reading this because you want to create a type library, then
+you're probably better off reading L<Type::Tiny::Intro>.
+
+=head2 Methods
+
+A type library is a singleton class. Use the C<meta> method to get a blessed
+object which other methods can get called on. For example:
+
+	MyTypes->meta->add_type($foo);
+
+=over
+
+=item C<< add_type($type) >> or C<< add_type(%opts) >>
+
+Add a type to the library. If C<< %opts >> is given, then this method calls
+C<< Type::Tiny->new(%opts) >> first, and adds the resultant type.
+
+Adding a type named "Foo" to the library will automatically define four
+functions in the library's namespace:
+
+=over
+
+=item C<< Foo >>
+
+Returns the Type::Tiny object.
+
+=item C<< is_Foo($value) >>
+
+Returns true iff $value passes the type contraint.
+
+=item C<< assert_Foo($value) >>
+
+Returns true iff $value passes the type contraint. Dies otherwise.
+
+=item C<< to_Foo($value) >>
+
+Coerces the value to the type. (Not implemented yet.)
+
+=back
+
+=item C<< get_type($name) >>
+
+Gets the C<Type::Tiny> object corresponding to the name.
+
+=item C<< has_type($name) >>
+
+Boolean; returns true if the type exists in the library.
+
+=item C<< type_names >>
+
+List all types defined by the library.
+
+=item C<< import(@args) >>
+
+Type::Library-based libraries are exporters.
+
+=back
+
+=head2 Export
+
+Not yet documented.
+
+=head1 BUGS
+
+Please report any bugs to
+L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
+
+=head1 SEE ALSO
+
+L<Type::Tiny::Intro>, L<Type::Library>, L<Type::Library::Util>.
+
+L<Moose::Meta::TypeConstraint>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
