@@ -104,6 +104,7 @@ sub parents
 sub _get_failure_level
 {
 	my $self = shift;
+	_confess "need an argument!" unless @_;
 	
 	if ($self->has_parent)
 	{
