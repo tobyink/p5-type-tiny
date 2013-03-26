@@ -94,6 +94,13 @@ sub is_anon
 	$self->name eq "__ANON__";
 }
 
+sub parents
+{
+	my $self = shift;
+	return unless $self->has_parent;
+	return ($self->parent, $self->parent->parents);
+}
+
 sub _get_failure_level
 {
 	my $self = shift;
