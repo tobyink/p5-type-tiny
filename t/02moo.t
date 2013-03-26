@@ -1,9 +1,37 @@
+=pod
+
+=encoding utf-8
+
+=head1 PURPOSE
+
+Check type constraints work with L<Moo>. Checks values that should pass
+and should fail; checks error messages.
+
+=head1 DEPENDENCIES
+
+Uses the bundled BiggerLib.pm type library.
+
+Test is skipped if Moo 1.001000 is not available.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
 use strict;
 use warnings;
 use lib qw( . ./t ../inc ./inc );
 
 use Test::More;
-use Test::Requires Moo => 2.00;
+use Test::Requires { Moo => 1.001000 };
 use Test::Fatal;
 
 {

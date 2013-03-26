@@ -1,9 +1,38 @@
+=pod
+
+=encoding utf-8
+
+=head1 PURPOSE
+
+Checks that type constraints continue to work when a L<Moo> class is
+inflated to a L<Moose> class. Checks that Moo::HandleMoose correctly
+calls back to Type::Tiny to build Moose type constraints.
+
+=head1 DEPENDENCIES
+
+Uses the bundled BiggerLib.pm type library.
+
+Test is skipped if Moo 1.001000 and Moose 2.0000 are not available.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
 use strict;
 use warnings;
 use lib qw( . ./t ../inc ./inc );
 
 use Test::More;
-use Test::Requires Moo => 2.00;
+use Test::Requires { Moo => 1.001000, Moose => 2.0000 };
 use Test::Fatal;
 
 {

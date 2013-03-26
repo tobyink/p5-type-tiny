@@ -4,7 +4,7 @@
 
 =head1 PURPOSE
 
-Test that Type::Tiny compiles.
+Test that Type::Tiny, Type::Library and Type::Library::Util compile.
 
 =head1 AUTHOR
 
@@ -25,6 +25,8 @@ use warnings;
 use Test::More;
 
 use_ok('Type::Tiny');
+use_ok('Type::Library');
+use_ok('Type::Library::Util');
 
 done_testing;
 
