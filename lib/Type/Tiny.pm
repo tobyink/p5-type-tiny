@@ -289,6 +289,10 @@ For non-anonymous type constraints that have a library, returns a qualified
 C<< "Library::Type" >> sort of name. Otherwise, returns the same as
 C<< name >>.
 
+=item C<< parents >>
+
+Returns a list of all this type constraint's all ancestor constraints.
+
 =item C<< check($value) >>
 
 Returns true iff the value passes the type constraint.
@@ -305,6 +309,11 @@ constraint.
 
 Yes, that's three very similar methods. Blame L<Moose::Meta::TypeConstraint>
 whose API I'm attempting to emulate. :-)
+
+=item C<< get_message($value) >>
+
+Returns the error message for the value; even if the value passes the type
+constraint.
 
 =item C<< coerce($value) >>
 
