@@ -59,9 +59,17 @@ sub message     { $_[0]{message}    ||= $_[0]->_build_message }
 sub inlined     { $_[0]{inlined} }
 sub library     { $_[0]{library} }
 
-sub has_parent  { exists $_[0]{parent} }
-sub has_inlined { exists $_[0]{inlined} }
-sub has_library { exists $_[0]{library} }
+sub has_parent   { exists $_[0]{parent} }
+sub has_inlined  { exists $_[0]{inlined} }
+sub has_library  { exists $_[0]{library} }
+sub has_coercion { exists $_[0]{coercion} }
+
+sub _assert_coercion
+{
+	my $self = shift;
+	$self->has_coercion or _confess "no coercion for this type constraint";
+	return $self->coercion;
+}
 
 sub _build_constraint
 {
@@ -153,12 +161,14 @@ sub assert_valid
 
 sub coerce
 {
-	...;
+	my $self = shift;
+	$self->_assert_coercion->coerce(@_);
 }
 
 sub assert_coerce
 {
-	...;
+	my $self = shift;
+	$self->_assert_coercion->assert_coerce(@_);
 }
 
 sub as_moose
@@ -169,7 +179,7 @@ sub as_moose
 	$options{parent}     = $self->parent->as_moose if $self->has_parent;
 	$options{constraint} = $self->constraint;
 	$options{message}    = $self->message;
-	# ... coerce
+	# XXX - ... coercion
 	
 	require Moose::Meta::TypeConstraint;
 	return "Moose::Meta::TypeConstraint"->new(%options);
