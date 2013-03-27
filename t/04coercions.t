@@ -6,8 +6,6 @@
 
 Checks that the coercion functions exported by a type library work as expected.
 
-B<< Not yet implemented! >>
-
 =head1 DEPENDENCIES
 
 Uses the bundled BiggerLib.pm type library.
@@ -29,9 +27,26 @@ use strict;
 use warnings;
 use lib qw( . ./t ../inc ./inc );
 
-use Test::More skip_all => "not implemeted yet; tests not even written yet!";
-use Test::Fatal;
+use Test::More;
 
 use BiggerLib qw(:to);
+
+is(
+	to_BigInteger(8),
+	18,
+	'to_BigInteger converts a small integer OK'
+);
+
+is(
+	to_BigInteger(17),
+	17,
+	'to_BigInteger leaves an existing BigInteger OK'
+);
+
+is(
+	to_BigInteger(3.14),
+	3.14,
+	'to_BigInteger ignores something it cannot coerce'
+);
 
 done_testing;

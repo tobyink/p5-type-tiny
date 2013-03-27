@@ -34,17 +34,32 @@ sub new
 	return $self;
 }
 
-sub type_constraint   { $_[0]{type_constraint} }
-sub type_coercion_map { $_[0]{type_coercion_map} ||= [] }
+sub type_constraint     { $_[0]{type_constraint} }
+sub type_coercion_map   { $_[0]{type_coercion_map} ||= [] }
+
+sub has_type_constraint { exists $_[0]{type_constraint} }
 
 sub coerce
 {
-	...;
+	my $self = shift;
+	my $c = $self->type_coercion_map;
+	local $_ = $_[0];
+	for (my $i = 0; $i <= $#$c; $i += 2)
+	{
+		return scalar $c->[$i+1]->(@_) if $c->[$i]->check(@_);
+	}
+	return $_[0];
 }
 
 sub assert_coerce
 {
-	...;
+	my $self = shift;
+	my $r = $self->coerce(@_);
+	if ($self->has_type_constraint)
+	{
+		$self->type_constraint->assert_valid($r);
+	}
+	return $r;
 }
 
 sub has_coercion_for_type
@@ -54,7 +69,14 @@ sub has_coercion_for_type
 
 sub has_coercion_for_value
 {
-	...;
+	my $self = shift;
+	my $c = $self->type_coercion_map;
+	local $_ = $_[0];
+	for (my $i = 0; $i <= $#$c; $i += 2)
+	{
+		return !!1 if $c->[$i]->check(@_);
+	}
+	return;
 }
 
 sub add_type_coercions

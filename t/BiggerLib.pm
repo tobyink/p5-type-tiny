@@ -41,4 +41,19 @@ declare "BigInteger",
 	as "Integer",
 	where { $_ >= 10 };
 
+# No sugar for coercion yet
+require Type::Coercion;
+my $small = __PACKAGE__->get_type("SmallInteger");
+my $big   = __PACKAGE__->get_type("BigInteger");
+$small->{coercion} = "Type::Coercion"->new;
+$big->{coercion} = "Type::Coercion"->new;
+
+$small->coercion->add_type_coercions(
+	$big, sub { abs($_) % 10 },
+);
+
+$big->coercion->add_type_coercions(
+	$small, sub { abs($_) + 10 },
+);
+
 1;
