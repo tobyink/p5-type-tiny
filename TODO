@@ -4,7 +4,7 @@
 - class_type, role_type, duck_type, enum, union, intersection
 - documentation
 - standard type library of types, based on Moose built-ins, plus MooseX::Types::Structured
-- Sub::Exporter-style renaming of exports from type libraries
 - Mouse compat?
 - implement has_coercion_for_type; this means I need to be able to figure out when $type1 >= $type2
 - create "plus_coercions" and "minus_coercions" methods for Type::Tiny which create a new anonymous subtypewith additional/fewer coercions
+
