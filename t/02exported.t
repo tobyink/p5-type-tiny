@@ -60,4 +60,12 @@ like(
 	"coderef overload works (value that should throw)",
 );
 
+use DemoLib String => {
+	-prefix  => "foo",
+	-as      => "bar",
+	-suffix  => "baz",
+};
+
+is(foobarbaz->qualified_name, "DemoLib::String", "Sub::Exporter-style export renaming");
+
 done_testing;

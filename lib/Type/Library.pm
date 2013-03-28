@@ -19,6 +19,16 @@ sub _confess ($;@)
 	goto \&Carp::confess;
 }
 
+{
+	my $got_subname;
+	sub _subname ($$)
+	{
+		$got_subname = 1 && goto \&Sub::Name::subname
+			if $got_subname || eval "require Sub::Name";
+		return $_[1];
+	}
+}
+
 sub import
 {
 	my $meta             = shift->meta;
@@ -30,22 +40,26 @@ sub import
 sub _process_tags
 {
 	my $meta = shift; # private; no need for ->meta
+	my @args = @_;
 	my ($opts, @exports) = ({});
 	
-	for my $arg (@_)
+	while (defined(my $arg = shift @args))
 	{
+		my %arg_opts = ref $args[0] ? %{shift @args} : ();
+		my $optify   = sub {+{ sub => $_[0], %arg_opts }};
+		
 		if ($arg =~ /^[:-]moose$/i)
 			{ $opts->{moose} = 1 }
 		elsif ($arg =~ /^[:-]all$/i)
-			{ push @exports, map { $_, "is_$_", "to_$_", "assert_$_" } $meta->type_names }
+			{ push @exports, map $optify->($_), map { $_, "is_$_", "to_$_", "assert_$_" } $meta->type_names }
 		elsif ($arg =~ /^[:-](assert|is|to)$/i)
-			{ push @exports, map "$1\_$_", $meta->type_names }
+			{ push @exports, map $optify->($_), map "$1\_$_", $meta->type_names }
 		elsif ($arg =~ /^[:-]types$/i)
-			{ push @exports, $meta->type_names }
+			{ push @exports, map $optify->($_), $meta->type_names }
 		elsif ($arg =~ /^\+(.+)$/i)
-			{ push @exports, map { $_, "is_$_", "to_$_", "assert_$_" } $1 }
+			{ push @exports, map $optify->($_), map { $_, "is_$_", "to_$_", "assert_$_" } $1 }
 		else
-			{ push @exports, $arg }
+			{ push @exports, map $optify->($_), $arg }
 	}
 	
 	return ($opts, @exports);
@@ -54,24 +68,31 @@ sub _process_tags
 sub _export
 {
 	my $meta = shift; # private; no need for ->meta
-	my ($subname, $opts) = @_;
+	my ($sub, $opts) = @_;
 	my $class = blessed($meta);
 	
+	my $type;
+	my $export_coderef;
+	my $export_as        = $sub->{sub};
+	my $export_to        = $opts->{caller};
+	
+	if ($sub->{sub} =~ /^(is|to|assert)_/ and my $coderef = $class->can($sub->{sub}))
+		{ $export_coderef = $coderef }
+	elsif ($opts->{moose} and $type = $meta->get_type($sub->{sub}))
+		{ $export_coderef = sub (;$) { $type->as_moose(@_) } }
+	elsif ($type = $meta->get_type($sub->{sub}))
+		{ $export_coderef = sub (;$) { @_ ? $type->with_params(@_) : $type } }
+	else
+		{ _confess "'%s' is not exported by '%s'", $sub->{sub}, $class }
+	
+	$export_as = $sub->{-as}                if exists $sub->{-as};
+	$export_as = $sub->{-prefix}.$export_as if exists $sub->{-prefix};
+	$export_as = $export_as.$sub->{-suffix} if exists $sub->{-suffix};
+	
+	my $export_fullname = join("::", $export_to, $export_as);
+	
 	no strict "refs";
-	if ($subname =~ /^(is|to|assert)_/ and my $coderef = $class->can($subname))
-	{
-		*{join("::", $opts->{caller}, $subname)} = $coderef;
-		return;
-	}
-	
-	if (my $type = $meta->get_type($subname))
-	{
-		*{join("::", $opts->{caller}, $subname)} =
-			$opts->{moose} ? sub (;$) { $type->as_moose(@_) } : sub (;$) { @_ ? $type->with_params(@_) : $type };
-		return;
-	}
-	
-	_confess "'%s' is not exported by '%s'", $subname, $class;
+	*{$export_fullname} = _subname $export_fullname => $export_coderef;
 }
 
 sub meta
