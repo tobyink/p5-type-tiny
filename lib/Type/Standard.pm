@@ -108,8 +108,7 @@ declare "HashRef",
 			$param->check($_) || return for values %$hash;
 			return !!1;
 		};
-	};
-	
+	};	
 
 declare "ScalarRef",
 	as "Ref",
@@ -144,6 +143,22 @@ declare "Maybe",
 	};
 
 # TODO: things from MooseX::Types::Structured
+
+declare "Map",
+	as "HashRef",
+	where { ref $_ eq "HASH" },
+	constraint_generator => sub
+	{
+		my ($keys, $values) = @_;
+		return sub
+		{
+			my $hash = shift;
+			$keys->check($_)   || return for keys %$hash;
+			$values->check($_) || return for values %$hash;
+			return !!1;
+		};
+	};
+
 # TODO: inline_as
 
 1;
