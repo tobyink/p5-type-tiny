@@ -79,9 +79,9 @@ sub _export
 	if ($sub->{sub} =~ /^(is|to|assert)_/ and my $coderef = $class->can($sub->{sub}))
 		{ $export_coderef = $coderef }
 	elsif ($opts->{moose} and $type = $meta->get_type($sub->{sub}))
-		{ $export_coderef = sub (;$) { $type->as_moose(@_) } }
+		{ $export_coderef = _subname $type->qualified_name, sub (;$) { $type->as_moose(@_) } }
 	elsif ($type = $meta->get_type($sub->{sub}))
-		{ $export_coderef = sub (;$) { @_ ? $type->with_params(@_) : $type } }
+		{ $export_coderef = _subname $type->qualified_name, sub (;$) { @_ ? $type->with_params(@_) : $type } }
 	else
 		{ _confess "'%s' is not exported by '%s'", $sub->{sub}, $class }
 	
@@ -92,7 +92,7 @@ sub _export
 	my $export_fullname = join("::", $export_to, $export_as);
 	
 	no strict "refs";
-	*{$export_fullname} = _subname $export_fullname => $export_coderef;
+	*{$export_fullname} = $export_coderef;
 }
 
 sub meta
@@ -116,10 +116,10 @@ sub add_type
 	
 	no strict "refs";
 	my $class = blessed($meta);
-	*{"$class\::$name"   }     = sub (;$) { $type };
-	*{"$class\::is_$name"}     = sub ($)  { $type->check($_[0]) };
-	*{"$class\::to_$name"}     = sub ($)  { $type->coerce($_[0]) };
-	*{"$class\::assert_$name"} = sub ($)  { $type->assert_valid($_[0]) };
+	*{"$class\::$name"   }     = _subname $type->qualified_name, sub (;$) { $type };
+	*{"$class\::is_$name"}     = _subname $type->qualified_name, sub ($)  { $type->check($_[0]) };
+	*{"$class\::to_$name"}     = _subname $type->qualified_name, sub ($)  { $type->coerce($_[0]) };
+	*{"$class\::assert_$name"} = _subname $type->qualified_name, sub ($)  { $type->assert_valid($_[0]) };
 	return $type;
 }
 
