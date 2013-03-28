@@ -51,18 +51,18 @@ sub new
 	return $self;
 }
 
-sub name        { $_[0]{name} }
-sub parent      { $_[0]{parent} }
-sub constraint  { $_[0]{constraint} ||= $_[0]->_build_constraint }
-sub coercion    { $_[0]{coercion} }
-sub message     { $_[0]{message}    ||= $_[0]->_build_message }
-sub inlined     { $_[0]{inlined} }
-sub library     { $_[0]{library} }
+sub name                     { $_[0]{name} }
+sub parent                   { $_[0]{parent} }
+sub constraint               { $_[0]{constraint} ||= $_[0]->_build_constraint }
+sub coercion                 { $_[0]{coercion}   ||= $_[0]->_build_coercion }
+sub message                  { $_[0]{message}    ||= $_[0]->_build_message }
+sub library                  { $_[0]{library} }
+sub constraint_generator     { $_[0]{constraint_generator} }
 
-sub has_parent   { exists $_[0]{parent} }
-sub has_inlined  { exists $_[0]{inlined} }
-sub has_library  { exists $_[0]{library} }
-sub has_coercion { exists $_[0]{coercion} }
+sub has_parent               { exists $_[0]{parent} }
+sub has_library              { exists $_[0]{library} }
+sub has_coercion             { exists $_[0]{coercion} }
+sub has_constraint_generator { exists $_[0]{constraint_generator} }
 
 sub _assert_coercion
 {
@@ -74,6 +74,12 @@ sub _assert_coercion
 sub _build_constraint
 {
 	return sub { !!1 };
+}
+
+sub _build_coercion
+{
+	my $self = shift;
+	return "Type::Coercion"->new(type_constraint => $self);
 }
 
 sub _build_message
@@ -171,6 +177,20 @@ sub assert_coerce
 	$self->_assert_coercion->assert_coerce(@_);
 }
 
+sub parameterize
+{
+	my $self = shift;
+	return $self unless @_;
+	$self->has_constraint_generator
+		or _confess "type '%s' does not accept parameters", $self;
+	
+	local $_ = $_[0];
+	ref($self)->new(
+		parent     => $self,
+		constraint => $self->constraint_generator->(@_),
+	);
+}
+
 sub as_moose
 {	
 	my $self = shift;
@@ -261,18 +281,20 @@ coderef will not be called unless the value is known to pass any parent
 type constraint. Defaults to C<< sub { 1 } >> - i.e. a coderef that passes
 all values.
 
+=item C<< constraint_generator >>
+
+Coderef that generates a new type contraint based on parameters. Optional.
+This is used to create type constraints like C<< ArrayRef[Int] >>.
+
 =item C<< coercion >>
 
-(Not implemented yet.)
+Returns a L<Type::Coercion> object associated with this type (or creates
+one if it does not exist).
 
 =item C<< message >>
 
 Coderef that returns an error message when C<< $_ >> does not validate
 against the type constraint. Optional (there's a vaguely sensible default.)
-
-=item C<< inlined >>
-
-(Not implemented yet.)
 
 =item C<< library >>
 
@@ -286,7 +308,7 @@ the type into the package.
 
 =over
 
-=item C<< has_parent >>, C<< has_inlined >>, C<< has_library >>
+=item C<< has_parent >>, C<< has_coercion >>, C<< has_library >>, C<< has_constraint_generator >>
 
 Predicate methods.
 

@@ -4,7 +4,7 @@
 
 =head1 PURPOSE
 
-Checks various values against the type constraints from Type::Standard
+Checks various values against the type constraints from Type::Standard.
 
 =head1 AUTHOR
 
@@ -110,5 +110,17 @@ ok should_fail(undef, ClassName);
 ok should_fail([], ClassName);
 ok should_pass("Local::Class$_", ClassName) for 2..4;
 ok should_fail("Local::Dummy1", ClassName);
+
+ok should_pass([], ArrayRef[Int]);
+ok should_pass([1,2,3], ArrayRef[Int]);
+ok should_fail([1.1,2,3], ArrayRef[Int]);
+ok should_fail([1,2,3.1], ArrayRef[Int]);
+ok should_fail([[]], ArrayRef[Int]);
+ok should_pass([[3]], ArrayRef[ArrayRef[Int]]);
+ok should_fail([["A"]], ArrayRef[ArrayRef[Int]]);
+
+ok should_pass(undef, Maybe[Int]);
+ok should_pass(123, Maybe[Int]);
+ok should_fail(1.3, Maybe[Int]);
 
 done_testing;

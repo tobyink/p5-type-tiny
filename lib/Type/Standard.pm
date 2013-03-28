@@ -84,21 +84,65 @@ declare "FileHandle",
 
 declare "ArrayRef",
 	as "Ref",
-	where { ref $_ eq "ARRAY" };
+	where { ref $_ eq "ARRAY" },
+	constraint_generator => sub
+	{
+		my $param = shift;
+		return sub
+		{
+			my $array = shift;
+			$param->check($_) || return for @$array;
+			return !!1;
+		};
+	};
 
 declare "HashRef",
 	as "Ref",
-	where { ref $_ eq "HASH" };
+	where { ref $_ eq "HASH" },
+	constraint_generator => sub
+	{
+		my $param = shift;
+		return sub
+		{
+			my $hash = shift;
+			$param->check($_) || return for values %$hash;
+			return !!1;
+		};
+	};
+	
 
 declare "ScalarRef",
 	as "Ref",
-	where { ref $_ eq "SCALAR" or ref $_ eq "REF" };
+	where { ref $_ eq "SCALAR" or ref $_ eq "REF" },
+	constraint_generator => sub
+	{
+		my $param = shift;
+		return sub
+		{
+			my $ref = shift;
+			$param->check($$ref) || return;
+			return !!1;
+		};
+	};
 
 declare "Object",
 	as "Ref",
 	where { blessed $_ };
 
-# TODO: Maybe
+declare "Maybe",
+	as "Item",
+	where { 1 },
+	constraint_generator => sub
+	{
+		my $param = shift;
+		return sub
+		{
+			my $value = shift;
+			return !!1 unless defined $value;
+			return $param->check($value);
+		};
+	};
+
 # TODO: things from MooseX::Types::Structured
 # TODO: inline_as
 
