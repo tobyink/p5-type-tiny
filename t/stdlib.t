@@ -27,6 +27,10 @@ use Test::More;
 
 use Type::Standard -all;
 
+# avoid prototype
+no warnings "redefine";
+sub ok { goto \&Test::More::ok }
+
 sub should_pass
 {
 	my ($value, $type) = @_;
