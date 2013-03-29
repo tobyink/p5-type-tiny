@@ -54,7 +54,7 @@ declare "Num",
 declare "Int",
 	as "Num",
 	where { /\A-?[0-9]+\z/ },
-	inline_as { "$_ =~ /\A-?[0-9]+\z/" };
+	inline_as { "defined $_ and $_ =~ /\A-?[0-9]+\z/" };
 
 declare "ClassName",
 	as "Str",
