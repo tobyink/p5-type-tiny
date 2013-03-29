@@ -220,17 +220,24 @@ sub parameterize
 }
 
 sub as_moose
-{	
+{
 	my $self = shift;
 	
-	my %options = (name => $self->qualified_name);
-	$options{parent}     = $self->parent->as_moose if $self->has_parent;
-	$options{constraint} = $self->constraint;
-	$options{message}    = $self->message;
-	# XXX - ... coercion
+	unless ($self->{as_moose})
+	{
+		my %options = (name => $self->qualified_name);
+		$options{parent}     = $self->parent->as_moose   if $self->has_parent;
+		$options{constraint} = $self->constraint         unless $self->_is_null_constraint;
+		$options{message}    = $self->message;
+		$options{inlined}    = $self->inlined            if $self->has_inlined;
+		
+		require Moose::Meta::TypeConstraint;
+		$self->{as_moose} = "Moose::Meta::TypeConstraint"->new(%options);
+		
+		$self->{as_moose}->coercion($self->coercion->as_moose) if $self->has_coercion;
+	}
 	
-	require Moose::Meta::TypeConstraint;
-	return "Moose::Meta::TypeConstraint"->new(%options);
+	return $self->{as_moose};
 }
 
 1;

@@ -100,4 +100,20 @@ sub add_type_coercions
 	return $self;
 }
 
+sub as_moose
+{
+	my $self = shift;
+	return $self->{as_moose} if $self->{as_moose};
+	
+	my %options = ();
+	$options{type_coercion_map} = [
+		map { blessed($_) && $_->can("as_moose") ? $_->as_moose : $_ }
+		@{ $self->type_coercion_map }
+	];
+	$options{type_constraint} = $self->type_constraint if $self->has_type_constraint;
+	
+	require Moose::Meta::TypeCoercion;
+	$self->{as_moose} = "Moose::Meta::TypeCoercion"->new(%options);
+}
+
 1;
