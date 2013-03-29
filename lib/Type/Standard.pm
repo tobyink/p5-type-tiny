@@ -17,11 +17,9 @@ sub _is_class_loaded {
 	return !!0;
 }
 
-declare "Any",
-	where { 1 };
+declare "Any";
 
-declare "Item",
-	where { 1 };
+declare "Item";
 
 declare "Bool",
 	as "Item",
@@ -130,7 +128,6 @@ declare "Object",
 
 declare "Maybe",
 	as "Item",
-	where { 1 },
 	constraint_generator => sub
 	{
 		my $param = shift;

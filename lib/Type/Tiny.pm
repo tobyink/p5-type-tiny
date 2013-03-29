@@ -71,9 +71,16 @@ sub _assert_coercion
 	return $self->coercion;
 }
 
+my $null_constraint = sub { !!1 };
+
 sub _build_constraint
 {
-	return sub { !!1 };
+	return $null_constraint;
+}
+
+sub _is_null_constraint
+{
+	shift->constraint == $null_constraint;
 }
 
 sub _build_coercion
