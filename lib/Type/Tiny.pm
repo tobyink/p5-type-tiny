@@ -59,12 +59,14 @@ sub message                  { $_[0]{message}    ||= $_[0]->_build_message }
 sub library                  { $_[0]{library} }
 sub inlined                  { $_[0]{inlined} }
 sub constraint_generator     { $_[0]{constraint_generator} }
+sub inline_generator         { $_[0]{inline_generator} }
 
 sub has_parent               { exists $_[0]{parent} }
 sub has_library              { exists $_[0]{library} }
 sub has_coercion             { exists $_[0]{coercion} }
 sub has_inlined              { exists $_[0]{inlined} }
 sub has_constraint_generator { exists $_[0]{constraint_generator} }
+sub has_inline_generator     { exists $_[0]{inline_generator} }
 
 sub _assert_coercion
 {
@@ -193,6 +195,11 @@ sub inline_check
 	$r =~ /[;{}]/ ? "(do { $r })" : "($r)";
 }
 
+sub _inline_check
+{
+	shift->inline_check(@_);
+}
+
 sub coerce
 {
 	my $self = shift;
@@ -213,10 +220,20 @@ sub parameterize
 		or _confess "type '%s' does not accept parameters", $self;
 	
 	local $_ = $_[0];
-	ref($self)->new(
-		parent     => $self,
+	my %options = (
 		constraint => $self->constraint_generator->(@_),
 	);
+	$options{inlined} = $self->inline_generator->(@_)
+		if $self->has_inline_generator;
+	delete $options{inlined} unless defined $options{inlined};
+	
+	return $self->create_child_type(%options);
+}
+
+sub create_child_type
+{
+	my $self = shift;
+	return ref($self)->new(parent => $self, @_);
 }
 
 sub as_moose
@@ -391,6 +408,19 @@ Not implemented yet.
 
 Not implemented yet.
 
+=item C<< inline_check($varname) >>
+
+Creates a type constraint check for a particular variable as a string of
+Perl code. For example:
+
+	print( Type::Standard::Num->inline_check('$foo') );
+
+prints the following output:
+
+	(!ref($foo) && Scalar::Util::looks_like_number($foo))
+
+For Moose-compat, there is an alias C<< _inline_check >> for this method.
+
 =item C<< as_moose >>
 
 Returns a L<Moose::Meta::TypeConstraint> object equivalent to this Type::Tiny
@@ -427,7 +457,8 @@ L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
 
 =head1 SEE ALSO
 
-L<Type::Tiny::Intro>, L<Type::Library>, L<Type::Library::Util>.
+L<Type::Tiny::Intro>, L<Type::Library>, L<Type::Library::Util>,
+L<Type::Standard>, L<Type::Coercion>.
 
 L<Moose::Meta::TypeConstraint>.
 

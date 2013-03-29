@@ -53,7 +53,8 @@ declare "Num",
 
 declare "Int",
 	as "Num",
-	where { /\A-?[0-9]+\z/ };
+	where { /\A-?[0-9]+\z/ },
+	inline_as { "$_ =~ /\A-?[0-9]+\z/" };
 
 declare "ClassName",
 	as "Str",
@@ -95,6 +96,7 @@ declare "FileHandle",
 declare "ArrayRef",
 	as "Ref",
 	where { ref $_ eq "ARRAY" },
+	inline_as { "ref($_) eq 'ARRAY'" },
 	constraint_generator => sub
 	{
 		my $param = shift;
@@ -104,11 +106,27 @@ declare "ArrayRef",
 			$param->check($_) || return for @$array;
 			return !!1;
 		};
+	},
+	inline_generator => sub {
+		my $param = shift;
+		return unless $param->can_be_inlined;
+		my $param_check = $param->inline_check('$i');
+		return sub {
+			my $v = $_[1];
+			"ref($v) eq 'ARRAY' and do { "
+			.  "my \$ok = 1; "
+			.  "for my \$i (\@{$v}) { "
+			.    "\$ok = 0 && last unless $param_check "
+			.  "}; "
+			.  "\$ok "
+			."}"
+		};
 	};
 
 declare "HashRef",
 	as "Ref",
 	where { ref $_ eq "HASH" },
+	inline_as { "ref($_) eq 'HASH'" },
 	constraint_generator => sub
 	{
 		my $param = shift;
@@ -118,11 +136,27 @@ declare "HashRef",
 			$param->check($_) || return for values %$hash;
 			return !!1;
 		};
-	};	
+	},
+	inline_generator => sub {
+		my $param = shift;
+		return unless $param->can_be_inlined;
+		my $param_check = $param->inline_check('$i');
+		return sub {
+			my $v = $_[1];
+			"ref($v) eq 'HASH' and do { "
+			.  "my \$ok = 1; "
+			.  "for my \$i (values \%{$v}) { "
+			.    "\$ok = 0 && last unless $param_check "
+			.  "}; "
+			.  "\$ok "
+			."}"
+		};
+	};
 
 declare "ScalarRef",
 	as "Ref",
 	where { ref $_ eq "SCALAR" or ref $_ eq "REF" },
+	inline_as { "ref($_) eq 'SCALAR' or ref($_) eq 'REF'" },
 	constraint_generator => sub
 	{
 		my $param = shift;
@@ -131,6 +165,22 @@ declare "ScalarRef",
 			my $ref = shift;
 			$param->check($$ref) || return;
 			return !!1;
+		};
+	},
+	inline_generator => sub {
+		my $param = shift;
+		return unless $param->can_be_inlined;
+		my $param_check = $param->inline_check('$i');
+		# kinda clumsy, but it does the job...
+		return sub {
+			my $v = $_[1];
+			"ref($v) eq 'SCALAR' or ref($v) eq 'REF' and do { "
+			.  "my \$ok = 1; "
+			.  "for my \$i (${$v}) { "
+			.    "\$ok = 0 unless $param_check "
+			.  "}; "
+			.  "\$ok "
+			."}"
 		};
 	};
 
@@ -149,6 +199,15 @@ declare "Maybe",
 			return !!1 unless defined $value;
 			return $param->check($value);
 		};
+	},
+	inline_generator => sub {
+		my $param = shift;
+		return unless $param->can_be_inlined;
+		return sub {
+			my $v = $_[1];
+			my $param_check = $param->inline_check($v);
+			"!defined($v) or $param_check";
+		};
 	};
 
 # TODO: things from MooseX::Types::Structured
@@ -156,6 +215,7 @@ declare "Maybe",
 declare "Map",
 	as "HashRef",
 	where { ref $_ eq "HASH" },
+	inline_as { "ref($_) eq 'HASH'" },
 	constraint_generator => sub
 	{
 		my ($keys, $values) = @_;
@@ -165,6 +225,25 @@ declare "Map",
 			$keys->check($_)   || return for keys %$hash;
 			$values->check($_) || return for values %$hash;
 			return !!1;
+		};
+	},
+	inline_generator => sub {
+		my ($k, $v) = @_;
+		return unless $k->can_be_inlined && $v->can_be_inlined;
+		my $k_check = $k->inline_check('$k');
+		my $v_check = $v->inline_check('$v');
+		return sub {
+			my $h = $_[1];
+			"ref($h) eq 'HASH' and do { "
+			.  "my \$ok = 1; "
+			.  "for my \$v (values \%{$h}) { "
+			.    "\$ok = 0 && last unless $v_check "
+			.  "}; "
+			.  "for my \$k (keys \%{$h}) { "
+			.    "\$ok = 0 && last unless $k_check "
+			.  "}; "
+			.  "\$ok "
+			."}"
 		};
 	};
 
