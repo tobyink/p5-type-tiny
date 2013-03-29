@@ -57,11 +57,13 @@ sub constraint               { $_[0]{constraint} ||= $_[0]->_build_constraint }
 sub coercion                 { $_[0]{coercion}   ||= $_[0]->_build_coercion }
 sub message                  { $_[0]{message}    ||= $_[0]->_build_message }
 sub library                  { $_[0]{library} }
+sub inlined                  { $_[0]{inlined} }
 sub constraint_generator     { $_[0]{constraint_generator} }
 
 sub has_parent               { exists $_[0]{parent} }
 sub has_library              { exists $_[0]{library} }
 sub has_coercion             { exists $_[0]{coercion} }
+sub has_inlined              { exists $_[0]{inlined} }
 sub has_constraint_generator { exists $_[0]{constraint_generator} }
 
 sub _assert_coercion
@@ -170,6 +172,25 @@ sub assert_valid
 	
 	local $_ = $_[0];
 	_confess $failed_at->get_message($_[0]);
+}
+
+sub can_be_inlined
+{
+	my $self = shift;
+	return $self->parent->can_be_inlined
+		if $self->has_parent && $self->_is_null_constraint;
+	return $self->has_inlined;
+}
+
+sub inline_check
+{
+	my $self = shift;
+	_confess "cannot inline type constraint check for %s", $self
+		unless $self->can_be_inlined;
+	return $self->parent->inline_check(@_)
+		if $self->has_parent && $self->_is_null_constraint;
+	my $r = $self->inlined->($self, @_);
+	$r =~ /[;{}]/ ? "(do { $r })" : "($r)";
 }
 
 sub coerce

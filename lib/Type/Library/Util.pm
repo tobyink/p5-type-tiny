@@ -15,7 +15,7 @@ use Type::Library;
 use Type::Tiny;
 
 use Exporter qw< import >;
-our @EXPORT = qw< declare as where message extends >;
+our @EXPORT = qw< declare as where message extends inline_as >;
 
 sub as ($;@)
 {
@@ -25,6 +25,12 @@ sub as ($;@)
 sub where (&;@)
 {
 	constraint => @_;
+}
+
+sub inline_as (&;@)
+{
+	my $coderef = shift;
+	inlined => sub { local $_ = $_[1]; $coderef->(@_) }, @_;
 }
 
 sub message (&;@)

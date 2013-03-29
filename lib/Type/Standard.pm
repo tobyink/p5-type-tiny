@@ -17,9 +17,11 @@ sub _is_class_loaded {
 	return !!0;
 }
 
-declare "Any";
+declare "Any",
+	inline_as { "!!1" };
 
-declare "Item";
+declare "Item",
+	inline_as { "!!1" };
 
 declare "Bool",
 	as "Item",
@@ -27,15 +29,18 @@ declare "Bool",
 
 declare "Undef",
 	as "Item",
-	where { !defined $_ };
+	where { !defined $_ },
+	inline_as { "!defined($_)" };
 
 declare "Defined",
 	as "Item",
-	where { defined $_ };
+	where { defined $_ },
+	inline_as { "defined($_)" };
 
 declare "Value",
 	as "Defined",
-	where { not ref $_ };
+	where { not ref $_ },
+	inline_as { "!ref($_)" };
 
 declare "Str",
 	as "Value",
@@ -43,7 +48,8 @@ declare "Str",
 
 declare "Num",
 	as "Str",
-	where { looks_like_number $_ };
+	where { looks_like_number $_ },
+	inline_as { "!ref($_) && Scalar::Util::looks_like_number($_)" };
 
 declare "Int",
 	as "Num",
@@ -51,27 +57,33 @@ declare "Int",
 
 declare "ClassName",
 	as "Str",
-	where { goto \&_is_class_loaded };
+	where { goto \&_is_class_loaded },
+	inline_as { "Type::Standard::_is_class_loaded($_)" };
 
 declare "RoleName",
 	as "ClassName",
-	where { not $_->can("new") };
+	where { not $_->can("new") },
+	inline_as { "Type::Standard::_is_class_loaded($_) and not $_->can('new')" };
 
 declare "Ref",
 	as "Defined",
-	where { ref $_ };
+	where { ref $_ },
+	inline_as { "!!ref($_)" };
 
 declare "CodeRef",
 	as "Ref",
-	where { ref $_ eq "CODE" };
+	where { ref $_ eq "CODE" },
+	inline_as { "ref($_) eq 'CODE'" };
 
 declare "RegexpRef",
 	as "Ref",
-	where { ref $_ eq "Regexp" };
+	where { ref $_ eq "Regexp" },
+	inline_as { "ref($_) eq 'Regexp'" };
 
 declare "GlobRef",
 	as "Ref",
-	where { ref $_ eq "GLOB" };
+	where { ref $_ eq "GLOB" },
+	inline_as { "ref($_) eq 'GLOB'" };
 
 declare "FileHandle",
 	as "Ref",
