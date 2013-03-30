@@ -4,7 +4,7 @@
 
 =head1 PURPOSE
 
-Checks role type constraints work.
+Checks duck type constraints work.
 
 =head1 DEPENDENCIES
 
@@ -55,17 +55,19 @@ sub should_fail
 	goto \&Test::More::ok;
 }
 
-isa_ok(DoesQuux, "Type::Tiny", "DoesQuux");
-isa_ok(DoesQuux, "Type::Tiny::Role", "DoesQuux");
+isa_ok(CanFooBar, "Type::Tiny", "CanFooBar");
+isa_ok(CanFooBaz, "Type::Tiny::Duck", "CanFooBar");
 
-should_fail("Foo::Bar"->new, DoesQuux);
-should_pass("Foo::Baz"->new, DoesQuux);
+should_pass("Foo::Bar"->new, CanFooBar);
+should_fail("Foo::Bar"->new, CanFooBaz);
+should_pass("Foo::Baz"->new, CanFooBar);
+should_pass("Foo::Baz"->new, CanFooBaz);
 
-should_fail(undef, DoesQuux);
-should_fail({}, DoesQuux);
-should_fail(FooBar, DoesQuux);
-should_fail(FooBaz, DoesQuux);
-should_fail(DoesQuux, DoesQuux);
-should_fail("Quux", DoesQuux);
+should_fail(undef, CanFooBar);
+should_fail({}, CanFooBar);
+should_fail(FooBar, CanFooBar);
+should_fail(FooBaz, CanFooBar);
+should_fail(CanFooBar, CanFooBar);
+should_fail("Foo::Bar", CanFooBar);
 
 done_testing;

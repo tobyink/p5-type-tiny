@@ -56,6 +56,8 @@ declare "DoesQuux", role "Quux";
 {
 	package Foo::Bar;
 	sub new { my $c = shift; bless {@_}, $c }
+	sub foo { 1 }
+	sub bar { 2 }
 }
 
 declare "FooBar", class "Foo::Bar";
@@ -67,9 +69,15 @@ declare "FooBar", class "Foo::Bar";
 		return 1 if $_[1] eq 'Quux';
 		$_[0]->isa($_[0]);
 	}
+	sub foo { 3 }
+	sub baz { 4 }
 }
 
 declare "FooBaz", class "Foo::Baz";
+
+declare "CanFooBar", duck_type[qw/ foo bar /];
+
+declare "CanFooBaz", duck_type[qw/ foo baz /];
 
 # No sugar for coercion yet
 require Type::Coercion;
