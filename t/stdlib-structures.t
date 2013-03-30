@@ -27,37 +27,35 @@ use Test::More;
 
 use Type::Standard -all;
 
-# avoid prototype
-no warnings "redefine";
-sub ok { goto \&Test::More::ok }
-
 sub should_pass
 {
 	my ($value, $type) = @_;
-	return (
+	@_ = (
 		!!$type->check($value),
 		defined $value
 			? sprintf("value '%s' passes type constraint '%s'", $value, $type)
 			: sprintf("undef passes type constraint '%s'", $type),
 	);
+	goto \&Test::More::ok;
 }
 
 sub should_fail
 {
 	my ($value, $type) = @_;
-	return (
+	@_ = (
 		!$type->check($value),
 		defined $value
 			? sprintf("value '%s' fails type constraint '%s'", $value, $type)
 			: sprintf("undef fails type constraint '%s'", $type),
 	);
+	goto \&Test::More::ok;
 }
 
 my $struct1 = Map[Int, Num];
 
-ok should_pass({1=>111,2=>222}, $struct1);
-ok should_pass({1=>1.1,2=>2.2}, $struct1);
-ok should_fail({1=>"Str",2=>222}, $struct1);
-ok should_pass({1.1=>1,2=>2.2}, $struct1);
+should_pass({1=>111,2=>222}, $struct1);
+should_pass({1=>1.1,2=>2.2}, $struct1);
+should_fail({1=>"Str",2=>222}, $struct1);
+should_fail({1.1=>1,2=>2.2}, $struct1);
 
 done_testing;

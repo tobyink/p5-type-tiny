@@ -27,71 +27,70 @@ use Test::More;
 
 use Type::Standard -all;
 
-# avoid prototype
-no warnings "redefine";
-sub ok { goto \&Test::More::ok }
-
 sub should_pass
 {
 	my ($value, $type) = @_;
-	return (
+	@_ = (
 		!!$type->check($value),
 		defined $value
 			? sprintf("value '%s' passes type constraint '%s'", $value, $type)
 			: sprintf("undef passes type constraint '%s'", $type),
 	);
+	goto \&Test::More::ok;
 }
 
 sub should_fail
 {
 	my ($value, $type) = @_;
-	return (
+	@_ = (
 		!$type->check($value),
 		defined $value
 			? sprintf("value '%s' fails type constraint '%s'", $value, $type)
 			: sprintf("undef fails type constraint '%s'", $type),
 	);
+	goto \&Test::More::ok;
 }
 
 my $var = 123;
-ok should_pass(\$var, ScalarRef);
-ok should_pass([], ArrayRef);
-ok should_pass(+{}, HashRef);
-ok should_pass(sub {0}, CodeRef);
-ok should_pass(\*STDOUT, GlobRef);
-ok should_pass(\(\"Hello"), Ref);
-ok should_pass(\*STDOUT, FileHandle);
-ok should_pass(qr{x}, RegexpRef);
-ok should_pass(1, Str);
-ok should_pass(1, Num);
-ok should_pass(1, Int);
-ok should_pass(1, Defined);
-ok should_pass(1, Value);
-ok should_pass(undef, Undef);
-ok should_pass(undef, Item);
-ok should_pass(undef, Any);
-ok should_pass('Scalar::should_pass', ClassName);
-ok should_pass('Scalar::should_pass', RoleName);
+should_pass(\$var, ScalarRef);
+should_pass([], ArrayRef);
+should_pass(+{}, HashRef);
+should_pass(sub {0}, CodeRef);
+should_pass(\*STDOUT, GlobRef);
+should_pass(\(\"Hello"), Ref);
+should_pass(\*STDOUT, FileHandle);
+should_pass(qr{x}, RegexpRef);
+should_pass(1, Str);
+should_pass(1, Num);
+should_pass(1, Int);
+should_pass(1, Defined);
+should_pass(1, Value);
+should_pass(undef, Undef);
+should_pass(undef, Item);
+should_pass(undef, Any);
+should_pass('Type::Tiny', ClassName);
+should_pass('Type::Library', RoleName);
 
-ok should_pass(undef, Bool);
-ok should_pass('', Bool);
-ok should_pass(0, Bool);
-ok should_pass(1, Bool);
-ok should_fail(7, Bool);
-ok should_pass(\(\"Hello"), ScalarRef);
+should_pass(undef, Bool);
+should_pass('', Bool);
+should_pass(0, Bool);
+should_pass(1, Bool);
+should_fail(7, Bool);
+should_pass(\(\"Hello"), ScalarRef);
+should_fail('Type::Tiny', RoleName);
 
-ok should_fail([], Str);
-ok should_fail([], Num);
-ok should_fail([], Int);
-ok should_pass("4x4", Str);
-ok should_fail("4x4", Num);
-ok should_fail("4.2", Int);
+should_fail([], Str);
+should_fail([], Num);
+should_fail([], Int);
+should_pass("4x4", Str);
+should_fail("4x4", Num);
+should_fail("4.2", Int);
 
-ok should_fail(undef, Str);
-ok should_fail(undef, Num);
-ok should_fail(undef, Int);
-ok should_fail(undef, Defined);
-ok should_fail(undef, Value);
+should_fail(undef, Str);
+should_fail(undef, Num);
+should_fail(undef, Int);
+should_fail(undef, Defined);
+should_fail(undef, Value);
 
 {
 	package Local::Class1;
@@ -110,21 +109,21 @@ ok should_fail(undef, Value);
 	sub XYZ () { 1 }
 }
 
-ok should_fail(undef, ClassName);
-ok should_fail([], ClassName);
-ok should_pass("Local::Class$_", ClassName) for 2..4;
-ok should_fail("Local::Dummy1", ClassName);
+should_fail(undef, ClassName);
+should_fail([], ClassName);
+should_pass("Local::Class$_", ClassName) for 2..4;
+should_fail("Local::Dummy1", ClassName);
 
-ok should_pass([], ArrayRef[Int]);
-ok should_pass([1,2,3], ArrayRef[Int]);
-ok should_fail([1.1,2,3], ArrayRef[Int]);
-ok should_fail([1,2,3.1], ArrayRef[Int]);
-ok should_fail([[]], ArrayRef[Int]);
-ok should_pass([[3]], ArrayRef[ArrayRef[Int]]);
-ok should_fail([["A"]], ArrayRef[ArrayRef[Int]]);
+should_pass([], ArrayRef[Int]);
+should_pass([1,2,3], ArrayRef[Int]);
+should_fail([1.1,2,3], ArrayRef[Int]);
+should_fail([1,2,3.1], ArrayRef[Int]);
+should_fail([[]], ArrayRef[Int]);
+should_pass([[3]], ArrayRef[ArrayRef[Int]]);
+should_fail([["A"]], ArrayRef[ArrayRef[Int]]);
 
-ok should_pass(undef, Maybe[Int]);
-ok should_pass(123, Maybe[Int]);
-ok should_fail(1.3, Maybe[Int]);
+should_pass(undef, Maybe[Int]);
+should_pass(123, Maybe[Int]);
+should_fail(1.3, Maybe[Int]);
 
 done_testing;
