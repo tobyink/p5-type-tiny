@@ -40,7 +40,7 @@ declare "Defined",
 declare "Value",
 	as "Defined",
 	where { not ref $_ },
-	inline_as { "!ref($_)" };
+	inline_as { "defined($_) and not ref($_)" };
 
 declare "Str",
 	as "Value",
@@ -54,7 +54,7 @@ declare "Num",
 declare "Int",
 	as "Num",
 	where { /\A-?[0-9]+\z/ },
-	inline_as { "defined $_ and $_ =~ /\A-?[0-9]+\z/" };
+	inline_as { "defined $_ and $_ =~ /\\A-?[0-9]+\\z/" };
 
 declare "ClassName",
 	as "Str",
