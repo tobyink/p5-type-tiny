@@ -1,4 +1,3 @@
-- get test suite passing again re stdlibs
 - sanity check type names
 - class_type, role_type, duck_type, enum, union, intersection
 - documentation
