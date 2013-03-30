@@ -15,11 +15,19 @@ use Type::Library;
 use Type::Tiny;
 
 use Exporter qw< import >;
-our @EXPORT = qw< declare as where message extends inline_as >;
+our @EXPORT = qw< 
+	declare as where message extends inline_as
+	class
+>;
 
 sub as ($;@)
 {
 	parent => @_;
+}
+
+sub class ($;@)
+{
+	bless => "Type::Tiny::Class", class => @_;
 }
 
 sub where (&;@)
@@ -61,7 +69,18 @@ sub declare
 	
 	$opts{library} = blessed($caller) || $caller;
 	
-	my $type = "Type::Tiny"->new(%opts);
+	my $type;
+	if (defined $opts{parent})
+	{
+		$type = delete($opts{parent})->create_child_type(%opts);
+	}
+	else
+	{
+		my $bless = delete($opts{bless}) || "Type::Tiny";
+		eval "require $bless";
+		$type = $bless->new(%opts);
+	}
+	
 	$caller->add_type($type) unless $type->is_anon;
 	return $type;
 }

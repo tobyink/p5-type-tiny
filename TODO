@@ -1,5 +1,10 @@
 - sanity check type names
-- class_type, role_type, duck_type, enum, union, intersection
+- subclasses of Type::Tiny, along same lines as Type::Tiny::Class
+	- role_type
+	- duck_type
+	- enum
+	- union
+	- intersection
 - documentation
 - expand standard type library of types:
 	- MooseX::Types::Structured

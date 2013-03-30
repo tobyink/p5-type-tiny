@@ -6,7 +6,11 @@
 
 Type library used in several test cases.
 
-Defines types C<SmallInteger> and C<BigInteger>. Library extends DemoLib.pm.
+Defines types C<SmallInteger> and C<BigInteger>.
+Defines classes C<Foo::Bar> and C<Foo::Baz> along with correponding
+C<FooBar> and C<FooBaz> class types.
+
+Library extends DemoLib.pm.
 
 =head1 AUTHOR
 
@@ -40,6 +44,21 @@ declare "SmallInteger",
 declare "BigInteger",
 	as "Integer",
 	where { $_ >= 10 };
+
+
+{
+	package Foo::Bar;
+	sub new { my $c = shift; bless {@_}, $c }
+}
+
+declare "FooBar", class "Foo::Bar";
+
+{
+	package Foo::Baz;
+	use base "Foo::Bar";
+}
+
+declare "FooBaz", class "Foo::Baz";
 
 # No sugar for coercion yet
 require Type::Coercion;
