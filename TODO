@@ -1,6 +1,5 @@
 - sanity check type names
 - subclasses of Type::Tiny, along same lines as Type::Tiny::Class
-	- role_type
 	- duck_type
 	- enum
 	- union

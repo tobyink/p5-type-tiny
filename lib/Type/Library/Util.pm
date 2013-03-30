@@ -17,7 +17,7 @@ use Type::Tiny;
 use Exporter qw< import >;
 our @EXPORT = qw< 
 	declare as where message extends inline_as
-	class
+	class role
 >;
 
 sub as ($;@)
@@ -28,6 +28,11 @@ sub as ($;@)
 sub class ($;@)
 {
 	bless => "Type::Tiny::Class", class => @_;
+}
+
+sub role ($;@)
+{
+	bless => "Type::Tiny::Role", role => @_;
 }
 
 sub where (&;@)

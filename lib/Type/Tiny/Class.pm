@@ -5,8 +5,8 @@ use strict;
 use warnings;
 
 BEGIN {
-	$Type::Tiny::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::VERSION   = '0.001';
+	$Type::Tiny::Class::AUTHORITY = 'cpan:TOBYINK';
+	$Type::Tiny::Class::VERSION   = '0.001';
 }
 
 use Scalar::Util qw< blessed >;

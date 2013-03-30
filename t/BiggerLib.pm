@@ -8,7 +8,8 @@ Type library used in several test cases.
 
 Defines types C<SmallInteger> and C<BigInteger>.
 Defines classes C<Foo::Bar> and C<Foo::Baz> along with correponding
-C<FooBar> and C<FooBaz> class types.
+C<FooBar> and C<FooBaz> class type constraints; defines role C<Quux>
+and the C<DoesQuux> role type constraint.
 
 Library extends DemoLib.pm.
 
@@ -45,6 +46,12 @@ declare "BigInteger",
 	as "Integer",
 	where { $_ >= 10 };
 
+{
+	package Quux;
+	our $VERSION = 1;
+}
+
+declare "DoesQuux", role "Quux";
 
 {
 	package Foo::Bar;
@@ -56,6 +63,10 @@ declare "FooBar", class "Foo::Bar";
 {
 	package Foo::Baz;
 	use base "Foo::Bar";
+	sub DOES {
+		return 1 if $_[1] eq 'Quux';
+		$_[0]->isa($_[0]);
+	}
 }
 
 declare "FooBaz", class "Foo::Baz";
