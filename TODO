@@ -4,6 +4,7 @@
 - test cases
 	- inlining of class, role and duck types
 	- inlining of unions, intersections and complements
+	- Overload from stdlib
 - documentation
 - expand standard type library of types:
 	- MooseX::Types::Structured

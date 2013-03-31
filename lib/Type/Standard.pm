@@ -210,6 +210,32 @@ declare "Maybe",
 		};
 	};
 
+use overload ();
+declare "Overload",
+	as "Object",
+	where { overload::Overloaded($_) },
+	inline_as { "Scalar::Util::blessed($_) and overload::Overloaded($_)" },
+	constraint_generator => sub
+	{
+		my @operations = @_;
+		return sub {
+			my $value = shift;
+			for my $op (@operations) {
+				return unless overload::Method($value, $op);
+			}
+			return !!1;
+		}
+	},
+	inline_generator => sub {
+		my @operations = @_;
+		return sub {
+			my $v = $_[1];
+			join " and ",
+				"Scalar::Util::blessed($v)",
+				map "overload::Method($v, q[$_])", @operations;
+		};
+	};
+
 # TODO: things from MooseX::Types::Structured
 
 declare "Map",
@@ -246,8 +272,6 @@ declare "Map",
 			."}"
 		};
 	};
-
-# TODO: inline_as
 
 1;
 
