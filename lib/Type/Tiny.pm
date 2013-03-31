@@ -22,6 +22,9 @@ use overload
 	q("")      => sub { $_[0]->qualified_name },
 	q(bool)    => sub { 1 },
 	q(&{})     => sub { my $t = shift; sub { $t->assert_valid(@_) } },
+	q(|)       => sub { my @tc = _swap(@_); require Type::Tiny::Union; "Type::Tiny::Union"->new(type_constraints => \@tc) },
+	q(&)       => sub { my @tc = _swap(@_); require Type::Tiny::Intersection; "Type::Tiny::Intersection"->new(type_constraints => \@tc) },
+	q(^)       => sub { my @tc = _swap(@_); require Type::Tiny::Complement; "Type::Tiny::Complement"->new(type_constraints => \@tc) },
 	fallback   => 1,
 ;
 use if ($] >= 5.010001), overload =>
