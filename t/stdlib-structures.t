@@ -88,4 +88,15 @@ should_fail([1, 1.1, 2.1], $struct3);
 should_fail([1, 1.1, 2, 2.2, 2.3, 2.4, "xyz"], $struct3);
 should_fail([1, 1.1, undef], $struct3);
 
+my $struct4 = Dict[ name => Str, age => Int, height => Optional[Num] ];
+
+should_pass({ name => "Bob", age => 40, height => 1.76 }, $struct4);
+should_pass({ name => "Bob", age => 40 }, $struct4);
+should_fail({ name => "Bob" }, $struct4);
+should_fail({ age => 40 }, $struct4);
+should_fail({ name => "Bob", age => 40.1 }, $struct4);
+should_fail({ name => "Bob", age => 40, weight => 80.3 }, $struct4);
+should_fail({ name => "Bob", age => 40, height => 1.76, weight => 80.3 }, $struct4);
+should_fail({ name => "Bob", age => 40, height => "xyz" }, $struct4);
+
 done_testing;

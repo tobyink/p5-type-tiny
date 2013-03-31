@@ -1,5 +1,8 @@
 package Type::Standard;
 
+use strict;
+use warnings;
+
 use base "Type::Library";
 use Type::Library::Util;
 
@@ -290,10 +293,7 @@ declare "Optional",
 		sub { exists($_[0]) ? $param->check($_[0]) : !!1 }
 	};
 
-sub slurpy ($)
-{
-	return +{ slurpy => $_[0] };
-}
+sub slurpy ($) { +{ slurpy => $_[0] } }
 
 declare "Tuple",
 	as "ArrayRef",
@@ -325,6 +325,27 @@ declare "Tuple",
 			{
 				$constraints[$i]->check(exists $value->[$i] ? $value->[$i] : ()) or return;
 			}
+			return !!1;
+		};
+	};
+
+declare "Dict",
+	as "HashRef",
+	where { ref $_ eq "HASH" },
+	inline_as { "ref($_) eq 'HASH'" },
+	name_generator => sub
+	{
+		my ($s, %a) = @_;
+		sprintf('%s[%s]', $s, join q[,], map sprintf("%s=>%s", $_, $a{$_}), sort keys %a);
+	},
+	constraint_generator => sub
+	{
+		my %constraints = @_;		
+		return sub
+		{
+			my $value = $_[0];
+			exists ($constraints{$_}) || return for sort keys %$value;
+			$constraints{$_}->check(exists $value->{$_} ? $value->{$_} : ()) || return for sort keys %constraints;
 			return !!1;
 		};
 	};
