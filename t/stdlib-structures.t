@@ -73,6 +73,7 @@ should_fail([1.1, 1.1], $struct2);
 should_fail([1, 1.1, 2.1], $struct2);
 should_fail([1, 1.1, 2.1], $struct2);
 should_fail([1, 1.1, 2, 2.2, 2.3, 2.4, "xyz"], $struct2);
+should_fail([1, 1.1, undef], $struct2);
 should_pass([1, 1.1], $struct3);
 should_pass([1, 1.1, 2], $struct3);
 should_fail([1, 1.1, 2, 2.2], $struct3);
@@ -85,5 +86,6 @@ should_fail([1.1, 1.1], $struct3);
 should_fail([1, 1.1, 2.1], $struct3);
 should_fail([1, 1.1, 2.1], $struct3);
 should_fail([1, 1.1, 2, 2.2, 2.3, 2.4, "xyz"], $struct3);
+should_fail([1, 1.1, undef], $struct3);
 
 done_testing;
