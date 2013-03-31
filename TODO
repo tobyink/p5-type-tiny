@@ -1,10 +1,9 @@
 - sanity check type names
 - subclasses of Type::Tiny
 	- enum
-	- union
-	- intersection
 - test cases
 	- inlining of class, role and duck types
+	- inlining of unions, intersections and complements
 - documentation
 - expand standard type library of types:
 	- MooseX::Types::Structured

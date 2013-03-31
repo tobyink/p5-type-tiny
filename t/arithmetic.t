@@ -126,4 +126,54 @@ should_fail(undef, ~(Maybe[Int]));
 should_fail(123, ~(Maybe[Int]));
 should_pass(1.3, ~(Maybe[Int]));
 
+my $even = "Type::Tiny"->new(
+	name       => "Even",
+	parent     => Int,
+	constraint => sub { !(abs($_) % 2) },
+);
+
+my $odd = "Type::Tiny"->new(
+	name       => "Even",
+	parent     => Int,
+	constraint => sub { !!(abs($_) % 2) },
+);
+
+my $positive = "Type::Tiny"->new(
+	name       => "Positive",
+	parent     => Int,
+	constraint => sub { $_ > 0 },
+);
+
+my $negative = "Type::Tiny"->new(
+	name       => "Negative",
+	parent     => Int,
+	constraint => sub { $_ < 0 },
+);
+
+should_pass(-2, $even & $negative);
+should_pass(-1, $odd & $negative);
+should_pass(0, $even & ~$negative & ~$positive);
+should_pass(1, $odd & $positive);
+should_pass(2, $even & $positive);
+should_pass(3, $even | $odd);
+should_pass(4, $even | $odd);
+should_pass(5, $negative | $positive);
+should_pass(-6, $negative | $positive);
+
+should_fail(-3, $even & $negative);
+should_fail(1, $odd & $negative);
+should_fail(1, $even & ~$negative & ~$positive);
+should_fail(2, $odd & $positive);
+should_fail(1, $even & $positive);
+should_fail("Str", $even | $odd);
+should_fail(1.1, $even | $odd);
+should_fail(0, $negative | $positive);
+should_fail("Str", $negative | $positive);
+
+is(
+	($even & ~$negative & ~$positive)->display_name,
+	"Even&~Negative&~Positive",
+	"coolio stringification",
+);
+
 done_testing;

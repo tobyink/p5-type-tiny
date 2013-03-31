@@ -18,6 +18,8 @@ sub _confess ($;@)
 	goto \&Carp::confess;
 }
 
+sub _swap { $_[2] ? @_[1,0] : @_[0,1] }
+
 use overload
 	q("")      => sub { $_[0]->display_name },
 	q(bool)    => sub { 1 },
@@ -55,7 +57,7 @@ sub new
 }
 
 sub name                     { $_[0]{name} }
-sub display_name             { $_[0]{display_name}   ||= $_[0]->name }
+sub display_name             { $_[0]{display_name}   ||= $_[0]->_build_display_name }
 sub parent                   { $_[0]{parent} }
 sub constraint               { $_[0]{constraint}     ||= $_[0]->_build_constraint }
 sub coercion                 { $_[0]{coercion}       ||= $_[0]->_build_coercion }
@@ -81,6 +83,11 @@ sub _assert_coercion
 }
 
 my $null_constraint = sub { !!1 };
+
+sub _build_display_name
+{
+	shift->name;
+}
 
 sub _build_constraint
 {
