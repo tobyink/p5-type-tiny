@@ -76,7 +76,22 @@ declare "RoleName",
 declare "Ref",
 	as "Defined",
 	where { ref $_ },
-	inline_as { "!!ref($_)" };
+	inline_as { "!!ref($_)" },
+	constraint_generator => sub
+	{
+		my $reftype = shift;
+		return sub {
+			ref($_[0]) and Scalar::Util::reftype($_[0]) eq $reftype;
+		}
+	},
+	inline_generator => sub
+	{
+		my $reftype = shift;
+		return sub {
+			my $v = $_[1];
+			"ref($v) and Scalar::Util::reftype($v) eq q($reftype)";
+		};
+	};
 
 declare "CodeRef",
 	as "Ref",

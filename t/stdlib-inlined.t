@@ -147,4 +147,13 @@ should_pass(undef, Maybe[Int]);
 should_pass(123, Maybe[Int]);
 should_fail(1.3, Maybe[Int]);
 
+should_pass(bless([], "Local::Class4"), Ref["ARRAY"]);
+should_pass(bless({}, "Local::Class4"), Ref["HASH"]);
+should_pass([], Ref["ARRAY"]);
+should_pass({}, Ref["HASH"]);
+should_fail(bless([], "Local::Class4"), Ref["HASH"]);
+should_fail(bless({}, "Local::Class4"), Ref["ARRAY"]);
+should_fail([], Ref["HASH"]);
+should_fail({}, Ref["ARRAY"]);
+
 done_testing;
