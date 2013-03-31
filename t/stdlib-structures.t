@@ -25,7 +25,7 @@ use lib qw( . ./t ../inc ./inc );
 
 use Test::More;
 
-use Type::Standard -all;
+use Type::Standard -all, "slurpy";
 
 sub should_pass
 {
@@ -57,5 +57,33 @@ should_pass({1=>111,2=>222}, $struct1);
 should_pass({1=>1.1,2=>2.2}, $struct1);
 should_fail({1=>"Str",2=>222}, $struct1);
 should_fail({1.1=>1,2=>2.2}, $struct1);
+
+my $struct2 = Tuple[Int, Num, Optional[Int], slurpy ArrayRef[Num]];
+my $struct3 = Tuple[Int, Num, Optional[Int]];
+
+should_pass([1, 1.1], $struct2);
+should_pass([1, 1.1, 2], $struct2);
+should_pass([1, 1.1, 2, 2.2], $struct2);
+should_pass([1, 1.1, 2, 2.2, 2.3], $struct2);
+should_pass([1, 1.1, 2, 2.2, 2.3, 2.4], $struct2);
+should_fail({}, $struct2);
+should_fail([], $struct2);
+should_fail([1], $struct2);
+should_fail([1.1, 1.1], $struct2);
+should_fail([1, 1.1, 2.1], $struct2);
+should_fail([1, 1.1, 2.1], $struct2);
+should_fail([1, 1.1, 2, 2.2, 2.3, 2.4, "xyz"], $struct2);
+should_pass([1, 1.1], $struct3);
+should_pass([1, 1.1, 2], $struct3);
+should_fail([1, 1.1, 2, 2.2], $struct3);
+should_fail([1, 1.1, 2, 2.2, 2.3], $struct3);
+should_fail([1, 1.1, 2, 2.2, 2.3, 2.4], $struct3);
+should_fail({}, $struct3);
+should_fail([], $struct3);
+should_fail([1], $struct3);
+should_fail([1.1, 1.1], $struct3);
+should_fail([1, 1.1, 2.1], $struct3);
+should_fail([1, 1.1, 2.1], $struct3);
+should_fail([1, 1.1, 2, 2.2, 2.3, 2.4, "xyz"], $struct3);
 
 done_testing;

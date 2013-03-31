@@ -67,6 +67,7 @@ sub inlined                  { $_[0]{inlined} }
 sub constraint_generator     { $_[0]{constraint_generator} }
 sub inline_generator         { $_[0]{inline_generator} }
 sub name_generator           { $_[0]{name_generator} ||= $_[0]->_build_name_generator }
+sub parameters               { $_[0]{parameters} }
 
 sub has_parent               { exists $_[0]{parent} }
 sub has_library              { exists $_[0]{library} }
@@ -150,7 +151,6 @@ sub parents
 sub _get_failure_level
 {
 	my $self = shift;
-	_confess "need an argument!" unless @_;
 	
 	if ($self->has_parent)
 	{
@@ -159,7 +159,7 @@ sub _get_failure_level
 	}
 	
 	local $_ = $_[0];
-	return if $self->constraint->($_[0]);
+	return if $self->constraint->(@_);
 	return $self;
 }
 
@@ -179,22 +179,22 @@ sub validate
 {
 	my $self = shift;
 	
-	my $failed_at = $self->_get_failure_level($_[0]);
+	my $failed_at = $self->_get_failure_level(@_);
 	return undef unless defined $failed_at;
 	
 	local $_ = $_[0];
-	return $failed_at->get_message($_[0]);
+	return $failed_at->get_message(@_);
 }
 
 sub assert_valid
 {
 	my $self = shift;
 	
-	my $failed_at = $self->_get_failure_level($_[0]);
+	my $failed_at = $self->_get_failure_level(@_);
 	return !!1 unless defined $failed_at;
 	
 	local $_ = $_[0];
-	_confess $failed_at->get_message($_[0]);
+	_confess $failed_at->get_message(@_);
 }
 
 sub can_be_inlined
@@ -244,6 +244,7 @@ sub parameterize
 	my %options = (
 		constraint   => $self->constraint_generator->(@_),
 		display_name => $self->name_generator->($self, @_),
+		parameters   => [@_],
 	);
 	$options{inlined} = $self->inline_generator->(@_)
 		if $self->has_inline_generator;

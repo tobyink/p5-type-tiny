@@ -3,6 +3,8 @@ package Type::Standard;
 use base "Type::Library";
 use Type::Library::Util;
 
+our @EXPORT_OK = qw( slurpy );
+
 use Scalar::Util qw( blessed looks_like_number );
 
 sub _is_class_loaded {
@@ -277,6 +279,53 @@ declare "Map",
 			.  "}; "
 			.  "\$ok "
 			."}"
+		};
+	};
+
+declare "Optional",
+	as "Item",
+	constraint_generator => sub
+	{
+		my $param = shift;
+		sub { exists($_[0]) ? $param->check($_[0]) : !!1 }
+	};
+
+sub slurpy ($)
+{
+	return +{ slurpy => $_[0] };
+}
+
+declare "Tuple",
+	as "ArrayRef",
+	where { ref $_ eq "ARRAY" },
+	inline_as { "ref($_) eq 'ARRAY'" },
+	name_generator => sub
+	{
+		my ($s, @a) = @_;
+		sprintf('%s[%s]', $s, join q[,], map { ref($_) eq "HASH" ? sprintf("slurpy %s", $_->{slurpy}) : $_ } @a);
+	},
+	constraint_generator => sub
+	{
+		my @constraints = @_;
+		my $slurpy;
+		if (exists $constraints[-1] and ref $constraints[-1] eq "HASH")
+		{
+			$slurpy = pop(@constraints)->{slurpy};
+		}
+		
+		return sub
+		{
+			my $value = $_[0];
+			if ($#constraints < $#$value)
+			{
+				$slurpy or return;
+				$slurpy->check([@$value[$#constraints+1 .. $#$value]]) or return;
+			}
+			for my $i (0 .. $#constraints)
+			{
+				$constraints[$i]->check(exists $value->[$i] ? $value->[$i] : ()) or return;
+			}
+			return !!1;
 		};
 	};
 

@@ -65,6 +65,13 @@ sub _process_tags
 	return ($opts, @exports);
 }
 
+sub _EXPORT_OK
+{
+	no strict "refs";
+	my $class = shift;
+	@{"$class\::EXPORT_OK"};
+}
+
 sub _export
 {
 	my $meta = shift; # private; no need for ->meta
@@ -82,6 +89,8 @@ sub _export
 		{ $export_coderef = _subname $type->qualified_name, sub (;$) { (@_ ? $type->parameterize(@{$_[0]}) : $type)->as_moose } }
 	elsif ($type = $meta->get_type($sub->{sub}))
 		{ $export_coderef = _subname $type->qualified_name, sub (;$) { (@_ ? $type->parameterize(@{$_[0]}) : $type) } }
+	elsif (scalar grep($_ eq $sub->{sub}, $class->_EXPORT_OK) and my $additional = $class->can($sub->{sub}))
+		{ $export_coderef = $additional }
 	else
 		{ _confess "'%s' is not exported by '%s'", $sub->{sub}, $class }
 	
