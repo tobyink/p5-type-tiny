@@ -25,7 +25,8 @@ declare "Item",
 
 declare "Bool",
 	as "Item",
-	where { !defined $_ or $_ eq q() or $_ eq '0' or $_ eq '1' };
+	where { !defined $_ or $_ eq q() or $_ eq '0' or $_ eq '1' },
+	inline_as { "!defined $_ or $_ eq q() or $_ eq '0' or $_ eq '1'" };
 
 declare "Undef",
 	as "Item",
@@ -44,7 +45,8 @@ declare "Value",
 
 declare "Str",
 	as "Value",
-	where { ref(\$_) eq 'SCALAR' or ref(\(my $val = $_)) eq 'SCALAR' };
+	where { ref(\$_) eq 'SCALAR' or ref(\(my $val = $_)) eq 'SCALAR' },
+	inline_as { "defined($_) and (ref(\\$_) eq 'SCALAR' or ref(\\(my \$val = $_)) eq 'SCALAR')" };
 
 declare "Num",
 	as "Str",
@@ -91,6 +93,10 @@ declare "FileHandle",
 	where {
 		(ref($_) eq "GLOB" && Scalar::Util::openhandle($_))
 		or (blessed($_) && $_->isa("IO::Handle"))
+	},
+	inline_as {
+		"(ref($_) eq \"GLOB\" && Scalar::Util::openhandle($_)) ".
+		"or (Scalar::Util::blessed($_) && $_->isa(\"IO::Handle\"))"
 	};
 
 declare "ArrayRef",
@@ -186,7 +192,8 @@ declare "ScalarRef",
 
 declare "Object",
 	as "Ref",
-	where { blessed $_ };
+	where { blessed $_ },
+	inline_as { "Scalar::Util::blessed($_)" };
 
 declare "Maybe",
 	as "Item",
