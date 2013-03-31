@@ -19,7 +19,7 @@ sub _confess ($;@)
 }
 
 use overload
-	q("")      => sub { $_[0]->qualified_name },
+	q("")      => sub { $_[0]->display_name },
 	q(bool)    => sub { 1 },
 	q(&{})     => sub { my $t = shift; sub { $t->assert_valid(@_) } },
 	q(|)       => sub { my @tc = _swap(@_); require Type::Tiny::Union; "Type::Tiny::Union"->new(type_constraints => \@tc) },
@@ -55,14 +55,16 @@ sub new
 }
 
 sub name                     { $_[0]{name} }
+sub display_name             { $_[0]{display_name}   ||= $_[0]->name }
 sub parent                   { $_[0]{parent} }
-sub constraint               { $_[0]{constraint} ||= $_[0]->_build_constraint }
-sub coercion                 { $_[0]{coercion}   ||= $_[0]->_build_coercion }
-sub message                  { $_[0]{message}    ||= $_[0]->_build_message }
+sub constraint               { $_[0]{constraint}     ||= $_[0]->_build_constraint }
+sub coercion                 { $_[0]{coercion}       ||= $_[0]->_build_coercion }
+sub message                  { $_[0]{message}        ||= $_[0]->_build_message }
 sub library                  { $_[0]{library} }
 sub inlined                  { $_[0]{inlined} }
 sub constraint_generator     { $_[0]{constraint_generator} }
 sub inline_generator         { $_[0]{inline_generator} }
+sub name_generator           { $_[0]{name_generator} ||= $_[0]->_build_name_generator }
 
 sub has_parent               { exists $_[0]{parent} }
 sub has_library              { exists $_[0]{library} }
@@ -102,6 +104,15 @@ sub _build_message
 	return sub { sprintf 'value "%s" did not pass type constraint', $_[0] } if $self->is_anon;
 	my $name = "$self";
 	return sub { sprintf 'value "%s" did not pass type constraint "%s"', $_[0], $name };
+}
+
+sub _build_name_generator
+{
+	my $self = shift;
+	return sub {
+		my ($s, @a) = @_;
+		sprintf('%s[%s]', $s, join q[,], @a);
+	};
 }
 
 sub qualified_name
@@ -224,7 +235,8 @@ sub parameterize
 	
 	local $_ = $_[0];
 	my %options = (
-		constraint => $self->constraint_generator->(@_),
+		constraint   => $self->constraint_generator->(@_),
+		display_name => $self->name_generator->($self, @_),
 	);
 	$options{inlined} = $self->inline_generator->(@_)
 		if $self->has_inline_generator;
@@ -250,7 +262,11 @@ sub complementary_type
 sub _build_complementary_type
 {
 	my $self = shift;
-	my %opts = (constraint => sub { not $self->check($_) });
+	my %opts = (
+		constraint   => sub { not $self->check($_) },
+		display_name => sprintf("~%s", $self),
+	);
+	$opts{display_name} =~ s/^\~{2}//;
 	$opts{inlined} = sub { shift; "not ".$self->inline_check(@_) }
 		if $self->can_be_inlined;
 	return "Type::Tiny"->new(%opts);
@@ -337,7 +353,13 @@ Moose-style constructor function.
 
 =item C<< name >>
 
-The name of the type constraint.
+The name of the type constraint. These need to conform to certain naming
+rules.
+
+=item C<< display_name >>
+
+A name to display for the type constraint when stringified. These don't
+have to conform to any naming rules.
 
 =item C<< parent >>
 
@@ -393,7 +415,7 @@ Predicate methods.
 
 =item C<< is_anon >>
 
-Returns true iff the type constraint does not have a name.
+Returns true iff the type constraint does not have a C<name>.
 
 =item C<< qualified_name >>
 

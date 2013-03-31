@@ -40,13 +40,13 @@ isa_ok DemoLib::String, "Type::Tiny", "DemoLib::String";
 isa_ok DemoLib::Number, "Type::Tiny", "DemoLib::Number";
 isa_ok DemoLib::Integer, "Type::Tiny", "DemoLib::Integer";
 
-is(String."", "DemoLib::String", "String has correct stringification");
-is(Number."", "DemoLib::Number", "Number has correct stringification");
-is(Integer."", "DemoLib::Integer", "Integer has correct stringification");
+is(String."", "String", "String has correct stringification");
+is(Number."", "Number", "Number has correct stringification");
+is(Integer."", "Integer", "Integer has correct stringification");
 
-is(DemoLib::String."", "DemoLib::String", "DemoLib::String has correct stringification");
-is(DemoLib::Number."", "DemoLib::Number", "DemoLib::Number has correct stringification");
-is(DemoLib::Integer."", "DemoLib::Integer", "DemoLib::Integer has correct stringification");
+is(DemoLib::String."", "String", "DemoLib::String has correct stringification");
+is(DemoLib::Number."", "Number", "DemoLib::Number has correct stringification");
+is(DemoLib::Integer."", "Integer", "DemoLib::Integer has correct stringification");
 
 is(
 	exception { Integer->(5) },
@@ -56,7 +56,7 @@ is(
 
 like(
 	exception { Integer->(5.5) },
-	qr{^value "5\.5" did not pass type constraint "DemoLib::Integer"},
+	qr{^value "5\.5" did not pass type constraint "Integer"},
 	"coderef overload works (value that should throw)",
 );
 
