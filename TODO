@@ -3,7 +3,6 @@
 	- enum
 	- union
 	- intersection
-	- complement (i.e. Str^Int is any string which does not look like an int)
 - test cases
 	- inlining of class, role and duck types
 - documentation

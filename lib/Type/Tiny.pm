@@ -9,7 +9,7 @@ BEGIN {
 	$Type::Tiny::VERSION   = '0.001';
 }
 
-use Scalar::Util qw< blessed >;
+use Scalar::Util qw< blessed weaken >;
 
 sub _confess ($;@)
 {
@@ -24,7 +24,7 @@ use overload
 	q(&{})     => sub { my $t = shift; sub { $t->assert_valid(@_) } },
 	q(|)       => sub { my @tc = _swap(@_); require Type::Tiny::Union; "Type::Tiny::Union"->new(type_constraints => \@tc) },
 	q(&)       => sub { my @tc = _swap(@_); require Type::Tiny::Intersection; "Type::Tiny::Intersection"->new(type_constraints => \@tc) },
-	q(^)       => sub { my @tc = _swap(@_); require Type::Tiny::Complement; "Type::Tiny::Complement"->new(type_constraints => \@tc) },
+	q(~)       => sub { shift->complementary_type },
 	fallback   => 1,
 ;
 use if ($] >= 5.010001), overload =>
@@ -239,6 +239,23 @@ sub create_child_type
 	return ref($self)->new(parent => $self, @_);
 }
 
+sub complementary_type
+{
+	my $self = shift;
+	my $r    = ($self->{complementary_type} ||= $self->_build_complementary_type);
+	weaken($self->{complementary_type});
+	return $r;
+}
+
+sub _build_complementary_type
+{
+	my $self = shift;
+	my %opts = (constraint => sub { not $self->check($_) });
+	$opts{inlined} = sub { shift; "not ".$self->inline_check(@_) }
+		if $self->can_be_inlined;
+	return "Type::Tiny"->new(%opts);
+}
+
 sub as_moose
 {
 	my $self = shift;
@@ -357,6 +374,13 @@ The package name of the type library this type is associated with.
 Optional. Informational only: setting this attribute does not install
 the type into the package.
 
+=item C<< complementary_type >>
+
+A complementary type for this type. For example, the complementary type
+for an integer type would be all things that are not integers, including
+floating point numbers, but also alphabetic strings, arrayrefs, filehandles,
+etc.
+
 =back
 
 =head2 Methods
@@ -450,6 +474,10 @@ Coderefification is overloaded to call C<assert_value>.
 =item *
 
 On Perl 5.10.1 and above, smart match is overloaded to call C<check>.
+
+=item *
+
+The C<< ~ >> operator is overloaded to call C<complementary_type>.
 
 =back
 
