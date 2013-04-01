@@ -318,6 +318,10 @@ L<Moose::Util::TypeConstraints>.
 C<declare> is a function which works like C<subtype> and C<type>. In fact,
 the latter pair are just aliases for the former.
 
+If the caller package inherits from L<Type::Library> then any non-anonymous
+types declared in the package will be automatically installed into the
+library.
+
 =item C<< intersection $name, \@constraints >>
 
 =item C<< intersection \@constraints >>
