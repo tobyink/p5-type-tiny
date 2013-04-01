@@ -27,7 +27,7 @@ use strict;
 use warnings;
 
 use Scalar::Util "looks_like_number";
-use Type::Library::Util;
+use Type::Utils;
 
 use base "Type::Library";
 

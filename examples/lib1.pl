@@ -4,7 +4,7 @@ use warnings;
 BEGIN {
 	package Local::TypeLib; no thanks;
 	
-	use Type::Library::Util;
+	use Type::Utils;
 	use Data::Dumper;
 	use Scalar::Util "looks_like_number";
 	

@@ -269,7 +269,7 @@ L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
 
 =head1 SEE ALSO
 
-L<Type::Tiny::Intro>, L<Type::Library>, L<Type::Library::Util>.
+L<Type::Tiny::Intro>, L<Type::Library>, L<Type::Utils>.
 
 L<Moose::Meta::TypeConstraint>.
 

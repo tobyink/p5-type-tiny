@@ -1,4 +1,4 @@
-package Type::Library::Util;
+package Type::Utils;
 
 use 5.008001;
 use strict;

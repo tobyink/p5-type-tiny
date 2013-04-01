@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use base "Type::Library";
-use Type::Library::Util;
+use Type::Utils;
 
 our @EXPORT_OK = qw( slurpy );
 
