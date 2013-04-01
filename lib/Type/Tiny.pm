@@ -50,7 +50,7 @@ sub new
 	
 	if ($self->has_library and not $self->is_anon)
 	{
-		$Moo::HandleMoose::TYPE_MAP{"$self"} = sub { $self->as_moose };
+		$Moo::HandleMoose::TYPE_MAP{"$self"} = sub { $self->moose_type };
 	}
 	
 	return $self;
@@ -68,6 +68,8 @@ sub constraint_generator     { $_[0]{constraint_generator} }
 sub inline_generator         { $_[0]{inline_generator} }
 sub name_generator           { $_[0]{name_generator} ||= $_[0]->_build_name_generator }
 sub parameters               { $_[0]{parameters} }
+sub moose_type               { $_[0]{moose_type}     ||= $_[0]->_build_moose_type }
+sub mouse_type               { $_[0]{mouse_type}     ||= $_[0]->_build_mouse_type }
 
 sub has_parent               { exists $_[0]{parent} }
 sub has_library              { exists $_[0]{library} }
@@ -296,45 +298,40 @@ sub _build_complementary_type
 	return "Type::Tiny"->new(%opts);
 }
 
-sub as_moose
+sub _build_moose_type
 {
 	my $self = shift;
 	
-	unless ($self->{as_moose})
-	{
-		my %options = (name => $self->qualified_name);
-		$options{parent}     = $self->parent->as_moose   if $self->has_parent;
-		$options{constraint} = $self->constraint         unless $self->_is_null_constraint;
-		$options{message}    = $self->message;
-		$options{inlined}    = $self->inlined            if $self->has_inlined;
-		
-		require Moose::Meta::TypeConstraint;
-		$self->{as_moose} = "Moose::Meta::TypeConstraint"->new(%options);
-		
-		$self->{as_moose}->coercion($self->coercion->as_moose) if $self->has_coercion;
-	}
+	my %options = (name => $self->qualified_name);
+	$options{parent}     = $self->parent->moose_type if $self->has_parent;
+	$options{constraint} = $self->constraint         unless $self->_is_null_constraint;
+	$options{message}    = $self->message;
+	$options{inlined}    = $self->inlined            if $self->has_inlined;
 	
-	return $self->{as_moose};
+	require Moose::Meta::TypeConstraint;
+	my $r = "Moose::Meta::TypeConstraint"->new(%options);
+	
+	$self->{moose_type} = $r;  # prevent recursion
+	$r->coercion($self->coercion->moose_coercion) if $self->has_coercion;
+	
+	return $r;
 }
 
-sub as_mouse
+sub _build_mouse_type
 {
 	my $self = shift;
 	
-	unless ($self->{as_mouse})
-	{
-		my %options = (name => $self->qualified_name);
-		$options{parent}     = $self->parent->as_moose   if $self->has_parent;
-		$options{constraint} = $self->constraint         unless $self->_is_null_constraint;
-		$options{message}    = $self->message;
+	my %options = (name => $self->qualified_name);
+	$options{parent}     = $self->parent->mouse_type if $self->has_parent;
+	$options{constraint} = $self->constraint         unless $self->_is_null_constraint;
+	$options{message}    = $self->message;
 		
-		require Mouse::Meta::TypeConstraint;
-		$self->{as_mouse} = "Mouse::Meta::TypeConstraint"->new(%options);
+	require Mouse::Meta::TypeConstraint;
+	my $r = "Mouse::Meta::TypeConstraint"->new(%options);
 		
-		# XXX - coercions
-	}
+	# XXX - coercions
 	
-	return $self->{as_mouse};
+	return $r;
 }
 
 1;
@@ -367,7 +364,7 @@ Type::Tiny - tiny, yet Moo(se)-compatible type constraint
    
    package Bullwinkle {
       use Moose;
-      has favourite_number => (is => "ro", isa => $NUM->as_moose);
+      has favourite_number => (is => "ro", isa => $NUM->moose_type);
    }
 
 =head1 DESCRIPTION
@@ -452,6 +449,14 @@ etc.
 
 Generally speaking this attribute should not be passed to the constructor;
 you should rely on the default lazily-built complementary type.
+
+=item C<< moose_type >>, C<< mouse_type >>
+
+Objects equivalent to this type constraint, but as a
+L<Moose::Meta::TypeConstraint> or L<Mouse::Meta::TypeConstraint>.
+
+Generally speaking this attribute should not be passed to the constructor;
+you should rely on the default lazily-built objects.
 
 =back
 
@@ -566,16 +571,6 @@ Construct a new Type::Tiny object with this object as its parent.
 =item C<< child_type_class >>
 
 The class that create_child_type will construct.
-
-=item C<< as_moose >>
-
-Returns a L<Moose::Meta::TypeConstraint> object equivalent to this Type::Tiny
-object.
-
-=item C<< as_mouse >>
-
-Returns a L<Mouse::Meta::TypeConstraint> object equivalent to this Type::Tiny
-object.
 
 =back
 

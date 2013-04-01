@@ -37,6 +37,7 @@ sub new
 
 sub type_constraint     { $_[0]{type_constraint} }
 sub type_coercion_map   { $_[0]{type_coercion_map} ||= [] }
+sub moose_coercion      { $_[0]{moose_coercion}    ||= $_[0]->_build_moose_coercion }
 
 sub has_type_constraint { exists $_[0]{type_constraint} }
 
@@ -101,20 +102,21 @@ sub add_type_coercions
 	return $self;
 }
 
-sub as_moose
+sub _build_moose_coercion
 {
 	my $self = shift;
-	return $self->{as_moose} if $self->{as_moose};
 	
 	my %options = ();
 	$options{type_coercion_map} = [
-		map { blessed($_) && $_->can("as_moose") ? $_->as_moose : $_ }
+		map { blessed($_) && $_->can("moose_type") ? $_->moose_type : $_ }
 		@{ $self->type_coercion_map }
 	];
 	$options{type_constraint} = $self->type_constraint if $self->has_type_constraint;
 	
 	require Moose::Meta::TypeCoercion;
-	$self->{as_moose} = "Moose::Meta::TypeCoercion"->new(%options);
+	my $r = "Moose::Meta::TypeCoercion"->new(%options);
+	
+	return $r;
 }
 
 1;

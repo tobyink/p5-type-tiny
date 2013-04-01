@@ -88,9 +88,9 @@ sub _export
 	if ($sub->{sub} =~ /^(is|to|assert)_/ and my $coderef = $class->can($sub->{sub}))
 		{ $export_coderef = $coderef }
 	elsif ($opts->{moose} and $type = $meta->get_type($sub->{sub}))
-		{ $export_coderef = _subname $type->qualified_name, sub (;$) { (@_ ? $type->parameterize(@{$_[0]}) : $type)->as_moose } }
+		{ $export_coderef = _subname $type->qualified_name, sub (;$) { (@_ ? $type->parameterize(@{$_[0]}) : $type)->moose_type } }
 	elsif ($opts->{mouse} and $type = $meta->get_type($sub->{sub}))
-		{ $export_coderef = _subname $type->qualified_name, sub (;$) { (@_ ? $type->parameterize(@{$_[0]}) : $type)->as_mouse } }
+		{ $export_coderef = _subname $type->qualified_name, sub (;$) { (@_ ? $type->parameterize(@{$_[0]}) : $type)->mouse_type } }
 	elsif ($type = $meta->get_type($sub->{sub}))
 		{ $export_coderef = _subname $type->qualified_name, sub (;$) { (@_ ? $type->parameterize(@{$_[0]}) : $type) } }
 	elsif (scalar grep($_ eq $sub->{sub}, $class->_EXPORT_OK) and my $additional = $class->can($sub->{sub}))
