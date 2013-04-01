@@ -36,6 +36,7 @@ use Type::Utils;
 use base "Type::Library";
 
 extends "DemoLib";
+extends "Type::Standard";
 
 declare "SmallInteger",
 	as "Integer",
@@ -51,7 +52,7 @@ declare "BigInteger",
 	our $VERSION = 1;
 }
 
-declare "DoesQuux", role "Quux";
+role_type "DoesQuux", { role => "Quux" };
 
 {
 	package Foo::Bar;
@@ -60,7 +61,7 @@ declare "DoesQuux", role "Quux";
 	sub bar { 2 }
 }
 
-declare "FooBar", class "Foo::Bar";
+class_type "FooBar", { class => "Foo::Bar" };
 
 {
 	package Foo::Baz;
@@ -73,25 +74,16 @@ declare "FooBar", class "Foo::Bar";
 	sub baz { 4 }
 }
 
-declare "FooBaz", class "Foo::Baz";
+class_type "FooBaz", { class => "Foo::Baz" };
+duck_type "CanFooBar", [qw/ foo bar /];
+duck_type "CanFooBaz", [qw/ foo baz /];
 
-declare "CanFooBar", duck_type[qw/ foo bar /];
+coerce "SmallInteger",
+	from BigInteger   => via { abs($_) % 10 },
+	from ArrayRef     => via { 1 };
 
-declare "CanFooBaz", duck_type[qw/ foo baz /];
-
-# No sugar for coercion yet
-require Type::Coercion;
-my $small = __PACKAGE__->get_type("SmallInteger");
-my $big   = __PACKAGE__->get_type("BigInteger");
-$small->{coercion} = "Type::Coercion"->new;
-$big->{coercion} = "Type::Coercion"->new;
-
-$small->coercion->add_type_coercions(
-	$big, sub { abs($_) % 10 },
-);
-
-$big->coercion->add_type_coercions(
-	$small, sub { abs($_) + 10 },
-);
+coerce "BigInteger",
+	from SmallInteger => via { abs($_) + 10 },
+	from ArrayRef     => via { 100 };
 
 1;

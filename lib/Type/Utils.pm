@@ -16,49 +16,25 @@ use Type::Tiny;
 
 use Exporter qw< import >;
 our @EXPORT = qw< 
-	declare as where message extends inline_as
-	class role duck_type
+	extends declare as where message inline_as
+	class_type role_type duck_type union intersection enum
+	coerce from via
 >;
+our @EXPORT_OK = (@EXPORT, qw< type subtype >);
 
-sub as ($;@)
+sub extends
 {
-	parent => @_;
-}
-
-sub class ($;@)
-{
-	bless => "Type::Tiny::Class", class => @_;
-}
-
-sub role ($;@)
-{
-	bless => "Type::Tiny::Role", role => @_;
-}
-
-sub duck_type ($;@)
-{
-	bless => "Type::Tiny::Duck", methods => @_;
-}
-
-sub where (&;@)
-{
-	constraint => @_;
-}
-
-sub inline_as (&;@)
-{
-	my $coderef = shift;
-	inlined => sub { local $_ = $_[1]; $coderef->(@_) }, @_;
-}
-
-sub message (&;@)
-{
-	message => @_;
+	my $caller = caller->meta;
+	
+	foreach my $lib (@_)
+	{
+		eval "require $lib" or _confess "could not load library '$lib': $@";
+		$caller->add_type($lib->get_type($_)) for $lib->meta->type_names;
+	}
 }
 
 sub declare
 {
-	my $caller = caller->meta;
 	my %opts;
 	if (@_ % 2 == 0)
 	{
@@ -70,15 +46,18 @@ sub declare
 		_confess "cannot provide two names for type" if exists $opts{name};
 		$opts{name} = $name;
 	}
-	
+
+	my $caller = caller($opts{_caller_level} || 0);
+	$opts{library} = $caller;
+
 	if (defined $opts{parent} and not blessed $opts{parent})
 	{
-		$opts{parent} = $caller->get_type($opts{parent})
+		$caller->isa("Type::Library")
+			or _confess "parent type cannot be a string";
+		$opts{parent} = $caller->meta->get_type($opts{parent})
 			or _confess "could not find parent type";
 	}
-	
-	$opts{library} = blessed($caller) || $caller;
-	
+		
 	my $type;
 	if (defined $opts{parent})
 	{
@@ -91,19 +70,154 @@ sub declare
 		$type = $bless->new(%opts);
 	}
 	
-	$caller->add_type($type) unless $type->is_anon;
+	if ($caller->isa("Type::Library"))
+	{
+		$caller->meta->add_type($type) unless $type->is_anon;
+	}
+	
 	return $type;
 }
 
-sub extends
+*subtype = \&declare;
+*type = \&declare;
+
+sub as ($;@)
 {
-	my $caller = caller->meta;
+	parent => @_;
+}
+
+sub where (&;@)
+{
+	constraint => @_;
+}
+
+sub message (&;@)
+{
+	message => @_;
+}
+
+sub inline_as (&;@)
+{
+	my $coderef = shift;
+	inlined => sub { local $_ = $_[1]; $coderef->(@_) }, @_;
+}
+
+sub class_type
+{
+	my $name = ref($_[0]) ? undef : shift;
+	my %opts = %{ +shift };
 	
-	foreach my $lib (@_)
+	if (defined $name)
 	{
-		eval "require $lib" or _confess "could not load library '$lib': $@";
-		$caller->add_type($lib->get_type($_)) for $lib->meta->type_names;
+		$opts{name}  = $name unless exists $opts{name};
+		$opts{class} = $name unless exists $opts{class};
 	}
+	
+	$opts{bless} = "Type::Tiny::Class";
+	
+	{ no warnings "numeric"; $opts{_caller_level}++ }
+	declare(%opts);
+}
+
+sub role_type
+{
+	my $name = ref($_[0]) ? undef : shift;
+	my %opts = %{ +shift };
+	
+	if (defined $name)
+	{
+		$opts{name}  = $name unless exists $opts{name};
+		$opts{role}  = $name unless exists $opts{role};
+	}
+	
+	$opts{bless} = "Type::Tiny::Role";
+	
+	{ no warnings "numeric"; $opts{_caller_level}++ }
+	declare(%opts);
+}
+
+sub duck_type
+{
+	my $name    = ref($_[0]) ? undef : shift;
+	my @methods = @{ +shift };
+	
+	my %opts;
+	$opts{name} = $name if defined $name;
+	$opts{methods} = \@methods;
+	
+	$opts{bless} = "Type::Tiny::Duck";
+	
+	{ no warnings "numeric"; $opts{_caller_level}++ }
+	declare(%opts);
+}
+
+sub enum
+{
+	my $name   = ref($_[0]) ? undef : shift;
+	my @values = @{ +shift };
+	
+	my %opts;
+	$opts{name} = $name if defined $name;
+	$opts{values} = \@values;
+	
+	$opts{bless} = "Type::Tiny::Enum";
+	
+	{ no warnings "numeric"; $opts{_caller_level}++ }
+	declare(%opts);
+}
+
+sub union
+{
+	my $name = ref($_[0]) ? undef : shift;
+	my @tcs  = @{ +shift };
+	
+	my %opts;
+	$opts{name} = $name if defined $name;
+	$opts{type_constraints} = \@tcs;
+	
+	$opts{bless} = "Type::Tiny::Union";
+	
+	{ no warnings "numeric"; $opts{_caller_level}++ }
+	declare(%opts);
+}
+
+sub intersection
+{
+	my $name = ref($_[0]) ? undef : shift;
+	my @tcs  = @{ +shift };
+	
+	my %opts;
+	$opts{name} = $name if defined $name;
+	$opts{type_constraints} = \@tcs;
+	
+	$opts{bless} = "Type::Tiny::Intersection";
+	
+	{ no warnings "numeric"; $opts{_caller_level}++ }
+	declare(%opts);
+}
+
+sub coerce
+{
+	my $meta = (scalar caller)->meta;
+	
+	if ((scalar caller)->isa("Type::Library"))
+	{
+		my ($type, @opts) = map { ref($_) ? $_ : $meta->get_type($_) } @_;
+		return $type->coercion->add_type_coercions(@opts);
+	}
+
+	my ($type, @opts) = @_;
+	return $type->coercion->add_type_coercions(@opts);
+}
+
+sub from ($;@)
+{
+	return @_;
+}
+
+sub via (&;@)
+{
+	return @_;
 }
 
 1;

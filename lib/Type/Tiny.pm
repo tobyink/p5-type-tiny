@@ -105,6 +105,7 @@ sub _is_null_constraint
 
 sub _build_coercion
 {
+	require Type::Coercion;
 	my $self = shift;
 	return "Type::Coercion"->new(type_constraint => $self);
 }
