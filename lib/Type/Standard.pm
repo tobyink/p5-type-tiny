@@ -367,3 +367,134 @@ declare "Dict",
 
 1;
 
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Type::Standard - bundled set of built-in types for Type::Tiny
+
+=head1 DESCRIPTION
+
+L<Type::Tiny> bundles a few types which seem to be useful.
+
+=head2 Moose-like
+
+The following types are similar to those described in
+L<Moose::Util::TypeConstraints>.
+
+=over
+
+=item C<< Any >>
+
+=item C<< Item >>
+
+=item C<< Bool >>
+
+=item C<< Maybe[`a] >>
+
+=item C<< Undef >>
+
+=item C<< Defined >>
+
+=item C<< Value >>
+
+=item C<< Str >>
+
+=item C<< Num >>
+
+=item C<< Int >>
+
+=item C<< ClassName >>
+
+=item C<< RoleName >>
+
+=item C<< Ref[`a] >>
+
+=item C<< ScalarRef[`a] >>
+
+=item C<< ArrayRef[`a] >>
+
+=item C<< HashRef[`a] >>
+
+=item C<< CodeRef >>
+
+=item C<< RegexpRef >>
+
+=item C<< GlobRef >>
+
+=item C<< FileHandle >>
+
+=item C<< Object >>
+
+=back
+
+Unlike Moose, C<Ref> is a parameterized type, allowing Scalar::Util::reftype
+checks, a la
+
+	Ref["HASH"]  # hashrefs, including blessed hashrefs
+
+=head2 Structured
+
+OK, so I stole some ideas from L<MooseX::Types::Structured>.
+
+=over
+
+=item C<< Map[`a] >>
+
+=item C<< Tuple[`a] >>
+
+=item C<< Dict[`a] >>
+
+=item C<< Optional[`a] >>
+
+=back
+
+This module also exports a C<slurpy> function.
+
+=head2 More
+
+There are a couple of other types exported by this function:
+
+=over
+
+=item C<< Overload[`a] >>
+
+With no parameters, checks that the value is an overloaded object. Can
+be given one or more string parameters, which are specific operations
+to check are overloaded. For example, the following checks for objects
+which overload addition and subtraction.
+
+	Overload["+", "-"]
+
+=back
+
+=head1 BUGS
+
+Please report any bugs to
+L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
+
+=head1 SEE ALSO
+
+L<Type::Tiny>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
