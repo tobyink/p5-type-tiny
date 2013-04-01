@@ -485,7 +485,12 @@ L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
 
 =head1 SEE ALSO
 
-L<Type::Tiny>.
+L<Type::Tiny::Manual>.
+
+L<Type::Tiny>, L<Type::Library>, L<Type::Utils>, L<Type::Coercion>.
+
+L<Moose::Util::TypeConstraints>,
+L<Mouse::Util::TypeConstraints>.
 
 =head1 AUTHOR
 

@@ -338,9 +338,12 @@ L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
 
 =head1 SEE ALSO
 
-L<Type::Tiny::Intro>, L<Type::Library>, L<Type::Utils>.
+L<Type::Tiny::Manual>.
 
-L<Moose::Meta::TypeConstraint>.
+L<Type::Tiny>, L<Type::Utils>, L<Type::Standard>, L<Type::Coercion>.
+
+L<Moose::Util::TypeConstraints>,
+L<Mouse::Util::TypeConstraints>.
 
 =head1 AUTHOR
 
@@ -358,4 +361,5 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
 

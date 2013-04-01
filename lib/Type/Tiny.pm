@@ -377,7 +377,7 @@ Maybe now we won't need to have separate MooseX, MouseX and MooX versions
 of everything? We can but hope...
 
 If you're reading this because you want to create a type library, then
-you're probably better off reading L<Type::Tiny::Intro>.
+you're probably better off reading L<Type::Tiny::Manual>.
 
 =head2 Constructor
 
@@ -618,10 +618,15 @@ L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
 
 =head1 SEE ALSO
 
-L<Type::Tiny::Intro>, L<Type::Library>, L<Type::Utils>,
-L<Type::Standard>, L<Type::Coercion>.
+L<Type::Tiny::Manual>.
 
-L<Moose::Meta::TypeConstraint>.
+L<Type::Library>, L<Type::Utils>, L<Type::Standard>, L<Type::Coercion>.
+
+L<Type::Tiny::Class>, L<Type::Tiny::Role>, L<Type::Tiny::Duck>,
+L<Type::Tiny::Enum>, L<Type::Tiny::Union>.
+
+L<Moose::Meta::TypeConstraint>,
+L<Mouse::Meta::TypeConstraint>.
 
 =head1 AUTHOR
 
