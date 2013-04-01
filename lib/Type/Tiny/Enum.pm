@@ -1,0 +1,63 @@
+package Type::Tiny::Enum;
+
+use 5.008001;
+use strict;
+use warnings;
+
+BEGIN {
+	$Type::Tiny::Enum::AUTHORITY = 'cpan:TOBYINK';
+	$Type::Tiny::Enum::VERSION   = '0.001';
+}
+
+sub _confess ($;@)
+{
+	require Carp;
+	@_ = sprintf($_[0], @_[1..$#_]) if @_ > 1;
+	goto \&Carp::confess;
+}
+
+use overload q[@{}] => 'values';
+
+use base "Type::Tiny";
+
+sub new
+{
+	my $proto = shift;
+	my %opts = @_;
+	_confess "need to supply list of values" unless exists $opts{values};
+	my %tmp =
+		map { $_ => 1 }
+		@{ ref $opts{values} eq "ARRAY" ? $opts{values} : [$opts{values}] };
+	$opts{values} = [sort keys %tmp];
+	return $proto->SUPER::new(%opts);
+}
+
+sub values      { $_[0]{values} }
+sub constraint  { $_[0]{constraint} ||= $_[0]->_build_constraint }
+
+sub _build_display_name
+{
+	my $self = shift;
+	sprintf("Enum[%s]", join q[,], @$self);
+}
+
+sub _build_constraint
+{
+	my $self   = shift;
+	my $regexp = qr{^${\(join "|", map quotemeta, @$self)}$};
+	return sub { /$regexp/ };
+}
+
+sub can_be_inlined
+{
+	!!1;
+}
+
+sub inline_check
+{
+	my $self = shift;
+	my $regexp = qq{^${\(join "|", map quotemeta, @$self)}\$};
+	"$_[0] =~ m{$regexp}"
+}
+
+1;
