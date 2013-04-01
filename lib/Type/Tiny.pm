@@ -75,6 +75,7 @@ sub has_coercion             { exists $_[0]{coercion} }
 sub has_inlined              { exists $_[0]{inlined} }
 sub has_constraint_generator { exists $_[0]{constraint_generator} }
 sub has_inline_generator     { exists $_[0]{inline_generator} }
+sub has_parameters           { exists $_[0]{parameters} }
 
 sub _assert_coercion
 {
@@ -233,16 +234,21 @@ sub assert_coerce
 	$self->_assert_coercion->assert_coerce(@_);
 }
 
-sub can_be_parameterized
+sub is_parameterizable
 {
 	shift->has_constraint_generator;
+}
+
+sub is_parameterized
+{
+	!shift->has_parameters;
 }
 
 sub parameterize
 {
 	my $self = shift;
 	return $self unless @_;
-	$self->has_constraint_generator
+	$self->is_parameterizable
 		or _confess "type '%s' does not accept parameters", $self;
 	
 	local $_ = $_[0];
@@ -325,24 +331,24 @@ Type::Tiny - tiny, yet Moo(se)-compatible type constraint
 
 =head1 SYNOPSIS
 
-	use Scalar::Util qw(looks_like_number);
-	use Type::Tiny;
-	
-	my $NUM = "Type::Tiny"->new(
-		name       => "Number",
-		constraint => sub { looks_like_number($_) },
-		message    => sub { "$_ ain't a number" },
-	);
-	
-	package Ermintrude {
-		use Moo;
-		has favourite_number => (is => "ro", isa => $NUM);
-	}
-	
-	package Bullwinkle {
-		use Moose;
-		has favourite_number => (is => "ro", isa => $NUM->as_moose);
-	}
+   use Scalar::Util qw(looks_like_number);
+   use Type::Tiny;
+   
+   my $NUM = "Type::Tiny"->new(
+      name       => "Number",
+      constraint => sub { looks_like_number($_) },
+      message    => sub { "$_ ain't a number" },
+   );
+   
+   package Ermintrude {
+      use Moo;
+      has favourite_number => (is => "ro", isa => $NUM);
+   }
+   
+   package Bullwinkle {
+      use Moose;
+      has favourite_number => (is => "ro", isa => $NUM->as_moose);
+   }
 
 =head1 DESCRIPTION
 
@@ -372,16 +378,12 @@ Moose-style constructor function.
 =item C<< name >>
 
 The name of the type constraint. These need to conform to certain naming
-rules.
+rules. Optional; if not supplied will be an anonymous type constraint.
 
 =item C<< display_name >>
 
 A name to display for the type constraint when stringified. These don't
-have to conform to any naming rules.
-
-=item C<< name_generator >>
-
-A coderef which generates a new display_name based on parameters.
+have to conform to any naming rules. Optional.
 
 =item C<< parent >>
 
@@ -394,18 +396,9 @@ If provided, must be a Type::Tiny object.
 
 Coderef to validate a value (C<< $_ >>) against the type constraint. The
 coderef will not be called unless the value is known to pass any parent
-type constraint. Defaults to C<< sub { 1 } >> - i.e. a coderef that passes
-all values.
+type constraint.
 
-=item C<< constraint_generator >>
-
-Coderef that generates a new type contraint coderef based on parameters.
-Optional. This is used to create type constraints like C<< ArrayRef[Int] >>.
-
-=item C<< coercion >>
-
-Returns a L<Type::Coercion> object associated with this type (or creates
-one if it does not exist).
+Defaults to C<< sub { 1 } >> - i.e. a coderef that passes all values.
 
 =item C<< message >>
 
@@ -415,17 +408,20 @@ against the type constraint. Optional (there's a vaguely sensible default.)
 =item C<< inlined >>
 
 A coderef which returns a string of Perl code suitable for inlining this
-type.
-
-=item C<< inline_generator >>
-
-A coderef which generates a new inlining coderef based on parameters.
+type. Optional.
 
 =item C<< library >>
 
 The package name of the type library this type is associated with.
 Optional. Informational only: setting this attribute does not install
 the type into the package.
+
+=item C<< coercion >>
+
+A L<Type::Coercion> object associated with this type.
+
+Generally speaking this attribute should not be passed to the constructor;
+you should rely on the default lazily-built coercion object.
 
 =item C<< complementary_type >>
 
@@ -434,19 +430,52 @@ for an integer type would be all things that are not integers, including
 floating point numbers, but also alphabetic strings, arrayrefs, filehandles,
 etc.
 
+Generally speaking this attribute should not be passed to the constructor;
+you should rely on the default lazily-built complementary type.
+
+=back
+
+The following additional attributes are used for parameterizable (e.g.
+C<ArrayRef>) and parameterized (e.g. C<< ArrayRef[Int] >>) type
+constraints. Unlike Moose, these aren't handled by separate subclasses.
+
+=over
+
+=item C<< parameters >>
+
+In parameterized types, returns an arrayref of the parameters.
+
+=item C<< name_generator >>
+
+A coderef which generates a new display_name based on parameters.
+
+=item C<< constraint_generator >>
+
+Coderef that generates a new constraint coderef based on parameters.
+Optional.
+
+=item C<< inline_generator >>
+
+A coderef which generates a new inlining coderef based on parameters.
+
 =back
 
 =head2 Methods
 
 =over
 
-=item C<has_parent>, C<has_coercion>, C<has_library>, C<has_constraint_generator>, C<has_inlined>, C<has_inline_generator>
+=item C<has_parent>, C<has_coercion>, C<has_library>, C<has_constraint_generator>, C<has_inlined>, C<has_inline_generator>, C<has_parameters>
 
 Predicate methods.
 
 =item C<< is_anon >>
 
 Returns true iff the type constraint does not have a C<name>.
+
+=item C<< is_parameterized >>, C<< is_parameterizable >>
+
+Indicates whether a type has been parameterized (e.g. C<< ArrayRef[Int] >>)
+or could potentially be (e.g. C<< ArrayRef >>).
 
 =item C<< qualified_name >>
 
@@ -481,11 +510,12 @@ constraint.
 
 =item C<< coerce($value) >>
 
-Not implemented yet.
+Attempt to coerce C<< $value >> to this type.
 
 =item C<< assert_coerce($value) >>
 
-Not implemented yet.
+Attempt to coerce C<< $value >> to this type. Throws an exception if this is
+not possible.
 
 =item C<< can_be_inlined >>
 
@@ -503,6 +533,11 @@ prints the following output:
 	(!ref($foo) && Scalar::Util::looks_like_number($foo))
 
 For Moose-compat, there is an alias C<< _inline_check >> for this method.
+
+=item C<< parameterize(@parameters) >>
+
+Creates a new parameterized type; throws an exception if called on a
+non-parameterizable type.
 
 =item C<< create_child_type(%attributes) >>
 
