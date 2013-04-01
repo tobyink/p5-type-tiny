@@ -317,6 +317,26 @@ sub as_moose
 	return $self->{as_moose};
 }
 
+sub as_mouse
+{
+	my $self = shift;
+	
+	unless ($self->{as_mouse})
+	{
+		my %options = (name => $self->qualified_name);
+		$options{parent}     = $self->parent->as_moose   if $self->has_parent;
+		$options{constraint} = $self->constraint         unless $self->_is_null_constraint;
+		$options{message}    = $self->message;
+		
+		require Mouse::Meta::TypeConstraint;
+		$self->{as_mouse} = "Mouse::Meta::TypeConstraint"->new(%options);
+		
+		# XXX - coercions
+	}
+	
+	return $self->{as_mouse};
+}
+
 1;
 
 __END__
@@ -353,10 +373,10 @@ Type::Tiny - tiny, yet Moo(se)-compatible type constraint
 =head1 DESCRIPTION
 
 L<Type::Tiny> is a tiny class for creating Moose-like type constraint
-objects which are compatible with Moo and Moose.
+objects which are compatible with Moo, Moose and Mouse.
 
-Maybe now we won't need to have separate MooseX and MooX versions of
-everything? We can but hope...
+Maybe now we won't need to have separate MooseX, MouseX and MooX versions
+of everything? We can but hope...
 
 If you're reading this because you want to create a type library, then
 you're probably better off reading L<Type::Tiny::Intro>.
@@ -550,6 +570,11 @@ The class that create_child_type will construct.
 =item C<< as_moose >>
 
 Returns a L<Moose::Meta::TypeConstraint> object equivalent to this Type::Tiny
+object.
+
+=item C<< as_mouse >>
+
+Returns a L<Mouse::Meta::TypeConstraint> object equivalent to this Type::Tiny
 object.
 
 =back

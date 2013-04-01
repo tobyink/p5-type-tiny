@@ -50,6 +50,8 @@ sub _process_tags
 		
 		if ($arg =~ /^[:-]moose$/i)
 			{ $opts->{moose} = 1 }
+		elsif ($arg =~ /^[:-]mouse$/i)
+			{ $opts->{mouse} = 1 }
 		elsif ($arg =~ /^[:-]all$/i)
 			{ push @exports, map $optify->($_), map { $_, "is_$_", "to_$_", "assert_$_" } $meta->type_names }
 		elsif ($arg =~ /^[:-](assert|is|to)$/i)
@@ -87,6 +89,8 @@ sub _export
 		{ $export_coderef = $coderef }
 	elsif ($opts->{moose} and $type = $meta->get_type($sub->{sub}))
 		{ $export_coderef = _subname $type->qualified_name, sub (;$) { (@_ ? $type->parameterize(@{$_[0]}) : $type)->as_moose } }
+	elsif ($opts->{mouse} and $type = $meta->get_type($sub->{sub}))
+		{ $export_coderef = _subname $type->qualified_name, sub (;$) { (@_ ? $type->parameterize(@{$_[0]}) : $type)->as_mouse } }
 	elsif ($type = $meta->get_type($sub->{sub}))
 		{ $export_coderef = _subname $type->qualified_name, sub (;$) { (@_ ? $type->parameterize(@{$_[0]}) : $type) } }
 	elsif (scalar grep($_ eq $sub->{sub}, $class->_EXPORT_OK) and my $additional = $class->can($sub->{sub}))
