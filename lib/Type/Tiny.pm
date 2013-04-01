@@ -233,6 +233,11 @@ sub assert_coerce
 	$self->_assert_coercion->assert_coerce(@_);
 }
 
+sub can_be_parameterized
+{
+	shift->has_constraint_generator;
+}
+
 sub parameterize
 {
 	my $self = shift;
@@ -374,6 +379,10 @@ rules.
 A name to display for the type constraint when stringified. These don't
 have to conform to any naming rules.
 
+=item C<< name_generator >>
+
+A coderef which generates a new display_name based on parameters.
+
 =item C<< parent >>
 
 Optional attribute; parent type constraint. For example, an "Integer"
@@ -390,8 +399,8 @@ all values.
 
 =item C<< constraint_generator >>
 
-Coderef that generates a new type contraint based on parameters. Optional.
-This is used to create type constraints like C<< ArrayRef[Int] >>.
+Coderef that generates a new type contraint coderef based on parameters.
+Optional. This is used to create type constraints like C<< ArrayRef[Int] >>.
 
 =item C<< coercion >>
 
@@ -402,6 +411,15 @@ one if it does not exist).
 
 Coderef that returns an error message when C<< $_ >> does not validate
 against the type constraint. Optional (there's a vaguely sensible default.)
+
+=item C<< inlined >>
+
+A coderef which returns a string of Perl code suitable for inlining this
+type.
+
+=item C<< inline_generator >>
+
+A coderef which generates a new inlining coderef based on parameters.
 
 =item C<< library >>
 
@@ -422,7 +440,7 @@ etc.
 
 =over
 
-=item C<< has_parent >>, C<< has_coercion >>, C<< has_library >>, C<< has_constraint_generator >>
+=item C<has_parent>, C<has_coercion>, C<has_library>, C<has_constraint_generator>, C<has_inlined>, C<has_inline_generator>
 
 Predicate methods.
 
@@ -433,8 +451,7 @@ Returns true iff the type constraint does not have a C<name>.
 =item C<< qualified_name >>
 
 For non-anonymous type constraints that have a library, returns a qualified
-C<< "Library::Type" >> sort of name. Otherwise, returns the same as
-C<< name >>.
+C<< "Library::Type" >> sort of name. Otherwise, returns the same as C<name>.
 
 =item C<< parents >>
 
@@ -470,6 +487,10 @@ Not implemented yet.
 
 Not implemented yet.
 
+=item C<< can_be_inlined >>
+
+Returns boolean indicating if this type can be inlined.
+
 =item C<< inline_check($varname) >>
 
 Creates a type constraint check for a particular variable as a string of
@@ -482,6 +503,14 @@ prints the following output:
 	(!ref($foo) && Scalar::Util::looks_like_number($foo))
 
 For Moose-compat, there is an alias C<< _inline_check >> for this method.
+
+=item C<< create_child_type(%attributes) >>
+
+Construct a new Type::Tiny object with this object as its parent.
+
+=item C<< child_type_class >>
+
+The class that create_child_type will construct.
 
 =item C<< as_moose >>
 
