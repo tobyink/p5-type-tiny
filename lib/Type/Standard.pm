@@ -435,7 +435,7 @@ L<Moose::Util::TypeConstraints>.
 Unlike Moose, C<Ref> is a parameterized type, allowing Scalar::Util::reftype
 checks, a la
 
-	Ref["HASH"]  # hashrefs, including blessed hashrefs
+   Ref["HASH"]  # hashrefs, including blessed hashrefs
 
 =head2 Structured
 
@@ -468,7 +468,7 @@ be given one or more string parameters, which are specific operations
 to check are overloaded. For example, the following checks for objects
 which overload addition and subtraction.
 
-	Overload["+", "-"]
+   Overload["+", "-"]
 
 =back
 

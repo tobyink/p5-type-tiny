@@ -578,6 +578,16 @@ On Perl 5.10.1 and above, smart match is overloaded to call C<check>.
 
 The C<< ~ >> operator is overloaded to call C<complementary_type>.
 
+=item *
+
+The C<< | >> operator is overloaded to build a union of two type constraints.
+See L<Type::Tiny::Union>.
+
+=item *
+
+The C<< & >> operator is overloaded to build the intersection of two type
+constraints. See L<Type::Tiny::Intersection>.
+
 =back
 
 =head1 BUGS
