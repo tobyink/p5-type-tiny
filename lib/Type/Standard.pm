@@ -455,6 +455,12 @@ OK, so I stole some ideas from L<MooseX::Types::Structured>.
 
 This module also exports a C<slurpy> function.
 
+=begin trustme
+
+=item slurpy
+
+=end trustme
+
 =head2 More
 
 There are a couple of other types exported by this function:
