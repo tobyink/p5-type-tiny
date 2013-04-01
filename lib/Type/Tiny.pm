@@ -253,10 +253,15 @@ sub parameterize
 	return $self->create_child_type(%options);
 }
 
+sub child_type_class
+{
+	__PACKAGE__;
+}
+
 sub create_child_type
 {
 	my $self = shift;
-	return ref($self)->new(parent => $self, @_);
+	return $self->child_type_class->new(parent => $self, @_);
 }
 
 sub complementary_type
