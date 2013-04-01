@@ -66,7 +66,7 @@ sub assert_coerce
 
 sub has_coercion_for_type
 {
-	...;
+	die "not implemented";
 }
 
 sub has_coercion_for_value

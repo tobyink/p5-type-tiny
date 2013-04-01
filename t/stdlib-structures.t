@@ -58,7 +58,7 @@ should_pass({1=>1.1,2=>2.2}, $struct1);
 should_fail({1=>"Str",2=>222}, $struct1);
 should_fail({1.1=>1,2=>2.2}, $struct1);
 
-my $struct2 = Tuple[Int, Num, Optional[Int], slurpy ArrayRef[Num]];
+my $struct2 = Tuple[Int, Num, Optional([Int]), slurpy ArrayRef[Num]];
 my $struct3 = Tuple[Int, Num, Optional[Int]];
 
 should_pass([1, 1.1], $struct2);
