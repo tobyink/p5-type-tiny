@@ -43,9 +43,9 @@ sub _build_display_name
 
 sub _build_constraint
 {
-	my $self   = shift;
-	my $regexp = qr{^${\(join "|", map quotemeta, @$self)}$};
-	return sub { /$regexp/ };
+	my $self = shift;
+	my $regexp = join "|", map quotemeta, @$self;
+	return sub { m{^(?:$regexp)$} };
 }
 
 sub can_be_inlined
@@ -56,8 +56,8 @@ sub can_be_inlined
 sub inline_check
 {
 	my $self = shift;
-	my $regexp = qq{^${\(join "|", map quotemeta, @$self)}\$};
-	"$_[0] =~ m{$regexp}"
+	my $regexp = join "|", map quotemeta, @$self;
+	"$_[0] =~ m{^(?:$regexp)$}"
 }
 
 1;

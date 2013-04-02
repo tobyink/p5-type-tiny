@@ -99,4 +99,27 @@ should_fail({ name => "Bob", age => 40, weight => 80.3 }, $struct4);
 should_fail({ name => "Bob", age => 40, height => 1.76, weight => 80.3 }, $struct4);
 should_fail({ name => "Bob", age => 40, height => "xyz" }, $struct4);
 
+use Type::Utils;
+
+my $DistanceUnit = enum DistanceUnit => [qw/ mm cm m km /];
+my $Distance = declare Distance => as StrMatch[
+	qr{^([0-9]+)\s+(.+)$},
+	Tuple[Int, $DistanceUnit],
+];
+
+should_pass("mm", $DistanceUnit);
+should_pass("cm", $DistanceUnit);
+should_pass("m", $DistanceUnit);
+should_pass("km", $DistanceUnit);
+should_fail("MM", $DistanceUnit);
+should_fail("mm ", $DistanceUnit);
+should_fail(" mm", $DistanceUnit);
+should_fail("miles", $DistanceUnit);
+
+should_pass("5 km", $Distance);
+should_pass("5 mm", $Distance);
+should_fail("4 miles", $Distance);
+should_fail("5.5 km", $Distance);
+should_fail([qw/5 km/], $Distance);
+
 done_testing;

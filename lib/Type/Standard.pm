@@ -242,34 +242,6 @@ declare "Maybe",
 		};
 	};
 
-use overload ();
-declare "Overload",
-	as "Object",
-	where { overload::Overloaded($_) },
-	inline_as { "Scalar::Util::blessed($_) and overload::Overloaded($_)" },
-	constraint_generator => sub
-	{
-		my @operations = @_;
-		return sub {
-			my $value = shift;
-			for my $op (@operations) {
-				return unless overload::Method($value, $op);
-			}
-			return !!1;
-		}
-	},
-	inline_generator => sub {
-		my @operations = @_;
-		return sub {
-			my $v = $_[1];
-			join " and ",
-				"Scalar::Util::blessed($v)",
-				map "overload::Method($v, q[$_])", @operations;
-		};
-	};
-
-# TODO: things from MooseX::Types::Structured
-
 declare "Map",
 	as "HashRef",
 	where { ref $_ eq "HASH" },
@@ -368,6 +340,51 @@ declare "Dict",
 			$constraints{$_}->check(exists $value->{$_} ? $value->{$_} : ()) || return for sort keys %constraints;
 			return !!1;
 		};
+	};
+
+use overload ();
+declare "Overload",
+	as "Object",
+	where { overload::Overloaded($_) },
+	inline_as { "Scalar::Util::blessed($_) and overload::Overloaded($_)" },
+	constraint_generator => sub
+	{
+		my @operations = @_;
+		return sub {
+			my $value = shift;
+			for my $op (@operations) {
+				return unless overload::Method($value, $op);
+			}
+			return !!1;
+		}
+	},
+	inline_generator => sub {
+		my @operations = @_;
+		return sub {
+			my $v = $_[1];
+			join " and ",
+				"Scalar::Util::blessed($v)",
+				map "overload::Method($v, q[$_])", @operations;
+		};
+	};
+
+declare "StrMatch",
+	as "Str",
+	constraint_generator => sub
+	{
+		my ($regexp, $checker) = @_;
+		$checker
+			? sub {
+				my $value = shift;
+				return if ref($value);
+				my @m = ($value =~ $regexp);
+				$checker->check(\@m);
+			}
+			: sub {
+				my $value = shift;
+				!ref($value) and $value =~ $regexp;
+			}
+		;
 	};
 
 1;
@@ -480,6 +497,24 @@ to check are overloaded. For example, the following checks for objects
 which overload addition and subtraction.
 
    Overload["+", "-"]
+
+=item C<< StrMatch[`a] >>
+
+A string that matches a regular exception:
+
+	declare "Distance",
+		as StrMatch[ qr{^([0-9]+)\s*(mm|cm|m|km)$} ];
+
+You can provide a type constraint for the array of subexpressions:
+
+	declare "Distance",
+		as StrMatch[
+			qr{^([0-9]+)\s*(.+)$},
+			Tuple[
+				Int,
+				enum(DistanceUnit => [qw/ mm cm m km /]),
+			],
+		];
 
 =back
 
