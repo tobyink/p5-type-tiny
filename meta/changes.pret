@@ -4,3 +4,10 @@
 	issued  2013-04-02;
 	label   "Developer preview".
 
+`Type-Tiny 0.000_02 cpan:TOBYINK`
+	issued  2013-04-03;
+	changeset [
+		item "Beginnings of Type::Tiny::Manual."^^Documentation;
+		item "Anchor enum regexps to beginning and end of string."^^Bugfix;
+		item "StrMatch added to Type::Standard."^^Addition;
+	].
