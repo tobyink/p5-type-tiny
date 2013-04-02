@@ -20,7 +20,7 @@ use Type::Library;
 use Type::Tiny;
 
 use Exporter qw< import >;
-our @EXPORT = qw< 
+our @EXPORT = qw<
 	extends declare as where message inline_as
 	class_type role_type duck_type union intersection enum
 	coerce from via

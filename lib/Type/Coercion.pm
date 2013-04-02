@@ -29,7 +29,7 @@ use if ($] >= 5.010001), overload =>
 sub new
 {
 	my $class  = shift;
-	my %params = (@_==1) ? %{$_[0]} : @_;	
+	my %params = (@_==1) ? %{$_[0]} : @_;
 	my $self   = bless \%params, $class;
 	Scalar::Util::weaken($self->{type_constraint}); # break ref cycle
 	return $self;

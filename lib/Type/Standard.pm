@@ -360,7 +360,7 @@ declare "Dict",
 	},
 	constraint_generator => sub
 	{
-		my %constraints = @_;		
+		my %constraints = @_;
 		return sub
 		{
 			my $value = $_[0];
