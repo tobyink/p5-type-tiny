@@ -1,0 +1,40 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Type::Tiny::Manual - an overview of Type::Tiny
+
+=head1 SYNOPSIS
+
+Type::Tiny is a small framework for writing type constraints and organising
+them into type libraries. Although inspired by Moose's type constraint API,
+it has no non-core dependencies, and can be used with L<Moose>, L<Mouse> and
+L<Moo>.
+
+It provides a small Moose-inspired library of built-in type constraints.
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+L<Libraries|Type::Tiny::Manual::Libraries> - how to build a type library with Type::Tiny, Type::Library and Type::Utils
+
+=item *
+
+L<Using with Moose|Type::Tiny::Manual::UsingWithMoose> - how to use Type::Tiny and Type::Library with Moose
+
+=item *
+
+L<Using with Mouse|Type::Tiny::Manual::UsingWithMouse> - how to use Type::Tiny and Type::Library with Mouse
+
+=item *
+
+L<Using with Moo|Type::Tiny::Manual::UsingWithMoo> - how to use Type::Tiny and Type::Library with Moo
+
+=back
+
+=cut

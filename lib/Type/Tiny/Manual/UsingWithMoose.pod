@@ -1,0 +1,9 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Type::Tiny::Manual::UsingWithMoose - how to use Type::Tiny and Type::Library with Moose
+
+=cut
