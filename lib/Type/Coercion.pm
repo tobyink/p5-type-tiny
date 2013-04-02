@@ -131,6 +131,71 @@ __END__
 
 Type::Coercion - a set of coercions to a particular target type constraint
 
+=head1 DESCRIPTION
+
+=head2 Constructor
+
+=over
+
+=item C<< new(%attributes) >>
+
+Moose-style constructor function.
+
+=back
+
+=head2 Attributes
+
+=over
+
+=item C<type_constraint>
+
+Weak reference to the target type constraint (i.e. the type constraint which
+the output of coercion coderefs is expected to conform to).
+
+=item C<type_coercion_map>
+
+Arrayref of source-type/coercion-coderef pairs. Don't set this in the
+constructor; use the C<add_type_coercions> method instead.
+
+=item C<moose_coercion>
+
+A L<Moose::Meta::TypeCoercion> object equivalent to this one. Don't set this
+manually; rely on the default built one.
+
+=back
+
+=head2 Methods
+
+=over
+
+=item C<has_type_constraint>
+
+Predicate method.
+
+=item C<< add_type_coercions($type1, $code1, ...) >>
+
+Takes one or more pairs of L<Type::Tiny> objects and coderefs, creating an
+ordered list of source types and coercion coderefs.
+
+=item C<< coerce($value) >>
+
+Coerce the value to the target type.
+
+=item C<< assert_coerce($value) >>
+
+Coerce the value to the target type, and throw an exception if the result
+does not validate against the target type constraint.
+
+=item C<< has_coercion_for_type($source_type) >>
+
+Not implemented yet.
+
+=item C<< has_coercion_for_value($value) >>
+
+Returns true iff the value could be coerced by this coercion.
+
+=back
+
 =head1 BUGS
 
 Please report any bugs to
@@ -141,6 +206,8 @@ L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
 L<Type::Tiny::Manual>.
 
 L<Type::Tiny>, L<Type::Library>, L<Type::Utils>, L<Type::Standard>.
+
+L<Moose::Meta::TypeCoercion>.
 
 =head1 AUTHOR
 
