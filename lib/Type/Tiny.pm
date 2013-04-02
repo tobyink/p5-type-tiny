@@ -367,6 +367,11 @@ Type::Tiny - tiny, yet Moo(se)-compatible type constraint
       use Moose;
       has favourite_number => (is => "ro", isa => $NUM->moose_type);
    }
+   
+   package Maisy {
+      use Mouse;
+      has favourite_number => (is => "ro", isa => $NUM->mouse_type);
+   }
 
 =head1 DESCRIPTION
 
@@ -376,8 +381,8 @@ objects which are compatible with Moo, Moose and Mouse.
 Maybe now we won't need to have separate MooseX, MouseX and MooX versions
 of everything? We can but hope...
 
-If you're reading this because you want to create a type library, then
-you're probably better off reading L<Type::Tiny::Manual>.
+This documents the internals of L<Type::Tiny>. L<Type::Tiny::Manual> is
+a better starting place if you're new.
 
 =head2 Constructor
 
