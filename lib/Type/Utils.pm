@@ -4,6 +4,11 @@ use 5.008001;
 use strict;
 use warnings;
 
+BEGIN {
+	$Type::Utils::AUTHORITY = 'cpan:TOBYINK';
+	$Type::Utils::VERSION   = '0.001';
+}
+
 sub _confess ($;@) {
 	require Carp;
 	@_ = sprintf($_[0], @_[1..$#_]) if @_ > 1;

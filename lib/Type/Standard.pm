@@ -3,6 +3,11 @@ package Type::Standard;
 use strict;
 use warnings;
 
+BEGIN {
+	$Type::Standard::AUTHORITY = 'cpan:TOBYINK';
+	$Type::Standard::VERSION   = '0.001';
+}
+
 use base "Type::Library";
 use Type::Utils;
 
