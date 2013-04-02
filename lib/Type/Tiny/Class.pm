@@ -70,6 +70,33 @@ __END__
 
 Type::Tiny::Class - type constraints based on the "isa" method
 
+=head1 DESCRIPTION
+
+Type constraints of the general form C<< { $_->isa("Some::Class") } >>.
+
+This package inherits from L<Type::Tiny>; see that for most documentation.
+Major differences are listed below:
+
+=head2 Attributes
+
+=over
+
+=item C<class>
+
+The class for the constraint.
+
+=item C<constraint>
+
+Unlike Type::Tiny, you should generally I<not> pass a constraint to the
+constructor. Instead rely on the default.
+
+=item C<inlined>
+
+Unlike Type::Tiny, you should generally I<not> pass an inlining coderef to
+the constructor. Instead rely on the default.
+
+=back
+
 =head1 BUGS
 
 Please report any bugs to
@@ -80,6 +107,8 @@ L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
 L<Type::Tiny::Manual>.
 
 L<Type::Tiny>.
+
+L<Moose::Meta::TypeConstraint::Class>.
 
 =head1 AUTHOR
 

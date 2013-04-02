@@ -72,6 +72,34 @@ __END__
 
 Type::Tiny::Enum - string enum type constraints
 
+=head1 DESCRIPTION
+
+Enum type constraints.
+
+This package inherits from L<Type::Tiny>; see that for most documentation.
+Major differences are listed below:
+
+=head2 Attributes
+
+=over
+
+=item C<values>
+
+Arrayref of allowable value strings. Non-string values (e.g. objects with
+overloading) will be stringified in the constructor.
+
+=item C<constraint>
+
+Unlike Type::Tiny, you should generally I<not> pass a constraint to the
+constructor. Instead rely on the default.
+
+=item C<inlined>
+
+Unlike Type::Tiny, you should generally I<not> pass an inlining coderef to
+the constructor. Instead rely on the default.
+
+=back
+
 =head1 BUGS
 
 Please report any bugs to
@@ -82,6 +110,8 @@ L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
 L<Type::Tiny::Manual>.
 
 L<Type::Tiny>.
+
+L<Moose::Meta::TypeConstraint::Enum>.
 
 =head1 AUTHOR
 

@@ -69,6 +69,33 @@ __END__
 
 Type::Tiny::Duck - type constraints based on the "can" method
 
+=head1 DESCRIPTION
+
+Type constraints of the general form C<< { $_->can("method") } >>.
+
+This package inherits from L<Type::Tiny>; see that for most documentation.
+Major differences are listed below:
+
+=head2 Attributes
+
+=over
+
+=item C<methods>
+
+An arrayref of method names.
+
+=item C<constraint>
+
+Unlike Type::Tiny, you should generally I<not> pass a constraint to the
+constructor. Instead rely on the default.
+
+=item C<inlined>
+
+Unlike Type::Tiny, you should generally I<not> pass an inlining coderef to
+the constructor. Instead rely on the default.
+
+=back
+
 =head1 BUGS
 
 Please report any bugs to
@@ -79,6 +106,8 @@ L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
 L<Type::Tiny::Manual>.
 
 L<Type::Tiny>.
+
+L<Moose::Meta::TypeConstraint::DuckType>.
 
 =head1 AUTHOR
 

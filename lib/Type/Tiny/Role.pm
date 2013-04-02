@@ -68,6 +68,37 @@ __END__
 
 Type::Tiny::Role - type constraints based on the "DOES" method
 
+=head1 DESCRIPTION
+
+Type constraints of the general form C<< { $_->DOES("Some::Role") } >>.
+
+This package inherits from L<Type::Tiny>; see that for most documentation.
+Major differences are listed below:
+
+=head2 Attributes
+
+=over
+
+=item C<role>
+
+The role for the constraint.
+
+Note that this package doesn't subscribe to any particular flavour of roles
+(L<Moose::Role>, L<Mouse::Role>, L<Moo::Role>, L<Role::Tiny>, etc). It simply
+trusts the object's C<DOES> method (see L<UNIVERSAL>).
+
+=item C<constraint>
+
+Unlike Type::Tiny, you should generally I<not> pass a constraint to the
+constructor. Instead rely on the default.
+
+=item C<inlined>
+
+Unlike Type::Tiny, you should generally I<not> pass an inlining coderef to
+the constructor. Instead rely on the default.
+
+=back
+
 =head1 BUGS
 
 Please report any bugs to
@@ -78,6 +109,8 @@ L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
 L<Type::Tiny::Manual>.
 
 L<Type::Tiny>.
+
+L<Moose::Meta::TypeConstraint::Role>.
 
 =head1 AUTHOR
 

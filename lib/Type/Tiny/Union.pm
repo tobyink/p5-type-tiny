@@ -77,6 +77,33 @@ __END__
 
 Type::Tiny::Union - union type constraints
 
+=head1 DESCRIPTION
+
+Union type constraints.
+
+This package inherits from L<Type::Tiny>; see that for most documentation.
+Major differences are listed below:
+
+=head2 Attributes
+
+=over
+
+=item C<type_constraints>
+
+Arrayref of type constraints.
+
+=item C<constraint>
+
+Unlike Type::Tiny, you should generally I<not> pass a constraint to the
+constructor. Instead rely on the default.
+
+=item C<inlined>
+
+Unlike Type::Tiny, you should generally I<not> pass an inlining coderef to
+the constructor. Instead rely on the default.
+
+=back
+
 =head1 BUGS
 
 Please report any bugs to
