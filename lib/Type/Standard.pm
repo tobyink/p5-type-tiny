@@ -530,7 +530,8 @@ L<Type::Tiny::Manual>.
 L<Type::Tiny>, L<Type::Library>, L<Type::Utils>, L<Type::Coercion>.
 
 L<Moose::Util::TypeConstraints>,
-L<Mouse::Util::TypeConstraints>.
+L<Mouse::Util::TypeConstraints>,
+L<MooseX::Types::Structured>.
 
 =head1 AUTHOR
 
