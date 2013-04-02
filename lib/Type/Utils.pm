@@ -242,7 +242,7 @@ Type::Utils - utility functions to make defining type constraints a little easie
 
    package MyTypes;
    
-   use base "Type::Library";
+   use Type::Library -base;
    use Type::Utils;
    
    extends "Type::Standard";

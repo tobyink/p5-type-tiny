@@ -34,6 +34,8 @@ sub import
 	my $meta             = shift->meta;
 	my ($opts, @exports) = $meta->_process_tags(@_);
 	$opts->{caller}      = caller;
+	no strict 'refs';
+	push @{"$opts->{caller}\::ISA"}, ref($meta) if $opts->{base};
 	$meta->_export($_, $opts) for @exports;
 }
 
@@ -52,6 +54,10 @@ sub _process_tags
 			{ $opts->{moose} = 1 }
 		elsif ($arg =~ /^[:-]mouse$/i)
 			{ $opts->{mouse} = 1 }
+		elsif ($arg =~ /^[:-]declare$/i)
+			{ $opts->{declare} = 1 }
+		elsif ($arg =~ /^[:-]base/i)
+			{ $opts->{base} = 1 }
 		elsif ($arg =~ /^[:-]all$/i)
 			{ push @exports, map $optify->($_), map { $_, "is_$_", "to_$_", "assert_$_" } $meta->type_names }
 		elsif ($arg =~ /^[:-](assert|is|to)$/i)
@@ -87,6 +93,8 @@ sub _export
 	
 	if ($sub->{sub} =~ /^(is|to|assert)_/ and my $coderef = $class->can($sub->{sub}))
 		{ $export_coderef = $coderef }
+	elsif ($opts->{declare} and $export_to->isa("Type::Library"))
+		{ $export_coderef = sub (;$) { $export_to->get_type($sub->{sub}) || $sub->{sub} } }
 	elsif ($opts->{moose} and $type = $meta->get_type($sub->{sub}))
 		{ $export_coderef = _subname $type->qualified_name, sub (;$) { (@_ ? $type->parameterize(@{$_[0]}) : $type)->moose_type } }
 	elsif ($opts->{mouse} and $type = $meta->get_type($sub->{sub}))
@@ -128,6 +136,7 @@ sub add_type
 	$meta->{types}{$name} = $type;
 	
 	no strict "refs";
+	no warnings "redefine";
 	my $class = blessed($meta);
 	*{"$class\::$name"   }     = _subname $type->qualified_name, sub (;$) { $type };
 	*{"$class\::is_$name"}     = _subname $type->qualified_name, sub ($)  { $type->check($_[0]) };
@@ -170,7 +179,7 @@ Type::Library - tiny, yet Moo(se)-compatible type libraries
 
    package MyTypes {
       use Scalar::Util qw(looks_like_number);
-      use base "Type::Library";
+      use Type::Library -base;
       use Type::Tiny;
       
       my $NUM = "Type::Tiny"->new(
