@@ -396,7 +396,6 @@ declare "Overload",
 		};
 	};
 
-# XXX - inlining
 declare "StrMatch",
 	as "Str",
 	constraint_generator => sub
@@ -414,6 +413,35 @@ declare "StrMatch",
 				!ref($value) and $value =~ $regexp;
 			}
 		;
+	},
+	inline_generator => sub
+	{
+		require B;
+		my ($regexp, $checker) = @_;
+		if ($checker)
+		{
+			return unless $checker->can_be_inlined;
+			return sub
+			{
+				my $v = $_[1];
+				sprintf
+					"!ref($v) and do { my \$m = [$v =~ m%s]; %s }",
+					B::perlstring("$regexp"),
+					$checker->inline_check('$m'),
+				;
+			};
+		}
+		else
+		{
+			return sub
+			{
+				my $v = $_[1];
+				sprintf
+					"!ref($v) and $v =~ m%s",
+					B::perlstring("$regexp"),
+				;
+			};
+		}
 	};
 
 1;
