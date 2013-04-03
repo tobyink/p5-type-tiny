@@ -132,10 +132,13 @@ sub _build_compiled_check
 {
 	my $self = shift;
 	
-#	warn("COMPILING $self: ".$self->inline_check('$_[0]')) if $self->can_be_inlined;
-	
-	return eval sprintf('sub ($) { %s }', $self->inline_check('$_[0]'))
-		if $self->can_be_inlined;
+	if ($self->can_be_inlined)
+	{
+		local $@;
+		my $sub = eval sprintf('sub ($) { %s }', $self->inline_check('$_[0]'));
+		die "Failed to compile check for $self: $@\n\nCODE: ".$self->inline_check('$_[0]') if $@;
+		return $sub;
+	}
 	
 	my @constraints =
 		reverse

@@ -204,7 +204,7 @@ declare "ScalarRef",
 		return sub {
 			my $v = $_[1];
 			my $param_check = $param->inline_check("\${$v}");
-			"(ref($v) eq 'SCALAR' or ref($v) eq 'REF') and ($param_check)";
+			"(ref($v) eq 'SCALAR' or ref($v) eq 'REF') and $param_check";
 		};
 	};
 
@@ -276,6 +276,15 @@ declare "Optional",
 	{
 		my $param = shift;
 		sub { exists($_[0]) ? $param->check($_[0]) : !!1 }
+	},
+	inline_generator => sub {
+		my $param = shift;
+		return unless $param->can_be_inlined;
+		return sub {
+			my $v = $_[1];
+			my $param_check = $param->inline_check($v);
+			"!exists($v) or $param_check";
+		};
 	};
 
 sub slurpy ($) { +{ slurpy => $_[0] } }
@@ -333,6 +342,31 @@ declare "Dict",
 			$constraints{$_}->check(exists $value->{$_} ? $value->{$_} : ()) || return for sort keys %constraints;
 			return !!1;
 		};
+	},
+	inline_generator => sub
+	{
+		# We can only inline a parameterized Dict if all the
+		# constraints inside can be inlined.
+		my %constraints = @_;
+		for my $c (values %constraints)
+		{
+			next if $c->can_be_inlined;
+			return;
+		}
+		my $regexp = join "|", map quotemeta, sort keys %constraints;
+		return sub
+		{
+			require B;
+			my $h = $_[1];
+			join " and ",
+				"ref($h) eq 'HASH'",
+				"not(grep !/^($regexp)\$/, keys \%{$h})",
+				map {
+					my $k = B::perlstring($_);
+					$constraints{$_}->inline_check("$h\->{$k}");
+				}
+				sort keys %constraints;
+		}
 	};
 
 use overload ();
@@ -498,7 +532,7 @@ A string that matches a regular exception:
 	declare "Distance",
 		as StrMatch[ qr{^([0-9]+)\s*(mm|cm|m|km)$} ];
 
-You can provide a type constraint for the array of subexpressions:
+You can optionally provide a type constraint for the array of subexpressions:
 
 	declare "Distance",
 		as StrMatch[
