@@ -24,32 +24,9 @@ use warnings;
 use lib qw( . ./t ../inc ./inc );
 
 use Test::More;
+use Test::TypeTiny;
 
 use Type::Standard -all;
-
-sub should_pass
-{
-	my ($value, $type) = @_;
-	@_ = (
-		!!$type->check($value),
-		defined $value
-			? sprintf("value '%s' passes type constraint '%s'", $value, $type)
-			: sprintf("undef passes type constraint '%s'", $type),
-	);
-	goto \&Test::More::ok;
-}
-
-sub should_fail
-{
-	my ($value, $type) = @_;
-	@_ = (
-		!$type->check($value),
-		defined $value
-			? sprintf("value '%s' fails type constraint '%s'", $value, $type)
-			: sprintf("undef fails type constraint '%s'", $type),
-	);
-	goto \&Test::More::ok;
-}
 
 my $var = 123;
 should_pass(\$var, ScalarRef);

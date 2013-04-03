@@ -4,7 +4,8 @@
 
 =head1 PURPOSE
 
-Checks type complements, unions and intersections.
+Tests overloading of bitwise operators and numeric comparison operators
+for L<Type::Tiny>.
 
 =head1 AUTHOR
 
@@ -21,35 +22,12 @@ the same terms as the Perl 5 programming language system itself.
 
 use strict;
 use warnings;
-use lib qw( . ./t ../inc ./inc );
+use lib qw( ./lib ./t/lib ../inc ./inc );
 
 use Test::More;
+use Test::TypeTiny;
 
 use Type::Standard -all;
-
-sub should_pass
-{
-	my ($value, $type) = @_;
-	@_ = (
-		!!$type->check($value),
-		defined $value
-			? sprintf("value '%s' passes type constraint '%s'", $value, $type)
-			: sprintf("undef passes type constraint '%s'", $type),
-	);
-	goto \&Test::More::ok;
-}
-
-sub should_fail
-{
-	my ($value, $type) = @_;
-	@_ = (
-		!$type->check($value),
-		defined $value
-			? sprintf("value '%s' fails type constraint '%s'", $value, $type)
-			: sprintf("undef fails type constraint '%s'", $type),
-	);
-	goto \&Test::More::ok;
-}
 
 my $var = 123;
 should_fail(\$var, ~ScalarRef);

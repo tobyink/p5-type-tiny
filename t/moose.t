@@ -28,7 +28,7 @@ the same terms as the Perl 5 programming language system itself.
 
 use strict;
 use warnings;
-use lib qw( . ./t ../inc ./inc );
+use lib qw( ./lib ./t/lib ../inc ./inc );
 
 use Test::More;
 use Test::Requires { Moose => 2.0000 };
