@@ -322,6 +322,30 @@ declare "Tuple",
 			}
 			return !!1;
 		};
+	},
+	inline_generator => sub
+	{
+		my @constraints = @_;
+		my $slurpy;
+		if (exists $constraints[-1] and ref $constraints[-1] eq "HASH")
+		{
+			$slurpy = pop(@constraints)->{slurpy};
+		}
+		
+		return if grep { not $_->can_be_inlined } @constraints;
+		return if defined $slurpy && !$slurpy->can_be_inlined;
+		
+		return sub
+		{
+			my $v = $_[1];
+			join " and ",
+				"ref($v) eq 'ARRAY'",
+				($slurpy
+					? sprintf("do { my \$tmp = [\@{$v}[%d..\$#{$v}]]; %s }", $#constraints+1, $slurpy->inline_check('$tmp'))
+					: sprintf("\@{$v} <= %d", scalar @constraints)
+				),
+				map { $constraints[$_]->inline_check("$v\->[$_]") } 0 .. $#constraints;
+		};		
 	};
 
 declare "Dict",
@@ -418,6 +442,8 @@ declare "StrMatch",
 	{
 		require B;
 		my ($regexp, $checker) = @_;
+		my $regexp_string = "$regexp";
+		$regexp_string =~ s/\\\//\\\\\//g; # toothpicks
 		if ($checker)
 		{
 			return unless $checker->can_be_inlined;
@@ -425,8 +451,8 @@ declare "StrMatch",
 			{
 				my $v = $_[1];
 				sprintf
-					"!ref($v) and do { my \$m = [$v =~ m%s]; %s }",
-					B::perlstring("$regexp"),
+					"!ref($v) and do { my \$m = [$v =~ /%s/]; %s }",
+					$regexp_string,
 					$checker->inline_check('$m'),
 				;
 			};
@@ -437,8 +463,8 @@ declare "StrMatch",
 			{
 				my $v = $_[1];
 				sprintf
-					"!ref($v) and $v =~ m%s",
-					B::perlstring("$regexp"),
+					"!ref($v) and $v =~ /%s/",
+					$regexp_string,
 				;
 			};
 		}

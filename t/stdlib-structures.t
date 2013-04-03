@@ -116,7 +116,7 @@ should_fail("mm ", $DistanceUnit);
 should_fail(" mm", $DistanceUnit);
 should_fail("miles", $DistanceUnit);
 
-should_pass("5 km", $Distance);
+should_pass("5 km", $Distance) or diag($Distance->inline_check('$XXX'));
 should_pass("5 mm", $Distance);
 should_fail("4 miles", $Distance);
 should_fail("5.5 km", $Distance);
