@@ -98,7 +98,8 @@ sub has_parameters           { exists $_[0]{parameters} }
 sub _assert_coercion
 {
 	my $self = shift;
-	$self->has_coercion or _confess "no coercion for this type constraint";
+	_confess "no coercion for this type constraint"
+		unless $self->has_coercion && @{$self->coercion->type_coercion_map};
 	return $self->coercion;
 }
 
