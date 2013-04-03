@@ -1,8 +1,5 @@
 - sanity check type names
 - test cases
-	- inlining of class, role and duck types
-	- inlining of unions, intersections and complements
-	- inlining for MooseX::Types::Structured
 	- Type::Standard::Overload
 	- Type::Tiny::Enum
 - documentation

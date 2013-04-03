@@ -45,8 +45,10 @@ sub _build_inlined
 {
 	my $self  = shift;
 	my $class = $self->class;
-	my $var   = $_[0];
-	return qq{blessed($var) and $var->isa(q[$class])};
+	sub {
+		my $var = $_[1];
+		qq{blessed($var) and $var->isa(q[$class])};
+	};
 }
 
 sub _build_message

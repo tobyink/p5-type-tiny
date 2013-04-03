@@ -43,10 +43,12 @@ sub _build_constraint
 sub _build_inlined
 {
 	my $self = shift;
-	my $var  = $_[0];
 	my @methods = @{$self->methods};
-	local $" = q{ };
-	return qq{ blessed($var) and not grep(!$var->can(\$_), qw/@methods/) };
+	sub {
+		my $var = $_[1];
+		local $" = q{ };
+		qq{ blessed($var) and not grep(!$var->can(\$_), qw/@methods/) };
+	};
 }
 
 sub _build_message

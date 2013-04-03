@@ -62,7 +62,7 @@ sub can_be_inlined
 sub inline_check
 {
 	my $self = shift;
-	join " and ", map $_->inline_check(@_), @$self;
+	sub { join " and ", map $_->inline_check($_[1]), @$self };
 }
 
 1;

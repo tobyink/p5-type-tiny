@@ -58,19 +58,19 @@ like(
 
 like(
 	exception { "Local::Class"->new(small => 5.5) },
-	qr{^isa check for "small" failed: value "5.5" did not pass type constraint "Integer"},
+	qr{^isa check for "small" failed: 5.5 is too big},
 	"violation of parent type constraint",
 );
 
 like(
 	exception { "Local::Class"->new(small => "five point five") },
-	qr{^isa check for "small" failed: 'five point five' doesn't look like a number},
+	qr{^isa check for "small" failed: five point five is too big},
 	"violation of grandparent type constraint",
 );
 
 like(
 	exception { "Local::Class"->new(small => []) },
-	qr{^isa check for "small" failed: is not a string},
+	qr{^isa check for "small" failed: ARRAY\(\w+\) is too big},
 	"violation of great-grandparent type constraint",
 );
 

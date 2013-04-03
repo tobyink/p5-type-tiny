@@ -57,7 +57,7 @@ sub inline_check
 {
 	my $self = shift;
 	my $regexp = join "|", map quotemeta, @$self;
-	"$_[0] =~ m{^(?:$regexp)$}"
+	"$_[0] =~ m{^(?:$regexp)\$}";
 }
 
 1;

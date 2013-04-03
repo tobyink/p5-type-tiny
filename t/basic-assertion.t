@@ -49,7 +49,7 @@ like(
 ok assert_SmallInteger(5), "assert_SmallInteger works (value that should pass)";
 like(
 	exception { assert_SmallInteger([]) },
-	qr{^is not a string},
+	qr{^ARRAY\(\w+\) is too big},
 	"assert_SmallInteger works (value that should fail)"
 );
 
