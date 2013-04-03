@@ -605,19 +605,19 @@ which overload addition and subtraction.
 
 A string that matches a regular exception:
 
-	declare "Distance",
-		as StrMatch[ qr{^([0-9]+)\s*(mm|cm|m|km)$} ];
+   declare "Distance",
+      as StrMatch[ qr{^([0-9]+)\s*(mm|cm|m|km)$} ];
 
 You can optionally provide a type constraint for the array of subexpressions:
 
-	declare "Distance",
-		as StrMatch[
-			qr{^([0-9]+)\s*(.+)$},
-			Tuple[
-				Int,
-				enum(DistanceUnit => [qw/ mm cm m km /]),
-			],
-		];
+   declare "Distance",
+      as StrMatch[
+         qr{^([0-9]+)\s*(.+)$},
+         Tuple[
+            Int,
+            enum(DistanceUnit => [qw/ mm cm m km /]),
+         ],
+      ];
 
 =back
 
