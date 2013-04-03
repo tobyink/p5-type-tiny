@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Tiny::Enum::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::Enum::VERSION   = '0.000_04';
+	$Type::Tiny::Enum::VERSION   = '0.000_05';
 }
 
 sub _confess ($;@)

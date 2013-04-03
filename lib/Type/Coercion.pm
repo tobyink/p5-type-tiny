@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Coercion::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Coercion::VERSION   = '0.000_04';
+	$Type::Coercion::VERSION   = '0.000_05';
 }
 
 use Scalar::Util qw< blessed >;

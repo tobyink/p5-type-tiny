@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Utils::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Utils::VERSION   = '0.000_04';
+	$Type::Utils::VERSION   = '0.000_05';
 }
 
 sub _confess ($;@) {

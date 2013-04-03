@@ -35,3 +35,10 @@
 		item "Finally implement Type::Coercion's has_coercion_for_type method."^^Addition;
 		item "Allow coercion code to be expressed as a string; quite a bit faster."^^Change;
 	].
+
+`Type-Tiny 0.000_05 cpan:TOBYINK`
+	issued  2013-04-04;
+	changeset [
+		item "Factor out some functions from test suite into a new module: Test::TypeTiny."^^Addition;
+		item "Rearrange test suite slightly."^^Packaging;
+	].
