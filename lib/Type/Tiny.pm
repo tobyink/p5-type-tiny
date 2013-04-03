@@ -24,10 +24,14 @@ use overload
 	q("")      => sub { caller eq 'Moo::HandleMoose' ? "Type::Tiny~~$_[0]{uniq}" : $_[0]->display_name },
 	q(bool)    => sub { 1 },
 	q(&{})     => sub { my $t = shift; sub { $t->assert_valid(@_) } },
-	q(|)       => sub { my @tc = _swap(@_); require Type::Tiny::Union; "Type::Tiny::Union"->new(type_constraints => \@tc) },
-	q(&)       => sub { my @tc = _swap(@_); require Type::Tiny::Intersection; "Type::Tiny::Intersection"->new(type_constraints => \@tc) },
+	q(|)       => sub { my @tc = _swap @_; require Type::Tiny::Union; "Type::Tiny::Union"->new(type_constraints => \@tc) },
+	q(&)       => sub { my @tc = _swap @_; require Type::Tiny::Intersection; "Type::Tiny::Intersection"->new(type_constraints => \@tc) },
 	q(~)       => sub { shift->complementary_type },
 	q(==)      => sub { $_[0]->equals($_[1]) },
+	q(<)       => sub { my $m = $_[0]->can('is_subtype_of'); $m->(_swap @_) },
+	q(>)       => sub { my $m = $_[0]->can('is_subtype_of'); $m->(reverse _swap @_) },
+	q(<=)      => sub { my $m = $_[0]->can('is_a_type_of');  $m->(_swap @_) },
+	q(>=)      => sub { my $m = $_[0]->can('is_a_type_of');  $m->(reverse _swap @_) },
 	fallback   => 1,
 ;
 use if ($] >= 5.010001), overload =>
@@ -174,18 +178,47 @@ sub equals
 {
 	my ($self, $other) = @_;
 	
+	return unless blessed($other) && $other->isa("Type::Tiny");
+	
 	return !!1 if refaddr($self) == refaddr($other);
 	
 	return !!1 if $self->has_parent  && $self->_is_null_constraint  && $self->parent==$other;
 	return !!1 if $other->has_parent && $other->_is_null_constraint && $other->parent==$self;
 	
-	return $self->inline_check('$x') eq $other->inline_check('$x')
-		if $self->can_be_inlined && $other->can_be_inlined;
-	
 	return $self->qualified_name eq $other->qualified_name
 		if $self->has_library && !$self->is_anon && $other->has_library && !$other->is_anon;
 	
+	return $self->inline_check('$x') eq $other->inline_check('$x')
+		if $self->can_be_inlined && $other->can_be_inlined;
+	
 	return;
+}
+
+sub is_subtype_of
+{
+	my ($self, $other) = @_;
+	return unless blessed($other) && $other->isa("Type::Tiny");
+
+	my $this = $self;
+	while (my $parent = $this->parent)
+	{
+		return !!1 if $parent->equals($other);
+		$this = $parent;
+	}
+	return;
+}
+
+sub is_supertype_of
+{
+	my ($self, $other) = @_;
+	return unless blessed($other) && $other->isa("Type::Tiny");
+	$other->is_subtype_of($self);
+}
+
+sub is_a_type_of
+{
+	my ($self, $other) = @_;
+	$self->equals($other) or $self->is_subtype_of($other);
 }
 
 sub qualified_name
@@ -438,6 +471,11 @@ sub minus_coercions
 	return $new;
 }
 
+sub no_coercions
+{
+	shift->_clone;
+}
+
 1;
 
 __END__
@@ -630,6 +668,11 @@ C<< "Library::Type" >> sort of name. Otherwise, returns the same as C<name>.
 
 Returns a list of all this type constraint's all ancestor constraints.
 
+=item C<< equals($other) >>, C<< is_subtype_of($other) >>, C<< is_supertype_of($other) >>, , C<< is_a_type_of($other) >>
+
+Compare two types. See L<Moose::Meta::TypeConstraint> for what these all mean.
+(OK, Moose doesn't define C<is_supertype_of>, but you get the idea, right?)
+
 =item C<< check($value) >>
 
 Returns true iff the value passes the type constraint.
@@ -701,6 +744,10 @@ the existing ones).
 
 Shorthand for creating a new child type constraint with fewer type coercions.
 
+=item C<< no_coercions >>
+
+Shorthand for creating a new child type constraint with no coercions at all.
+
 =back
 
 =head2 Overloading
@@ -722,6 +769,15 @@ Coderefification is overloaded to call C<assert_value>.
 =item *
 
 On Perl 5.10.1 and above, smart match is overloaded to call C<check>.
+
+=item *
+
+The C<< == >> operator is overloaded to call C<equals>.
+
+=item *
+
+The C<< < >> and C<< > >> operators are overloaded to call C<is_subtype_of>
+and C<is_supertype_of>.
 
 =item *
 

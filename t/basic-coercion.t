@@ -28,6 +28,7 @@ use warnings;
 use lib qw( . ./t ../inc ./inc );
 
 use Test::More;
+use Test::Fatal qw(dies_ok);
 
 use BiggerLib qw(:to);
 
@@ -53,17 +54,24 @@ my $new_type = BiggerLib::BigInteger->plus_coercions(
 	BiggerLib::HashRef, sub { 999 },
 	BiggerLib::Undef,   sub { 666 },
 );
-my $arr = [];
+my $arr  = [];
+my $hash = {};
 
-is($new_type->coerce({}), 999, 'plus_coercions - added coercion');
+is($new_type->coerce($hash), 999, 'plus_coercions - added coercion');
 is($new_type->coerce(undef), 666, 'plus_coercions - added coercion');
 is($new_type->coerce(-1), 11, 'plus_coercions - retained coercion');
 is($new_type->coerce($arr), 100, 'plus_coercions - retained coercion');
 
 my $newer_type = $new_type->minus_coercions(BiggerLib::ArrayRef, BiggerLib::Undef);
-is($newer_type->coerce({}), 999, 'minus_coercions - retained coercion');
+is($newer_type->coerce($hash), 999, 'minus_coercions - retained coercion');
 is($newer_type->coerce(undef), undef, 'minus_coercions - removed coercion');
 is($newer_type->coerce(-1), 11, 'minus_coercions - retained coercion');
 is($newer_type->coerce($arr), $arr, 'minus_coercions - removed coercion');
+
+my $no_coerce = $new_type->no_coercions;
+dies_ok { $no_coerce->coerce($hash) } 'no_coercions - removed coercion';
+dies_ok { $no_coerce->coerce(undef) } 'no_coercions - removed coercion';
+dies_ok { $no_coerce->coerce(-1) } 'no_coercions - removed coercion';
+dies_ok { $no_coerce->coerce($arr) } 'no_coercions - removed coercion';
 
 done_testing;
