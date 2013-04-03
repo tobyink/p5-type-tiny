@@ -69,7 +69,18 @@ sub assert_coerce
 
 sub has_coercion_for_type
 {
-	die "not implemented";
+	my $self = shift;
+	my $type = $_[0];
+	
+	for my $has (@{$self->type_coercion_map})
+	{
+		if (blessed($has) and $has->isa("Type::Tiny"))
+		{
+			return !!1 if $type->is_a_type_of($has);
+		}
+	}
+	
+	return;
 }
 
 sub has_coercion_for_value

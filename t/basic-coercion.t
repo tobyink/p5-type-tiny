@@ -57,6 +57,21 @@ my $new_type = BiggerLib::BigInteger->plus_coercions(
 my $arr  = [];
 my $hash = {};
 
+ok(
+	$new_type->coercion->has_coercion_for_type(BiggerLib::HashRef),
+	'has_coercian_for_type - obvious',
+);
+
+ok(
+	$new_type->coercion->has_coercion_for_type(BiggerLib::HashRef[BiggerLib::Num]),
+	'has_coercian_for_type - subtle',
+);
+
+ok(
+	not($new_type->coercion->has_coercion_for_type(BiggerLib::Ref["CODE"])),
+	'has_coercian_for_type - negative',
+);
+
 is($new_type->coerce($hash), 999, 'plus_coercions - added coercion');
 is($new_type->coerce(undef), 666, 'plus_coercions - added coercion');
 is($new_type->coerce(-1), 11, 'plus_coercions - retained coercion');
