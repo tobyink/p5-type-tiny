@@ -33,4 +33,5 @@
 		item "Type::Tiny plus_coercions/minus_coercions/no_coercions methods for creating subtypes with different sets of coercions."^^Addition;
 		item "Type::Tiny equals/is_subtype_of/is_supertype_of/is_a_type_of methods for type constraint comparisons."^^Addition;
 		item "Finally implement Type::Coercion's has_coercion_for_type method."^^Addition;
+		item "Allow coercion code to be expressed as a string; quite a bit faster."^^Change;
 	].
