@@ -6,6 +6,10 @@
 
 Checks various values against the type constraints from Type::Standard.
 
+(This test is fairly redundant now because inlined checks are used to
+compile optimized versions of type constraints whenever possible. We'll
+keep it for now.)
+
 =head1 AUTHOR
 
 Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
