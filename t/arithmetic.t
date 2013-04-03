@@ -176,4 +176,40 @@ is(
 	"coolio stringification",
 );
 
+ok(Item > Value, "Item > Value");
+ok(Value > Str, "Value > Str");
+ok(Str > Num, "Str > Num");
+ok(Num > Int, "Num > Int");
+ok(Int > $odd, "Int > \$odd");
+
+ok(Item >= Value, "Item >= Value");
+ok(Value >= Str, "Value >= Str");
+ok(Str >= Num, "Str >= Num");
+ok(Num >= Int, "Num >= Int");
+ok(Int >= $odd, "Int >= \$odd");
+
+ok(Value() < Item, "Value < Item");
+ok(Str() < Value, "Str < Value");
+ok(Num() < Str, "Num < Str");
+ok(Int() < Num, "Int < Num");
+ok($even < Int, "\$even < Int");
+
+ok(Value() <= Item, "Value <= Item");
+ok(Str() <= Value, "Str <= Value");
+ok(Num() <= Str, "Num <= Str");
+ok(Int() <= Num, "Int <= Num");
+ok($even <= Int, "\$even < Int");
+
+ok(not(Int > Int), "not(Int > Int)");
+ok(not(Int() < Int), "not(Int < Int)");
+ok(Int() <= Int, "Int <= Int");
+ok(Int >= Int, "Int >= Int");
+
+ok(not(ArrayRef[Int] > ArrayRef[Num]), 'not(ArrayRef[Int] > ArrayRef[Num])');
+ok(not(ArrayRef[Int] == ArrayRef[Num]), 'not(ArrayRef[Int] == ArrayRef[Num])');
+ok(ArrayRef[Int] == ArrayRef[Int], 'ArrayRef[Int] == ArrayRef[Int]');
+
+ok(not(ArrayRef == ArrayRef[Int]), 'not(ArrayRef == ArrayRef[Int])');
+ok(ArrayRef > ArrayRef[Int], 'ArrayRef > ArrayRef[Int]');
+
 done_testing;
