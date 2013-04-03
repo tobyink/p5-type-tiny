@@ -53,7 +53,7 @@ sub _isStr {
 	require Type::Standard;
 	$_isStr ||= Type::Utils::union([
 		Type::Standard::Overload([q[""]]),
-		Type::Standard::Str,
+		Type::Standard::Str(),
 	]);
 	$_isStr->compiled_check->(@_);
 }
