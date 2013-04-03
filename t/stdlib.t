@@ -126,6 +126,19 @@ should_pass(undef, Maybe[Int]);
 should_pass(123, Maybe[Int]);
 should_fail(1.3, Maybe[Int]);
 
+my $i = 1;
+my $f = 1.1;
+my $s = "Hello";
+should_pass(\$s, ScalarRef[Str]);
+should_pass(\$f, ScalarRef[Str]);
+should_pass(\$i, ScalarRef[Str]);
+should_fail(\$s, ScalarRef[Num]);
+should_pass(\$f, ScalarRef[Num]);
+should_pass(\$i, ScalarRef[Num]);
+should_fail(\$s, ScalarRef[Int]);
+should_fail(\$f, ScalarRef[Int]);
+should_pass(\$i, ScalarRef[Int]);
+
 should_pass(bless([], "Local::Class4"), Ref["ARRAY"]);
 should_pass(bless({}, "Local::Class4"), Ref["HASH"]);
 should_pass([], Ref["ARRAY"]);

@@ -201,17 +201,10 @@ declare "ScalarRef",
 	inline_generator => sub {
 		my $param = shift;
 		return unless $param->can_be_inlined;
-		my $param_check = $param->inline_check('$i');
-		# kinda clumsy, but it does the job...
 		return sub {
 			my $v = $_[1];
-			"ref($v) eq 'SCALAR' or ref($v) eq 'REF' and do { "
-			.  "my \$ok = 1; "
-			.  "for my \$i (${$v}) { "
-			.    "\$ok = 0 unless $param_check "
-			.  "}; "
-			.  "\$ok "
-			."}"
+			my $param_check = $param->inline_check("\${$v}");
+			"(ref($v) eq 'SCALAR' or ref($v) eq 'REF') and ($param_check)";
 		};
 	};
 
