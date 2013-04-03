@@ -15,6 +15,10 @@ L<Moo>.
 
 It provides a small Moose-inspired library of built-in type constraints.
 
+Type::Tiny is similar in aim to L<Specio>. The major differences are that
+Type::Tiny is "tiny"; and Type::Tiny dispenses with the idea of a type
+registry and stringy access to type constraints.
+
 =head1 SEE ALSO
 
 =over
@@ -36,5 +40,22 @@ L<Using with Mouse|Type::Tiny::Manual::UsingWithMouse> - how to use Type::Tiny a
 L<Using with Moo|Type::Tiny::Manual::UsingWithMoo> - how to use Type::Tiny and Type::Library with Moo
 
 =back
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
 =cut
