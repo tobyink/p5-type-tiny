@@ -18,9 +18,10 @@
 	issued  2013-04-03;
 	changeset [
 		item "Document Type::Coercion's overloading."^^Documentation;
-		item "Create compiled type constraint checks; much faster!"^^Change;
-		item "Inlined type constraints for more of Type::Standard."^^Addition;
+		item "Create and use compiled type constraint checks; much faster!"^^Change;
+		item "Inlined type constraints for all of Type::Standard."^^Addition;
 		item "Test cases for ScalarRef[`a]."^^Addition;
 		item "Fix the crashing t/moo-inflation.t test case."^^Bugfix;
 		item "Use more unique stringification for %Moo::HandleMoose::TYPE_MAP keys."^^Change;
+		item "Make sure Type::Standard's Moose-like built-ins get inflated to real Moose built-in types."^^Change;
 	].

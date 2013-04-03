@@ -28,57 +28,69 @@ sub _is_class_loaded {
 }
 
 declare "Any",
+	_is_core => 1,
 	inline_as { "!!1" };
 
 declare "Item",
+	_is_core => 1,
 	inline_as { "!!1" };
 
 declare "Bool",
+	_is_core => 1,
 	as "Item",
 	where { !defined $_ or $_ eq q() or $_ eq '0' or $_ eq '1' },
 	inline_as { "!defined $_ or $_ eq q() or $_ eq '0' or $_ eq '1'" };
 
 declare "Undef",
+	_is_core => 1,
 	as "Item",
 	where { !defined $_ },
 	inline_as { "!defined($_)" };
 
 declare "Defined",
+	_is_core => 1,
 	as "Item",
 	where { defined $_ },
 	inline_as { "defined($_)" };
 
 declare "Value",
+	_is_core => 1,
 	as "Defined",
 	where { not ref $_ },
 	inline_as { "defined($_) and not ref($_)" };
 
 declare "Str",
+	_is_core => 1,
 	as "Value",
 	where { ref(\$_) eq 'SCALAR' or ref(\(my $val = $_)) eq 'SCALAR' },
 	inline_as { "defined($_) and (ref(\\$_) eq 'SCALAR' or ref(\\(my \$val = $_)) eq 'SCALAR')" };
 
 declare "Num",
+	_is_core => 1,
 	as "Str",
 	where { looks_like_number $_ },
 	inline_as { "!ref($_) && Scalar::Util::looks_like_number($_)" };
 
 declare "Int",
+	_is_core => 1,
 	as "Num",
 	where { /\A-?[0-9]+\z/ },
 	inline_as { "defined $_ and $_ =~ /\\A-?[0-9]+\\z/" };
 
 declare "ClassName",
+	_is_core => 1,
 	as "Str",
 	where { goto \&_is_class_loaded },
 	inline_as { "Type::Standard::_is_class_loaded($_)" };
 
 declare "RoleName",
+	_is_core => 1,
 	as "ClassName",
 	where { not $_->can("new") },
 	inline_as { "Type::Standard::_is_class_loaded($_) and not $_->can('new')" };
 
 declare "Ref",
+	_is_core => 1,
 	as "Defined",
 	where { ref $_ },
 	inline_as { "!!ref($_)" },
@@ -99,21 +111,25 @@ declare "Ref",
 	};
 
 declare "CodeRef",
+	_is_core => 1,
 	as "Ref",
 	where { ref $_ eq "CODE" },
 	inline_as { "ref($_) eq 'CODE'" };
 
 declare "RegexpRef",
+	_is_core => 1,
 	as "Ref",
 	where { ref $_ eq "Regexp" },
 	inline_as { "ref($_) eq 'Regexp'" };
 
 declare "GlobRef",
+	_is_core => 1,
 	as "Ref",
 	where { ref $_ eq "GLOB" },
 	inline_as { "ref($_) eq 'GLOB'" };
 
 declare "FileHandle",
+	_is_core => 1,
 	as "Ref",
 	where {
 		(ref($_) eq "GLOB" && Scalar::Util::openhandle($_))
@@ -125,6 +141,7 @@ declare "FileHandle",
 	};
 
 declare "ArrayRef",
+	_is_core => 1,
 	as "Ref",
 	where { ref $_ eq "ARRAY" },
 	inline_as { "ref($_) eq 'ARRAY'" },
@@ -155,6 +172,7 @@ declare "ArrayRef",
 	};
 
 declare "HashRef",
+	_is_core => 1,
 	as "Ref",
 	where { ref $_ eq "HASH" },
 	inline_as { "ref($_) eq 'HASH'" },
@@ -185,6 +203,7 @@ declare "HashRef",
 	};
 
 declare "ScalarRef",
+	_is_core => 1,
 	as "Ref",
 	where { ref $_ eq "SCALAR" or ref $_ eq "REF" },
 	inline_as { "ref($_) eq 'SCALAR' or ref($_) eq 'REF'" },
@@ -209,11 +228,13 @@ declare "ScalarRef",
 	};
 
 declare "Object",
+	_is_core => 1,
 	as "Ref",
 	where { blessed $_ },
 	inline_as { "Scalar::Util::blessed($_)" };
 
 declare "Maybe",
+	_is_core => 1,
 	as "Item",
 	constraint_generator => sub
 	{
@@ -289,7 +310,6 @@ declare "Optional",
 
 sub slurpy ($) { +{ slurpy => $_[0] } }
 
-# XXX - inlining
 declare "Tuple",
 	as "ArrayRef",
 	where { ref $_ eq "ARRAY" },
@@ -345,7 +365,7 @@ declare "Tuple",
 					: sprintf("\@{$v} <= %d", scalar @constraints)
 				),
 				map { $constraints[$_]->inline_check("$v\->[$_]") } 0 .. $#constraints;
-		};		
+		};
 	};
 
 declare "Dict",

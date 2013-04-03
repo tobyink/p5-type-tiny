@@ -320,14 +320,23 @@ sub _build_moose_type
 {
 	my $self = shift;
 	
-	my %options = (name => $self->qualified_name);
-	$options{parent}     = $self->parent->moose_type if $self->has_parent;
-	$options{constraint} = $self->constraint         unless $self->_is_null_constraint;
-	$options{message}    = $self->message;
-	$options{inlined}    = $self->inlined            if $self->has_inlined;
-	
-	require Moose::Meta::TypeConstraint;
-	my $r = "Moose::Meta::TypeConstraint"->new(%options);
+	my $r;
+	if ($self->{_is_core})
+	{
+		require Moose::Util::TypeConstraints;
+		return Moose::Util::TypeConstraints::find_type_constraint($self->name);
+	}
+	else
+	{
+		my %options = (name => $self->qualified_name);
+		$options{parent}     = $self->parent->moose_type if $self->has_parent;
+		$options{constraint} = $self->constraint         unless $self->_is_null_constraint;
+		$options{message}    = $self->message;
+		$options{inlined}    = $self->inlined            if $self->has_inlined;
+		
+		require Moose::Meta::TypeConstraint;
+		$r = "Moose::Meta::TypeConstraint"->new(%options);
+	}
 	
 	$self->{moose_type} = $r;  # prevent recursion
 	$r->coercion($self->coercion->moose_coercion) if $self->has_coercion;
@@ -443,6 +452,16 @@ coderef will not be called unless the value is known to pass any parent
 type constraint.
 
 Defaults to C<< sub { 1 } >> - i.e. a coderef that passes all values.
+
+=item C<< compiled_check >>
+
+Coderef to validate a value (C<< $_[0] >>) against the type constraint.
+This coderef is expected to also handle all validation for the parent
+type constraints.
+
+The general point of this attribute is that you should not set it, and
+rely on the lazily-built default. Type::Tiny will usually generate a
+pretty fast coderef.
 
 =item C<< message >>
 
