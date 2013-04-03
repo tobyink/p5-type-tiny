@@ -21,7 +21,7 @@ sub _confess ($;@)
 sub _swap { $_[2] ? @_[1,0] : @_[0,1] }
 
 use overload
-	q("")      => sub { $_[0]->display_name },
+	q("")      => sub { caller eq 'Moo::HandleMoose' ? "Type::Tiny~~$_[0]{uniq}" : $_[0]->display_name },
 	q(bool)    => sub { 1 },
 	q(&{})     => sub { my $t = shift; sub { $t->assert_valid(@_) } },
 	q(|)       => sub { my @tc = _swap(@_); require Type::Tiny::Union; "Type::Tiny::Union"->new(type_constraints => \@tc) },
@@ -33,6 +33,7 @@ use if ($] >= 5.010001), overload =>
 	q(~~)      => sub { $_[0]->check($_[1]) },
 ;
 
+my $uniq = 1;
 sub new
 {
 	my $class  = shift;
@@ -45,12 +46,13 @@ sub new
 	}
 	
 	$params{name} = "__ANON__" unless exists $params{name};
+	$params{uniq} = $uniq++;
 	
 	my $self = bless \%params, $class;
 	
 	if ($self->has_library and not $self->is_anon)
 	{
-		$Moo::HandleMoose::TYPE_MAP{"$self"} = sub { $self->moose_type };
+		$Moo::HandleMoose::TYPE_MAP{"Type::Tiny~~$self->{uniq}"} = sub { $self->moose_type };
 	}
 	
 	return $self;
