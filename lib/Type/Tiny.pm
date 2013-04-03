@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Tiny::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::VERSION   = '0.000_03';
+	$Type::Tiny::VERSION   = '0.000_02';
 }
 
 use Scalar::Util qw< blessed weaken >;
@@ -346,8 +346,12 @@ sub _build_mouse_type
 		
 	require Mouse::Meta::TypeConstraint;
 	my $r = "Mouse::Meta::TypeConstraint"->new(%options);
-		
-	# XXX - coercions
+	
+	$self->{mouse_type} = $r;  # prevent recursion
+	$r->_add_type_coercions(
+		map { blessed($_) and $_->can('mouse_type') ? $_->mouse_type : $_ }
+		@{ $self->coercion->type_coercion_map }
+	) if $self->has_coercion;
 	
 	return $r;
 }
