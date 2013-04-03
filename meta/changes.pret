@@ -13,3 +13,14 @@
 		item "use Type::Library -base"^^Addition;
 		item "use Type::Library -declare"^^Addition;
 	].
+
+`Type-Tiny 0.000_03 cpan:TOBYINK`
+	issued  2013-04-03;
+	changeset [
+		item "Document Type::Coercion's overloading."^^Documentation;
+		item "Create compiled type constraint checks; much faster!"^^Change;
+		item "Inlined type constraints for more of Type::Standard."^^Addition;
+		item "Test cases for ScalarRef[`a]."^^Addition;
+		item "Fix the crashing t/moo-inflation.t test case."^^Bugfix;
+		item "Use more unique stringification for %Moo::HandleMoose::TYPE_MAP keys."^^Change;
+	].
