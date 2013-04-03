@@ -45,6 +45,29 @@ sub has_type_constraint { defined $_[0]{type_constraint} } # sic
 
 sub _clear_compiled_coercion { delete $_[0]{compiled_coercion} }
 
+# Some Type::Tiny objects for internal use!
+my ($_isStr, $_isCode);
+
+sub _isStr {
+	require Type::Utils;
+	require Type::Standard;
+	$_isStr ||= Type::Utils::union([
+		Type::Standard::Overload([q[""]]),
+		Type::Standard::Str,
+	]);
+	$_isStr->compiled_check->(@_);
+}
+
+sub _isCode {
+	require Type::Utils;
+	require Type::Standard;
+	$_isCode ||= Type::Utils::union([
+		Type::Standard::Overload([q[&{}]]),
+		Type::Standard::Ref(["CODE"]),
+	]);
+	$_isCode->compiled_check->(@_);
+}
+
 sub coerce
 {
 	my $self = shift;
@@ -101,7 +124,7 @@ sub add_type_coercions
 		_confess "types must be blessed Type::Tiny objects"
 			unless blessed($type) && $type->isa("Type::Tiny");
 		_confess "coercions must be code references"
-			unless ref($coercion);  # really want: does($coercion, "&{}")
+			unless _isStr($coercion) || _isCode($coercion);
 		
 		push @{$self->type_coercion_map}, $type, $coercion;
 	}
@@ -134,12 +157,13 @@ sub _build_compiled_coercion
 	
 	for my $i (0..$#types)
 	{
-		push @sub, $types[$i]->can_be_inlined
-			? sprintf('if (%s)', $types[$i]->inline_check('$_[0]'))
-			: sprintf('if ($types[%d]->check(@_))', $i);
-		push @sub, !defined $codes[$i]
-			? sprintf('  { return $_[0] }')
-			: sprintf('  { local $_ = $_[0]; return $codes[%d]->(@_) }', $i);
+		push @sub,
+			$types[$i]->can_be_inlined ? sprintf('if (%s)', $types[$i]->inline_check('$_[0]')) :
+			sprintf('if ($types[%d]->check(@_))', $i);
+		push @sub,
+			!defined($codes[$i]) ? sprintf('  { return $_[0] }') :
+			_isStr($codes[$i])   ? sprintf('  { local $_ = $_[0]; return( %s ) }', $codes[$i]) :
+			sprintf('  { local $_ = $_[0]; return $codes[%d]->(@_) }', $i);
 	}
 	
 	push @sub, 'return $_[0];';

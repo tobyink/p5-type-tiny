@@ -51,7 +51,7 @@ is(
 );
 
 my $new_type = BiggerLib::BigInteger->plus_coercions(
-	BiggerLib::HashRef, sub { 999 },
+	BiggerLib::HashRef, "999",
 	BiggerLib::Undef,   sub { 666 },
 );
 my $arr  = [];
