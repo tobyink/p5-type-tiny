@@ -1,6 +1,13 @@
-- sanity check type names
+- features
+	- sanity check type names: require initial capital letter, word characters
+	- maybe Type::Coercion "can_be_inlined"/"inline_coercion" methods??
+
 - test cases
-	- Type::Standard::Overload
-	- Type::Tiny::Enum
+	- t/type.t: some basic Type::Tiny tests minus libraries, stdlib, etc.
+	- t/type-enum.t: test the Type::Tiny::Enum class
+	- t/type-union.t: test the Type::Tiny::Union class
+	- t/type-intersection.t: test the Type::Tiny::Intersection class
+	- t/stdlib-overload.t: test Overload type from Type::Standard
+
 - documentation
 	- write manual
