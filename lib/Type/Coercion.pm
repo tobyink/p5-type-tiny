@@ -226,8 +226,8 @@ the output of coercion coderefs is expected to conform to).
 
 =item C<type_coercion_map>
 
-Arrayref of source-type/coercion-coderef pairs. Don't set this in the
-constructor; use the C<add_type_coercions> method instead.
+Arrayref of source-type/code pairs. Don't set this in the constructor; use
+the C<add_type_coercions> method instead.
 
 =item C<< compiled_coercion >>
 
@@ -254,8 +254,13 @@ Predicate method.
 
 =item C<< add_type_coercions($type1, $code1, ...) >>
 
-Takes one or more pairs of L<Type::Tiny> objects and coderefs, creating an
-ordered list of source types and coercion coderefs.
+Takes one or more pairs of L<Type::Tiny> constraints and coercion code,
+creating an ordered list of source types and coercion codes.
+
+Coercion codes can be expressed as either a string of Perl code (this
+includes objects which overload stringification), or a coderef (or object
+that overloads coderefification). In either case, the value to be coerced
+is C<< $_ >>.
 
 =item C<< coerce($value) >>
 
