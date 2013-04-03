@@ -9,7 +9,7 @@ BEGIN {
 	$Type::Tiny::VERSION   = '0.000_03';
 }
 
-use Scalar::Util qw< blessed weaken >;
+use Scalar::Util qw< blessed weaken refaddr >;
 
 sub _confess ($;@)
 {
@@ -27,6 +27,7 @@ use overload
 	q(|)       => sub { my @tc = _swap(@_); require Type::Tiny::Union; "Type::Tiny::Union"->new(type_constraints => \@tc) },
 	q(&)       => sub { my @tc = _swap(@_); require Type::Tiny::Intersection; "Type::Tiny::Intersection"->new(type_constraints => \@tc) },
 	q(~)       => sub { shift->complementary_type },
+	q(==)      => sub { $_[0]->equals($_[1]) },
 	fallback   => 1,
 ;
 use if ($] >= 5.010001), overload =>
@@ -56,6 +57,14 @@ sub new
 	}
 	
 	return $self;
+}
+
+sub _clone
+{
+	my $self = shift;
+	my %opts;
+	$opts{$_} = $self->{$_} for qw< name display_name message >;
+	$self->create_child_type(%opts);
 }
 
 sub name                     { $_[0]{name} }
@@ -159,6 +168,24 @@ sub _build_compiled_check
 		}
 		return !!1;
 	};
+}
+
+sub equals
+{
+	my ($self, $other) = @_;
+	
+	return !!1 if refaddr($self) == refaddr($other);
+	
+	return !!1 if $self->has_parent  && $self->_is_null_constraint  && $self->parent==$other;
+	return !!1 if $other->has_parent && $other->_is_null_constraint && $other->parent==$self;
+	
+	return $self->inline_check('$x') eq $other->inline_check('$x')
+		if $self->can_be_inlined && $other->can_be_inlined;
+	
+	return $self->qualified_name eq $other->qualified_name
+		if $self->has_library && !$self->is_anon && $other->has_library && !$other->is_anon;
+	
+	return;
 }
 
 sub qualified_name
@@ -363,6 +390,52 @@ sub _build_mouse_type
 	) if $self->has_coercion;
 	
 	return $r;
+}
+
+sub plus_coercions
+{
+	my $self = shift;
+	
+	my @more = (@_==1 && blessed($_[0]) && $_[0]->can('type_coercion_map'))
+		? @{ $_[0]->type_coercion_map }
+		: (@_==1 && ref $_[0]) ? @{$_[0]} : @_;
+	
+	my $new = $self->_clone;
+	$new->coercion->add_type_coercions(
+		@more,
+		@{$self->coercion->type_coercion_map},
+	);
+	return $new;
+}
+
+sub minus_coercions
+{
+	my $self = shift;
+	
+	my @not = (@_==1 && blessed($_[0]) && $_[0]->can('type_coercion_map'))
+		? grep(blessed($_)&&$_->isa("Type::Tiny"), @{ $_[0]->type_coercion_map })
+		: (@_==1 && ref $_[0]) ? @{$_[0]} : @_;
+	
+	my @keep;
+	my $c = $self->coercion->type_coercion_map;
+	for (my $i = 0; $i <= $#$c; $i += 2)
+	{
+		my $keep_this = 1;
+		NOT: for my $n (@not)
+		{
+			if ($c->[$i] == $n)
+			{
+				$keep_this = 0;
+				last NOT;
+			}
+		}
+		
+		push @keep, $c->[$i], $c->[$i+1] if $keep_this;
+	}
+
+	my $new = $self->_clone;
+	$new->coercion->add_type_coercions(@keep);
+	return $new;
 }
 
 1;
@@ -617,6 +690,16 @@ Construct a new Type::Tiny object with this object as its parent.
 =item C<< child_type_class >>
 
 The class that create_child_type will construct.
+
+=item C<< plus_coercions($type1, $code1, ...) >>
+
+Shorthand for creating a new child type constraint with the same coercions
+as this one, but then adding some extra coercions (at a higher priority than
+the existing ones).
+
+=item C<< minus_coercions($type1, ...) >>
+
+Shorthand for creating a new child type constraint with fewer type coercions.
 
 =back
 

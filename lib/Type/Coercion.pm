@@ -40,11 +40,15 @@ sub type_constraint     { $_[0]{type_constraint} }
 sub type_coercion_map   { $_[0]{type_coercion_map} ||= [] }
 sub moose_coercion      { $_[0]{moose_coercion}    ||= $_[0]->_build_moose_coercion }
 
-sub has_type_constraint { exists $_[0]{type_constraint} }
+sub has_type_constraint { defined $_[0]{type_constraint} } # sic
 
 sub coerce
 {
 	my $self = shift;
+	
+	return $_[0]
+		if $self->has_type_constraint && $self->type_constraint->check(@_);
+	
 	my $c = $self->type_coercion_map;
 	local $_ = $_[0];
 	for (my $i = 0; $i <= $#$c; $i += 2)
@@ -58,10 +62,8 @@ sub assert_coerce
 {
 	my $self = shift;
 	my $r = $self->coerce(@_);
-	if ($self->has_type_constraint)
-	{
-		$self->type_constraint->assert_valid($r);
-	}
+	$self->type_constraint->assert_valid($r)
+		if $self->has_type_constraint;
 	return $r;
 }
 

@@ -49,4 +49,21 @@ is(
 	'to_BigInteger ignores something it cannot coerce'
 );
 
+my $new_type = BiggerLib::BigInteger->plus_coercions(
+	BiggerLib::HashRef, sub { 999 },
+	BiggerLib::Undef,   sub { 666 },
+);
+my $arr = [];
+
+is($new_type->coerce({}), 999, 'plus_coercions - added coercion');
+is($new_type->coerce(undef), 666, 'plus_coercions - added coercion');
+is($new_type->coerce(-1), 11, 'plus_coercions - retained coercion');
+is($new_type->coerce($arr), 100, 'plus_coercions - retained coercion');
+
+my $newer_type = $new_type->minus_coercions(BiggerLib::ArrayRef, BiggerLib::Undef);
+is($newer_type->coerce({}), 999, 'minus_coercions - retained coercion');
+is($newer_type->coerce(undef), undef, 'minus_coercions - removed coercion');
+is($newer_type->coerce(-1), 11, 'minus_coercions - retained coercion');
+is($newer_type->coerce($arr), $arr, 'minus_coercions - removed coercion');
+
 done_testing;
