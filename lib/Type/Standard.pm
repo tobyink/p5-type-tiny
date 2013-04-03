@@ -289,6 +289,7 @@ declare "Optional",
 
 sub slurpy ($) { +{ slurpy => $_[0] } }
 
+# XXX - inlining
 declare "Tuple",
 	as "ArrayRef",
 	where { ref $_ eq "ARRAY" },
@@ -395,6 +396,7 @@ declare "Overload",
 		};
 	};
 
+# XXX - inlining
 declare "StrMatch",
 	as "Str",
 	constraint_generator => sub
