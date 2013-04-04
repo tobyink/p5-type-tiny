@@ -100,6 +100,16 @@ the constructor. Instead rely on the default.
 
 =back
 
+=head2 Overloading
+
+=over
+
+=item *
+
+Arrayrefification calls C<values>.
+
+=back
+
 =head1 BUGS
 
 Please report any bugs to
