@@ -1,5 +1,4 @@
 - features
-	- sanity check type names: require initial capital letter, word characters
 	- maybe Type::Coercion "can_be_inlined"/"inline_coercion" methods??
 
 - test cases

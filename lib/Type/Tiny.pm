@@ -55,11 +55,17 @@ sub new
 	
 	my $self = bless \%params, $class;
 	
+	unless ($self->is_anon)
+	{
+		$self->name =~ /^\p{Lu}[\p{L}0-9_]+$/sm
+			or _confess '%s is not a valid type name', $self->name;
+	}
+
 	if ($self->has_library and not $self->is_anon)
 	{
 		$Moo::HandleMoose::TYPE_MAP{"Type::Tiny~~$self->{uniq}"} = sub { $self->moose_type };
 	}
-	
+		
 	return $self;
 }
 
@@ -543,12 +549,16 @@ Moose-style constructor function.
 =item C<< name >>
 
 The name of the type constraint. These need to conform to certain naming
-rules. Optional; if not supplied will be an anonymous type constraint.
+rules (they must begin with an uppercase letter and continue using only
+letters, digits 0-9 and underscores).
+
+Optional; if not supplied will be an anonymous type constraint.
 
 =item C<< display_name >>
 
 A name to display for the type constraint when stringified. These don't
-have to conform to any naming rules. Optional.
+have to conform to any naming rules. Optional; a default name will be
+calculated from the C<name>.
 
 =item C<< parent >>
 
