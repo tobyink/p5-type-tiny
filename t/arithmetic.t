@@ -27,7 +27,7 @@ use lib qw( ./lib ./t/lib ../inc ./inc );
 use Test::More;
 use Test::TypeTiny;
 
-use Type::Standard -all;
+use Types::Standard -all;
 
 my $var = 123;
 should_fail(\$var, ~ScalarRef);

@@ -4,7 +4,7 @@
 
 =head1 PURPOSE
 
-Checks various values against C<StrMatch> from Type::Standard.
+Checks various values against C<StrMatch> from Types::Standard.
 
 =head1 AUTHOR
 
@@ -26,7 +26,7 @@ use lib qw( . ./t ../inc ./inc );
 use Test::More;
 use Test::TypeTiny;
 
-use Type::Standard -all, "slurpy";
+use Types::Standard -all, "slurpy";
 use Type::Utils;
 
 my $DistanceUnit = enum DistanceUnit => [qw/ mm cm m km /];

@@ -74,12 +74,12 @@ like(
 	"violation of great-grandparent type constraint",
 );
 
-require Type::Standard;
+require Types::Standard;
 ok(
-	Type::Standard::Num->moose_type->equals(
+	Types::Standard::Num->moose_type->equals(
 		Moose::Util::TypeConstraints::find_type_constraint("Num")
 	),
-	"equivalence between Type::Standard types and core Moose types",
+	"equivalence between Types::Standard types and core Moose types",
 );
 
 done_testing;

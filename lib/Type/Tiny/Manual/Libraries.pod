@@ -18,7 +18,7 @@ The following is an example type library:
       -base,
       -declare => qw( Datetime DatetimeHash EpochHash );
    use Type::Utils;
-   use Type::Standard -types;
+   use Types::Standard -types;
    
    class_type Datetime, { class => "DateTime" };
    
@@ -70,9 +70,9 @@ declaration above just allows us to use them within the library itself.)
 Imports some utility functions from L<Type::Utils>. These will be useful
 for defining our types and the relationships between them.
 
-   use Type::Standard -types;
+   use Types::Standard -types;
 
-Here we import a standard set of type constraints from L<Type::Standard>.
+Here we import a standard set of type constraints from L<Types::Standard>.
 There is no need to do this, but it's often helpful to have a base set of
 types which we can define our own in terms of.
 
@@ -92,14 +92,14 @@ into the L<DateTime> package. Because this type constraint is not anonymous
 (it has a name), it will be automagically installed into the type library.
 
 The next two statements declare two further types constraints, using type
-constraints from the Type::Standard library. Let's look at C<EpochHash> in
+constraints from the Types::Standard library. Let's look at C<EpochHash> in
 more detail. This is a hashref with one key called "epoch" and a value which
 is an integer.
 
    declare EpochHash,
       as Dict[ epoch => Int ];
 
-C<EpochHash> inherits from the C<Dict> type defined in Type::Standard. It
+C<EpochHash> inherits from the C<Dict> type defined in Types::Standard. It
 equally could have been defined as:
 
    declare EpochHash,

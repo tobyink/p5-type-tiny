@@ -41,4 +41,5 @@
 	changeset [
 		item "Factor out some functions from test suite into a new module: Test::TypeTiny."^^Addition;
 		item "Rearrange test suite slightly."^^Packaging;
+		item "Rename Type::Standard module to Types::Standard."^^Change;
 	].

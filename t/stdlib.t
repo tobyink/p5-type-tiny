@@ -4,7 +4,7 @@
 
 =head1 PURPOSE
 
-Checks various values against the type constraints from Type::Standard.
+Checks various values against the type constraints from Types::Standard.
 
 =head1 AUTHOR
 
@@ -26,7 +26,7 @@ use lib qw( . ./t ../inc ./inc );
 use Test::More;
 use Test::TypeTiny;
 
-use Type::Standard -all;
+use Types::Standard -all;
 
 my $var = 123;
 should_pass(\$var, ScalarRef);

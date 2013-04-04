@@ -4,7 +4,7 @@
 
 =head1 PURPOSE
 
-Checks various values against the type constraints from Type::Standard.
+Checks various values against the type constraints from Types::Standard.
 
 (This test is fairly redundant now because inlined checks are used to
 compile optimized versions of type constraints whenever possible. We'll
@@ -29,7 +29,7 @@ use lib qw( . ./t ../inc ./inc );
 
 use Test::More;
 
-use Type::Standard -all;
+use Types::Standard -all;
 
 sub inline_check
 {

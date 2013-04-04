@@ -1,11 +1,11 @@
-package Type::Standard;
+package Types::Standard;
 
 use strict;
 use warnings;
 
 BEGIN {
-	$Type::Standard::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Standard::VERSION   = '0.000_05';
+	$Types::Standard::AUTHORITY = 'cpan:TOBYINK';
+	$Types::Standard::VERSION   = '0.000_05';
 }
 
 use base "Type::Library";
@@ -81,13 +81,13 @@ declare "ClassName",
 	_is_core => 1,
 	as "Str",
 	where { goto \&_is_class_loaded },
-	inline_as { "Type::Standard::_is_class_loaded($_)" };
+	inline_as { "Types::Standard::_is_class_loaded($_)" };
 
 declare "RoleName",
 	_is_core => 1,
 	as "ClassName",
 	where { not $_->can("new") },
-	inline_as { "Type::Standard::_is_class_loaded($_) and not $_->can('new')" };
+	inline_as { "Types::Standard::_is_class_loaded($_) and not $_->can('new')" };
 
 declare "Ref",
 	_is_core => 1,
@@ -500,7 +500,7 @@ __END__
 
 =head1 NAME
 
-Type::Standard - bundled set of built-in types for Type::Tiny
+Types::Standard - bundled set of built-in types for Type::Tiny
 
 =head1 DESCRIPTION
 

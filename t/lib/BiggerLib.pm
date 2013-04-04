@@ -36,7 +36,7 @@ use Type::Utils;
 use base "Type::Library";
 
 extends "DemoLib";
-extends "Type::Standard";
+extends "Types::Standard";
 
 declare "SmallInteger",
 	as "Integer",

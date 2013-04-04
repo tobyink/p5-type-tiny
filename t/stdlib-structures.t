@@ -4,7 +4,7 @@
 
 =head1 PURPOSE
 
-Checks various values against structured types from Type::Standard.
+Checks various values against structured types from Types::Standard.
 
 =head1 AUTHOR
 
@@ -26,7 +26,7 @@ use lib qw( . ./t ../inc ./inc );
 use Test::More;
 use Test::TypeTiny;
 
-use Type::Standard -all, "slurpy";
+use Types::Standard -all, "slurpy";
 
 my $struct1 = Map[Int, Num];
 

@@ -245,7 +245,7 @@ Type::Utils - utility functions to make defining type constraints a little easie
    use Type::Library -base;
    use Type::Utils;
    
-   extends "Type::Standard";
+   extends "Types::Standard";
    
    declare "AllCaps",
       as "Str",
@@ -350,7 +350,7 @@ L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
 
 L<Type::Tiny::Manual>.
 
-L<Type::Tiny>, L<Type::Library>, L<Type::Standard>, L<Type::Coercion>.
+L<Type::Tiny>, L<Type::Library>, L<Types::Standard>, L<Type::Coercion>.
 
 L<Type::Tiny::Class>, L<Type::Tiny::Role>, L<Type::Tiny::Duck>,
 L<Type::Tiny::Enum>, L<Type::Tiny::Union>.

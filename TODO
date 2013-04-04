@@ -8,7 +8,7 @@
 	- t/type-enum.t: test the Type::Tiny::Enum class
 	- t/type-union.t: test the Type::Tiny::Union class
 	- t/type-intersection.t: test the Type::Tiny::Intersection class
-	- t/stdlib-overload.t: test Overload type from Type::Standard
+	- t/stdlib-overload.t: test Overload type from Types::Standard
 
 - documentation
 	- write manual

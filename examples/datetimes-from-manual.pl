@@ -8,7 +8,7 @@ BEGIN {
 		-base,
 		-declare => qw( Datetime DatetimeHash EpochHash );
 	use Type::Utils;
-	use Type::Standard -types;
+	use Types::Standard -types;
 	
 	class_type Datetime, { class => "DateTime" };
 	

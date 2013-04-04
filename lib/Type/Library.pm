@@ -349,7 +349,7 @@ L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
 
 L<Type::Tiny::Manual>.
 
-L<Type::Tiny>, L<Type::Utils>, L<Type::Standard>, L<Type::Coercion>.
+L<Type::Tiny>, L<Type::Utils>, L<Types::Standard>, L<Type::Coercion>.
 
 L<Moose::Util::TypeConstraints>,
 L<Mouse::Util::TypeConstraints>.

@@ -714,7 +714,7 @@ Returns boolean indicating if this type can be inlined.
 Creates a type constraint check for a particular variable as a string of
 Perl code. For example:
 
-	print( Type::Standard::Num->inline_check('$foo') );
+	print( Types::Standard::Num->inline_check('$foo') );
 
 prints the following output:
 
@@ -805,7 +805,7 @@ L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
 
 L<Type::Tiny::Manual>.
 
-L<Type::Library>, L<Type::Utils>, L<Type::Standard>, L<Type::Coercion>.
+L<Type::Library>, L<Type::Utils>, L<Types::Standard>, L<Type::Coercion>.
 
 L<Type::Tiny::Class>, L<Type::Tiny::Role>, L<Type::Tiny::Duck>,
 L<Type::Tiny::Enum>, L<Type::Tiny::Union>.

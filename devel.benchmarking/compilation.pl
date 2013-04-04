@@ -1,7 +1,7 @@
 use strict;
 use Benchmark qw(:all);
 
-use Type::Standard qw(ArrayRef Int);
+use Types::Standard qw(ArrayRef Int);
 
 my $type = ArrayRef[Int];
 our $data = [1..10];

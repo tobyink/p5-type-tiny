@@ -50,20 +50,20 @@ my ($_isStr, $_isCode);
 
 sub _isStr {
 	require Type::Utils;
-	require Type::Standard;
+	require Types::Standard;
 	$_isStr ||= Type::Utils::union([
-		Type::Standard::Overload([q[""]]),
-		Type::Standard::Str(),
+		Types::Standard::Overload([q[""]]),
+		Types::Standard::Str(),
 	]);
 	$_isStr->compiled_check->(@_);
 }
 
 sub _isCode {
 	require Type::Utils;
-	require Type::Standard;
+	require Types::Standard;
 	$_isCode ||= Type::Utils::union([
-		Type::Standard::Overload([q[&{}]]),
-		Type::Standard::Ref(["CODE"]),
+		Types::Standard::Overload([q[&{}]]),
+		Types::Standard::Ref(["CODE"]),
 	]);
 	$_isCode->compiled_check->(@_);
 }
@@ -308,7 +308,7 @@ L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
 
 L<Type::Tiny::Manual>.
 
-L<Type::Tiny>, L<Type::Library>, L<Type::Utils>, L<Type::Standard>.
+L<Type::Tiny>, L<Type::Library>, L<Type::Utils>, L<Types::Standard>.
 
 L<Moose::Meta::TypeCoercion>.
 
