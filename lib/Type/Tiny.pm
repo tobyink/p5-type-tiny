@@ -645,11 +645,13 @@ In parameterized types, returns an arrayref of the parameters.
 =item C<< name_generator >>
 
 A coderef which generates a new display_name based on parameters.
+Optional; the default is reasonable.
 
 =item C<< constraint_generator >>
 
 Coderef that generates a new constraint coderef based on parameters.
-Optional.
+Optional; providing a generator makes this type into a parameterizable
+type constraint.
 
 =item C<< inline_generator >>
 
