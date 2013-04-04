@@ -11,11 +11,11 @@ BEGIN {
 
 use Scalar::Util qw< blessed >;
 
-sub _confess ($;@)
+sub _croak ($;@)
 {
 	require Carp;
 	@_ = sprintf($_[0], @_[1..$#_]) if @_ > 1;
-	goto \&Carp::confess;
+	goto \&Carp::croak;
 }
 
 use base "Type::Tiny";
@@ -23,7 +23,7 @@ use base "Type::Tiny";
 sub new {
 	my $proto = shift;
 	my %opts = @_;
-	_confess "need to supply role name" unless exists $opts{role};
+	_croak "need to supply role name" unless exists $opts{role};
 	return $proto->SUPER::new(%opts);
 }
 

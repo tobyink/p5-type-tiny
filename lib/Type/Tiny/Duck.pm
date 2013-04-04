@@ -11,11 +11,11 @@ BEGIN {
 
 use Scalar::Util qw< blessed >;
 
-sub _confess ($;@)
+sub _croak ($;@)
 {
 	require Carp;
 	@_ = sprintf($_[0], @_[1..$#_]) if @_ > 1;
-	goto \&Carp::confess;
+	goto \&Carp::croak;
 }
 
 use base "Type::Tiny";
@@ -23,7 +23,7 @@ use base "Type::Tiny";
 sub new {
 	my $proto = shift;
 	my %opts = @_;
-	_confess "need to supply list of methods" unless exists $opts{methods};
+	_croak "need to supply list of methods" unless exists $opts{methods};
 	$opts{methods} = [$opts{methods}] unless ref $opts{methods};
 	return $proto->SUPER::new(%opts);
 }

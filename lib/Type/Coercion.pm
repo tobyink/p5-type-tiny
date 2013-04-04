@@ -12,11 +12,11 @@ BEGIN {
 use Scalar::Util qw< blessed >;
 use Types::TypeTiny qw< CodeLike StringLike TypeTiny >;
 
-sub _confess ($;@)
+sub _croak ($;@)
 {
 	require Carp;
 	@_ = sprintf($_[0], @_[1..$#_]) if @_ > 1;
-	goto \&Carp::confess;
+	goto \&Carp::croak;
 }
 
 use overload
@@ -96,9 +96,9 @@ sub add_type_coercions
 		my $type     = shift @args;
 		my $coercion = shift @args;
 		
-		_confess "types must be blessed Type::Tiny objects"
+		_croak "types must be blessed Type::Tiny objects"
 			unless TypeTiny->check($type);
-		_confess "coercions must be code references"
+		_croak "coercions must be code references"
 			unless StringLike->check($coercion) || CodeLike->check($coercion);
 		
 		push @{$self->type_coercion_map}, $type, $coercion;

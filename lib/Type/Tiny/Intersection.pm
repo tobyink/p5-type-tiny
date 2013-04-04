@@ -11,11 +11,11 @@ BEGIN {
 
 use Scalar::Util qw< blessed >;
 
-sub _confess ($;@)
+sub _croak ($;@)
 {
 	require Carp;
 	@_ = sprintf($_[0], @_[1..$#_]) if @_ > 1;
-	goto \&Carp::confess;
+	goto \&Carp::croak;
 }
 
 use overload q[@{}] => 'type_constraints';
@@ -25,7 +25,7 @@ use base "Type::Tiny";
 sub new {
 	my $proto = shift;
 	my %opts = @_;
-	_confess "need to supply list of type constraints" unless exists $opts{type_constraints};
+	_croak "need to supply list of type constraints" unless exists $opts{type_constraints};
 	$opts{type_constraints} = [
 		map { $_->isa(__PACKAGE__) ? @$_ : $_ }
 		@{ ref $opts{type_constraints} eq "ARRAY" ? $opts{type_constraints} : [$opts{type_constraints}] }

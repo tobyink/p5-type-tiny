@@ -9,11 +9,11 @@ BEGIN {
 	$Type::Tiny::Enum::VERSION   = '0.000_05';
 }
 
-sub _confess ($;@)
+sub _croak ($;@)
 {
 	require Carp;
 	@_ = sprintf($_[0], @_[1..$#_]) if @_ > 1;
-	goto \&Carp::confess;
+	goto \&Carp::croak;
 }
 
 use overload q[@{}] => 'values';
@@ -24,7 +24,7 @@ sub new
 {
 	my $proto = shift;
 	my %opts = @_;
-	_confess "need to supply list of values" unless exists $opts{values};
+	_croak "need to supply list of values" unless exists $opts{values};
 	my %tmp =
 		map { $_ => 1 }
 		@{ ref $opts{values} eq "ARRAY" ? $opts{values} : [$opts{values}] };

@@ -13,11 +13,11 @@ use Scalar::Util qw< blessed >;
 use Type::Tiny;
 use Types::TypeTiny qw< TypeTiny >;
 
-sub _confess ($;@)
+sub _croak ($;@)
 {
 	require Carp;
 	@_ = sprintf($_[0], @_[1..$#_]) if @_ > 1;
-	goto \&Carp::confess;
+	goto \&Carp::croak;
 }
 
 {
@@ -105,7 +105,7 @@ sub _export
 	elsif (scalar grep($_ eq $sub->{sub}, $class->_EXPORT_OK) and my $additional = $class->can($sub->{sub}))
 		{ $export_coderef = $additional }
 	else
-		{ _confess "'%s' is not exported by '%s'", $sub->{sub}, $class }
+		{ _croak "'%s' is not exported by '%s'", $sub->{sub}, $class }
 	
 	$export_as = $sub->{-as}                if exists $sub->{-as};
 	$export_as = $sub->{-prefix}.$export_as if exists $sub->{-prefix};
@@ -132,8 +132,8 @@ sub add_type
 	my $name = $type->name;
 	
 	$meta->{types} ||= {};
-	_confess 'type %s already exists in this library', $name if exists $meta->{types}{$name};
-	_confess 'cannot add anonymous type to a library' if $type->is_anon;
+	_croak 'type %s already exists in this library', $name if exists $meta->{types}{$name};
+	_croak 'cannot add anonymous type to a library' if $type->is_anon;
 	$meta->{types}{$name} = $type;
 	
 	no strict "refs";
