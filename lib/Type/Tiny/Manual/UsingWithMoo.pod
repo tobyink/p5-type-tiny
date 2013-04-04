@@ -6,6 +6,13 @@
 
 Type::Tiny::Manual::UsingWithMoo - how to use Type::Tiny and Type::Library with Moo
 
+=head1 DESCRIPTION
+
+This document has not yet been written. For examples using Type::Tiny with
+L<Moo> see the SYNOPSIS sections of L<Type::Tiny> and L<Type::Library>,
+and the files C<< moo.t >> and C<< moo-coercion.t >> in the Type-Tiny
+L<test suite|https://bitbucket.org/tobyink/p5-type-tiny/src/tip/t>.
+
 =head1 AUTHOR
 
 Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
