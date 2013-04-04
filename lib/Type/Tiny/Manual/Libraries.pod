@@ -191,6 +191,55 @@ need loops and so on, you can output a C<do> block.)
 
 =head2 Parameterized Constraints
 
+Parameterized type constraints are those that can generate simple child type
+constraints by passing parameters to their C<parameterize> method. For
+example, ArrayRef in Types::Standard:
+
+   use Types::Standard;
+   
+   my $ArrayRef         = Types::Standard::ArrayRef;
+   my $Int              = Types::Standard::Int;
+   my $ArrayRef_of_Ints = $ArrayRef->parameterize($Int);
+
+Type libraries provide some convenient sugar for this:
+
+   use Types::Standard qw( ArrayRef Int );
+   
+   my $ArrayRef_of_Ints = ArrayRef[Int];
+
+Unlike L<Moose> which has separate meta classes for parameterizable,
+parameterized and non-parameterizable type constraints, L<Type::Tiny> handles
+all that in one.
+
+To create a parameterizable type constraint, you'll need to pass an extra
+named parameter to C<declare>. Let's imagine that we want to make our earlier
+C<NonEmptyHash> constraint accept a parameter telling it the minimum size of
+the hash. For example C<< NonEmptyHash[4] >> would need to contain at least
+four key-value pairs. Here's how you'd do it:
+
+   declare NonEmptyHash, as HashLike,
+      where     { scalar values %$_ },
+      inline_as {
+         my ($constraint, $varname) = @_;
+         return "scalar values \%{$varname}";
+      },
+      # Generate a new "where" coderef...
+      constraint_generator => sub {
+         my ($minimum) = @_;
+         die "parameter must be positive" unless int($minimum) > 0;
+         return sub {
+             scalar(values(%$_)) >= int($minimum);
+         };
+      },
+      # Generate a new "inline_as" coderef...
+      inline_generator => sub {
+         my ($minimum) = @_;
+         return sub {
+             my ($constraint, $varname) = @_;
+             "scalar(values \%{$varname}) >= " . int($minimum);
+         };
+      };
+
 =head1 AUTHOR
 
 Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
