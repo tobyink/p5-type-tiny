@@ -44,4 +44,6 @@
 		item "Rename Type::Standard module to Types::Standard."^^Change;
 		item "Types::TypeTiny bootstrapping library now takes care of vaious internal type checking requirements."^^Change;
 		item "Sanity checks for type constraint names."^^Change;
+		item "Fix is_parameterized."^^Bugfix;
+		item "Allow null type constraints with no parent type (e.g. 'Any' in Types::Standard) to be inlined."^^Change;
 	].

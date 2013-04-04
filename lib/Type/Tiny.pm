@@ -290,6 +290,8 @@ sub can_be_inlined
 	my $self = shift;
 	return $self->parent->can_be_inlined
 		if $self->has_parent && $self->_is_null_constraint;
+	return !!1
+		if !$self->has_parent && $self->_is_null_constraint;
 	return $self->has_inlined;
 }
 
@@ -300,6 +302,8 @@ sub inline_check
 		unless $self->can_be_inlined;
 	return $self->parent->inline_check(@_)
 		if $self->has_parent && $self->_is_null_constraint;
+	return '(!!1)'
+		if !$self->has_parent && $self->_is_null_constraint;
 	my $r = $self->inlined->($self, @_);
 	$r =~ /[;{}]/ ? "(do { $r })" : "($r)";
 }
@@ -328,7 +332,7 @@ sub is_parameterizable
 
 sub is_parameterized
 {
-	!shift->has_parameters;
+	shift->has_parameters;
 }
 
 sub parameterize
