@@ -47,4 +47,5 @@
 		item "Fix is_parameterized."^^Bugfix;
 		item "Allow null type constraints with no parent type (e.g. 'Any' in Types::Standard) to be inlined."^^Change;
 		item "Don't die with full stack trace."^^Change;
+		item "Get Mouse coercions working."^^Bugfix;
 	].
