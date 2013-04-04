@@ -333,7 +333,7 @@ sub is_parameterizable
 
 sub is_parameterized
 {
-	!shift->has_parameters;
+	shift->has_parameters;
 }
 
 sub parameterize
