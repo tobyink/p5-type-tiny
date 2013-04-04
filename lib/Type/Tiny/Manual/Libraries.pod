@@ -135,7 +135,59 @@ are given something else.
 
 =head2 Messages
 
+It is sometimes nice to be able to emit a more useful error message than
+the standard:
+
+   value "Foo" did not pass type constraint "Bar"
+
+It is possible to define custom error messages for types.
+
+   declare MediumInteger, as Integer,
+      where   { $_ >= 10 and $_ < 20 },
+      message { $_ < 10  ? "$_ is too small" : "$_ is too big" };
+
 =head2 Inlining
+
+If your type constraint can be inlined, this can not only speed up
+Type::Tiny's own checks and coercions, it may also allow your type constraint
+to be inlined into generated methods such as Moose attribute accessors.
+
+All of the constraints from C<Types::Standard> can be inlined, as can enum,
+class_type, role_type and duck_type constraints. Union and intersection
+constraints can only be inlined if their sub-constraints can be. So if you can
+define your own types purely in terms of these types, you automatically
+get inlining:
+
+   declare HashLike, as union [
+      Ref["HASH"],
+      Overload["&{}"],
+   ];
+
+However, sometimes these base types are not powerful enough and you'll need
+to write a constraint coderef:
+
+   declare NonEmptyHash, as HashLike,
+      where     { scalar values %$_ };
+
+... and you've suddenly sacrificed a lot of speed.
+
+Inlining to the rescue! You can define an inlining coderef which will be
+passed two parameters: the constraint itself and a variable name as a string.
+For example, the variable name might be C<< '$_' >> or C<< '$_[0]' >>.
+Your coderef should return a Perl expression string, interpolating that
+variable name.
+
+   declare NonEmptyHash, as HashLike,
+      where     { scalar values %$_ },
+      inline_as {
+         my ($constraint, $varname) = @_;
+         return "scalar values \%{$varname}";
+      };
+
+The Perl expression could be inlined within a function or a C<if> clause or
+potentially anywhere, so it really must be an expression, not a statement.
+It should not C<return> or C<exit> and probably shouldn't C<die>. (If you
+need loops and so on, you can output a C<do> block.)
 
 =head2 Parameterized Constraints
 
