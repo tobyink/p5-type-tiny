@@ -10,12 +10,13 @@ BEGIN {
 }
 
 use Scalar::Util qw< blessed weaken refaddr >;
+use Types::TypeTiny qw< StringLike CodeLike TypeTiny >;
 
-sub _croak ($;@)
+sub _confess ($;@)
 {
 	require Carp;
 	@_ = sprintf($_[0], @_[1..$#_]) if @_ > 1;
-	goto \&Carp::croak;
+	goto \&Carp::confess;
 }
 
 sub _swap { $_[2] ? @_[1,0] : @_[0,1] }
@@ -46,7 +47,7 @@ sub new
 	
 	if (exists $params{parent})
 	{
-		_croak "parent must be an instance of %s", __PACKAGE__
+		_confess "parent must be an instance of %s", __PACKAGE__
 			unless blessed($params{parent}) && $params{parent}->isa(__PACKAGE__);
 	}
 	
@@ -58,7 +59,7 @@ sub new
 	unless ($self->is_anon)
 	{
 		$self->name =~ /^\p{Lu}[\p{L}0-9_]+$/sm
-			or _croak '%s is not a valid type name', $self->name;
+			or _confess '%s is not a valid type name', $self->name;
 	}
 
 	if ($self->has_library and not $self->is_anon)
@@ -104,7 +105,7 @@ sub has_parameters           { exists $_[0]{parameters} }
 sub _assert_coercion
 {
 	my $self = shift;
-	_croak "no coercion for this type constraint"
+	_confess "no coercion for this type constraint"
 		unless $self->has_coercion && @{$self->coercion->type_coercion_map};
 	return $self->coercion;
 }
@@ -282,7 +283,7 @@ sub assert_valid
 	return !!1 if $self->compiled_check->(@_);
 	
 	local $_ = $_[0];
-	_croak $self->get_message(@_);
+	_confess $self->get_message(@_);
 }
 
 sub can_be_inlined
@@ -298,7 +299,7 @@ sub can_be_inlined
 sub inline_check
 {
 	my $self = shift;
-	_croak "cannot inline type constraint check for %s", $self
+	_confess "cannot inline type constraint check for %s", $self
 		unless $self->can_be_inlined;
 	return $self->parent->inline_check(@_)
 		if $self->has_parent && $self->_is_null_constraint;
@@ -332,7 +333,7 @@ sub is_parameterizable
 
 sub is_parameterized
 {
-	shift->has_parameters;
+	!shift->has_parameters;
 }
 
 sub parameterize
@@ -340,7 +341,7 @@ sub parameterize
 	my $self = shift;
 	return $self unless @_;
 	$self->is_parameterizable
-		or _croak "type '%s' does not accept parameters", $self;
+		or _confess "type '%s' does not accept parameters", $self;
 	
 	local $_ = $_[0];
 	my %options = (
@@ -429,8 +430,7 @@ sub _build_mouse_type
 	
 	$self->{mouse_type} = $r;  # prevent recursion
 	$r->_add_type_coercions(
-		map { blessed($_) and $_->can('mouse_type') ? $_->mouse_type : $_ }
-		@{ $self->coercion->type_coercion_map }
+		$self->coercion->_codelike_type_coercion_map('mouse_type')
 	) if $self->has_coercion;
 	
 	return $r;

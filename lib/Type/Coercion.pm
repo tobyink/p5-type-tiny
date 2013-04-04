@@ -154,16 +154,43 @@ sub _build_moose_coercion
 	my $self = shift;
 	
 	my %options = ();
-	$options{type_coercion_map} = [
-		map { TypeTiny->check($_) ? $_->moose_type : $_ }
-		@{ $self->type_coercion_map }
-	];
-	$options{type_constraint} = $self->type_constraint if $self->has_type_constraint;
+	$options{type_coercion_map} = [ $self->_codelike_type_coercion_map('moose_type') ];
+	$options{type_constraint}   = $self->type_constraint if $self->has_type_constraint;
 	
 	require Moose::Meta::TypeCoercion;
 	my $r = "Moose::Meta::TypeCoercion"->new(%options);
 	
 	return $r;
+}
+
+sub _codelike_type_coercion_map
+{
+	my $self = shift;
+	my $modifier = $_[0];
+	
+	my @orig = @{ $self->type_coercion_map };
+	my @new;
+	
+	while (@orig)
+	{
+		my ($type, $converter) = splice(@orig, 0, 2);
+		
+		push @new, $modifier ? $type->$modifier : $type;
+		
+		if (CodeLike->check($converter))
+		{
+			push @new, $converter;
+		}
+		else
+		{
+			local $@;
+			my $r = eval sprintf('sub { local $_ = $_[0]; %s }', $converter);
+			die $@ if $@;
+			push @new, $r;
+		}
+	}
+	
+	return @new;
 }
 
 1;

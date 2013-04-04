@@ -39,6 +39,8 @@ use Test::Fatal;
 	use Mouse;
 	use BiggerLib -mouse, -all;
 	
+	::isa_ok(BigInteger, "Mouse::Meta::TypeConstraint");
+	
 	has small => (is => "rw", isa => SmallInteger, coerce => 1);
 	has big   => (is => "rw", isa => BigInteger, coerce => 1);
 }

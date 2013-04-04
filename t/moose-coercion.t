@@ -39,6 +39,8 @@ use Test::Fatal;
 	use Moose;
 	use BiggerLib -moose, -all;
 	
+	::isa_ok(BigInteger, "Moose::Meta::TypeConstraint");
+	
 	has small => (is => "rw", isa => SmallInteger, coerce => 1);
 	has big   => (is => "rw", isa => BigInteger, coerce => 1);
 }

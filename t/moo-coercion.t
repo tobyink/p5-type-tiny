@@ -39,6 +39,8 @@ use Test::Fatal;
 	use Moo;
 	use BiggerLib -all;
 	
+	::isa_ok(BigInteger, "Type::Tiny");
+	
 	has small => (is => "rw", isa => SmallInteger, coerce => SmallInteger->coercion);
 	has big   => (is => "rw", isa => BigInteger, coerce => BigInteger->coercion);
 }
