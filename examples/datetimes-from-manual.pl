@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 BEGIN {
-	package MyTypes::DateTime;
+	package Types::Datetime;
 	
 	use Type::Library
 		-base,
@@ -36,9 +36,9 @@ BEGIN {
 	1;
 };
 
-no thanks "MyTypes::DateTime";
+no thanks "Types::Datetime";
 use DateTime ();
-use MyTypes::DateTime -all;
+use Types::Datetime -all;
 use Data::Dumper;
 
 my $dt = to_Datetime { epoch => 328646500 };

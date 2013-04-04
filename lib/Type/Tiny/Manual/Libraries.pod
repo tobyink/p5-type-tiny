@@ -12,7 +12,7 @@ A type library is a collection of type constraints, optionally with coercions.
 
 The following is an example type library:
 
-   package MyTypes::DateTime;
+   package Types::Datetime;
    
    use Type::Library
       -base,
@@ -49,16 +49,20 @@ The following is an example type library:
 
 Here's a line by line description of what's going on in the type library.
 
-   package MyTypes::DateTime;
+   package Types::Datetime;
 
-Type libraries are packages.
+Type libraries are packages. It is recommended that re-usable type libraries
+be given a name in the C<< Types::* >> namespace. For application-specific
+type libraries, assuming your application's namespace is C<< MyApp::* >> then
+name the type library C<< MyApp::Types >>, or if more than one is needed, use
+the C<< MyApp::Types::* >> namespace.
 
    use Type::Library
       -base,
       -declare => qw( Datetime DatetimeHash EpochHash );
 
 The C<< -base >> part is used to establish inheritance. It makes
-C<MyTypes::DateTime> a child class of C<Type::Library>.
+C<Types::Datetime> a child class of C<Type::Library>.
 
 Declaring the types we're going to define ahead of their definition allows
 us to use them as barewords later on. (Note that in code which I<uses>
@@ -81,7 +85,7 @@ we haven't I<added> the types to our library. We've imported C<Str>, but other
 people won't be able to re-import C<Str> from our library. If you actually
 want your library to I<extend> another library, do this instead:
 
-   BEGIN { extends "Some::Other::Library" };
+   BEGIN { extends "Types::AnotherLibrary" };
 
 OK, now we're ready to declare a few types.
 

@@ -177,7 +177,7 @@ Type::Library - tiny, yet Moo(se)-compatible type libraries
 
 =head1 SYNOPSIS
 
-   package MyTypes {
+   package Types::Mine {
       use Scalar::Util qw(looks_like_number);
       use Type::Library -base;
       use Type::Tiny;
@@ -193,21 +193,21 @@ Type::Library - tiny, yet Moo(se)-compatible type libraries
       
    package Ermintrude {
       use Moo;
-      use MyTypes qw(Number);
+      use Types::Mine qw(Number);
       has favourite_number => (is => "ro", isa => Number);
    }
    
    # Note the "-moose" flag when importing!
    package Bullwinkle {
       use Moose;
-      use MyTypes -moose, qw(Number);
+      use Types::Mine -moose, qw(Number);
       has favourite_number => (is => "ro", isa => Number);
    }
    
    # Note the "-mouse" flag when importing!
    package Maisy {
       use Mouse;
-      use MyTypes -mouse, qw(Number);
+      use Types::Mine -mouse, qw(Number);
       has favourite_number => (is => "ro", isa => Number);
    }
 
@@ -224,7 +224,7 @@ you're probably better off reading L<Type::Tiny::Intro>.
 A type library is a singleton class. Use the C<meta> method to get a blessed
 object which other methods can get called on. For example:
 
-   MyTypes->meta->add_type($foo);
+   Types::Mine->meta->add_type($foo);
 
 =begin trustme
 
@@ -283,59 +283,59 @@ Type::Library-based libraries are exporters.
 =head2 Export
 
 Type libraries are exporters. For the purposes of the following examples,
-assume that the C<MyTypes> library defines types C<Number> and C<String>.
+assume that the C<Types::Mine> library defines types C<Number> and C<String>.
 
    # Exports nothing.
    # 
-   use MyTypes;
+   use Types::Mine;
    
    # Exports a function "String" which is a constant returning
    # the String type constraint.
    #
-   use MyTypes qw( String );
+   use Types::Mine qw( String );
    
    # Exports both String and Number as above.
    #
-   use MyTypes qw( String Number );
+   use Types::Mine qw( String Number );
    
    # Same.
    #
-   use MyTypes qw( :types );
+   use Types::Mine qw( :types );
    
    # Exports a sub "is_String" so that "is_String($foo)" is equivalent
    # to "String->check($foo)".
    #
-   use MyTypes qw( is_String );
+   use Types::Mine qw( is_String );
    
    # Exports "is_String" and "is_Number".
    #
-   use MyTypes qw( :is );
+   use Types::Mine qw( :is );
    
    # Exports a sub "assert_String" so that "assert_String($foo)" is
    # equivalent to "String->assert_valid($foo)".
    #
-   use MyTypes qw( assert_String );
+   use Types::Mine qw( assert_String );
    
    # Exports "assert_String" and "assert_Number".
    #
-   use MyTypes qw( :assert );
+   use Types::Mine qw( :assert );
    
    # Exports a sub "to_String" so that "to_String($foo)" is equivalent
    # to "String->coerce($foo)".
    #
-   use MyTypes qw( to_String );
+   use Types::Mine qw( to_String );
    
    # Exports "to_String" and "to_Number".
    #
-   use MyTypes qw( :to );
+   use Types::Mine qw( :to );
    
    # Exports "String", "is_String", "assert_String" and "coerce_String".
    #
-   use MyTypes qw( +String );
+   use Types::Mine qw( +String );
    
    # Exports everything.
    #
-   use MyTypes qw( :all );
+   use Types::Mine qw( :all );
 
 Adding C<< -mouse >> or C<< -moose >> to the export list ensures that all
 the type constraints exported are Mouse or Moose compatible respectively.

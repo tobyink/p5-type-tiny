@@ -51,7 +51,7 @@ Test::TypeTiny - useful functions for testing the efficacy of type constraints
    use Test::More;
    use Test::TypeTiny;
    
-   use MyTypes qw(Integer);
+   use Types::Mine qw(Integer);
    
    should_pass(1, Integer);
    should_pass(-1, Integer);

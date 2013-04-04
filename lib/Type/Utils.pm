@@ -240,7 +240,7 @@ Type::Utils - utility functions to make defining type constraints a little easie
 
 =head1 SYNOPSIS
 
-   package MyTypes;
+   package Types::Mine;
    
    use Type::Library -base;
    use Type::Utils;
