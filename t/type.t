@@ -58,7 +58,7 @@ should_pass($_, $Int)
 should_fail($_, $Int)
 	for 1.2, "Hello World", [], {}, undef, \*STDOUT;
 
-ok_subtype($Int, $Any);
+ok_subtype($Any, $Int);
 ok($Any->is_supertype_of($Int), 'Any is_supertype_of $Int');
 ok($Int->is_a_type_of($Any), '$Int is_a_type_of Any');
 ok($Int->is_a_type_of($Int), '$Int is_a_type_of $Int');
