@@ -683,7 +683,7 @@ C<< "Library::Type" >> sort of name. Otherwise, returns the same as C<name>.
 
 Returns a list of all this type constraint's all ancestor constraints.
 
-=item C<< equals($other) >>, C<< is_subtype_of($other) >>, C<< is_supertype_of($other) >>, , C<< is_a_type_of($other) >>
+=item C<< equals($other) >>, C<< is_subtype_of($other) >>, C<< is_supertype_of($other) >>, C<< is_a_type_of($other) >>
 
 Compare two types. See L<Moose::Meta::TypeConstraint> for what these all mean.
 (OK, Moose doesn't define C<is_supertype_of>, but you get the idea, right?)
