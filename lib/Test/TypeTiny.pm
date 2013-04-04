@@ -6,7 +6,7 @@ use base "Exporter";
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.000_05';
 
-our @EXPORT = qw( should_pass should_fail );
+our @EXPORT = qw( should_pass should_fail ok_subtype );
 
 sub should_pass
 {
@@ -28,6 +28,16 @@ sub should_fail
 		defined $value
 			? sprintf("value '%s' fails type constraint '%s'", $value, $type)
 			: sprintf("undef fails type constraint '%s'", $type),
+	);
+	goto \&Test::More::ok;
+}
+
+sub ok_subtype
+{
+	my ($type, @s) = @_;
+	@_ = (
+		not(scalar grep !$_->is_subtype_of($type), @s),
+		sprintf("%s subtype: %s", $type, join q[, ], @s),
 	);
 	goto \&Test::More::ok;
 }
@@ -58,6 +68,8 @@ Test::TypeTiny - useful functions for testing the efficacy of type constraints
    should_pass(0, Integer);
    should_fail(2.5, Integer);
    
+   ok_subtype(Number, Integer);
+   
    done_testing;
 
 =head1 DESCRIPTION
@@ -72,6 +84,8 @@ constraints.
 =item C<< should_pass($value, $type) >>
 
 =item C<< should_fail($value, $type) >>
+
+=item C<< ok_subtype($type, @subtypes) >>
 
 =back
 

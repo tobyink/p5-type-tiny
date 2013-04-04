@@ -34,6 +34,18 @@ use Test::Fatal;
 
 use BiggerLib -types;
 
+is(
+	BigInteger->coercion->coerce(2),
+	12,
+	'coercion works',
+);
+
+is(
+	BigInteger->coercion->(2),
+	12,
+	'coercion overloads &{}',
+);
+
 ok(
 	BigInteger->coercion->has_coercion_for_type(ArrayRef),
 	'BigInteger has_coercion_for_type ArrayRef',
@@ -42,6 +54,50 @@ ok(
 ok(
 	BigInteger->coercion->has_coercion_for_type(SmallInteger),
 	'BigInteger has_coercion_for_type SmallInteger',
+);
+
+ok(
+	!BigInteger->coercion->has_coercion_for_type(HashRef),
+	'not BigInteger has_coercion_for_type SmallInteger',
+);
+
+ok(
+	BigInteger->coercion->has_coercion_for_value([]),
+	'BigInteger has_coercion_for_value []',
+);
+
+ok(
+	BigInteger->coercion->has_coercion_for_value(2),
+	'BigInteger has_coercion_for_value 2',
+);
+
+ok(
+	!BigInteger->coercion->has_coercion_for_value({}),
+	'not BigInteger has_coercion_for_value {}',
+);
+
+is(
+	exception { BigInteger->coerce([]) },
+	undef,
+	"coerce doesn't throw an exception if it can coerce",
+);
+
+is(
+	exception { BigInteger->coerce({}) },
+	undef,
+	"coerce doesn't throw an exception if it can't coerce",
+);
+
+is(
+	exception { BigInteger->assert_coerce([]) },
+	undef,
+	"assert_coerce doesn't throw an exception if it can coerce",
+);
+
+like(
+	exception { BigInteger->assert_coerce({}) },
+	qr{^value "HASH\(\w+\)" did not pass type constraint "BigInteger"},
+	"assert_coerce DOES throw an exception if it can't coerce",
 );
 
 done_testing;
