@@ -10,6 +10,7 @@ BEGIN {
 }
 
 use Scalar::Util qw< blessed >;
+use Types::TypeTiny qw< CodeLike StringLike TypeTiny >;
 
 sub _confess ($;@)
 {
@@ -45,29 +46,6 @@ sub has_type_constraint { defined $_[0]{type_constraint} } # sic
 
 sub _clear_compiled_coercion { delete $_[0]{compiled_coercion} }
 
-# Some Type::Tiny objects for internal use!
-my ($_isStr, $_isCode);
-
-sub _isStr {
-	require Type::Utils;
-	require Types::Standard;
-	$_isStr ||= Type::Utils::union([
-		Types::Standard::Overload([q[""]]),
-		Types::Standard::Str(),
-	]);
-	$_isStr->compiled_check->(@_);
-}
-
-sub _isCode {
-	require Type::Utils;
-	require Types::Standard;
-	$_isCode ||= Type::Utils::union([
-		Types::Standard::Overload([q[&{}]]),
-		Types::Standard::Ref(["CODE"]),
-	]);
-	$_isCode->compiled_check->(@_);
-}
-
 sub coerce
 {
 	my $self = shift;
@@ -90,10 +68,7 @@ sub has_coercion_for_type
 	
 	for my $has (@{$self->type_coercion_map})
 	{
-		if (blessed($has) and $has->isa("Type::Tiny"))
-		{
-			return !!1 if $type->is_a_type_of($has);
-		}
+		return !!1 if TypeTiny->check($has) && $type->is_a_type_of($has);
 	}
 	
 	return;
@@ -122,9 +97,9 @@ sub add_type_coercions
 		my $coercion = shift @args;
 		
 		_confess "types must be blessed Type::Tiny objects"
-			unless blessed($type) && $type->isa("Type::Tiny");
+			unless TypeTiny->check($type);
 		_confess "coercions must be code references"
-			unless _isStr($coercion) || _isCode($coercion);
+			unless StringLike->check($coercion) || CodeLike->check($coercion);
 		
 		push @{$self->type_coercion_map}, $type, $coercion;
 	}
@@ -161,8 +136,8 @@ sub _build_compiled_coercion
 			$types[$i]->can_be_inlined ? sprintf('if (%s)', $types[$i]->inline_check('$_[0]')) :
 			sprintf('if ($types[%d]->check(@_))', $i);
 		push @sub,
-			!defined($codes[$i]) ? sprintf('  { return $_[0] }') :
-			_isStr($codes[$i])   ? sprintf('  { local $_ = $_[0]; return( %s ) }', $codes[$i]) :
+			!defined($codes[$i])          ? sprintf('  { return $_[0] }') :
+			StringLike->check($codes[$i]) ? sprintf('  { local $_ = $_[0]; return( %s ) }', $codes[$i]) :
 			sprintf('  { local $_ = $_[0]; return $codes[%d]->(@_) }', $i);
 	}
 	

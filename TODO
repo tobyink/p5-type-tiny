@@ -1,7 +1,7 @@
 - features
 	- sanity check type names: require initial capital letter, word characters
 	- maybe Type::Coercion "can_be_inlined"/"inline_coercion" methods??
-	- Types::TypeTiny type library for internally useful types and coercions?? (dogfooding)
+	- make more use of Types::TypeTiny
 
 - test cases
 	- t/type.t: some basic Type::Tiny tests minus libraries, stdlib, etc.
