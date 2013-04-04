@@ -5,11 +5,11 @@ use base "Exporter";
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.000_05';
 
-our @EXPORT_OK = qw( CodeLike StringLike TypeTiny );
+our @EXPORT_OK = qw( CodeLike StringLike TypeTiny HashLike );
 
 my %cache;
 
-sub StringLike
+sub StringLike ()
 {
 	require Type::Utils;
 	require Types::Standard;
@@ -19,7 +19,17 @@ sub StringLike
 	]);
 }
 
-sub CodeLike
+sub HashLike ()
+{
+	require Type::Utils;
+	require Types::Standard;
+	$cache{HashLike} ||= Type::Utils::union(HashLike => [
+		Types::Standard::Overload([q[%{}]]),
+		Types::Standard::HashRef(),
+	]);
+}
+
+sub CodeLike ()
 {
 	require Type::Utils;
 	require Types::Standard;
@@ -29,7 +39,7 @@ sub CodeLike
 	]);
 }
 
-sub TypeTiny
+sub TypeTiny ()
 {
 	require Type::Utils;
 	$cache{TypeTiny} ||= Type::Utils::class_type(TypeTiny => {class=>"Type::Tiny"});
@@ -59,6 +69,8 @@ much circularity. But it exports some type constraint "constants":
 =over
 
 =item C<< StringLike >>
+
+=item C<< HashLike >>
 
 =item C<< CodeLike >>
 

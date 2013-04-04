@@ -18,6 +18,7 @@ sub _confess ($;@) {
 use Scalar::Util qw< blessed >;
 use Type::Library;
 use Type::Tiny;
+use Types::TypeTiny qw< TypeTiny >;
 
 use Exporter qw< import >;
 our @EXPORT = qw<
@@ -56,7 +57,7 @@ sub declare
 	my $caller = caller($opts{_caller_level} || 0);
 	$opts{library} = $caller;
 
-	if (defined $opts{parent} and not blessed $opts{parent})
+	if (defined $opts{parent} and not TypeTiny->check($opts{parent}))
 	{
 		$caller->isa("Type::Library")
 			or _confess "parent type cannot be a string";

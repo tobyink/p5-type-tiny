@@ -155,7 +155,7 @@ sub _build_moose_coercion
 	
 	my %options = ();
 	$options{type_coercion_map} = [
-		map { blessed($_) && $_->can("moose_type") ? $_->moose_type : $_ }
+		map { TypeTiny->check($_) ? $_->moose_type : $_ }
 		@{ $self->type_coercion_map }
 	];
 	$options{type_constraint} = $self->type_constraint if $self->has_type_constraint;

@@ -11,6 +11,7 @@ BEGIN {
 
 use Scalar::Util qw< blessed >;
 use Type::Tiny;
+use Types::TypeTiny qw< TypeTiny >;
 
 sub _confess ($;@)
 {
@@ -127,7 +128,7 @@ sub meta
 sub add_type
 {
 	my $meta = shift->meta;
-	my $type = blessed($_[0]) ? $_[0] : ref($_[0]) ? "Type::Tiny"->new($_[0]) : "Type::Tiny"->new(@_);
+	my $type = TypeTiny->check($_[0]) ? $_[0] : "Type::Tiny"->new(@_);
 	my $name = $type->name;
 	
 	$meta->{types} ||= {};
