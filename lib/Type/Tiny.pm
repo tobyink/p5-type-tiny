@@ -35,9 +35,10 @@ use overload
 	q(>=)      => sub { my $m = $_[0]->can('is_a_type_of');  $m->(reverse _swap @_) },
 	fallback   => 1,
 ;
-use if ($] >= 5.010001), overload =>
-	q(~~)      => sub { $_[0]->check($_[1]) },
-;
+BEGIN {
+	overload->import(q(~~) => sub { $_[0]->check($_[1]) })
+		if $] >= 5.010001;
+}
 
 my $uniq = 1;
 sub new
@@ -58,8 +59,10 @@ sub new
 	
 	unless ($self->is_anon)
 	{
-		$self->name =~ /^\p{Lu}[\p{L}0-9_]+$/sm
-			or _croak '%s is not a valid type name', $self->name;
+		# First try a fast ASCII-only expression, but fall back to Unicode
+		$self->name =~ /^[A-Z][A-Za-z0-9_]+$/sm
+			or eval q( $self->name =~ /^\p{Lu}[\p{L}0-9_]+$/sm )
+			or _croak '"%s" is not a valid type name', $self->name;
 	}
 
 	if ($self->has_library and not $self->is_anon)

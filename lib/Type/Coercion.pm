@@ -24,9 +24,10 @@ use overload
 	q(bool)    => sub { !!1 },
 	fallback   => 1,
 ;
-use if ($] >= 5.010001), overload =>
-	q(~~)      => sub { $_[0]->has_coercion_for_value($_[1]) },
-;
+BEGIN {
+	overload->import(q(~~) => sub { $_[0]->has_coercion_for_value($_[1]) })
+		if $] >= 5.010001;
+}
 
 sub new
 {
