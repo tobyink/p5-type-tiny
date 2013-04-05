@@ -56,4 +56,7 @@
 		item "Monkey patch Moose::Meta::TypeConstraint to be able to retrieve Type::Tiny constraints from inflated Moose constraints."^^Addition;
 		item "More test cases."^^Packaging;
 		item "Improved documentation of parameterization attributes."^^Documentation;
+		item "Footprint reduction: Type::Tiny, Type::Library and Type::Coerce no longer automatically load Types::Standard and Type::Utils."^^Change;
+		item "Footprint reduction: Type::Tiny and Type::Coerce no longer use if.pm."^^Change;
+		item "Footprint reduction: Type::Tiny no longer triggers Perl to load its Unicode tables (unless you create a type constraint with a non-ASCII type name)."^^Change;
 	].
