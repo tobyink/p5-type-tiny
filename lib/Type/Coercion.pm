@@ -20,13 +20,21 @@ sub _croak ($;@)
 }
 
 use overload
-	q(&{})     => sub { my $t = shift; sub { $t->coerce(@_) } },
+	q(&{})     => "_overload_coderef",
 	q(bool)    => sub { !!1 },
 	fallback   => 1,
 ;
 BEGIN {
 	overload->import(q(~~) => sub { $_[0]->has_coercion_for_value($_[1]) })
 		if $] >= 5.010001;
+}
+
+sub _overload_coderef
+{
+	my $self = shift;
+	$self->{_overload_coderef} ||= "Sub::Quote"->can("quote_sub") && $self->can_be_inlined
+		? Sub::Quote::quote_sub($self->inline_coercion('$_[0]'))
+		: sub { $self->coerce(@_) }
 }
 
 sub new
@@ -45,7 +53,10 @@ sub compiled_coercion   { $_[0]{compiled_coercion} ||= $_[0]->_build_compiled_co
 
 sub has_type_constraint { defined $_[0]{type_constraint} } # sic
 
-sub _clear_compiled_coercion { delete $_[0]{compiled_coercion} }
+sub _clear_compiled_coercion {
+	delete $_[0]{_overload_coderef};
+	delete $_[0]{compiled_coercion};
+}
 
 sub coerce
 {
@@ -120,7 +131,7 @@ sub _build_compiled_coercion
 	{
 		local $@;
 		my $sub = eval sprintf('sub ($) { %s }', $self->inline_coercion('$_[0]'));
-		die "Failed to compile coercion: $@\n\nCODE: @sub" if $@;
+		die "Failed to compile coercion: $@\n\nCODE: ".$self->inline_coercion('$_[0]') if $@;
 		return $sub;
 	}
 

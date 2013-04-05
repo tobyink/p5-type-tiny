@@ -10,6 +10,7 @@ BEGIN {
 }
 
 use Scalar::Util qw< blessed weaken refaddr >;
+use Sub::Quote; #XXX
 use Types::TypeTiny qw< StringLike CodeLike TypeTiny >;
 
 sub _croak ($;@)
@@ -22,7 +23,7 @@ sub _croak ($;@)
 sub _swap { $_[2] ? @_[1,0] : @_[0,1] }
 
 use overload
-	q("")      => sub { caller eq 'Moo::HandleMoose' ? "Type::Tiny~~$_[0]{uniq}" : $_[0]->display_name },
+	q("")      => sub { caller =~ m{^(Moo::HandleMoose|Sub::Quote)} ? overload::StrVal($_[0]) : $_[0]->display_name },
 	q(bool)    => sub { 1 },
 	q(&{})     => "_overload_coderef",
 	q(|)       => sub { my @tc = _swap @_; require Type::Tiny::Union; "Type::Tiny::Union"->new(type_constraints => \@tc) },
@@ -44,9 +45,12 @@ sub _overload_coderef
 {
 	my $self = shift;
 	$self->_build_message unless exists $self->{message};
-	$self->{_default_message} && "Sub::Quote"->can("quote_sub") && $self->can_be_inlined
-		? Sub::Quote::quote_sub($self->inline_assert('$_[0]'))
-		: sub { $self->assert_valid(@_) }
+	$self->{_overload_coderef} ||=
+		$self->has_parent && $self->_is_null_constraint
+			? $self->parent->_overload_coderef :
+		$self->{_default_message} && "Sub::Quote"->can("quote_sub") && $self->can_be_inlined
+			? Sub::Quote::quote_sub($self->inline_assert('$_[0]')) :
+		sub { $self->assert_valid(@_) }
 }
 
 my $uniq = 1;

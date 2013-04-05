@@ -32,7 +32,11 @@ cmpthese(-1, {
 	TT    => q{ Local::TT->new(%::data) },
 });
 
+#use B::Deparse;
+#print B::Deparse->new->coderef2text(Local::TT->can('new'));
+
 __END__
         Rate MXTML    TT
-MXTML 3100/s    --  -35%
-TT    4799/s   55%    --
+MXTML 3110/s    --  -48%
+TT    6032/s   94%    --
+
