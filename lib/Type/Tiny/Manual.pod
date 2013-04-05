@@ -15,9 +15,35 @@ L<Moo>.
 
 It provides a small Moose-inspired library of built-in type constraints.
 
+=head1 TYPE::TINY VERSUS X
+
+=head2 Specio 
+
 Type::Tiny is similar in aim to L<Specio>. The major differences are that
 Type::Tiny is "tiny"; and Type::Tiny dispenses with the idea of a type
 registry and stringy access to type constraints.
+
+=head2 MooseX::Types
+
+Type::Tiny libraries expose a similar interface to L<MooseX::Types> libraries.
+In most cases you should be able to rewrite a L<MooseX::Types> library to
+use Type::Tiny easily. It might be wise to add a shim MooseX:: module:
+
+   package Types::Foo {
+      ...;
+   }
+   
+   package MooseX::Types::Foo {
+      sub import {
+         require Types::Foo;
+         splice(@_, 0, 1) = ("Types::Foo", "-moose");
+         goto \&Types::Foo::import;
+      }
+   }
+
+=head2 MooX::Types::MooseLike
+
+Type::Tiny is faster and supports coercions.
 
 =head1 SEE ALSO
 
