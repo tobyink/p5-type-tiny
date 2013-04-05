@@ -6,11 +6,71 @@
 
 Type::Tiny::Manual::UsingWithMoo - how to use Type::Tiny and Type::Library with Moo
 
+=head1 SYNOPSIS
+
+   {
+      package Person;
+      
+      use Moo;
+      use Types::Standard qw( Str Int );
+      use Type::Utils qw( declare as where inline_as coerce from );
+      
+      has name => (
+         is      => "ro",
+         isa     => Str,
+      );
+      
+      my $PositiveInt = declare
+         as        Int,
+         where     {  $_ > 0  },
+         inline_as { "$_ =~ /^0-9]\$/ and $_ > 0" };
+      
+      coerce $PositiveInt, from Int, q{ abs $_ };
+      
+      has age => (
+         is      => "rwp",
+         isa     => $PositiveInt,
+         coerce  => $PositiveInt->coercion,
+      );
+      
+      sub get_older {
+         my $self = shift;
+         my ($years) = @_;
+         $PositiveInt->assert_valid($years);
+         $self->_set_age($self->age + $years);
+      }
+   }
+
 =head1 DESCRIPTION
 
-This document has not yet been written. For examples using Type::Tiny with
-L<Moo> see the SYNOPSIS sections of L<Type::Tiny> and L<Type::Library>,
-and the files C<< moo.t >> and C<< moo-coercion.t >> in the Type-Tiny
+Type::Tiny is tested with L<Moo> 1.001000.
+
+Type::Tiny overloads C<< &{} >>. Moo supports using objects that overload
+C<< &{} >> as C<isa> constraints, so Type::Tiny objects can directly be used
+in C<isa>.
+
+Moo doesn't support C<< coerce => 1 >> but requires a coderef as a coercion.
+However, again it supports using objects that overload C<< &{} >>, which
+Type::Coercion does, allowing C<< coerce => $Type->coercion >> to work.
+
+Type::Tiny hooks into Moo's HandleMoose interface to ensure that type
+constraints get inflated to Moose type constraints if and when Moo inflates
+your class to a full Moose class.
+
+=head2 Optimization
+
+The usual advice for optimizing type constraints applies: use type constraints
+which can be inlined whenever possible, and define coercions as strings rather
+than coderefs.
+
+There is a patch in the Moo repository that will enable inlining to work
+L<http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=gitmo/Moo.git;a=shortlog;h=refs/heads/coderef-overload>.
+
+=head1 SEE ALSO
+
+For examples using Type::Tiny with L<Moo> see the SYNOPSIS sections of
+L<Type::Tiny> and L<Type::Library>, and the files C<< moo.t >> and
+C<< moo-coercion.t >> and C<< moo-inflation.t >> in the Type-Tiny
 L<test suite|https://bitbucket.org/tobyink/p5-type-tiny/src/tip/t>.
 
 =head1 AUTHOR
