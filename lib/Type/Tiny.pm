@@ -10,7 +10,6 @@ BEGIN {
 }
 
 use Scalar::Util qw< blessed weaken refaddr >;
-use Sub::Quote; #XXX
 use Types::TypeTiny qw< StringLike CodeLike TypeTiny >;
 
 sub _croak ($;@)
