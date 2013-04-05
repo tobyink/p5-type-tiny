@@ -5,6 +5,8 @@
 	- t/type-enum.t: test the Type::Tiny::Enum class
 	- t/type-union.t: test the Type::Tiny::Union class
 	- t/type-intersection.t: test the Type::Tiny::Intersection class
+	- test DWIM behaviour of Type::Tiny::Class::new
 
 - documentation
+	- mention DWIM behaviour of Type::Tiny::Class::new
 	- write manual
