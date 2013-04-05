@@ -3,7 +3,7 @@ package Types::TypeTiny;
 use base "Exporter";
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.000_05';
+our $VERSION   = '0.000_06';
 
 our @EXPORT_OK = qw( CodeLike StringLike TypeTiny HashLike );
 

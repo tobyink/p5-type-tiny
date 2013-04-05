@@ -5,7 +5,7 @@ use warnings;
 
 BEGIN {
 	$Types::Standard::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::VERSION   = '0.000_05';
+	$Types::Standard::VERSION   = '0.000_06';
 }
 
 use base "Type::Library";

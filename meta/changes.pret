@@ -49,3 +49,11 @@
 		item "Don't die with full stack trace."^^Change;
 		item "Get Mouse coercions working."^^Bugfix;
 	].
+
+`Type-Tiny 0.000_06 cpan:TOBYINK`
+	issued  2013-04-05;
+	changeset [
+		item "Monkey patch Moose::Meta::TypeConstraint to be able to retrieve Type::Tiny constraints from inflated Moose constraints."^^Addition;
+		item "More test cases."^^Packaging;
+		item "Improved documentation of parameterization attributes."^^Documentation;
+	].
