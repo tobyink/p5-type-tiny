@@ -204,12 +204,11 @@ sub intersection
 }
 
 sub coerce
-{
-	my $meta = (scalar caller)->meta;
-	
+{	
 	if ((scalar caller)->isa("Type::Library"))
 	{
-		my ($type, @opts) = map { ref($_) ? $_ : $meta->get_type($_) } @_;
+		my $meta = (scalar caller)->meta;
+		my ($type, @opts) = map { ref($_) ? $_ : $meta->get_type($_)||$_ } @_;
 		return $type->coercion->add_type_coercions(@opts);
 	}
 

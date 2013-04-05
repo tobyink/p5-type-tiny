@@ -1,0 +1,76 @@
+=pod
+
+=encoding utf-8
+
+=head1 PURPOSE
+
+Checks Type::Coercion can be inlined.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
+use strict;
+use warnings;
+use lib qw( ./lib ./t/lib ../inc ./inc );
+
+use Test::Requires { JSON => 2.01 };
+
+use Test::More;
+use Test::Fatal;
+
+{
+	package T;
+	
+	require JSON;
+	
+	use Type::Library -base, -declare => qw/ JsonHash JsonArray /;
+	use Type::Utils;
+	use Types::Standard -types;
+	
+	declare JsonHash, as HashRef;
+	declare JsonArray, as ArrayRef;
+	
+	coerce JsonHash,
+		from Str, 'JSON::from_json($_)';
+	
+	coerce ArrayRef,
+		from Str, 'JSON::from_json($_)';
+}
+
+my $code = T::ArrayRef->coercion->inline_coercion('$::foo');
+
+our $foo = "[3,2,1]";
+
+is_deeply(
+	eval $code,
+	[3,2,1],
+	'inlined coercion works',
+);
+
+$foo = [5,4,3];
+
+is_deeply(
+	eval $code,
+	[5,4,3],
+	'no coercion necessary',
+);
+
+$foo = {foo => "bar"};
+
+is_deeply(
+	eval $code,
+	{foo => "bar"},
+	'no coercion possible',
+);
+
+done_testing;

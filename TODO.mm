@@ -2,14 +2,7 @@
 <!-- To view this file, download free mind mapping software FreeMind from http://freemind.sourceforge.net -->
 <node CREATED="1365159230192" ID="ID_28734446" MODIFIED="1365160405562" TEXT="Type-Tiny">
 <node CREATED="1365159327593" ID="ID_644808216" MODIFIED="1365159338432" POSITION="right" TEXT="inlining">
-<node CREATED="1365159339630" ID="ID_1633552538" MODIFIED="1365159346856" TEXT="allow coercions to be inlined">
-<node CREATED="1365159349980" ID="ID_795692799" MODIFIED="1365159367171" TEXT="only if all conversion code is supplied as strings"/>
-<node CREATED="1365159369143" ID="ID_474117820" MODIFIED="1365159395956" TEXT="can_be_inlined / inline_coercion methods"/>
-</node>
-<node CREATED="1365159411680" ID="ID_626260024" MODIFIED="1365159437237" TEXT="inlining into Moo-generated accessors">
-<node CREATED="1365159438625" ID="ID_1512459758" MODIFIED="1365159446572" TEXT="Sub::Quote compat??"/>
-<node CREATED="1365159447746" ID="ID_675054921" MODIFIED="1365159452777" TEXT="Patch Moo??"/>
-</node>
+<node CREATED="1365172780395" ID="ID_304466750" MODIFIED="1365172792593" TEXT="supply inlined versions of coercions to Moo"/>
 </node>
 <node CREATED="1365159462252" ID="ID_1616794199" MODIFIED="1365159464518" POSITION="left" TEXT="testing">
 <node CREATED="1365159716050" ID="ID_110682305" MODIFIED="1365159724343" TEXT="tests for enums"/>

@@ -115,7 +115,15 @@ sub _build_compiled_coercion
 	
 	my @mishmash = @{$self->type_coercion_map};
 	return sub { $_[0] } unless @mishmash;
-	
+
+	if ($self->can_be_inlined)
+	{
+		local $@;
+		my $sub = eval sprintf('sub ($) { %s }', $self->inline_coercion('$_[0]'));
+		die "Failed to compile coercion: $@\n\nCODE: @sub" if $@;
+		return $sub;
+	}
+
 	# These arrays will be closed over.
 	my (@types, @codes);
 	while (@mishmash)
@@ -148,6 +156,56 @@ sub _build_compiled_coercion
 	my $sub = eval sprintf('sub ($) { %s }', join qq[\n], @sub);
 	die "Failed to compile coercion: $@\n\nCODE: @sub" if $@;
 	return $sub;
+}
+
+sub can_be_inlined
+{
+	my $self = shift;
+	my @mishmash = @{$self->type_coercion_map};
+	while (@mishmash)
+	{
+		my ($type, $converter) = splice(@mishmash, 0, 2);
+		return unless $type->can_be_inlined;
+		return unless StringLike->check($converter);
+	}
+	return !!1;
+}
+
+sub inline_coercion
+{
+	my $self = shift;
+	my $varname = $_[0];
+	
+	_croak "this coercion cannot be inlined" unless $self->can_be_inlined;
+	
+	my @mishmash = @{$self->type_coercion_map};
+	return "($varname)" unless @mishmash;
+	
+	my (@types, @codes);
+	while (@mishmash)
+	{
+		push @types, shift @mishmash;
+		push @codes, shift @mishmash;
+	}
+	if ($self->has_type_constraint)
+	{
+		unshift @types, $self->type_constraint;
+		unshift @codes, undef;
+	}
+	
+	my @sub;
+	
+	for my $i (0..$#types)
+	{
+		push @sub, sprintf('%s ?', $types[$i]->inline_check($varname));
+		push @sub, defined($codes[$i])
+			? sprintf('do { local $_ = %s; %s } :', $varname, $codes[$i])
+			: sprintf('(%s) :', $varname);
+	}
+	
+	push @sub, "($varname)";
+	
+	"scalar(@sub)";
 }
 
 sub _build_moose_coercion
@@ -281,6 +339,14 @@ Not implemented yet.
 =item C<< has_coercion_for_value($value) >>
 
 Returns true iff the value could be coerced by this coercion.
+
+=item C<< can_be_inlined >>
+
+Returns true iff the coercion can be inlined.
+
+=item C<< inline_coercion($varname) >>
+
+Much like C<inline_coerce> from L<Type::Tiny>.
 
 =back
 
