@@ -399,6 +399,8 @@ sub _instantiate_moose_type
 {
 	my $self = shift;
 	my %opts = @_;
+	require Moose::Meta::TypeConstraint;
+	return "Moose::Meta::TypeConstraint"->new(%opts);
 }
 
 my $trick_done = 0;
@@ -424,9 +426,7 @@ sub _build_moose_type
 		$opts{inlined}    = $self->inlined            if $self->has_inlined;
 		$opts{tt_type}    = $self;
 		
-		require Moose::Meta::TypeConstraint;
-		$r = "Moose::Meta::TypeConstraint"->new(%opts);
-		
+		$r = $self->_instantiate_moose_type(%opts);
 		$self->{moose_type} = $r;  # prevent recursion
 		$r->coercion($self->coercion->moose_coercion) if $self->has_coercion;
 	}
