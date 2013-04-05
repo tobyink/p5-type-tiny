@@ -43,7 +43,7 @@ BEGIN {
 sub _overload_coderef
 {
 	my $self = shift;
-	$self->_build_message unless exists $self->{message};
+	$self->message unless exists $self->{message};
 	$self->{_overload_coderef} ||=
 		$self->has_parent && $self->_is_null_constraint
 			? $self->parent->_overload_coderef :
