@@ -40,7 +40,7 @@ should_pass($_, $Any)
 
 like(
 	exception { $Any->create_child_type(name => "1") },
-	qr{^1 is not a valid type name},
+	qr{^"1" is not a valid type name},
 	"bad type constraint name",
 );
 
