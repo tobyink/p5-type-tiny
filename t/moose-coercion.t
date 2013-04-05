@@ -33,6 +33,8 @@ use Test::More;
 use Test::Requires { Moose => 2.0000 };
 use Test::Fatal;
 
+my @warnings;
+
 {
 	package Local::Class;
 	
@@ -41,9 +43,18 @@ use Test::Fatal;
 	
 	::isa_ok(BigInteger, "Moose::Meta::TypeConstraint");
 	
-	has small => (is => "rw", isa => SmallInteger, coerce => 1);
-	has big   => (is => "rw", isa => BigInteger, coerce => 1);
+	has small  => (is => "rw", isa => SmallInteger, coerce => 1);
+	has big    => (is => "rw", isa => BigInteger, coerce => 1);
+	
+	local $SIG{__WARN__} = sub { push @warnings, \@_ };
+	has big_nc => (is => "rw", isa => BigInteger->no_coercions, coerce => 1);
 }
+
+like(
+	$warnings[0][0],
+	qr{^You cannot coerce an attribute .?big_nc.? unless its type .?BigInteger.? has a coercion},
+	"no_coercions and friends available on Moose type constraint objects",
+);
 
 my ($e, $o);
 
