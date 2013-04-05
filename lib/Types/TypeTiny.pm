@@ -11,38 +11,42 @@ my %cache;
 
 sub StringLike ()
 {
-	require Type::Utils;
-	require Types::Standard;
-	$cache{StringLike} ||= Type::Utils::union(StringLike => [
-		Types::Standard::Overload([q[""]]),
-		Types::Standard::Str(),
-	]);
+	require Type::Tiny;
+	$cache{StringLike} ||= "Type::Tiny"->new(
+		name       => "StringLike",
+		constraint => sub {    !ref($_   ) or Scalar::Util::blessed($_   ) && overload::Method($_   , q[""])  },
+		inlined    => sub { qq/!ref($_[1]) or Scalar::Util::blessed($_[1]) && overload::Method($_[1], q[""])/ },
+	);
 }
 
 sub HashLike ()
 {
-	require Type::Utils;
-	require Types::Standard;
-	$cache{HashLike} ||= Type::Utils::union(HashLike => [
-		Types::Standard::Overload([q[%{}]]),
-		Types::Standard::HashRef(),
-	]);
+	require Type::Tiny;
+	$cache{HashLike} ||= "Type::Tiny"->new(
+		name       => "HashLike",
+		constraint => sub {    ref($_   ) eq q[HASH] or Scalar::Util::blessed($_   ) && overload::Method($_   , q[%{}])  },
+		inlined    => sub { qq/ref($_[1]) eq q[HASH] or Scalar::Util::blessed($_[1]) && overload::Method($_[1], q[\%{}])/ },
+	);
 }
 
 sub CodeLike ()
 {
-	require Type::Utils;
-	require Types::Standard;
-	$cache{CodeLike} ||= Type::Utils::union(CodeLike => [
-		Types::Standard::Overload([q[&{}]]),
-		Types::Standard::Ref(["CODE"]),
-	]);
+	require Type::Tiny;
+	$cache{CodeLike} ||= "Type::Tiny"->new(
+		name       => "CodeLike",
+		constraint => sub {    ref($_   ) eq q[CODE] or Scalar::Util::blessed($_   ) && overload::Method($_   , q[&{}])  },
+		inlined    => sub { qq/ref($_[1]) eq q[CODE] or Scalar::Util::blessed($_[1]) && overload::Method($_[1], q[\&{}])/ },
+	);
 }
 
 sub TypeTiny ()
 {
-	require Type::Utils;
-	$cache{TypeTiny} ||= Type::Utils::class_type(TypeTiny => {class=>"Type::Tiny"});
+	require Type::Tiny;
+	$cache{TypeTiny} ||= "Type::Tiny"->new(
+		name       => "TypeTiny",
+		constraint => sub {  Scalar::Util::blessed($_   ) && $_   ->isa(q[Type::Tiny])  },
+		inlined    => sub { "Scalar::Util::blessed($_[1]) && $_[1]->isa(q[Type::Tiny])" },
+	);
 }
 
 1;
