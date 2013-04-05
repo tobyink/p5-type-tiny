@@ -6,6 +6,7 @@
 	- t/type-union.t: test the Type::Tiny::Union class
 	- t/type-intersection.t: test the Type::Tiny::Intersection class
 	- test DWIM behaviour of Type::Tiny::Class::new
+	- test Moose inflation of Type::Tiny subclasses
 
 - documentation
 	- mention DWIM behaviour of Type::Tiny::Class::new

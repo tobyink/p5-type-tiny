@@ -60,6 +60,17 @@ sub _build_message
 	return sub { sprintf 'value "%s" did not pass type constraint "%s" (not isa %s)', $_[0], $name, $c };
 }
 
+sub _instantiate_moose_type
+{
+	my $self = shift;
+	my %opts = @_;
+	delete $opts{parent};
+	delete $opts{constraint};
+	delete $opts{inlined};
+	require Moose::Meta::TypeConstraint::Class;
+	return "Moose::Meta::TypeConstraint::Class"->new(%opts, class => $self->class);
+}
+
 1;
 
 __END__
