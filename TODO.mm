@@ -1,6 +1,6 @@
 <map version="0.9.0">
 <!-- To view this file, download free mind mapping software FreeMind from http://freemind.sourceforge.net -->
-<node CREATED="1365159230192" ID="ID_28734446" MODIFIED="1365159286868" TEXT="Type-Tiny">
+<node CREATED="1365159230192" ID="ID_28734446" MODIFIED="1365160405562" TEXT="Type-Tiny">
 <node CREATED="1365159327593" ID="ID_644808216" MODIFIED="1365159338432" POSITION="right" TEXT="inlining">
 <node CREATED="1365159339630" ID="ID_1633552538" MODIFIED="1365159346856" TEXT="allow coercions to be inlined">
 <node CREATED="1365159349980" ID="ID_795692799" MODIFIED="1365159367171" TEXT="only if all conversion code is supplied as strings"/>

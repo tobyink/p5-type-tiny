@@ -24,7 +24,7 @@ sub _swap { $_[2] ? @_[1,0] : @_[0,1] }
 use overload
 	q("")      => sub { caller eq 'Moo::HandleMoose' ? "Type::Tiny~~$_[0]{uniq}" : $_[0]->display_name },
 	q(bool)    => sub { 1 },
-	q(&{})     => sub { my $t = shift; sub { $t->assert_valid(@_) } },
+	q(&{})     => "_overload_coderef",
 	q(|)       => sub { my @tc = _swap @_; require Type::Tiny::Union; "Type::Tiny::Union"->new(type_constraints => \@tc) },
 	q(&)       => sub { my @tc = _swap @_; require Type::Tiny::Intersection; "Type::Tiny::Intersection"->new(type_constraints => \@tc) },
 	q(~)       => sub { shift->complementary_type },
@@ -38,6 +38,15 @@ use overload
 BEGIN {
 	overload->import(q(~~) => sub { $_[0]->check($_[1]) })
 		if $] >= 5.010001;
+}
+
+sub _overload_coderef
+{
+	my $self = shift;
+	$self->_build_message unless exists $self->{message};
+	$self->{_default_message} && "Sub::Quote"->can("quote_sub") && $self->can_be_inlined
+		? Sub::Quote::quote_sub($self->inline_assert('$_[0]'))
+		: sub { $self->assert_valid(@_) }
 }
 
 my $uniq = 1;
@@ -140,6 +149,7 @@ sub _build_coercion
 sub _build_message
 {
 	my $self = shift;
+	$self->{_default_message}++;
 	return sub { sprintf 'value "%s" did not pass type constraint', $_[0] } if $self->is_anon;
 	my $name = "$self";
 	return sub { sprintf 'value "%s" did not pass type constraint "%s"', $_[0], $name };
@@ -317,6 +327,19 @@ sub inline_check
 		if !$self->has_parent && $self->_is_null_constraint;
 	my $r = $self->inlined->($self, @_);
 	$r =~ /[;{}]/ ? "(do { $r })" : "($r)";
+}
+
+sub inline_assert
+{
+	my $self = shift;
+	my $varname = $_[0];
+	my $code = sprintf(
+		q[die qq(value "%s" did not pass type constraint "%s") unless %s],
+		$varname,
+		"$self",
+		$self->inline_check(@_)
+	);
+	return $code;
 }
 
 sub _inline_check
