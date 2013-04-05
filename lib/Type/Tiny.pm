@@ -80,7 +80,7 @@ sub new
 
 	if ($self->has_library and not $self->is_anon)
 	{
-		$Moo::HandleMoose::TYPE_MAP{"Type::Tiny~~$self->{uniq}"} = sub { $self->moose_type };
+		$Moo::HandleMoose::TYPE_MAP{overload::StrVal($self)} = sub { $self->moose_type };
 	}
 		
 	return $self;
