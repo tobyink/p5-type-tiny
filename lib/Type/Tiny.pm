@@ -424,9 +424,9 @@ sub _build_moose_type
 		$opts{constraint} = $self->constraint         unless $self->_is_null_constraint;
 		$opts{message}    = $self->message;
 		$opts{inlined}    = $self->inlined            if $self->has_inlined;
-		$opts{tt_type}    = $self;
 		
 		$r = $self->_instantiate_moose_type(%opts);
+		$r->_set_tt_type($self);
 		$self->{moose_type} = $r;  # prevent recursion
 		$r->coercion($self->coercion->moose_coercion) if $self->has_coercion;
 	}
@@ -517,7 +517,7 @@ sub _MONKEY_MAGIC
 		Moose::Meta::TypeConstraint;
 		__PACKAGE__->meta->make_mutable;
 		__PACKAGE__->meta->add_attribute(
-			tt_type => (reader => "tt_type", writer => "_set_tt_type"),
+			tt_type => (reader => "tt_type", writer => "_set_tt_type", predicate => "has_tt_type"),
 		);
 		__PACKAGE__->meta->make_immutable(inline_constructor => 0);
 		sub plus_coercions {
@@ -528,6 +528,9 @@ sub _MONKEY_MAGIC
 		}
 		sub no_coercions {
 			shift->tt_type->no_coercions->moose_type;
+		}
+		sub complementary_type {
+			shift->tt_type->complementary_type->moose_type;
 		}
 		1;
 	} or _croak("could not perform magic Moose trick: $@");

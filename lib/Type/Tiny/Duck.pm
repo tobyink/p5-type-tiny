@@ -66,6 +66,7 @@ sub _instantiate_moose_type
 	delete $opts{parent};
 	delete $opts{constraint};
 	delete $opts{inlined};
+	
 	require Moose::Meta::TypeConstraint::DuckType;
 	return "Moose::Meta::TypeConstraint::DuckType"->new(%opts, methods => $self->methods);
 }
