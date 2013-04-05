@@ -334,10 +334,10 @@ sub inline_assert
 	my $self = shift;
 	my $varname = $_[0];
 	my $code = sprintf(
-		q[die qq(value "%s" did not pass type constraint "%s") unless %s],
+		q[die qq(value "%s" did not pass type constraint "%s") unless %s;],
 		$varname,
 		"$self",
-		$self->inline_check(@_)
+		$self->inline_check(@_),
 	);
 	return $code;
 }
@@ -805,13 +805,22 @@ Returns boolean indicating if this type can be inlined.
 Creates a type constraint check for a particular variable as a string of
 Perl code. For example:
 
-	print( Types::Standard::Num->inline_check('$foo') );
+   print( Types::Standard::Num->inline_check('$foo') );
 
 prints the following output:
 
-	(!ref($foo) && Scalar::Util::looks_like_number($foo))
+   (!ref($foo) && Scalar::Util::looks_like_number($foo))
 
 For Moose-compat, there is an alias C<< _inline_check >> for this method.
+
+=item C<< inline_assert($varname) >>
+
+Much like C<inline_check> but outputs a statement of the form:
+
+   die ... unless ...;
+
+Note that if this type has a custom error message, the inlined code will
+I<ignore> this custom message!!
 
 =item C<< parameterize(@parameters) >>
 
