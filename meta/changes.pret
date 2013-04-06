@@ -75,3 +75,9 @@
 		item "Type::Coercion::Union - automatically handles coercion to union types."^^Addition;
 		item "Fix inlining of certain conditionals into coercion code."^^Bugfix;
 	].
+
+`Type-Tiny 0.000_08 cpan:TOBYINK`
+	issued  2013-04-07;
+	changeset [
+		item "Rewrite most of the functions exported by Type::Library-based type libraries to cope better with being used mid-list."^^Change;
+	].
