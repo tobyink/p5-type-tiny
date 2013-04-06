@@ -30,7 +30,9 @@ sub new {
 		map { $_->isa(__PACKAGE__) ? @$_ : $_ }
 		@{ ref $opts{type_constraints} eq "ARRAY" ? $opts{type_constraints} : [$opts{type_constraints}] }
 	];
-	return $proto->SUPER::new(%opts);
+	my $self = $proto->SUPER::new(%opts);
+	$self->coercion if grep $_->has_coercion, @$self;
+	return $self;
 }
 
 sub type_constraints { $_[0]{type_constraints} }
