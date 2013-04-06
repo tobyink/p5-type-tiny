@@ -42,6 +42,13 @@ sub _build_display_name
 	join q[|], @$self;
 }
 
+sub _build_coercion
+{
+	require Type::Coercion::Union;
+	my $self = shift;
+	return "Type::Coercion::Union"->new(type_constraint => $self);
+}
+
 sub _build_constraint
 {
 	my @tcs = @{+shift};
@@ -118,6 +125,10 @@ constructor. Instead rely on the default.
 
 Unlike Type::Tiny, you should generally I<not> pass an inlining coderef to
 the constructor. Instead rely on the default.
+
+=item C<coercion>
+
+Will typically be a L<Type::Coercion::Union>.
 
 =back
 
