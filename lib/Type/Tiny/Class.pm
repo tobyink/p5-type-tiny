@@ -94,6 +94,25 @@ Major differences are listed below:
 
 =over
 
+=item C<new>
+
+When the constructor is called on an I<instance> of Type::Tiny::Class, it
+passes the call through to the constructor of the class for the constraint.
+So for example:
+
+   my $type = Type::Tiny::Class->new(class => "Foo::Bar");
+   my $obj  = $type->new(hello => "World");
+   say ref($obj);   # prints "Foo::Bar"
+
+This little bit of DWIM was borrowed from L<MooseX::Types::TypeDecorator>,
+but Type::Tiny doesn't take the idea quite as far.
+
+=back
+
+=head2 Attributes
+
+=over
+
 =item C<class>
 
 The class for the constraint.

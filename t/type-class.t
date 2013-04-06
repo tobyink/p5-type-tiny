@@ -60,4 +60,10 @@ should_fail("Foo::Bar", FooBaz);
 should_fail("Foo::Baz", FooBar);
 should_fail("Foo::Baz", FooBaz);
 
+is(
+	ref(FooBar->new),
+	ref(FooBar->class->new),
+	'DWIM Type::Tiny::Class::new',
+);
+
 done_testing;
