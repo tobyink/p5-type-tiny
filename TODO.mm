@@ -1,9 +1,6 @@
 <map version="0.9.0">
 <!-- To view this file, download free mind mapping software FreeMind from http://freemind.sourceforge.net -->
 <node CREATED="1365159230192" ID="ID_28734446" MODIFIED="1365160405562" TEXT="Type-Tiny">
-<node CREATED="1365159462252" ID="ID_1616794199" MODIFIED="1365159464518" POSITION="left" TEXT="testing">
-<node CREATED="1365159729649" ID="ID_1811421590" MODIFIED="1365159734517" TEXT="tests for intersections"/>
-</node>
 <node CREATED="1365159476220" ID="ID_326312292" MODIFIED="1365159479239" POSITION="right" TEXT="documentation">
 <node CREATED="1365159485188" ID="ID_987220404" MODIFIED="1365159488209" TEXT="usage with Moose">
 <node CREATED="1365159509356" ID="ID_1702622097" MODIFIED="1365159575116" TEXT="using type constraints from libraries"/>
