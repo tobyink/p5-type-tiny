@@ -183,9 +183,9 @@ ok(not(Int() < Int), "not(Int < Int)");
 ok(Int() <= Int, "Int <= Int");
 ok(Int >= Int, "Int >= Int");
 
-ok(not(ArrayRef[Int] > ArrayRef[Num]), 'not(ArrayRef[Int] > ArrayRef[Num])');
-ok(not(ArrayRef[Int] == ArrayRef[Num]), 'not(ArrayRef[Int] == ArrayRef[Num])');
-ok(ArrayRef[Int] == ArrayRef[Int], 'ArrayRef[Int] == ArrayRef[Int]');
+ok(not((ArrayRef[Int]) > (ArrayRef[Num])), 'not(ArrayRef[Int] > ArrayRef[Num])');
+ok(not((ArrayRef[Int]) == (ArrayRef[Num])), 'not(ArrayRef[Int] == ArrayRef[Num])');
+ok((ArrayRef[Int]) == (ArrayRef[Int]), 'ArrayRef[Int] == ArrayRef[Int]');
 
 ok(not(ArrayRef == ArrayRef[Int]), 'not(ArrayRef == ArrayRef[Int])');
 ok(ArrayRef > ArrayRef[Int], 'ArrayRef > ArrayRef[Int]');

@@ -206,7 +206,7 @@ sub _build_compiled_check
 sub equals
 {
 	my ($self, $other) = @_;
-	
+	return unless blessed($self)  && $self->isa("Type::Tiny");
 	return unless blessed($other) && $other->isa("Type::Tiny");
 	
 	return !!1 if refaddr($self) == refaddr($other);
@@ -228,6 +228,7 @@ sub equals
 sub is_subtype_of
 {
 	my ($self, $other) = @_;
+	return unless blessed($self)  && $self->isa("Type::Tiny");
 	return unless blessed($other) && $other->isa("Type::Tiny");
 
 	my $this = $self;
@@ -242,13 +243,18 @@ sub is_subtype_of
 sub is_supertype_of
 {
 	my ($self, $other) = @_;
+	return unless blessed($self)  && $self->isa("Type::Tiny");
 	return unless blessed($other) && $other->isa("Type::Tiny");
+	
 	$other->is_subtype_of($self);
 }
 
 sub is_a_type_of
 {
 	my ($self, $other) = @_;
+	return unless blessed($self)  && $self->isa("Type::Tiny");
+	return unless blessed($other) && $other->isa("Type::Tiny");
+	
 	$self->equals($other) or $self->is_subtype_of($other);
 }
 
@@ -377,7 +383,7 @@ sub parameterize
 	my $self = shift;
 	return $self unless @_;
 	$self->is_parameterizable
-		or _croak "type '%s' does not accept parameters", $self;
+		or _croak "type '%s' does not accept parameters", "$self";
 	
 	local $_ = $_[0];
 	my %options = (

@@ -45,7 +45,7 @@ sub TypeTiny ()
 	$cache{TypeTiny} ||= "Type::Tiny"->new(
 		name       => "TypeTiny",
 		constraint => sub {  Scalar::Util::blessed($_   ) && $_   ->isa(q[Type::Tiny])  },
-		inlined    => sub { "Scalar::Util::blessed($_[1]) && $_[1]->isa(q[Type::Tiny])" },
+		inlined    => sub { my $var = $_[1]; "Scalar::Util::blessed($var) && $var\->isa(q[Type::Tiny])" },
 	);
 }
 
