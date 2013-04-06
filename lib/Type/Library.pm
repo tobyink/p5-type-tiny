@@ -139,7 +139,7 @@ sub add_type
 	no strict "refs";
 	no warnings "redefine";
 	my $class = blessed($meta);
-	*{"$class\::$name"   }     = _subname $type->qualified_name, sub (;$) { $type };
+	*{"$class\::$name"   }     = _subname $type->qualified_name, sub (;$) { (@_ ? $type->parameterize(@{$_[0]}) : $type) };
 	*{"$class\::is_$name"}     = _subname $type->qualified_name, $type->compiled_check;
 	*{"$class\::to_$name"}     = _subname $type->qualified_name, sub ($)  { $type->coerce($_[0]) };
 	*{"$class\::assert_$name"} = _subname $type->qualified_name, sub ($)  { $type->assert_valid($_[0]) };
