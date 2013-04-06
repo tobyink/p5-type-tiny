@@ -73,4 +73,5 @@
 		item "Fix inlining for Type::Tiny::Intersection."^^Bugfix;
 		item "Types within libraries, if accessed directly rather than exported, did not accept parameters."^^Bugfix;
 		item "Type::Coercion::Union - automatically handles coercion to union types."^^Addition;
+		item "Fix inlining of certain conditionals into coercion code."^^Bugfix;
 	].

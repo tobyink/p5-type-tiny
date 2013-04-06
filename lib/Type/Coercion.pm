@@ -208,15 +208,15 @@ sub inline_coercion
 	
 	for my $i (0..$#types)
 	{
-		push @sub, sprintf('%s ?', $types[$i]->inline_check($varname));
+		push @sub, sprintf('(%s) ?', $types[$i]->inline_check($varname));
 		push @sub, defined($codes[$i])
-			? sprintf('do { local $_ = %s; %s } :', $varname, $codes[$i])
-			: sprintf('(%s) :', $varname);
+			? sprintf('do { local $_ = %s; scalar(%s) } :', $varname, $codes[$i])
+			: sprintf('%s :', $varname);
 	}
 	
-	push @sub, "($varname)";
+	push @sub, "$varname";
 	
-	"scalar(@sub)";
+	"@sub";
 }
 
 sub _build_moose_coercion
