@@ -74,8 +74,7 @@ Test::TypeTiny - useful functions for testing the efficacy of type constraints
 
 =head1 DESCRIPTION
 
-L<Test::TypeTiny> provides a couple of handy functions for testing type
-constraints.
+L<Test::TypeTiny> provides a few handy functions for testing type constraints.
 
 =head2 Functions
 
