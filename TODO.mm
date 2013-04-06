@@ -16,11 +16,5 @@
 </node>
 </node>
 <node CREATED="1365159705390" ID="ID_1309512802" MODIFIED="1365159712207" POSITION="left" TEXT="integration with MooX-late"/>
-<node CREATED="1365248212309" ID="ID_240924307" MODIFIED="1365259561464" POSITION="right" TEXT="coercion to union">
-<icon BUILTIN="button_ok"/>
-<node CREATED="1365259536100" ID="ID_693433019" MODIFIED="1365259553125" TEXT="needs test cases">
-<icon BUILTIN="stop-sign"/>
-</node>
-</node>
 </node>
 </map>
