@@ -90,7 +90,7 @@ Type constraints of the general form C<< { $_->isa("Some::Class") } >>.
 This package inherits from L<Type::Tiny>; see that for most documentation.
 Major differences are listed below:
 
-=head2 Attributes
+=head2 Constructor
 
 =over
 
