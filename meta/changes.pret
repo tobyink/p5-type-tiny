@@ -64,3 +64,13 @@
 		item "Using Type::Tiny with Moo added to manual."^^Documentation;
 		item "Section in manual comparing Type::Tiny with various other type library frameworks."^^Documentation;
 	].
+
+`Type-Tiny 0.000_07 cpan:TOBYINK`
+	issued  2013-04-06;
+	changeset [
+		item "More test cases."^^Packaging;
+		item "Document constructor for Type::Tiny::Class."^^Documentation;
+		item "Fix inlining for Type::Tiny::Intersection."^^Bugfix;
+		item "Types within libraries, if accessed directly rather than exported, did not accept parameters."^^Bugfix;
+		item "Type::Coercion::Union - automatically handles coercion to union types."^^Addition;
+	].

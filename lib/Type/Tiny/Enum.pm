@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Tiny::Enum::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::Enum::VERSION   = '0.000_06';
+	$Type::Tiny::Enum::VERSION   = '0.000_07';
 }
 
 sub _croak ($;@)
