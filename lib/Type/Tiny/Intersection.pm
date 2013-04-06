@@ -92,6 +92,10 @@ Major differences are listed below:
 
 Arrayref of type constraints.
 
+When passed to the constructor, if any of the type constraints in the
+intersection is itself an intersection type constraint, this is "exploded"
+into the new intersection.
+
 =item C<constraint>
 
 Unlike Type::Tiny, you should generally I<not> pass a constraint to the
