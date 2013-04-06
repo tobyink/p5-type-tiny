@@ -2,7 +2,6 @@
 <!-- To view this file, download free mind mapping software FreeMind from http://freemind.sourceforge.net -->
 <node CREATED="1365159230192" ID="ID_28734446" MODIFIED="1365160405562" TEXT="Type-Tiny">
 <node CREATED="1365159462252" ID="ID_1616794199" MODIFIED="1365159464518" POSITION="left" TEXT="testing">
-<node CREATED="1365159716050" ID="ID_110682305" MODIFIED="1365159724343" TEXT="tests for enums"/>
 <node CREATED="1365159725619" ID="ID_1659384299" MODIFIED="1365159729039" TEXT="tests for unions"/>
 <node CREATED="1365159729649" ID="ID_1811421590" MODIFIED="1365159734517" TEXT="tests for intersections"/>
 <node CREATED="1365159750963" ID="ID_1721841066" MODIFIED="1365159761085" TEXT="test for Type::Tiny::Class::new"/>
