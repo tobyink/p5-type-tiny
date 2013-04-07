@@ -200,6 +200,11 @@ sub add_type
 		@_ && wantarray ? return($t, @_) : return $t;
 	};
 	
+	if ($type and not $type->is_parameterizable)
+	{
+		&Scalar::Util::set_prototype(\&{"$class\::$name"}, '');
+	}
+	
 	*{"$class\::is_$name"} = _subname $type->qualified_name, $type->compiled_check;
 	
 	# There is an inlined version available, but don't use that because
