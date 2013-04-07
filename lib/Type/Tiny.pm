@@ -9,7 +9,7 @@ BEGIN {
 	$Type::Tiny::VERSION   = '0.000_08';
 }
 
-use Scalar::Util qw< blessed weaken refaddr >;
+use Scalar::Util qw< blessed weaken refaddr isweak >;
 use Types::TypeTiny qw< StringLike CodeLike TypeTiny to_TypeTiny >;
 
 sub _croak ($;@)
@@ -417,7 +417,7 @@ sub complementary_type
 {
 	my $self = shift;
 	my $r    = ($self->{complementary_type} ||= $self->_build_complementary_type);
-	weaken($self->{complementary_type});
+	weaken($self->{complementary_type}) unless isweak($self->{complementary_type});
 	return $r;
 }
 

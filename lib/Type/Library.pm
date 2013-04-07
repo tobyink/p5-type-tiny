@@ -154,6 +154,11 @@ sub _export
 		_croak "'%s' is not exported by '%s'", $sub->{sub}, $class;
 	}
 	
+	if ($type and not $type->is_parameterizable)
+	{
+		$export_coderef = &Scalar::Util::set_prototype($export_coderef, '');
+	}
+	
 	$export_as = $sub->{-as}                if exists $sub->{-as};
 	$export_as = $sub->{-prefix}.$export_as if exists $sub->{-prefix};
 	$export_as = $export_as.$sub->{-suffix} if exists $sub->{-suffix};
