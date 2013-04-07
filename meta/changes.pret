@@ -83,3 +83,10 @@
 		item "Most parts of the API that accept Type::Tiny objects (e.g. Type::Utils::from()) now also accept Moose::Meta::TypeConstraint objects."^^Change;
 		item "Types::TypeTiny::to_TypeTiny can be used to coerce a Moose type constraint object to Type::Tiny."^^Addition;
 	].
+
+`Type-Tiny 0.000_09 cpan:TOBYINK`
+	issued  2013-04-08;
+	changeset [
+		item "Bundle benchmarking scripts."^^Addition;
+		item "Fill in the Usage with Moose section of the fine manual."^^Documentation;
+	].
