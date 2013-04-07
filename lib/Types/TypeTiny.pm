@@ -1,11 +1,15 @@
 package Types::TypeTiny;
 
-use base "Exporter";
+use strict;
+use warnings;
 
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.000_08';
 
-our @EXPORT_OK = qw( CodeLike StringLike TypeTiny HashLike );
+use Scalar::Util qw< blessed >;
+
+use base "Exporter";
+our @EXPORT_OK = qw( CodeLike StringLike TypeTiny HashLike to_TypeTiny );
 
 my %cache;
 
@@ -49,6 +53,31 @@ sub TypeTiny ()
 	);
 }
 
+sub to_TypeTiny
+{
+	my $t = $_[0];
+	
+	if (blessed $t and $t->isa("Moose::Meta::TypeConstraint"))
+	{
+		if ($t->can("tt_type") and my $tt = $t->tt_type)
+		{
+			return $tt;
+		}
+		
+		my %opts;
+		$opts{name}       = $t->name;
+		$opts{constraint} = $t->constraint;
+		$opts{parent}     = to_TypeTiny($t->parent)              if $t->has_parent;
+		$opts{inlined}    = sub { shift; $t->_inline_check(@_) } if $t->can_be_inlined;
+		$opts{message}    = sub { $t->get_message($_) }          if $t->has_message;
+		
+		require Type::Tiny;
+		return "Type::Tiny"->new(%opts);
+	}
+	
+	return $t;
+}
+
 1;
 
 __END__
@@ -78,7 +107,7 @@ much circularity. But it exports some type constraint "constants":
 
 =item C<< CodeLike >>
 
-=item C<< TypeTiny >>
+=item C<< TypeTiny >>, C<< to_TypeTiny >>
 
 =back
 

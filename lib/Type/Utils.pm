@@ -18,7 +18,7 @@ sub _croak ($;@) {
 use Scalar::Util qw< blessed >;
 use Type::Library;
 use Type::Tiny;
-use Types::TypeTiny qw< TypeTiny >;
+use Types::TypeTiny qw< TypeTiny to_TypeTiny >;
 
 use Exporter qw< import >;
 our @EXPORT = qw<
@@ -57,12 +57,17 @@ sub declare
 	my $caller = caller($opts{_caller_level} || 0);
 	$opts{library} = $caller;
 
-	if (defined $opts{parent} and not TypeTiny->check($opts{parent}))
+	if (defined $opts{parent})
 	{
-		$caller->isa("Type::Library")
-			or _croak "parent type cannot be a string";
-		$opts{parent} = $caller->meta->get_type($opts{parent})
-			or _croak "could not find parent type";
+		$opts{parent} = to_TypeTiny($opts{parent});
+		
+		unless (TypeTiny->check($opts{parent}))
+		{
+			$caller->isa("Type::Library")
+				or _croak "parent type cannot be a string";
+			$opts{parent} = $caller->meta->get_type($opts{parent})
+				or _croak "could not find parent type";
+		}
 	}
 		
 	my $type;
@@ -208,11 +213,12 @@ sub coerce
 	if ((scalar caller)->isa("Type::Library"))
 	{
 		my $meta = (scalar caller)->meta;
-		my ($type, @opts) = map { ref($_) ? $_ : $meta->get_type($_)||$_ } @_;
+		my ($type, @opts) = map { ref($_) ? to_TypeTiny($_) : $meta->get_type($_)||$_ } @_;
 		return $type->coercion->add_type_coercions(@opts);
 	}
 	
 	my ($type, @opts) = @_;
+	$type = to_TypeTiny($type);
 	return $type->coercion->add_type_coercions(@opts);
 }
 

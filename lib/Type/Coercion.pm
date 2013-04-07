@@ -10,7 +10,7 @@ BEGIN {
 }
 
 use Scalar::Util qw< blessed >;
-use Types::TypeTiny qw< CodeLike StringLike TypeTiny >;
+use Types::TypeTiny qw< CodeLike StringLike TypeTiny to_TypeTiny >;
 
 sub _croak ($;@)
 {
@@ -76,7 +76,7 @@ sub assert_coerce
 sub has_coercion_for_type
 {
 	my $self = shift;
-	my $type = $_[0];
+	my $type = to_TypeTiny($_[0]);
 	
 	for my $has (@{$self->type_coercion_map})
 	{
@@ -105,7 +105,7 @@ sub add_type_coercions
 	
 	while (@args)
 	{
-		my $type     = shift @args;
+		my $type     = to_TypeTiny(shift @args);
 		my $coercion = shift @args;
 		
 		_croak "types must be blessed Type::Tiny objects"

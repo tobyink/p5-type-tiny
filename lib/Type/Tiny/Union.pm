@@ -10,6 +10,7 @@ BEGIN {
 }
 
 use Scalar::Util qw< blessed >;
+use Types::TypeTiny qw< to_TypeTiny >;
 
 sub _croak ($;@)
 {
@@ -28,6 +29,7 @@ sub new {
 	_croak "need to supply list of type constraints" unless exists $opts{type_constraints};
 	$opts{type_constraints} = [
 		map { $_->isa(__PACKAGE__) ? @$_ : $_ }
+		map to_TypeTiny($_),
 		@{ ref $opts{type_constraints} eq "ARRAY" ? $opts{type_constraints} : [$opts{type_constraints}] }
 	];
 	my $self = $proto->SUPER::new(%opts);

@@ -6,6 +6,47 @@
 
 Type::Tiny::Manual::UsingWithMoose - how to use Type::Tiny and Type::Library with Moose
 
+=head1 SYNOPSIS
+
+   {
+      package Person;
+      
+      use Moose;
+      use Types::Standard -moose, qw( Str Int );
+      use Type::Utils qw( declare as where inline_as coerce from );
+      
+      has name => (
+         is      => "ro",
+         isa     => Str,
+      );
+      
+      my $PositiveInt = declare
+         as        Int,
+         where     {  $_ > 0  },
+         inline_as { "$_ =~ /^0-9]\$/ and $_ > 0" };
+      
+      coerce $PositiveInt, from Int, q{ abs $_ };
+      
+      # Note that $PositiveInt is a Type::Tiny object, not a
+      # Moose::Meta::TypeConstraint object, so when passing it
+      # into Moose's "has" function you need to get the Moose
+      # equivalent type using "->moose_type".
+      #
+      has age => (
+         is      => "ro",
+         isa     => $PositiveInt->moose_type,
+         coerce  => 1,
+         writer  => "_set_age",
+      );
+      
+      sub get_older {
+         my $self = shift;
+         my ($years) = @_;
+         $PositiveInt->assert_valid($years);
+         $self->_set_age($self->age + $years);
+      }
+   }
+
 =head1 DESCRIPTION
 
 This document has not yet been written. For examples using Type::Tiny with

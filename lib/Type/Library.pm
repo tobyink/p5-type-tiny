@@ -11,7 +11,7 @@ BEGIN {
 
 use Scalar::Util qw< blessed >;
 use Type::Tiny;
-use Types::TypeTiny qw< TypeTiny >;
+use Types::TypeTiny qw< TypeTiny to_TypeTiny >;
 
 sub _croak ($;@)
 {
@@ -175,7 +175,7 @@ sub meta
 sub add_type
 {
 	my $meta = shift->meta;
-	my $type = TypeTiny->check($_[0]) ? $_[0] : "Type::Tiny"->new(@_);
+	my $type = blessed($_[0]) ? to_TypeTiny($_[0]) : "Type::Tiny"->new(@_);
 	my $name = $type->name;
 	
 	$meta->{types} ||= {};
