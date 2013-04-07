@@ -24,9 +24,20 @@ use strict;
 use warnings;
 use Test::More;
 
-use_ok('Type::Tiny');
-use_ok('Type::Library');
-use_ok('Type::Utils');
+use_ok("Test::TypeTiny");
+use_ok("Type::Coercion");
+use_ok("Type::Coercion::Union");
+use_ok("Type::Library");
+use_ok("Types::Standard");
+use_ok("Types::TypeTiny");
+use_ok("Type::Tiny");
+use_ok("Type::Tiny::Class");
+use_ok("Type::Tiny::Duck");
+use_ok("Type::Tiny::Enum");
+use_ok("Type::Tiny::Intersection");
+use_ok("Type::Tiny::Role");
+use_ok("Type::Tiny::Union");
+use_ok("Type::Utils");
 
 done_testing;
 
