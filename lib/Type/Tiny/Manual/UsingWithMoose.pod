@@ -49,10 +49,49 @@ Type::Tiny::Manual::UsingWithMoose - how to use Type::Tiny and Type::Library wit
 
 =head1 DESCRIPTION
 
-This document has not yet been written. For examples using Type::Tiny with
-L<Moose> see the SYNOPSIS sections of L<Type::Tiny> and L<Type::Library>,
-and the files C<< moose.t >> and C<< moose-coercion.t >> in the Type-Tiny
-L<test suite|https://bitbucket.org/tobyink/p5-type-tiny/src/tip/t>.
+L<Type::Tiny> type constraints have an API almost identical to that of
+L<Moose::Meta::TypeConstraint>.
+
+Almost. But not quite good enough to trick Moose. This means that any
+time you want to pass a Type::Tiny constraint into Moose (e.g. the C<isa>
+option when defining an attribute) you need to convert it into a I<real>
+Moose::Meta::TypeConstraint object. Luckily this is as simple as calling
+the C<moose_type> method on the object. For example, see the C<isa> option
+for C<age> in the SYNOPSIS.
+
+As a shortcut, you can provide a C<< -moose >> option when importing from
+a type library
+
+   use Types::Standard -moose, qw( Str Int );
+
+... and the imported bareword type constraint functions will automagically
+return Moose-compatible types. For example, the C<Str> type used as the
+constraint for C<name> in the SYNOPSIS.
+
+You may prefer instead to import the standard Type::Tiny constraints and
+call C<moose_type> as needed.
+
+=head2 Per-Attribute Coercions
+
+Type::Tiny offers convenience methods to alter the list of coercions
+associated with a type constraint. And via a little cheeky monkey patching,
+it also makes these methods available to Moose type constraint objects.
+Let's imagine we wish to allow our C<name> attribute to be coerced from an
+arrayref of strings.
+
+      has name => (
+         is      => "ro",
+         isa     => Str->plus_coercions(
+            ArrayRef[Str], sub { join " ", @{$_} },
+         ),
+         coerce  => 1,
+      );
+
+This coercion will apply to the C<name> attribute only; other attributes
+using the C<Str> type constraint will be unaffected.
+
+See the documentation for C<plus_coercions>, C<minus_coercions> and
+C<no_coercions> in L<Type::Tiny>.
 
 =head1 AUTHOR
 
