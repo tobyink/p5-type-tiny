@@ -80,4 +80,6 @@
 	issued  2013-04-07;
 	changeset [
 		item "Rewrite most of the functions exported by Type::Library-based type libraries to cope better with being used mid-list."^^Change;
+		item "Most parts of the API that accept Type::Tiny objects (e.g. Type::Utils::from()) now also accept Moose::Meta::TypeConstraint objects."^^Change;
+		item "Types::TypeTiny::to_TypeTiny can be used to coerce a Moose type constraint object to Type::Tiny."^^Addition;
 	].
