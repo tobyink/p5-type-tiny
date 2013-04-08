@@ -93,6 +93,16 @@ using the C<Str> type constraint will be unaffected.
 See the documentation for C<plus_coercions>, C<minus_coercions> and
 C<no_coercions> in L<Type::Tiny>.
 
+=head2 Optimization
+
+The usual advice for optimizing type constraints applies: use type constraints
+which can be inlined whenever possible.
+
+Defining coercions as strings rather than coderefs won't give you as much of
+a boost with Moose as it does with Moo, because Moose doesn't inline coercion
+code. However, it should still improve performance somewhat because it allows
+L<Type::Coercion> to do some internal inlining.
+
 =head1 AUTHOR
 
 Toby Inkster E<lt>tobyink@cpan.orgE<gt>.

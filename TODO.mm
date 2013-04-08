@@ -2,13 +2,6 @@
 <!-- To view this file, download free mind mapping software FreeMind from http://freemind.sourceforge.net -->
 <node CREATED="1365159230192" ID="ID_28734446" MODIFIED="1365160405562" TEXT="Type-Tiny">
 <node CREATED="1365159476220" ID="ID_326312292" MODIFIED="1365249813940" POSITION="right" TEXT="documentation">
-<node CREATED="1365159485188" ID="ID_987220404" MODIFIED="1365249820201" TEXT="usage with Moose">
-<icon BUILTIN="stop-sign"/>
-<node CREATED="1365159509356" ID="ID_1702622097" MODIFIED="1365159575116" TEXT="using type constraints from libraries"/>
-<node CREATED="1365159489697" ID="ID_1899441856" MODIFIED="1365159583970" TEXT="creating constraints using Type::Utils"/>
-<node CREATED="1365159498401" ID="ID_1855924046" MODIFIED="1365159500968" TEXT="coercions"/>
-<node CREATED="1365159590750" ID="ID_1458204786" MODIFIED="1365159606961" TEXT="minus_coercions, etc"/>
-</node>
 <node CREATED="1365159650166" ID="ID_243763962" MODIFIED="1365159653932" TEXT="usage with Mouse">
 <node CREATED="1365159658261" ID="ID_537118133" MODIFIED="1365159664111" TEXT="using type constraints from libraries"/>
 <node CREATED="1365159668221" ID="ID_785265846" MODIFIED="1365159675666" TEXT="creating type constraints using Type::Utils"/>
