@@ -88,5 +88,6 @@
 	issued  2013-04-08;
 	changeset [
 		item "Bundle benchmarking scripts."^^Addition;
+		item "Tidy up the 'examples' directory."^^Packaging;
 		item "Fill in the Usage with Moose section of the fine manual."^^Documentation;
 	].
