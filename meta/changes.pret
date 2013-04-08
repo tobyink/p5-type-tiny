@@ -89,5 +89,6 @@
 	changeset [
 		item "Bundle benchmarking scripts."^^Addition;
 		item "Tidy up the 'examples' directory."^^Packaging;
+		item "When generating Moose/Mouse constraints from Type::Tiny objects, prefer to generate anonymous ones."^^Packaging;
 		item "Fill in the Usage with Moose section of the fine manual."^^Documentation;
 	].
