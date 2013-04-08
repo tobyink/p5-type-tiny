@@ -30,7 +30,7 @@ use warnings;
 use lib qw( ./lib ./t/lib ../inc ./inc );
 
 use Test::More;
-use Test::Requires { Moose => 2.0000 };
+use Test::Requires { Mouse => 1.00 };
 use Test::Fatal;
 
 {
