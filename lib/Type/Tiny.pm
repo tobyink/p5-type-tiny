@@ -79,7 +79,7 @@ sub new
 			or _croak '"%s" is not a valid type name', $self->name;
 	}
 
-	if ($self->has_library and not $self->is_anon)
+	if ($self->has_library and !$self->is_anon and !$params{tmp})
 	{
 		$Moo::HandleMoose::TYPE_MAP{overload::StrVal($self)} = sub { $self->moose_type };
 	}
