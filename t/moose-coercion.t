@@ -52,7 +52,7 @@ my @warnings;
 
 like(
 	$warnings[0][0],
-	qr{^You cannot coerce an attribute .?big_nc.? unless its type .?BigInteger.? has a coercion},
+	qr{^You cannot coerce an attribute .?big_nc.? unless its type .?\w+.? has a coercion},
 	"no_coercions and friends available on Moose type constraint objects",
 );
 
