@@ -15,6 +15,28 @@ L<Moo>.
 
 It provides a small Moose-inspired library of built-in type constraints.
 
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+L<Libraries|Type::Tiny::Manual::Libraries> - how to build a type library with Type::Tiny, Type::Library and Type::Utils
+
+=item *
+
+L<Using with Moose|Type::Tiny::Manual::UsingWithMoose> - how to use Type::Tiny and Type::Library with Moose
+
+=item *
+
+L<Using with Mouse|Type::Tiny::Manual::UsingWithMouse> - how to use Type::Tiny and Type::Library with Mouse
+
+=item *
+
+L<Using with Moo|Type::Tiny::Manual::UsingWithMoo> - how to use Type::Tiny and Type::Library with Moo
+
+=back
+
 =head1 TYPE::TINY VERSUS X
 
 =head2 Specio 
@@ -45,27 +67,34 @@ use Type::Tiny easily. It might be wise to add a shim MooseX:: module:
 
 Type::Tiny is faster and supports coercions.
 
-=head1 SEE ALSO
+=head1 CAVEATS
 
-=over
+=head2 Mutability of Type::Coercion
 
-=item *
+Type::Tiny type constraints are designed as immutable objects. Once you've
+created a constraint, rather than modifying it you generally create child
+constraints to do what you need.
 
-L<Libraries|Type::Tiny::Manual::Libraries> - how to build a type library with Type::Tiny, Type::Library and Type::Utils
+Type::Coercion objects, on the other hand, are mutable. Coercion routines
+can be added at any time during the object's lifetime.
 
-=item *
+This combination of features means that if you create a Type::Tiny type
+constraint, then create a Moose or Mouse type from it (the C<moose_type>
+and C<mouse_type> lazily built attributes), and then add coercions to the
+Type::Tiny constraint, the Moose/Mouse constraint will not see them.
 
-L<Using with Moose|Type::Tiny::Manual::UsingWithMoose> - how to use Type::Tiny and Type::Library with Moose
+In general you should avoid adding coercions to a type constraint once the
+type constraint has started being used. Add coercions straight after defining
+the type. The C<plus_coercions> method (which returns a new type constraint
+with extra coercions, so doesn't violate immutability) is a better technique
+than adding coercions willy-nilly during the course of a constraint's
+lifetime.
 
-=item *
-
-L<Using with Mouse|Type::Tiny::Manual::UsingWithMouse> - how to use Type::Tiny and Type::Library with Mouse
-
-=item *
-
-L<Using with Moo|Type::Tiny::Manual::UsingWithMoo> - how to use Type::Tiny and Type::Library with Moo
-
-=back
+I I<do> consider this to be an issue that needs resolving in a future
+release. The likely solution will be to have the ability to "freeze" a
+Type::Coercion object, and then change the C<moose_type> and C<mouse_type>
+lazy builders to make them automatically freeze the type's associated
+coercion.
 
 =head1 AUTHOR
 
