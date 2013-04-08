@@ -180,6 +180,9 @@ sub can_be_inlined
 {
 	my $self = shift;
 	my @mishmash = @{$self->type_coercion_map};
+	return
+		if $self->has_type_constraint
+		&& !$self->type_constraint->can_be_inlined;
 	while (@mishmash)
 	{
 		my ($type, $converter) = splice(@mishmash, 0, 2);
