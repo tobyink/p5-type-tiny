@@ -458,7 +458,8 @@ sub _build_moose_type
 	}
 	else
 	{
-		my %opts = (name => $self->qualified_name);
+		my %opts;
+		$opts{name}       = $self->qualified_name     if $self->has_library && !$self->is_anon;
 		$opts{parent}     = $self->parent->moose_type if $self->has_parent;
 		$opts{constraint} = $self->constraint         unless $self->_is_null_constraint;
 		$opts{message}    = $self->message;
@@ -477,7 +478,8 @@ sub _build_mouse_type
 {
 	my $self = shift;
 	
-	my %options = (name => $self->qualified_name);
+	my %options;
+	$options{name}       = $self->qualified_name     if $self->has_library && !$self->is_anon;
 	$options{parent}     = $self->parent->mouse_type if $self->has_parent;
 	$options{constraint} = $self->constraint         unless $self->_is_null_constraint;
 	$options{message}    = $self->message;
