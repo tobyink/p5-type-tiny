@@ -1,3 +1,37 @@
+=pod
+
+=encoding utf-8
+
+=head1 PURPOSE
+
+This example expands upon the Types::Datetime library defined in
+L<Type::Tiny::Manual::Libraries>. It defines class types for L<DateTime>
+and L<DateTime::Duration> and some structured types for hashes that
+can be used to instantiate DateTime objects. It defines some coercions
+for the C<Datetime> class type.
+
+A simple L<Moose> class is provided using some of these types and
+coercions. The class also defines a couple of extra coercions inline.
+
+See the source code of this file for the actual example code.
+
+=head1 DEPENDENCIES
+
+L<Moose>, L<DateTime>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
 use strict;
 use warnings;
 use lib "lib", "../lib";
