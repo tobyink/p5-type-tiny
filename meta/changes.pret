@@ -92,3 +92,10 @@
 		item "When generating Moose/Mouse constraints from Type::Tiny objects, prefer to generate anonymous ones."^^Packaging;
 		item "Fill in the Usage with Moose section of the fine manual."^^Documentation;
 	].
+
+`Type-Tiny 0.000_10 cpan:TOBYINK`
+	issued  2013-04-09;
+	changeset [
+		item "Improvements to has_coercion_for_{type,value} from Type::Coercion."^^Change;
+		item "Fix incorrect Test::Requires line in 'mouse-coercion.t'."^^Bugfix;
+	].
