@@ -1,0 +1,25 @@
+  * Type-Tiny
+      * documentation
+          * usage with Mouse
+              * using type constraints from libraries
+              * creating type constraints using Type::Utils
+              * coercions
+      * integration with MooX-late
+      * new type constraints for Types::Standard
+          * Chars - i.e. strings where the UTF-8 bit is on
+          * Bytes - i.e. strings where the UTF-8 bit is off
+          * Tied - i.e. references to tied variables. Parameterized:
+            Tied["Some::Package"]
+          * Varchar[length]
+          * steal from MooseX-Types-Common?
+          * steal from MooseX-Types-Ro?
+      * coercion
+          * Auto-coercion
+              * could do with better tests
+              * needs documenting
+              * needs merge with tip
+              * need a way of switching this feature on/off?
+              * generated coercion functions could maybe be returned as
+                thunks?
+          * investigate to what extent child types should inherit
+            coercions
