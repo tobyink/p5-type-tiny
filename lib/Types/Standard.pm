@@ -400,6 +400,50 @@ declare "Map",
 			.  "\$ok "
 			."}"
 		};
+	},
+	coercion_generator => sub {
+		my ($parent, $child, $kparam, $vparam) = @_;
+		return unless $kparam->has_coercion || $vparam->has_coercion;
+		
+		my $kcoercable_item = $kparam->has_coercion ? $kparam->coercion->_source_type_union : $kparam;
+		my $vcoercable_item = $vparam->has_coercion ? $vparam->coercion->_source_type_union : $vparam;
+		my $C = "Type::Coercion"->new(type_constraint => $child);
+		
+		if ((!$kparam->has_coercion or $kparam->coercion->can_be_inlined)
+		and (!$vparam->has_coercion or $vparam->coercion->can_be_inlined))
+		{
+			my @code;
+			push @code, 'do { my ($orig, $return_orig, %new) = ($_, 0);';
+			push @code,    'for (keys %$orig) {';
+			push @code, sprintf('$return_orig++ && last unless (%s);', $kcoercable_item->inline_check('$_'));
+			push @code, sprintf('$return_orig++ && last unless (%s);', $vcoercable_item->inline_check('$orig->{$_}'));
+			push @code, sprintf('$new{(%s)} = (%s);',
+				$kparam->has_coercion ? $kparam->coercion->inline_coercion('$_') : '$_',
+				$vparam->has_coercion ? $vparam->coercion->inline_coercion('$orig->{$_}') : '$orig->{$_}',
+			);
+			push @code,    '}';
+			push @code,    '$return_orig ? $orig : \\%new';
+			push @code, '}';
+			$C->add_type_coercions($parent => "@code");
+		}
+		else
+		{
+			$C->add_type_coercions(
+				$parent => sub {
+					my $value = @_ ? $_[0] : $_;
+					my %new;
+					for my $k (keys %$value)
+					{
+						return $value unless $kcoercable_item->check($k) && $vcoercable_item->check($value->{$k});
+						$new{$kparam->has_coercion ? $kparam->coerce($k) : $k} =
+							$vparam->has_coercion ? $vparam->coerce($value->{$k}) : $value->{$k};
+					}
+					return \%new;
+				},
+			);
+		}
+		
+		return $C;
 	};
 
 declare "Optional",

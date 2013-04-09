@@ -5,7 +5,7 @@
 =head1 PURPOSE
 
 If a coercion exists for type C<Foo>, then Type::Tiny should be able to
-auto-generate a coercion for type C<< ArrayRef[Foo] >>.
+auto-generate a coercion for type C<< ArrayRef[Foo] >>, etc.
 
 =head1 AUTHOR
 
@@ -26,7 +26,7 @@ use lib qw( ./lib ./t/lib ../inc ./inc );
 
 use Test::More;
 
-use Types::Standard qw( Int Num ArrayRef HashRef ScalarRef );
+use Types::Standard qw( Str Int Num ArrayRef HashRef ScalarRef Map );
 use Type::Utils;
 
 subtest "Coercion to ArrayRef[\$Foo], etc where \$Foo->coercion cannot be inlined" => sub
@@ -191,6 +191,64 @@ subtest "Coercion to ArrayRef[\$Bar], etc where \$Bar->coercion can be inlined" 
 		$RefOfBar->coerce($ref2),
 		$ref2,
 		'$RefOfBar does not coerce value that cannot be coerced',
+	);
+	
+	done_testing;
+};
+
+subtest "Coercion to Map" => sub
+{
+	my $IntFromStr = declare IntFromStr => as Int;
+	coerce $IntFromStr, from Str, q{ length($_) };
+	
+	my $IntFromNum = declare IntFromNum => as Int;
+	coerce $IntFromNum, from Num, q{ int($_) };
+
+	my $IntFromArray = declare IntFromArray => as Int;
+	coerce $IntFromArray, from ArrayRef, via { scalar(@$_) };
+	
+	my $Map1 = Map[$IntFromNum, $IntFromStr];
+	ok(
+		$Map1->has_coercion && $Map1->coercion->can_be_inlined,
+		"$Map1 has an inlinable coercion",
+	);
+	is_deeply(
+		$Map1->coerce({ 1.1 => "Hello", 2.1 => "World", 3.1 => "Hiya" }),
+		{ 1 => 5, 2 => 5, 3 => 4 },
+		"Coercions to $Map1",
+	);
+	is_deeply(
+		$Map1->coerce({ 1.1 => "Hello", 2.1 => "World", 3.1 => [] }),
+		{ 1.1 => "Hello", 2.1 => "World", 3.1 => [] },
+		"Impossible coercion to $Map1",
+	);
+	my $m = { 1 => 2 };
+	is(
+		$Map1->coerce($m),
+		$m,
+		"Unneeded coercion to $Map1",
+	);
+	
+	my $Map2 = Map[$IntFromNum, $IntFromArray];
+	ok(
+		$Map2->has_coercion && !$Map2->coercion->can_be_inlined,
+		"$Map2 has a coercion, but it cannot be inlined",
+	);
+	is_deeply(
+		$Map2->coerce({ 1.1 => [1], 2.1 => [1,2], 3.1 => [] }),
+		{ 1 => 1, 2 => 2, 3 => 0 },
+		"Coercions to $Map2",
+	);
+	is_deeply(
+		$Map2->coerce({ 1.1 => [1], 2.1 => [1,2], 3.1 => {} }),
+		{ 1.1 => [1], 2.1 => [1,2], 3.1 => {} },
+		"Impossible coercion to $Map2",
+	);
+	$m = { 1 => 2 };
+	is(
+		$Map2->coerce($m),
+		$m,
+		"Unneeded coercion to $Map2",
 	);
 	
 	done_testing;
