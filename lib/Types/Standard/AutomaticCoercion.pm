@@ -8,6 +8,8 @@ BEGIN {
 	$Types::Standard::AutomaticCoercion::VERSION   = '0.000_09';
 }
 
+require Type::Coercion;
+
 my $lib = "Types::Standard"->meta;
 
 $lib->get_type("ArrayRef")->{coercion_generator} = sub
@@ -180,6 +182,7 @@ $lib->get_type("Optional")->{coercion_generator} = sub
 	return $param->coercion;
 };
 
+my $label_counter = 0;
 $lib->get_type("Dict")->{coercion_generator} = sub
 {
 	my ($parent, $child, %dict) = @_;
@@ -190,20 +193,55 @@ $lib->get_type("Dict")->{coercion_generator} = sub
 	{
 		$all_inlinable = 0 if $tc->has_coercion && !$tc->can_be_inlined;
 	}
+
+	if ($all_inlinable)
+	{
+		require B;
+		
+		my $label = sprintf("LABEL%d", ++$label_counter);
+		my @code;
+		push @code, 'do { my ($orig, $return_orig, %tmp, %new) = ($_, 0);';
+		push @code,       "$label: {";
+		for my $k (keys %dict)
+		{
+			my $ct = $dict{$k};
+			my $ct_coerce   = $ct->has_coercion;
+			my $ct_optional = $ct->is_a_type_of(Types::Standard::Optional());
+			my $K = B::perlstring($k);
+			
+			if ($ct_coerce)
+			{
+				push @code, sprintf('%%tmp = (); $tmp{x} = %s;', $ct->coercion->inline_coercion("\$orig->{$K}"));
+				push @code, sprintf(
+					$ct_optional
+						? 'if (%s) { $new{%s}=$tmp{x} }'
+						: 'if (%s) { $new{%s}=$tmp{x} } else { $return_orig = 1; last %s }',
+					$ct->inline_check('$tmp{x}'),
+					$K,
+					$label,
+				);
+			}
+			else
+			{
+				push @code, sprintf(
+					$ct_optional
+						? 'if (%s) { $new{%s}=$orig->{%s} }'
+						: 'if (%s) { $new{%s}=$orig->{%s} } else { $return_orig = 1; last %s }',
+					$ct->inline_check("\$orig->{$K}"),
+					$K,
+					$K,
+					$label,
+				);
+			}
+		}
+		push @code,       '}';
+		push @code,    '$return_orig ? $orig : \\%new';
+		push @code, '}';
+		#warn "CODE: @code";
+		$C->add_type_coercions($parent => "@code");
+	}
 	
-#	if ($all_inlinable)
-#	{
-#		my @code;
-#		push @code, 'do { my ($orig, $return_orig, %new) = ($_, 0);';
-#		push @code,    'for (keys %$orig) {';
-#		push @code, sprintf('$return_orig++ && last unless (%s);', $coercable_item->inline_check('$orig->{$_}'));
-#		push @code, sprintf('$new{$_} = (%s);', $param->coercion->inline_coercion('$orig->{$_}'));
-#		push @code,    '}';
-#		push @code,    '$return_orig ? $orig : \\%new';
-#		push @code, '}';
-#		$C->add_type_coercions($parent => "@code");
-#	}
-#	else
+	else
 	{
 		$C->add_type_coercions(
 			$parent => sub {
