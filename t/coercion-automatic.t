@@ -26,7 +26,7 @@ use lib qw( ./lib ./t/lib ../inc ./inc );
 
 use Test::More;
 
-use Types::Standard qw( Str Int Num ArrayRef HashRef ScalarRef Map );
+use Types::Standard -types;
 use Type::Utils;
 
 subtest "Coercion to ArrayRef[\$Foo], etc where \$Foo->coercion cannot be inlined" => sub
@@ -249,6 +249,41 @@ subtest "Coercion to Map" => sub
 		$Map2->coerce($m),
 		$m,
 		"Unneeded coercion to $Map2",
+	);
+	
+	done_testing;
+};
+
+subtest "Coercion to Dict" => sub
+{
+	my $IntFromStr = declare IntFromStr => as Int;
+	coerce $IntFromStr, from Str, q{ length($_) };
+	
+	my $IntFromNum = declare IntFromNum => as Int;
+	coerce $IntFromNum, from Num, q{ int($_) };
+
+	my $IntFromArray = declare IntFromArray => as Int;
+	coerce $IntFromArray, from ArrayRef, via { scalar(@$_) };
+	
+	my $Dict1 = Dict[ a => $IntFromStr, b => $IntFromNum, c => Optional[$IntFromNum] ];
+	ok(
+		$Dict1->has_coercion && $Dict1->coercion->can_be_inlined,
+		"$Dict1 has an inlinable coercion",
+	);
+	is_deeply(
+		$Dict1->coerce({ a => "Hello", b => 1.1, c => 2.2 }),
+		{ a => 5, b => 1, c => 2 },
+		"Coercion (A) to $Dict1",
+	);
+	is_deeply(
+		$Dict1->coerce({ a => "Hello", b => 1 }),
+		{ a => 5, b => 1 },
+		"Coercion (B) to $Dict1",
+	);
+	is_deeply(
+		$Dict1->coerce({ a => "Hello", b => 1, c => [], d => 1 }),
+		{ a => 5, b => 1 },
+		"Coercion (C) to $Dict1",
 	);
 	
 	done_testing;

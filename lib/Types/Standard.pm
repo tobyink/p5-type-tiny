@@ -299,6 +299,7 @@ declare "Optional",
 	as "Item",
 	constraint_generator => sub
 	{
+		require Types::Standard::AutomaticCoercion;
 		my $param = shift;
 		sub { exists($_[0]) ? $param->check($_[0]) : !!1 }
 	},
@@ -383,6 +384,7 @@ declare "Dict",
 	},
 	constraint_generator => sub
 	{
+		require Types::Standard::AutomaticCoercion;
 		my %constraints = @_;
 		return sub
 		{

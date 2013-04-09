@@ -173,6 +173,79 @@ $lib->get_type("Map")->{coercion_generator} = sub
 	return $C;
 };
 
+$lib->get_type("Optional")->{coercion_generator} = sub
+{
+	my ($parent, $child, $param) = @_;
+	return unless $param->has_coercion;
+	return $param->coercion;
+};
+
+$lib->get_type("Dict")->{coercion_generator} = sub
+{
+	my ($parent, $child, %dict) = @_;
+	my $C = "Type::Coercion"->new(type_constraint => $child);
+	
+	my $all_inlinable = 1;
+	for my $tc (values %dict)
+	{
+		$all_inlinable = 0 if $tc->has_coercion && !$tc->can_be_inlined;
+	}
+	
+#	if ($all_inlinable)
+#	{
+#		my @code;
+#		push @code, 'do { my ($orig, $return_orig, %new) = ($_, 0);';
+#		push @code,    'for (keys %$orig) {';
+#		push @code, sprintf('$return_orig++ && last unless (%s);', $coercable_item->inline_check('$orig->{$_}'));
+#		push @code, sprintf('$new{$_} = (%s);', $param->coercion->inline_coercion('$orig->{$_}'));
+#		push @code,    '}';
+#		push @code,    '$return_orig ? $orig : \\%new';
+#		push @code, '}';
+#		$C->add_type_coercions($parent => "@code");
+#	}
+#	else
+	{
+		$C->add_type_coercions(
+			$parent => sub {
+				my $value = @_ ? $_[0] : $_;
+				my %new;
+				for my $k (keys %dict)
+				{
+					my $ct = $dict{$k};
+					my @accept;
+					
+					if ($ct->check($value->{$k}))
+					{
+						@accept = $value->{$k};
+					}
+					elsif ($ct->has_coercion)
+					{
+						my $x = $ct->coerce($value->{$k});
+						@accept = $x if $ct->check($x);
+					}
+					else
+					{
+						return $value;
+					}
+					
+					if (@accept)
+					{
+						$new{$k} = $accept[0];
+					}
+					elsif (not $ct->is_a_type_of(Types::Standard::Optional()))
+					{
+						return $value;
+					}
+				}
+				
+				return \%new;
+			},
+		);
+	}
+	
+	return $C;
+};
+
 1;
 
 __END__
