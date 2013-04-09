@@ -1,0 +1,199 @@
+=pod
+
+=encoding utf-8
+
+=head1 PURPOSE
+
+If a coercion exists for type C<Foo>, then Type::Tiny should be able to
+auto-generate a coercion for type C<< ArrayRef[Foo] >>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
+use strict;
+use warnings;
+use lib qw( ./lib ./t/lib ../inc ./inc );
+
+use Test::More;
+
+use Types::Standard qw( Int Num ArrayRef HashRef ScalarRef );
+use Type::Utils;
+
+subtest "Coercion to ArrayRef[\$Foo], etc where \$Foo->coercion cannot be inlined" => sub
+{
+	my $Foo = declare Foo => as Int;
+	coerce $Foo, from Num, via { int($_) };
+	
+	my $ArrayOfFoo = ArrayRef[$Foo];
+	
+	ok($ArrayOfFoo->has_coercion, '$ArrayOfFoo has coercion');
+	
+	my $arr1 = [1..3];
+	my $arr2 = [1..3, "Hello"];
+	
+	is(
+		$ArrayOfFoo->coerce($arr1),
+		$arr1,
+		'$ArrayOfFoo does not coerce value that needs no coercion',
+	);
+	
+	is_deeply(
+		$ArrayOfFoo->coerce([1.1, 2.1, 3.1]),
+		[1, 2, 3],
+		'$ArrayOfFoo does coerce value that can be coerced',
+	);
+	
+	is(
+		$ArrayOfFoo->coerce($arr2),
+		$arr2,
+		'$ArrayOfFoo does not coerce value that cannot be coerced',
+	);
+	
+	my $HashOfFoo = HashRef[$Foo];
+	
+	ok($HashOfFoo->has_coercion, '$HashOfFoo has coercion');
+	
+	my $hsh1 = {one => 1, two => 2, three => 3};
+	my $hsh2 = {one => 1, two => 2, three => 3, greeting => "Hello"};
+	
+	is(
+		$HashOfFoo->coerce($hsh1),
+		$hsh1,
+		'$HashOfFoo does not coerce value that needs no coercion',
+	);
+	
+	is_deeply(
+		$HashOfFoo->coerce({one => 1.1, two => 2.2, three => 3.3}),
+		{one => 1, two => 2, three => 3},
+		'$HashOfFoo does coerce value that can be coerced',
+	);
+	
+	is(
+		$HashOfFoo->coerce($hsh2),
+		$hsh2,
+		'$HashOfFoo does not coerce value that cannot be coerced',
+	);
+	
+	my $RefOfFoo = ScalarRef[$Foo];
+	ok($RefOfFoo->has_coercion, '$RefOfFoo has coercion');
+	
+	my $ref1 = do { my $x = 1; \$x };
+	my $ref2 = do { my $x = "xxx"; \$x };
+	
+	is(
+		$RefOfFoo->coerce($ref1),
+		$ref1,
+		'$RefOfFoo does not coerce value that needs no coercion',
+	);
+	
+	is_deeply(
+		${ $RefOfFoo->coerce(do { my $x = 1.1; \$x }) },
+		1,
+		'$RefOfFoo does coerce value that can be coerced',
+	);
+	
+	is(
+		$RefOfFoo->coerce($ref2),
+		$ref2,
+		'$RefOfFoo does not coerce value that cannot be coerced',
+	);
+	
+	done_testing;
+};
+
+subtest "Coercion to ArrayRef[\$Bar], etc where \$Bar->coercion can be inlined" => sub
+{
+	my $Bar = declare Bar => as Int;
+	coerce $Bar, from Num, q { int($_) };
+	
+	my $ArrayOfBar = ArrayRef[$Bar];
+	
+	ok($ArrayOfBar->has_coercion, '$ArrayOfBar has coercion');
+	ok($ArrayOfBar->coercion->can_be_inlined, '$ArrayOfBar coercion can be inlined');
+	
+	my $arr1 = [1..3];
+	my $arr2 = [1..3, "Hello"];
+	
+	is(
+		$ArrayOfBar->coerce($arr1),
+		$arr1,
+		'$ArrayOfBar does not coerce value that needs no coercion',
+	);
+	
+	is_deeply(
+		$ArrayOfBar->coerce([1.1, 2.1, 3.1]),
+		[1, 2, 3],
+		'$ArrayOfBar does coerce value that can be coerced',
+	);
+	
+	is(
+		$ArrayOfBar->coerce($arr2),
+		$arr2,
+		'$ArrayOfBar does not coerce value that cannot be coerced',
+	);
+	
+	my $HashOfBar = HashRef[$Bar];
+	
+	ok($HashOfBar->has_coercion, '$HashOfBar has coercion');
+	ok($HashOfBar->coercion->can_be_inlined, '$HashOfBar coercion can be inlined');
+	
+	my $hsh1 = {one => 1, two => 2, three => 3};
+	my $hsh2 = {one => 1, two => 2, three => 3, greeting => "Hello"};
+	
+	is(
+		$HashOfBar->coerce($hsh1),
+		$hsh1,
+		'$HashOfBar does not coerce value that needs no coercion',
+	);
+	
+	is_deeply(
+		$HashOfBar->coerce({one => 1.1, two => 2.2, three => 3.3}),
+		{one => 1, two => 2, three => 3},
+		'$HashOfBar does coerce value that can be coerced',
+	);
+	
+	is(
+		$HashOfBar->coerce($hsh2),
+		$hsh2,
+		'$HashOfBar does not coerce value that cannot be coerced',
+	);
+	
+	my $RefOfBar = ScalarRef[$Bar];
+	ok($RefOfBar->has_coercion, '$RefOfBar has coercion');
+	ok($RefOfBar->coercion->can_be_inlined, '$RefOfBar coercion can be inlined');
+	
+	my $ref1 = do { my $x = 1; \$x };
+	my $ref2 = do { my $x = "xxx"; \$x };
+	
+	is(
+		$RefOfBar->coerce($ref1),
+		$ref1,
+		'$RefOfBar does not coerce value that needs no coercion',
+	);
+	
+	is_deeply(
+		${ $RefOfBar->coerce(do { my $x = 1.1; \$x }) },
+		1,
+		'$RefOfBar does coerce value that can be coerced',
+	);
+	
+	is(
+		$RefOfBar->coerce($ref2),
+		$ref2,
+		'$RefOfBar does not coerce value that cannot be coerced',
+	);
+	
+	done_testing;
+};
+
+done_testing;
