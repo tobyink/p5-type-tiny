@@ -78,7 +78,7 @@ sub new
 			or eval q( $self->name =~ /^\p{Lu}[\p{L}0-9_]+$/sm )
 			or _croak '"%s" is not a valid type name', $self->name;
 	}
-
+	
 	if ($self->has_library and !$self->is_anon and !$params{tmp})
 	{
 		$Moo::HandleMoose::TYPE_MAP{overload::StrVal($self)} = sub { $self->moose_type };
@@ -107,6 +107,7 @@ sub inlined                  { $_[0]{inlined} }
 sub constraint_generator     { $_[0]{constraint_generator} }
 sub inline_generator         { $_[0]{inline_generator} }
 sub name_generator           { $_[0]{name_generator} ||= $_[0]->_build_name_generator }
+sub coercion_generator       { $_[0]{coercion_generator} }
 sub parameters               { $_[0]{parameters} }
 sub moose_type               { $_[0]{moose_type}     ||= $_[0]->_build_moose_type }
 sub mouse_type               { $_[0]{mouse_type}     ||= $_[0]->_build_mouse_type }
@@ -117,6 +118,7 @@ sub has_coercion             { exists $_[0]{coercion} }
 sub has_inlined              { exists $_[0]{inlined} }
 sub has_constraint_generator { exists $_[0]{constraint_generator} }
 sub has_inline_generator     { exists $_[0]{inline_generator} }
+sub has_coercion_generator   { exists $_[0]{coercion_generator} }
 sub has_parameters           { exists $_[0]{parameters} }
 
 sub _assert_coercion
@@ -397,9 +399,17 @@ sub parameterize
 	);
 	$options{inlined} = $self->inline_generator->(@_)
 		if $self->has_inline_generator;
-	delete $options{inlined} unless defined $options{inlined};
+	exists $options{$_} && !defined $options{$_} && delete $options{$_}
+		for keys %options;
 	
-	return $self->create_child_type(%options);
+	my $P = $self->create_child_type(%options);
+
+	my $coercion = $self->coercion_generator->($self, $P, @_)
+		if $self->has_coercion_generator;
+	$P->coercion->add_type_coercions( @{$coercion->type_coercion_map} )
+		if $coercion;
+	
+	return $P;
 }
 
 sub child_type_class
