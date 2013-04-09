@@ -35,6 +35,10 @@ L<Using with Mouse|Type::Tiny::Manual::UsingWithMouse> - how to use Type::Tiny a
 
 L<Using with Moo|Type::Tiny::Manual::UsingWithMoo> - how to use Type::Tiny and Type::Library with Moo
 
+=item *
+
+Type::Tiny and friends don't need to be used within an OO framework. See L<FreeMind::Node> for an example that does not.
+
 =back
 
 =head1 TYPE::TINY VERSUS X
