@@ -26,7 +26,7 @@ use lib qw( ./lib ./t/lib ../inc ./inc );
 
 use Test::More;
 
-use Types::Standard -types;
+use Types::Standard qw( -types slurpy );
 use Type::Utils;
 
 subtest "Coercion to ArrayRef[\$Foo], etc where \$Foo->coercion cannot be inlined" => sub
@@ -265,6 +265,8 @@ subtest "Coercion to Dict" => sub
 	my $IntFromArray = declare IntFromArray => as Int;
 	coerce $IntFromArray, from ArrayRef, via { scalar(@$_) };
 	
+	my @a = (a => $IntFromStr, b => $IntFromNum, c => Optional[$IntFromNum]);
+	
 	my $Dict1 = Dict[ a => $IntFromStr, b => $IntFromNum, c => Optional[$IntFromNum] ];
 	ok(
 		$Dict1->has_coercion && $Dict1->coercion->can_be_inlined,
@@ -284,6 +286,36 @@ subtest "Coercion to Dict" => sub
 		$Dict1->coerce({ a => "Hello", b => 1, c => [], d => 1 }),
 		{ a => 5, b => 1 },
 		"Coercion (C) to $Dict1",
+	);
+	
+	done_testing;
+};
+
+subtest "Coercion to Tuple" => sub
+{
+	my $IntFromStr = declare IntFromStr => as Int;
+	coerce $IntFromStr, from Str, q{ length($_) };
+	
+	my $IntFromNum = declare IntFromNum => as Int;
+	coerce $IntFromNum, from Num, q{ int($_) };
+
+	my $IntFromArray = declare IntFromArray => as Int;
+	coerce $IntFromArray, from ArrayRef, via { scalar(@$_) };
+	
+	my $Tuple1 = Tuple[ $IntFromNum, Optional[$IntFromStr], slurpy ArrayRef[$IntFromNum]];
+	ok(
+		$Tuple1->has_coercion && $Tuple1->coercion->can_be_inlined,
+		"$Tuple1 has an inlinable coercion",
+	);
+	is_deeply(
+		$Tuple1->coerce([qw( 1.1 1.1 )]),
+		[1, 3],
+		"Coercion (A) to $Tuple1",
+	);
+	is_deeply(
+		$Tuple1->coerce([qw( 1.1 1.1 2.2 2.2 33 3.3 )]),
+		[1, 3, 2, 2, 33, 3],
+		"Coercion (B) to $Tuple1",
 	);
 	
 	done_testing;

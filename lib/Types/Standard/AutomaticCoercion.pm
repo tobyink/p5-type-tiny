@@ -183,6 +183,7 @@ $lib->get_type("Optional")->{coercion_generator} = sub
 };
 
 my $label_counter = 0;
+
 $lib->get_type("Dict")->{coercion_generator} = sub
 {
 	my ($parent, $child, %dict) = @_;
@@ -252,11 +253,11 @@ $lib->get_type("Dict")->{coercion_generator} = sub
 					my $ct = $dict{$k};
 					my @accept;
 					
-					if ($ct->check($value->{$k}))
+					if (exists $value->{$k} and $ct->check($value->{$k}))
 					{
 						@accept = $value->{$k};
 					}
-					elsif ($ct->has_coercion)
+					elsif (exists $value->{$k} and $ct->has_coercion)
 					{
 						my $x = $ct->coerce($value->{$k});
 						@accept = $x if $ct->check($x);
@@ -283,6 +284,132 @@ $lib->get_type("Dict")->{coercion_generator} = sub
 	
 	return $C;
 };
+
+$lib->get_type("Tuple")->{coercion_generator} = sub
+{
+	my ($parent, $child, @tuple) = @_;
+	my $C = "Type::Coercion"->new(type_constraint => $child);
+
+	my $slurpy;
+	if (exists $tuple[-1] and ref $tuple[-1] eq "HASH")
+	{
+		$slurpy = pop(@tuple)->{slurpy};
+	}
+
+	my $all_inlinable = $slurpy ? ($slurpy->has_coercion && $slurpy->can_be_inlined) : 1;
+	for my $tc (@tuple)
+	{
+		$all_inlinable = 0 if $tc->has_coercion && !$tc->can_be_inlined;
+	}
+
+	if ($all_inlinable)
+	{
+		my $label = sprintf("LABEL%d", ++$label_counter);
+		my @code;
+		push @code, 'do { my ($orig, $return_orig, @tmp, @new) = ($_, 0);';
+		push @code,       "$label: {";
+		for my $i (0 .. $#tuple)
+		{
+			my $ct = $tuple[$i];
+			my $ct_coerce   = $ct->has_coercion;
+			my $ct_optional = $ct->is_a_type_of(Types::Standard::Optional());
+			
+			if ($ct_coerce)
+			{
+				push @code, sprintf('@tmp = (); $tmp[0] = %s;', $ct->coercion->inline_coercion("\$orig->[$i]"));
+				push @code, sprintf(
+					$ct_optional
+						? 'if (%s) { $new[%d]=$tmp[0] }'
+						: 'if (%s) { $new[%d]=$tmp[0] } else { $return_orig = 1; last %s }',
+					$ct->inline_check('$tmp[0]'),
+					$i,
+					$label,
+				);
+			}
+			else
+			{
+				push @code, sprintf(
+					$ct_optional
+						? 'if (%s) { $new[%d]=$orig->[%s] }'
+						: 'if (%s) { $new[%d]=$orig->[%s] } else { $return_orig = 1; last %s }',
+					$ct->inline_check("\$orig->[$i]"),
+					$i,
+					$i,
+					$label,
+				);
+			}
+		}
+		if ($slurpy)
+		{
+			my $size = @tuple;
+			push @code, sprintf('if (@$orig > %d) {', $size);
+			push @code, sprintf('my $tail = [ @{$orig}[%d .. $#$orig] ];', $size);
+			push @code, $slurpy->has_coercion
+				? sprintf('$tail = %s;', $slurpy->coercion->inline_coercion('$tail'))
+				: '';
+			push @code, sprintf(
+				'(%s) ? push(@new, @$tail) : ($return_orig++);',
+				$slurpy->inline_check('$tail'),
+			);
+			push @code, '}';
+		}
+		push @code,       '}';
+		push @code,    '$return_orig ? $orig : \\@new';
+		push @code, '}';
+		$C->add_type_coercions($parent => "@code");
+	}
+	
+	else
+	{
+		$C->add_type_coercions(
+			$parent => sub {
+				my $value = @_ ? $_[0] : $_;
+				my @new;
+				for my $i (0 .. $#tuple)
+				{
+					my $ct = $tuple[$i];
+					my @accept;
+					
+					if (exists $value->[$i] and $ct->check($value->[$i]))
+					{
+						@accept = $value->[$i];
+					}
+					elsif (exists $value->[$i] and $ct->has_coercion)
+					{
+						my $x = $ct->coerce($value->[$i]);
+						@accept = $x if $ct->check($x);
+					}
+					else
+					{
+						return $value;
+					}
+					
+					if (@accept)
+					{
+						$new[$i] = $accept[0];
+					}
+					elsif (not $ct->is_a_type_of(Types::Standard::Optional()))
+					{
+						return $value;
+					}
+				}
+				
+				if ($slurpy and @$value > @tuple)
+				{
+					my $tmp = $slurpy->has_coercion
+						? $slurpy->coerce([ @{$value}[@tuple .. $#$value] ])
+						: [ @{$value}[@tuple .. $#$value] ];
+					$slurpy->check($tmp) ? push(@new, @$tmp) : return($value);
+				}
+				
+				return \@new;
+			},
+		);
+	};
+	
+	return $C;
+};
+
 
 1;
 

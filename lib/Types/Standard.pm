@@ -326,6 +326,7 @@ declare "Tuple",
 	},
 	constraint_generator => sub
 	{
+		require Types::Standard::AutomaticCoercion;
 		my @constraints = @_;
 		my $slurpy;
 		if (exists $constraints[-1] and ref $constraints[-1] eq "HASH")
@@ -379,7 +380,8 @@ declare "Dict",
 	inline_as { "ref($_) eq 'HASH'" },
 	name_generator => sub
 	{
-		my ($s, %a) = @_;
+		my $s = shift;
+		my %a = @_;
 		sprintf('%s[%s]', $s, join q[,], map sprintf("%s=>%s", $_, $a{$_}), sort keys %a);
 	},
 	constraint_generator => sub
