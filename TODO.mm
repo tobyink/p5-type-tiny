@@ -8,6 +8,7 @@
 <node CREATED="1365159668221" ID="ID_785265846" MODIFIED="1365159675666" TEXT="creating type constraints using Type::Utils"/>
 <node CREATED="1365159676662" ID="ID_1609293562" MODIFIED="1365159679179" TEXT="coercions"/>
 </node>
+<node CREATED="1365529877901" ID="ID_1445114250" MODIFIED="1365529919532" TEXT="link to FreeMind-Document as an example of a distribution using Type-Tiny directly (no OO framework)"/>
 </node>
 <node CREATED="1365159705390" ID="ID_1309512802" MODIFIED="1365441700190" POSITION="left" TEXT="integration with MooX-late">
 <icon BUILTIN="full-3"/>
@@ -21,23 +22,17 @@
 <node CREATED="1365441979900" ID="ID_1969541225" MODIFIED="1365442361862" TEXT="steal from MooseX-Types-Common?"/>
 <node CREATED="1365442342382" ID="ID_345593149" MODIFIED="1365442365283" TEXT="steal from MooseX-Types-Ro?"/>
 </node>
-<node CREATED="1365442049043" FOLDED="true" ID="ID_1920269603" MODIFIED="1365442316721" POSITION="left" TEXT="Auto-coercion">
-<richcontent TYPE="NOTE"><html>
-  <head>
-    
-  </head>
-  <body>
-    <p>
-      e.g. if a coercion exists for Bar, then creating parameterized ArrayRef[Bar] should create coercion ArrayRef[Any]-&gt;ArrayRef[Bar]
-    </p>
-  </body>
-</html>
-</richcontent>
+<node CREATED="1365529954377" ID="ID_1288968569" MODIFIED="1365529957564" POSITION="right" TEXT="coercion">
+<node CREATED="1365442049043" ID="ID_1920269603" MODIFIED="1365529829535" TEXT="Auto-coercion">
 <font NAME="SansSerif" SIZE="12"/>
 <icon BUILTIN="full-3"/>
-<node CREATED="1365442300798" ID="ID_1913696701" MODIFIED="1365442304106" TEXT="ArrayRef"/>
-<node CREATED="1365442305110" ID="ID_1481710724" MODIFIED="1365442307257" TEXT="HashRef"/>
-<node CREATED="1365442307650" ID="ID_1249248601" MODIFIED="1365442313309" TEXT="ScalarRef"/>
+<node CREATED="1365529838164" ID="ID_1740996713" MODIFIED="1365529843768" TEXT="could do with better tests"/>
+<node CREATED="1365529844572" ID="ID_700685078" MODIFIED="1365529849044" TEXT="needs documenting"/>
+<node CREATED="1365529851374" ID="ID_1411816545" MODIFIED="1365529863215" TEXT="needs merge with tip"/>
+<node CREATED="1365530075403" ID="ID_545406096" MODIFIED="1365530115590" TEXT="need a way of switching this feature on/off?"/>
+<node CREATED="1365530123214" ID="ID_492312961" MODIFIED="1365530179212" TEXT="generated coercion functions could maybe be returned as thunks?"/>
+</node>
+<node CREATED="1365529965179" ID="ID_1417745941" MODIFIED="1365530069787" TEXT="investigate to what extent child types should inherit coercions"/>
 </node>
 </node>
 </map>
