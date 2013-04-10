@@ -1,0 +1,80 @@
+package main;
+use strict;
+use warnings;
+use Benchmark qw(cmpthese);
+
+{
+	package Class::WithMoose;
+	use Moose;
+	has attr => (is => "ro", isa => "ArrayRef[Int]");
+	__PACKAGE__->meta->make_immutable;
+}
+
+{
+	package Class::WithMooseAndTypeTiny;
+	use Moose;
+	use Types::Standard -moose, -all;
+	has attr => (is => "ro", isa => ArrayRef[Int]);
+	__PACKAGE__->meta->make_immutable;
+}
+
+our %data = ( attr => [1 .. 20] );
+
+cmpthese(-1, {
+	WithMoose            => q{ Class::WithMoose->new(%::data) },
+	WithMooseAndTypeTiny => q{ Class::WithMooseAndTypeTiny->new(%::data) },
+});
+
+=pod
+
+=head1 Introducing Type::Tiny
+
+L<Type::Tiny> is a tiny (no non-core dependencies) class for building
+type constraints.
+
+It comes bundled with L<Type::Library> (a L<MooseX::Types>-like framework
+for type libraries), L<Type::Utils> (some syntactic sugar for declaring
+types), L<Types::Standard> (a library of commonly used types) and a handful
+of other modules.
+
+OK, probably not that exciting. How can I grab your attention?
+
+=for highlighter language=Text
+
+                         Rate            WithMoose WithMooseAndTypeTiny
+ WithMoose             8296/s                   --                 -24%
+ WithMooseAndTypeTiny 10860/s                  31%                   --
+
+The benchmark script is shown later so you can check I'm not doing anything
+hideously unfair to disadvantage Moose.
+
+=for highlighter language=Perl
+
+ package main;
+ use strict;
+ use warnings;
+ use Benchmark qw(cmpthese);
+ 
+ {
+    package Class::WithMoose;
+    use Moose;
+    has attr => (is => "ro", isa => "ArrayRef[Int]");
+    __PACKAGE__->meta->make_immutable;
+ }
+ 
+ {
+    package Class::WithMooseAndTypeTiny;
+    use Moose;
+    use Types::Standard -moose, -all;
+    has attr => (is => "ro", isa => ArrayRef[Int]);
+    __PACKAGE__->meta->make_immutable;
+ }
+ 
+ our %data = ( attr => [1 .. 20] );
+ 
+ cmpthese(-1, {
+    WithMoose            => q{ Class::WithMoose->new(%::data) },
+    WithMooseAndTypeTiny => q{ Class::WithMooseAndTypeTiny->new(%::data) },
+ });
+
+=cut
