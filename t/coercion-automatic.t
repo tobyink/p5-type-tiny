@@ -34,7 +34,7 @@ subtest "Coercion to ArrayRef[\$Foo], etc where \$Foo->coercion cannot be inline
 	my $Foo = declare Foo => as Int;
 	coerce $Foo, from Num, via { int($_) };
 	
-	my $ArrayOfFoo = ArrayRef[$Foo];
+	my $ArrayOfFoo = declare ArrayOfFoo => as ArrayRef[$Foo], coercion => 1;
 	
 	ok($ArrayOfFoo->has_coercion, '$ArrayOfFoo has coercion');
 	

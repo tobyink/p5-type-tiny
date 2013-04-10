@@ -69,6 +69,14 @@ sub new
 	$params{name} = "__ANON__" unless exists $params{name};
 	$params{uniq} = $uniq++;
 	
+	if (exists $params{coercion} and !ref $params{coercion} and $params{coercion})
+	{
+		$params{parent}->has_coercion
+			or _croak "coercion => 1 requires type to have a direct parent with a coercion";
+		
+		$params{coercion} = $params{parent}->coercion;
+	}
+	
 	my $self = bless \%params, $class;
 	
 	unless ($self->is_anon)
@@ -711,6 +719,10 @@ A L<Type::Coercion> object associated with this type.
 
 Generally speaking this attribute should not be passed to the constructor;
 you should rely on the default lazily-built coercion object.
+
+You may pass C<< coercion => 1 >> to the constructor to inherit coercions
+from the constraint's parent. (This requires the parent constraint to have
+a coercion.)
 
 =item C<< complementary_type >>
 
