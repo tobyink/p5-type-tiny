@@ -35,7 +35,7 @@ BEGIN {
 				local $Carp::CarpLevel = 3;
 				push @return,
 					$constraint->has_coercion       ? $constraint->assert_coerce($arg) :
-					$constraint->assert_valid($arg) ? @args : ();
+					$constraint->assert_valid($arg) ? $arg : undef;
 				@args = ();
 			}
 			else
@@ -47,7 +47,7 @@ BEGIN {
 				local $Carp::CarpLevel = 3;
 				push @return,
 					$constraint->has_coercion       ? $constraint->assert_coerce(@arg) :
-					$constraint->assert_valid(@arg) ? @arg : ();
+					$constraint->assert_valid(@arg) ? $arg[0] : undef;
 			}
 		}
 		
@@ -64,12 +64,12 @@ my $RoundedInt = declare RoundedInt, as Int;
 coerce $RoundedInt, from Num, q{ int($_) };
 
 sub foo {
-	my ($name, $age, %bits) = check(\@_, Str, $RoundedInt, slurpy HashRef[Int]);
+	my ($name, $age, $bits) = check(\@_, Str, $RoundedInt, slurpy HashRef[Int]);
 	
 	print Dumper {
 		name  => $name,
 		age   => $age,
-		bits  => \%bits,
+		bits  => $bits,
 	};
 }
 
