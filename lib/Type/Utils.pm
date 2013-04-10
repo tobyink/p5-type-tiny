@@ -93,7 +93,7 @@ sub declare
 *subtype = \&declare;
 *type = \&declare;
 
-sub as ($;@)
+sub as (@)
 {
 	parent => @_;
 }
