@@ -556,11 +556,14 @@ sub _MONKEY_MAGIC
 	eval q{
 		package #
 		Moose::Meta::TypeConstraint;
-		__PACKAGE__->meta->make_mutable;
-		__PACKAGE__->meta->add_attribute(
-			tt_type => (reader => "tt_type", writer => "_set_tt_type", predicate => "has_tt_type"),
-		);
-		__PACKAGE__->meta->make_immutable(inline_constructor => 0);
+		my $meta = __PACKAGE__->meta;
+		$meta->make_mutable;
+		$meta->add_attribute(tt_type => (
+			reader    => "tt_type",
+			writer    => "_set_tt_type",
+			predicate => "has_tt_type"
+		));
+		$meta->make_immutable(inline_constructor => 0);
 		1;
 	} or _croak("could not perform magic Moose trick: $@");
 }
