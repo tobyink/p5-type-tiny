@@ -39,7 +39,7 @@ use Test::Fatal;
 	package Person;
 	
 	use Moose;
-	use Types::Standard -moose, qw( Str Int );
+	use Types::Standard qw( Str Int );
 	use Type::Utils qw( declare as where inline_as coerce from );
 	
 	::isa_ok(

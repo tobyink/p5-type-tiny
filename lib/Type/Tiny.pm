@@ -561,20 +561,49 @@ sub _MONKEY_MAGIC
 			tt_type => (reader => "tt_type", writer => "_set_tt_type", predicate => "has_tt_type"),
 		);
 		__PACKAGE__->meta->make_immutable(inline_constructor => 0);
-		sub plus_coercions {
-			shift->tt_type->plus_coercions(@_)->moose_type;
-		}
-		sub minus_coercions {
-			shift->tt_type->minus_coercions(@_)->moose_type;
-		}
-		sub no_coercions {
-			shift->tt_type->no_coercions->moose_type;
-		}
-		sub complementary_type {
-			shift->tt_type->complementary_type->moose_type;
-		}
 		1;
 	} or _croak("could not perform magic Moose trick: $@");
+}
+
+sub isa
+{
+	my $self = shift;
+	
+	if ($INC{"Moose.pm"} and blessed($self) and my $r = $self->moose_type->isa(@_))
+	{
+		return $r;
+	}
+	
+	$self->SUPER::isa(@_);
+}
+
+sub can
+{
+	my $self = shift;
+	
+	my $can = $self->SUPER::can(@_);
+	return $can if $can;
+	
+	if ($INC{"Moose.pm"} and blessed($self) and my $method = $self->moose_type->can(@_))
+	{
+		return sub { $method->(shift->moose_type, @_) };
+	}
+	
+	return;
+}
+
+sub AUTOLOAD
+{
+	my $self = shift;
+	my ($m) = (our $AUTOLOAD =~ /::(\w+)$/);
+	return if $m eq 'DESTROY';
+	
+	if ($INC{"Moose.pm"} and blessed($self) and my $method = $self->moose_type->can($m))
+	{
+		return $method->($self->moose_type, @_);
+	}
+	
+	_croak q[Can't locate object method "%s" via package "%s"], $m, ref($self)||$self;
 }
 
 1;
