@@ -59,7 +59,11 @@
 		item "Footprint reduction: Type::Tiny, Type::Library and Type::Coerce no longer automatically load Types::Standard and Type::Utils."^^Change;
 		item "Footprint reduction: Type::Tiny and Type::Coercion no longer use if.pm."^^Change;
 		item "Footprint reduction: Type::Tiny no longer triggers Perl to load its Unicode tables (unless you create a type constraint with a non-ASCII type name)."^^Change;
-		item "In Moo, type assertions and coercions are now inlined."^^Addition;
+		item [
+			a dcs:Addition;
+			label "In Moo, type assertions and coercions are now inlined.";
+			dcs:thanks cpan:MSTROUT;
+		];
 		item "Type::Tiny now has an 'inline_assert' function."^^Addition;
 		item "Using Type::Tiny with Moo added to manual."^^Documentation;
 		item "Section in manual comparing Type::Tiny with various other type library frameworks."^^Documentation;

@@ -969,6 +969,10 @@ L<Mouse::Meta::TypeConstraint>.
 
 Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
+=head1 THANKS
+
+Thanks to Matt S Trout for advice on L<Moo> integration.
+
 =head1 COPYRIGHT AND LICENCE
 
 This software is copyright (c) 2013 by Toby Inkster.
