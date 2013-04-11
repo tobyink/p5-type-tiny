@@ -80,7 +80,7 @@ use Test::Fatal;
 
 	has age => (
 		is      => "ro",
-		isa     => $PositiveInt->moose_type,
+		isa     => $PositiveInt,
 		coerce  => 1,
 		writer  => "_set_age",
 	);
