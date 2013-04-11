@@ -276,10 +276,9 @@ Type::Library - tiny, yet Moo(se)-compatible type libraries
       has favourite_number => (is => "ro", isa => Number);
    }
    
-   # Note the "-moose" flag when importing!
    package Bullwinkle {
       use Moose;
-      use Types::Mine -moose, qw(Number);
+      use Types::Mine qw(Number);
       has favourite_number => (is => "ro", isa => Number);
    }
    
@@ -293,7 +292,7 @@ Type::Library - tiny, yet Moo(se)-compatible type libraries
 =head1 DESCRIPTION
 
 L<Type::Library> is a tiny class for creating MooseX::Types-like type
-libraries which are compatible with Moo and Moose.
+libraries which are compatible with Moo, Moose and Mouse.
 
 If you're reading this because you want to create a type library, then
 you're probably better off reading L<Type::Tiny::Intro>.
@@ -416,8 +415,8 @@ assume that the C<Types::Mine> library defines types C<Number> and C<String>.
    #
    use Types::Mine qw( :all );
 
-Adding C<< -mouse >> or C<< -moose >> to the export list ensures that all
-the type constraints exported are Mouse or Moose compatible respectively.
+Adding C<< -mouse >> to the export list ensures that all the type constraints
+exported are Mouse-compatible.
 
 =head1 BUGS
 
