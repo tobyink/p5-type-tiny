@@ -13,7 +13,7 @@ use Benchmark qw(cmpthese);
 {
 	package Class::WithMooseAndTypeTiny;
 	use Moose;
-	use Types::Standard -moose, -all;
+	use Types::Standard -all;
 	has attr => (is => "ro", isa => ArrayRef[Int]);
 	__PACKAGE__->meta->make_immutable;
 }
@@ -42,8 +42,8 @@ OK, probably not that exciting. How can I grab your attention?
 =for highlighter language=Text
 
                          Rate            WithMoose WithMooseAndTypeTiny
- WithMoose             8296/s                   --                 -24%
- WithMooseAndTypeTiny 10860/s                  31%                   --
+ WithMoose             8071/s                   --                 -25%
+ WithMooseAndTypeTiny 10778/s                  34%                   --
 
 The benchmark script is shown later so you can check I'm not doing anything
 hideously unfair to disadvantage Moose.
@@ -100,7 +100,8 @@ an object that we can call methods on, so:
  NaturalNum->check($value);         # returns true or false
  NaturalNum->assert_valid($value);  # returns true or dies
 
-The constant can also be used directly within L<Moo> attribute declarations:
+The constant can also be used directly within L<Moo> or L<Moose> attribute
+declarations:
 
  has message_count => (is => "ro", isa => NaturalNum, required => 1);
 
@@ -121,7 +122,7 @@ The constant can also be used directly within L<Moo> attribute declarations:
  {
     package Class::WithMooseAndTypeTiny;
     use Moose;
-    use Types::Standard -moose, -all;
+    use Types::Standard -all;
     has attr => (is => "ro", isa => ArrayRef[Int]);
     __PACKAGE__->meta->make_immutable;
  }
