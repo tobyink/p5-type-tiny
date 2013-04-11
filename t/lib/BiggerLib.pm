@@ -40,12 +40,12 @@ extends "Types::Standard";
 
 declare "SmallInteger",
 	as "Integer",
-	where { $_ < 10 }
-	message { "$_ is too big" };
+	where { no warnings; $_ < 10 }
+	message { no warnings; "$_ is too big" };
 
 declare "BigInteger",
 	as "Integer",
-	where { $_ >= 10 };
+	where { no warnings; $_ >= 10 };
 
 {
 	package Quux;

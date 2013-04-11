@@ -38,7 +38,7 @@ use Test::Fatal;
 	package Local::Class;
 	
 	use Moose;
-	use BiggerLib -moose, -all;
+	use BiggerLib -all;
 	
 	has small => (is => "ro", isa => SmallInteger);
 	has big   => (is => "ro", isa => BigInteger);
