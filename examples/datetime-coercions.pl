@@ -83,8 +83,8 @@ BEGIN {
 	package Person;
 	
 	use Moose;
-	use Types::Standard -moose, qw( Str Int Num );
-	use Types::Datetime -moose, qw( Datetime Duration );
+	use Types::Standard qw( Str Int Num );
+	use Types::Datetime qw( Datetime Duration );
 	
 	has name => (
 		is       => "ro",

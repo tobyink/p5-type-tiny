@@ -91,7 +91,7 @@ use Benchmark ':all';
 {
 	package Local::Moose_TT;
 	use Moose;
-	use Types::Standard -moose, qw(HashRef ArrayRef Int);
+	use Types::Standard qw(HashRef ArrayRef Int);
 	has attr1 => (is  => "ro", isa => ArrayRef[Int]);
 	has attr2 => (is  => "ro", isa => HashRef[ArrayRef[Int]]);
 	__PACKAGE__->meta->make_immutable;
