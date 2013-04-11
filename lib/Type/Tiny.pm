@@ -896,6 +896,11 @@ Shorthand for creating a new child type constraint with fewer type coercions.
 
 Shorthand for creating a new child type constraint with no coercions at all.
 
+=item C<< isa($class) >>, C<< can($method) >>, C<< AUTOLOAD(@args) >>
+
+If Moose is loaded, then the combination of these methods is used to mock
+a Moose::Meta::TypeConstraint.
+
 =back
 
 =head2 Overloading

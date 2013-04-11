@@ -417,6 +417,11 @@ Returns true iff the coercion can be inlined.
 
 Much like C<inline_coerce> from L<Type::Tiny>.
 
+=item C<< isa($class) >>, C<< can($method) >>, C<< AUTOLOAD(@args) >>
+
+If Moose is loaded, then the combination of these methods is used to mock
+a Moose::Meta::TypeCoercion.
+
 =back
 
 =head2 Overloading
