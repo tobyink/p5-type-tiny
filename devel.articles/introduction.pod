@@ -45,6 +45,8 @@ OK, probably not that exciting. How can I grab your attention?
  WithMoose             8071/s                   --                 -25%
  WithMooseAndTypeTiny 10778/s                  34%                   --
 
+=for highlighter language=Perl
+
 The benchmark script is shown later so you can check I'm not doing anything
 hideously unfair to disadvantage Moose.
 
@@ -105,7 +107,54 @@ declarations:
 
  has message_count => (is => "ro", isa => NaturalNum, required => 1);
 
-=for highlighter language=Perl
+=head2 Coercions
+
+A next step is to define coercions. Within our type constraint library we
+can add:
+
+ use Types::Standard qw( Num ArrayRef );
+ 
+ coerce "NaturalNum",
+    from Num,      via { int(abs($_)) },
+    from ArrayRef, via { scalar(@$_) };
+
+Now within our application we can:
+
+ use MyApp::Types qw(to_NaturalNum);
+ 
+ my $goats = ["Alice Gruff", "Bob Gruff", "Carol Gruff"];
+ say to_NaturalNum($goats);  # say 3
+
+Coercions can be used within Moose attribute definitions:
+
+ has message_count => (
+    is       => "ro",
+    isa      => NaturalNum,
+    required => 1,
+    coerce   => 1,
+ );
+
+Or Moo attribute definitions:
+
+ has message_count => (
+    is       => "ro",
+    isa      => NaturalNum,
+    required => 1,
+    coerce   => NaturalNum->coercion,  # spot the difference
+ );
+
+Coercions are a useful feature, and there are planned additions to
+Type::Coercion and Type::Library to make them even better in the future.
+
+* * *
+
+Anyway, I hope this provides a brief summary of Type::Tiny's features,
+and maybe tempts you to try it out. Keep an eye out for future articles on
+topics such as optimizing type constraints, and coercion power features.
+
+=head2 Appendix
+
+Here's the benchmarking script as promised...
 
  package main;
  use strict;
