@@ -465,6 +465,11 @@ Predicate methods.
 
 TODO.
 
+=item C<< qualified_name >>
+
+For non-anonymous coercions that have a library, returns a qualified
+C<< "Library::Type" >> sort of name. Otherwise, returns the same as C<name>.
+
 =item C<< add_type_coercions($type1, $code1, ...) >>
 
 Takes one or more pairs of L<Type::Tiny> constraints and coercion code,

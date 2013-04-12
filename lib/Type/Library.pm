@@ -400,6 +400,35 @@ Boolean; returns true if the type exists in the library.
 
 List all types defined by the library.
 
+=item C<< add_coercion($c) >> or C<< add_coercion(%opts) >>
+
+Add a standalone coercion to the library. If C<< %opts >> is given, then
+this method calls C<< Type::Coercion->new(%opts) >> first, and adds the
+resultant coercion.
+
+Adding a coercion named "FooFromBar" to the library will automatically
+define a function in the library's namespace:
+
+=over
+
+=item C<< FooFromBar >>
+
+Returns the Type::Coercion object.
+
+=back
+
+=item C<< get_coercion($name) >>
+
+Gets the C<Type::Coercion> object corresponding to the name.
+
+=item C<< has_coercion($name) >>
+
+Boolean; returns true if the coercion exists in the library.
+
+=item C<< coercion_names >>
+
+List all standalone coercions defined by the library.
+
 =item C<< import(@args) >>
 
 Type::Library-based libraries are exporters.
