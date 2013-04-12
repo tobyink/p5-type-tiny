@@ -26,8 +26,7 @@
           * documentation
           * test cases
           * benchmark versus Params::Validate
-              * should be faster once you've got more than 3 or 4
-                params
+              * much faster, even compared to Params::Validate::XS
       * improve speed for non-inlineable type constraints coercions
           * maybe use eval context idea from Type::Check
       * release 0.001

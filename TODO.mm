@@ -33,8 +33,8 @@
 <node CREATED="1365785762582" ID="ID_962609536" MODIFIED="1365785782828" TEXT="already a first draft (called Type::Check) in p5-type-tiny"/>
 <node CREATED="1365785801395" ID="ID_1524020588" MODIFIED="1365785806092" TEXT="documentation"/>
 <node CREATED="1365785808269" ID="ID_307623283" MODIFIED="1365785811103" TEXT="test cases"/>
-<node CREATED="1365785814748" ID="ID_911344221" MODIFIED="1365785841515" TEXT="benchmark versus Params::Validate">
-<node CREATED="1365785866892" ID="ID_804038092" MODIFIED="1365785899542" TEXT="should be faster once you&apos;ve got more than 3 or 4 params"/>
+<node CREATED="1365785814748" ID="ID_911344221" MODIFIED="1365805112338" TEXT="benchmark versus Params::Validate">
+<node CREATED="1365805120478" ID="ID_403602084" MODIFIED="1365805135628" TEXT="much faster, even compared to Params::Validate::XS"/>
 </node>
 </node>
 <node CREATED="1365786093068" ID="ID_1062710536" MODIFIED="1365786149491" POSITION="left" TEXT="improve speed for non-inlineable type constraints coercions">
