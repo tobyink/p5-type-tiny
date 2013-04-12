@@ -47,7 +47,7 @@ sub _build_inlined
 	my $class = $self->class;
 	sub {
 		my $var = $_[1];
-		qq{blessed($var) and $var->isa(q[$class])};
+		qq{Scalar::Util::blessed($var) and $var->isa(q[$class])};
 	};
 }
 

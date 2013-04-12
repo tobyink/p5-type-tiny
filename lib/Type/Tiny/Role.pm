@@ -45,7 +45,7 @@ sub _build_inlined
 	my $role = $self->role;
 	sub {
 		my $var = $_[1];
-		qq{blessed($var) and do { my \$method = $var->can('DOES')||$var->can('isa'); $var->\$method(q[$role]) }};
+		qq{Scalar::Util::blessed($var) and do { my \$method = $var->can('DOES')||$var->can('isa'); $var->\$method(q[$role]) }};
 	};
 }
 
