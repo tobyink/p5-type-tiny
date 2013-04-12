@@ -4,6 +4,7 @@
               * using type constraints from libraries
               * creating type constraints using Type::Utils
               * coercions
+          * better coercion docs
       * integration with MooX-late
       * new type constraints for Types::Standard
           * Chars - i.e. strings where the UTF-8 bit is on
@@ -15,11 +16,22 @@
           * steal from MooseX-Types-Ro?
       * coercion
           * Auto-coercion
-              * could do with better tests
               * needs documenting
               * needs merge with tip
-              * need a way of switching this feature on/off?
-              * generated coercion functions could maybe be returned as
-                thunks?
-          * investigate to what extent child types should inherit
-            coercions
+          * First-class coercions
+              * moar docs
+              * moar tests
+      * new distribution: Params-Type (name?)
+          * already a first draft (called Type::Check) in p5-type-tiny
+          * documentation
+          * test cases
+          * benchmark versus Params::Validate
+              * should be faster once you've got more than 3 or 4
+                params
+      * improve speed for non-inlineable type constraints coercions
+          * maybe use eval context idea from Type::Check
+      * release 0.001
+          * Mon 15th April?
+          * publish intro blog article
+      * Type-Tiny could be used as a backend for Scalar::Does?
+          * if not, certainly a SEE ALSO
