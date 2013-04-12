@@ -146,4 +146,25 @@ is_deeply(
 	"Coercion $sum2 prioritizes ArrayRefFromPiped",
 );
 
+my $arr = (ArrayRef) + (ArrayRefFromAny);
+is_deeply(
+	$arr->coerce("foo|bar"),
+	["foo|bar"],
+	"Type \$arr coercion works",
+);
+
+my $sum3 = ($arr) + (ArrayRefFromPiped);
+is_deeply(
+	$sum3->coerce("foo|bar"),
+	["foo|bar"],
+	"Type \$sum3 coercion works",
+);
+
+my $sum4 = (ArrayRefFromPiped) + ($arr);
+is_deeply(
+	$sum4->coerce("foo|bar"),
+	["foo","bar"],
+	"Type \$sum4 coercion works",
+);
+
 done_testing;

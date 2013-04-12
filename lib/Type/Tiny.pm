@@ -25,6 +25,7 @@ use overload
 	q("")      => sub { caller =~ m{^(Moo::HandleMoose|Sub::Quote)} ? overload::StrVal($_[0]) : $_[0]->display_name },
 	q(bool)    => sub { 1 },
 	q(&{})     => "_overload_coderef",
+	q(+)       => sub { $_[2] ? $_[1]->plus_coercions($_[0]) : $_[0]->plus_fallback_coercions($_[1]) },
 	q(|)       => sub { my @tc = _swap @_; require Type::Tiny::Union; "Type::Tiny::Union"->new(type_constraints => \@tc) },
 	q(&)       => sub { my @tc = _swap @_; require Type::Tiny::Intersection; "Type::Tiny::Intersection"->new(type_constraints => \@tc) },
 	q(~)       => sub { shift->complementary_type },
@@ -511,6 +512,22 @@ sub plus_coercions
 	return $new;
 }
 
+sub plus_fallback_coercions
+{
+	my $self = shift;
+	
+	my @more = (@_==1 && blessed($_[0]) && $_[0]->can('type_coercion_map'))
+		? @{ $_[0]->type_coercion_map }
+		: (@_==1 && ref $_[0]) ? @{$_[0]} : @_;
+	
+	my $new = $self->_clone;
+	$new->coercion->add_type_coercions(
+		@{$self->coercion->type_coercion_map},
+		@more,
+	);
+	return $new;
+}
+
 sub minus_coercions
 {
 	my $self = shift;
@@ -888,6 +905,10 @@ Shorthand for creating a new child type constraint with the same coercions
 as this one, but then adding some extra coercions (at a higher priority than
 the existing ones).
 
+=item C<< plus_fallback_coercions($type1, $code1, ...) >>
+
+Like C<plus_coercions>, but added at a lower priority.
+
 =item C<< minus_coercions($type1, ...) >>
 
 Shorthand for creating a new child type constraint with fewer type coercions.
@@ -945,6 +966,11 @@ See L<Type::Tiny::Union>.
 
 The C<< & >> operator is overloaded to build the intersection of two type
 constraints. See L<Type::Tiny::Intersection>.
+
+=item *
+
+The C<< + >> operator is overloaded to call C<plus_coercions> or
+C<plus_fallback_coercions> as appropriate.
 
 =back
 
