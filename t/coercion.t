@@ -132,4 +132,18 @@ is_deeply(
 	'ArrayRefFromAny coercion works',
 );
 
+my $sum1 = ArrayRefFromAny + ArrayRefFromPiped;
+is_deeply(
+	$sum1->coerce("foo|bar"),
+	["foo|bar"],
+	"Coercion $sum1 prioritizes ArrayRefFromAny",
+);
+
+my $sum2 = ArrayRefFromPiped + ArrayRefFromAny;
+is_deeply(
+	$sum2->coerce("foo|bar"),
+	["foo","bar"],
+	"Coercion $sum2 prioritizes ArrayRefFromPiped",
+);
+
 done_testing;

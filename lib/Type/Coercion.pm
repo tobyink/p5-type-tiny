@@ -20,8 +20,10 @@ sub _croak ($;@)
 }
 
 use overload
+	q("")      => sub { caller =~ m{^(Moo::HandleMoose|Sub::Quote)} ? overload::StrVal($_[0]) : $_[0]->display_name },
+	q(bool)    => sub { 1 },
 	q(&{})     => "_overload_coderef",
-	q(bool)    => sub { !!1 },
+	q(+)       => sub { __PACKAGE__->add(@_) },
 	fallback   => 1,
 ;
 BEGIN {
@@ -60,6 +62,29 @@ sub frozen              { $_[0]{frozen}            ||= 0 }
 
 sub has_library         { exists $_[0]{library} }
 sub has_type_constraint { defined $_[0]{type_constraint} } # sic
+
+sub add
+{
+	my $class = shift;
+	my ($x, $y, $swap) = @_;
+	($y, $x) = ($x, $y) if $swap;
+	
+	_croak "Attempt to add $class to something that is not a $class"
+		unless blessed($x) && blessed($y) && $x->isa($class) && $y->isa($class);
+	
+	my %opts;
+	if ($x->has_type_constraint and $y->has_type_constraint and $x->type_constraint == $y->type_constraint)
+	{
+		$opts{type_constraint} = $x->type_constraint;
+	}
+	$opts{name} ||= "$x+$y";
+	$opts{name} = '__ANON__' if $opts{name} eq '__ANON__+__ANON__';
+	
+	my $new = $class->new(%opts);
+	$new->add_type_coercions( @{$x->type_coercion_map} );
+	$new->add_type_coercions( @{$y->type_coercion_map} );
+	return $new;
+}
 
 sub _build_display_name
 {
@@ -364,7 +389,7 @@ Type::Coercion - a set of coercions to a particular target type constraint
 
 =head1 DESCRIPTION
 
-=head2 Constructor
+=head2 Constructors
 
 =over
 
@@ -372,11 +397,27 @@ Type::Coercion - a set of coercions to a particular target type constraint
 
 Moose-style constructor function.
 
+=item C<< add($c1, $c2) >>
+
+Create a Type::Coercion from two existing Type::Coercion objects.
+
 =back
 
 =head2 Attributes
 
 =over
+
+=item C<name>
+
+TODO.
+
+=item C<display_name>
+
+TODO.
+
+=item C<library>
+
+TODO.
 
 =item C<type_constraint>
 
@@ -412,9 +453,13 @@ called upon it.
 
 =over
 
-=item C<has_type_constraint>
+=item C<has_type_constraint>, C<has_library>
 
-Predicate method.
+Predicate methods.
+
+=item C<is_anon>
+
+TODO.
 
 =item C<< add_type_coercions($type1, $code1, ...) >>
 
@@ -485,6 +530,10 @@ Coderefification is overloaded to call C<coerce>.
 =item *
 
 On Perl 5.10.1 and above, smart match is overloaded to call C<has_coercion_for_value>.
+
+=item *
+
+Addition is overloaded to call C<add>.
 
 =back
 
