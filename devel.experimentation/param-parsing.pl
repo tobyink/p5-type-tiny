@@ -149,27 +149,45 @@ BEGIN {
 	}	
 };
 
+BEGIN {
+	$ENV{PARAMS_VALIDATE_IMPLEMENTATION} = 'PP';
+};
+
+use Benchmark qw(cmpthese);
 use Data::Dumper;
+use IO::Handle;
+use Params::Validate qw( validate_pos ARRAYREF SCALAR );
 use Type::Check validate => { -as => "check" };
 use Type::Utils;
 use Types::Standard qw( -types slurpy );
 
-my $RoundedInt = declare RoundedInt => as Int, where { !!1 };
-coerce $RoundedInt, from Num, q { int($_) };
-
-sub foo {
-	my ($name, $age, $bits) = check(Any, Optional[$RoundedInt], slurpy HashRef[$RoundedInt]);
-	
-	print Dumper {
-		name  => $name,
-		age   => $age,
-		bits  => $bits,
-	};
+my @spec1 = (
+	ArrayRef[Int],
+	duck_type(PrintAndSay => ["print", "say"]),
+	declare(SmallInt => as Int, where { $_ < 90 }, inline_as { $_[0]->parent->inline_check($_)." and $_ < 90" }),
+);
+sub foo1
+{
+	my @in = check(@spec1);
 }
 
-sub bar {
-	foo("Bob", 32.5, foo => 1.1);
-	foo("Alice", "Gumble");
+my @spec2 = (
+	{ type => ARRAYREF, callbacks => { 'all ints' => sub { !grep !/^\d+$/, @{+shift} } } },
+	{ can  => ["print", "say"] },
+	{ type => SCALAR, regex => qr{^\d+$}, callbacks => { 'less than 90' => sub { shift() < 90 } } },
+);
+sub foo2
+{
+	my @in = validate_pos(@_, @spec2);
 }
 
-bar();
+our @data = (
+	[1, 2, 3],
+	IO::Handle->new,
+	50,
+);
+
+cmpthese(-1, {
+	'Type::Check'       => q{ foo1(@::data) },
+	'Params::Validate'  => q{ foo2(@::data) },
+});
