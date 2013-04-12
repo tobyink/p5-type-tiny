@@ -30,7 +30,7 @@ use lib qw( ./lib ./t/lib ../inc ./inc );
 use Test::More;
 use Test::Fatal;
 
-use BiggerLib -types;
+use BiggerLib -types, -coercions;
 
 is(
 	BigInteger->coercion->coerce(2),
@@ -118,6 +118,18 @@ like(
 	exception { BigInteger->assert_coerce({}) },
 	qr{^value "HASH\(\w+\)" did not pass type constraint "BigInteger"},
 	"assert_coerce DOES throw an exception if it can't coerce",
+);
+
+isa_ok(
+	ArrayRefFromAny,
+	'Type::Coercion',
+	'ArrayRefFromAny',
+);
+
+is_deeply(
+	ArrayRefFromAny->coerce(1),
+	[1],
+	'ArrayRefFromAny coercion works',
 );
 
 done_testing;

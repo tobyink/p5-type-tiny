@@ -86,4 +86,6 @@ coerce "BigInteger",
 	from SmallInteger => via { abs($_) + 10 },
 	from ArrayRef     => via { 100 };
 
+declare_coercion "ArrayRefFromAny", to_type "ArrayRef", from "Any", q { [$_] };
+
 1;

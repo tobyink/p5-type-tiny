@@ -18,24 +18,25 @@ sub _croak ($;@) {
 use Scalar::Util qw< blessed >;
 use Type::Library;
 use Type::Tiny;
-use Types::TypeTiny qw< TypeTiny to_TypeTiny >;
+use Types::TypeTiny qw< TypeTiny to_TypeTiny HashLike >;
 
 use Exporter qw< import >;
 our @EXPORT = qw<
 	extends declare as where message inline_as
 	class_type role_type duck_type union intersection enum
 	coerce from via
+	declare_coercion to_type
 >;
 our @EXPORT_OK = (@EXPORT, qw< type subtype >);
 
 sub extends
 {
-	_croak "not a type library" unless caller->isa("Type::Library");
+	_croak "Not a type library" unless caller->isa("Type::Library");
 	my $caller = caller->meta;
 	
 	foreach my $lib (@_)
 	{
-		eval "require $lib" or _croak "could not load library '$lib': $@";
+		eval "require $lib" or _croak "Could not load library '$lib': $@";
 		$caller->add_type($lib->get_type($_)) for $lib->meta->type_names;
 	}
 }
@@ -50,7 +51,7 @@ sub declare
 	else
 	{
 		(my($name), %opts) = @_;
-		_croak "cannot provide two names for type" if exists $opts{name};
+		_croak "Cannot provide two names for type" if exists $opts{name};
 		$opts{name} = $name;
 	}
 
@@ -64,9 +65,9 @@ sub declare
 		unless (TypeTiny->check($opts{parent}))
 		{
 			$caller->isa("Type::Library")
-				or _croak "parent type cannot be a string";
+				or _croak "Parent type cannot be a string";
 			$opts{parent} = $caller->meta->get_type($opts{parent})
-				or _croak "could not find parent type";
+				or _croak "Could not find parent type";
 		}
 	}
 		
@@ -208,6 +209,37 @@ sub intersection
 	declare(%opts);
 }
 
+sub declare_coercion
+{
+	my %opts;
+	$opts{name} = shift if !ref($_[0]);
+	
+	while (HashLike->check($_[0]) and not TypeTiny->check($_[0]))
+	{
+		%opts = (%opts, %{+shift});
+	}
+
+	my $caller = caller($opts{_caller_level} || 0);
+	$opts{library} = $caller;
+	
+	my $bless = delete($opts{bless}) || "Type::Coercion";
+	eval "require $bless";
+	my $c = $bless->new(%opts);
+	
+	my @C = @_;
+	
+	if ($caller->isa("Type::Library"))
+	{
+		my $meta = $caller->meta;
+		$meta->add_coercion($c) unless $c->is_anon;
+		@C = map { ref($_) ? to_TypeTiny($_) : $meta->get_type($_)||$_ } @C;
+	}
+	
+	$c->add_type_coercions(@C);
+	
+	return $c->freeze;
+}
+
 sub coerce
 {
 	if ((scalar caller)->isa("Type::Library"))
@@ -222,9 +254,22 @@ sub coerce
 	return $type->coercion->add_type_coercions(@opts);
 }
 
-sub from ($;@)
+sub from (@)
 {
 	return @_;
+}
+
+sub to_type (@)
+{
+	my $type = shift;
+	unless (TypeTiny->check($type))
+	{
+		caller->isa("Type::Library")
+			or _croak "Target type cannot be a string";
+		$type = caller->meta->get_type($type)
+			or _croak "Could not find target type";
+	}
+	return +{ type_constraint => $type }, @_;
 }
 
 sub via (&;@)
@@ -344,6 +389,37 @@ constraints.
 
 Indicates that this type library extends other type libraries, importing
 their type constraints.
+
+=item C<< declare_coercion $name, \%opts, $type1, $code1, ... >>
+
+=item C<< declare_coercion \%opts, $type1, $code1, ... >>
+
+Declares a coercion that is not explicitly attached to any type in the
+library. For example:
+
+   declare_coercion "ArrayRefFromAny", from "Any", via { [$_] };
+
+This coercion will be exportable from the library as a L<Type::Coercion>
+object, but the ArrayRef type exported by the library won't automatically
+use it.
+
+Coercions declared this way are immutable (frozen).
+
+=item C<< to_type $type >>
+
+Used with C<declare_coercion> to declare the target type constraint for
+a coercion, but still without explicitly attaching the coercion to the
+type constraint:
+
+   declare_coercion "ArrayRefFromAny",
+      to_type "ArrayRef",
+      from "Any", via { [$_] };
+
+You should pretty much always use this when declaring an unattached
+coercion because it's exceedingly useful for a type coercion to know what
+it will coerce to - this allows it to skip coercion when no coercion is
+needed (e.g. avoiding coercing C<< [] >> to C<< [ [] ] >>) and allows
+C<assert_coerce> to work properly.
 
 =back
 

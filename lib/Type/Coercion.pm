@@ -41,18 +41,48 @@ sub new
 {
 	my $class  = shift;
 	my %params = (@_==1) ? %{$_[0]} : @_;
+	
+	$params{name} = '__ANON__' unless exists $params{name};
+	
 	my $self   = bless \%params, $class;
 	Scalar::Util::weaken($self->{type_constraint}); # break ref cycle
 	return $self;
 }
 
-sub frozen              { $_[0]{frozen}            ||= 0 }
+sub name                { $_[0]{name} }
+sub display_name        { $_[0]{display_name}      ||= $_[0]->_build_display_name }
+sub library             { $_[0]{library} }
 sub type_constraint     { $_[0]{type_constraint} }
 sub type_coercion_map   { $_[0]{type_coercion_map} ||= [] }
 sub moose_coercion      { $_[0]{moose_coercion}    ||= $_[0]->_build_moose_coercion }
 sub compiled_coercion   { $_[0]{compiled_coercion} ||= $_[0]->_build_compiled_coercion }
+sub frozen              { $_[0]{frozen}            ||= 0 }
 
+sub has_library         { exists $_[0]{library} }
 sub has_type_constraint { defined $_[0]{type_constraint} } # sic
+
+sub _build_display_name
+{
+	shift->name;
+}
+
+sub qualified_name
+{
+	my $self = shift;
+	
+	if ($self->has_library and not $self->is_anon)
+	{
+		return sprintf("%s::%s", $self->library, $self->name);
+	}
+	
+	return $self->name;
+}
+
+sub is_anon
+{
+	my $self = shift;
+	$self->name eq "__ANON__";
+}
 
 sub _clear_compiled_coercion {
 	delete $_[0]{_overload_coderef};
