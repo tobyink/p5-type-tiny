@@ -1,3 +1,4 @@
+use v5.10;
 use strict;
 use warnings;
 
@@ -39,8 +40,7 @@ BEGIN {
 	
 	my %compiled;
 	sub validate
-	{
-	
+	{	
 		my @args  = ref($_[0]) eq 'ARRAY'  ? @{+shift} : caller_args(1);
 		my $uniq  = join '|', (caller 1)[1..3,8], Scope::Upper::UP();
 		
@@ -160,24 +160,24 @@ use Type::Check validate => { -as => "check" };
 use Type::Utils;
 use Types::Standard qw( -types slurpy );
 
-my @spec1 = (
-	ArrayRef,
-	duck_type(PrintAndSay => ["print", "say"]),
-	declare(SmallInt => as Int, where { $_ < 90 }, inline_as { $_[0]->parent->inline_check($_)." and $_ < 90" }),
-);
 sub foo1
 {
-	my @in = check(@spec1);
+	state $spec = [
+		ArrayRef[Int],
+		duck_type(PrintAndSay => ["print", "say"]),
+		declare(SmallInt => as Int, where { $_ < 90 }, inline_as { $_[0]->parent->inline_check($_)." and $_ < 90" }),
+	];
+	my @in = check(@$spec);
 }
 
-my @spec2 = (
-	{ type => ARRAYREF}, #, callbacks => { 'all ints' => sub { !grep !/^\d+$/, @{+shift} } } },
-	{ can  => ["print", "say"] },
-	{ type => SCALAR, regex => qr{^\d+$}, callbacks => { 'less than 90' => sub { shift() < 90 } } },
-);
 sub foo2
 {
-	my @in = validate_pos(@_, @spec2);
+	state $spec = [
+		{ type => ARRAYREF, callbacks => { 'all ints' => sub { !grep !/^\d+$/, @{+shift} } } },
+		{ can  => ["print", "say"] },
+		{ type => SCALAR, regex => qr{^\d+$}, callbacks => { 'less than 90' => sub { shift() < 90 } } },
+	];
+	my @in = validate_pos(@_, @$spec);
 }
 
 our @data = (
