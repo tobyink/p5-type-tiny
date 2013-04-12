@@ -6,8 +6,6 @@
 
 Checks Type::Coercion works.
 
-(Very limited at the moment.)
-
 =head1 DEPENDENCIES
 
 Uses the bundled BiggerLib.pm type library.
@@ -61,6 +59,22 @@ ok(
 	'not BigInteger has_coercion_for_type SmallInteger',
 );
 
+cmp_ok(
+	BigInteger->coercion->has_coercion_for_type(BigInteger),
+	eq => '0 but true',
+	'BigInteger has_coercion_for_type BigInteger eq "0 but true"'
+);
+
+my $BiggerInteger = BigInteger->create_child_type(
+	constraint => sub { $_ > 1_000_000 },
+);
+
+cmp_ok(
+	BigInteger->coercion->has_coercion_for_type($BiggerInteger),
+	eq => '0 but true',
+	'BigInteger has_coercion_for_type $BiggerInteger eq "0 but true"'
+);
+
 ok(
 	BigInteger->coercion->has_coercion_for_value([]),
 	'BigInteger has_coercion_for_value []',
@@ -74,6 +88,12 @@ ok(
 ok(
 	!BigInteger->coercion->has_coercion_for_value({}),
 	'not BigInteger has_coercion_for_value {}',
+);
+
+cmp_ok(
+	BigInteger->coercion->has_coercion_for_value(200),
+	eq => '0 but true',
+	'BigInteger has_coercion_for_value 200 eq "0 but true"'
 );
 
 is(

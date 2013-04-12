@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.000_09';
+our $VERSION   = '0.000_12';
 
 use Scalar::Util qw< blessed >;
 
@@ -57,7 +57,7 @@ sub to_TypeTiny
 {
 	my $t = $_[0];
 	
-	if (blessed $t and $t->isa("Moose::Meta::TypeConstraint"))
+	if (blessed($t) and ref($t)->isa("Moose::Meta::TypeConstraint"))
 	{
 		if ($t->can("tt_type") and my $tt = $t->tt_type)
 		{

@@ -1,0 +1,137 @@
+package main;
+use strict;
+use warnings;
+use Benchmark qw(cmpthese);
+
+{
+	package Class::WithMoose;
+	use Moose;
+	has attr => (is => "ro", isa => "ArrayRef[Int]");
+	__PACKAGE__->meta->make_immutable;
+}
+
+{
+	package Class::WithMooseAndTypeTiny;
+	use Moose;
+	use Types::Standard -all;
+	has attr => (is => "ro", isa => ArrayRef[Int]);
+	__PACKAGE__->meta->make_immutable;
+}
+
+our %data = ( attr => [1 .. 20] );
+
+cmpthese(-1, {
+	WithMoose            => q{ Class::WithMoose->new(%::data) },
+	WithMooseAndTypeTiny => q{ Class::WithMooseAndTypeTiny->new(%::data) },
+});
+
+=pod
+
+=head1 Introducing Type::Tiny
+
+L<Type::Tiny> is a tiny (no non-core dependencies) class for building
+type constraints.
+
+It comes bundled with L<Type::Library> (a L<MooseX::Types>-like framework
+for type libraries), L<Type::Utils> (some syntactic sugar for declaring
+types), L<Types::Standard> (a library of commonly used types) and a handful
+of other modules.
+
+OK, probably not that exciting. How can I grab your attention?
+
+=for highlighter language=Text
+
+                         Rate            WithMoose WithMooseAndTypeTiny
+ WithMoose             8071/s                   --                 -25%
+ WithMooseAndTypeTiny 10778/s                  34%                   --
+
+The benchmark script is shown later so you can check I'm not doing anything
+hideously unfair to disadvantage Moose.
+
+How can I hold your attention?
+
+B<< Type constraint libraries built with Type::Tiny and Type::Library work
+with Moose, Mouse I<and> Moo! >> And because it's such a lightweight library,
+with no dependencies on heavy OO frameworks, it even becomes appealing to use
+in situations where you wouldn't normally consider a proper type constraint
+library.
+
+=head2 Type Constraints?
+
+Let's get back to basics... what's a type constraint library? If you're
+writing anything more than a quick throwaway script, you generally need to
+do a bit of data validation. Your C<array_sum> function might need to check
+that it gets passed an arrayref and all the values in the array are numeric.
+
+In another part of the code your C<delete_articles_by_id> function might
+also need to accept an array of numeric values. Two checks for arrayrefs
+of numbers, in different parts of your codebase. The principle of
+L<DRY|http://en.wikipedia.org/wiki/Don't_repeat_yourself> says that you
+should factor both of these checks out to a single place in your code.
+
+Once you've factored all of these checks out into one place, that's your
+type constraint library.
+
+=head2 Building a Type Library with Type::Library
+
+Let's say we want to build a "natural numbers" type contraint. Natural
+numbers are the positive integers plus zero. (The inclusion of zero is
+contentious in some circles, but we'll put that aside for now.) It helps
+that L<Types::Standard> defines an C<Int> type constraint, so rather than
+starting from scratch, we can refine that.
+
+ package MyApp::Types;
+ 
+ use base "Type::Library";  # type libraries must inherit from this
+ use Type::Utils;           # sugar for declaring type constraints
+ use Types::Standard qw(Int);
+ 
+ declare "NaturalNum", as Int, where { $_ >= 0 };
+ 
+ 1;  # magic true value
+
+That was easy. Now within our application we can:
+
+ use MyApp::Types qw(NaturalNum);
+
+And this will export C<NaturalNum> as a "constant". The constant returns
+an object that we can call methods on, so:
+
+ NaturalNum->check($value);         # returns true or false
+ NaturalNum->assert_valid($value);  # returns true or dies
+
+The constant can also be used directly within L<Moo> or L<Moose> attribute
+declarations:
+
+ has message_count => (is => "ro", isa => NaturalNum, required => 1);
+
+=for highlighter language=Perl
+
+ package main;
+ use strict;
+ use warnings;
+ use Benchmark qw(cmpthese);
+ 
+ {
+    package Class::WithMoose;
+    use Moose;
+    has attr => (is => "ro", isa => "ArrayRef[Int]");
+    __PACKAGE__->meta->make_immutable;
+ }
+ 
+ {
+    package Class::WithMooseAndTypeTiny;
+    use Moose;
+    use Types::Standard -all;
+    has attr => (is => "ro", isa => ArrayRef[Int]);
+    __PACKAGE__->meta->make_immutable;
+ }
+ 
+ our %data = ( attr => [1 .. 20] );
+ 
+ cmpthese(-1, {
+    WithMoose            => q{ Class::WithMoose->new(%::data) },
+    WithMooseAndTypeTiny => q{ Class::WithMooseAndTypeTiny->new(%::data) },
+ });
+
+=cut

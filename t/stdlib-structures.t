@@ -76,4 +76,13 @@ should_fail({ name => "Bob", age => 40, weight => 80.3 }, $struct4);
 should_fail({ name => "Bob", age => 40, height => 1.76, weight => 80.3 }, $struct4);
 should_fail({ name => "Bob", age => 40, height => "xyz" }, $struct4);
 
+my $opt1 = Optional[Int];
+ok( $opt1->check(), "$opt1 check ()");
+ok( $opt1->check(1), "$opt1 check (1)");
+TODO: {
+	local $TODO = "`exists \$arr[\$idx]` behaves oddly in all versions of Perl";
+	ok(!$opt1->check(undef), "$opt1 check (undef)");
+};
+ok(!$opt1->check('xxx'), "$opt1 check ('xxx')");
+
 done_testing;

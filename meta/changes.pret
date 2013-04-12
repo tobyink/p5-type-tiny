@@ -59,7 +59,11 @@
 		item "Footprint reduction: Type::Tiny, Type::Library and Type::Coerce no longer automatically load Types::Standard and Type::Utils."^^Change;
 		item "Footprint reduction: Type::Tiny and Type::Coercion no longer use if.pm."^^Change;
 		item "Footprint reduction: Type::Tiny no longer triggers Perl to load its Unicode tables (unless you create a type constraint with a non-ASCII type name)."^^Change;
-		item "In Moo, type assertions and coercions are now inlined."^^Addition;
+		item [
+			a dcs:Addition;
+			label "In Moo, type assertions and coercions are now inlined.";
+			dcs:thanks cpan:MSTROUT;
+		];
 		item "Type::Tiny now has an 'inline_assert' function."^^Addition;
 		item "Using Type::Tiny with Moo added to manual."^^Documentation;
 		item "Section in manual comparing Type::Tiny with various other type library frameworks."^^Documentation;
@@ -91,4 +95,24 @@
 		item "Tidy up the 'examples' directory."^^Packaging;
 		item "When generating Moose/Mouse constraints from Type::Tiny objects, prefer to generate anonymous ones."^^Packaging;
 		item "Fill in the Usage with Moose section of the fine manual."^^Documentation;
+	].
+
+`Type-Tiny 0.000_10 cpan:TOBYINK`
+	issued  2013-04-09;
+	changeset [
+		item "Improvements to has_coercion_for_{type,value} from Type::Coercion."^^Change;
+		item "Fix incorrect Test::Requires line in 'mouse-coercion.t'."^^Bugfix;
+	].
+
+`Type-Tiny 0.000_11 cpan:TOBYINK`
+	issued  2013-04-11;
+	changeset [
+		item "Fix prototype for Type::Utils::as."^^Bugfix;
+		item "BIG, AWESOME CHANGE: no longer need to pass '-moose' parameter when importing a library into a Moose class; only Mouse needs that treatment now."^^Change;
+	].
+
+`Type-Tiny 0.000_12 cpan:TOBYINK`
+	issued  2013-04-12;
+	changeset [
+		item "Fix minor typo."^^Documentation;
 	].

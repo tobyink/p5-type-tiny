@@ -119,7 +119,7 @@ use Benchmark ':all';
 {
 	package Local::Moose_TT;
 	use Moose;
-	use Types::Standard -moose, qw(HashRef ArrayRef Int);
+	use Types::Standard qw(HashRef ArrayRef Int);
 	use Sub::Quote;
 	my $AofI = (ArrayRef[Int])->plus_coercions(Int, '[$_]');
 	has attr1 => (

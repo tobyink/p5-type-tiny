@@ -12,7 +12,7 @@ Type::Tiny::Manual::UsingWithMoose - how to use Type::Tiny and Type::Library wit
       package Person;
       
       use Moose;
-      use Types::Standard -moose, qw( Str Int );
+      use Types::Standard qw( Str Int );
       use Type::Utils qw( declare as where inline_as coerce from );
       
       has name => (
@@ -23,18 +23,13 @@ Type::Tiny::Manual::UsingWithMoose - how to use Type::Tiny and Type::Library wit
       my $PositiveInt = declare
          as        Int,
          where     {  $_ > 0  },
-         inline_as { "$_ =~ /^0-9]\$/ and $_ > 0" };
+         inline_as { "$_ =~ /^[0-9]\$/ and $_ > 0" };
       
       coerce $PositiveInt, from Int, q{ abs $_ };
       
-      # Note that $PositiveInt is a Type::Tiny object, not a
-      # Moose::Meta::TypeConstraint object, so when passing it
-      # into Moose's "has" function you need to get the Moose
-      # equivalent type using "->moose_type".
-      #
       has age => (
          is      => "ro",
-         isa     => $PositiveInt->moose_type,
+         isa     => $PositiveInt,
          coerce  => 1,
          writer  => "_set_age",
       );
@@ -50,34 +45,19 @@ Type::Tiny::Manual::UsingWithMoose - how to use Type::Tiny and Type::Library wit
 =head1 DESCRIPTION
 
 L<Type::Tiny> type constraints have an API almost identical to that of
-L<Moose::Meta::TypeConstraint>.
-
-Almost. But not quite good enough to trick Moose. This means that any
-time you want to pass a Type::Tiny constraint into Moose (e.g. the C<isa>
-option when defining an attribute) you need to convert it into a I<real>
-Moose::Meta::TypeConstraint object. Luckily this is as simple as calling
-the C<moose_type> method on the object. For example, see the C<isa> option
-for C<age> in the SYNOPSIS.
-
-As a shortcut, you can provide a C<< -moose >> option when importing from
-a type library
-
-   use Types::Standard -moose, qw( Str Int );
-
-... and the imported bareword type constraint functions will automagically
-return Moose-compatible types. For example, the C<Str> type used as the
-constraint for C<name> in the SYNOPSIS.
-
-You may prefer instead to import the standard Type::Tiny constraints and
-call C<moose_type> as needed.
+L<Moose::Meta::TypeConstraint>. It is also able to build a
+Moose::Meta::TypeConstraint constraint from a Type::Tiny constraint, and
+will do so automatically when needed. When Moose.pm is loaded, Type::Tiny
+will use Perl's C<AUTOLOAD> feature to proxy method calls through to the
+Moose::Meta::TypeConstraint object. In short, you can use a Type::Tiny
+object pretty much anywhere you'd use a Moose::Meta::TypeConstraint and
+you are unlikely to notice the difference.
 
 =head2 Per-Attribute Coercions
 
 Type::Tiny offers convenience methods to alter the list of coercions
-associated with a type constraint. And via a little cheeky monkey patching,
-it also makes these methods available to Moose type constraint objects.
-Let's imagine we wish to allow our C<name> attribute to be coerced from an
-arrayref of strings.
+associated with a type constraint. Let's imagine we wish to allow our
+C<name> attribute to be coerced from an arrayref of strings.
 
       has name => (
          is      => "ro",

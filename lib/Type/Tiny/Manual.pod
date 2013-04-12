@@ -35,6 +35,10 @@ L<Using with Mouse|Type::Tiny::Manual::UsingWithMouse> - how to use Type::Tiny a
 
 L<Using with Moo|Type::Tiny::Manual::UsingWithMoo> - how to use Type::Tiny and Type::Library with Moo
 
+=item *
+
+Type::Tiny and friends don't need to be used within an OO framework. See L<FreeMind::Node> for an example that does not.
+
 =back
 
 =head1 TYPE::TINY VERSUS X
@@ -49,19 +53,7 @@ registry and stringy access to type constraints.
 
 Type::Tiny libraries expose a similar interface to L<MooseX::Types> libraries.
 In most cases you should be able to rewrite a L<MooseX::Types> library to
-use Type::Tiny easily. It might be wise to add a shim MooseX:: module:
-
-   package Types::Foo {
-      ...;
-   }
-   
-   package MooseX::Types::Foo {
-      sub import {
-         require Types::Foo;
-         splice(@_, 0, 1) = ("Types::Foo", "-moose");
-         goto \&Types::Foo::import;
-      }
-   }
+use Type::Tiny pretty easily.
 
 =head2 MooX::Types::MooseLike
 

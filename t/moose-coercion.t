@@ -39,7 +39,7 @@ my @warnings;
 	package Local::Class;
 	
 	use Moose;
-	use BiggerLib -moose, -all;
+	use BiggerLib -all;
 	
 	::isa_ok(BigInteger, "Moose::Meta::TypeConstraint");
 	

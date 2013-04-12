@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Utils::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Utils::VERSION   = '0.000_09';
+	$Type::Utils::VERSION   = '0.000_12';
 }
 
 sub _croak ($;@) {

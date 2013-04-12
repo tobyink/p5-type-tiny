@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Coercion::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Coercion::VERSION   = '0.000_09';
+	$Type::Coercion::VERSION   = '0.000_12';
 }
 
 use Scalar::Util qw< blessed >;
@@ -294,6 +294,47 @@ sub _codelike_type_coercion_map
 	return @new;
 }
 
+sub isa
+{
+	my $self = shift;
+	
+	if ($INC{"Moose.pm"} and blessed($self) and my $r = $self->moose_coercion->isa(@_))
+	{
+		return $r;
+	}
+	
+	$self->SUPER::isa(@_);
+}
+
+sub can
+{
+	my $self = shift;
+	
+	my $can = $self->SUPER::can(@_);
+	return $can if $can;
+	
+	if ($INC{"Moose.pm"} and blessed($self) and my $method = $self->moose_coercion->can(@_))
+	{
+		return sub { $method->(shift->moose_coercion, @_) };
+	}
+	
+	return;
+}
+
+sub AUTOLOAD
+{
+	my $self = shift;
+	my ($m) = (our $AUTOLOAD =~ /::(\w+)$/);
+	return if $m eq 'DESTROY';
+	
+	if ($INC{"Moose.pm"} and blessed($self) and my $method = $self->moose_coercion->can($m))
+	{
+		return $method->($self->moose_coercion, @_);
+	}
+	
+	_croak q[Can't locate object method "%s" via package "%s"], $m, ref($self)||$self;
+}
+
 1;
 
 __END__
@@ -396,6 +437,11 @@ Returns true iff the coercion can be inlined.
 =item C<< inline_coercion($varname) >>
 
 Much like C<inline_coerce> from L<Type::Tiny>.
+
+=item C<< isa($class) >>, C<< can($method) >>, C<< AUTOLOAD(@args) >>
+
+If Moose is loaded, then the combination of these methods is used to mock
+a Moose::Meta::TypeCoercion.
 
 =back
 
