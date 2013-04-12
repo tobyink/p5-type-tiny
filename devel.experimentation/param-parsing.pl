@@ -7,9 +7,8 @@ BEGIN {
 	no thanks;
 	
 	use Carp qw(croak);
-	use Devel::Caller qw(caller_args);
-	use Eval::Closure ();
-	use Scope::Upper ();
+	use Eval::Closure qw();
+	use Scalar::Util qw(refaddr);
 	use Types::Standard -types;
 	use Types::TypeTiny qw(to_TypeTiny);
 	
@@ -40,26 +39,25 @@ BEGIN {
 	
 	my %compiled;
 	sub validate
-	{	
-		my @args  = ref($_[0]) eq 'ARRAY'  ? @{+shift} : caller_args(1);
-		my $uniq  = join '|', (caller 1)[1..3,8], Scope::Upper::UP();
+	{
+		my $uniq = refaddr $_[1];
 		
 		$compiled{$uniq} ||= do
 		{
-			my (@code, %env);
+			my @C = @{$_[1]};
 			
+			my (@code, %env);
 			@code = 'my (@R, %tmp, $tmp);';
 			$env{'$croaker'} = \sub {
 				local $Carp::CarpLevel = 4;
 				Carp::croak($_[0]);
 			};
-			
 			my $arg = -1;
 			
-			while (@_)
+			while (@C)
 			{
 				++$arg;
-				my $constraint = shift;
+				my $constraint = shift @C;
 				my $is_optional;
 				my $varname;
 				
@@ -144,7 +142,7 @@ BEGIN {
 			);
 		};
 		
-		return $compiled{$uniq}->(@args);
+		return $compiled{$uniq}->(@{$_[0]});
 	}	
 };
 
@@ -167,7 +165,7 @@ sub foo1
 		duck_type(PrintAndSay => ["print", "say"]),
 		declare(SmallInt => as Int, where { $_ < 90 }, inline_as { $_[0]->parent->inline_check($_)." and $_ < 90" }),
 	];
-	my @in = check(@$spec);
+	my @in = check(\@_, $spec);
 }
 
 sub foo2
