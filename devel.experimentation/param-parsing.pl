@@ -7,6 +7,8 @@ BEGIN {
 	
 	use Carp qw(croak);
 	use Devel::Caller qw(caller_args);
+	use Eval::Closure ();
+	use Scope::Upper ();
 	use Types::Standard -types;
 	use Types::TypeTiny qw(to_TypeTiny);
 	
@@ -38,11 +40,9 @@ BEGIN {
 	my %compiled;
 	sub validate
 	{
-		require Eval::Closure;
-		require Scope::Upper;
 	
-		my @args      = ref($_[0]) eq 'ARRAY'  ? @{+shift} : caller_args(1);
-		my $uniq      = join '|', (caller 1)[1..3,8], Scope::Upper::UP();
+		my @args  = ref($_[0]) eq 'ARRAY'  ? @{+shift} : caller_args(1);
+		my $uniq  = join '|', (caller 1)[1..3,8], Scope::Upper::UP();
 		
 		$compiled{$uniq} ||= do
 		{
