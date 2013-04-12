@@ -59,35 +59,6 @@ use Type::Tiny pretty easily.
 
 Type::Tiny is faster and supports coercions.
 
-=head1 CAVEATS
-
-=head2 Mutability of Type::Coercion
-
-Type::Tiny type constraints are designed as immutable objects. Once you've
-created a constraint, rather than modifying it you generally create child
-constraints to do what you need.
-
-Type::Coercion objects, on the other hand, are mutable. Coercion routines
-can be added at any time during the object's lifetime.
-
-This combination of features means that if you create a Type::Tiny type
-constraint, then create a Moose or Mouse type from it (the C<moose_type>
-and C<mouse_type> lazily built attributes), and then add coercions to the
-Type::Tiny constraint, the Moose/Mouse constraint will not see them.
-
-In general you should avoid adding coercions to a type constraint once the
-type constraint has started being used. Add coercions straight after defining
-the type. The C<plus_coercions> method (which returns a new type constraint
-with extra coercions, so doesn't violate immutability) is a better technique
-than adding coercions willy-nilly during the course of a constraint's
-lifetime.
-
-I I<do> consider this to be an issue that needs resolving in a future
-release. The likely solution will be to have the ability to "freeze" a
-Type::Coercion object, and then change the C<moose_type> and C<mouse_type>
-lazy builders to make them automatically freeze the type's associated
-coercion.
-
 =head1 AUTHOR
 
 Toby Inkster E<lt>tobyink@cpan.orgE<gt>.

@@ -489,7 +489,7 @@ sub _build_mouse_type
 	
 	$self->{mouse_type} = $r;  # prevent recursion
 	$r->_add_type_coercions(
-		$self->coercion->_codelike_type_coercion_map('mouse_type')
+		$self->coercion->freeze->_codelike_type_coercion_map('mouse_type')
 	) if $self->has_coercion;
 	
 	return $r;

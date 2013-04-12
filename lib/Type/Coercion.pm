@@ -46,6 +46,7 @@ sub new
 	return $self;
 }
 
+sub frozen              { $_[0]{frozen}            ||= 0 }
 sub type_constraint     { $_[0]{type_constraint} }
 sub type_coercion_map   { $_[0]{type_coercion_map} ||= [] }
 sub moose_coercion      { $_[0]{moose_coercion}    ||= $_[0]->_build_moose_coercion }
@@ -57,6 +58,8 @@ sub _clear_compiled_coercion {
 	delete $_[0]{_overload_coderef};
 	delete $_[0]{compiled_coercion};
 }
+
+sub freeze { $_[0]{frozen} = 1; $_[0] }
 
 sub coerce
 {
@@ -110,14 +113,17 @@ sub add_type_coercions
 	my $self = shift;
 	my @args = @_;
 	
+	_croak "Attempt to add coercion code to a Type::Coercion which has been frozen"
+		if $self->frozen;
+	
 	while (@args)
 	{
 		my $type     = to_TypeTiny(shift @args);
 		my $coercion = shift @args;
 		
-		_croak "types must be blessed Type::Tiny objects"
+		_croak "Types must be blessed Type::Tiny objects"
 			unless TypeTiny->check($type);
-		_croak "coercions must be code references"
+		_croak "Coercions must be code references or strings"
 			unless StringLike->check($coercion) || CodeLike->check($coercion);
 		
 		push @{$self->type_coercion_map}, $type, $coercion;
@@ -197,7 +203,7 @@ sub inline_coercion
 	my $self = shift;
 	my $varname = $_[0];
 	
-	_croak "this coercion cannot be inlined" unless $self->can_be_inlined;
+	_croak "This coercion cannot be inlined" unless $self->can_be_inlined;
 	
 	my @mishmash = @{$self->type_coercion_map};
 	return "($varname)" unless @mishmash;
@@ -234,7 +240,7 @@ sub _build_moose_coercion
 	my $self = shift;
 	
 	my %options = ();
-	$options{type_coercion_map} = [ $self->_codelike_type_coercion_map('moose_type') ];
+	$options{type_coercion_map} = [ $self->freeze->_codelike_type_coercion_map('moose_type') ];
 	$options{type_constraint}   = $self->type_constraint if $self->has_type_constraint;
 	
 	require Moose::Meta::TypeCoercion;
@@ -365,6 +371,11 @@ pretty fast coderef, inlining all type constraint checks, etc.
 A L<Moose::Meta::TypeCoercion> object equivalent to this one. Don't set this
 manually; rely on the default built one.
 
+=item C<frozen>
+
+Boolean; default false. A frozen coercion cannot have C<add_type_coercions>
+called upon it.
+
 =back
 
 =head2 Methods
@@ -417,6 +428,11 @@ Returns true iff the coercion can be inlined.
 
 Much like C<inline_coerce> from L<Type::Tiny>.
 
+=item C<< freeze >>
+
+Set C<frozen> to true. There is no C<unfreeze>. Called automatically by
+L<Type::Tiny> sometimes.
+
 =item C<< isa($class) >>, C<< can($method) >>, C<< AUTOLOAD(@args) >>
 
 If Moose is loaded, then the combination of these methods is used to mock
@@ -439,6 +455,44 @@ Coderefification is overloaded to call C<coerce>.
 =item *
 
 On Perl 5.10.1 and above, smart match is overloaded to call C<has_coercion_for_value>.
+
+=back
+
+=head1 DIAGNOSTICS
+
+=over
+
+=item B<< Attempt to add coercion code to a Type::Coercion which has been frozen >>
+
+Type::Tiny type constraints are designed as immutable objects. Once you've
+created a constraint, rather than modifying it you generally create child
+constraints to do what you need.
+
+Type::Coercion objects, on the other hand, are mutable. Coercion routines
+can be added at any time during the object's lifetime.
+
+Sometimes Type::Tiny needs to freeze a Type::Coercion object to prevent this.
+In L<Moose> and L<Mouse> code this is likely to happen as soon as you use a
+type constraint in an attribute.
+
+Workarounds:
+
+=over
+
+=item *
+
+Define as many of your coercions as possible within type libraries, not
+within the code that uses the type libraries. The type library will be
+evaluated relatively early, likely before there is any reason to freeze
+a coercion.
+
+=item *
+
+If you do need to add coercions to a type within application code outside
+the type library, instead create a subtype and add coercions to that. The
+C<plus_coercions> method provided by L<Type::Tiny> should make this simple.
+
+=back
 
 =back
 
