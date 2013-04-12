@@ -110,3 +110,9 @@
 		item "Fix prototype for Type::Utils::as."^^Bugfix;
 		item "BIG, AWESOME CHANGE: no longer need to pass '-moose' parameter when importing a library into a Moose class; only Mouse needs that treatment now."^^Change;
 	].
+
+`Type-Tiny 0.000_12 cpan:TOBYINK`
+	issued  2013-04-12;
+	changeset [
+		item "Fix minor typo."^^Documentation;
+	].
