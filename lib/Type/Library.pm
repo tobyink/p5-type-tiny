@@ -336,7 +336,7 @@ Returns true iff $value passes the type contraint. Dies otherwise.
 
 =item C<< to_Foo($value) >>
 
-Coerces the value to the type. (Not implemented yet.)
+Coerces the value to the type.
 
 =back
 
