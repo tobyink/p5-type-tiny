@@ -41,8 +41,7 @@ BEGIN {
 		require Eval::Closure;
 		require Scope::Upper;
 	
-		my @args      = ArrayRef->check($_[0])  ? @{+shift} : caller_args(1);
-		my $carplevel = ScalarRef->check($_[0]) ? ${+shift} : 1;
+		my @args      = ref($_[0]) eq 'ARRAY'  ? @{+shift} : caller_args(1);
 		my $uniq      = join '|', (caller 1)[1..3,8], Scope::Upper::UP();
 		
 		$compiled{$uniq} ||= do
@@ -150,7 +149,7 @@ BEGIN {
 };
 
 BEGIN {
-	$ENV{PARAMS_VALIDATE_IMPLEMENTATION} = 'PP';
+	$ENV{PARAMS_VALIDATE_IMPLEMENTATION} = 'XS';
 };
 
 use Benchmark qw(cmpthese);
@@ -162,7 +161,7 @@ use Type::Utils;
 use Types::Standard qw( -types slurpy );
 
 my @spec1 = (
-	ArrayRef[Int],
+	ArrayRef,
 	duck_type(PrintAndSay => ["print", "say"]),
 	declare(SmallInt => as Int, where { $_ < 90 }, inline_as { $_[0]->parent->inline_check($_)." and $_ < 90" }),
 );
@@ -172,7 +171,7 @@ sub foo1
 }
 
 my @spec2 = (
-	{ type => ARRAYREF, callbacks => { 'all ints' => sub { !grep !/^\d+$/, @{+shift} } } },
+	{ type => ARRAYREF}, #, callbacks => { 'all ints' => sub { !grep !/^\d+$/, @{+shift} } } },
 	{ can  => ["print", "say"] },
 	{ type => SCALAR, regex => qr{^\d+$}, callbacks => { 'less than 90' => sub { shift() < 90 } } },
 );
