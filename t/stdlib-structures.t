@@ -75,6 +75,8 @@ should_fail({ name => "Bob", age => 40.1 }, $struct4);
 should_fail({ name => "Bob", age => 40, weight => 80.3 }, $struct4);
 should_fail({ name => "Bob", age => 40, height => 1.76, weight => 80.3 }, $struct4);
 should_fail({ name => "Bob", age => 40, height => "xyz" }, $struct4);
+should_fail({ name => "Bob", age => 40, height => undef }, $struct4);
+should_fail({ name => "Bob", age => undef, height => 1.76 }, $struct4);
 
 my $opt1 = Optional[Int];
 ok( $opt1->check(), "$opt1 check ()");
