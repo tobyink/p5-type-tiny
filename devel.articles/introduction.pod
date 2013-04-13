@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 use TOBYINK::Pod::HTML;
 print "TOBYINK::Pod::HTML"->new(
 	pretty             => 1,
