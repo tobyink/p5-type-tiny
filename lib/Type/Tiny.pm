@@ -558,11 +558,17 @@ sub _MONKEY_MAGIC
 		Moose::Meta::TypeConstraint;
 		my $meta = __PACKAGE__->meta;
 		$meta->make_mutable;
-		$meta->add_attribute(tt_type => (
-			reader    => "tt_type",
-			writer    => "_set_tt_type",
-			predicate => "has_tt_type"
-		));
+		$meta->add_attribute(
+			"Moose::Meta::Attribute"->new(
+				tt_type => (
+					reader    => "tt_type",
+					writer    => "_set_tt_type",
+					predicate => "has_tt_type",
+					weak_ref  => 1,
+					Class::MOP::_definition_context(),
+				),
+			),
+		);
 		$meta->make_immutable(inline_constructor => 0);
 		1;
 	} or _croak("could not perform magic Moose trick: $@");
