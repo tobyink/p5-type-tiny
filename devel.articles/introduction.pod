@@ -10,15 +10,9 @@ print "TOBYINK::Pod::HTML"->new(
 
 =head1 Introducing Type::Tiny
 
-L<Type::Tiny> is a tiny (no non-core dependencies) class for building
-type constraints.
-
-It comes bundled with L<Type::Library> (a L<MooseX::Types>-like framework
-for type libraries), L<Type::Utils> (some syntactic sugar for declaring
-types), L<Types::Standard> (a library of commonly used types) and a handful
-of other modules.
-
-OK, probably not that exciting. How can I grab your attention?
+L<Type::Tiny> is a tiny (no non-core dependencies) framework for building
+type constraints. OK, probably not that exciting. How can I grab your
+attention?
 
 =for highlighter language=Text
 
@@ -33,11 +27,34 @@ hideously unfair to disadvantage Moose.
 
 How can I I<hold> your attention?
 
-B<< Type constraint libraries built with Type::Tiny and Type::Library work
-with Moose, Mouse I<and> Moo! >> And because it's such a lightweight library,
-with no dependencies on heavy OO frameworks, it even becomes appealing to use
-in situations where you wouldn't normally consider using a type constraint
+B<< Type constraint libraries built with Type::Tiny work with Moose, Mouse
+I<and> Moo! >> And because it's such a lightweight framework, with no
+dependencies on heavy metaobject protocols, it even becomes appealing to use
+in situations where you might not otherwise consider using a type constraint
 library at all.
+
+Type::Tiny comes bundled with a number of other modules that help round out
+the framework, including:
+
+=over
+
+=item *
+
+L<Type::Library> - a base class for collections of type constraints
+
+=item *
+
+L<Type::Utils> - syntactic sugar for declaring types
+
+=item *
+
+L<Types::Standard> - a library of commonly used types
+
+=item *
+
+L<Test::TypeTiny> - simple functions for testing type constraints work
+
+=back
 
 =head2 Type Constraints?
 
