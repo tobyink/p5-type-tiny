@@ -1,29 +1,10 @@
-package main;
-use strict;
-use warnings;
-use Benchmark qw(cmpthese);
-
-{
-	package Class::WithMoose;
-	use Moose;
-	has attr => (is => "ro", isa => "ArrayRef[Int]");
-	__PACKAGE__->meta->make_immutable;
-}
-
-{
-	package Class::WithMooseAndTypeTiny;
-	use Moose;
-	use Types::Standard -all;
-	has attr => (is => "ro", isa => ArrayRef[Int]);
-	__PACKAGE__->meta->make_immutable;
-}
-
-our %data = ( attr => [1 .. 20] );
-
-cmpthese(-1, {
-	WithMoose            => q{ Class::WithMoose->new(%::data) },
-	WithMooseAndTypeTiny => q{ Class::WithMooseAndTypeTiny->new(%::data) },
-});
+#!/usr/bin/perl
+use TOBYINK::Pod::HTML;
+print "TOBYINK::Pod::HTML"->new(
+	pretty             => 1,
+	code_highlighting  => 1,
+	code_line_numbers  => 0,
+)->file_to_html(__FILE__);
 
 =pod
 
