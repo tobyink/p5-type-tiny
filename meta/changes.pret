@@ -108,11 +108,22 @@
 	issued  2013-04-11;
 	changeset [
 		item "Fix prototype for Type::Utils::as."^^Bugfix;
-		item "BIG, AWESOME CHANGE: no longer need to pass '-moose' parameter when importing a library into a Moose class; only Mouse needs that treatment now."^^Change;
+		item "No longer need to pass '-moose' parameter when importing a library into a Moose class; only Mouse needs that treatment now."^^Change;
 	].
 
 `Type-Tiny 0.000_12 cpan:TOBYINK`
 	issued  2013-04-12;
 	changeset [
 		item "Fix minor typo."^^Documentation;
+	].
+
+`Type-Tiny 0.001 cpan:TOBYINK`
+	issued  2013-04-15;
+	label   "First public release";
+	changeset [
+		item "Minor improvements."^^Documentation;
+		item "Some inline code assumed that it would be compiled in a package that had 'blessed' imported."^^Bugfix;
+		item "Some inline code wasn't wrapped in parentheses."^^Bugfix;
+		item "More test cases for Optional[`a] within Dict[`a]."^^Addition;
+		item "Weaken the reference from a Moose::Meta::TypeConstraint object to its Type::Tiny origin."^^Change;
 	].
