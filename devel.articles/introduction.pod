@@ -50,13 +50,13 @@ OK, probably not that exciting. How can I grab your attention?
 The benchmark script is shown later so you can check I'm not doing anything
 hideously unfair to disadvantage Moose.
 
-How can I hold your attention?
+How can I I<hold> your attention?
 
 B<< Type constraint libraries built with Type::Tiny and Type::Library work
 with Moose, Mouse I<and> Moo! >> And because it's such a lightweight library,
 with no dependencies on heavy OO frameworks, it even becomes appealing to use
-in situations where you wouldn't normally consider a proper type constraint
-library.
+in situations where you wouldn't normally consider using a type constraint
+library at all.
 
 =head2 Type Constraints?
 
