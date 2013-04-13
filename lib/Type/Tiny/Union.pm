@@ -73,7 +73,7 @@ sub can_be_inlined
 sub inline_check
 {
 	my $self = shift;
-	join " or ", map $_->inline_check($_[0]), @$self;
+	sprintf '(%s)', join " or ", map $_->inline_check($_[0]), @$self;
 }
 
 sub _instantiate_moose_type

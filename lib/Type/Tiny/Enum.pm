@@ -58,8 +58,8 @@ sub inline_check
 	my $self = shift;
 	my $regexp = join "|", map quotemeta, @$self;
 	$_[0] eq '$_'
-		? "defined and m{^(?:$regexp)\$}"
-		: "defined($_[0]) and $_[0] =~ m{^(?:$regexp)\$}";
+		? "(defined and m{^(?:$regexp)\$})"
+		: "(defined($_[0]) and $_[0] =~ m{^(?:$regexp)\$})";
 }
 
 sub _instantiate_moose_type
