@@ -100,6 +100,13 @@ should_fail([[]], ArrayRef[Int]);
 should_pass([[3]], ArrayRef[ArrayRef[Int]]);
 should_fail([["A"]], ArrayRef[ArrayRef[Int]]);
 
+my $deep = ArrayRef[HashRef[ArrayRef[HashRef[Int]]]];
+ok($deep->can_be_inlined, "$deep can be inlined");
+
+should_pass([{foo1=>[{bar=>1}]},{foo2=>[{baz=>2}]}], $deep);
+should_pass([{foo1=>[{bar=>1}]},{foo2=>[]}], $deep);
+should_fail([{foo1=>[{bar=>1}]},{foo2=>[2]}], $deep);
+
 should_pass(undef, Maybe[Int]);
 should_pass(123, Maybe[Int]);
 should_fail(1.3, Maybe[Int]);
