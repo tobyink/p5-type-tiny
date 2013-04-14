@@ -63,7 +63,7 @@ Type::Coercion::Union - a set of coercions to a union type constraint
 This package inherits from L<Type::Coercion>; see that for most documentation.
 The major differences are that C<add_type_coercions> always throws an
 exception, and the C<type_coercion_map> is automatically populated from
-the child contraints of the union type constraint.
+the child constraints of the union type constraint.
 
 =head1 BUGS
 

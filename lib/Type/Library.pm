@@ -328,11 +328,11 @@ Returns the Type::Tiny object.
 
 =item C<< is_Foo($value) >>
 
-Returns true iff $value passes the type contraint.
+Returns true iff $value passes the type constraint.
 
 =item C<< assert_Foo($value) >>
 
-Returns true iff $value passes the type contraint. Dies otherwise.
+Returns true iff $value passes the type constraint. Dies otherwise.
 
 =item C<< to_Foo($value) >>
 
