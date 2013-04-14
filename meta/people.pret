@@ -6,5 +6,21 @@ cpan:TOBYINK
 	:name  "Toby Inkster";
 	:mbox  <mailto:tobyink@cpan.org>.
 
+# This dude gets a thanks...
+
 cpan:MSTROUT
 	:name  "Matt S Trout".
+
+# We bundle some files made by these dudes...
+
+cpan:RJBS
+	:name  "Ricardo Signes".
+
+cpan:TOKUHIROM
+	:name  "MATSUNO Tokuhiro".
+
+cpan:NUFFIN
+	:name  "Yuval Kogman".
+
+cpan:INGY
+	:name  "Ingy döt Net".

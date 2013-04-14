@@ -1,0 +1,75 @@
+f`CONTRIBUTING`
+	dc:license <http://dev.perl.org/licenses/>;
+	dc:rightsHolder cpan:TOBYINK.
+
+f`CREDITS`
+	dc:license <http://dev.perl.org/licenses/>;
+	dc:rightsHolder cpan:TOBYINK.
+
+f`Changes`
+	dc:license <http://dev.perl.org/licenses/>;
+	dc:rightsHolder cpan:TOBYINK.
+
+f`LICENSE`
+	dc:license <http://dev.perl.org/licenses/>;
+	dc:rightsHolder cpan:TOBYINK.
+
+f`META.ttl`
+	dc:license <http://dev.perl.org/licenses/>;
+	dc:rightsHolder cpan:TOBYINK.
+
+f`Makefile.PL`
+	dc:license <http://dev.perl.org/licenses/>;
+	dc:rightsHolder cpan:TOBYINK.
+
+f`NEWS`
+	dc:license <http://dev.perl.org/licenses/>;
+	dc:rightsHolder cpan:TOBYINK.
+
+f`README`
+	dc:license <http://dev.perl.org/licenses/>;
+	dc:rightsHolder cpan:TOBYINK.
+
+f`TODO`
+	dc:license <http://dev.perl.org/licenses/>;
+	dc:rightsHolder cpan:TOBYINK.
+
+f`TODO.mm`
+	dc:license <http://dev.perl.org/licenses/>;
+	dc:rightsHolder cpan:TOBYINK.
+
+f`meta/changes.pret`
+	dc:license <http://dev.perl.org/licenses/>;
+	dc:rightsHolder cpan:TOBYINK.
+
+f`meta/doap.pret`
+	dc:license <http://dev.perl.org/licenses/>;
+	dc:rightsHolder cpan:TOBYINK.
+
+f`meta/makefile.pret`
+	dc:license <http://dev.perl.org/licenses/>;
+	dc:rightsHolder cpan:TOBYINK.
+
+f`meta/people.pret`
+	dc:license <http://dev.perl.org/licenses/>;
+	dc:rightsHolder cpan:TOBYINK.
+
+f`meta/rights.pret`
+	dc:license <http://dev.perl.org/licenses/>;
+	dc:rightsHolder cpan:TOBYINK.
+
+f`inc/Test/Fatal.pm`
+	dc:license <http://dev.perl.org/licenses/>;
+	dc:rightsHolder cpan:RJBS.
+
+f`inc/Test/Requires.pm`
+	dc:license <http://dev.perl.org/licenses/>;
+	dc:rightsHolder cpan:TOKUHIROM.
+
+f`inc/Try/Tiny.pm`
+	dc:license <http://dev.perl.org/licenses/>;
+	dc:rightsHolder cpan:NUFFIN.
+
+f`MANIFEST.SKIP`
+	dc:license <http://dev.perl.org/licenses/>;
+	dc:rightsHolder cpan:INGY.
