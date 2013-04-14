@@ -645,7 +645,7 @@ Type::Tiny - tiny, yet Moo(se)-compatible type constraint
    
    package Bullwinkle {
       use Moose;
-      has favourite_number => (is => "ro", isa => $NUM->moose_type);
+      has favourite_number => (is => "ro", isa => $NUM);
    }
    
    package Maisy {
