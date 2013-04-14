@@ -74,7 +74,7 @@ type constraint library.
 
 =head2 Building a Type Library with Type::Library
 
-Let's say we want to build a "natural numbers" type contraint. Natural
+Let's say we want to build a "natural numbers" type constraint. Natural
 numbers are the positive integers plus zero. (The inclusion of zero is
 contentious in some circles, but we'll put that aside for now.) It helps
 that L<Types::Standard> defines an C<Int> type constraint, so rather than
