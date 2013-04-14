@@ -453,6 +453,8 @@ L<Type::Tiny::Manual>.
 
 L<Type::Tiny>, L<Type::Library>, L<Type::Utils>, L<Types::Standard>.
 
+L<Type::Coercion::Union>.
+
 L<Moose::Meta::TypeCoercion>.
 
 =head1 AUTHOR

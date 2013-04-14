@@ -970,7 +970,7 @@ L<Type::Tiny::Manual>.
 L<Type::Library>, L<Type::Utils>, L<Types::Standard>, L<Type::Coercion>.
 
 L<Type::Tiny::Class>, L<Type::Tiny::Role>, L<Type::Tiny::Duck>,
-L<Type::Tiny::Enum>, L<Type::Tiny::Union>.
+L<Type::Tiny::Enum>, L<Type::Tiny::Union>, L<Type::Tiny::Intersection>.
 
 L<Moose::Meta::TypeConstraint>,
 L<Mouse::Meta::TypeConstraint>.
