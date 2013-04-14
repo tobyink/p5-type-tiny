@@ -24,6 +24,7 @@ use warnings;
 use lib qw( . ./t ../inc ./inc );
 
 use Test::More;
+use Test::Fatal;
 use Test::TypeTiny;
 
 use Types::Standard -all;
@@ -124,5 +125,29 @@ should_fail(bless([], "Local::Class4"), Ref["HASH"]);
 should_fail(bless({}, "Local::Class4"), Ref["ARRAY"]);
 should_fail([], Ref["HASH"]);
 should_fail({}, Ref["ARRAY"]);
+
+like(
+	exception { ArrayRef["Int"] },
+	qr{^Parameter to ArrayRef\[\`a\] expected to be a type constraint; got Int},
+	qq{ArrayRef["Int"] is not a valid type constraint},
+);
+
+like(
+	exception { HashRef[[]] },
+	qr{^Parameter to HashRef\[\`a\] expected to be a type constraint; got ARRAY},
+	qq{HashRef[[]] is not a valid type constraint},
+);
+
+like(
+	exception { ScalarRef[undef] },
+	qr{^Parameter to ScalarRef\[\`a\] expected to be a type constraint; got},
+	qq{ScalarRef[undef] is not a valid type constraint},
+);
+
+like(
+	exception { Ref[{}] },
+	qr{^Parameter to Ref\[\`a\] expected to be string; got HASH},
+	qq{Ref[{}] is not a valid type constraint},
+);
 
 done_testing;

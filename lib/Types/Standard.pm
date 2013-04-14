@@ -9,11 +9,11 @@ BEGIN {
 }
 
 use base "Type::Library";
-use Type::Utils;
-
 our @EXPORT_OK = qw( slurpy );
 
 use Scalar::Util qw( blessed looks_like_number );
+use Type::Utils;
+use Types::TypeTiny ();
 
 sub _is_class_loaded {
 	return !!0 if ref $_[0];
@@ -26,6 +26,15 @@ sub _is_class_loaded {
 	}
 	return !!0;
 }
+
+sub _croak ($;@)
+{
+	require Carp;
+	@_ = sprintf($_[0], @_[1..$#_]) if @_ > 1;
+	goto \&Carp::croak;
+}
+
+no warnings;
 
 declare "Any",
 	_is_core => 1,
@@ -97,6 +106,10 @@ declare "Ref",
 	constraint_generator => sub
 	{
 		my $reftype = shift;
+		Types::TypeTiny::StringLike->check($reftype)
+			or _croak("Parameter to Ref[`a] expected to be string; got $reftype");
+		
+		$reftype = "$reftype";
 		return sub {
 			ref($_[0]) and Scalar::Util::reftype($_[0]) eq $reftype;
 		}
@@ -147,7 +160,10 @@ declare "ArrayRef",
 	inline_as { "ref($_) eq 'ARRAY'" },
 	constraint_generator => sub
 	{
-		my $param = shift;
+		my $param = Types::TypeTiny::to_TypeTiny(shift);
+		Types::TypeTiny::TypeTiny->check($param)
+			or _croak("Parameter to ArrayRef[`a] expected to be a type constraint; got $param");
+		
 		return sub
 		{
 			my $array = shift;
@@ -178,7 +194,10 @@ declare "HashRef",
 	inline_as { "ref($_) eq 'HASH'" },
 	constraint_generator => sub
 	{
-		my $param = shift;
+		my $param = Types::TypeTiny::to_TypeTiny(shift);
+		Types::TypeTiny::TypeTiny->check($param)
+			or _croak("Parameter to HashRef[`a] expected to be a type constraint; got $param");
+		
 		return sub
 		{
 			my $hash = shift;
@@ -209,7 +228,10 @@ declare "ScalarRef",
 	inline_as { "ref($_) eq 'SCALAR' or ref($_) eq 'REF'" },
 	constraint_generator => sub
 	{
-		my $param = shift;
+		my $param = Types::TypeTiny::to_TypeTiny(shift);
+		Types::TypeTiny::TypeTiny->check($param)
+			or _croak("Parameter to ScalarRef[`a] expected to be a type constraint; got $param");
+		
 		return sub
 		{
 			my $ref = shift;
@@ -238,7 +260,10 @@ declare "Maybe",
 	as "Item",
 	constraint_generator => sub
 	{
-		my $param = shift;
+		my $param = Types::TypeTiny::to_TypeTiny(shift);
+		Types::TypeTiny::TypeTiny->check($param)
+			or _croak("Parameter to Maybe[`a] expected to be a type constraint; got $param");
+		
 		return sub
 		{
 			my $value = shift;
@@ -262,7 +287,12 @@ declare "Map",
 	inline_as { "ref($_) eq 'HASH'" },
 	constraint_generator => sub
 	{
-		my ($keys, $values) = @_;
+		my ($keys, $values) = map Types::TypeTiny::to_TypeTiny($_), @_;
+		Types::TypeTiny::TypeTiny->check($keys)
+			or _croak("First parameter to Map[`k,`v] expected to be a type constraint; got $keys");
+		Types::TypeTiny::TypeTiny->check($values)
+			or _croak("Second parameter to Map[`k,`v] expected to be a type constraint; got $values");
+		
 		return sub
 		{
 			my $hash = shift;
@@ -295,7 +325,10 @@ declare "Optional",
 	as "Item",
 	constraint_generator => sub
 	{
-		my $param = shift;
+		my $param = Types::TypeTiny::to_TypeTiny(shift);
+		Types::TypeTiny::TypeTiny->check($param)
+			or _croak("Parameter to Optional[`a] expected to be a type constraint; got $param");
+		
 		sub { exists($_[0]) ? $param->check($_[0]) : !!1 }
 	},
 	inline_generator => sub {
@@ -325,9 +358,18 @@ declare "Tuple",
 		my $slurpy;
 		if (exists $constraints[-1] and ref $constraints[-1] eq "HASH")
 		{
-			$slurpy = pop(@constraints)->{slurpy};
+			$slurpy = Types::TypeTiny::to_TypeTiny(pop(@constraints)->{slurpy});
+			Types::TypeTiny::TypeTiny->check($slurpy)
+				or _croak("Slurpy parameter to Tuple[...] expected to be a type constraint; got $slurpy");
 		}
-		
+
+		@constraints = map Types::TypeTiny::to_TypeTiny($_), @constraints;
+		for (@constraints)
+		{
+			Types::TypeTiny::TypeTiny->check($_)
+				or _croak("Parameters to Tuple[...] expected to be type constraints; got $_");
+		}
+			
 		return sub
 		{
 			my $value = $_[0];
@@ -380,6 +422,14 @@ declare "Dict",
 	constraint_generator => sub
 	{
 		my %constraints = @_;
+		
+		while (my ($k, $v) = each %constraints)
+		{
+			$constraints{$k} = Types::TypeTiny::to_TypeTiny($v);
+			Types::TypeTiny::TypeTiny->check($v)
+				or _croak("Parameter to Dict[`a] for key '$k' expected to be a type constraint; got $v");
+		}
+		
 		return sub
 		{
 			my $value = $_[0];
@@ -421,7 +471,12 @@ declare "Overload",
 	inline_as { "Scalar::Util::blessed($_) and overload::Overloaded($_)" },
 	constraint_generator => sub
 	{
-		my @operations = @_;
+		my @operations = map {
+			Type::Tiny::StringLike->check($_)
+				? "$_"
+				: _croak("Parameters to Overload[`a] expected to be a strings; got $_");
+		} @_;
+		
 		return sub {
 			my $value = shift;
 			for my $op (@operations) {
@@ -445,6 +500,17 @@ declare "StrMatch",
 	constraint_generator => sub
 	{
 		my ($regexp, $checker) = @_;
+		
+		ref($regexp) eq 'Regexp'
+			or _croak("First parameter to StrMatch[`a] expected to be a Regexp; got $regexp");
+
+		if (@_ > 1)
+		{
+			$checker = Type::Tiny::to_TypeTiny($checker);
+			Type::Tiny::TypeTiny->check($checker)
+				or _croak("Second parameter to StrMatch[`a] expected to be a type constraint; got $checker")
+		}
+
 		$checker
 			? sub {
 				my $value = shift;
