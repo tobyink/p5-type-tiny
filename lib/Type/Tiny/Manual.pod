@@ -8,7 +8,7 @@ Type::Tiny::Manual - an overview of Type::Tiny
 
 =head1 SYNOPSIS
 
-Type::Tiny is a small framework for writing type constraints and organising
+Type::Tiny is a small framework for writing type constraints and organizing
 them into type libraries. Although inspired by Moose's type constraint API,
 it has no non-core dependencies, and can be used with L<Moose>, L<Mouse> and
 L<Moo>.
