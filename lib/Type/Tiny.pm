@@ -758,6 +758,10 @@ L<Moose::Meta::TypeConstraint> or L<Mouse::Meta::TypeConstraint>.
 Generally speaking this attribute should not be passed to the constructor;
 you should rely on the default lazily-built objects.
 
+It should rarely be necessary to obtain a L<Moose::Meta::TypeConstraint>
+object from L<Type::Tiny> because the L<Type::Tiny> object itself should
+be usable pretty much anywhere a L<Moose::Meta::TypeConstraint> is expected.
+
 =back
 
 The following additional attributes are used for parameterizable (e.g.
