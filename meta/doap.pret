@@ -12,7 +12,16 @@
 	:created              2013-03-23;
 	:license              <http://dev.perl.org/licenses/>;
 	:maintainer           cpan:TOBYINK;
-	:developer            cpan:TOBYINK.
+	:developer            cpan:TOBYINK;
+	:category
+		[ label "Moo" ],
+		[ label "Moose" ],
+		[ label "Mouse" ],
+		[ label "Type Constraint" ],
+		[ label "Type Coercion" ],
+		[ label "Type Library" ],
+		[ label "Schema" ],
+		[ label "Validation" ].
 
 <http://dev.perl.org/licenses/>
 	dc:title  "the same terms as the perl 5 programming language system itself".
