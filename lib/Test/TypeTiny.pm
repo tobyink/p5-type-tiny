@@ -8,26 +8,41 @@ our $VERSION   = '0.001';
 
 our @EXPORT = qw( should_pass should_fail ok_subtype );
 
+sub _mk_message
+{
+	require B;
+	my ($template, $value) = @_;
+	sprintf(
+		$template,
+		!defined $value      ? 'undef' :
+		!ref $value          ? sprintf('value %s', B::perlstring($value)) :
+		do {
+			require Data::Dumper;
+			local $Data::Dumper::Indent   = 0;
+			local $Data::Dumper::Useqq    = 1;
+			local $Data::Dumper::Terse    = 1;
+			local $Data::Dumper::Maxdepth = 2;
+			Data::Dumper::Dumper($value)
+		}
+	);
+}
+
 sub should_pass
 {
-	my ($value, $type) = @_;
+	my ($value, $type, $message) = @_;
 	@_ = (
 		!!$type->check($value),
-		defined $value
-			? sprintf("value '%s' passes type constraint '%s'", $value, $type)
-			: sprintf("undef passes type constraint '%s'", $type),
+		$message || _mk_message("%s passes type constraint $type", $value),
 	);
 	goto \&Test::More::ok;
 }
 
 sub should_fail
 {
-	my ($value, $type) = @_;
+	my ($value, $type, $message) = @_;
 	@_ = (
 		!$type->check($value),
-		defined $value
-			? sprintf("value '%s' fails type constraint '%s'", $value, $type)
-			: sprintf("undef fails type constraint '%s'", $type),
+		$message || _mk_message("%s fails type constraint $type", $value),
 	);
 	goto \&Test::More::ok;
 }
@@ -80,7 +95,11 @@ L<Test::TypeTiny> provides a few handy functions for testing type constraints.
 
 =over
 
+=item C<< should_pass($value, $type, $test_name) >>
+
 =item C<< should_pass($value, $type) >>
+
+=item C<< should_fail($value, $type, $test_name) >>
 
 =item C<< should_fail($value, $type) >>
 
