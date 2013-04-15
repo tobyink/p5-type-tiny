@@ -1,3 +1,4 @@
+use v5.10;
 use strict;
 use warnings;
 
@@ -6,95 +7,194 @@ BEGIN {
 	no thanks;
 	
 	use Carp qw(croak);
-	use Devel::Caller qw(caller_args);
+	use Eval::Closure qw();
+	use Scalar::Util qw(refaddr);
 	use Types::Standard -types;
 	use Types::TypeTiny qw(to_TypeTiny);
 	
-	use base "Exporter";
-	our @EXPORT = qw( check );
-	our @EXPORT_OK = qw( _check );
+	use Sub::Exporter::Progressive -setup => {
+		exports  => ['validate', 'compile_validation'],
+		groups   => {
+			default => ['validate'],
+		},
+	};
 	
-	sub check
+	sub _mkslurpy
 	{
-		my @args      = ArrayRef->check($_[0])  ? @{+shift} : caller_args(1);
-		my $carplevel = ScalarRef->check($_[0]) ? ${+shift} : 1;
-		my @return;
+		my ($name, $type, $tc, $i) = @_;
+		$type eq '@'
+			? sprintf(
+				'%s = [ @_[%d..$#_] ];',
+				$name,
+				$i,
+			)
+			: sprintf(
+				'%s = $#_-%d==0 ? $croaker->("Odd number of elements in %s") : +{ @_[%d..$#_] };',
+				$name,
+				$i,
+				$tc,
+				$i,
+			);
+	}
+	
+	sub compile_validation
+	{
+		my @C = @{$_[0]};
 		
-		my $signature = join ", ", map { ref($_) eq 'HASH' ? "slurpy $_->{slurpy}" : "$_" } @_;
-
-		local $Carp::Internal{+__PACKAGE__} = 1;
-
-		while (@_)
+		my (@code, %env);
+		@code = 'my (@R, %tmp, $tmp);';
+		$env{'$croaker'} = \sub {
+			local $Carp::CarpLevel = 4;
+			Carp::croak($_[0]);
+		};
+		my $arg = -1;
+		
+		while (@C)
 		{
-			my $constraint = shift;
+			++$arg;
+			my $constraint = shift @C;
+			my $is_optional;
+			my $varname;
 			
 			if (HashRef->check($constraint))
 			{
 				$constraint = to_TypeTiny($constraint->{slurpy});
-				my $arg =
-					$constraint->is_a_type_of(HashRef)  ? +{@args % 2 ? croak("Odd number of elements for slurpy $constraint") : @args } :
-					$constraint->is_a_type_of(Dict)     ? +{@args % 2 ? croak("Odd number of elements for slurpy $constraint") : @args } :
-					$constraint->is_a_type_of(Map)      ? +{@args % 2 ? croak("Odd number of elements for slurpy $constraint") : @args } :
-					$constraint->is_a_type_of(ArrayRef) ? +[@args] :
-					$constraint->is_a_type_of(Tuple)    ? +[@args] :
+				push @code,
+					$constraint->is_a_type_of(HashRef)  ? _mkslurpy('$_', '%', HashRef  => $arg) :
+					$constraint->is_a_type_of(Dict)     ? _mkslurpy('$_', '%', Dict     => $arg) :
+					$constraint->is_a_type_of(Map)      ? _mkslurpy('$_', '%', Map      => $arg) :
+					$constraint->is_a_type_of(ArrayRef) ? _mkslurpy('$_', '@', ArrayRef => $arg) :
+					$constraint->is_a_type_of(Tuple)    ? _mkslurpy('$_', '@', Tuple    => $arg) :
 					croak("Slurpy parameter not of type HashRef or ArrayRef");
-				
-				local $Carp::CarpLevel = $carplevel + 2;
-				push @return,
-					$constraint->has_coercion       ? $constraint->assert_coerce($arg) :
-					$constraint->assert_valid($arg) ? $arg : undef;
-				@args = ();
-				next;
+				$varname = '$_';
 			}
-			
-			$constraint = to_TypeTiny($constraint);
-			my $is_optional = grep $_->{uniq} == Optional->{uniq}, $constraint->parents;
-			
-			if (not @args)
+			else
 			{
-				if (not $is_optional)
+				$is_optional = grep $_->{uniq} == Optional->{uniq}, $constraint->parents;
+				
+				if ($is_optional)
 				{
-					local $Carp::CarpLevel = $carplevel + 1;
-					croak("Wrong number of arguments (sub signature: $signature)");
-					next;  # never happens??
+					push @code, sprintf 'return @R if $#_ < %d;', $arg;
 				}
-				return @return;
+				
+				$varname = sprintf '$_[%d]', $arg;
 			}
 			
-			my @arg = @args ? shift(@args) : ();
+			if ($constraint->has_coercion and $constraint->coercion->can_be_inlined)
+			{
+				push @code, sprintf(
+					'$tmp%s = %s;',
+					($is_optional ? '{x}' : ''),
+					$constraint->coercion->inline_coercion($varname)
+				);
+				$varname = '$tmp'.($is_optional ? '{x}' : '');
+			}
+			elsif ($constraint->has_coercion)
+			{
+				$env{'@coerce'}[$arg] = $constraint->coercion->compiled_coercion;
+				push @code, sprintf(
+					'$tmp%s = $coerce[%d]->(%s);',
+					($is_optional ? '{x}' : ''),
+					$arg,
+					$varname,
+				);
+				$varname = '$tmp'.($is_optional ? '{x}' : '');
+			}
+
+			if ($constraint->can_be_inlined)
+			{
+				push @code, sprintf(
+					'(%s) or $croaker->("Value \\"%s\\" in $_[%d] does not meet type constraint \\"%s\\"");',
+					$constraint->inline_check($varname),
+					$varname,
+					$arg,
+					$constraint,
+				);
+			}
+			else
+			{
+				$env{'@check'}[$arg] = $constraint->compiled_check;
+				push @code, sprintf(
+					'%s or $croaker->("Value \\"%s\\" in $_[%d] does not meet type constraint \\"%s\\"");',
+					sprintf(sprintf '$check[%d]->(%s)', $arg, $varname),
+					$varname,
+					$arg,
+					$constraint,
+				);
+			}
 			
-			local $Carp::CarpLevel = 3;
-			push @return,
-				$constraint->has_coercion       ? $constraint->assert_coerce(@arg) :
-				$constraint->assert_valid(@arg) ? $arg[0] : undef;
+			push @code, sprintf 'push @R, %s;', $varname;
 		}
 		
-		return (@return, @args);
+		push @code, '@R;';
+		
+		my $comment = sprintf('line 0 "parameter validation for %s"', [caller 1]->[3]);
+		my $source  = "# $comment\nsub { no warnings; ".join("\n", @code)." };";
+		
+		return Eval::Closure::eval_closure(
+			source      => $source,
+			environment => \%env,
+		);
 	}
 	
-	*_check = \&check;
+	my %compiled;
+	sub validate
+	{
+		($compiled{ join ":", map($_->{uniq}||"\@$_->{slurpy}", @{$_[1]}) }
+			||= compile_validation $_[1])->(@{$_[0]})
+	}	
 };
 
+BEGIN {
+	$ENV{PARAMS_VALIDATE_IMPLEMENTATION} = 'XS';
+};
+
+use Benchmark qw(cmpthese);
 use Data::Dumper;
-use Type::Check qw( _check );
+use IO::Handle;
+use Params::Validate qw( validate_pos ARRAYREF SCALAR );
+use Type::Check compile_validation => {}, validate => { -as => "check" };
 use Type::Utils;
 use Types::Standard qw( -types slurpy );
 
-my $RoundedInt = declare RoundedInt => as Int;
-coerce $RoundedInt, from Num, q{ int($_) };
-
-sub foo {
-	my ($name, $age, $bits) = _check(Str, $RoundedInt, slurpy HashRef[Int]);
-	
-	print Dumper {
-		name  => $name,
-		age   => $age,
-		bits  => $bits,
-	};
+sub foo1
+{
+	state $spec = [
+		ArrayRef[Int],
+		duck_type(PrintAndSay => ["print", "say"]),
+		declare(SmallInt => as Int, where { $_ < 90 }, inline_as { $_[0]->parent->inline_check($_)." and $_ < 90" }),
+	];
+	my @in = check(\@_, $spec);
 }
 
-sub bar {
-	foo("Bob", 32.5, foo => 1);
+sub foo2
+{
+	state $spec = [
+		{ type => ARRAYREF, callbacks => { 'all ints' => sub { !grep !/^\d+$/, @{+shift} } } },
+		{ can  => ["print", "say"] },
+		{ type => SCALAR, regex => qr{^\d+$}, callbacks => { 'less than 90' => sub { shift() < 90 } } },
+	];
+	my @in = validate_pos(@_, @$spec);
 }
 
-bar();
+sub foo3
+{
+	state $spec = compile_validation [
+		ArrayRef[Int],
+		duck_type(PrintAndSay => ["print", "say"]),
+		declare(SmallInt => as Int, where { $_ < 90 }, inline_as { $_[0]->parent->inline_check($_)." and $_ < 90" }),
+	];
+	my @in = $spec->(@_);
+}
+
+our @data = (
+	[1, 2, 3],
+	IO::Handle->new,
+	50,
+);
+
+cmpthese(-1, {
+	'Type::Check'       => q{ foo1(@::data) },
+	'Params::Validate'  => q{ foo2(@::data) },
+	'Type::Check 2'     => q{ foo3(@::data) },
+});
