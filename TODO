@@ -5,7 +5,6 @@
               * creating type constraints using Type::Utils
               * coercions
           * better coercion docs
-      * integration with MooX-late
       * new type constraints for Types::Standard
           * Chars - i.e. strings where the UTF-8 bit is on
           * Bytes - i.e. strings where the UTF-8 bit is off
@@ -18,7 +17,6 @@
       * coercion
           * Auto-coercion
               * needs documenting
-              * needs merge with tip
           * First-class coercions
               * moar docs
               * moar tests
@@ -28,10 +26,7 @@
           * test cases
           * benchmark versus Params::Validate
               * much faster, even compared to Params::Validate::XS
-      * improve speed for non-inlineable type constraints coercions
+      * improve speed for non-inlineable type constraints and coercions
           * maybe use eval context idea from Type::Check
-      * release 0.001
-          * Mon 15th April?
-          * publish intro blog article
       * Type-Tiny could be used as a backend for Scalar::Does?
           * if not, certainly a SEE ALSO
