@@ -30,7 +30,7 @@ use lib qw( ./lib ./t/lib ../inc ./inc );
 use Test::More;
 use Test::Fatal;
 
-use BiggerLib -types;
+use BiggerLib -types, -coercions;
 
 is(
 	BigInteger->coercion->coerce(2),
@@ -118,6 +118,53 @@ like(
 	exception { BigInteger->assert_coerce({}) },
 	qr{^value "HASH\(\w+\)" did not pass type constraint "BigInteger"},
 	"assert_coerce DOES throw an exception if it can't coerce",
+);
+
+isa_ok(
+	ArrayRefFromAny,
+	'Type::Coercion',
+	'ArrayRefFromAny',
+);
+
+is_deeply(
+	ArrayRefFromAny->coerce(1),
+	[1],
+	'ArrayRefFromAny coercion works',
+);
+
+my $sum1 = ArrayRefFromAny + ArrayRefFromPiped;
+is_deeply(
+	$sum1->coerce("foo|bar"),
+	["foo|bar"],
+	"Coercion $sum1 prioritizes ArrayRefFromAny",
+);
+
+my $sum2 = ArrayRefFromPiped + ArrayRefFromAny;
+is_deeply(
+	$sum2->coerce("foo|bar"),
+	["foo","bar"],
+	"Coercion $sum2 prioritizes ArrayRefFromPiped",
+);
+
+my $arr = (ArrayRef) + (ArrayRefFromAny);
+is_deeply(
+	$arr->coerce("foo|bar"),
+	["foo|bar"],
+	"Type \$arr coercion works",
+);
+
+my $sum3 = ($arr) + (ArrayRefFromPiped);
+is_deeply(
+	$sum3->coerce("foo|bar"),
+	["foo|bar"],
+	"Type \$sum3 coercion works",
+);
+
+my $sum4 = (ArrayRefFromPiped) + ($arr);
+is_deeply(
+	$sum4->coerce("foo|bar"),
+	["foo","bar"],
+	"Type \$sum4 coercion works",
 );
 
 done_testing;

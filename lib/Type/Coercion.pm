@@ -20,8 +20,10 @@ sub _croak ($;@)
 }
 
 use overload
+	q("")      => sub { caller =~ m{^(Moo::HandleMoose|Sub::Quote)} ? overload::StrVal($_[0]) : $_[0]->display_name },
+	q(bool)    => sub { 1 },
 	q(&{})     => "_overload_coderef",
-	q(bool)    => sub { !!1 },
+	q(+)       => sub { __PACKAGE__->add(@_) },
 	fallback   => 1,
 ;
 BEGIN {
@@ -41,22 +43,82 @@ sub new
 {
 	my $class  = shift;
 	my %params = (@_==1) ? %{$_[0]} : @_;
+	
+	$params{name} = '__ANON__' unless exists $params{name};
+	
 	my $self   = bless \%params, $class;
 	Scalar::Util::weaken($self->{type_constraint}); # break ref cycle
 	return $self;
 }
 
+sub name                { $_[0]{name} }
+sub display_name        { $_[0]{display_name}      ||= $_[0]->_build_display_name }
+sub library             { $_[0]{library} }
 sub type_constraint     { $_[0]{type_constraint} }
 sub type_coercion_map   { $_[0]{type_coercion_map} ||= [] }
 sub moose_coercion      { $_[0]{moose_coercion}    ||= $_[0]->_build_moose_coercion }
 sub compiled_coercion   { $_[0]{compiled_coercion} ||= $_[0]->_build_compiled_coercion }
+sub frozen              { $_[0]{frozen}            ||= 0 }
 
+sub has_library         { exists $_[0]{library} }
 sub has_type_constraint { defined $_[0]{type_constraint} } # sic
+
+sub add
+{
+	my $class = shift;
+	my ($x, $y, $swap) = @_;
+	
+	TypeTiny->check($x) and return $x->plus_fallback_coercions($y);
+	TypeTiny->check($y) and return $y->plus_coercions($x);
+	
+	_croak "Attempt to add $class to something that is not a $class"
+		unless blessed($x) && blessed($y) && $x->isa($class) && $y->isa($class);
+
+	($y, $x) = ($x, $y) if $swap;
+
+	my %opts;
+	if ($x->has_type_constraint and $y->has_type_constraint and $x->type_constraint == $y->type_constraint)
+	{
+		$opts{type_constraint} = $x->type_constraint;
+	}
+	$opts{name} ||= "$x+$y";
+	$opts{name} = '__ANON__' if $opts{name} eq '__ANON__+__ANON__';
+	
+	my $new = $class->new(%opts);
+	$new->add_type_coercions( @{$x->type_coercion_map} );
+	$new->add_type_coercions( @{$y->type_coercion_map} );
+	return $new;
+}
+
+sub _build_display_name
+{
+	shift->name;
+}
+
+sub qualified_name
+{
+	my $self = shift;
+	
+	if ($self->has_library and not $self->is_anon)
+	{
+		return sprintf("%s::%s", $self->library, $self->name);
+	}
+	
+	return $self->name;
+}
+
+sub is_anon
+{
+	my $self = shift;
+	$self->name eq "__ANON__";
+}
 
 sub _clear_compiled_coercion {
 	delete $_[0]{_overload_coderef};
 	delete $_[0]{compiled_coercion};
 }
+
+sub freeze { $_[0]{frozen} = 1; $_[0] }
 
 sub coerce
 {
@@ -110,14 +172,17 @@ sub add_type_coercions
 	my $self = shift;
 	my @args = @_;
 	
+	_croak "Attempt to add coercion code to a Type::Coercion which has been frozen"
+		if $self->frozen;
+	
 	while (@args)
 	{
 		my $type     = to_TypeTiny(shift @args);
 		my $coercion = shift @args;
 		
-		_croak "types must be blessed Type::Tiny objects"
+		_croak "Types must be blessed Type::Tiny objects"
 			unless TypeTiny->check($type);
-		_croak "coercions must be code references"
+		_croak "Coercions must be code references or strings"
 			unless StringLike->check($coercion) || CodeLike->check($coercion);
 		
 		push @{$self->type_coercion_map}, $type, $coercion;
@@ -197,7 +262,7 @@ sub inline_coercion
 	my $self = shift;
 	my $varname = $_[0];
 	
-	_croak "this coercion cannot be inlined" unless $self->can_be_inlined;
+	_croak "This coercion cannot be inlined" unless $self->can_be_inlined;
 	
 	my @mishmash = @{$self->type_coercion_map};
 	return "($varname)" unless @mishmash;
@@ -234,7 +299,7 @@ sub _build_moose_coercion
 	my $self = shift;
 	
 	my %options = ();
-	$options{type_coercion_map} = [ $self->_codelike_type_coercion_map('moose_type') ];
+	$options{type_coercion_map} = [ $self->freeze->_codelike_type_coercion_map('moose_type') ];
 	$options{type_constraint}   = $self->type_constraint if $self->has_type_constraint;
 	
 	require Moose::Meta::TypeCoercion;
@@ -328,7 +393,7 @@ Type::Coercion - a set of coercions to a particular target type constraint
 
 =head1 DESCRIPTION
 
-=head2 Constructor
+=head2 Constructors
 
 =over
 
@@ -336,11 +401,27 @@ Type::Coercion - a set of coercions to a particular target type constraint
 
 Moose-style constructor function.
 
+=item C<< add($c1, $c2) >>
+
+Create a Type::Coercion from two existing Type::Coercion objects.
+
 =back
 
 =head2 Attributes
 
 =over
+
+=item C<name>
+
+TODO.
+
+=item C<display_name>
+
+TODO.
+
+=item C<library>
+
+TODO.
 
 =item C<type_constraint>
 
@@ -365,15 +446,29 @@ pretty fast coderef, inlining all type constraint checks, etc.
 A L<Moose::Meta::TypeCoercion> object equivalent to this one. Don't set this
 manually; rely on the default built one.
 
+=item C<frozen>
+
+Boolean; default false. A frozen coercion cannot have C<add_type_coercions>
+called upon it.
+
 =back
 
 =head2 Methods
 
 =over
 
-=item C<has_type_constraint>
+=item C<has_type_constraint>, C<has_library>
 
-Predicate method.
+Predicate methods.
+
+=item C<is_anon>
+
+TODO.
+
+=item C<< qualified_name >>
+
+For non-anonymous coercions that have a library, returns a qualified
+C<< "Library::Type" >> sort of name. Otherwise, returns the same as C<name>.
 
 =item C<< add_type_coercions($type1, $code1, ...) >>
 
@@ -417,6 +512,11 @@ Returns true iff the coercion can be inlined.
 
 Much like C<inline_coerce> from L<Type::Tiny>.
 
+=item C<< freeze >>
+
+Set C<frozen> to true. There is no C<unfreeze>. Called automatically by
+L<Type::Tiny> sometimes.
+
 =item C<< isa($class) >>, C<< can($method) >>, C<< AUTOLOAD(@args) >>
 
 If Moose is loaded, then the combination of these methods is used to mock
@@ -439,6 +539,48 @@ Coderefification is overloaded to call C<coerce>.
 =item *
 
 On Perl 5.10.1 and above, smart match is overloaded to call C<has_coercion_for_value>.
+
+=item *
+
+Addition is overloaded to call C<add>.
+
+=back
+
+=head1 DIAGNOSTICS
+
+=over
+
+=item B<< Attempt to add coercion code to a Type::Coercion which has been frozen >>
+
+Type::Tiny type constraints are designed as immutable objects. Once you've
+created a constraint, rather than modifying it you generally create child
+constraints to do what you need.
+
+Type::Coercion objects, on the other hand, are mutable. Coercion routines
+can be added at any time during the object's lifetime.
+
+Sometimes Type::Tiny needs to freeze a Type::Coercion object to prevent this.
+In L<Moose> and L<Mouse> code this is likely to happen as soon as you use a
+type constraint in an attribute.
+
+Workarounds:
+
+=over
+
+=item *
+
+Define as many of your coercions as possible within type libraries, not
+within the code that uses the type libraries. The type library will be
+evaluated relatively early, likely before there is any reason to freeze
+a coercion.
+
+=item *
+
+If you do need to add coercions to a type within application code outside
+the type library, instead create a subtype and add coercions to that. The
+C<plus_coercions> method provided by L<Type::Tiny> should make this simple.
+
+=back
 
 =back
 

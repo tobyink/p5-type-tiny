@@ -60,11 +60,13 @@ sub _process_tags
 		elsif ($arg =~ /^[:-]base/i)
 			{ $opts->{base} = 1 }
 		elsif ($arg =~ /^[:-]all$/i)
-			{ push @exports, map $optify->($_), map { $_, "is_$_", "to_$_", "assert_$_" } $meta->type_names }
+			{ push @exports, map $optify->($_), $meta->coercion_names, map { $_, "is_$_", "to_$_", "assert_$_" } $meta->type_names }
 		elsif ($arg =~ /^[:-](assert|is|to)$/i)
 			{ push @exports, map $optify->($_), map "$1\_$_", $meta->type_names }
 		elsif ($arg =~ /^[:-]types$/i)
 			{ push @exports, map $optify->($_), $meta->type_names }
+		elsif ($arg =~ /^[:-]coercions$/i)
+			{ push @exports, map $optify->($_), $meta->coercion_names }
 		elsif ($arg =~ /^\+(.+)$/i)
 			{ push @exports, map $optify->($_), map { $_, "is_$_", "to_$_", "assert_$_" } $1 }
 		else
@@ -144,6 +146,11 @@ sub _export
 		}
 	}
 	
+	elsif (my $c = $meta->get_coercion($sub->{sub}))
+	{
+		$export_coderef = _subname $c->qualified_name, sub () { $c }
+	}
+	
 	elsif (scalar grep($_ eq $sub->{sub}, $class->_EXPORT_OK) and my $additional = $class->can($sub->{sub}))
 	{
 		$export_coderef = $additional;
@@ -184,8 +191,9 @@ sub add_type
 	my $name = $type->name;
 	
 	$meta->{types} ||= {};
-	_croak 'type %s already exists in this library', $name if exists $meta->{types}{$name};
-	_croak 'cannot add anonymous type to a library' if $type->is_anon;
+	_croak 'Type %s already exists in this library', $name if $meta->has_type($name);
+	_croak 'Type %s conflicts with coercion of same name', $name if $meta->has_coercion($name);
+	_croak 'Cannot add anonymous type to a library' if $type->is_anon;
 	$meta->{types}{$name} = $type;
 	
 	no strict "refs";
@@ -210,6 +218,8 @@ sub add_type
 	# There is an inlined version available, but don't use that because
 	# additional coercions can be added *after* the type has been installed
 	# into the library.
+	#
+	# XXX: maybe we can use it if the coercion is frozen???
 	#
 	*{"$class\::to_$name"} = _subname $type->qualified_name, sub ($)
 	{
@@ -240,6 +250,44 @@ sub type_names
 {
 	my $meta = shift->meta;
 	keys %{ $meta->{types} };
+}
+
+sub add_coercion
+{
+	my $meta = shift->meta;
+	my $c    = blessed($_[0]) ? $_[0] : "Type::Coercion"->new(@_);
+	my $name = $c->name;
+
+	$meta->{coercions} ||= {};
+	_croak 'Coercion %s already exists in this library', $name if $meta->has_coercion($name);
+	_croak 'Coercion %s conflicts with type of same name', $name if $meta->has_type($name);
+	_croak 'Cannot add anonymous type to a library' if $c->is_anon;
+	$meta->{coercions}{$name} = $c;
+
+	no strict "refs";
+	no warnings "redefine";
+	my $class = blessed($meta);
+	*{"$class\::$name"} = _subname $c->qualified_name, sub () { $c };
+	
+	return $c;
+}
+
+sub get_coercion
+{
+	my $meta = shift->meta;
+	$meta->{coercions}{$_[0]};
+}
+
+sub has_coercion
+{
+	my $meta = shift->meta;
+	exists $meta->{coercions}{$_[0]};
+}
+
+sub coercion_names
+{
+	my $meta = shift->meta;
+	keys %{ $meta->{coercions} };
 }
 
 1;
@@ -351,6 +399,35 @@ Boolean; returns true if the type exists in the library.
 =item C<< type_names >>
 
 List all types defined by the library.
+
+=item C<< add_coercion($c) >> or C<< add_coercion(%opts) >>
+
+Add a standalone coercion to the library. If C<< %opts >> is given, then
+this method calls C<< Type::Coercion->new(%opts) >> first, and adds the
+resultant coercion.
+
+Adding a coercion named "FooFromBar" to the library will automatically
+define a function in the library's namespace:
+
+=over
+
+=item C<< FooFromBar >>
+
+Returns the Type::Coercion object.
+
+=back
+
+=item C<< get_coercion($name) >>
+
+Gets the C<Type::Coercion> object corresponding to the name.
+
+=item C<< has_coercion($name) >>
+
+Boolean; returns true if the coercion exists in the library.
+
+=item C<< coercion_names >>
+
+List all standalone coercions defined by the library.
 
 =item C<< import(@args) >>
 
