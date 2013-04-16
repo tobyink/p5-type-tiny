@@ -116,6 +116,9 @@ L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
 
 L<Type::Tiny>.
 
+For an alternative to C<should_pass>, see L<Test::Deep::Type> which will
+happily accept a Type::Tiny type constraint instead of a MooseX::Types one.
+
 =head1 AUTHOR
 
 Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
