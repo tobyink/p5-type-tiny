@@ -1045,6 +1045,8 @@ L<Type::Tiny::Enum>, L<Type::Tiny::Union>, L<Type::Tiny::Intersection>.
 L<Moose::Meta::TypeConstraint>,
 L<Mouse::Meta::TypeConstraint>.
 
+L<Type::Params>.
+
 =head1 AUTHOR
 
 Toby Inkster E<lt>tobyink@cpan.orgE<gt>.

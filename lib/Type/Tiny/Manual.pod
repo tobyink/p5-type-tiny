@@ -39,6 +39,10 @@ L<Using with Moo|Type::Tiny::Manual::UsingWithMoo> - how to use Type::Tiny and T
 
 Type::Tiny and friends don't need to be used within an OO framework. See L<FreeMind::Node> for an example that does not.
 
+=item *
+
+L<Processing arguments to subs|Type::Tiny::Manual::Params> - coerce and validate arguments to functions and methods.
+
 =back
 
 =head1 TYPE::TINY VERSUS X
