@@ -140,3 +140,10 @@
 		item "Build coercions automatically for certain type parameterized constraints. Say there's a Num->Int coercion defined; then we should be able to coerce ArrayRef[Num]->ArrayRef[Int]."^^Addition;
 		item "Allow subtypes to inherit coercions from their parent type constraint. (They do not by default.)"^^Addition;
 	].
+
+`Type-Tiny 0.003_02 cpan:TOBYINK`
+	issued  2013-04-16;
+	changeset [
+		item "Document how to process sub parameters with Type::Tiny, and point people towards Type::Params."^^Documentation;
+		item "Avoid unnecessarily regenerating parameterized type constraints."^^Change;
+	].
