@@ -828,13 +828,17 @@ type constraint.
 
 A coderef which generates a new inlining coderef based on parameters.
 
+=item C<< coercion_generator >>
+
+A coderef which generates a new L<Type::Coercion> object based on parameters.
+
 =back
 
 =head2 Methods
 
 =over
 
-=item C<has_parent>, C<has_coercion>, C<has_library>, C<has_constraint_generator>, C<has_inlined>, C<has_inline_generator>, C<has_parameters>
+=item C<has_parent>, C<has_coercion>, C<has_library>, C<has_inlined>, C<has_constraint_generator>, C<has_inline_generator>, C<has_coercion_generator>, C<has_parameters>
 
 Predicate methods.
 

@@ -142,7 +142,7 @@ BEGIN {
 	{
 		($compiled{ join ":", map($_->{uniq}||"\@$_->{slurpy}", @{$_[1]}) }
 			||= compile_validation $_[1])->(@{$_[0]})
-	}	
+	}
 };
 
 BEGIN {

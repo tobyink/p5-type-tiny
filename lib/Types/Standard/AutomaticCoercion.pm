@@ -452,6 +452,12 @@ automatically generated if C<< Foo >> has a coercion.
 
 It is loaded automatically on demand, and provides no public API.
 
+=begin private
+
+=item Stringable
+
+=end private
+
 =head1 BUGS
 
 Please report any bugs to
