@@ -59,6 +59,18 @@ use Type::Tiny pretty easily.
 
 Type::Tiny is faster and supports coercions.
 
+=head1 BUGS
+
+Please report any bugs to
+L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
+
+=head1 SUPPORT
+
+B<< IRC: >> support is available through in the I<< #moose >> channel
+on L<irc.perl.org|http://www.irc.perl.org/channels.html>. If Type::Tiny
+discussion there becomes overwhelming (unlikely) then I'll move it
+to a separate channel.
+
 =head1 CAVEATS
 
 =head2 Mutability of Type::Coercion
