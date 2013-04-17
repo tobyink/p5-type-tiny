@@ -7,6 +7,7 @@
 `Type-Tiny 0.000_02 cpan:TOBYINK`
 	issued  2013-04-02;
 	changeset [
+		dcs:versus `Type-Tiny 0.000_01 cpan:TOBYINK`;
 		item "Beginnings of Type::Tiny::Manual."^^Documentation;
 		item "Anchor enum regexps to beginning and end of string."^^Bugfix;
 		item "StrMatch added to Type::Standard."^^Addition;
@@ -17,6 +18,7 @@
 `Type-Tiny 0.000_03 cpan:TOBYINK`
 	issued  2013-04-03;
 	changeset [
+		dcs:versus `Type-Tiny 0.000_02 cpan:TOBYINK`;
 		item "Document Type::Coercion's overloading."^^Documentation;
 		item "Create and use compiled type constraint checks; much faster!"^^Change;
 		item "Inlined type constraints for all of Type::Standard."^^Addition;
@@ -29,6 +31,7 @@
 `Type-Tiny 0.000_04 cpan:TOBYINK`
 	issued  2013-04-03;
 	changeset [
+		dcs:versus `Type-Tiny 0.000_03 cpan:TOBYINK`;
 		item "Create and use compiled coercions; somewhat faster."^^Change;
 		item "Type::Tiny plus_coercions/minus_coercions/no_coercions methods for creating subtypes with different sets of coercions."^^Addition;
 		item "Type::Tiny equals/is_subtype_of/is_supertype_of/is_a_type_of methods for type constraint comparisons."^^Addition;
@@ -39,6 +42,7 @@
 `Type-Tiny 0.000_05 cpan:TOBYINK`
 	issued  2013-04-04;
 	changeset [
+		dcs:versus `Type-Tiny 0.000_04 cpan:TOBYINK`;
 		item "Factor out some functions from test suite into a new module: Test::TypeTiny."^^Addition;
 		item "Rearrange test suite slightly."^^Packaging;
 		item "Rename Type::Standard module to Types::Standard."^^Change;
@@ -53,6 +57,7 @@
 `Type-Tiny 0.000_06 cpan:TOBYINK`
 	issued  2013-04-05;
 	changeset [
+		dcs:versus `Type-Tiny 0.000_05 cpan:TOBYINK`;
 		item "Monkey patch Moose::Meta::TypeConstraint to be able to retrieve Type::Tiny constraints from inflated Moose constraints."^^Addition;
 		item "More test cases."^^Packaging;
 		item "Improved documentation of parameterization attributes."^^Documentation;
@@ -72,6 +77,7 @@
 `Type-Tiny 0.000_07 cpan:TOBYINK`
 	issued  2013-04-06;
 	changeset [
+		dcs:versus `Type-Tiny 0.000_06 cpan:TOBYINK`;
 		item "More test cases."^^Packaging;
 		item "Document constructor for Type::Tiny::Class."^^Documentation;
 		item "Fix inlining for Type::Tiny::Intersection."^^Bugfix;
@@ -83,6 +89,7 @@
 `Type-Tiny 0.000_08 cpan:TOBYINK`
 	issued  2013-04-07;
 	changeset [
+		dcs:versus `Type-Tiny 0.000_07 cpan:TOBYINK`;
 		item "Rewrite most of the functions exported by Type::Library-based type libraries to cope better with being used mid-list."^^Change;
 		item "Most parts of the API that accept Type::Tiny objects (e.g. Type::Utils::from()) now also accept Moose::Meta::TypeConstraint objects."^^Change;
 		item "Types::TypeTiny::to_TypeTiny can be used to coerce a Moose type constraint object to Type::Tiny."^^Addition;
@@ -91,6 +98,7 @@
 `Type-Tiny 0.000_09 cpan:TOBYINK`
 	issued  2013-04-08;
 	changeset [
+		dcs:versus `Type-Tiny 0.000_08 cpan:TOBYINK`;
 		item "Bundle benchmarking scripts."^^Addition;
 		item "Tidy up the 'examples' directory."^^Packaging;
 		item "When generating Moose/Mouse constraints from Type::Tiny objects, prefer to generate anonymous ones."^^Packaging;
@@ -100,6 +108,7 @@
 `Type-Tiny 0.000_10 cpan:TOBYINK`
 	issued  2013-04-09;
 	changeset [
+		dcs:versus `Type-Tiny 0.000_09 cpan:TOBYINK`;
 		item "Improvements to has_coercion_for_{type,value} from Type::Coercion."^^Change;
 		item "Fix incorrect Test::Requires line in 'mouse-coercion.t'."^^Bugfix;
 	].
@@ -107,6 +116,7 @@
 `Type-Tiny 0.000_11 cpan:TOBYINK`
 	issued  2013-04-11;
 	changeset [
+		dcs:versus `Type-Tiny 0.000_10 cpan:TOBYINK`;
 		item "Fix prototype for Type::Utils::as."^^Bugfix;
 		item "No longer need to pass '-moose' parameter when importing a library into a Moose class; only Mouse needs that treatment now."^^Change;
 	].
@@ -114,6 +124,7 @@
 `Type-Tiny 0.000_12 cpan:TOBYINK`
 	issued  2013-04-12;
 	changeset [
+		dcs:versus `Type-Tiny 0.000_11 cpan:TOBYINK`;
 		item "Fix minor typo."^^Documentation;
 	].
 
@@ -121,6 +132,7 @@
 	issued  2013-04-15;
 	label   "First public release";
 	changeset [
+		dcs:versus `Type-Tiny 0.000_12 cpan:TOBYINK`;
 		item "Minor improvements."^^Documentation;
 		item "Some inline code assumed that it would be compiled in a package that had 'blessed' imported."^^Bugfix;
 		item "Some inline code wasn't wrapped in parentheses."^^Bugfix;
