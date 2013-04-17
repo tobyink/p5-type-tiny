@@ -167,4 +167,6 @@
 	changeset [
 		dcs:versus `Type-Tiny 0.003_02 cpan:TOBYINK`;
 		item "When inflating Moo type constraints to Moose, don't unnecessarily call 'moose_type' method."^^Change;
+		item "Make Type::Tiny's has_coercion method more DWIM."^^Change;
+		item "Add OptList data type to Types::Standard, plus MkOpt coercion."^^Addition;
 	].

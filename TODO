@@ -13,19 +13,11 @@
           * Varchar[length]
           * steal from MooseX-Types-Common?
           * steal from MooseX-Types-Ro?
-          * OptList[Undef|Ref]
       * coercion
           * Auto-coercion
               * needs documenting
           * First-class coercions
               * moar docs
-              * moar tests
-      * new distribution: Params-Type (name?)
-          * already a first draft (called Type::Check) in p5-type-tiny
-          * documentation
-          * test cases
-          * benchmark versus Params::Validate
-              * much faster, even compared to Params::Validate::XS
       * improve speed for non-inlineable type constraints and coercions
           * maybe use eval context idea from Type::Check
       * Type-Tiny could be used as a backend for Scalar::Does?
