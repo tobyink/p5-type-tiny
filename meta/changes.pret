@@ -145,6 +145,7 @@
 `Type-Tiny 0.003_01 cpan:TOBYINK`
 	issued  2013-04-16;
 	changeset [
+		dcs:versus `Type-Tiny 0.001 cpan:TOBYINK`;
 		item "Link from Test::TypeTiny to Test::Deep::Type."^^Documentation;
 		item "Allow a Type::Tiny object to \"freeze\" its coercions. This prevents a Type::Tiny object from becoming out of sync with its equivalent Mouse or Moose constraint objects."^^Change;
 		item "Type::Library packages can now include \"standalone\" Type::Coercion objects, not attached to a type constraint. These can be exported on request."^^Addition;
@@ -156,6 +157,7 @@
 `Type-Tiny 0.003_02 cpan:TOBYINK`
 	issued  2013-04-16;
 	changeset [
+		dcs:versus `Type-Tiny 0.003_01 cpan:TOBYINK`;
 		item "Document how to process sub parameters with Type::Tiny, and point people towards Type::Params."^^Documentation;
 		item "Avoid unnecessarily regenerating parameterized type constraints."^^Change;
 	].
