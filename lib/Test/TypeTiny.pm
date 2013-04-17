@@ -4,7 +4,7 @@ use Test::More ();
 use base "Exporter";
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001';
+our $VERSION   = '0.002';
 
 our @EXPORT = qw( should_pass should_fail ok_subtype );
 
