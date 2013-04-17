@@ -90,7 +90,7 @@ sub new
 	
 	if ($self->has_library and !$self->is_anon and !$params{tmp})
 	{
-		$Moo::HandleMoose::TYPE_MAP{overload::StrVal($self)} = sub { $self->moose_type };
+		$Moo::HandleMoose::TYPE_MAP{overload::StrVal($self)} = sub { $self };
 	}
 		
 	return $self;

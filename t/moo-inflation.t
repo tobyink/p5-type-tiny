@@ -93,7 +93,7 @@ for (0..1)
 $state eq 'Moose is loaded'
 	? is(
 		"Local::Class"->meta->get_attribute("small")->type_constraint->name,
-		"BiggerLib::SmallInteger",
+		"SmallInteger",
 		"type constraint metaobject inflates from Moo to Moose",
 	)
 	: pass("redundant test");
