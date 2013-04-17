@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Tiny::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::VERSION   = '0.003_02';
+	$Type::Tiny::VERSION   = '0.003_03';
 }
 
 use Scalar::Util qw< blessed weaken refaddr isweak >;

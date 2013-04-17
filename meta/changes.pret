@@ -161,3 +161,10 @@
 		item "Document how to process sub parameters with Type::Tiny, and point people towards Type::Params."^^Documentation;
 		item "Avoid unnecessarily regenerating parameterized type constraints."^^Change;
 	].
+
+`Type-Tiny 0.003_03 cpan:TOBYINK`
+	issued  2013-04-17;
+	changeset [
+		dcs:versus `Type-Tiny 0.003_02 cpan:TOBYINK`;
+		item "When inflating Moo type constraints to Moose, don't unnecessarily call 'moose_type' method."^^Change;
+	].
