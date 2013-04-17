@@ -815,9 +815,14 @@ A coderef which generates a new inlining coderef based on parameters.
 
 =over
 
-=item C<has_parent>, C<has_coercion>, C<has_library>, C<has_constraint_generator>, C<has_inlined>, C<has_inline_generator>, C<has_parameters>
+=item C<has_parent>, C<has_library>, C<has_constraint_generator>, C<has_inlined>, C<has_inline_generator>, C<has_parameters>
 
 Predicate methods.
+
+=item C<has_coercion>
+
+Predicate method with a little extra DWIM. Returns false if the coercion is
+a no-op.
 
 =item C<< is_anon >>
 
