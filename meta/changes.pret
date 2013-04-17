@@ -148,4 +148,5 @@
 		dcs:versus `Type-Tiny 0.001 cpan:TOBYINK`;
 		item "Link from Test::TypeTiny to Test::Deep::Type."^^Documentation;
 		item "Avoid unnecessarily regenerating parameterized type constraints."^^Change;
+		item "Make Type::Tiny's has_coercion method more DWIM."^^Change;
 	].
