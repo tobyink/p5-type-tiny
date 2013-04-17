@@ -571,6 +571,60 @@ declare "StrMatch",
 		}
 	};
 
+declare "OptList",
+	as ArrayRef( [ArrayRef()] ),
+	where {
+		for my $inner (@$_) {
+			return unless @$inner == 2;
+			return unless is_Str($inner->[0]);
+		}
+	},
+	inline_as {
+		my ($self, $var) = @_;
+		my $Str_check = __PACKAGE__->meta->get_type("Str")->inline_check('$inner->[0]');
+		my @code = 'do { my $ok = 1; ';
+		push @code,   sprintf('for my $inner (@{%s}) { no warnings; ', $var);
+		push @code,     '($ok=0) && last unless @$inner == 2; ';
+		push @code,     sprintf('($ok=0) && last unless (%s); ', $Str_check);
+		push @code,   '} ';
+		push @code, '$ok }';
+		sprintf(
+			'%s and %s',
+			$self->parent->inline_check($var),
+			join(" ", @code),
+		);
+	};
+
+declare_coercion "MkOpt",
+	to_type "OptList",
+	from    "ArrayRef", q{ Types::Standard::_mkopt($_) },
+	from    "HashRef",  q{ Types::Standard::_mkopt($_) },
+	from    "Undef",    q{ [] };
+
+sub _mkopt
+{
+	my ($in) = @_;
+	my @out;
+	
+	$in = [map(($_ => ref($in->{$_}) ? $in->{$_} : ()), sort keys %$in)]
+		if ref($in) eq q(HASH);
+	
+	for (my $i = 0; $i < @$in; $i++)
+	{
+		my $k = $in->[$i];
+		my $v;
+		
+		($i == $#$in)         ? ($v = undef) :
+		!defined($in->[$i+1]) ? (++$i, ($v = undef)) :
+		is_Str($in->[$i+1])   ? ($v = undef) :
+		($v = $in->[++$i]);
+		
+		push @out, [ $k => $v ];
+	}
+	
+	return \@out;
+}
+
 1;
 
 __END__
@@ -669,7 +723,7 @@ This module also exports a C<slurpy> function.
 
 =head2 More
 
-There are a couple of other types exported by this function:
+There are a few other types exported by this function:
 
 =over
 
@@ -699,6 +753,32 @@ You can optionally provide a type constraint for the array of subexpressions:
             enum(DistanceUnit => [qw/ mm cm m km /]),
          ],
       ];
+
+=item C<< OptList >>
+
+An arrayref of arrayrefs in the style of L<Data::OptList> output.
+
+=back
+
+=head2 Coercions
+
+None of the types in this type library have any coercions by default.
+However one standalone coercion is exported:
+
+=over
+
+=item C<< MkOpt >>
+
+A coercion from C<ArrayRef>, C<HashRef> or C<Undef> to C<OptList>. Example
+usage in a Moose attribute:
+
+   use Types::Standard qw( OptList MkOpt );
+   
+   has options => (
+      is     => "ro",
+      isa    => OptList + MkOpt,
+      coerce => 1,
+   );
 
 =back
 
