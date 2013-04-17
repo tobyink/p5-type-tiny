@@ -380,6 +380,7 @@ sub is_parameterized
 	shift->has_parameters;
 }
 
+my %param_cache;
 sub parameterize
 {
 	my $self = shift;
@@ -388,6 +389,17 @@ sub parameterize
 		or _croak "type '%s' does not accept parameters", "$self";
 	
 	@_ = map to_TypeTiny($_), @_;
+	
+	# Generate a key for caching parameterized type constraints,
+	# but only if all the parameters are strings or type constraints.
+	my $key;
+	unless (grep(ref($_) && !TypeTiny->check($_), @_))
+	{
+		require B;
+		$key = join ":", map(TypeTiny->check($_) ? $_->{uniq} : B::perlstring($_), $self, @_);
+	}
+	
+	return $param_cache{$key} if defined $key && defined $param_cache{$key};
 	
 	local $_ = $_[0];
 	my %options = (
@@ -399,7 +411,15 @@ sub parameterize
 		if $self->has_inline_generator;
 	delete $options{inlined} unless defined $options{inlined};
 	
-	return $self->create_child_type(%options);
+	my $P = $self->create_child_type(%options);
+	
+	if (defined $key)
+	{
+		$param_cache{$key} = $P;
+		weaken($param_cache{$key});
+	}
+	
+	return $P;
 }
 
 sub child_type_class
