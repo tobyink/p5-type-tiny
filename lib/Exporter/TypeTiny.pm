@@ -116,7 +116,16 @@ sub _exporter_install_sub
 		$name = "$name$suffix";
 	}
 	
-	my $into = $globals->{into};
+	my $into = $globals->{into};	
+	return ($into->{$name} = $sym) if ref($into) eq q(HASH);
+	
+	for (grep ref, $into->can($name))
+	{
+		require B;
+		my $cv = B::svref_2object($_);
+		$cv->STASH->NAME eq $into
+			and _croak("Refusing to overwrite local sub '$name' with export from $class");
+	}
 	*{"$into\::$name"} = $sym;
 }
 
