@@ -4,6 +4,9 @@ use 5.008001;
 use strict;   no strict qw(refs);
 use warnings; no warnings qw(void once uninitialized numeric redefine);
 
+our $AUTHORITY = 'cpan:TOBYINK';
+our $VERSION   = '0.003_03';
+
 sub _croak ($;@) {
 	require Carp;
 	@_ = sprintf($_[0], @_[1..$#_]) if @_ > 1;
