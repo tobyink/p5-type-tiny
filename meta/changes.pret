@@ -177,3 +177,12 @@
 		dcs:versus `Type-Tiny 0.003_03 cpan:TOBYINK`;
 		item "Factor out the sub exporting code scattered around (in Type::Utils, Types::TypeTiny and Type::Library) into a single module."^^Change;
 	].
+
+`Type-Tiny 0.003_05 cpan:TOBYINK`
+	issued  2013-04-19;
+	changeset [
+		dcs:versus `Type-Tiny 0.003_04 cpan:TOBYINK`;
+		item "Chars and Bytes types added to Types::Standard."^^Addition;
+		item "Allow coercions to accept parameters."^^Addition;
+		item "Encode and Decide coercions added to Types::Standard."^^Addition;
+	].
