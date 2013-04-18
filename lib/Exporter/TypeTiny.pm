@@ -116,7 +116,7 @@ sub _exporter_install_sub
 		$name = "$name$suffix";
 	}
 	
-	my $into = $globals->{into};	
+	my $into = $globals->{into};
 	return ($into->{$name} = $sym) if ref($into) eq q(HASH);
 	
 	for (grep ref, $into->can($name))
@@ -162,5 +162,11 @@ __END__
 =pod
 
 Nothing to see here. Move along.
+
+=begin private
+
+=item mkopt
+
+=end private
 
 =cut
