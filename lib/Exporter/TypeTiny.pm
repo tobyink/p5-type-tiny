@@ -5,7 +5,7 @@ use strict;   no strict qw(refs);
 use warnings; no warnings qw(void once uninitialized numeric redefine);
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.003_03';
+our $VERSION   = '0.003_04';
 
 sub _croak ($;@) {
 	require Carp;

@@ -170,3 +170,10 @@
 		item "Make Type::Tiny's has_coercion method more DWIM."^^Change;
 		item "Add OptList data type to Types::Standard, plus MkOpt coercion."^^Addition;
 	].
+
+`Type-Tiny 0.003_04 cpan:TOBYINK`
+	issued  2013-04-18;
+	changeset [
+		dcs:versus `Type-Tiny 0.003_03 cpan:TOBYINK`;
+		item "Factor out the sub exporting code scattered around (in Type::Utils, Types::TypeTiny and Type::Library) into a single module."^^Change;
+	].
