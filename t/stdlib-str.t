@@ -4,7 +4,8 @@
 
 =head1 PURPOSE
 
-Checks various values against C<Bytes> and C<Chars> from Types::Standard.
+Checks various values against C<Bytes> and C<Chars> from Types::Standard;
+and checks the C<Decode> and C<Encode> parameterized coercions.
 
 =head1 AUTHOR
 
@@ -28,7 +29,7 @@ use Test::More;
 use Test::TypeTiny;
 
 use Encode;
-use Types::Standard qw( Str Bytes Chars );
+use Types::Standard qw( Str Bytes Chars Encode Decode );
 use Type::Utils;
 
 my $chars          = "café";
@@ -54,5 +55,37 @@ should_pass($bytes_utf8, Bytes);
 should_pass($bytes_western, Str);
 should_fail($bytes_western, Chars);
 should_pass($bytes_western, Bytes);
+
+my $BytesUTF8 = Bytes + Encode["utf-8"];
+
+is(
+	$BytesUTF8->coerce($chars),
+	$bytes_utf8,
+	'coerce using Bytes + Encode["utf-8"]',
+);
+
+my $BytesWestern = Bytes + Encode["iso-8859-1"];
+
+is(
+	$BytesWestern->coerce($chars),
+	$bytes_western,
+	'coerce using Bytes + Encode["iso-8859-1"]',
+);
+
+my $CharsFromUTF8 = Chars + Decode["utf-8"];
+
+is(
+	$CharsFromUTF8->coerce($bytes_utf8),
+	$chars,
+	'coerce using Chars + Decode["utf-8"]',
+);
+
+my $CharsFromWestern = Chars + Decode["iso-8859-1"];
+
+is(
+	$CharsFromWestern->coerce($bytes_western),
+	$chars,
+	'coerce using Chars + Decode["iso-8859-1"]',
+);
 
 done_testing;

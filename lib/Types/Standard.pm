@@ -611,6 +611,26 @@ declare_coercion "MkOpt",
 	from    "HashRef",  q{ Exporter::TypeTiny::mkopt($_) },
 	from    "Undef",    q{ [] };
 
+declare_coercion "Decode", to_type "Chars" => {
+	coercion_generator => sub {
+		my ($self, $target, $encoding) = @_;
+		require Encode;
+		require B;
+		$encoding = B::perlstring($encoding);
+		return (Bytes(), qq{ Encode::decode($encoding, \$_) });
+	},
+};
+
+declare_coercion "Encode", to_type "Bytes" => {
+	coercion_generator => sub {
+		my ($self, $target, $encoding) = @_;
+		require Encode;
+		require B;
+		$encoding = B::perlstring($encoding);
+		return (Chars(), qq{ Encode::encode($encoding, \$_) });
+	},
+};
+
 1;
 
 __END__
@@ -757,7 +777,8 @@ An arrayref of arrayrefs in the style of L<Data::OptList> output.
 =head2 Coercions
 
 None of the types in this type library have any coercions by default.
-However one standalone coercion is exported:
+However some standalone coercions may be exported. These can be combined
+with type constraints using the C<< + >> operator.
 
 =over
 
@@ -773,6 +794,26 @@ usage in a Moose attribute:
       isa    => OptList + MkOpt,
       coerce => 1,
    );
+
+=item C<< Encode[`a] >>
+
+Coercion to encode a character string to a byte string using
+C<< Encode::encode() >>. This is a parameterized type coercion, which
+expects a character set:
+
+   use Types::Standard qw( Bytes Encode );
+   
+   has filename => (
+      is     => "ro",
+      isa    => Bytes + Encode["utf-8"],
+      coerce => 1,
+   );
+
+=item C<< Decode[`a] >>
+
+Coercion to decode a byte string to a character string using
+C<< Encode::decode() >>. This is a parameterized type coercion, which
+expects a character set.
 
 =back
 

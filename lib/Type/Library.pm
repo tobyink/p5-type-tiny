@@ -237,9 +237,10 @@ sub add_coercion
 	$meta->{coercions}{$name} = $c;
 
 	no strict "refs";
-	no warnings "redefine";
+	no warnings "redefine", "prototype";
+	
 	my $class = blessed($meta);
-	*{"$class\::$name"} = _subname $c->qualified_name, sub () { $c };
+	*{"$class\::$name"} = $class->_mksub($c);
 	
 	return $c;
 }
