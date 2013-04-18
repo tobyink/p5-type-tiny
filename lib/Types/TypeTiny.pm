@@ -8,7 +8,7 @@ our $VERSION   = '0.003_03';
 
 use Scalar::Util qw< blessed >;
 
-use base "Exporter";
+use base qw< Exporter::TypeTiny >;
 our @EXPORT_OK = qw( CodeLike StringLike TypeTiny HashLike to_TypeTiny );
 
 my %cache;

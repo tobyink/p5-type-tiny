@@ -597,33 +597,9 @@ declare "OptList",
 
 declare_coercion "MkOpt",
 	to_type "OptList",
-	from    "ArrayRef", q{ Types::Standard::_mkopt($_) },
-	from    "HashRef",  q{ Types::Standard::_mkopt($_) },
+	from    "ArrayRef", q{ Exporter::TypeTiny::mkopt($_) },
+	from    "HashRef",  q{ Exporter::TypeTiny::mkopt($_) },
 	from    "Undef",    q{ [] };
-
-sub _mkopt
-{
-	my ($in) = @_;
-	my @out;
-	
-	$in = [map(($_ => ref($in->{$_}) ? $in->{$_} : ()), sort keys %$in)]
-		if ref($in) eq q(HASH);
-	
-	for (my $i = 0; $i < @$in; $i++)
-	{
-		my $k = $in->[$i];
-		my $v;
-		
-		($i == $#$in)         ? ($v = undef) :
-		!defined($in->[$i+1]) ? (++$i, ($v = undef)) :
-		is_Str($in->[$i+1])   ? ($v = undef) :
-		($v = $in->[++$i]);
-		
-		push @out, [ $k => $v ];
-	}
-	
-	return \@out;
-}
 
 1;
 

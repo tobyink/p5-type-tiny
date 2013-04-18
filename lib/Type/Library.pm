@@ -13,6 +13,8 @@ use Scalar::Util qw< blessed >;
 use Type::Tiny;
 use Types::TypeTiny qw< TypeTiny to_TypeTiny >;
 
+use base qw< Exporter::TypeTiny >;
+
 sub _croak ($;@)
 {
 	require Carp;
@@ -30,150 +32,139 @@ sub _croak ($;@)
 	}
 }
 
-sub import
+sub _exporter_validate_opts
 {
-	my $meta             = shift->meta;
-	my ($opts, @exports) = $meta->_process_tags(@_);
-	$opts->{caller}      = caller;
-	no strict 'refs';
-	push @{"$opts->{caller}\::ISA"}, ref($meta) if $opts->{base};
-	$meta->_export($_, $opts) for @exports;
-}
-
-sub _process_tags
-{
-	my $meta = shift; # private; no need for ->meta
-	my @args = @_;
-	my ($opts, @exports) = ({});
-	
-	while (defined(my $arg = shift @args))
-	{
-		my %arg_opts = ref $args[0] ? %{shift @args} : ();
-		my $optify   = sub {+{ sub => $_[0], %arg_opts }};
-		
-		if ($arg =~ /^[:-]moose$/i)
-			{ $opts->{moose} = 1 }
-		elsif ($arg =~ /^[:-]mouse$/i)
-			{ $opts->{mouse} = 1 }
-		elsif ($arg =~ /^[:-]declare$/i)
-			{ $opts->{declare} = 1 }
-		elsif ($arg =~ /^[:-]base/i)
-			{ $opts->{base} = 1 }
-		elsif ($arg =~ /^[:-]all$/i)
-			{ push @exports, map $optify->($_), $meta->coercion_names, map { $_, "is_$_", "to_$_", "assert_$_" } $meta->type_names }
-		elsif ($arg =~ /^[:-](assert|is|to)$/i)
-			{ push @exports, map $optify->($_), map "$1\_$_", $meta->type_names }
-		elsif ($arg =~ /^[:-]types$/i)
-			{ push @exports, map $optify->($_), $meta->type_names }
-		elsif ($arg =~ /^[:-]coercions$/i)
-			{ push @exports, map $optify->($_), $meta->coercion_names }
-		elsif ($arg =~ /^\+(.+)$/i)
-			{ push @exports, map $optify->($_), map { $_, "is_$_", "to_$_", "assert_$_" } $1 }
-		else
-			{ push @exports, map $optify->($_), $arg }
-	}
-	
-	return ($opts, @exports);
-}
-
-sub _EXPORT_OK
-{
-	no strict "refs";
 	my $class = shift;
-	@{"$class\::EXPORT_OK"};
+	
+	no strict "refs";
+	my $into  = $_[0]{into};
+	push @{"$into\::ISA"}, $class if $_[0]{base};
+	
+	return $class->SUPER::_exporter_validate_opts(@_);
 }
 
-sub _export
+sub _exporter_expand_tag
 {
-	my $meta = shift; # private; no need for ->meta
-	my ($sub, $opts) = @_;
-	my $class = blessed($meta);
+	my $class = shift;
+	my ($name, $value, $globals) = @_;
 	
-	my $type;
-	my $export_coderef;
-	my $export_as        = $sub->{sub};
-	my $export_to        = $opts->{caller};
+	$name eq 'types'     and return map [ "$_"        => $value ], $class->type_names;
+	$name eq 'is'        and return map [ "is_$_"     => $value ], $class->type_names;
+	$name eq 'assert'    and return map [ "assert_$_" => $value ], $class->type_names;
+	$name eq 'to'        and return map [ "to_$_"     => $value ], $class->type_names;
+	$name eq 'coercions' and return map [ "$_"        => $value ], $class->coercion_names;
 	
-	if ($sub->{sub} =~ /^(is|to|assert)_/ and my $coderef = $class->can($sub->{sub}))
+	if ($name eq 'all')
 	{
-		$export_coderef = $coderef;
+		no strict "refs";
+		return (
+			map(
+				[ "+$_" => $value ],
+				$class->type_names,
+			),
+			map(
+				[ $_ => $value ],
+				$class->coercion_names,
+				@{"$class\::EXPORT"},
+				@{"$class\::EXPORT_OK"},
+			),
+		);
 	}
 	
-	elsif ($opts->{declare} and $export_to->isa("Type::Library"))
+	return $class->SUPER::_exporter_expand_tag(@_);
+}
+
+sub _mksub
+{
+	my $class = shift;
+	my ($type, $post_method) = @_;
+	$post_method ||= "";
+	
+	my $coderef;
+	if ($type->is_parameterizable)
 	{
-		$export_coderef = sub (;@)
+		$coderef = eval sprintf q{
+			sub (;@) {
+				my $params; $params = shift if ref($_[0]) eq q(ARRAY);
+				my $t = $params ? $type->parameterize(@$params) : $type;
+				@_ && wantarray ? return($t%s, @_) : return $t%s;
+			}
+		}, $post_method, $post_method;
+	}
+	else
+	{
+		$coderef = eval sprintf q{ sub () { $type%s } }, $post_method;
+	}
+	
+	return _subname $type->qualified_name, $coderef;
+}
+
+sub _exporter_expand_sub
+{
+	my $class = shift;
+	my ($name, $value, $globals) = @_;
+	
+	if ($name =~ /^\+(.+)/ and $class->has_type($1))
+	{
+		my $type   = $1;
+		my $value2 = +{%{$value||{}}};
+		
+		return map $class->_exporter_expand_sub($_, $value2, $globals),
+			$type, "is_$type", "assert_$type", "to_$type";
+	}
+	
+	if (my $type = $class->get_type($name))
+	{
+		my $post_method = '';
+		$post_method = '->mouse_type' if $globals->{mouse};
+		$post_method = '->moose_type' if $globals->{moose};
+		return ($name => $class->_mksub($type, $post_method));
+	}
+	
+	return $class->SUPER::_exporter_expand_sub(@_);
+}
+
+#sub _exporter_install_sub
+#{
+#	my $class = shift;
+#	my ($name, $value, $globals, $sym) = @_;
+#	
+#	warn sprintf(
+#		'Exporter %s exporting %s with prototype %s',
+#		$class,
+#		$name,
+#		prototype($sym),
+#	);
+#	
+#	$class->SUPER::_exporter_install_sub(@_);
+#}
+
+sub _exporter_fail
+{
+	my $class = shift;
+	my ($name, $value, $globals) = @_;
+	
+	my $into = $globals->{into}
+		or _croak("Parameter 'into' not supplied");
+	
+	if ($globals->{declare})
+	{
+		return($name, _subname("$class\::$name", sub (;@)
 		{
 			my $params; $params = shift if ref($_[0]) eq "ARRAY";
-			my $type = $export_to->get_type($sub->{sub});
+			my $type = $into->get_type($name);
 			unless ($type)
 			{
 				_croak "cannot parameterize a non-existant type" if $params;
-				$type = $sub->{sub};
+				$type = $name;
 			}
 			
 			my $t = $params ? $type->parameterize(@$params) : $type;
 			@_ && wantarray ? return($t, @_) : return $t;
-		};
+		}));
 	}
 	
-	elsif ($opts->{moose} and $type = $meta->get_type($sub->{sub}))
-	{
-		$export_coderef = _subname $type->qualified_name, sub (;@)
-		{
-			my $params; $params = shift if ref($_[0]) eq "ARRAY";
-			my $t = $params ? $type->parameterize(@$params) : $type;
-			@_ && wantarray ? return($t->moose_type, @_) : return $t->moose_type;
-		}
-	}
-	
-	elsif ($opts->{mouse} and $type = $meta->get_type($sub->{sub}))
-	{
-		$export_coderef = _subname $type->qualified_name, sub (;@)
-		{
-			my $params; $params = shift if ref($_[0]) eq "ARRAY";
-			my $t = $params ? $type->parameterize(@$params) : $type;
-			@_ && wantarray ? return($t->mouse_type, @_) : return $t->mouse_type;
-		}
-	}
-	
-	elsif ($type = $meta->get_type($sub->{sub}))
-	{
-		$export_coderef = _subname $type->qualified_name, sub (;@)
-		{
-			my $params; $params = shift if ref($_[0]) eq "ARRAY";
-			my $t = $params ? $type->parameterize(@$params) : $type;
-			@_ && wantarray ? return($t, @_) : return $t;
-		}
-	}
-	
-	elsif (my $c = $meta->get_coercion($sub->{sub}))
-	{
-		$export_coderef = _subname $c->qualified_name, sub () { $c }
-	}
-	
-	elsif (scalar grep($_ eq $sub->{sub}, $class->_EXPORT_OK) and my $additional = $class->can($sub->{sub}))
-	{
-		$export_coderef = $additional;
-	}
-	
-	else
-	{
-		_croak "'%s' is not exported by '%s'", $sub->{sub}, $class;
-	}
-	
-	if ($type and not $type->is_parameterizable)
-	{
-		$export_coderef = &Scalar::Util::set_prototype($export_coderef, '');
-	}
-	
-	$export_as = $sub->{-as}                if exists $sub->{-as};
-	$export_as = $sub->{-prefix}.$export_as if exists $sub->{-prefix};
-	$export_as = $export_as.$sub->{-suffix} if exists $sub->{-suffix};
-	
-	my $export_fullname = join("::", $export_to, $export_as);
-	
-	no strict "refs";
-	*{$export_fullname} = $export_coderef;
+	return $class->SUPER::_exporter_fail(@_);
 }
 
 sub meta
@@ -197,39 +188,20 @@ sub add_type
 	$meta->{types}{$name} = $type;
 	
 	no strict "refs";
-	no warnings "redefine";
+	no warnings "redefine", "prototype";
 	
 	my $class = blessed($meta);
 	
-	*{"$class\::$name"} = _subname $type->qualified_name, sub (;@)
-	{
-		my $params; $params = shift if ref($_[0]) eq "ARRAY";
-		my $t = $params ? $type->parameterize(@$params) : $type;
-		@_ && wantarray ? return($t, @_) : return $t;
-	};
-	
-	if ($type and not $type->is_parameterizable)
-	{
-		&Scalar::Util::set_prototype(\&{"$class\::$name"}, '');
-	}
-	
-	*{"$class\::is_$name"} = _subname $type->qualified_name, $type->compiled_check;
-	
-	# There is an inlined version available, but don't use that because
+	# There is an inlined coercion available, but don't use that because
 	# additional coercions can be added *after* the type has been installed
 	# into the library.
 	#
 	# XXX: maybe we can use it if the coercion is frozen???
 	#
-	*{"$class\::to_$name"} = _subname $type->qualified_name, sub ($)
-	{
-		$type->coerce($_[0]);
-	};
-	
-	*{"$class\::assert_$name"} = _subname $type->qualified_name, sub ($)
-	{
-		$type->assert_valid($_[0]);
-	};
+	*{"$class\::$name"}        = $class->_mksub($type);
+	*{"$class\::is_$name"}     = _subname "is_"    .$type->qualified_name, $type->compiled_check;
+	*{"$class\::to_$name"}     = _subname "to_"    .$type->qualified_name, sub ($) { $type->coerce($_[0]) };
+	*{"$class\::assert_$name"} = _subname "assert_".$type->qualified_name, sub ($) { $type->assert_valid($_[0]) };
 	
 	return $type;
 }
