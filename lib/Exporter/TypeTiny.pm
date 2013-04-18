@@ -18,8 +18,8 @@ sub import
 	my $class = shift;
 	my @args  = @_ ? @_ : @{"$class\::EXPORT"};
 	my $opts  = mkopt(\@args);
-
-	my $global_opts = { -into => scalar caller };
+	
+	my $global_opts = { into => scalar caller };
 	my @want;
 	
 	while (@$opts)
@@ -57,15 +57,15 @@ sub _exporter_expand_tag
 	
 	if (exists $tags->{$name})
 	{
-		return map(($_=>$value), @{$tags->{$name}});
+		return map [$_ => $value], @{$tags->{$name}};
 	}
 	elsif ($name eq 'all')
 	{
-		return map(($_=>$value), @{"$class\::EXPORT"}, @{"$class\::EXPORT_OK"});
+		return map [$_ => $value], @{"$class\::EXPORT"}, @{"$class\::EXPORT_OK"};
 	}
 	elsif ($name eq 'default')
 	{
-		return map(($_=>$value), @{"$class\::EXPORT"});
+		return map [$_ => $value], @{"$class\::EXPORT"};
 	}
 	else
 	{
@@ -81,9 +81,16 @@ sub _exporter_expand_sub
 	
 	if (exists &{"$class\::$name"})
 	{
-		return($name => \&{"$class\::$name"});
+		return ($name => \&{"$class\::$name"});
 	}
 	
+	$class->_exporter_fail(@_);
+}
+
+sub _exporter_fail
+{
+	my $class = shift;
+	my ($name, $value, $globals) = @_;
 	_croak("Could not find sub '$name' to export in package '$class'");
 }
 
@@ -100,16 +107,16 @@ sub _exporter_install_sub
 		return;
 	}
 	
-	if (my $prefix = $value->{-prefix} || $globals->{-prefix})
+	if (my $prefix = $value->{-prefix} || $globals->{prefix})
 	{
 		$name = "$prefix$name";
 	}
-	if (my $suffix = $value->{-suffix} || $globals->{-suffix})
+	if (my $suffix = $value->{-suffix} || $globals->{suffix})
 	{
 		$name = "$name$suffix";
 	}
 	
-	my $into = $globals->{-into};
+	my $into = $globals->{into};
 	*{"$into\::$name"} = $sym;
 }
 
