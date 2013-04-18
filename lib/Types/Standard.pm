@@ -571,6 +571,16 @@ declare "StrMatch",
 		}
 	};
 
+declare "Bytes",
+	as "Str",
+	where { !utf8::is_utf8($_) },
+	inline_as { "!utf8::is_utf8($_)" };
+
+declare "Chars",
+	as "Str",
+	where { utf8::is_utf8($_) },
+	inline_as { "utf8::is_utf8($_)" };
+
 declare "OptList",
 	as ArrayRef( [ArrayRef()] ),
 	where {
@@ -729,6 +739,14 @@ You can optionally provide a type constraint for the array of subexpressions:
             enum(DistanceUnit => [qw/ mm cm m km /]),
          ],
       ];
+
+=item C<< Bytes >>
+
+Strings where C<< utf8::is_utf8() >> is false.
+
+=item C<< Chars >>
+
+Strings where C<< utf8::is_utf8() >> is true.
 
 =item C<< OptList >>
 
