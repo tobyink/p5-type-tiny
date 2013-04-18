@@ -6,8 +6,6 @@
               * coercions
           * better coercion docs
       * new type constraints for Types::Standard
-          * Chars - i.e. strings where the UTF-8 bit is on
-          * Bytes - i.e. strings where the UTF-8 bit is off
           * Tied - i.e. references to tied variables. Parameterized:
             Tied["Some::Package"]
           * Varchar[length]
@@ -22,3 +20,7 @@
           * maybe use eval context idea from Type::Check
       * Type-Tiny could be used as a backend for Scalar::Does?
           * if not, certainly a SEE ALSO
+      * moar tests
+          * Exporter::TypeTiny
+          * Types::Standard types
+              * OptList
