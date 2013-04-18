@@ -149,4 +149,5 @@
 		item "Link from Test::TypeTiny to Test::Deep::Type."^^Documentation;
 		item "Avoid unnecessarily regenerating parameterized type constraints."^^Change;
 		item "Make Type::Tiny's has_coercion method more DWIM."^^Change;
+		item "Chars and Bytes types added to Types::Standard."^^Addition;
 	].
