@@ -615,6 +615,8 @@ declare_coercion "Decode", to_type "Chars" => {
 	coercion_generator => sub {
 		my ($self, $target, $encoding) = @_;
 		require Encode;
+		Encode::find_encoding($encoding)
+			or _croak("Parameter \"$encoding\" for Decode[`a] is not an encoding supported by this version of Perl");
 		require B;
 		$encoding = B::perlstring($encoding);
 		return (Bytes(), qq{ Encode::decode($encoding, \$_) });
@@ -625,6 +627,8 @@ declare_coercion "Encode", to_type "Bytes" => {
 	coercion_generator => sub {
 		my ($self, $target, $encoding) = @_;
 		require Encode;
+		Encode::find_encoding($encoding)
+			or _croak("Parameter \"$encoding\" for Encode[`a] is not an encoding supported by this version of Perl");
 		require B;
 		$encoding = B::perlstring($encoding);
 		return (Chars(), qq{ Encode::encode($encoding, \$_) });
