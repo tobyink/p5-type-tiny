@@ -150,4 +150,5 @@
 		item "Avoid unnecessarily regenerating parameterized type constraints."^^Change;
 		item "Make Type::Tiny's has_coercion method more DWIM."^^Change;
 		item "Chars and Bytes types added to Types::Standard."^^Addition;
+		item "Prevent warnings (about 'my $val' masking a previously declared variable) when several Str checks are being inlined in close proximity, such as Tuple[Str,Str]"^^Bugfix;
 	].
