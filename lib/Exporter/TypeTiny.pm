@@ -6,6 +6,7 @@ use warnings; no warnings qw(void once uninitialized numeric redefine);
 
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.003_04';
+our @EXPORT_OK = qw< mkopt mkopt_hash _croak >;
 
 sub _croak ($;@) {
 	require Carp;
@@ -33,14 +34,13 @@ sub import
 	}
 	
 	$class->_exporter_validate_opts($global_opts);
+	my $permitted = $class->_exporter_permitted_regexp($global_opts);
 	
 	for my $wanted (@want)
 	{
-		my %symbols = $class->_exporter_expand_sub(@$wanted, $global_opts);
-		for my $name (keys %symbols)
-		{
-			$class->_exporter_install_sub($name, $wanted->[1], $global_opts, $symbols{$name});
-		}
+		my %symbols = $class->_exporter_expand_sub(@$wanted, $global_opts, $permitted);
+		$class->_exporter_install_sub($_, $wanted->[1], $global_opts, $symbols{$_})
+			for keys %symbols;
 	}
 }
 
@@ -55,36 +55,37 @@ sub _exporter_expand_tag
 	my ($name, $value, $globals) = @_;
 	my $tags  = \%{"$class\::EXPORT_TAGS"};
 	
-	if (exists $tags->{$name})
-	{
-		return map [$_ => $value], @{$tags->{$name}};
-	}
-	elsif ($name eq 'all')
-	{
-		return map [$_ => $value], @{"$class\::EXPORT"}, @{"$class\::EXPORT_OK"};
-	}
-	elsif ($name eq 'default')
-	{
-		return map [$_ => $value], @{"$class\::EXPORT"};
-	}
-	else
-	{
-		$globals->{$name} = $value || 1;
-		return;
-	}
+	return map [$_ => $value], @{$tags->{$name}}
+		if exists $tags->{$name};
+	
+	return map [$_ => $value], @{"$class\::EXPORT"}, @{"$class\::EXPORT_OK"}
+		if $name eq 'all';
+	
+	return map [$_ => $value], @{"$class\::EXPORT"}
+		if $name eq 'default';
+	
+	$globals->{$name} = $value || 1;
+	return;
+}
+
+sub _exporter_permitted_regexp
+{
+	my $class = shift;
+	my $re = join "|", map quotemeta, sort {
+		length($b) <=> length($a) or $a cmp $b
+	} @{"$class\::EXPORT"}, @{"$class\::EXPORT_OK"};
+	qr{^(?:$re)$}ms;
 }
 
 sub _exporter_expand_sub
 {
 	my $class = shift;
-	my ($name, $value, $globals) = @_;
+	my ($name, $value, $globals, $permitted) = @_;
+	$permitted ||= $class->_exporter_permitted_regexp($globals);
 	
-	if (exists &{"$class\::$name"})
-	{
-		return ($name => \&{"$class\::$name"});
-	}
-	
-	$class->_exporter_fail(@_);
+	exists &{"$class\::$name"} && $name =~ $permitted
+		? ($name => \&{"$class\::$name"})
+		: $class->_exporter_fail(@_);
 }
 
 sub _exporter_fail
@@ -107,31 +108,27 @@ sub _exporter_install_sub
 		return;
 	}
 	
-	if (my $prefix = $value->{-prefix} || $globals->{prefix})
-	{
-		$name = "$prefix$name";
-	}
-	if (my $suffix = $value->{-suffix} || $globals->{suffix})
-	{
-		$name = "$name$suffix";
-	}
+	my ($prefix) = grep defined, $value->{-prefix}, $globals->{prefix}, '';
+	my ($suffix) = grep defined, $value->{-suffix}, $globals->{suffix}, '';
+	$name = "$prefix$name$suffix";
 	
 	my $into = $globals->{into};
 	return ($into->{$name} = $sym) if ref($into) eq q(HASH);
 	
+	require B;
 	for (grep ref, $into->can($name))
 	{
-		require B;
 		my $cv = B::svref_2object($_);
 		$cv->STASH->NAME eq $into
 			and _croak("Refusing to overwrite local sub '$name' with export from $class");
 	}
+	
 	*{"$into\::$name"} = $sym;
 }
 
 sub mkopt
 {
-	my ($in) = @_;
+	my $in = shift or return [];
 	my @out;
 	
 	$in = [map(($_ => ref($in->{$_}) ? $in->{$_} : ()), sort keys %$in)]
@@ -150,23 +147,108 @@ sub mkopt
 		push @out, [ $k => $v ];
 	}
 	
-	return \@out;
+	\@out;
+}
+
+sub mkopt_hash
+{
+	my $in  = shift or return;
+	my %out = map @$_, mkopt($in);
+	\%out;
 }
 
 1;
 
 __END__
 
-=encoding utf-8
-
 =pod
 
-Nothing to see here. Move along.
+=encoding utf-8
 
-=begin private
+=head1 NAME
 
-=item mkopt
+Exporter::TypeTiny - a small exporter used internally by Type::Library and friends
 
-=end private
+=head1 DESCRIPTION
 
-=cut
+B<< Y O Y O Y O Y O Y ??? >>
+
+B<< Why >> bundle an exporter with Type-Tiny?
+
+Well, it wasn't always that way. L<Type::Library> had a bunch of custom
+exporting code which poked coderefs into its caller's stash. It needed this
+so that it could switch between exporting Moose, Mouse and Moo-compatible
+objects on request.
+
+Meanwhile L<Type::Utils>, L<Types::TypeTiny> and L<Test::TypeTiny> each
+used the venerable L<Exporter.pm|Exporter>. However, this meant they were
+unable to use the features like L<Sub::Exporter>-style function renaming
+which I'd built into Type::Library:
+
+   ## import "Str" but rename it to "String".
+   use Types::Standard "Str" => { -as => "String" };
+
+And so I decided to factor out code that could be shared by all Type-Tiny's
+exporters into a single place.
+
+This supports many of Sub::Exporter's external facing features including
+C<< -as >>, C<< -prefix >>, C<< -suffix >> but in only about 40% of the
+code, and with zero non-core dependencies. It provides an Exporter.pm-like
+internal interface with configuration done through the C<< @EXPORT >>,
+C<< @EXPORT_OK >> and C<< %EXPORT_TAGS >> package variables.
+
+Although builders are not an explicit part of the interface,
+Exporter::TypeTiny performs most of its internal duties (including
+resolution of tag names to symbol names, resolution of symbol names to
+coderefs, and installation of coderefs into the target package) as method
+calls, which means they can be overridden to provide more interesting
+behaviour. These are not currently documented.
+
+=head2 Functions
+
+These are really for internal use, but can be exported if you need them.
+
+=over
+
+=item C<< mkopt(\@array) >>
+
+Similar to C<mkopt> from L<Data::OptList>. It doesn't support all the
+fancy options that Data::OptList does (C<moniker>, C<require_unique>,
+C<must_be> and C<name_test>) but runs about 50% faster.
+
+=item C<< mkopt_hash(\@array) >>
+
+Similar to C<mkopt_hash> from L<Data::OptList>. See also C<mkopt>.
+
+=back
+
+=head1 BUGS
+
+Please report any bugs to
+L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
+
+=head1 SEE ALSO
+
+L<Type::Library>.
+
+L<Exporter>,
+L<Sub::Exporter>,
+L<Sub::Exporter::Progressive>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITAerTION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

@@ -99,6 +99,25 @@ sub _mksub
 	return _subname $type->qualified_name, $coderef;
 }
 
+sub _exporter_permitted_regexp
+{
+	my $class = shift;
+	
+	my $inherited = $class->SUPER::_exporter_permitted_regexp(@_);
+	my $types = join "|", map quotemeta, sort {
+		length($b) <=> length($a) or $a cmp $b
+	} $class->type_names;
+	my $coercions = join "|", map quotemeta, sort {
+		length($b) <=> length($a) or $a cmp $b
+	} $class->coercion_names;
+	
+	qr{^(?:
+		$inherited
+		| (?: (?:is_|to_|assert_)? (?:$types) )
+		| (?:$coercions)
+	)$}xms;
+}
+
 sub _exporter_expand_sub
 {
 	my $class = shift;
