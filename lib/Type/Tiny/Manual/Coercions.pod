@@ -26,7 +26,7 @@ However, there are good reasons to avoid this practice. It ties the
 coercion routine to the type constraint. Any people wishing to use your
 C<PathTiny> type constraint need to buy in to your idea of how they
 should be coerced from C<Str>. With L<Path::Tiny> this is unlikely to
-bee contraversial, however consider:
+be controversial, however consider:
 
    coerce ArrayRef,
       from Str, via { [split /\n/] };
@@ -85,7 +85,7 @@ It allows Type::Coercion to do a little optimization and run faster:
       Undef, q{ "Path::Tiny"->new("/etc/myapp/default.conf") },
    );
 
-Now, where were we...
+Now, where were we...?
 
 =head2 Named Coercions
 
@@ -139,11 +139,11 @@ into lines:
 
    use Types::Standard qw( ArrayRef Split );
    
-   my $ArrayOfLines = ArrayRef + Split[ qr{\n} ];
+   my $ArrayOfLines = (ArrayRef) + Split[ qr{\n} ];
 
 The implementation of this feature is considered experimental, and the
 API for building parameterized coercions is likely to change. However, the
-feature itself, and is surface syntax (the square brackets) is likely
+feature itself, and its surface syntax (the square brackets) is likely
 to stay. So beware building your own parameterizable coercions, but don't
 be shy about using the ones in Types::Standard.
 
@@ -163,8 +163,8 @@ type constraint without that coercion:
    PathTiny->minus_coercions(Str)
 
 C<no_coercions> gives us a new type anonymous constraint without any
-of its parents coercions. It's useful to create a blank slate for
-C<plus_coercions>:
+of its parents coercions. This is useful as a way to create a blank slate
+for a subsequent C<plus_coercions>:
 
    PathTiny->no_coercions->plus_coercions(...)
 
