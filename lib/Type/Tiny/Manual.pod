@@ -25,6 +25,10 @@ L<Libraries|Type::Tiny::Manual::Libraries> - how to build a type library with Ty
 
 =item *
 
+L<Coercions|Type::Tiny::Manual::Coercions> - adding coercions to type constraints
+
+=item *
+
 L<Using with Moose|Type::Tiny::Manual::UsingWithMoose> - how to use Type::Tiny and Type::Library with Moose
 
 =item *

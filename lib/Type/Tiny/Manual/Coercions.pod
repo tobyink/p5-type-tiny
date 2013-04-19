@@ -1,0 +1,197 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Type::Tiny::Manual::Coercions - adding coercions to type constraints
+
+=head1 DESCRIPTION
+
+B<< Stop! Don't do it! >>
+
+OK, it's fairly common practice in L<Moose>/L<Mouse> code to define
+coercions for type constraints. For example, suppose we have a type
+constraint:
+
+   class_type PathTiny, { class => "Path::Tiny" };
+
+We may wish to define a coercion (i.e. a convertion routine) to handle
+strings, and convert them into Path::Tiny objects:
+
+   coerce PathTiny,
+      from Str, via { "Path::Tiny"->new($_) };
+
+However, there are good reasons to avoid this practice. It ties the
+coercion routine to the type constraint. Any people wishing to use your
+C<PathTiny> type constraint need to buy in to your idea of how they
+should be coerced from C<Str>. With L<Path::Tiny> this is unlikely to
+bee contraversial, however consider:
+
+   coerce ArrayRef,
+      from Str, via { [split /\n/] };
+
+In one part of the application (dealing with parsing log files for
+instance), this could be legitimate. But another part (dealing with
+logins perhaps) might prefer to split on colons. Another (dealing with
+web services) might attempt to parse the string as a JSON array.
+
+If all these coercions have attached themselves to the C<ArrayRef>
+type constraint, coercing a string becomes a complicated proposition!
+In a large application where coercions are defined across many different
+files, the application can start to suffer from "spooky action at a
+distance".
+
+In the interests of Moose-compatibility, L<Type::Tiny> and L<Type::Coercion>
+do allow you to define coercions this way, but they also provide an
+alternative that you should consider: C<plus_coercions>.
+
+=head2 plus_coercions
+
+L<Type::Tiny> offers a method C<plus_coercions> which constructs a new
+anonymous type constraint, but with additional coercions. 
+
+In our earlier example, we'd define the C<PathTiny> type constraint
+as before:
+
+   class_type PathTiny, { class => "Path::Tiny" };
+
+But then not define any coercions for it. Later, when using the
+type constraint, we can add coercions:
+
+   my $ConfigFileType = PathTiny->plus_coercions(
+      Str,   sub { "Path::Tiny"->new($_) },
+      Undef, sub { "Path::Tiny"->new("/etc/myapp/default.conf") },
+   );
+   
+   has config_file => (
+      is     => "ro",
+      isa    => $ConfigFileType,
+      coerce => 1,
+   );
+
+Where the C<PathTiny> constraint is used in another part of the code, it
+will not see these coercions, because they were added to the new anonymous
+type constraint, not to the C<PathTiny> constraint itself!
+
+=head2 Aside: Optimizing Coercions
+
+Stepping away from the flow of this article, I'll point out that the
+following also works, using strings of Perl code instead of coderefs.
+It allows Type::Coercion to do a little optimization and run faster:
+
+   my $ConfigFileType = PathTiny->plus_coercions(
+      Str,   q{ "Path::Tiny"->new($_) },
+      Undef, q{ "Path::Tiny"->new("/etc/myapp/default.conf") },
+   );
+
+Now, where were we...
+
+=head2 Named Coercions
+
+A type library may define a named set of coercions to a particular
+type. For example, let's define that coercion from C<Str> to C<ArrayRef>:
+
+   define_coercion "LinesFromStr",
+      to_type ArrayRef,
+      from Str, q{ [split /\n/] };
+
+Now we can import that coercion using a name, and it makes our code
+look a little cleaner:
+
+   use Types::Standard qw(ArrayRef);
+   use MyApp::Types qw(LinesFromStr);
+   
+   has lines => (
+      is     => "ro",
+      isa    => ArrayRef->plus_coercions(LinesFromStr),
+      coerce => 1,
+   );
+
+=head2 Overloading
+
+L<Type::Tiny> and L<Type::Coercion> overload the C<< + >> operator to add
+coercions. So you may use:
+
+      isa    => PathTiny + PathTinyFromStr,
+
+However, beware precedence. The following is parsed as a function call with
+an argument preceded by a unary plus:
+
+      isa    => ArrayRef + LinesFromStr,
+      #         ArrayRef( +LinesFromStr )
+
+When things can be parameterized, it's generally a good idea to wrap them in
+parentheses to disambiguate:
+
+      isa    => (ArrayRef) + LinesFromStr,
+
+=head2 Parameterized Coercions
+
+Parameterized type constraints are familiar from Moose. For example, an
+arrayref of integers:
+
+   ArrayRef[Int]
+
+L<Type::Coercion> supports parameterized named coercions too. For example,
+the following type constraint has a coercion from strings that splits them
+into lines:
+
+   use Types::Standard qw( ArrayRef Split );
+   
+   my $ArrayOfLines = ArrayRef + Split[ qr{\n} ];
+
+The implementation of this feature is considered experimental, and the
+API for building parameterized coercions is likely to change. However, the
+feature itself, and is surface syntax (the square brackets) is likely
+to stay. So beware building your own parameterizable coercions, but don't
+be shy about using the ones in Types::Standard.
+
+=head2 plus_fallback_coercions, minus_coercions and no_coercions
+
+Getting back to the C<plus_coercions> method, there are some other
+methods that perform coercion maths.
+
+C<plus_fallback_coercions> is the same as C<plus_coercions> but the
+added coercions have a lower priority than any existing coercions.
+
+C<minus_coercions> can be given a list of type constraints that we
+wish to ignore coercions for. Imagine our C<PathTiny> constraint already
+has a coercion from C<Str>, then the following creates a new anonymous
+type constraint without that coercion:
+
+   PathTiny->minus_coercions(Str)
+
+C<no_coercions> gives us a new type anonymous constraint without any
+of its parents coercions. It's useful to create a blank slate for
+C<plus_coercions>:
+
+   PathTiny->no_coercions->plus_coercions(...)
+
+=head2 plus_constructors
+
+The C<plus_constructors> method defined in L<Type::Tiny::Class> is sugar
+for C<plus_coercions>. The following two are the same:
+
+   PathTiny->plus_coercions(Str, q{ Path::Tiny->new($_) })
+   
+   PathTiny->plus_constructors(Str, "new");
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+=cut

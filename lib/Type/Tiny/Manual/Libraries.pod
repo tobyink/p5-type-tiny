@@ -128,8 +128,9 @@ define any coercions.
       from DatetimeHash, via { "DateTime"->new(%$_) },
       from EpochHash,    via { "DateTime"->from_epoch(%$_) };
 
-These are simply coderefs that will be fired when you want a Datetime, but
-are given something else.
+These are simply coderefs that will be fired when you want a Datetime,
+but are given something else. For more information on coercions, see
+L<Type::Tiny::Manual::Coercions>.
 
 =head1 ADVANCED TOPICS
 
@@ -154,7 +155,7 @@ to be inlined into generated methods such as Moose attribute accessors.
 
 All of the constraints from C<Types::Standard> can be inlined, as can enum,
 class_type, role_type and duck_type constraints. Union and intersection
-constraints can only be inlined if their sub-constraints can be. So if you can
+constraints can be inlined if their sub-constraints can be. So if you can
 define your own types purely in terms of these types, you automatically
 get inlining:
 
