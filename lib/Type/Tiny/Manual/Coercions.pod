@@ -177,6 +177,11 @@ for C<plus_coercions>. The following two are the same:
    
    PathTiny->plus_constructors(Str, "new");
 
+=head1 SEE ALSO
+
+L<Moose::Manual::BestPractices>,
+L<http://www.catalyzed.org/2009/06/keeping-your-coercions-to-yourself.html>.
+
 =head1 AUTHOR
 
 Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
