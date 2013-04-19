@@ -635,6 +635,28 @@ declare_coercion "Encode", to_type "Bytes" => {
 	},
 };
 
+declare_coercion "Join", to_type "Str" => {
+	coercion_generator => sub {
+		my ($self, $target, $sep) = @_;
+		Types::TypeTiny::StringLike->check($sep)
+			or _croak("Parameter to Join[`a] expected to be a string; got $sep");
+		require B;
+		$sep = B::perlstring($sep);
+		return (ArrayRef(), qq{ join($sep, \@\$_) });
+	},
+};
+
+declare_coercion "Split", to_type ArrayRef()->parameterize(Str()) => {
+	coercion_generator => sub {
+		my ($self, $target, $re) = @_;
+		ref($re) eq q(Regexp)
+			or _croak("Parameter to Split[`a] expected to be a regular expresssion; got $re");
+		my $regexp_string = "$re";
+		$regexp_string =~ s/\\\//\\\\\//g; # toothpicks
+		return (Str(), qq{ [split /$regexp_string/, \$_] });
+	},
+};
+
 1;
 
 __END__
@@ -818,6 +840,32 @@ expects a character set:
 Coercion to decode a byte string to a character string using
 C<< Encode::decode() >>. This is a parameterized type coercion, which
 expects a character set.
+
+=item C<< Split[`a] >>
+
+Split a string on a regexp.
+
+   use Types::Standard qw( ArrayRef Str Split );
+   
+   has name => (
+      is     => "ro",
+      isa    => (ArrayRef[Str]) + (Split[qr/\s/]),
+      coerce => 1,
+   );
+
+=item C<< Join[`a] >>
+
+Join an array of strings with a delimiter.
+
+   use Types::Standard qw( Bytes Join );
+   
+   my $FileLines = Bytes + Join["\n"];
+   
+   has file_contents => (
+      is     => "ro",
+      isa    => $FileLines,
+      coerce => 1,
+   );
 
 =back
 
