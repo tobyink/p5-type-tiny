@@ -576,6 +576,27 @@ a Moose::Meta::TypeCoercion.
 
 =back
 
+The following methods are used for parameterized coercions, but are not
+fully documented because they may change in the near future:
+
+=over
+
+=item C<< coercion_generator >>
+
+=item C<< has_coercion_generator >>
+
+=item C<< has_parameters >>
+
+=item C<< is_parameterizable >>
+
+=item C<< is_parameterized >>
+
+=item C<< parameterize(@params) >>
+
+=item C<< parameters >>
+
+=back
+
 =head2 Overloading
 
 =over
