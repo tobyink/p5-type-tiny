@@ -5,7 +5,7 @@ use warnings;
 
 BEGIN {
 	$Types::Standard::AutomaticCoercion::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::AutomaticCoercion::VERSION   = '0.003_04';
+	$Types::Standard::AutomaticCoercion::VERSION   = '0.003_05';
 }
 
 require Type::Coercion;

@@ -175,7 +175,7 @@
 	issued  2013-04-18;
 	changeset [
 		dcs:versus `Type-Tiny 0.003_03 cpan:TOBYINK`;
-		item "Factor out the sub exporting code scattered around (in Type::Utils, Types::TypeTiny and Type::Library) into a single module."^^Change;
+		item "Factor out the sub exporting code scattered around (in Type::Utils, Types::TypeTiny and Type::Library) into a single module, Exporter::TypeTiny."^^Change;
 	].
 
 `Type-Tiny 0.003_05 cpan:TOBYINK`
@@ -184,5 +184,9 @@
 		dcs:versus `Type-Tiny 0.003_04 cpan:TOBYINK`;
 		item "Chars and Bytes types added to Types::Standard."^^Addition;
 		item "Allow coercions to accept parameters."^^Addition;
-		item "Encode and Decide coercions added to Types::Standard."^^Addition;
-	].
+		item "Encode, Decide, Join and Split coercions added to Types::Standard."^^Addition;
+		item "Prevent warnings (about 'my $val' masking a previously declared variable) when several Str checks are being inlined in close proximity, such as Tuple[Str,Str]"^^Bugfix;
+		item "Type::Tiny::Class now has a plus_constructors method."^^Addition;
+		item "Type::Tiny::Manual::Coercions."^^Documentation;
+		item "Document Exporter::TypeTiny."^^Documentation;
+ 	].
