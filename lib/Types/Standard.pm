@@ -72,7 +72,9 @@ declare "Str",
 	_is_core => 1,
 	as "Value",
 	where { ref(\$_) eq 'SCALAR' or ref(\(my $val = $_)) eq 'SCALAR' },
-	inline_as { "defined($_) and (ref(\\$_) eq 'SCALAR' or ref(\\(my \$val = $_)) eq 'SCALAR')" };
+	inline_as {
+		"defined($_) and do { ref(\\$_) eq 'SCALAR' or ref(\\(my \$val = $_)) eq 'SCALAR' }"
+	};
 
 declare "Num",
 	_is_core => 1,
