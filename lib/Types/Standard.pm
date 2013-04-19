@@ -69,11 +69,15 @@ declare "Value",
 	where { not ref $_ },
 	inline_as { "defined($_) and not ref($_)" };
 
+my $u;
 declare "Str",
 	_is_core => 1,
 	as "Value",
 	where { ref(\$_) eq 'SCALAR' or ref(\(my $val = $_)) eq 'SCALAR' },
-	inline_as { "defined($_) and (ref(\\$_) eq 'SCALAR' or ref(\\(my \$val = $_)) eq 'SCALAR')" };
+	inline_as {
+		$u++;
+		"defined($_) and (ref(\\$_) eq 'SCALAR' or ref(\\(my \$val$u = $_)) eq 'SCALAR')"
+	};
 
 declare "Num",
 	_is_core => 1,
