@@ -101,20 +101,20 @@ sub _exporter_install_sub
 	my $class = shift;
 	my ($name, $value, $globals, $sym) = @_;
 	
+	my $into      = $globals->{into};
+	my $installer = $globals->{installer} || $globals->{exporter};
+	
 	$name = $value->{-as} || $name;
-	
-	if (ref($name) eq q(SCALAR))
+	unless (ref($name) eq q(SCALAR))
 	{
-		$$name = $sym;
-		return;
-	}
+		my ($prefix) = grep defined, $value->{-prefix}, $globals->{prefix}, '';
+		my ($suffix) = grep defined, $value->{-suffix}, $globals->{suffix}, '';
+		$name = "$prefix$name$suffix";
+	}	
 	
-	my ($prefix) = grep defined, $value->{-prefix}, $globals->{prefix}, '';
-	my ($suffix) = grep defined, $value->{-suffix}, $globals->{suffix}, '';
-	$name = "$prefix$name$suffix";
-	
-	my $into = $globals->{into};
-	return ($into->{$name} = $sym) if ref($into) eq q(HASH);
+	return $installer->($globals, [$name, $sym]) if $installer;
+	return ($$name = $sym)                       if ref($name) eq q(SCALAR);
+	return ($into->{$name} = $sym)               if ref($into) eq q(HASH);
 	
 	require B;
 	for (grep ref, $into->can($name))
