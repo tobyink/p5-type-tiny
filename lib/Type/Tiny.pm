@@ -110,7 +110,7 @@ sub parent                   { $_[0]{parent} }
 sub constraint               { $_[0]{constraint}     ||= $_[0]->_build_constraint }
 sub compiled_check           { $_[0]{compiled_check} ||= $_[0]->_build_compiled_check }
 sub coercion                 { $_[0]{coercion}       ||= $_[0]->_build_coercion }
-sub message                  { $_[0]{message}        ||= $_[0]->_build_message }
+sub message                  { $_[0]{message} }
 sub library                  { $_[0]{library} }
 sub inlined                  { $_[0]{inlined} }
 sub constraint_generator     { $_[0]{constraint_generator} }
@@ -129,6 +129,11 @@ sub has_constraint_generator { exists $_[0]{constraint_generator} }
 sub has_inline_generator     { exists $_[0]{inline_generator} }
 sub has_coercion_generator   { exists $_[0]{coercion_generator} }
 sub has_parameters           { exists $_[0]{parameters} }
+sub has_message              { exists $_[0]{message} }
+
+sub _default_message         { $_[0]{_default_message} ||= $_[0]->_build_default_message }
+
+# has_message, , _compiled_type_constraint, _default_message
 
 sub _assert_coercion
 {
@@ -162,10 +167,9 @@ sub _build_coercion
 	return "Type::Coercion"->new(type_constraint => $self);
 }
 
-sub _build_message
+sub _build_default_message
 {
 	my $self = shift;
-	$self->{_default_message}++;
 	return sub { sprintf 'value "%s" did not pass type constraint', $_[0] } if $self->is_anon;
 	my $name = "$self";
 	return sub { sprintf 'value "%s" did not pass type constraint "%s"', $_[0], $name };
@@ -305,7 +309,10 @@ sub check
 sub get_message
 {
 	my $self = shift;
-	$self->message->(@_);
+	local $_ = $_[0];
+	$self->has_message
+		? $self->message->(@_)
+		: $self->_default_message->(@_);
 }
 
 sub validate
@@ -499,7 +506,7 @@ sub _build_moose_type
 		$opts{name}       = $self->qualified_name     if $self->has_library && !$self->is_anon;
 		$opts{parent}     = $self->parent->moose_type if $self->has_parent;
 		$opts{constraint} = $self->constraint         unless $self->_is_null_constraint;
-		$opts{message}    = $self->message;
+		$opts{message}    = $self->message            if $self->has_message;
 		$opts{inlined}    = $self->inlined            if $self->has_inlined;
 		
 		$r = $self->_instantiate_moose_type(%opts);
@@ -519,7 +526,7 @@ sub _build_mouse_type
 	$options{name}       = $self->qualified_name     if $self->has_library && !$self->is_anon;
 	$options{parent}     = $self->parent->mouse_type if $self->has_parent;
 	$options{constraint} = $self->constraint         unless $self->_is_null_constraint;
-	$options{message}    = $self->message;
+	$options{message}    = $self->message            if $self->has_message;
 		
 	require Mouse::Meta::TypeConstraint;
 	my $r = "Mouse::Meta::TypeConstraint"->new(%options);
@@ -631,7 +638,12 @@ sub isa
 {
 	my $self = shift;
 	
-	if ($INC{"Moose.pm"} and blessed($self) and my $r = $self->moose_type->isa(@_))
+	if ($INC{"Moose.pm"} and blessed($self) and $_[0] eq 'Moose::Meta::TypeConstraint')
+	{
+		return !!1;
+	}
+	
+	if ($INC{"Moose.pm"} and blessed($self) and $_[0] =~ /^Moose/ and my $r = $self->moose_type->isa(@_))
 	{
 		return $r;
 	}
@@ -667,6 +679,10 @@ sub AUTOLOAD
 	
 	_croak q[Can't locate object method "%s" via package "%s"], $m, ref($self)||$self;
 }
+
+# fill out Moose-compatible API
+sub inline_environment { +{} }
+*_compiled_type_constraint = \&compiled_check;
 
 1;
 

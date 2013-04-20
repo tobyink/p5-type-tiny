@@ -51,7 +51,7 @@ sub _build_inlined
 	};
 }
 
-sub _build_message
+sub _build_default_message
 {
 	my $self = shift;
 	return sub { sprintf 'value "%s" did not pass type constraint', $_[0] } if $self->is_anon;

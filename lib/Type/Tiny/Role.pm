@@ -49,7 +49,7 @@ sub _build_inlined
 	};
 }
 
-sub _build_message
+sub _build_default_message
 {
 	my $self = shift;
 	my $c = $self->role;
