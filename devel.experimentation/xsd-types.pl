@@ -8,6 +8,68 @@ BEGIN {
 	no thanks;
 	use B qw(perlstring);
 	
+	sub create_range_check
+	{
+		my $class = $_[0]; eval "require $class";
+		my ($lower, $upper) = map(defined($_) ? $class->new($_) : $_, @_[1,2]);
+		my ($lexcl, $uexcl) = map(!!$_, @_[3,4]);
+		
+		my $checker =
+			(defined $lower and defined $upper and $lexcl and $uexcl)
+				? sub { my $n = $class->new($_); $n > $lower and $n < $upper } :
+			(defined $lower and defined $upper and $lexcl)
+				? sub { my $n = $class->new($_); $n > $lower and $n <= $upper } :
+			(defined $lower and defined $upper and $uexcl)
+				? sub { my $n = $class->new($_); $n >= $lower and $n < $upper } :
+			(defined $lower and defined $upper)
+				? sub { my $n = $class->new($_); $n >= $lower and $n <= $upper } :
+			(defined $lower and $lexcl)
+				? sub { $class->new($_) > $lower } :
+			(defined $upper and $uexcl)
+				? sub { $class->new($_) < $upper } :
+			(defined $lower)
+				? sub { $class->new($_) >= $lower } :
+			(defined $upper)
+				? sub { $class->new($_) <= $upper } :
+			sub { !!1 };
+		
+		my $inlined = sub {
+			my $var = $_[1];
+			my @checks;
+			push @checks, sprintf('$n >%s "%s"->new("%s")', $lexcl?'':'=', $class, $lower) if defined $lower;
+			push @checks, sprintf('$n <%s "%s"->new("%s")', $uexcl?'':'=', $class, $upper) if defined $upper;
+			my $code = sprintf(
+				'%s and do { my $n = "%s"->new(%s); %s }',
+				Types::Standard::Int()->inline_check($var),
+				$class,
+				$var,
+				join(" and ", @checks),
+			);
+		};
+		
+		return (
+			constraint  => $checker,
+			inlined     => $inlined,
+		);
+	}
+
+	sub quick_range_check
+	{
+		my $class = $_[0]; eval "require $class";
+		my ($lower, $upper) = map(defined($_) ? $class->new($_) : $_, @_[1,2]);
+		my ($lexcl, $uexcl) = map(!!$_, @_[3,4]);
+		my $var = $_[5];
+		my @checks;
+		push @checks, sprintf('$n >%s "%s"->new("%s")', $lexcl?'':'=', $class, $lower) if defined $lower;
+		push @checks, sprintf('$n <%s "%s"->new("%s")', $uexcl?'':'=', $class, $upper) if defined $upper;
+		my $code = sprintf(
+			'do { my $n = "%s"->new(%s); %s }',
+			$class,
+			$var,
+			join(" and ", @checks),
+		);
+	}
+
 	my %facets = (
 		length => sub {
 			my ($o, $var) = @_;
@@ -44,22 +106,42 @@ BEGIN {
 		maxInclusive => sub {
 			my ($o, $var) = @_;
 			return unless exists $o->{maxInclusive};
-			sprintf('%s <= %f', $var, delete $o->{maxInclusive});
+			quick_range_check("Math::BigInt", undef, delete($o->{maxInclusive}), undef, undef, $var);
 		},
 		minInclusive => sub {
 			my ($o, $var) = @_;
 			return unless exists $o->{minInclusive};
-			sprintf('%s >= %f', $var, delete $o->{minInclusive});
+			quick_range_check("Math::BigInt", delete($o->{minInclusive}), undef, undef, undef, $var);
 		},
 		maxExclusive => sub {
 			my ($o, $var) = @_;
 			return unless exists $o->{maxExclusive};
-			sprintf('%s < %f', $var, delete $o->{maxExclusive});
+			quick_range_check("Math::BigInt", undef, delete($o->{maxExclusive}), undef, 1, $var);
 		},
 		minExclusive => sub {
 			my ($o, $var) = @_;
 			return unless exists $o->{minInclusive};
-			sprintf('%s > %f', $var, delete $o->{minExclusive});
+			quick_range_check("Math::BigInt", delete($o->{minExclusive}), undef, 1, undef, $var);
+		},
+		maxInclusiveFloat => sub {
+			my ($o, $var) = @_;
+			return unless exists $o->{maxInclusive};
+			quick_range_check("Math::BigFloat", undef, delete($o->{maxInclusive}), undef, undef, $var);
+		},
+		minInclusiveFloat => sub {
+			my ($o, $var) = @_;
+			return unless exists $o->{minInclusive};
+			quick_range_check("Math::BigFloat", delete($o->{minInclusive}), undef, undef, undef, $var);
+		},
+		maxExclusiveFloat => sub {
+			my ($o, $var) = @_;
+			return unless exists $o->{maxExclusive};
+			quick_range_check("Math::BigFloat", undef, delete($o->{maxExclusive}), undef, 1, $var);
+		},
+		minExclusiveFloat => sub {
+			my ($o, $var) = @_;
+			return unless exists $o->{minInclusive};
+			quick_range_check("Math::BigFloat", delete($o->{minExclusive}), undef, 1, undef, $var);
 		},
 		maxInclusiveStr => sub {
 			my ($o, $var) = @_;
@@ -98,9 +180,6 @@ BEGIN {
 		my $self   = pop;
 		my @facets = @_;
 		
-		return if $self->is_anon;
-		&Scalar::Util::set_prototype(__PACKAGE__->can($self->name), ';@');
-		
 		my $inline_generator = sub
 		{
 			my %p = @_;
@@ -125,6 +204,12 @@ BEGIN {
 				$inline_generator->(@_)->($self, '$_[0]'),
 			);
 		};
+		
+		return if $self->is_anon;
+		
+		no strict qw( refs );
+		no warnings qw( redefine prototype );
+		*{$self->name} = __PACKAGE__->_mksub($self);
 	}
 
 	use Types::Standard;
@@ -138,6 +223,8 @@ BEGIN {
 		UnsignedShort UnsignedByte Duration DateTime Time Date GYearMonth
 		GYear GMonthDay GDay GMonth
 	);
+	
+	our @EXPORT_OK = qw( in_range );
 	
 	declare AnyType, as Types::Standard::Any;
 	
@@ -179,10 +266,10 @@ BEGIN {
 	facet qw( length minLength maxLength pattern enumeration whiteSpace ),
 	declare HexBinary, as Types::Standard::StrMatch[qr{^[a-fA-F0-9]+$}ism];
 
-	facet qw( pattern enumeration whiteSpace maxInclusive maxExclusive minInclusive minExclusive ),
+	facet qw( pattern enumeration whiteSpace maxInclusiveFloat maxExclusiveFloat minInclusiveFloat minExclusiveFloat ),
 	declare Float, as Types::Standard::Num;
 	
-	facet qw( pattern enumeration whiteSpace maxInclusive maxExclusive minInclusive minExclusive ),
+	facet qw( pattern enumeration whiteSpace maxInclusiveFloat maxExclusiveFloat minInclusiveFloat minExclusiveFloat ),
 	declare Double, as Types::Standard::Num;
 	
 	facet qw( length minLength maxLength pattern enumeration whiteSpace ),
@@ -191,71 +278,47 @@ BEGIN {
 	# XXX - QName
 	# XXX - Notation
 	
-	facet qw( totalDigits fractionDigits pattern whiteSpace enumeration maxInclusive maxExclusive minInclusive minExclusive ),
+	facet qw( totalDigits fractionDigits pattern whiteSpace enumeration maxInclusiveFloat maxExclusiveFloat minInclusiveFloat minExclusiveFloat ),
 	declare Decimal, as Types::Standard::StrMatch[qr{^[+-]?[0-9]+(?:\.[0-9]+)?$}ism];
 
 	facet qw( totalDigits fractionDigits pattern whiteSpace enumeration maxInclusive maxExclusive minInclusive minExclusive ),
 	declare Integer, as Types::Standard::Int;
 
 	facet qw( totalDigits fractionDigits pattern whiteSpace enumeration maxInclusive maxExclusive minInclusive minExclusive ),
-	declare NonPositiveInteger, as Integer,
-		where     {  $_ <= 0  },
-		inline_as { sprintf "(%s and $_ <= 0)", $_[0]->parent->inline_check($_) };
+	declare NonPositiveInteger, as Integer, create_range_check("Math::BigInt", undef, 0);
 
 	facet qw( totalDigits fractionDigits pattern whiteSpace enumeration maxInclusive maxExclusive minInclusive minExclusive ),
-	declare NegativeInteger, as NonPositiveInteger,
-		where     {  $_ != 0  },
-		inline_as { sprintf "(%s and $_ != 0)", $_[0]->parent->inline_check($_) };
+	declare NegativeInteger, as NonPositiveInteger, create_range_check("Math::BigInt", undef, -1);
 
 	facet qw( totalDigits fractionDigits pattern whiteSpace enumeration maxInclusive maxExclusive minInclusive minExclusive ),
-	declare NonNegativeInteger, as Integer,
-		where     {  $_ >= 0  },
-		inline_as { sprintf "(%s and $_ >= 0)", $_[0]->parent->inline_check($_) };
+	declare NonNegativeInteger, as Integer, create_range_check("Math::BigInt", 0, undef);
 
 	facet qw( totalDigits fractionDigits pattern whiteSpace enumeration maxInclusive maxExclusive minInclusive minExclusive ),
-	declare PositiveInteger, as NonNegativeInteger,
-		where     {  $_ != 0  },
-		inline_as { sprintf "(%s and $_ != 0)", $_[0]->parent->inline_check($_) };
+	declare PositiveInteger, as NonNegativeInteger, create_range_check("Math::BigInt", 1, undef);
 
 	facet qw( totalDigits fractionDigits pattern whiteSpace enumeration maxInclusive maxExclusive minInclusive minExclusive ),
-	declare Long, as Integer,
-		where     {  $_ <= 9223372036854775807 and $_ >= -9223372036854775808  },
-		inline_as { sprintf "(%s and $_ <= 9223372036854775807 and $_ >= -9223372036854775808)", $_[0]->parent->inline_check($_) };
+	declare Long, as Integer, create_range_check("Math::BigInt", q[-9223372036854775808], q[9223372036854775807]);
 
 	facet qw( totalDigits fractionDigits pattern whiteSpace enumeration maxInclusive maxExclusive minInclusive minExclusive ),
-	declare Int, as Long,
-		where     {  $_ <= 2147483647 and $_ >= -2147483648  },
-		inline_as { sprintf "(%s and $_ <= 2147483647 and $_ >= -2147483648)", $_[0]->parent->inline_check($_) };
+	declare Int, as Long, create_range_check("Math::BigInt", q[-2147483648], q[2147483647]);
 
 	facet qw( totalDigits fractionDigits pattern whiteSpace enumeration maxInclusive maxExclusive minInclusive minExclusive ),
-	declare Short, as Int,
-		where     {  $_ <= 32767 and $_ >= -32768  },
-		inline_as { sprintf "(%s and $_ <= 32767 and $_ >= -32768)", $_[0]->parent->inline_check($_) };
+	declare Short, as Int, create_range_check("Math::BigInt", q[-32768], q[32767]);
 
 	facet qw( totalDigits fractionDigits pattern whiteSpace enumeration maxInclusive maxExclusive minInclusive minExclusive ),
-	declare Byte, as Short,
-		where     {  $_ <= 127 and $_ >= -128  },
-		inline_as { sprintf "(%s and $_ <= 127 and $_ >= -128)", $_[0]->parent->inline_check($_) };
+	declare Byte, as Short, create_range_check("Math::BigInt", q[-128], q[127]);
 
 	facet qw( totalDigits fractionDigits pattern whiteSpace enumeration maxInclusive maxExclusive minInclusive minExclusive ),
-	declare UnsignedLong, as NonNegativeInteger,
-		where     {  $_ <= 18446744073709551615 },
-		inline_as { sprintf "(%s and $_ <= 18446744073709551615)", $_[0]->parent->inline_check($_) };
+	declare UnsignedLong, as NonNegativeInteger, create_range_check("Math::BigInt", q[0], q[18446744073709551615]);
 
 	facet qw( totalDigits fractionDigits pattern whiteSpace enumeration maxInclusive maxExclusive minInclusive minExclusive ),
-	declare UnsignedInt, as UnsignedLong,
-		where     {  $_ <= 4294967295 },
-		inline_as { sprintf "(%s and $_ <= 4294967295)", $_[0]->parent->inline_check($_) };
+	declare UnsignedInt, as UnsignedLong, create_range_check("Math::BigInt", q[0], q[4294967295]);
 
 	facet qw( totalDigits fractionDigits pattern whiteSpace enumeration maxInclusive maxExclusive minInclusive minExclusive ),
-	declare UnsignedShort, as UnsignedInt,
-		where     {  $_ <= 65535 },
-		inline_as { sprintf "(%s and $_ <= 65535)", $_[0]->parent->inline_check($_) };
+	declare UnsignedShort, as UnsignedInt, create_range_check("Math::BigInt", q[0], q[65535]);
 
 	facet qw( totalDigits fractionDigits pattern whiteSpace enumeration maxInclusive maxExclusive minInclusive minExclusive ),
-	declare UnsignedByte, as UnsignedShort,
-		where     {  $_ <= 255 },
-		inline_as { sprintf "(%s and $_ <= 255)", $_[0]->parent->inline_check($_) };
+	declare UnsignedByte, as UnsignedShort, create_range_check("Math::BigInt", q[0], q[255]);
 
 	# XXX - Duration
 	# XXX - DateTime
@@ -268,7 +331,7 @@ BEGIN {
 	# XXX - GMonth
 };
 
-use Types::XSD qw(Token);
+use Types::XSD -types;
 
-my $type = Token[maxLength => 8, minLength => 2];
+my $type = Types::XSD::Decimal[maxExclusive => 50_000];
 say $type->inline_check('$XXX');
