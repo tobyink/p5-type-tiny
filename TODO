@@ -4,23 +4,17 @@
               * using type constraints from libraries
               * creating type constraints using Type::Utils
               * coercions
-          * better coercion docs
       * new type constraints for Types::Standard
           * Tied - i.e. references to tied variables. Parameterized:
             Tied["Some::Package"]
-          * Varchar[length]
-          * steal from MooseX-Types-Common?
           * steal from MooseX-Types-Ro?
       * coercion
           * Auto-coercion
               * needs documenting
-          * First-class coercions
-              * moar docs
       * improve speed for non-inlineable type constraints and coercions
           * maybe use eval context idea from Type::Check
       * Type-Tiny could be used as a backend for Scalar::Does?
           * if not, certainly a SEE ALSO
       * moar tests
           * Exporter::TypeTiny
-          * Types::Standard types
-              * OptList
+      * Types-XSD
