@@ -394,7 +394,12 @@ sub isa
 {
 	my $self = shift;
 	
-	if ($INC{"Moose.pm"} and blessed($self) and my $r = $self->moose_coercion->isa(@_))
+	if ($INC{"Moose.pm"} and blessed($self) and $_[0] eq 'Moose::Meta::TypeCoercion')
+	{
+		return !!1;
+	}
+	
+	if ($INC{"Moose.pm"} and blessed($self) and $_[0] =~ /^Moose/ and my $r = $self->moose_coercion->isa(@_))
 	{
 		return $r;
 	}
@@ -430,6 +435,8 @@ sub AUTOLOAD
 	
 	_croak q[Can't locate object method "%s" via package "%s"], $m, ref($self)||$self;
 }
+
+*_compiled_type_coercion = \&compiled_coercion;
 
 1;
 
