@@ -16,11 +16,12 @@ sub _croak ($;@) {
 
 sub import
 {
-	my $class = shift;
-	my @args  = @_ ? @_ : @{"$class\::EXPORT"};
-	my $opts  = mkopt(\@args);
+	my $class       = shift;
+	my $global_opts = +{ @_ && ref($_[0]) eq q(HASH) ? %{+shift} : () };
+	my @args        = @_ ? @_ : @{"$class\::EXPORT"};
+	my $opts        = mkopt(\@args);
 	
-	my $global_opts = { into => scalar caller };
+	$global_opts->{into} = caller unless exists $global_opts->{into};
 	my @want;
 	
 	while (@$opts)
