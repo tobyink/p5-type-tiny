@@ -45,11 +45,20 @@ sub import
 	}
 }
 
+# Called once per import, passed the "global" import options. Expected to
+# validate the import options and carp or croak if there are problems. Can
+# also take the opportunity to do other stuff if needed.
+#
 sub _exporter_validate_opts
 {
 	1;
 }
 
+# Given a tag name, looks it up in %EXPORT_TAGS and returns the list of
+# associated functions. The default implementation magically handles tags
+# "all" and "default". The default implementation interprets any undefined
+# tags as being global options.
+# 
 sub _exporter_expand_tag
 {
 	my $class = shift;
@@ -69,6 +78,9 @@ sub _exporter_expand_tag
 	return;
 }
 
+# Helper for _exporter_expand_sub. Returns a regexp matching all subs in
+# the exporter package which are available for export.
+#
 sub _exporter_permitted_regexp
 {
 	my $class = shift;
@@ -78,6 +90,9 @@ sub _exporter_permitted_regexp
 	qr{^(?:$re)$}ms;
 }
 
+# Given a sub name, returns a hash of subs to install (usually just one sub).
+# Keys are sub names, values are coderefs.
+#
 sub _exporter_expand_sub
 {
 	my $class = shift;
@@ -89,6 +104,9 @@ sub _exporter_expand_sub
 		: $class->_exporter_fail(@_);
 }
 
+# Called by _exporter_expand_sub if it is unable to generate a key-value
+# pair for a sub.
+#
 sub _exporter_fail
 {
 	my $class = shift;
@@ -96,6 +114,9 @@ sub _exporter_fail
 	_croak("Could not find sub '$name' to export in package '$class'");
 }
 
+# Actually performs the installation of the sub into the target package. This
+# also handles renaming the sub.
+#
 sub _exporter_install_sub
 {
 	my $class = shift;
@@ -110,7 +131,7 @@ sub _exporter_install_sub
 		my ($prefix) = grep defined, $value->{-prefix}, $globals->{prefix}, '';
 		my ($suffix) = grep defined, $value->{-suffix}, $globals->{suffix}, '';
 		$name = "$prefix$name$suffix";
-	}	
+	}
 	
 	return $installer->($globals, [$name, $sym]) if $installer;
 	return ($$name = $sym)                       if ref($name) eq q(SCALAR);
@@ -192,18 +213,22 @@ which I'd built into Type::Library:
 And so I decided to factor out code that could be shared by all Type-Tiny's
 exporters into a single place.
 
-This supports many of Sub::Exporter's external facing features including
-C<< -as >>, C<< -prefix >>, C<< -suffix >> but in only about 40% of the
-code, and with zero non-core dependencies. It provides an Exporter.pm-like
-internal interface with configuration done through the C<< @EXPORT >>,
-C<< @EXPORT_OK >> and C<< %EXPORT_TAGS >> package variables.
+Exporter::TypeTiny supports many of Sub::Exporter's external-facing features
+including renaming imported functions with the C<< -as >>, C<< -prefix >> and
+C<< -suffix >> options; explicit destinations with the C<< into >> option;
+and alternative installers with the C<< installler >> option. But it's written
+in only about 40% as many lines of code and has with zero non-core dependencies.
+
+Its internal-facing interface is closer to Exporter.pm, with configuration
+done through the C<< @EXPORT >>, C<< @EXPORT_OK >> and C<< %EXPORT_TAGS >>
+package variables.
 
 Although builders are not an explicit part of the interface,
-Exporter::TypeTiny performs most of its internal duties (including
-resolution of tag names to symbol names, resolution of symbol names to
-coderefs, and installation of coderefs into the target package) as method
-calls, which means they can be overridden to provide more interesting
-behaviour. These are not currently documented.
+Exporter::TypeTiny performs most of its internal duties (including resolution
+of tag names to function names, resolution of function names to coderefs, and
+installation of coderefs into the target package) as method calls, which
+means they can be overridden to provide interesting behaviour. These are not
+currently documented, and are still subject to change.
 
 =head2 Functions
 
