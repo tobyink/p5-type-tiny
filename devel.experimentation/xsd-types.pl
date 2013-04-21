@@ -7,6 +7,7 @@ BEGIN {
 	
 	no thanks;
 	use B qw(perlstring);
+	use Carp;
 	
 	sub create_range_check
 	{
@@ -101,6 +102,8 @@ BEGIN {
 			sprintf('%s =~ m/^(?:%s)$/sm', $var, $re);
 		},
 		whiteSpace => sub {
+			my ($o, $var) = @_;
+			return unless exists $o->{whiteSpace};
 			"!!1";
 		},
 		maxInclusive => sub {
@@ -120,7 +123,7 @@ BEGIN {
 		},
 		minExclusive => sub {
 			my ($o, $var) = @_;
-			return unless exists $o->{minInclusive};
+			return unless exists $o->{minExclusive};
 			quick_range_check("Math::BigInt", delete($o->{minExclusive}), undef, 1, undef, $var);
 		},
 		maxInclusiveFloat => sub {
@@ -140,7 +143,7 @@ BEGIN {
 		},
 		minExclusiveFloat => sub {
 			my ($o, $var) = @_;
-			return unless exists $o->{minInclusive};
+			return unless exists $o->{minExclusive};
 			quick_range_check("Math::BigFloat", delete($o->{minExclusive}), undef, 1, undef, $var);
 		},
 		maxInclusiveStr => sub {
@@ -160,8 +163,28 @@ BEGIN {
 		},
 		minExclusiveStr => sub {
 			my ($o, $var) = @_;
-			return unless exists $o->{minInclusive};
+			return unless exists $o->{minExclusive};
 			sprintf('%s gt %s', $var, perlstring delete $o->{minExclusive});
+		},
+		maxInclusiveDuration => sub {
+			my ($o, $var) = @_;
+			return unless exists $o->{maxInclusive};
+			q[Carp::carp("maxInclusive not implemented for Durations yet")];
+		},
+		minInclusiveDuration => sub {
+			my ($o, $var) = @_;
+			return unless exists $o->{minInclusive};
+			q[Carp::carp("minInclusive not implemented for Durations yet")];
+		},
+		maxExclusiveDuration => sub {
+			my ($o, $var) = @_;
+			return unless exists $o->{maxExclusive};
+			q[Carp::carp("maxExclusive not implemented for Durations yet")];
+		},
+		minExclusiveDuration => sub {
+			my ($o, $var) = @_;
+			return unless exists $o->{minExclusive};
+			q[Carp::carp("minExclusive not implemented for Durations yet")];
 		},
 		totalDigits => sub {
 			my ($o, $var) = @_;
@@ -320,7 +343,20 @@ BEGIN {
 	facet qw( totalDigits fractionDigits pattern whiteSpace enumeration maxInclusive maxExclusive minInclusive minExclusive ),
 	declare UnsignedByte, as UnsignedShort, create_range_check("Math::BigInt", q[0], q[255]);
 
-	# XXX - Duration
+	facet qw( pattern whiteSpace enumeration maxInclusiveDuration maxExclusiveDuration minInclusiveDuration minExclusiveDuration ),
+	declare Duration, as Types::Standard::StrMatch[
+		qr{^P
+			(?:[0-9]+Y)?
+			(?:[0-9]+M)?
+			(?:[0-9]+D)?
+			(?:T
+				(?:[0-9]+H)?
+				(?:[0-9]+M)?
+				(?:[0-9]+(?:\.[0-9]+)?S)?
+			)?
+		$}xism
+	];
+
 	# XXX - DateTime
 	# XXX - Time
 	# XXX - Date
@@ -333,5 +369,5 @@ BEGIN {
 
 use Types::XSD -types;
 
-my $type = Types::XSD::Decimal[maxExclusive => 50_000];
+my $type = Types::XSD::Duration[maxInclusive => "P365D"];
 say $type->inline_check('$XXX');
