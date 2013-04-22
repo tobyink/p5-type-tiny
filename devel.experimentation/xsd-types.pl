@@ -10,7 +10,10 @@ BEGIN {
 	use Carp;
 	
 	use DateTimeX::Auto qw( dt dur );
+	use DateTime::Incomplete ();
 	use XML::RegExp;
+	
+	our $T;
 	
 	sub create_range_check
 	{
@@ -200,6 +203,26 @@ BEGIN {
 			return unless exists $o->{minExclusive};
 			sprintf('(Types::XSD::dur_cmp(%s, %s)||0) > 0', $var, perlstring delete $o->{minExclusive});
 		},
+		maxInclusiveDT => sub {
+			my ($o, $var) = @_;
+			return unless exists $o->{maxInclusive};
+			sprintf('(Types::XSD::dt_cmp(%s, %s, %s)||0) <= 0', perlstring($T), $var, perlstring delete $o->{maxInclusive});
+		},
+		minInclusiveDT => sub {
+			my ($o, $var) = @_;
+			return unless exists $o->{minInclusive};
+			sprintf('(Types::XSD::dt_cmp(%s, %s, %s)||0) >= 0', perlstring($T), $var, perlstring delete $o->{minInclusive});
+		},
+		maxExclusiveDT => sub {
+			my ($o, $var) = @_;
+			return unless exists $o->{maxExclusive};
+			sprintf('(Types::XSD::dt_cmp(%s, %s, %s)||0) < 0', perlstring($T), $var, perlstring delete $o->{maxExclusive});
+		},
+		minExclusiveDT => sub {
+			my ($o, $var) = @_;
+			return unless exists $o->{minExclusive};
+			sprintf('(Types::XSD::dt_cmp(%s, %s, %s)||0) > 0', perlstring($T), $var, perlstring delete $o->{minExclusive});
+		},
 		totalDigits => sub {
 			my ($o, $var) = @_;
 			return unless exists $o->{totalDigits};
@@ -216,13 +239,14 @@ BEGIN {
 	{
 		my $self   = pop;
 		my @facets = @_;
-		
+		my $regexp = qr{^${\(join "|", map quotemeta, @facets)}$}ms;
+				
 		my $inline_generator = sub
 		{
 			my %p = @_;
-			# XXX - sanity check keys %p
 			return sub {
-				my $var = $_[1];
+				local $T = $_[0]->parent;
+				my $var  = $_[1];
 				sprintf(
 					'(%s)',
 					join(
@@ -241,12 +265,65 @@ BEGIN {
 				$inline_generator->(@_)->($self, '$_[0]'),
 			);
 		};
+		$self->{name_generator} = sub {
+			my ($s, %a) = @_;
+			sprintf('%s[%s]', $s, join q[,], map sprintf("%s=>%s", $_, perlstring $a{$_}), sort keys %a);			
+		};
 		
 		return if $self->is_anon;
 		
 		no strict qw( refs );
 		no warnings qw( redefine prototype );
 		*{$self->name} = __PACKAGE__->_mksub($self);
+	}
+	
+	our @dtarr;
+	my $i = -1;
+	our $base_datetime = "DateTime"->new(year => 2000, month => 1, day => 1); # leap year, 31 day month
+	sub dt_maker
+	{
+		my ($name, $regexp, @fields) = @_;
+		$i++; $dtarr[$i] = $regexp;
+		
+		my $inlined = sub
+		{
+			my $var = $_[1];
+			my @code;
+			push @code, "do {";
+			push @code, sprintf(
+				'my (%s) = (%s =~ $Types::XSD::dtarr[%d]);',
+				join(', ', map "\$$_", @fields),
+				$var,
+				$i,
+			);
+			push @code, sprintf(
+				'eval { "DateTime::Incomplete"->new(%s)->to_datetime(base => $Types::XSD::base_datetime) };',
+				join(', ', map "$_ => \$$_", @fields),
+			);
+			push @code, "}";
+			"@code";
+		};
+		
+		my $type = declare(
+			$name,
+			constraint => eval sprintf('sub { %s }', $inlined->(undef, '$_')),
+			inlined    => $inlined,
+		);
+		facet(
+			qw( pattern whiteSpace enumeration maxInclusiveDT maxExclusiveDT minInclusiveDT minExclusiveDT ),
+			$type,
+		);
+	}
+	
+	sub dt_cmp
+	{
+		my ($type, $a, $b) = @_;
+		warn 'dt_cmp';
+		my $A = eval __PACKAGE__->get_type($type)->inline_check('$a');
+		my $B = eval __PACKAGE__->get_type($type)->inline_check('$b');
+		say '$A: ', $A;
+		say '$B: ', $B;
+		return($A <=> $B);
 	}
 	
 	use Types::Standard;
@@ -391,17 +468,103 @@ BEGIN {
 		$}xism
 	];
 	
-	# XXX - DateTime
-	# XXX - Time
-	# XXX - Date
-	# XXX - GYearMonth
-	# XXX - GYear
-	# XXX - GMonthDay
-	# XXX - GDay
-	# XXX - GMonth
+	dt_maker(
+		DateTime => qr{^
+			(-?[0-9]{4,})
+			-
+			([0-9]{2})
+			-
+			([0-9]{2})
+			T
+			([0-9]{2})
+			:
+			([0-9]{2})
+			:
+			([0-9]{2}(?:\.[0-9]+)?)
+			(Z | (?: [+-]\d{2}:?\d{2} ))?
+		$}xism,
+		qw( year month day hour minute second time_zone ),
+	);
+
+	dt_maker(
+		Time => qr{^
+			([0-9]{2})
+			:
+			([0-9]{2})
+			:
+			([0-9]{2}(?:\.[0-9]+)?)
+			(Z | (?: [+-]\d{2}:?\d{2} ))?
+		$}xism,
+		qw( hour minute second time_zone ),
+	);
+	
+	dt_maker(
+		Date => qr{^
+			(-?[0-9]{4,})
+			-
+			([0-9]{2})
+			-
+			([0-9]{2})
+			(Z | (?: [+-]\d{2}:?\d{2} ))?
+		$}xism,
+		qw( year month day time_zone ),
+	);
+	
+	dt_maker(
+		GYearMonth => qr{^
+			(-?[0-9]{4,})
+			-
+			([0-9]{2})
+			(Z | (?: [+-]\d{2}:?\d{2} ))?
+		$}xism,
+		qw( year month time_zone ),
+	);
+
+	dt_maker(
+		GYear => qr{^
+			(-?[0-9]{4,})
+			(Z | (?: [+-]\d{2}:?\d{2} ))?
+		$}xism,
+		qw( year time_zone ),
+	);
+	
+	dt_maker(
+		GMonthDay => qr{^
+			-
+			-
+			([0-9]{2})
+			-
+			([0-9]{2})
+			(Z | (?: [+-]\d{2}:?\d{2} ))?
+		$}xism,
+		qw( month day time_zone ),
+	);
+	
+	dt_maker(
+		GDay => qr{^
+			-
+			-
+			-
+			([0-9]{2})
+			(Z | (?: [+-]\d{2}:?\d{2} ))?
+		$}xism,
+		qw( day time_zone ),
+	);
+	
+	dt_maker(
+		GMonth => qr{^
+			-
+			-
+			([0-9]{2})
+			(Z | (?: [+-]\d{2}:?\d{2} ))?
+		$}xism,
+		qw( month time_zone ),
+	);
 };
 
 use Types::XSD -types;
 
-my $type = Types::XSD::Notation[enumeration => [qw[ foo bar baz ]]];
+my $type = Types::XSD::GMonthDay[ maxExclusive => '--07-01' ];
+say $type;
 say $type->inline_check('$XXX');
+$type->assert_valid('--02-28');
