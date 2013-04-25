@@ -190,3 +190,14 @@
 		item "Type::Tiny::Manual::Coercions."^^Documentation;
 		item "Document Exporter::TypeTiny."^^Documentation;
  	].
+
+`Type-Tiny 0.003_06 cpan:TOBYINK`
+	issued  2013-04-25;
+	changeset [
+		dcs:versus `Type-Tiny 0.003_05 cpan:TOBYINK`;
+		item "No longer need to add '-mouse' when importing types into Mouse libraries. (Same change as what we did for Moose in 0.000_11.)"^^Change;
+		item "Add lots of stuff to Type::Tiny::Manual::UsingWithMouse."^^Documentation;
+		item "Document deep coercions (feature added in 0.003_01)."^^Documentation;
+		item "Add a bunch of stub methods to Type::Tiny and Type::Coercion in order to make it less necessary to inflate to Moose/Mouse meta objects."^^Change;
+		item "Various minor changes to Exporter::TypeTiny to make it more Sub::Exporter compatible."^^Change;
+ 	].
