@@ -1,0 +1,64 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Type::Tiny::Manual::UsingWithOther - how to use Type::Tiny and Type::Library with Class::InsideOut
+
+=head1 DESCRIPTION
+
+=head2 Class::InsideOut
+
+You want L<Class::InsideOut> 1.13 or above.
+
+   {
+      package Person;
+      
+      use Class::InsideOut qw( public );
+      use Types::Standard qw( Str Int );
+      use Type::Utils qw( declare as where inline_as coerce from );
+      
+      public name => my %_name, {
+         set_hook => Str,
+      };
+      
+      my $PositiveInt = declare
+         as        Int,
+         where     {  $_ > 0  },
+         inline_as { "$_ =~ /^[0-9]\$/ and $_ > 0" };
+      
+      coerce $PositiveInt, from Int, q{ abs $_ };
+      
+      public age => my %_age, {
+         set_hook => sub { $_ = $PositiveInt->assert_coerce($_) },
+      };
+      
+      sub get_older {
+         my $self = shift;
+         my ($years) = @_;
+         $PositiveInt->assert_valid($years);
+         $self->_set_age($self->age + $years);
+      }
+   }
+
+I probably need to make coercions a little prettier.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+=cut

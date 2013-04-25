@@ -41,6 +41,10 @@ L<Using with Moo|Type::Tiny::Manual::UsingWithMoo> - how to use Type::Tiny and T
 
 =item *
 
+L<Using with Other OO Frameworks|Type::Tiny::Manual::UsingWithOther> - how to use Type::Tiny and Type::Library with Class::InsideOut
+
+=item *
+
 Type::Tiny and friends don't need to be used within an OO framework. See L<FreeMind::Node> for an example that does not.
 
 =item *
