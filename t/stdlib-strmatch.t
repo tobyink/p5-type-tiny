@@ -50,4 +50,16 @@ should_fail("4 miles", $Distance);
 should_fail("5.5 km", $Distance);
 should_fail([qw/5 km/], $Distance);
 
+my $Boolean = declare Boolean => as StrMatch[qr{^(?:true|false|0|1)$}ism];
+should_pass("true", $Boolean);
+should_pass("True", $Boolean);
+should_pass("TRUE", $Boolean);
+should_pass("false", $Boolean);
+should_pass("False", $Boolean);
+should_pass("FALSE", $Boolean);
+should_pass("0", $Boolean);
+should_pass("1", $Boolean);
+should_fail("True ", $Boolean);
+should_fail("11", $Boolean);
+
 done_testing;
