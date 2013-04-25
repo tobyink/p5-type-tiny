@@ -1,9 +1,4 @@
   * Type-Tiny
-      * documentation
-          * usage with Mouse
-              * using type constraints from libraries
-              * creating type constraints using Type::Utils
-              * coercions
       * new type constraints for Types::Standard
           * Tied - i.e. references to tied variables. Parameterized:
             Tied["Some::Package"]

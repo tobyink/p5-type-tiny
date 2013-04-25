@@ -6,12 +6,82 @@
 
 Type::Tiny::Manual::UsingWithMouse - how to use Type::Tiny and Type::Library with Mouse
 
+=head1 SYNOPSIS
+
+   {
+      package Person;
+      
+      use Mouse;
+      use Types::Standard qw( Str Int );
+      use Type::Utils qw( declare as where inline_as coerce from );
+      
+      has name => (
+         is      => "ro",
+         isa     => Str,
+      );
+      
+      my $PositiveInt = declare
+         as        Int,
+         where     {  $_ > 0  },
+         inline_as { "$_ =~ /^[0-9]\$/ and $_ > 0" };
+      
+      coerce $PositiveInt, from Int, q{ abs $_ };
+      
+      has age => (
+         is      => "ro",
+         isa     => $PositiveInt,
+         coerce  => 1,
+         writer  => "_set_age",
+      );
+      
+      sub get_older {
+         my $self = shift;
+         my ($years) = @_;
+         $PositiveInt->assert_valid($years);
+         $self->_set_age($self->age + $years);
+      }
+   }
+
+=head1 STATUS
+
+L<Mouse> support in Type::Tiny was somewhat of an afterthought. It should
+work, but is not anywhere near as well-tested as L<Moo> or L<Moose>
+support.
+
 =head1 DESCRIPTION
 
-This document has not yet been written. For examples using Type::Tiny with
-L<Mouse> see the SYNOPSIS sections of L<Type::Tiny> and L<Type::Library>,
-and the files C<< mouse.t >> and C<< mouse-coercion.t >> in the Type-Tiny
-L<test suite|https://bitbucket.org/tobyink/p5-type-tiny/src/tip/t>.
+L<Type::Tiny> type constraints have an API almost identical to that of
+L<Mouse::Meta::TypeConstraint>. As a result, you can use a Type::Tiny
+object pretty much anywhere you'd use a Mouse::Meta::TypeConstraint and
+you are unlikely to notice the difference. (And Mouse is unlikely to
+notice the difference too!)
+
+=head2 Per-Attribute Coercions
+
+Type::Tiny offers convenience methods to alter the list of coercions
+associated with a type constraint. Let's imagine we wish to allow our
+C<name> attribute to be coerced from an arrayref of strings.
+
+      has name => (
+         is      => "ro",
+         isa     => Str->plus_coercions(
+            ArrayRef[Str], sub { join " ", @{$_} },
+         ),
+         coerce  => 1,
+      );
+
+This coercion will apply to the C<name> attribute only; other attributes
+using the C<Str> type constraint will be unaffected.
+
+See the documentation for C<plus_coercions>, C<minus_coercions> and
+C<no_coercions> in L<Type::Tiny>.
+
+=head2 Optimization
+
+Mouse's built-in type constraints are implemented using XS and are stupidly
+fast. Using Type::Tiny type constraints I<will> be significantly slower.
+However, Type::Tiny constraints should not be significantly slower (and may
+even be faster) than non-built-in Mouse type constraints.
 
 =head1 AUTHOR
 
