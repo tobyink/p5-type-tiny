@@ -200,4 +200,5 @@
 		item "Document deep coercions (feature added in 0.003_01)."^^Documentation;
 		item "Add a bunch of stub methods to Type::Tiny and Type::Coercion in order to make it less necessary to inflate to Moose/Mouse meta objects."^^Change;
 		item "Various minor changes to Exporter::TypeTiny to make it more Sub::Exporter compatible."^^Change;
+		item "Types::TypeTiny::to_TypeTiny can now coerce from a Mouse::Meta::TypeConstraint."^^Addition;
  	].
