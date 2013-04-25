@@ -647,7 +647,12 @@ sub isa
 	{
 		return $r;
 	}
-	
+
+	if ($INC{"Mouse.pm"} and blessed($self) and $_[0] eq 'Mouse::Meta::TypeConstraint')
+	{
+		return !!1;
+	}
+
 	$self->SUPER::isa(@_);
 }
 
@@ -684,6 +689,14 @@ sub AUTOLOAD
 sub inline_environment { +{} }
 *_compiled_type_constraint = \&compiled_check;
 
+# some stuff for Mouse-compatible API
+*__is_parameterized = \&is_parameterized;
+sub _add_type_coercions { shift->coercion->add_type_coercions(@_) };
+*_as_string = \&qualified_name;
+sub _compiled_type_coercion { shift->coercion->compiled_coercion(@_) };
+sub _identify { refaddr(shift) };
+sub _unite { require Type::Tiny::Union; "Type::Tiny::Union"->new(type_constraints => \@_) };
+
 1;
 
 __END__
@@ -719,7 +732,7 @@ Type::Tiny - tiny, yet Moo(se)-compatible type constraint
    
    package Maisy {
       use Mouse;
-      has favourite_number => (is => "ro", isa => $NUM->mouse_type);
+      has favourite_number => (is => "ro", isa => $NUM);
    }
 
 =head1 DESCRIPTION

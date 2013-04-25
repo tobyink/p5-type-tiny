@@ -322,10 +322,9 @@ Type::Library - tiny, yet Moo(se)-compatible type libraries
       has favourite_number => (is => "ro", isa => Number);
    }
    
-   # Note the "-mouse" flag when importing!
    package Maisy {
       use Mouse;
-      use Types::Mine -mouse, qw(Number);
+      use Types::Mine qw(Number);
       has favourite_number => (is => "ro", isa => Number);
    }
 
@@ -483,9 +482,6 @@ assume that the C<Types::Mine> library defines types C<Number> and C<String>.
    # Exports everything.
    #
    use Types::Mine qw( :all );
-
-Adding C<< -mouse >> to the export list ensures that all the type constraints
-exported are Mouse-compatible.
 
 =head1 BUGS
 
