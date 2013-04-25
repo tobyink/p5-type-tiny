@@ -133,8 +133,6 @@ sub has_message              { exists $_[0]{message} }
 
 sub _default_message         { $_[0]{_default_message} ||= $_[0]->_build_default_message }
 
-# has_message, , _compiled_type_constraint, _default_message
-
 sub _assert_coercion
 {
 	my $self = shift;
@@ -606,8 +604,7 @@ sub no_coercions
 	shift->_clone;
 }
 
-# Monkey patch Moose::Meta::TypeConstraint to make
-# plus_coercions/minus_coercions/no_coercions available
+# Monkey patch Moose::Meta::TypeConstraint to refer to Type::Tiny
 sub _MONKEY_MAGIC
 {
 	return if $trick_done;
@@ -885,7 +882,7 @@ A coderef which generates a new L<Type::Coercion> object based on parameters.
 
 =over
 
-=item C<has_parent>, C<has_library>, C<has_inlined>, C<has_constraint_generator>, C<has_inline_generator>, C<has_coercion_generator>, C<has_parameters>
+=item C<has_parent>, C<has_library>, C<has_inlined>, C<has_constraint_generator>, C<has_inline_generator>, C<has_coercion_generator>, C<has_parameters>, C<has_message>
 
 Predicate methods.
 
@@ -1009,6 +1006,12 @@ Shorthand for creating a new child type constraint with no coercions at all.
 
 If Moose is loaded, then the combination of these methods is used to mock
 a Moose::Meta::TypeConstraint.
+
+If Mouse is loaded, then C<isa> mocks Mouse::Meta::TypeConstraint.
+
+=item C<< inline_environment >>
+
+Stub for Moose compatibility. Always returns an empty hashref.
 
 =back
 
