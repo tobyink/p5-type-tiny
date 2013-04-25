@@ -10,3 +10,8 @@
       * moar tests
           * Exporter::TypeTiny
       * Types-XSD
+      * improved error messages
+          * an ArrayRef[Int] should be able to tell you what elements
+            are not Ints
+          * if something is not a number, then the Int error message
+            should report that; not just report that it's not an Int

@@ -15,5 +15,9 @@
 <node CREATED="1366312442869" ID="ID_982807734" MODIFIED="1366312447777" TEXT="Exporter::TypeTiny"/>
 </node>
 <node CREATED="1366493405737" ID="ID_1537740588" MODIFIED="1366493410536" POSITION="right" TEXT="Types-XSD"/>
+<node CREATED="1366904774462" ID="ID_1574254872" MODIFIED="1366904780973" POSITION="left" TEXT="improved error messages">
+<node CREATED="1366904783424" ID="ID_854471961" MODIFIED="1366904804409" TEXT="an ArrayRef[Int] should be able to tell you what elements are not Ints"/>
+<node CREATED="1366904810438" ID="ID_1602844550" MODIFIED="1366904850449" TEXT="if something is not a number, then the Int error message should report that; not just report that it&apos;s not an Int"/>
+</node>
 </node>
 </map>
