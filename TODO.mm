@@ -5,12 +5,6 @@
 <node CREATED="1365441792858" ID="ID_393588377" MODIFIED="1365441880404" TEXT="Tied - i.e. references to tied variables. Parameterized: Tied[&quot;Some::Package&quot;]"/>
 <node CREATED="1365442342382" ID="ID_345593149" MODIFIED="1365442365283" TEXT="steal from MooseX-Types-Ro?"/>
 </node>
-<node CREATED="1365529954377" ID="ID_1288968569" MODIFIED="1365533825483" POSITION="left" TEXT="coercion">
-<node CREATED="1365442049043" ID="ID_1920269603" MODIFIED="1365534968825" TEXT="Auto-coercion">
-<font NAME="SansSerif" SIZE="12"/>
-<node CREATED="1365529844572" ID="ID_700685078" MODIFIED="1365529849044" TEXT="needs documenting"/>
-</node>
-</node>
 <node CREATED="1365786093068" ID="ID_1062710536" MODIFIED="1366039141668" POSITION="left" TEXT="improve speed for non-inlineable type constraints and coercions">
 <node CREATED="1365786151311" ID="ID_213645694" LINK="#ID_962609536" MODIFIED="1365786201307" TEXT="maybe use eval context idea from Type::Check"/>
 </node>

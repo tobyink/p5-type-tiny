@@ -177,6 +177,46 @@ for C<plus_coercions>. The following two are the same:
    
    PathTiny->plus_constructors(Str, "new");
 
+=head2 "Deep" Coercions
+
+Certain parameterized type constraints can automatically acquire coercions
+if their parameters have coercions. For example:
+
+   ArrayRef[ Int->plus_coercions(Num, q{int($_)}) ]
+
+... does what you mean!
+
+The parameterized type constraints that do this magic include the following
+ones from L<Types::Standard>:
+
+=over
+
+=item *
+
+C<ScalarRef>
+
+=item *
+
+C<ArrayRef>
+
+=item *
+
+C<HashRef>
+
+=item *
+
+C<Tuple>
+
+=item *
+
+C<Dict>
+
+=item *
+
+C<Optional>
+
+=back
+
 =head1 SEE ALSO
 
 L<Moose::Manual::BestPractices>,

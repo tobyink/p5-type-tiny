@@ -3,9 +3,6 @@
           * Tied - i.e. references to tied variables. Parameterized:
             Tied["Some::Package"]
           * steal from MooseX-Types-Ro?
-      * coercion
-          * Auto-coercion
-              * needs documenting
       * improve speed for non-inlineable type constraints and coercions
           * maybe use eval context idea from Type::Check
       * Type-Tiny could be used as a backend for Scalar::Does?
