@@ -483,6 +483,9 @@ assume that the C<Types::Mine> library defines types C<Number> and C<String>.
    #
    use Types::Mine qw( :all );
 
+Type libraries automatically inherit from L<Exporter::TypeTiny>; see the
+documentation of that module for tips and tricks importing from libraries.
+
 =head1 BUGS
 
 Please report any bugs to

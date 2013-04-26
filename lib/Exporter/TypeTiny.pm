@@ -248,6 +248,73 @@ Similar to C<mkopt_hash> from L<Data::OptList>. See also C<mkopt>.
 
 =back
 
+=head1 TIPS AND TRICKS
+
+For the purposes of this discussion we'll assume we have a module called
+C<< MyUtils >> which exports one function, C<< frobnicate >>. C<< MyUtils >>
+inherits fom Exporter::TypeTiny.
+
+Many of these tricks may seem familiar from L<Sub::Exporter>. That is
+intentional. Exporter::TypeTiny doesn't attempt to provide every feature of
+Sub::Exporter, but where it does it usually uses a fairly similar API.
+
+=head2 Basic importing
+
+   # import "frobnicate" function
+   use MyUtils "frobnicate";
+
+   # import all functions that MyUtils offers
+   use MyUtils -all;
+
+=head2 Renaming imported functions
+
+   # call it "frob"
+   use MyUtils "frobnicate" => { -as => "frob" };
+
+   # call it "my_frobnicate"
+   use MyUtils "frobnicate" => { -prefix => "my_" };
+
+   # call it "frobnicate_util"
+   use MyUtils "frobnicate" => { -suffix => "_util" };
+
+   # import it twice with two different names
+   use MyUtils
+      "frobnicate" => { -as => "frob" },
+      "frobnicate" => { -as => "frbnct" };
+
+=head2 Lexical subs
+
+   {
+      use Sub::Exporter::Lexical lexical_installer => { -as => "lex" };
+      use MyUtils { installer => lex }, "frobnicate";
+      
+      frobnicate(...);  # ok
+   }
+   
+   frobnicate(...);  # not ok
+
+=head2 Import functions into another package
+
+   use MyUtils { into => "OtherPkg" }, "frobnicate";
+   
+   OtherPkg::frobincate(...);
+
+=head2 Import functions into a scalar
+
+   my $func;
+   use MyUtils "frobnicate" => { -as => \$func };
+   
+   $func->(...);
+
+=head2 Import functions into a hash
+
+OK, Sub::Exporter doesn't do this...
+
+   my %funcs;
+   use MyUtils { into => \%funcs }, "frobnicate";
+   
+   $funcs{frobnicate}->(...);
+
 =head1 BUGS
 
 Please report any bugs to

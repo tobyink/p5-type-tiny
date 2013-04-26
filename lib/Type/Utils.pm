@@ -310,8 +310,7 @@ Type::Utils - utility functions to make defining type constraints a little easie
 =head1 DESCRIPTION
 
 This module provides utility functions to make defining type constraints a
-little easier. By default, all of the functions documented below are
-exported, except C<subtype> and C<type> (use C<declare> instead).
+little easier. 
 
 =head2 Moose::Util::TypeConstraints-like
 
@@ -423,6 +422,14 @@ needed (e.g. avoiding coercing C<< [] >> to C<< [ [] ] >>) and allows
 C<assert_coerce> to work properly.
 
 =back
+
+=head1 EXPORT
+
+By default, all of the functions documented above are exported, except
+C<subtype> and C<type> (prefer C<declare> instead).
+
+This module uses L<Exporter::TypeTiny>; see the documentation of that module
+for tips and tricks importing from Type::Utils.
 
 =head1 BUGS
 
