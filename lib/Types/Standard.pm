@@ -578,10 +578,11 @@ declare "Bytes",
 	where { !utf8::is_utf8($_) },
 	inline_as { "!utf8::is_utf8($_)" };
 
+our $SevenBitSafe = qr{^[\x00-\x7F]*$}sm;
 declare "Chars",
 	as "Str",
-	where { utf8::is_utf8($_) },
-	inline_as { "utf8::is_utf8($_)" };
+	where { utf8::is_utf8($_) or $_ =~ $Types::Standard::SevenBitSafe },
+	inline_as { "utf8::is_utf8($_) or $_ =~ \$Types::Standard::SevenBitSafe" };
 
 declare "OptList",
 	as ArrayRef( [ArrayRef()] ),
@@ -794,7 +795,8 @@ Strings where C<< utf8::is_utf8() >> is false.
 
 =item C<< Chars >>
 
-Strings where C<< utf8::is_utf8() >> is true.
+Strings where either C<< utf8::is_utf8() >> is true, or each byte is
+below C<0x7F>.
 
 =item C<< OptList >>
 

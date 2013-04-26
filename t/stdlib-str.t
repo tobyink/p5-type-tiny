@@ -27,7 +27,7 @@ use warnings;
 use lib qw( . ./t ../inc ./inc );
 use utf8;
 
-use Test::More tests => 2;
+use Test::More tests => 3;
 use Test::TypeTiny;
 
 use Encode;
@@ -185,5 +185,30 @@ subtest "Check ArrayRef[Str], ArrayRef[Bytes] and ArrayRef[Chars]; Join and Spli
 		'$JoinPipe->coerce($arr_bytes_western)',
 	);
 	should_pass($_, Bytes);
+};
+
+subtest "Seven-bit safe stuff" => sub
+{
+	plan tests => 12;
+	
+	my $chars          = "coffee shop";
+	my $bytes_utf8     = Encode::encode("utf-8",      $chars);
+	my $bytes_western  = Encode::encode("iso-8859-1", $chars);
+	
+	is(length($chars),         11, 'length $chars == 11');
+	is(length($bytes_utf8),    11, 'length $bytes_utf8 == 11');
+	is(length($bytes_western), 11, 'length $bytes_western == 11');
+
+	should_pass($chars, Str);
+	should_pass($chars, Chars);
+	should_pass($chars, Bytes);
+
+	should_pass($bytes_utf8, Str);
+	should_pass($bytes_utf8, Chars);
+	should_pass($bytes_utf8, Bytes);
+
+	should_pass($bytes_western, Str);
+	should_pass($bytes_western, Chars);
+	should_pass($bytes_western, Bytes);
 };
 
