@@ -10,7 +10,9 @@ Type::Tiny::Manual::UsingWithOther - how to use Type::Tiny and Type::Library wit
 
 =head2 Class::InsideOut
 
-You want L<Class::InsideOut> 1.13 or above.
+You want L<Class::InsideOut> 1.13 or above, which has support for blessed
+and overloaded objects (including Type::Tiny type constraints) for the
+C<get_hook> and C<set_hook> options.
 
    {
       package Person;
@@ -43,6 +45,9 @@ You want L<Class::InsideOut> 1.13 or above.
    }
 
 I probably need to make coercions a little prettier.
+
+B<< See also: >> C<< t/25_accessor_hooks_typetiny.t >> and
+C<< t/Object/HookedTT.pm >> in the Class::InsideOut test suite.
 
 =head1 AUTHOR
 

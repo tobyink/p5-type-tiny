@@ -219,7 +219,7 @@ sub declare_coercion
 	{
 		%opts = (%opts, %{+shift});
 	}
-
+	
 	my $caller = caller($opts{_caller_level} || 0);
 	$opts{library} = $caller;
 	

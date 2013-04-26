@@ -83,6 +83,13 @@ a boost with Moose as it does with Moo, because Moose doesn't inline coercion
 code. However, it should still improve performance somewhat because it allows
 L<Type::Coercion> to do some internal inlining.
 
+=head1 SEE ALSO
+
+For examples using Type::Tiny with L<Moose> see the SYNOPSIS sections of
+L<Type::Tiny> and L<Type::Library>, and the files C<< moose.t >>,
+C<< moose-coercion.t >> and C<< moo-inflation.t >> in the Type-Tiny
+L<test suite|https://bitbucket.org/tobyink/p5-type-tiny/src/tip/t>.
+
 =head1 AUTHOR
 
 Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
