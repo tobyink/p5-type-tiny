@@ -136,12 +136,7 @@ sub _export
 	
 	elsif ($type = $meta->get_type($sub->{sub}))
 	{
-		$export_coderef = _subname $type->qualified_name, sub (;@)
-		{
-			my $params; $params = shift if ref($_[0]) eq "ARRAY";
-			my $t = $params ? $type->parameterize(@$params) : $type;
-			@_ && wantarray ? return($t, @_) : return $t;
-		}
+		$export_coderef = ref($meta)->can($sub->{sub});
 	}
 	
 	elsif (scalar grep($_ eq $sub->{sub}, $class->_EXPORT_OK) and my $additional = $class->can($sub->{sub}))
