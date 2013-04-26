@@ -72,8 +72,8 @@ sub add
 	my $class = shift;
 	my ($x, $y, $swap) = @_;
 	
-	TypeTiny->check($x) and return $x->plus_fallback_coercions($y);
-	TypeTiny->check($y) and return $y->plus_coercions($x);
+	Types::TypeTiny::TypeTiny->check($x) and return $x->plus_fallback_coercions($y);
+	Types::TypeTiny::TypeTiny->check($y) and return $y->plus_coercions($x);
 	
 	_croak "Attempt to add $class to something that is not a $class"
 		unless blessed($x) && blessed($y) && $x->isa($class) && $y->isa($class);

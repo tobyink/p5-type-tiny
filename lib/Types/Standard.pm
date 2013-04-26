@@ -489,7 +489,7 @@ declare "Overload",
 	constraint_generator => sub
 	{
 		my @operations = map {
-			Type::Tiny::StringLike->check($_)
+			Types::TypeTiny::StringLike->check($_)
 				? "$_"
 				: _croak("Parameters to Overload[`a] expected to be a strings; got $_");
 		} @_;
@@ -523,8 +523,8 @@ declare "StrMatch",
 
 		if (@_ > 1)
 		{
-			$checker = Type::Tiny::to_TypeTiny($checker);
-			Type::Tiny::TypeTiny->check($checker)
+			$checker = Types::TypeTiny::to_TypeTiny($checker);
+			Types::TypeTiny::TypeTiny->check($checker)
 				or _croak("Second parameter to StrMatch[`a] expected to be a type constraint; got $checker")
 		}
 
