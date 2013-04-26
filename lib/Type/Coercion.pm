@@ -10,7 +10,7 @@ BEGIN {
 }
 
 use Scalar::Util qw< blessed >;
-use Types::TypeTiny qw< CodeLike StringLike TypeTiny to_TypeTiny >;
+use Types::TypeTiny ();
 
 sub _croak ($;@)
 {
@@ -142,14 +142,14 @@ sub assert_coerce
 sub has_coercion_for_type
 {
 	my $self = shift;
-	my $type = to_TypeTiny($_[0]);
+	my $type = Types::TypeTiny::to_TypeTiny($_[0]);
 	
 	return "0 but true"
 		if $self->has_type_constraint && $type->is_a_type_of($self->type_constraint);
 	
 	for my $has (@{$self->type_coercion_map})
 	{
-		return !!1 if TypeTiny->check($has) && $type->is_a_type_of($has);
+		return !!1 if Types::TypeTiny::TypeTiny->check($has) && $type->is_a_type_of($has);
 	}
 	
 	return;
@@ -181,13 +181,13 @@ sub add_type_coercions
 	
 	while (@args)
 	{
-		my $type     = to_TypeTiny(shift @args);
+		my $type     = Types::TypeTiny::to_TypeTiny(shift @args);
 		my $coercion = shift @args;
 		
 		_croak "Types must be blessed Type::Tiny objects"
-			unless TypeTiny->check($type);
+			unless Types::TypeTiny::TypeTiny->check($type);
 		_croak "Coercions must be code references or strings"
-			unless StringLike->check($coercion) || CodeLike->check($coercion);
+			unless Types::TypeTiny::StringLike->check($coercion) || Types::TypeTiny::CodeLike->check($coercion);
 		
 		push @{$self->type_coercion_map}, $type, $coercion;
 	}
@@ -232,8 +232,10 @@ sub _build_compiled_coercion
 			$types[$i]->can_be_inlined ? sprintf('if (%s)', $types[$i]->inline_check('$_[0]')) :
 			sprintf('if ($types[%d]->check(@_))', $i);
 		push @sub,
-			!defined($codes[$i])          ? sprintf('  { return $_[0] }') :
-			StringLike->check($codes[$i]) ? sprintf('  { local $_ = $_[0]; return( %s ) }', $codes[$i]) :
+			!defined($codes[$i])
+				? sprintf('  { return $_[0] }') :
+			Types::TypeTiny::StringLike->check($codes[$i])
+				? sprintf('  { local $_ = $_[0]; return( %s ) }', $codes[$i]) :
 			sprintf('  { local $_ = $_[0]; return $codes[%d]->(@_) }', $i);
 	}
 	
@@ -256,7 +258,7 @@ sub can_be_inlined
 	{
 		my ($type, $converter) = splice(@mishmash, 0, 2);
 		return unless $type->can_be_inlined;
-		return unless StringLike->check($converter);
+		return unless Types::TypeTiny::StringLike->check($converter);
 	}
 	return !!1;
 }
@@ -347,7 +349,7 @@ sub _codelike_type_coercion_map
 		
 		push @new, $modifier ? $type->$modifier : $type;
 		
-		if (CodeLike->check($converter))
+		if (Types::TypeTiny::CodeLike->check($converter))
 		{
 			push @new, $converter;
 		}
@@ -380,7 +382,7 @@ sub parameterize
 	$self->is_parameterizable
 		or _croak "constraint '%s' does not accept parameters", "$self";
 	
-	@_ = map to_TypeTiny($_), @_;
+	@_ = map Types::TypeTiny::to_TypeTiny($_), @_;
 	
 	return ref($self)->new(
 		type_constraint    => $self->type_constraint,

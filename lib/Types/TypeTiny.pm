@@ -8,10 +8,20 @@ our $VERSION   = '0.003_07';
 
 use Scalar::Util qw< blessed >;
 
-use base qw< Exporter::TypeTiny >;
 our @EXPORT_OK = qw( CodeLike StringLike TypeTiny HashLike to_TypeTiny );
 
 my %cache;
+
+sub import
+{
+	# do the shuffle!
+	no warnings "redefine";
+	our @ISA = qw( Exporter::TypeTiny );
+	require Exporter::TypeTiny;
+	my $next = \&Exporter::TypeTiny::import;
+	*import = $next;
+	goto $next;
+}
 
 sub StringLike ()
 {
