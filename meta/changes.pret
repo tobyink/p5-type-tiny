@@ -143,7 +143,7 @@
 	].
 
 `Type-Tiny 0.002 cpan:TOBYINK`
-	issued  2013-04-29;
+	issued  2013-04-26;
 	changeset [
 		dcs:versus `Type-Tiny 0.001 cpan:TOBYINK`;
 		item "Link from Test::TypeTiny to Test::Deep::Type."^^Documentation;
@@ -151,4 +151,10 @@
 		item "Make Type::Tiny's has_coercion method more DWIM."^^Change;
 		item "Chars and Bytes types added to Types::Standard."^^Addition;
 		item "Prevent warnings (about 'my $val' masking a previously declared variable) when several Str checks are being inlined in close proximity, such as Tuple[Str,Str]"^^Bugfix;
+		item [
+			a dcs:Bugfix;
+			label "Fix method conflicts when exporting type constraints to roles.";
+			dcs:thanks cpan:BOWTIE;
+			dcs:fixes [ dbug:reporter cpan:BOWTIE ];
+		];
 	].

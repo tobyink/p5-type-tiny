@@ -11,6 +11,11 @@ cpan:TOBYINK
 cpan:MSTROUT
 	:name  "Matt S Trout".
 
+# Bug reports
+
+cpan:BOWTIE
+	:name  "Kevin Dawson".
+
 # We bundle some files made by these dudes...
 
 cpan:RJBS
