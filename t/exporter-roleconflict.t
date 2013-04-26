@@ -54,8 +54,8 @@ my $e = exception {
 };
 
 use Scalar::Util "refaddr";
-diag refaddr(\&Local::Role1::Str);
-diag refaddr(\&Local::Role2::Str);
+note refaddr(\&Local::Role1::Str);
+note refaddr(\&Local::Role2::Str);
 
 is($e, undef);
 

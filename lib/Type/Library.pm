@@ -137,7 +137,7 @@ sub _exporter_expand_sub
 		my $post_method = '';
 		$post_method = '->mouse_type' if $globals->{mouse};
 		$post_method = '->moose_type' if $globals->{moose};
-		return ($name => $class->_mksub($type, $post_method));
+		return ($name => $class->_mksub($type, $post_method)) if $post_method;
 	}
 	
 	return $class->SUPER::_exporter_expand_sub(@_);
