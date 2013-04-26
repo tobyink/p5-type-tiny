@@ -231,4 +231,5 @@
 			dcs:fixes [ dbug:reporter cpan:BOWTIE ];
 		];
 		item "Document usage with Class::InsideOut."^^Documentation;
+		item "Minor improvements to manual."^^Documentation;
 	].
