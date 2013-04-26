@@ -233,3 +233,14 @@
 		item "Document usage with Class::InsideOut."^^Documentation;
 		item "Minor improvements to manual."^^Documentation;
 	].
+
+`Type-Tiny 0.003_08 cpan:TOBYINK`
+	issued  2013-04-26;
+	changeset [
+		dcs:versus `Type-Tiny 0.003_07 cpan:TOBYINK`;
+		item "ASCII-only strings are now accepted by the Chars constraint in Types::Standard."^^Change;
+		item "More Exporter::TypeTiny docs, including usage with Sub::Exporter::Lexical."^^Documentation;
+		item "Test case using Exporter::TypeTiny with Sub::Exporter::Lexical."^^Addition;
+		item "Type::Tiny, Type::Coercion and their subclasses no longer call Types::TypeTiny->import method."^^Change;
+		item "Types::TypeTiny lazily loads Exporter::TypeTiny - i.e. it loads Exporter::TypeTiny when Types::TypeTiny->import is first called."^^Change;
+	].
