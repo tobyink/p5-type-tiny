@@ -201,12 +201,12 @@
 		dcs:versus `Type-Tiny 0.003_04 cpan:TOBYINK`;
 		item "Chars and Bytes types added to Types::Standard."^^Addition;
 		item "Allow coercions to accept parameters."^^Addition;
-		item "Encode, Decide, Join and Split coercions added to Types::Standard."^^Addition;
+		item "Encode, Decode, Join and Split coercions added to Types::Standard."^^Addition;
 		item "Prevent warnings (about 'my $val' masking a previously declared variable) when several Str checks are being inlined in close proximity, such as Tuple[Str,Str]"^^Bugfix;
 		item "Type::Tiny::Class now has a plus_constructors method."^^Addition;
 		item "Type::Tiny::Manual::Coercions."^^Documentation;
 		item "Document Exporter::TypeTiny."^^Documentation;
- 	].
+	].
 
 `Type-Tiny 0.003_06 cpan:TOBYINK`
 	issued  2013-04-25;
@@ -218,7 +218,7 @@
 		item "Add a bunch of stub methods to Type::Tiny and Type::Coercion in order to make it less necessary to inflate to Moose/Mouse meta objects."^^Change;
 		item "Various minor changes to Exporter::TypeTiny to make it more Sub::Exporter compatible."^^Change;
 		item "Types::TypeTiny::to_TypeTiny can now coerce from a Mouse::Meta::TypeConstraint."^^Addition;
- 	].
+	].
 
 `Type-Tiny 0.003_07 cpan:TOBYINK`
 	issued  2013-04-26;
@@ -231,4 +231,4 @@
 			dcs:fixes [ dbug:reporter cpan:BOWTIE ];
 		];
 		item "Document usage with Class::InsideOut."^^Documentation;
- 	].
+	].
