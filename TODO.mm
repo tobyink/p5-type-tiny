@@ -11,10 +11,6 @@
 <node CREATED="1365786461715" ID="ID_1123916121" MODIFIED="1365786480681" POSITION="left" TEXT="Type-Tiny could be used as a backend for Scalar::Does?">
 <node CREATED="1365786482499" ID="ID_957202187" MODIFIED="1365786492545" TEXT="if not, certainly a SEE ALSO"/>
 </node>
-<node CREATED="1366312423802" ID="ID_956029313" MODIFIED="1366312426894" POSITION="right" TEXT="moar tests">
-<node CREATED="1366312442869" ID="ID_982807734" MODIFIED="1366312447777" TEXT="Exporter::TypeTiny"/>
-</node>
-<node CREATED="1366493405737" ID="ID_1537740588" MODIFIED="1366493410536" POSITION="right" TEXT="Types-XSD"/>
 <node CREATED="1366904774462" ID="ID_1574254872" MODIFIED="1366904780973" POSITION="left" TEXT="improved error messages">
 <node CREATED="1366904783424" ID="ID_854471961" MODIFIED="1366904804409" TEXT="an ArrayRef[Int] should be able to tell you what elements are not Ints"/>
 <node CREATED="1366904810438" ID="ID_1602844550" MODIFIED="1366904850449" TEXT="if something is not a number, then the Int error message should report that; not just report that it&apos;s not an Int"/>

@@ -7,9 +7,6 @@
           * maybe use eval context idea from Type::Check
       * Type-Tiny could be used as a backend for Scalar::Does?
           * if not, certainly a SEE ALSO
-      * moar tests
-          * Exporter::TypeTiny
-      * Types-XSD
       * improved error messages
           * an ArrayRef[Int] should be able to tell you what elements
             are not Ints

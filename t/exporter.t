@@ -48,4 +48,45 @@ like(
 	q {Attempt to export a function which exists but not in @EXPORT_OK},
 );
 
+{
+	my $hash = {};
+	"Types::Standard"->import({ into => $hash }, qw(-types));
+	is_deeply(
+		[ sort keys %$hash ],
+		[ sort "Types::Standard"->meta->type_names ],
+		'"-types" shortcut works',
+	);
+};
+
+{
+	my $hash = {};
+	"Types::Standard"->import({ into => $hash }, qw(-coercions));
+	is_deeply(
+		[ sort keys %$hash ],
+		[ sort "Types::Standard"->meta->coercion_names ],
+		'"-coercions" shortcut works',
+	);
+};
+
+{
+	my $hash = {};
+	"Types::Standard"->import({ into => $hash }, Str    => {                 });
+	"Types::Standard"->import({ into => $hash }, Str    => { -as => "String" });
+	"Types::Standard"->import({ into => $hash }, -types => { -prefix => "X_" });
+	"Types::Standard"->import({ into => $hash }, -types => { -suffix => "_Z" });
+	is($hash->{Str}, $hash->{String}, 'renaming works');
+	is($hash->{Str}, $hash->{X_Str}, 'prefixes work');
+	is($hash->{Str}, $hash->{Str_Z}, 'suffixes work');
+};
+
+{
+	my $hash = {};
+	"Types::Standard"->import({ into => $hash }, qw(+Str));
+	is_deeply(
+		[sort keys %$hash],
+		[sort qw/ assert_Str to_Str is_Str Str /],
+		'plus notation works for Type::Library',
+	);
+};
+
 done_testing;
