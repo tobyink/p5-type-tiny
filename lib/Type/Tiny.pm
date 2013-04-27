@@ -191,6 +191,13 @@ sub _build_compiled_check
 		return $self->parent->compiled_check;
 	}
 	
+	if ($self->{_is_core} and $INC{'Mouse/Util.pm'} and Mouse::Util::MOUSE_XS())
+	{
+		require Mouse::Util::TypeConstraints;
+		my $xs = "Mouse::Util::TypeConstraints"->can($self->name);
+		return $xs if $xs;
+	}
+	
 	if ($self->can_be_inlined)
 	{
 		local $@;

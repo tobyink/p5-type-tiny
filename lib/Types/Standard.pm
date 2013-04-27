@@ -96,7 +96,6 @@ declare "ClassName",
 	inline_as { "Types::Standard::_is_class_loaded($_)" };
 
 declare "RoleName",
-	_is_core => 1,
 	as "ClassName",
 	where { not $_->can("new") },
 	inline_as { "Types::Standard::_is_class_loaded($_) and not $_->can('new')" };
