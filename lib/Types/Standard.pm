@@ -608,6 +608,67 @@ declare "OptList",
 		);
 	};
 
+declare "Tied",
+	as "Ref",
+	where { 
+		!!tied(Scalar::Util::reftype($_) eq 'HASH' ?  %{$_} : Scalar::Util::reftype($_) eq 'ARRAY' ?  @{$_} :  ${$_})
+	}
+	inline_as {
+		my $self = shift;
+		$self->parent->inline_check(@_)
+		. " and !!tied(Scalar::Util::reftype($_) eq 'HASH' ? \%{$_} : Scalar::Util::reftype($_) eq 'ARRAY' ? \@{$_} : \${$_})"
+	}
+	name_generator => sub
+	{
+		my $self  = shift;
+		my $param = Types::TypeTiny::to_TypeTiny(shift);
+		unless (Types::TypeTiny::TypeTiny->check($param))
+		{
+			Types::TypeTiny::StringLike->check($param)
+				or _croak("Parameter to Tied[`a] expected to be a class name; got $param");
+			require B;
+			return sprintf("%s[%s]", $self, B::perlstring($param));
+		}
+		return sprintf("%s[%s]", $self, $param);
+	},
+	constraint_generator => sub
+	{
+		my $param = Types::TypeTiny::to_TypeTiny(shift);
+		unless (Types::TypeTiny::TypeTiny->check($param))
+		{
+			Types::TypeTiny::StringLike->check($param)
+				or _croak("Parameter to Tied[`a] expected to be a class name; got $param");
+			require Type::Tiny::Class;
+			$param = "Type::Tiny::Class"->new(class => "$param");
+		}
+		
+		my $check = $param->compiled_check;
+		return sub {
+			$check->(tied(Scalar::Util::reftype($_) eq 'HASH' ?  %{$_} : Scalar::Util::reftype($_) eq 'ARRAY' ?  @{$_} :  ${$_}));
+		};
+	},
+	inline_generator => sub {
+		my $param = Types::TypeTiny::to_TypeTiny(shift);
+		unless (Types::TypeTiny::TypeTiny->check($param))
+		{
+			Types::TypeTiny::StringLike->check($param)
+				or _croak("Parameter to Tied[`a] expected to be a class name; got $param");
+			require Type::Tiny::Class;
+			$param = "Type::Tiny::Class"->new(class => "$param");
+		}
+		return unless $param->can_be_inlined;
+		
+		return sub {
+			require B;
+			my $var = $_[1];
+			sprintf(
+				"%s and do { my \$TIED = tied(Scalar::Util::reftype($var) eq 'HASH' ? \%{$var} : Scalar::Util::reftype($var) eq 'ARRAY' ? \@{$var} : \${$var}); %s }",
+				Ref()->inline_check($var),
+				$param->inline_check('$TIED')
+			);
+		};
+	};
+
 declare_coercion "MkOpt",
 	to_type "OptList",
 	from    "ArrayRef", q{ Exporter::TypeTiny::mkopt($_) },
@@ -770,6 +831,42 @@ to check are overloaded. For example, the following checks for objects
 which overload addition and subtraction.
 
    Overload["+", "-"]
+
+=item C<< Tied[`a] >>
+
+A reference to a tied scalar, array or hash.
+
+Can be parameterized with a type constraint which will be applied to
+the object returned by the C<< tied() >> function. As a convenience,
+can also be parameterized with a string, which will be inflated to a
+L<Type::Tiny::Class>.
+
+   use Types::Standard qw(Tied);
+   use Type::Utils qw(class_type);
+   
+   my $My_Package = class_type { class => "My::Package" };
+   
+   tie my %h, "My::Package";
+   \%h ~~ Tied;                   # true
+   \%h ~~ Tied[ $My_Package ];    # true
+   \%h ~~ Tied["My::Package"];    # true
+   
+   tie my $s, "Other::Package";
+   \$s ~~ Tied;                   # true
+   $s  ~~ Tied;                   # false !!
+
+If you need to check that something is specifically a reference to
+a tied hash, use an intersection:
+
+   use Types::Standard qw( Tied HashRef );
+   
+   my $TiedHash = (Tied) & (HashRef);
+   
+   tie my %h, "My::Package";
+   tie my $s, "Other::Package";
+   
+   \%h ~~ $TiedHash;     # true
+   \$s ~~ $TiedHash;     # false
 
 =item C<< StrMatch[`a] >>
 
