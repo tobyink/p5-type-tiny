@@ -182,13 +182,21 @@ variable name.
       where     { scalar values %$_ },
       inline_as {
          my ($constraint, $varname) = @_;
-         return "scalar values \%{$varname}";
+         return sprintf(
+            '%s and scalar values %%{%s}',
+            $constraint->parent->inline_check($varname),
+            $varname,
+         );
       };
 
 The Perl expression could be inlined within a function or a C<if> clause or
 potentially anywhere, so it really must be an expression, not a statement.
 It should not C<return> or C<exit> and probably shouldn't C<die>. (If you
 need loops and so on, you can output a C<do> block.)
+
+Note that if you're subtyping an existing type constraint, your C<inline_as>
+block is also responsible for checking the parent type's constraint. This
+can be done quite easily, as shown in the example above.
 
 =head2 Parameterized Constraints
 
@@ -222,7 +230,11 @@ four key-value pairs. Here's how you'd do it:
       where     { scalar values %$_ },
       inline_as {
          my ($constraint, $varname) = @_;
-         return "scalar values \%{$varname}";
+         return sprintf(
+            '%s and scalar values %%{%s}',
+            $constraint->parent->inline_check($varname),
+            $varname,
+         );
       },
       # Generate a new "where" coderef...
       constraint_generator => sub {
@@ -236,8 +248,13 @@ four key-value pairs. Here's how you'd do it:
       inline_generator => sub {
          my ($minimum) = @_;
          return sub {
-             my ($constraint, $varname) = @_;
-             "scalar(values \%{$varname}) >= " . int($minimum);
+            my ($constraint, $varname) = @_;
+            return sprintf(
+               '%s and scalar(values(%%{%s})) >= %d',
+               $constraint->parent->inline_check($varname),
+               $varname,
+               $minimum,
+            );
          };
       };
 
