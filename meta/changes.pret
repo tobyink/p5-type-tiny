@@ -244,3 +244,11 @@
 		item "Type::Tiny, Type::Coercion and their subclasses no longer call Types::TypeTiny->import method."^^Change;
 		item "Types::TypeTiny lazily loads Exporter::TypeTiny - i.e. it loads Exporter::TypeTiny when Types::TypeTiny->import is first called."^^Change;
 	].
+
+`Type-Tiny 0.003_09 cpan:TOBYINK`
+	issued  2013-04-28;
+	changeset [
+		dcs:versus `Type-Tiny 0.003_08 cpan:TOBYINK`;
+		item "Document usage with Params::Check and Object::Accessor."^^Documentation;
+		item "If Mouse is already in memory, Type::Tiny will use its super-fast XS subs to validate values when possible."^^Change;
+	].
