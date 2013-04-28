@@ -250,5 +250,6 @@
 	changeset [
 		dcs:versus `Type-Tiny 0.003_08 cpan:TOBYINK`;
 		item "Document usage with Params::Check and Object::Accessor."^^Documentation;
+		item "'Tied' type constraint added to Types::Standard."^^Addition;
 		item "If Mouse is already in memory, Type::Tiny will use its super-fast XS subs to validate values when possible."^^Change;
 	].
