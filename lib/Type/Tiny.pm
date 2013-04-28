@@ -191,11 +191,21 @@ sub _build_compiled_check
 		return $self->parent->compiled_check;
 	}
 	
-	if ($self->{_is_core} and $INC{'Mouse/Util.pm'} and Mouse::Util::MOUSE_XS())
+	if ($INC{'Mouse/Util.pm'} and Mouse::Util::MOUSE_XS())
 	{
 		require Mouse::Util::TypeConstraints;
-		my $xs = "Mouse::Util::TypeConstraints"->can($self->name);
-		return $xs if $xs;
+		
+		if ($self->{_is_core})
+		{
+			my $xs = "Mouse::Util::TypeConstraints"->can($self->name);
+			return $xs if $xs;
+		}
+		elsif ($self->is_parameterized and $self->has_parent
+		and $self->parent->{_is_core} and $self->parent->name =~ /^(ArrayRef|HashRef|Maybe)$/)
+		{
+			my $xs = "Mouse::Util::TypeConstraints"->can("_parameterize_".$self->parent->name."_for");
+			return $xs->($self->parameters->[0]) if $xs;
+		}
 	}
 	
 	if ($self->can_be_inlined)
