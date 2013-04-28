@@ -1,5 +1,8 @@
 package Test::TypeTiny;
 
+use strict;
+use warnings;
+
 use Test::More ();
 use base qw< Exporter::TypeTiny >;
 

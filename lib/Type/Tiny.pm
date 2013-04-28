@@ -447,7 +447,8 @@ sub parameterize
 	
 	my $P = $self->create_child_type(%options);
 
-	my $coercion = $self->coercion_generator->($self, $P, @_)
+	my $coercion;
+	$coercion = $self->coercion_generator->($self, $P, @_)
 		if $self->has_coercion_generator;
 	$P->coercion->add_type_coercions( @{$coercion->type_coercion_map} )
 		if $coercion;
