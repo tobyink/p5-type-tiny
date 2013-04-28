@@ -191,33 +191,26 @@ __END__
 
 Exporter::TypeTiny - a small exporter used internally by Type::Library and friends
 
+=head1 SYNOPSIS
+
+   package MyUtils;
+   use base "Exporter::TypeTiny";
+   our @EXPORT = qw(frobnicate);
+   sub frobnicate { my $n = shift; ... }
+   1;
+
+   package MyScript;
+   use MyUtils "frobnicate" => { -as => "frob" };
+   print frob(42);
+   exit;
+
 =head1 DESCRIPTION
-
-B<< Y O Y O Y O Y O Y ??? >>
-
-B<< Why >> bundle an exporter with Type-Tiny?
-
-Well, it wasn't always that way. L<Type::Library> had a bunch of custom
-exporting code which poked coderefs into its caller's stash. It needed this
-so that it could switch between exporting Moose, Mouse and Moo-compatible
-objects on request.
-
-Meanwhile L<Type::Utils>, L<Types::TypeTiny> and L<Test::TypeTiny> each
-used the venerable L<Exporter.pm|Exporter>. However, this meant they were
-unable to use the features like L<Sub::Exporter>-style function renaming
-which I'd built into Type::Library:
-
-   ## import "Str" but rename it to "String".
-   use Types::Standard "Str" => { -as => "String" };
-
-And so I decided to factor out code that could be shared by all Type-Tiny's
-exporters into a single place.
 
 Exporter::TypeTiny supports many of Sub::Exporter's external-facing features
 including renaming imported functions with the C<< -as >>, C<< -prefix >> and
 C<< -suffix >> options; explicit destinations with the C<< into >> option;
 and alternative installers with the C<< installler >> option. But it's written
-in only about 40% as many lines of code and has with zero non-core dependencies.
+in only about 40% as many lines of code and with zero non-core dependencies.
 
 Its internal-facing interface is closer to Exporter.pm, with configuration
 done through the C<< @EXPORT >>, C<< @EXPORT_OK >> and C<< %EXPORT_TAGS >>
@@ -316,6 +309,26 @@ OK, Sub::Exporter doesn't do this...
    
    $funcs{frobnicate}->(...);
 
+=head1 HISTORY
+
+B<< Why >> bundle an exporter with Type-Tiny?
+
+Well, it wasn't always that way. L<Type::Library> had a bunch of custom
+exporting code which poked coderefs into its caller's stash. It needed this
+so that it could switch between exporting Moose, Mouse and Moo-compatible
+objects on request.
+
+Meanwhile L<Type::Utils>, L<Types::TypeTiny> and L<Test::TypeTiny> each
+used the venerable L<Exporter.pm|Exporter>. However, this meant they were
+unable to use the features like L<Sub::Exporter>-style function renaming
+which I'd built into Type::Library:
+
+   ## import "Str" but rename it to "String".
+   use Types::Standard "Str" => { -as => "String" };
+
+And so I decided to factor out code that could be shared by all Type-Tiny's
+exporters into a single place.
+
 =head1 OBLIGATORY EXPORTER COMPARISON
 
 Exporting is unlikely to be your application's performance bottleneck, but
@@ -393,6 +406,6 @@ the same terms as the Perl 5 programming language system itself.
 =head1 DISCLAIMER OF WARRANTIES
 
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
-WARRANTIES, INCLUDING, WITHOUT LIMITAerTION, THE IMPLIED WARRANTIES OF
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
