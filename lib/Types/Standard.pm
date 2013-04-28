@@ -609,7 +609,7 @@ declare "OptList",
 
 declare "Tied",
 	as "Ref",
-	where { 
+	where {
 		!!tied(Scalar::Util::reftype($_) eq 'HASH' ?  %{$_} : Scalar::Util::reftype($_) eq 'ARRAY' ?  @{$_} :  ${$_})
 	}
 	inline_as {
