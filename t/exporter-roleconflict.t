@@ -53,10 +53,10 @@ my $e = exception {
 	with qw( Local::Role1 Local::Role2 );
 };
 
+is($e, undef, 'no exception when trying to compose two roles that use type constraints');
+
 use Scalar::Util "refaddr";
 note refaddr(\&Local::Role1::Str);
 note refaddr(\&Local::Role2::Str);
-
-is($e, undef);
 
 done_testing;

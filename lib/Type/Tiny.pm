@@ -212,7 +212,7 @@ sub _build_compiled_check
 	{
 		local $@;
 		my $sub = eval sprintf('sub ($) { %s }', $self->inline_check('$_[0]'));
-		die "Failed to compile check for $self: $@\n\nCODE: ".$self->inline_check('$_[0]') if $@;
+		_croak "Failed to compile check for $self: $@\n\nCODE: ".$self->inline_check('$_[0]') if $@;
 		return $sub;
 	}
 	
@@ -426,7 +426,7 @@ sub parameterize
 	# Generate a key for caching parameterized type constraints,
 	# but only if all the parameters are strings or type constraints.
 	my $key;
-	unless (grep(ref($_) && !Types::TypeTiny::TypeTiny->check($_), @_))
+	if ( not grep(ref($_) && !Types::TypeTiny::TypeTiny->check($_), @_) )
 	{
 		require B;
 		$key = join ":", map(Types::TypeTiny::TypeTiny->check($_) ? $_->{uniq} : B::perlstring($_), $self, @_);

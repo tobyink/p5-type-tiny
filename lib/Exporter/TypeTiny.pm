@@ -1,7 +1,7 @@
 package Exporter::TypeTiny;
 
 use 5.008001;
-use strict;   no strict qw(refs);
+use strict;
 use warnings; no warnings qw(void once uninitialized numeric redefine);
 
 our $AUTHORITY = 'cpan:TOBYINK';
@@ -18,7 +18,7 @@ sub import
 {
 	my $class       = shift;
 	my $global_opts = +{ @_ && ref($_[0]) eq q(HASH) ? %{+shift} : () };
-	my @args        = @_ ? @_ : @{"$class\::EXPORT"};
+	my @args        = do { no strict qw(refs); @_ ? @_ : @{"$class\::EXPORT"} };
 	my $opts        = mkopt(\@args);
 	
 	$global_opts->{into} = caller unless exists $global_opts->{into};
@@ -61,6 +61,8 @@ sub _exporter_validate_opts
 # 
 sub _exporter_expand_tag
 {
+	no strict qw(refs);
+	
 	my $class = shift;
 	my ($name, $value, $globals) = @_;
 	my $tags  = \%{"$class\::EXPORT_TAGS"};
@@ -83,6 +85,7 @@ sub _exporter_expand_tag
 #
 sub _exporter_permitted_regexp
 {
+	no strict qw(refs);
 	my $class = shift;
 	my $re = join "|", map quotemeta, sort {
 		length($b) <=> length($a) or $a cmp $b
@@ -99,6 +102,7 @@ sub _exporter_expand_sub
 	my ($name, $value, $globals, $permitted) = @_;
 	$permitted ||= $class->_exporter_permitted_regexp($globals);
 	
+	no strict qw(refs);
 	exists &{"$class\::$name"} && $name =~ $permitted
 		? ($name => \&{"$class\::$name"})
 		: $class->_exporter_fail(@_);
@@ -145,6 +149,7 @@ sub _exporter_install_sub
 			and _croak("Refusing to overwrite local sub '$name' with export from $class");
 	}
 	
+	no strict qw(refs);
 	*{"$into\::$name"} = $sym;
 }
 

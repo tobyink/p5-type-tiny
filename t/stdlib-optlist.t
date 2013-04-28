@@ -55,11 +55,13 @@ ok($OM->has_coercion, "$OM has coercion");
 is_deeply(
 	$OM->coerce(undef),
 	[],
+	'$OM->coerce(undef)',
 );
 
 is_deeply(
 	$OM->coerce([]),
 	[],
+	'$OM->coerce([])',
 );
 
 is_deeply(
@@ -69,6 +71,7 @@ is_deeply(
 		[bar => undef],
 		[baz => undef],
 	],
+	'simple $OM coercion test',
 );
 
 is_deeply(
@@ -76,6 +79,7 @@ is_deeply(
 	[
 		[foo => []],
 	],
+	'another simple $OM coercion test',
 );
 
 done_testing;

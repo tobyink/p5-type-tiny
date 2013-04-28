@@ -207,7 +207,7 @@ sub _build_compiled_coercion
 	{
 		local $@;
 		my $sub = eval sprintf('sub ($) { %s }', $self->inline_coercion('$_[0]'));
-		die "Failed to compile coercion: $@\n\nCODE: ".$self->inline_coercion('$_[0]') if $@;
+		_croak "Failed to compile coercion: $@\n\nCODE: ".$self->inline_coercion('$_[0]') if $@;
 		return $sub;
 	}
 
@@ -243,7 +243,7 @@ sub _build_compiled_coercion
 	
 	local $@;
 	my $sub = eval sprintf('sub ($) { %s }', join qq[\n], @sub);
-	die "Failed to compile coercion: $@\n\nCODE: @sub" if $@;
+	_croak "Failed to compile coercion: $@\n\nCODE: @sub" if $@;
 	return $sub;
 }
 
@@ -357,7 +357,7 @@ sub _codelike_type_coercion_map
 		{
 			local $@;
 			my $r = eval sprintf('sub { local $_ = $_[0]; %s }', $converter);
-			die $@ if $@;
+			_croak $@ if $@;
 			push @new, $r;
 		}
 	}

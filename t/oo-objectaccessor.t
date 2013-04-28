@@ -46,12 +46,12 @@ $obj->mk_accessors(
 );
 
 $obj->foo(12);
-is($obj->foo, 12);
+is($obj->foo, 12, 'write then read on accessor works');
 
 my $e = exception {
 	local $Object::Accessor::FATAL = 1;
 	$obj->foo("Hello");
 };
-like($e, qr{^'Hello' is an invalid value for 'foo'});
+like($e, qr{^'Hello' is an invalid value for 'foo'}, 'exception thrown for bad value');
 
 done_testing;
