@@ -4,6 +4,6 @@
 	perl_version_from m`Type::Tiny`;
 	version_from      m`Type::Tiny`;
 	readme_from       m`Type::Tiny`;
-	test_requires     p`Test::More 0.88`;
+	test_requires     p`Test::More 0.96`;
 .
 
