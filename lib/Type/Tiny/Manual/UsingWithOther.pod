@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-Type::Tiny::Manual::UsingWithOther - how to use Type::Tiny and Type::Library with Class::InsideOut
+Type::Tiny::Manual::UsingWithOther - how to use Type::Tiny and Type::Library with other OO frameworks
 
 =head1 DESCRIPTION
 

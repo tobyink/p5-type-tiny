@@ -41,7 +41,7 @@ L<Using with Moo|Type::Tiny::Manual::UsingWithMoo> - how to use Type::Tiny and T
 
 =item *
 
-L<Using with Other OO Frameworks|Type::Tiny::Manual::UsingWithOther> - how to use Type::Tiny and Type::Library with Class::InsideOut
+L<Using with Other OO Frameworks|Type::Tiny::Manual::UsingWithOther> - how to use Type::Tiny and Type::Library with other OO frameworks
 
 =item *
 
