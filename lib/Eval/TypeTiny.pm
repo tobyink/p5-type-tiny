@@ -14,7 +14,7 @@ sub _clean_eval
 }
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.003_09';
+our $VERSION   = '0.003_10';
 our @EXPORT    = qw( eval_closure );
 
 sub _croak ($;@)
@@ -71,3 +71,53 @@ sub eval_closure
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Eval::TypeTiny - utility to evaluate a string of Perl code in a clean environment
+
+=head1 DESCRIPTION
+
+This is not considered part of Type::Tiny's public API.
+
+It exports one function, which works much like the similarly named function
+from L<Eval::Closure>:
+
+=over
+
+=item C<< eval_closure(source => $source, environment => \%env, %opt) >>
+
+=back
+
+=head1 BUGS
+
+Please report any bugs to
+L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
+
+=head1 SEE ALSO
+
+L<Eval::Closure>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
