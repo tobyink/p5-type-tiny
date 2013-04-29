@@ -24,6 +24,7 @@ use strict;
 use warnings;
 use Test::More;
 
+use_ok("Exporter::TypeTiny");
 use_ok("Test::TypeTiny");
 use_ok("Type::Coercion");
 use_ok("Type::Coercion::Union");
