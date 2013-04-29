@@ -253,3 +253,16 @@
 		item "'Tied' type constraint added to Types::Standard."^^Addition;
 		item "If Mouse is already in memory, Type::Tiny will use its super-fast XS subs to validate values when possible."^^Change;
 	].
+
+`Type-Tiny 0.003_10 cpan:TOBYINK`
+	issued  2013-04-29;
+	changeset [
+		dcs:versus `Type-Tiny 0.003_09 cpan:TOBYINK`;
+		item "Improve Exporter::TypeTiny documentation."^^Documentation;
+		item "Improve advice on inlining type constraints and coercions."^^Documentation;
+		item "Bump version of Test::More dependency fom 0.88 to 0.96."^^Packaging;
+		item "General code tidy-up."^^Change;
+		item "Type::Tiny::SUPPORT_SMARTMATCH constant."^^Addition;
+		item "Much of the stringy eval stuff has been factored out to a new module: Eval::TypeTiny."^^Addition;
+		item "Bundle Type::Params, which had previously appeared on CPAN in a separate developer release."^^Addition;
+	].
