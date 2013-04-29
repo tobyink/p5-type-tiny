@@ -8,6 +8,30 @@ Type::Tiny::Manual::Params - coerce and validate arguments to functions and meth
 
 =head1 DESCRIPTION
 
+There is a module called L<Type::Params> available to wrap up type coercion
+and constraint checks into a single, simple and fast check. If you care
+about speed, and your sub signatures are fairly simple, then this is the way
+to go...
+
+   use feature qw( state );
+   use Types::Standard qw( Str );
+   use Type::Utils;
+   use Type::Params qw( compile );
+   
+   my $Invocant = class_type { class => __PACKAGE__ };
+   
+   sub set_name
+   {
+      state $check = compile($Invocant, Str);
+      my ($self, $name) = $check->(@_);
+      
+      ...;
+   }
+
+See the COOKBOOK section of L<Type::Params> for further information.
+
+=head2 The Somewhat More Manual Way...
+
 Type::Tiny objects overload coderef calls to assert. For example, the
 following is a method that takes a string; if the parameters fail their
 constraints, then an exception will be thrown.
@@ -52,25 +76,6 @@ functions:
    {
       $Invocant->assert_valid(my $self = shift);
       assert_Str(my $name = shift);
-      
-      ...;
-   }
-
-There is a module called L<Type::Params> available to wrap up type coercion
-and constraint checks into a single, simple and fast check. If you care
-about speed, this is the way to go...
-
-   use feature qw( state );
-   use Types::Standard qw( Str );
-   use Type::Utils;
-   use Type::Params qw( compile );
-   
-   my $Invocant = class_type { class => __PACKAGE__ };
-   
-   sub set_name
-   {
-      state $check = compile($Invocant, Str);
-      my ($self, $name) = $check->(@_);
       
       ...;
    }

@@ -24,6 +24,7 @@ use strict;
 use warnings;
 use Test::More;
 
+use_ok("Eval::TypeTiny");
 use_ok("Exporter::TypeTiny");
 use_ok("Test::TypeTiny");
 use_ok("Type::Coercion");
@@ -39,6 +40,7 @@ use_ok("Type::Tiny::Intersection");
 use_ok("Type::Tiny::Role");
 use_ok("Type::Tiny::Union");
 use_ok("Type::Utils");
+use_ok("Type::Params");
 
 done_testing;
 
