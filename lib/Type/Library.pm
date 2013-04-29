@@ -9,6 +9,7 @@ BEGIN {
 	$Type::Tiny::VERSION   = '0.003_09';
 }
 
+use Eval::TypeTiny qw< eval_closure >;
 use Scalar::Util qw< blessed >;
 use Type::Tiny;
 use Types::TypeTiny qw< TypeTiny to_TypeTiny >;
@@ -80,23 +81,27 @@ sub _mksub
 	my ($type, $post_method) = @_;
 	$post_method ||= q();
 	
-	my $coderef;
-	if ($type->is_parameterizable)
-	{
-		$coderef = eval sprintf q{
-			sub (;@) {
-				my $params; $params = shift if ref($_[0]) eq q(ARRAY);
-				my $t = $params ? $type->parameterize(@$params) : $type;
-				@_ && wantarray ? return($t%s, @_) : return $t%s;
-			}
-		}, $post_method, $post_method;
-	}
-	else
-	{
-		$coderef = eval sprintf q{ sub () { $type%s } }, $post_method;
-	}
+	my $source = $type->is_parameterizable
+		? sprintf(
+			q{
+				sub (;@) {
+					my $params; $params = shift if ref($_[0]) eq q(ARRAY);
+					my $t = $params ? $type->parameterize(@$params) : $type;
+					@_ && wantarray ? return($t%s, @_) : return $t%s;
+				}
+			},
+			$post_method,
+			$post_method,
+		)
+		: sprintf(
+			q{ sub () { $type%s if $] } },
+			$post_method,
+		);
 	
-	return _subname $type->qualified_name, $coderef;
+	return _subname(
+		$type->qualified_name,
+		eval_closure(source => $source, environment => {'$type' => \$type}),
+	);
 }
 
 sub _exporter_permitted_regexp

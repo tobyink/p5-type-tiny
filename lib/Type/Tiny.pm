@@ -9,6 +9,7 @@ BEGIN {
 	$Type::Tiny::VERSION   = '0.003_09';
 }
 
+use Eval::TypeTiny ();
 use Scalar::Util qw< blessed weaken refaddr isweak >;
 use Types::TypeTiny ();
 
@@ -214,13 +215,9 @@ sub _build_compiled_check
 		}
 	}
 	
-	if ($self->can_be_inlined)
-	{
-		local $@;
-		my $sub = eval sprintf('sub ($) { %s }', $self->inline_check('$_[0]'));
-		_croak "Failed to compile check for $self: $@\n\nCODE: ".$self->inline_check('$_[0]') if $@;
-		return $sub;
-	}
+	return Eval::TypeTiny::eval_closure(
+		source      => sprintf('sub ($) { %s }', $self->inline_check('$_[0]')),
+	) if $self->can_be_inlined;
 	
 	my @constraints =
 		reverse

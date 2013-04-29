@@ -9,6 +9,7 @@ BEGIN {
 	$Type::Coercion::VERSION   = '0.003_09';
 }
 
+use Eval::TypeTiny ();
 use Scalar::Util qw< blessed >;
 use Types::TypeTiny ();
 
@@ -206,10 +207,9 @@ sub _build_compiled_coercion
 
 	if ($self->can_be_inlined)
 	{
-		local $@;
-		my $sub = eval sprintf('sub ($) { %s }', $self->inline_coercion('$_[0]'));
-		_croak "Failed to compile coercion: $@\n\nCODE: ".$self->inline_coercion('$_[0]') if $@;
-		return $sub;
+		return Eval::TypeTiny::eval_closure(
+			source      => sprintf('sub ($) { %s }', $self->inline_coercion('$_[0]')),
+		);
 	}
 
 	# These arrays will be closed over.
@@ -231,7 +231,7 @@ sub _build_compiled_coercion
 	{
 		push @sub,
 			$types[$i]->can_be_inlined ? sprintf('if (%s)', $types[$i]->inline_check('$_[0]')) :
-			sprintf('if ($types[%d]->check(@_))', $i);
+			sprintf('if ($checks[%d]->(@_))', $i);
 		push @sub,
 			!defined($codes[$i])
 				? sprintf('  { return $_[0] }') :
@@ -242,10 +242,13 @@ sub _build_compiled_coercion
 	
 	push @sub, 'return $_[0];';
 	
-	local $@;
-	my $sub = eval sprintf('sub ($) { %s }', join qq[\n], @sub);
-	_croak "Failed to compile coercion: $@\n\nCODE: @sub" if $@;
-	return $sub;
+	return Eval::TypeTiny::eval_closure(
+		source      => sprintf('sub ($) { %s }', join qq[\n], @sub),
+		environment => {
+			'@checks' => [ map $_->compiled_check, @types ],
+			'@codes'  => \@codes,
+		},
+	);
 }
 
 sub can_be_inlined
@@ -356,10 +359,9 @@ sub _codelike_type_coercion_map
 		}
 		else
 		{
-			local $@;
-			my $r = eval sprintf('sub { local $_ = $_[0]; %s }', $converter);
-			_croak $@ if $@;
-			push @new, $r;
+			Eval::TypeTiny::eval_closure(
+				source      => sprintf('sub { local $_ = $_[0]; %s }', $converter),
+			);
 		}
 	}
 	
