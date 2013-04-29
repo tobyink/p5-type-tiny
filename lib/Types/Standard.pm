@@ -603,7 +603,7 @@ declare "OptList",
 		sprintf(
 			'%s and %s',
 			$self->parent->inline_check($var),
-			join(" ", @code),
+			join(q( ), @code),
 		);
 	};
 

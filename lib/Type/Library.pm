@@ -78,7 +78,7 @@ sub _mksub
 {
 	my $class = shift;
 	my ($type, $post_method) = @_;
-	$post_method ||= "";
+	$post_method ||= q();
 	
 	my $coderef;
 	if ($type->is_parameterizable)
@@ -134,7 +134,7 @@ sub _exporter_expand_sub
 	
 	if (my $type = $class->get_type($name))
 	{
-		my $post_method = '';
+		my $post_method = q();
 		$post_method = '->mouse_type' if $globals->{mouse};
 		$post_method = '->moose_type' if $globals->{moose};
 		return ($name => $class->_mksub($type, $post_method)) if $post_method;

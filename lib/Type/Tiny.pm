@@ -21,6 +21,12 @@ sub _croak ($;@)
 
 sub _swap { $_[2] ? @_[1,0] : @_[0,1] }
 
+BEGIN {
+	($] > 5.010001)
+		? eval q{ sub SUPPORT_SMARTMATCH () { !!0 } }
+		: eval q{ sub SUPPORT_SMARTMATCH () { !!1 } }
+}
+
 use overload
 	q("")      => sub { caller =~ m{^(Moo::HandleMoose|Sub::Quote)} ? overload::StrVal($_[0]) : $_[0]->display_name },
 	q(bool)    => sub { 1 },
@@ -38,7 +44,7 @@ use overload
 ;
 BEGIN {
 	overload->import(q(~~) => sub { $_[0]->check($_[1]) })
-		if $] >= 5.010001;
+		if Type::Tiny::SUPPORT_SMARTMATCH;
 }
 
 sub _overload_coderef

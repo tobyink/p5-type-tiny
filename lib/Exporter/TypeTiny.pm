@@ -132,8 +132,8 @@ sub _exporter_install_sub
 	$name = $value->{-as} || $name;
 	unless (ref($name) eq q(SCALAR))
 	{
-		my ($prefix) = grep defined, $value->{-prefix}, $globals->{prefix}, '';
-		my ($suffix) = grep defined, $value->{-suffix}, $globals->{suffix}, '';
+		my ($prefix) = grep defined, $value->{-prefix}, $globals->{prefix}, q();
+		my ($suffix) = grep defined, $value->{-suffix}, $globals->{suffix}, q();
 		$name = "$prefix$name$suffix";
 	}
 	
@@ -251,7 +251,7 @@ Similar to C<mkopt_hash> from L<Data::OptList>. See also C<mkopt>.
 
 For the purposes of this discussion we'll assume we have a module called
 C<< MyUtils >> which exports one function, C<< frobnicate >>. C<< MyUtils >>
-inherits fom Exporter::TypeTiny.
+inherits from Exporter::TypeTiny.
 
 Many of these tricks may seem familiar from L<Sub::Exporter>. That is
 intentional. Exporter::TypeTiny doesn't attempt to provide every feature of

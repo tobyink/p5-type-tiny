@@ -366,7 +366,7 @@ $lib->get_type("Tuple")->{coercion_generator} = sub
 				push @code, sprintf('my $tail = [ @{$orig}[%d .. $#$orig] ];', $size);
 				push @code, $slurpy->has_coercion
 					? sprintf('$tail = %s;', $slurpy->coercion->inline_coercion('$tail'))
-					: '';
+					: q();
 				push @code, sprintf(
 					'(%s) ? push(@new, @$tail) : ($return_orig++);',
 					$slurpy->inline_check('$tail'),
