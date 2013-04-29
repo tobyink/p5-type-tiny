@@ -1089,6 +1089,17 @@ C<plus_fallback_coercions> as appropriate.
 
 =back
 
+=head2 Constants
+
+=over
+
+=item C<< Type::Tiny::SUPPORT_SMARTMATCH >>
+
+Indicates whether the smart match overload is supported on your
+version of Perl.
+
+=back
+
 =head1 BUGS
 
 Please report any bugs to
