@@ -266,3 +266,19 @@
 		item "Much of the stringy eval stuff has been factored out to a new module: Eval::TypeTiny."^^Addition;
 		item "Bundle Type::Params, which had previously appeared on CPAN in a separate developer release."^^Addition;
 	].
+
+`Type-Tiny 0.003_11 cpan:TOBYINK`
+	issued  2013-04-30;
+	changeset [
+		dcs:versus `Type-Tiny 0.003_10 cpan:TOBYINK`;
+		item [
+			label "Automatic coercion for parameterized Dict will no longer drop key/value pairs to force a coercion.";
+			seealso <http://play-perl.org/quest/51682ae05efa74c95c00001e>;
+			dcs:thanks cpan:MMCLERIC;
+		];
+		item [
+			label "Automatic coercion for parameterized Tuple will no longer drop values to force a coercion.";
+			seealso <http://play-perl.org/quest/51682ae05efa74c95c00001e>;
+			dcs:thanks cpan:MMCLERIC;
+		];
+	].

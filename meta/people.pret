@@ -6,15 +6,16 @@ cpan:TOBYINK
 	:name  "Toby Inkster";
 	:mbox  <mailto:tobyink@cpan.org>.
 
-# This dude gets a thanks...
+# General credits...
 
 cpan:MSTROUT
 	:name  "Matt S Trout".
 
-# Bug reports
-
 cpan:BOWTIE
 	:name  "Kevin Dawson".
+
+cpan:MMCLERIC
+	:name "Vyacheslav Matyukhin".
 
 # We bundle some files made by these dudes...
 
