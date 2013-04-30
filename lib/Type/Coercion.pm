@@ -209,6 +209,7 @@ sub _build_compiled_coercion
 	{
 		return Eval::TypeTiny::eval_closure(
 			source      => sprintf('sub ($) { %s }', $self->inline_coercion('$_[0]')),
+			description => sprintf("compiled coercion '%s'", $self),
 		);
 	}
 
@@ -244,6 +245,7 @@ sub _build_compiled_coercion
 	
 	return Eval::TypeTiny::eval_closure(
 		source      => sprintf('sub ($) { %s }', join qq[\n], @sub),
+		description => sprintf("compiled coercion '%s'", $self),
 		environment => {
 			'@checks' => [ map $_->compiled_check, @types ],
 			'@codes'  => \@codes,
@@ -361,6 +363,7 @@ sub _codelike_type_coercion_map
 		{
 			Eval::TypeTiny::eval_closure(
 				source      => sprintf('sub { local $_ = $_[0]; %s }', $converter),
+				description => sprintf("temporary compiled converter from '%s'", $type),
 			);
 		}
 	}

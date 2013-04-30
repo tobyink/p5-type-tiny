@@ -217,6 +217,7 @@ sub _build_compiled_check
 	
 	return Eval::TypeTiny::eval_closure(
 		source      => sprintf('sub ($) { %s }', $self->inline_check('$_[0]')),
+		description => sprintf("compiled check '%s'", $self),
 	) if $self->can_be_inlined;
 	
 	my @constraints =

@@ -100,7 +100,11 @@ sub _mksub
 	
 	return _subname(
 		$type->qualified_name,
-		eval_closure(source => $source, environment => {'$type' => \$type}),
+		eval_closure(
+			source      => $source,
+			description => sprintf("exportable function '%s'", $type),
+			environment => {'$type' => \$type},
+		),
 	);
 }
 
