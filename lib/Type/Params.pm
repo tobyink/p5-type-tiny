@@ -428,6 +428,60 @@ Note that the coercion is specified as a string of Perl code. This is usually
 the fastest way to do it, but a coderef is also accepted. Either way, the
 value to be coerced is C<< $_ >>.
 
+=head1 COMPARISON WITH PARAMS::VALIDATE
+
+L<Type::Params> is not really a drop-in replacement for L<Params::Validate>;
+the API differs far too much to claim that. Yet it performs a similar task,
+so it makes sense to compare them.
+
+=over
+
+=item *
+
+Type::Params will tend to be faster if you've got a sub which is called
+repeatedly, but may be a little slower than Params::Validate for subs that
+are only called a few times. This is because it does a bunch of work the
+first time your sub is called to make subsequent calls a lot faster.
+
+=item *
+
+Type::Params is mostly geared towards positional parameters, while
+Params::Validate seems to be primarily aimed at named paramaters. (Though
+either works for either.) Params::Validate doesn't appear to have a
+particularly natural way of validating a mix of positional and named
+parameters.
+
+=item *
+
+Type::Utils allows you to coerce parameters. For example, if you expect
+a L<Path::Tiny> object, you could coerce it from a string.
+
+=item *
+
+Params::Validate allows you to supply defaults for missing parameters;
+Type::Params does not, but you may be able to use coercion from Undef.
+
+=item *
+
+If you are primarily writing object-oriented code, using Moose or similar,
+and you are using Type::Tiny type constraints for your attributes, then
+using Type::Params allows you to use the same constraints for method calls.
+
+=item *
+
+Type::Params comes bundled with Types::Standard, which provides a much
+richer vocabulary of types than the type validation constants that come
+with Params::Validate. For example, Types::Standard provides constraints
+like C<< ArrayRef[Int] >> (an arrayref of integers), while the closest from
+Params::Validate is C<< ARRAYREF >>, which you'd need to supplement with
+additional callbacks if you wanted to check that the arrayref contained
+integers.
+
+Whatsmore, Type::Params doesn't just work with Types::Standard, but also
+any other Type::Tiny type constraints.
+
+=back
+
 =head1 BUGS
 
 Please report any bugs to
