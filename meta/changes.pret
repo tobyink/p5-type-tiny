@@ -281,4 +281,5 @@
 			seealso <http://play-perl.org/quest/51682ae05efa74c95c00001e>;
 			dcs:thanks cpan:MMCLERIC;
 		];
+		item "Test cases for Eval::TypeTiny."^^Addition;
 	].
