@@ -60,7 +60,7 @@ sub eval_closure
 		"package Eval::TypeTiny::Sandbox$sandbox;",
 		"sub {",
 		map(sprintf('my %s = %s{$_[%d]};', $_, substr($_, 0, 1), $i++), @keys),
-		"return $args{source}",
+		$args{source},
 		"}",
 	);
 	
