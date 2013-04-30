@@ -29,8 +29,7 @@ use Test::More;
 use Types::Standard qw( -types slurpy );
 use Type::Utils;
 
-subtest "Coercion to ArrayRef[\$Foo], etc where \$Foo->coercion cannot be inlined" => sub
-{
+NONINLINED: {
 	my $Foo = declare Foo => as Int;
 	coerce $Foo, from Num, via { int($_) };
 	
@@ -107,12 +106,9 @@ subtest "Coercion to ArrayRef[\$Foo], etc where \$Foo->coercion cannot be inline
 		$ref2,
 		'$RefOfFoo does not coerce value that cannot be coerced',
 	);
-	
-	done_testing;
 };
 
-subtest "Coercion to ArrayRef[\$Bar], etc where \$Bar->coercion can be inlined" => sub
-{
+INLINED: {
 	my $Bar = declare Bar => as Int;
 	coerce $Bar, from Num, q { int($_) };
 	
@@ -192,18 +188,15 @@ subtest "Coercion to ArrayRef[\$Bar], etc where \$Bar->coercion can be inlined" 
 		$ref2,
 		'$RefOfBar does not coerce value that cannot be coerced',
 	);
-	
-	done_testing;
 };
 
-subtest "Coercion to Map" => sub
-{
+MAP: {
 	my $IntFromStr = declare IntFromStr => as Int;
 	coerce $IntFromStr, from Str, q{ length($_) };
 	
 	my $IntFromNum = declare IntFromNum => as Int;
 	coerce $IntFromNum, from Num, q{ int($_) };
-
+	
 	my $IntFromArray = declare IntFromArray => as Int;
 	coerce $IntFromArray, from ArrayRef, via { scalar(@$_) };
 	
@@ -250,12 +243,9 @@ subtest "Coercion to Map" => sub
 		$m,
 		"Unneeded coercion to $Map2",
 	);
-	
-	done_testing;
 };
 
-subtest "Coercion to Dict" => sub
-{
+DICT: {
 	my $IntFromStr = declare IntFromStr => as Int;
 	coerce $IntFromStr, from Str, q{ length($_) };
 	
@@ -287,18 +277,15 @@ subtest "Coercion to Dict" => sub
 		{ a => "Hello", b => 1, c => [], d => 1 },
 		"Coercion (C) to $Dict1 - changed in 0.003_11; the presence of an additional value cancels coercion",
 	);
-	
-	done_testing;
 };
 
-subtest "Coercion to Tuple" => sub
-{
+TUPLE: {
 	my $IntFromStr = declare IntFromStr => as Int;
 	coerce $IntFromStr, from Str, q{ length($_) };
 	
 	my $IntFromNum = declare IntFromNum => as Int;
 	coerce $IntFromNum, from Num, q{ int($_) };
-
+	
 	my $IntFromArray = declare IntFromArray => as Int;
 	coerce $IntFromArray, from ArrayRef, via { scalar(@$_) };
 	
@@ -323,15 +310,13 @@ subtest "Coercion to Tuple" => sub
 		$Tuple2->coerce([qw( 1.1 )]),
 		[ 1 ],
 		"Coercion (A) to $Tuple2",
-	);	
-
+	);
+	
 	is_deeply(
 		$Tuple2->coerce([qw( 1.1 2.2 )]),
 		[ 1.1, 2.2 ],
 		"Coercion (B) to $Tuple2 - changed in 0.003_11; the presence of an additional value cancels coercion",
-	);	
-
-	done_testing;
+	);
 };
 
 done_testing;
