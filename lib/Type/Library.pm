@@ -295,6 +295,8 @@ __END__
 
 =encoding utf-8
 
+=for stopwords Moo(se)-compatible MooseX::Types-like
+
 =head1 NAME
 
 Type::Library - tiny, yet Moo(se)-compatible type libraries

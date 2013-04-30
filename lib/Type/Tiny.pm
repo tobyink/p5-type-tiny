@@ -389,11 +389,6 @@ sub inline_assert
 	return $code;
 }
 
-sub _inline_check
-{
-	shift->inline_check(@_);
-}
-
 sub coerce
 {
 	my $self = shift;
@@ -704,16 +699,17 @@ sub AUTOLOAD
 }
 
 # fill out Moose-compatible API
-sub inline_environment { +{} }
-*_compiled_type_constraint = \&compiled_check;
+sub inline_environment         { +{} }
+sub _inline_check              { shift->inline_check(@_) }
+sub _compiled_type_constraint  { shift->compiled_check(@_) }
 
 # some stuff for Mouse-compatible API
-*__is_parameterized = \&is_parameterized;
-sub _add_type_coercions { shift->coercion->add_type_coercions(@_) };
-*_as_string = \&qualified_name;
-sub _compiled_type_coercion { shift->coercion->compiled_coercion(@_) };
-sub _identify { refaddr(shift) };
-sub _unite { require Type::Tiny::Union; "Type::Tiny::Union"->new(type_constraints => \@_) };
+sub __is_parameterized         { shift->is_parameterized(@_) }
+sub _add_type_coercions        { shift->coercion->add_type_coercions(@_) };
+sub _as_string                 { shift->qualified_name(@_) }
+sub _compiled_type_coercion    { shift->coercion->compiled_coercion(@_) };
+sub _identify                  { refaddr(shift) };
+sub _unite                     { require Type::Tiny::Union; "Type::Tiny::Union"->new(type_constraints => \@_) };
 
 1;
 
@@ -722,6 +718,8 @@ __END__
 =pod
 
 =encoding utf-8
+
+=for stopwords Moo(se)-compatible MooseX MouseX MooX Moose-compat
 
 =head1 NAME
 
