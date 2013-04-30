@@ -27,17 +27,14 @@ use warnings;
 use lib qw( . ./t ../inc ./inc );
 use utf8;
 
-use Test::More tests => 3;
+use Test::More;
 use Test::TypeTiny;
 
 use Encode;
 use Types::Standard qw( Str Bytes Chars Encode Decode ArrayRef Join Split );
 use Type::Utils;
 
-subtest "Check Str, Bytes and Chars; Encode and Decode" => sub
-{
-	plan tests => 19;
-	
+STR_BYTES_CHARS_ENCODE_AND_DECODE: {
 	my $chars          = "café";
 	my $bytes_utf8     = Encode::encode("utf-8",      $chars);
 	my $bytes_western  = Encode::encode("iso-8859-1", $chars);
@@ -95,10 +92,7 @@ subtest "Check Str, Bytes and Chars; Encode and Decode" => sub
 	);
 };
 
-subtest "Check ArrayRef[Str], ArrayRef[Bytes] and ArrayRef[Chars]; Join and Split" => sub
-{
-	plan tests => 26;
-	
+ARRAYREF_JOIN_AND_SPLIT: {
 	my $chars          = "Café Paris|Garçon";
 	my $bytes_utf8     = Encode::encode("utf-8",      $chars);
 	my $bytes_western  = Encode::encode("iso-8859-1", $chars);
@@ -187,10 +181,7 @@ subtest "Check ArrayRef[Str], ArrayRef[Bytes] and ArrayRef[Chars]; Join and Spli
 	should_pass($_, Bytes);
 };
 
-subtest "Seven-bit safe stuff" => sub
-{
-	plan tests => 12;
-	
+SEVEN_BIT: {
 	my $chars          = "coffee shop";
 	my $bytes_utf8     = Encode::encode("utf-8",      $chars);
 	my $bytes_western  = Encode::encode("iso-8859-1", $chars);
@@ -212,3 +203,4 @@ subtest "Seven-bit safe stuff" => sub
 	should_pass($bytes_western, Bytes);
 };
 
+done_testing;
