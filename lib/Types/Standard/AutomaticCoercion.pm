@@ -201,7 +201,7 @@ $lib->get_type("Optional")->{coercion_generator} = sub
 };
 
 my $label_counter = 0;
-
+our ($keycheck_counter, @KEYCHECK) = -1;
 $lib->get_type("Dict")->{coercion_generator} = sub
 {
 	my ($parent, $child, %dict) = @_;
@@ -218,10 +218,14 @@ $lib->get_type("Dict")->{coercion_generator} = sub
 		$C->add_type_coercions($parent => Stringable {
 			require B;
 			
+			my $keycheck = join "|", map quotemeta, sort { length($b) <=> length($a) or $a cmp $b } keys %dict;
+			$keycheck = $KEYCHECK[++$keycheck_counter] = qr{^($keycheck)$}ms; # regexp for legal keys
+			
 			my $label = sprintf("LABEL%d", ++$label_counter);
 			my @code;
 			push @code, 'do { my ($orig, $return_orig, %tmp, %new) = ($_, 0);';
 			push @code,       "$label: {";
+			push @code,       sprintf('($_ =~ $%s::KEYCHECK[%d])||(($return_orig = 1), last %s) for sort keys %%$orig;', __PACKAGE__, $keycheck_counter, $label);
 			for my $k (keys %dict)
 			{
 				my $ct = $dict{$k};
@@ -267,6 +271,10 @@ $lib->get_type("Dict")->{coercion_generator} = sub
 			$parent => sub {
 				my $value = @_ ? $_[0] : $_;
 				my %new;
+				for my $k (keys %$value)
+				{
+					return $value unless exists $dict{$k};
+				}
 				for my $k (keys %dict)
 				{
 					my $ct = $dict{$k};
@@ -328,6 +336,7 @@ $lib->get_type("Tuple")->{coercion_generator} = sub
 			my @code;
 			push @code, 'do { my ($orig, $return_orig, @tmp, @new) = ($_, 0);';
 			push @code,       "$label: {";
+			push @code,       sprintf('(($return_orig = 1), last %s) if @$orig > %d;', $label, scalar @tuple) unless $slurpy;
 			for my $i (0 .. $#tuple)
 			{
 				my $ct = $tuple[$i];
@@ -385,6 +394,12 @@ $lib->get_type("Tuple")->{coercion_generator} = sub
 		$C->add_type_coercions(
 			$parent => sub {
 				my $value = @_ ? $_[0] : $_;
+				
+				if (!$slurpy and @$value > @tuple)
+				{
+					return $value;
+				}
+				
 				my @new;
 				for my $i (0 .. $#tuple)
 				{

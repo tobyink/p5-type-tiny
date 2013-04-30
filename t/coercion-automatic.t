@@ -284,8 +284,8 @@ subtest "Coercion to Dict" => sub
 	);
 	is_deeply(
 		$Dict1->coerce({ a => "Hello", b => 1, c => [], d => 1 }),
-		{ a => 5, b => 1 },
-		"Coercion (C) to $Dict1",
+		{ a => "Hello", b => 1, c => [], d => 1 },
+		"Coercion (C) to $Dict1 - changed in 0.003_11; the presence of an additional value cancels coercion",
 	);
 	
 	done_testing;
@@ -318,6 +318,19 @@ subtest "Coercion to Tuple" => sub
 		"Coercion (B) to $Tuple1",
 	);
 	
+	my $Tuple2 = Tuple[ $IntFromNum ];
+	is_deeply(
+		$Tuple2->coerce([qw( 1.1 )]),
+		[ 1 ],
+		"Coercion (A) to $Tuple2",
+	);	
+
+	is_deeply(
+		$Tuple2->coerce([qw( 1.1 2.2 )]),
+		[ 1.1, 2.2 ],
+		"Coercion (B) to $Tuple2 - changed in 0.003_11; the presence of an additional value cancels coercion",
+	);	
+
 	done_testing;
 };
 
