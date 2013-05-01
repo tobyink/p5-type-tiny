@@ -113,6 +113,8 @@ sub compile
 		}
 		else
 		{
+			croak("Parameter following slurpy parameter") if $saw_slurpy;
+			
 			$is_optional = grep $_->{uniq} == Optional->{uniq}, $constraint->parents;
 			
 			if ($is_optional)
