@@ -4,7 +4,7 @@
 
 =head1 PURPOSE
 
-Test usage with slurpy parameters.
+Test L<Type::Params> usage with slurpy parameters.
 
 =head1 AUTHOR
 

@@ -4,7 +4,7 @@
 
 =head1 PURPOSE
 
-Test usage with method calls.
+Test L<Type::Params> usage for method calls.
 
 =head1 AUTHOR
 

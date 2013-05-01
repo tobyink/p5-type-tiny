@@ -4,7 +4,7 @@
 
 =head1 PURPOSE
 
-Test usage with optional parameters.
+Test L<Type::Params> usage with optional parameters.
 
 =head1 AUTHOR
 

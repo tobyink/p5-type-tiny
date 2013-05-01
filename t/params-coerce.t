@@ -4,7 +4,7 @@
 
 =head1 PURPOSE
 
-Test usage of types with coercions.
+Test L<Type::Params> usage of types with coercions.
 
 =head1 AUTHOR
 

@@ -4,7 +4,7 @@
 
 =head1 PURPOSE
 
-Test type constraints that cannot be inlined.
+Test L<Type::Params> with type constraints that cannot be inlined.
 
 =head1 AUTHOR
 

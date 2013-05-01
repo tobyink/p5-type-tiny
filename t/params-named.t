@@ -4,7 +4,7 @@
 
 =head1 PURPOSE
 
-Test usage with named parameters.
+Test L<Type::Params> usage with named parameters.
 
 =head1 AUTHOR
 

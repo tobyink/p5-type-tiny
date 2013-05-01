@@ -4,7 +4,8 @@
 
 =head1 PURPOSE
 
-Test positional parameters, a la the example in the documentation:
+Test L<Type::Params> positional parameters, a la the example in the
+documentation:
 
    sub nth_root
    {
