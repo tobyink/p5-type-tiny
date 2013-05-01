@@ -56,25 +56,24 @@ is_deeply(
 	'(1.1, 2)',
 );
 
-is_deeply(
-	nth_root("1.1", "2.2", "3.3"),
-	[ "1.1", "2.2" ],
-	'(1.1, 2.2, 3.3)',
-);
-
 {
 	my $e = exception { nth_root() };
-	like($e, qr{^Value "" in \$_\[0\] does not meet type constraint "Num"}, '()');
+	like($e, qr{^Wrong number of parameters \(0\); expected 2}, '(1)');
 }
 
 {
 	my $e = exception { nth_root(1) };
-	like($e, qr{^Value "" in \$_\[1\] does not meet type constraint "Num"}, '(1)');
+	like($e, qr{^Wrong number of parameters \(1\); expected 2}, '(1)');
 }
 
 {
 	my $e = exception { nth_root(undef, 1) };
 	like($e, qr{^Value "" in \$_\[0\] does not meet type constraint "Num"}, '(undef, 1)');
+}
+
+{
+	my $e = exception { nth_root(1, 2, 3) };
+	like($e, qr{^Wrong number of parameters \(3\); expected 2}, '(1)');
 }
 
 done_testing;

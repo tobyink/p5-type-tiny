@@ -58,8 +58,14 @@ like(
 
 like(
 	exception { $chk->() },
-	qr{^Value "" in \$_\[0\] does not meet type constraint "Num"},
+	qr{^Wrong number of parameters \(0\); expected 1 to 4},
 );
+
+like(
+	exception { $chk->(1 .. 5) },
+	qr{^Wrong number of parameters \(5\); expected 1 to 4},
+);
+
 
 done_testing;
 

@@ -45,12 +45,22 @@ sub compile
 {
 	my (@code, %env);
 	@code = 'my (@R, %tmp, $tmp);';
-	$env{'$croaker'} = \sub {
-		local $Carp::CarpLevel = 4;
-		Carp::croak($_[0]);
-	};
-	my $arg = -1;
+	push @code, '#placeholder';   # $code[1]
 	
+	my %options    = (ref($_[0]) eq "HASH" && !$_[0]{slurpy}) ? %{+shift} : ();
+	my $arg        = -1;
+	my $saw_slurpy = 0;
+	my $min_args   = 0;
+	my $max_args   = 0;
+	my $saw_opt    = 0;
+	
+	my $level = 4 + ($options{'carp_level'} || 0);
+	$env{'$croaker'} =
+		$options{'carp'}    ? \sub { local $Carp::CarpLevel = $level; Carp::carp($_[0]) } :
+		$options{'cluck'}   ? \sub { local $Carp::CarpLevel = $level; Carp::cluck($_[0]) } :
+		$options{'confess'} ? \sub { local $Carp::CarpLevel = $level; Carp::confess($_[0]) } :
+		\sub { local $Carp::CarpLevel = $level; Carp::croak($_[0]) };
+
 	while (@_)
 	{
 		++$arg;
@@ -69,6 +79,7 @@ sub compile
 				$constraint->is_a_type_of(ArrayRef) ? _mkslurpy('$_', '@', ArrayRef => $arg) :
 				croak("Slurpy parameter not of type HashRef or ArrayRef");
 			$varname = '$_';
+			$saw_slurpy++;
 		}
 		else
 		{
@@ -77,6 +88,14 @@ sub compile
 			if ($is_optional)
 			{
 				push @code, sprintf 'return @R if $#_ < %d;', $arg;
+				$saw_opt++;
+				$max_args++;
+			}
+			else
+			{
+				croak("Non-Optional parameter following Optional parameter") if $saw_opt;
+				$min_args++;
+				$max_args++;
 			}
 			
 			$varname = sprintf '$_[%d]', $arg;
@@ -126,6 +145,33 @@ sub compile
 		}
 		
 		push @code, sprintf 'push @R, %s;', $varname;
+	}
+
+	if ($min_args == $max_args and not $saw_slurpy)
+	{
+		$code[1] = sprintf(
+			'$croaker->("Wrong number of parameters (${\scalar @_}); expected %d") if @_ != %d;',
+			$min_args,
+			$max_args,
+		);
+	}
+	elsif ($min_args < $max_args and not $saw_slurpy)
+	{
+		$code[1] = sprintf(
+			'$croaker->("Wrong number of parameters (${\scalar @_}); expected %d to %d") if @_ < %d || @_ > %d;',
+			$min_args,
+			$max_args,
+			$min_args,
+			$max_args,
+		);
+	}
+	elsif ($min_args and $saw_slurpy)
+	{
+		$code[1] = sprintf(
+			'$croaker->("Wrong number of parameters (${\scalar @_}); expected at least %d") if @_ < %d;',
+			$min_args,
+			$min_args,
+		);
 	}
 	
 	push @code, '@R;';
