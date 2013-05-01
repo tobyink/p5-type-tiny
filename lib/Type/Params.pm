@@ -543,7 +543,7 @@ first time your sub is called to make subsequent calls a lot faster.
 =item *
 
 Type::Params is mostly geared towards positional parameters, while
-Params::Validate seems to be primarily aimed at named paramaters. (Though
+Params::Validate seems to be primarily aimed at named parameters. (Though
 either works for either.) Params::Validate doesn't appear to have a
 particularly natural way of validating a mix of positional and named
 parameters.
