@@ -22,6 +22,36 @@ our @EXPORT_OK = qw( validate Invocant );
 
 use constant Invocant => union Invocant => [Object, ClassName];
 
+sub _exporter_expand_sub
+{
+	my $class = shift;
+	my ($name, $value, $globals, $permitted) = @_;
+	$permitted ||= $class->_exporter_permitted_regexp($globals);
+	
+	my %opts;
+	for (qw/ carp_level carp cluck confess /)
+	{
+		$opts{$_} = $globals->{$_} if exists $globals->{$_};
+		$opts{$_} = $value->{$_}   if exists $value->{$_};
+	}
+
+	if ($name eq 'compile' and keys %opts)
+	{
+		return compile => sub { unshift @_, \%opts; goto \&compile };
+	}
+	elsif ($name eq 'validate' and keys %opts)
+	{
+		my %compiled;
+		return validate => sub {
+			my $arr = shift;
+			($compiled{ join ":", map($_->{uniq}||"\@$_->{slurpy}", @_) } ||= compile(\%opts, @_))
+				->(@$arr);
+		};
+	}
+
+	return $class->SUPER::_exporter_expand_sub(@_);
+}
+
 sub _mkslurpy
 {
 	my ($name, $type, $tc, $i) = @_;
@@ -54,7 +84,7 @@ sub compile
 	my $max_args   = 0;
 	my $saw_opt    = 0;
 	
-	my $level = 4 + ($options{'carp_level'} || 0);
+	my $level = 3 + ($options{'carp_level'} || 0);
 	$env{'$croaker'} =
 		$options{'carp'}    ? \sub { local $Carp::CarpLevel = $level; Carp::carp($_[0]) } :
 		$options{'cluck'}   ? \sub { local $Carp::CarpLevel = $level; Carp::cluck($_[0]) } :
@@ -189,9 +219,9 @@ my %compiled;
 sub validate
 {
 	my $arr = shift;
-	
-	($compiled{ join ":", map($_->{uniq}||"\@$_->{slurpy}", @_) } ||= compile @_)
-		->(@$arr);
+	my $sub = $compiled{ join ":", map($_->{uniq}||"\@$_->{slurpy}", @_) } ||= compile @_;
+	@_ = @$arr;
+	goto $sub;
 }
 
 1;
