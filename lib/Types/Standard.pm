@@ -353,7 +353,10 @@ declare "Optional",
 		};
 	};
 
-sub slurpy ($) { +{ slurpy => $_[0] } }
+sub slurpy {
+	my $t = shift;
+	wantarray ? (+{ slurpy => $t }, @_) : +{ slurpy => $t };
+}
 
 declare "Tuple",
 	as "ArrayRef",
