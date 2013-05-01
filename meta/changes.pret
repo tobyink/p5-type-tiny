@@ -283,3 +283,16 @@
 		];
 		item "Test cases for Eval::TypeTiny."^^Addition;
 	].
+
+`Type-Tiny 0.003_12 cpan:TOBYINK`
+	issued  2013-05-01;
+	changeset [
+		dcs:versus `Type-Tiny 0.003_11 cpan:TOBYINK`;
+		item [
+			label "Type::Params validators now explicitly check the number of arguments passed to them.";
+			seealso <http://play-perl.org/quest/517efcef53a418983f000012>;
+			dcs:thanks cpan:MMCLERIC;
+		];
+		item "Allow people to use Carp::{confess,cluck,carp} with Type::Params validators; default is still croak."^^Change;
+		item "Improved Type::Params documentation."^^Change;
+	].
