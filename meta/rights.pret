@@ -38,6 +38,14 @@ f`TODO.mm`
 	dc:license <http://dev.perl.org/licenses/>;
 	dc:rightsHolder cpan:TOBYINK.
 
+f`examples/benchmark-mkopt.pl`
+	dc:license <http://dev.perl.org/licenses/>;
+	dc:rightsHolder cpan:TOBYINK.
+
+f`examples/benchmark-param-validation.pl`
+	dc:license <http://dev.perl.org/licenses/>;
+	dc:rightsHolder cpan:TOBYINK.
+
 f`meta/changes.pret`
 	dc:license <http://dev.perl.org/licenses/>;
 	dc:rightsHolder cpan:TOBYINK.
