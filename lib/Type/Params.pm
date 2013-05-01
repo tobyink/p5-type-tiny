@@ -322,6 +322,25 @@ Dude, these functions are documented!
 
 =end trustme
 
+=head1 EXPORT
+
+It is possible to export versions of the C<compile> and C<validate> functions
+that use C<confess>, C<carp> or C<cluck> instead of the default C<croak> to
+report error messages:
+
+   use Params::Validate
+      compile  => { confess => 1 },
+      validate => { cluck   => 1 },
+   ;
+
+You can even export more than one copy of the functions with different
+configurations:
+
+   use Params::Validate
+      validate => { croak => 1, -as => "validate_strict" },
+      validate => { cluck => 1, -as => "validate_sloppy" },
+   ;
+
 =head1 COOKBOOK
 
 =head2 Positional Parameters
