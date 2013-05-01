@@ -295,4 +295,5 @@
 		];
 		item "Allow people to use Carp::{confess,cluck,carp} with Type::Params validators; default is still croak."^^Change;
 		item "Improved Type::Params documentation."^^Change;
+		item "Sane behaviour for Types::Standard's 'slurpy' function when it appears mid-list."^^Bugfix;
 	].
