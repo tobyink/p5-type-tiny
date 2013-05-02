@@ -297,3 +297,14 @@
 		item "Improved Type::Params documentation."^^Change;
 		item "Sane behaviour for Types::Standard's 'slurpy' function when it appears mid-list."^^Bugfix;
 	].
+
+`Type-Tiny 0.003_13 cpan:TOBYINK`
+	issued  2013-05-03;
+	changeset [
+		dcs:versus `Type-Tiny 0.003_12 cpan:TOBYINK`;
+		item [
+			label "Fix typo in Type::Params documentation.";
+			seealso <https://bitbucket.org/tobyink/p5-type-tiny/pull-request/1/fix-typo-in-docs/diff>;
+			dcs:blame cpan:DJERIUS;
+		];
+	].

@@ -17,6 +17,9 @@ cpan:BOWTIE
 cpan:MMCLERIC
 	:name "Vyacheslav Matyukhin".
 
+cpan:DJERIUS
+	:name "Diab Jerius".
+
 # We bundle some files made by these dudes...
 
 cpan:RJBS
