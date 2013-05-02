@@ -100,10 +100,25 @@ cmpthese(-3, {
 	'[T:P c]'  => q{ TypeParams_compile(@::data) },
 });
 
+# Now we'll just do a simple check of argument count; not checking any types!
+print "\n----\n\n";
+our $CHK  = compile(Any, Any, Optional[Any]);
+our @ARGS = 1..2;
+cmpthese(-3, {
+	TypeParamsSimple     => q { $::CHK->(@::ARGS) },
+	ParamsValidateSimple => q { validate_pos(@::ARGS, 1, 1, 0) },
+});
+
 __END__
            Rate   [D:V]   [P:V]   [P:C] [T:P v] [T:P c]
-[D:V]   10114/s      --    -16%    -38%    -47%    -71%
-[P:V]   12027/s     19%      --    -27%    -37%    -66%
-[P:C]   16432/s     62%     37%      --    -14%    -54%
-[T:P v] 19123/s     89%     59%     16%      --    -46%
-[T:P c] 35430/s    250%    195%    116%     85%      --
+[D:V]    9983/s      --    -16%    -39%    -41%    -71%
+[P:V]   11898/s     19%      --    -27%    -29%    -65%
+[P:C]   16259/s     63%     37%      --     -3%    -52%
+[T:P v] 16797/s     68%     41%      3%      --    -51%
+[T:P c] 34032/s    241%    186%    109%    103%      --
+
+----
+
+                         Rate ParamsValidateSimple     TypeParamsSimple
+ParamsValidateSimple  74972/s                   --                 -63%
+TypeParamsSimple     204193/s                 172%                   --
