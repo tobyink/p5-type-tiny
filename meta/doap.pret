@@ -21,6 +21,10 @@
 		[ label "Type Coercion" ],
 		[ label "Type Library" ],
 		[ label "Schema" ],
+		[ label "Parameter Validation" ],
+		[ label "Parameter Checking" ],
+		[ label "Argument Validation" ],
+		[ label "Argument Checking" ],
 		[ label "Validation" ].
 
 <http://dev.perl.org/licenses/>
