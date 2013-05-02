@@ -307,4 +307,5 @@
 			seealso <https://bitbucket.org/tobyink/p5-type-tiny/pull-request/1/fix-typo-in-docs/diff>;
 			dcs:blame cpan:DJERIUS;
 		];
+		item "Don't crash in old versions of Moose that have no Class::MOP::_definition_context() function."^^Bugfix;
 	].

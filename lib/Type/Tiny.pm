@@ -639,7 +639,7 @@ sub _MONKEY_MAGIC
 					writer    => "_set_tt_type",
 					predicate => "has_tt_type",
 					weak_ref  => 1,
-					Class::MOP::_definition_context(),
+					Class::MOP->can("_definition_context") ? Class::MOP::_definition_context() : (),
 				),
 			),
 		);
