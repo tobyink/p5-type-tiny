@@ -587,9 +587,10 @@ declare "Chars",
 	inline_as { "utf8::is_utf8($_) or $_ =~ \$Types::Standard::SevenBitSafe" };
 
 declare "OptList",
-	as ArrayRef( [ArrayRef()] ),
+	as ArrayRef(),
 	where {
 		for my $inner (@$_) {
+			return unless ref($inner) eq q(ARRAY);
 			return unless @$inner == 2;
 			return unless is_Str($inner->[0]);
 		}
@@ -712,7 +713,7 @@ declare_coercion "Join", to_type "Str" => {
 	},
 };
 
-declare_coercion "Split", to_type ArrayRef()->parameterize(Str()) => {
+declare_coercion "Split", to_type ArrayRef() => {
 	coercion_generator => sub {
 		my ($self, $target, $re) = @_;
 		ref($re) eq q(Regexp)
