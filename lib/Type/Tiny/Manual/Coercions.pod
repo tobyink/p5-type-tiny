@@ -205,6 +205,10 @@ C<HashRef>
 
 =item *
 
+C<Map>
+
+=item *
+
 C<Tuple>
 
 =item *
