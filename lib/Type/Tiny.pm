@@ -169,7 +169,9 @@ sub _build_coercion
 {
 	require Type::Coercion;
 	my $self = shift;
-	return "Type::Coercion"->new(type_constraint => $self);
+	my %opts = (type_constraint => $self);
+	$opts{display_name} = "to_$self" unless $self->is_anon;
+	return "Type::Coercion"->new(%opts);
 }
 
 sub _build_default_message

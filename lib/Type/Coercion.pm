@@ -50,6 +50,15 @@ sub new
 	
 	my $self   = bless \%params, $class;
 	Scalar::Util::weaken($self->{type_constraint}); # break ref cycle
+	
+	unless ($self->is_anon)
+	{
+		# First try a fast ASCII-only expression, but fall back to Unicode
+		$self->name =~ /^[A-Z][A-Za-z0-9_]+$/sm
+			or eval q( $self->name =~ /^\p{Lu}[\p{L}0-9_]+$/sm )
+			or _croak '"%s" is not a valid coercion name', $self->name;
+	}
+	
 	return $self;
 }
 
@@ -87,8 +96,8 @@ sub add
 	{
 		$opts{type_constraint} = $x->type_constraint;
 	}
-	$opts{name} ||= "$x+$y";
-	$opts{name} = '__ANON__' if $opts{name} eq '__ANON__+__ANON__';
+	$opts{display_name} ||= "$x+$y";
+	delete $opts{display_name} if $opts{display_name} eq '__ANON__+__ANON__';
 	
 	my $new = $class->new(%opts);
 	$new->add_type_coercions( @{$x->type_coercion_map} );
@@ -482,15 +491,23 @@ Create a Type::Coercion from two existing Type::Coercion objects.
 
 =item C<name>
 
-TODO.
+A name for the coercion. These need to conform to certain naming
+rules (they must begin with an uppercase letter and continue using only
+letters, digits 0-9 and underscores).
+
+Optional; if not supplied will be an anonymous coercion.
 
 =item C<display_name>
 
-TODO.
+A name to display for the coercion when stringified. These don't have
+to conform to any naming rules. Optional; a default name will be
+calculated from the C<name>.
 
 =item C<library>
 
-TODO.
+The package name of the type library this coercion is associated with.
+Optional. Informational only: setting this attribute does not install
+the coercion into the package.
 
 =item C<type_constraint>
 
@@ -532,7 +549,7 @@ Predicate methods.
 
 =item C<is_anon>
 
-TODO.
+Returns true iff the coercion does not have a C<name>.
 
 =item C<< qualified_name >>
 
@@ -553,17 +570,24 @@ is C<< $_ >>.
 
 Coerce the value to the target type.
 
+Returns the coerced value, or the original value if no coercion was
+possible.
+
 =item C<< assert_coerce($value) >>
 
 Coerce the value to the target type, and throw an exception if the result
 does not validate against the target type constraint.
 
+Returns the coerced value.
+
 =item C<< has_coercion_for_type($source_type) >>
 
 Returns true iff this coercion has a coercion from the source type.
 
-Returns the special string C<< "0 but true" >> if no coercion would be
-actually be necessary for this type.
+Returns the special string C<< "0 but true" >> if no coercion should
+actually be necessary for this type. (For example, if a coercion coerces
+to a theoretical "Number" type, there is probably no coercion necessary
+for values that already conform to the "Integer" type.)
 
 =item C<< has_coercion_for_value($value) >>
 
