@@ -80,6 +80,58 @@ Caveat: Object::Accessor doesn't die when a value fails to meet its type
 constraint; instead it outputs a warning to STDERR. This behaviour can
 be changed by setting C<< $Object::Accessor::FATAL = 1 >>.
 
+=head2 Validation::Class
+
+You want L<Validation::Class> 7.900000 or above.
+
+The C<to_TypeTiny> function from L<Types::TypeTiny> can be used to create
+a Type::Tiny type constraint from a Validation::Class::Simple object (and
+probably from Validation::Class, but this is untested).
+
+   use Types::TypeTiny qw( to_TypeTiny );
+   use Validation::Class::Simple;
+   
+   my $type = to_TypeTiny Validation::Class::Simple->new(
+      fields => {
+         name => {
+            required => 1,
+            pattern  => qr{^\w+(\s\w+)*$},
+            filters  => ["trim", "strip"],
+         },
+         email => { required => 1, email => 1 },
+         pass  => { required => 1, min_length => 6 },
+      },
+   );
+   
+   # true
+   $type->check({
+      name   => "Toby Inkster",
+      email  => "tobyink@cpan.org",
+      pass   => "foobar",
+   });
+   
+   # false
+   $type->check({
+      name   => "Toby Inkster ",    # trailing whitespace
+      email  => "tobyink@cpan.org",
+      pass   => "foobar",
+   });
+   
+   # coercion from HashRef uses the filters defined above
+   my $fixed = $type->coerce({
+      name   => "Toby Inkster ",    # trailing whitespace
+      email  => "tobyink@cpan.org",
+      pass   => "foobar",
+   });
+   
+   # true
+   $type->check($fixed);
+
+Type constraints built with Validation::Class are not inlinable, so won't
+be as fast as C<Dict> from L<Types::Standard>, but the filters are a pretty
+useful feature. (Note that filters are explicitly I<ignored> for type
+constraint checking, and only come into play for coercion.)
+
 =head1 AUTHOR
 
 Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
