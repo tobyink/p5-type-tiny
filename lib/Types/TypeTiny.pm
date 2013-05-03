@@ -66,7 +66,7 @@ sub TypeTiny ()
 sub to_TypeTiny
 {
 	my $t = $_[0];
-	
+
 	if (blessed($t) and ref($t)->isa("Moose::Meta::TypeConstraint"))
 	{
 		if ($t->can("tt_type") and my $tt = $t->tt_type)
@@ -80,6 +80,7 @@ sub to_TypeTiny
 		$opts{parent}     = to_TypeTiny($t->parent)              if $t->has_parent;
 		$opts{inlined}    = sub { shift; $t->_inline_check(@_) } if $t->can_be_inlined;
 		$opts{message}    = sub { $t->get_message($_) }          if $t->has_message;
+		$opts{moose_type} = $t;
 		
 		require Type::Tiny;
 		return "Type::Tiny"->new(%opts);
@@ -92,11 +93,52 @@ sub to_TypeTiny
 		$opts{constraint} = $t->constraint;
 		$opts{parent}     = to_TypeTiny($t->parent)              if $t->has_parent;
 		$opts{message}    = sub { $t->get_message($_) }          if $t->has_message;
+		$opts{mouse_type} = $t;
 		
 		require Type::Tiny;
 		return "Type::Tiny"->new(%opts);
 	}
 
+	if (blessed($t) and ref($t)->isa("Validation::Class::Simple") || ref($t)->isa("Validation::Class"))
+	{
+		require Type::Tiny;
+		require Types::Standard;
+		
+		my %opts;		
+		$opts{parent}     = Types::Standard::HashRef();
+		$opts{constraint} = sub {
+			$t->params->clear;
+			$t->params->add(%$_);
+			no warnings "redefine"; ### XXX: Argh!!!!!!111
+			local *Validation::Class::Directive::Filters::execute_filtering = sub { $_[0] };
+			eval { $t->validate };
+		};
+		$opts{message} = sub {
+			$t->params->clear;
+			$t->params->add(%$_);
+			no warnings "redefine"; ### XXX: Argh!!!!!!111
+			local *Validation::Class::Directive::Filters::execute_filtering = sub { $_[0] };
+			eval { $t->validate } ? "OK" : $t->errors_to_string;
+		};
+		$opts{_validation_class} = $t;
+		
+		my $new = "Type::Tiny"->new(%opts);
+		
+		$new->coercion->add_type_coercions(
+			Types::Standard::HashRef() => sub {
+				my %params = %$_;
+				for my $k (keys %params)
+					{ delete $params{$_} unless $t->get_fields($k) };
+				$t->params->clear;
+				$t->params->add(%params);
+				eval { $t->validate };
+				$t->get_hash;
+			},
+		);
+		
+		return $new;
+	}	
+	
 	return $t;
 }
 
@@ -129,7 +171,24 @@ much circularity. But it exports some type constraint "constants":
 
 =item C<< CodeLike >>
 
-=item C<< TypeTiny >>, C<< to_TypeTiny >>
+=item C<< TypeTiny >>
+
+=back
+
+=head2 Coercion Functions
+
+=over
+
+=item C<< to_TypeTiny($constraint) >>
+
+Promotes (or "demotes" if you prefer) a Mo[ou]se::Meta::TypeConstraint object
+to a Type::Tiny object.
+
+Can also handle L<Validation::Class> objects. Type constraints built from 
+Validation::Class objects deliberately I<ignore> field filters when they
+do constraint checking (and go to great lengths to do so); using filters for
+coercion only. (The behaviour of C<coerce> if we don't do that is just too
+weird!)
 
 =back
 
