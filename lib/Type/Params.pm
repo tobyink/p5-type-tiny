@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Params::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Params::VERSION   = '0.003_13';
+	$Type::Params::VERSION   = '0.003_14';
 }
 
 use Carp qw(croak);

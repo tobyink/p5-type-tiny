@@ -311,3 +311,7 @@
 		item "Better documentation and tests of Moose/Mouse-compatible API."^^Change;
 		item "BAIL_OUT in test suite if 00-compile.t or 01-api.t fail."^^Change;
 	].
+
+`Type-Tiny 0.003_14 cpan:TOBYINK`
+	comment "No functional changes.";
+	issued  2013-05-03.
