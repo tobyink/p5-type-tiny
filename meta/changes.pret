@@ -315,3 +315,10 @@
 `Type-Tiny 0.003_14 cpan:TOBYINK`
 	comment "No functional changes.";
 	issued  2013-05-03.
+
+`Type-Tiny 0.003_15 cpan:TOBYINK`
+	issued  2013-05-03;
+	changeset [
+		dcs:versus `Type-Tiny 0.003_13 cpan:TOBYINK`; # !!!
+		item "Improvements to to_TypeTiny function, including accepting Validation::Class::Simple objects."^^Addition;
+	].
