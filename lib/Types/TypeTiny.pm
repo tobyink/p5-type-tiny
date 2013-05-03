@@ -66,7 +66,7 @@ sub TypeTiny ()
 sub to_TypeTiny
 {
 	my $t = $_[0];
-
+	
 	if (blessed($t) and ref($t)->isa("Moose::Meta::TypeConstraint"))
 	{
 		if ($t->can("tt_type") and my $tt = $t->tt_type)
@@ -98,13 +98,13 @@ sub to_TypeTiny
 		require Type::Tiny;
 		return "Type::Tiny"->new(%opts);
 	}
-
+	
 	if (blessed($t) and ref($t)->isa("Validation::Class::Simple") || ref($t)->isa("Validation::Class"))
 	{
 		require Type::Tiny;
 		require Types::Standard;
 		
-		my %opts;		
+		my %opts;
 		$opts{parent}     = Types::Standard::HashRef();
 		$opts{constraint} = sub {
 			$t->params->clear;
@@ -137,7 +137,7 @@ sub to_TypeTiny
 		);
 		
 		return $new;
-	}	
+	}
 	
 	return $t;
 }
@@ -181,7 +181,7 @@ much circularity. But it exports some type constraint "constants":
 
 =item C<< to_TypeTiny($constraint) >>
 
-Promotes (or "demotes" if you prefer) a Mo[ou]se::Meta::TypeConstraint object
+Promotes (or "demotes" if you prefer) a Moose/Mouse::Meta::TypeConstraint object
 to a Type::Tiny object.
 
 Can also handle L<Validation::Class> objects. Type constraints built from 

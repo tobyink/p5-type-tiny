@@ -2,6 +2,8 @@
 
 =encoding utf-8
 
+=for stopwords inlinable
+
 =head1 NAME
 
 Type::Tiny::Manual::UsingWithOther - how to use Type::Tiny and Type::Library with other OO frameworks
