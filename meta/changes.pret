@@ -308,4 +308,6 @@
 			dcs:blame cpan:DJERIUS;
 		];
 		item "Don't crash in old versions of Moose that have no Class::MOP::_definition_context() function."^^Bugfix;
+		item "Better documentation and tests of Moose/Mouse-compatible API."^^Change;
+		item "BAIL_OUT in test suite if 00-compile.t or 01-api.t fail."^^Change;
 	].
