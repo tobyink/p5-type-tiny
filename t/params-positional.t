@@ -69,7 +69,7 @@ is_deeply(
 
 {
 	my $e = exception { nth_root(undef, 1) };
-	like($e, qr{^Value "" in \$_\[0\] does not meet type constraint "Num"}, '(undef, 1)');
+	like($e, qr{^Undef in \$_\[0\] does not meet type constraint "Num"}, '(undef, 1)');
 }
 
 {

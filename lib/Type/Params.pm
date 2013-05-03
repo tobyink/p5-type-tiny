@@ -71,6 +71,22 @@ sub _mkslurpy
 		);
 }
 
+sub _dd
+{
+	my $value = @_ ? $_[0] : $_;
+	!defined $value ? 'Undef' :
+	!ref $value     ? sprintf('Value %s', B::perlstring($value)) :
+	do {
+		require Data::Dumper;
+		local $Data::Dumper::Indent   = 0;
+		local $Data::Dumper::Useqq    = 1;
+		local $Data::Dumper::Terse    = 1;
+		local $Data::Dumper::Sortkeys = 1;
+		local $Data::Dumper::Maxdepth = 2;
+		Data::Dumper::Dumper($value)
+	}
+}
+
 sub compile
 {
 	my (@code, %env);
@@ -86,10 +102,10 @@ sub compile
 	
 	my $level = 3 + ($options{'carp_level'} || 0);
 	$env{'$croaker'} =
-		$options{'carp'}    ? \sub { local $Carp::CarpLevel = $level; Carp::carp($_[0]) } :
-		$options{'cluck'}   ? \sub { local $Carp::CarpLevel = $level; Carp::cluck($_[0]) } :
-		$options{'confess'} ? \sub { local $Carp::CarpLevel = $level; Carp::confess($_[0]) } :
-		\sub { local $Carp::CarpLevel = $level; Carp::croak($_[0]) };
+		$options{'carp'}    ? \sub { local $Carp::CarpLevel = $level; Carp::carp(sprintf $_[0], map _dd, @_[1..$#_]) } :
+		$options{'cluck'}   ? \sub { local $Carp::CarpLevel = $level; Carp::cluck(sprintf $_[0], map _dd, @_[1..$#_]) } :
+		$options{'confess'} ? \sub { local $Carp::CarpLevel = $level; Carp::confess(sprintf $_[0], map _dd, @_[1..$#_]) } :
+		\sub { local $Carp::CarpLevel = $level; Carp::croak(sprintf $_[0], map _dd, @_[1..$#_]) };
 
 	while (@_)
 	{
@@ -157,22 +173,22 @@ sub compile
 		if ($constraint->can_be_inlined)
 		{
 			push @code, sprintf(
-				'(%s) or $croaker->("Value \\"%s\\" in \\$_[%d] does not meet type constraint \\"%s\\"");',
+				'(%s) or $croaker->("%%s in \\$_[%d] does not meet type constraint \\"%s\\"", %s);',
 				$constraint->inline_check($varname),
-				$varname,
 				$arg,
 				$constraint,
+				$varname,
 			);
 		}
 		else
 		{
 			$env{'@check'}[$arg] = $constraint->compiled_check;
 			push @code, sprintf(
-				'%s or $croaker->("Value \\"%s\\" in \\$_[%d] does not meet type constraint \\"%s\\"");',
+				'%s or $croaker->("%%s in \\$_[%d] does not meet type constraint \\"%s\\"", %s);',
 				sprintf(sprintf '$check[%d]->(%s)', $arg, $varname),
-				$varname,
 				$arg,
 				$constraint,
+				$varname,
 			);
 		}
 		
