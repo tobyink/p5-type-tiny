@@ -4,7 +4,7 @@
 
 =head1 PURPOSE
 
-Test that Type::Tiny, Type::Library and Type::Utils compile.
+Test that Type::Tiny, Type::Library, etc compile.
 
 =head1 AUTHOR
 
@@ -42,5 +42,7 @@ use_ok("Type::Tiny::Union");
 use_ok("Type::Utils");
 use_ok("Type::Params");
 
-done_testing;
+BAIL_OUT("Further tests rely on all modules compiling.")
+	unless "Test::Builder"->new->is_passing;
 
+done_testing;
