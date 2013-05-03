@@ -614,6 +614,17 @@ fully documented because they may change in the near future:
 
 =back
 
+The following methods exist for Moose/Mouse compatibility, but do not do
+anything useful.
+
+=over
+
+=item C<< compile_type_coercion >>
+
+=item C<< meta >>
+
+=back
+
 =head2 Overloading
 
 =over

@@ -1035,9 +1035,24 @@ a Moose::Meta::TypeConstraint.
 
 If Mouse is loaded, then C<isa> mocks Mouse::Meta::TypeConstraint.
 
+=back
+
+The following methods exist for Moose/Mouse compatibility, but do not do
+anything useful.
+
+=over
+
+=item C<< compile_type_constraint >>
+
+=item C<< hand_optimized_type_constraint >>
+
+=item C<< has_hand_optimized_type_constraint >>
+
 =item C<< inline_environment >>
 
-Stub for Moose compatibility. Always returns an empty hashref.
+=item C<< meta >>
+
+=item C<< type_parameter >>
 
 =back
 
