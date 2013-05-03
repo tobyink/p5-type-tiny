@@ -445,6 +445,8 @@ sub AUTOLOAD
 }
 
 *_compiled_type_coercion = \&compiled_coercion;
+*compile_type_coercion = \&compiled_coercion;
+sub meta { _croak("Not really a Moose::Meta::TypeCoercion. Sorry!") }
 
 1;
 
