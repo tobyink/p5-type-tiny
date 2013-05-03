@@ -5,6 +5,8 @@
 
 2013-05-06 Type-Tiny version 0.004 released!
 
+ - Contains over 3500 lines of code, over 5000 lines of documentation,
+   and over 1000 tests.
  - Improved manual.
  - Many improvements to coercions:
     - can be made immutable
@@ -21,3 +23,5 @@
  - OptList, Bytes and Chars types added to Types::Standard
  - MkOpt, Encode, Decode, Join and Split coercions added to Types::Standard
  - Better Mouse support.
+ - Types::TypeTiny::to_TypeTiny is able to built a type constraint from
+   Validation::Class::Simple
