@@ -161,9 +161,7 @@ declare "ArrayRef",
 	where { ref $_ eq "ARRAY" },
 	inline_as { "ref($_) eq 'ARRAY'" },
 	constraint_generator => sub
-	{
-		require Types::Standard::AutomaticCoercion;
-		
+	{		
 		my $param = Types::TypeTiny::to_TypeTiny(shift);
 		Types::TypeTiny::TypeTiny->check($param)
 			or _croak("Parameter to ArrayRef[`a] expected to be a type constraint; got $param");
@@ -198,8 +196,6 @@ declare "HashRef",
 	inline_as { "ref($_) eq 'HASH'" },
 	constraint_generator => sub
 	{
-		require Types::Standard::AutomaticCoercion;
-		
 		my $param = Types::TypeTiny::to_TypeTiny(shift);
 		Types::TypeTiny::TypeTiny->check($param)
 			or _croak("Parameter to HashRef[`a] expected to be a type constraint; got $param");
@@ -234,8 +230,6 @@ declare "ScalarRef",
 	inline_as { "ref($_) eq 'SCALAR' or ref($_) eq 'REF'" },
 	constraint_generator => sub
 	{
-		require Types::Standard::AutomaticCoercion;
-		
 		my $param = Types::TypeTiny::to_TypeTiny(shift);
 		Types::TypeTiny::TypeTiny->check($param)
 			or _croak("Parameter to ScalarRef[`a] expected to be a type constraint; got $param");
@@ -295,8 +289,6 @@ declare "Map",
 	inline_as { "ref($_) eq 'HASH'" },
 	constraint_generator => sub
 	{
-		require Types::Standard::AutomaticCoercion;
-		
 		my ($keys, $values) = map Types::TypeTiny::to_TypeTiny($_), @_;
 		Types::TypeTiny::TypeTiny->check($keys)
 			or _croak("First parameter to Map[`k,`v] expected to be a type constraint; got $keys");
@@ -335,8 +327,6 @@ declare "Optional",
 	as "Item",
 	constraint_generator => sub
 	{
-		require Types::Standard::AutomaticCoercion;
-		
 		my $param = Types::TypeTiny::to_TypeTiny(shift);
 		Types::TypeTiny::TypeTiny->check($param)
 			or _croak("Parameter to Optional[`a] expected to be a type constraint; got $param");
@@ -369,8 +359,6 @@ declare "Tuple",
 	},
 	constraint_generator => sub
 	{
-		require Types::Standard::AutomaticCoercion;
-		
 		my @constraints = @_;
 		my $slurpy;
 		if (exists $constraints[-1] and ref $constraints[-1] eq "HASH")
@@ -438,8 +426,6 @@ declare "Dict",
 	},
 	constraint_generator => sub
 	{
-		require Types::Standard::AutomaticCoercion;
-		
 		my %constraints = @_;
 		
 		while (my ($k, $v) = each %constraints)
@@ -587,10 +573,9 @@ declare "Chars",
 	inline_as { "utf8::is_utf8($_) or $_ =~ \$Types::Standard::SevenBitSafe" };
 
 declare "OptList",
-	as ArrayRef(),
+	as ArrayRef([ArrayRef()]),
 	where {
 		for my $inner (@$_) {
-			return unless ref($inner) eq q(ARRAY);
 			return unless @$inner == 2;
 			return unless is_Str($inner->[0]);
 		}
@@ -604,7 +589,7 @@ declare "OptList",
 		push @code,     sprintf('($ok=0) && last unless (%s); ', $Str_check);
 		push @code,   '} ';
 		push @code, '$ok }';
-		sprintf(
+		my $r = sprintf(
 			'%s and %s',
 			$self->parent->inline_check($var),
 			join(q( ), @code),
@@ -723,6 +708,8 @@ declare_coercion "Split", to_type ArrayRef() => {
 		return (Str(), qq{ [split /$regexp_string/, \$_] });
 	},
 };
+
+require Types::Standard::DeepCoercion;
 
 1;
 

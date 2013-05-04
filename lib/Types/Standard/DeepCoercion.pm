@@ -1,11 +1,11 @@
-package Types::Standard::AutomaticCoercion;
+package Types::Standard::DeepCoercion;
 
 use strict;
 use warnings;
 
 BEGIN {
-	$Types::Standard::AutomaticCoercion::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::AutomaticCoercion::VERSION   = '0.003_15';
+	$Types::Standard::DeepCoercion::AUTHORITY = 'cpan:TOBYINK';
+	$Types::Standard::DeepCoercion::VERSION   = '0.003_15';
 }
 
 require Type::Coercion;
@@ -13,7 +13,7 @@ require Type::Coercion;
 sub Stringable (&)
 {
 	package #private
-	Types::Standard::AutomaticCoercion::_Stringable;
+	Types::Standard::DeepCoercion::_Stringable;
 	use overload q[""] => sub { $_[0]{text} ||= $_[0]{code}->() }, fallback => 1;
 	bless +{ code => $_[0] };
 }
@@ -457,7 +457,7 @@ __END__
 
 =head1 NAME
 
-Types::Standard::AutomaticCoercions - internals for Types::Standard
+Types::Standard::DeepCoercion - internals for Types::Standard
 
 =head1 DESCRIPTION
 
@@ -465,7 +465,7 @@ This module contains additional code for L<Types::Standard>, allowing
 coercions for C<< HashRef[Foo] >>, C<< ArrayRef[Foo] >>, etc to be
 automatically generated if C<< Foo >> has a coercion.
 
-It is loaded automatically on demand, and provides no public API.
+It provides no public API.
 
 =begin private
 
