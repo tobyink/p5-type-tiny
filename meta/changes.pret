@@ -322,3 +322,14 @@
 		dcs:versus `Type-Tiny 0.003_13 cpan:TOBYINK`; # !!!
 		item "Improvements to to_TypeTiny function, including accepting Validation::Class::Simple objects."^^Addition;
 	].
+
+`Type-Tiny 0.003_16 cpan:TOBYINK`
+	issued  2013-05-04;
+	label   "May the fourth be with you...";
+	changeset [
+		dcs:versus `Type-Tiny 0.003_15 cpan:TOBYINK`;
+		item "Rename Types::Standard::AutomaticCoercion -> Types::Standard::DeepCoercion."^^Change;
+		item "Type::Params produces nicer error messages."^^Change;
+		item "Document that Map[`k,`v] has a deep coercion."^^Documentation;
+		item "Improve Type::Coercion documentation."^^Documentation;
+	].

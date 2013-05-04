@@ -14,7 +14,7 @@ sub _clean_eval
 }
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.003_15';
+our $VERSION   = '0.003_16';
 our @EXPORT    = qw( eval_closure );
 
 sub _croak ($;@)
