@@ -161,7 +161,7 @@ declare "ArrayRef",
 	where { ref $_ eq "ARRAY" },
 	inline_as { "ref($_) eq 'ARRAY'" },
 	constraint_generator => sub
-	{		
+	{
 		my $param = Types::TypeTiny::to_TypeTiny(shift);
 		Types::TypeTiny::TypeTiny->check($param)
 			or _croak("Parameter to ArrayRef[`a] expected to be a type constraint; got $param");
