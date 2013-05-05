@@ -1,10 +1,18 @@
   * Type-Tiny
-      * improve speed for non-inlineable type constraints and coercions
-          * maybe use eval context idea from Type::Check
-      * Type-Tiny could be used as a backend for Scalar::Does?
-          * if not, certainly a SEE ALSO
       * improved error messages
           * an ArrayRef[Int] should be able to tell you what elements
             are not Ints
           * if something is not a number, then the Int error message
             should report that; not just report that it's not an Int
+      * Improve API for parameterized coercions
+      * Consider ways to reduce duplication when definition a type
+        constraint coderef plus inline code
+      * Related Projects
+          * Type-Tiny could be used as a backend for Scalar::Does?
+              * if not, certainly a SEE ALSO
+          * Release stable version of Types-XSD
+          * Release Type-Tie
+      * Maybe[`a] should have a coercion if `a does???
+      * Documentation
+          * See what questions users come up with, and write more
+            documentation if necessary
