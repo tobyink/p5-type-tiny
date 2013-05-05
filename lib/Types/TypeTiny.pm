@@ -67,79 +67,118 @@ sub to_TypeTiny
 {
 	my $t = $_[0];
 	
-	if (blessed($t) and ref($t)->isa("Moose::Meta::TypeConstraint"))
+	goto \&_TypeTinyFromMoose
+		if (blessed($t) and ref($t)->isa("Moose::Meta::TypeConstraint"));
+	
+	goto \&_TypeTinyFromMouse
+		if (blessed($t) and ref($t)->isa("Mouse::Meta::TypeConstraint"));
+	
+	goto \&_TypeTinyFromValidationClass
+		if (blessed($t) and ref($t)->isa("Validation::Class::Simple") || ref($t)->isa("Validation::Class"));
+	
+	$t;
+}
+
+sub _TypeTinyFromMoose
+{
+	my $t = $_[0];
+	
+	if ($t->can("tt_type") and my $tt = $t->tt_type)
 	{
-		if ($t->can("tt_type") and my $tt = $t->tt_type)
-		{
-			return $tt;
-		}
-		
-		my %opts;
-		$opts{name}       = $t->name;
-		$opts{constraint} = $t->constraint;
-		$opts{parent}     = to_TypeTiny($t->parent)              if $t->has_parent;
-		$opts{inlined}    = sub { shift; $t->_inline_check(@_) } if $t->can_be_inlined;
-		$opts{message}    = sub { $t->get_message($_) }          if $t->has_message;
-		$opts{moose_type} = $t;
-		
-		require Type::Tiny;
-		return "Type::Tiny"->new(%opts);
+		return $tt;
 	}
 	
-	if (blessed($t) and ref($t)->isa("Mouse::Meta::TypeConstraint"))
-	{
-		my %opts;
-		$opts{name}       = $t->name;
-		$opts{constraint} = $t->constraint;
-		$opts{parent}     = to_TypeTiny($t->parent)              if $t->has_parent;
-		$opts{message}    = sub { $t->get_message($_) }          if $t->has_message;
-		$opts{mouse_type} = $t;
-		
-		require Type::Tiny;
-		return "Type::Tiny"->new(%opts);
-	}
+	my %opts;
+	$opts{name}       = $t->name;
+	$opts{constraint} = $t->constraint;
+	$opts{parent}     = to_TypeTiny($t->parent)              if $t->has_parent;
+	$opts{inlined}    = sub { shift; $t->_inline_check(@_) } if $t->can_be_inlined;
+	$opts{message}    = sub { $t->get_message($_) }          if $t->has_message;
+	$opts{moose_type} = $t;
 	
-	if (blessed($t) and ref($t)->isa("Validation::Class::Simple") || ref($t)->isa("Validation::Class"))
+	require Type::Tiny;
+	return "Type::Tiny"->new(%opts);
+}
+
+sub _TypeTinyFromMouse
+{
+	my $t = $_[0];
+	
+	my %opts;
+	$opts{name}       = $t->name;
+	$opts{constraint} = $t->constraint;
+	$opts{parent}     = to_TypeTiny($t->parent)              if $t->has_parent;
+	$opts{message}    = sub { $t->get_message($_) }          if $t->has_message;
+	$opts{mouse_type} = $t;
+	
+	require Type::Tiny;
+	return "Type::Tiny"->new(%opts);
+}
+
+sub _TypeTinyFromValidationClass
+{
+	my $t = $_[0];
+	
+	require Type::Tiny;
+	require Types::Standard;
+	
+	my %opts = (
+		parent            => Types::Standard::HashRef(),
+		_validation_class => $t,
+	);
+	
+	if ($t->VERSION >= "7.900048")
 	{
-		require Type::Tiny;
-		require Types::Standard;
-		
-		my %opts;
-		$opts{parent}     = Types::Standard::HashRef();
 		$opts{constraint} = sub {
 			$t->params->clear;
 			$t->params->add(%$_);
-			no warnings "redefine"; ### XXX: Argh!!!!!!111
+			my $f = $t->filtering; $t->filtering('off');
+			my $r = eval { $t->validate };
+			$t->filtering($f || 'pre');
+			return $r;
+		};
+		$opts{message} = sub {
+			$t->params->clear;
+			$t->params->add(%$_);
+			my $f = $t->filtering; $t->filtering('off');
+			my $r = (eval { $t->validate } ? "OK" : $t->errors_to_string);
+			$t->filtering($f || 'pre');
+			return $r;
+		};
+	}
+	else  # need to use hackish method
+	{
+		$opts{constraint} = sub {
+			$t->params->clear;
+			$t->params->add(%$_);
+			no warnings "redefine";
 			local *Validation::Class::Directive::Filters::execute_filtering = sub { $_[0] };
 			eval { $t->validate };
 		};
 		$opts{message} = sub {
 			$t->params->clear;
 			$t->params->add(%$_);
-			no warnings "redefine"; ### XXX: Argh!!!!!!111
+			no warnings "redefine";
 			local *Validation::Class::Directive::Filters::execute_filtering = sub { $_[0] };
 			eval { $t->validate } ? "OK" : $t->errors_to_string;
 		};
-		$opts{_validation_class} = $t;
-		
-		my $new = "Type::Tiny"->new(%opts);
-		
-		$new->coercion->add_type_coercions(
-			Types::Standard::HashRef() => sub {
-				my %params = %$_;
-				for my $k (keys %params)
-					{ delete $params{$_} unless $t->get_fields($k) };
-				$t->params->clear;
-				$t->params->add(%params);
-				eval { $t->validate };
-				$t->get_hash;
-			},
-		);
-		
-		return $new;
 	}
 	
-	return $t;
+	my $new = "Type::Tiny"->new(%opts);
+	
+	$new->coercion->add_type_coercions(
+		Types::Standard::HashRef() => sub {
+			my %params = %$_;
+			for my $k (keys %params)
+				{ delete $params{$_} unless $t->get_fields($k) };
+			$t->params->clear;
+			$t->params->add(%params);
+			eval { $t->validate };
+			$t->get_hash;
+		},
+	);
+	
+	return $new;
 }
 
 1;
