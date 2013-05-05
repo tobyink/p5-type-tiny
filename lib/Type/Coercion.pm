@@ -36,9 +36,18 @@ BEGIN {
 sub _overload_coderef
 {
 	my $self = shift;
-	$self->{_overload_coderef} ||= "Sub::Quote"->can("quote_sub") && $self->can_be_inlined
-		? Sub::Quote::quote_sub($self->inline_coercion('$_[0]'))
-		: sub { $self->coerce(@_) }
+	
+	if ("Sub::Quote"->can("quote_sub") && $self->can_be_inlined)
+	{
+		$self->{_overload_coderef} = Sub::Quote::quote_sub($self->inline_coercion('$_[0]'))
+			if !$self->{_overload_coderef} || !$self->{_sub_quoted}++;
+	}
+	else
+	{
+		$self->{_overload_coderef} ||= sub { $self->coerce(@_) };
+	}
+	
+	$self->{_overload_coderef};
 }
 
 sub new

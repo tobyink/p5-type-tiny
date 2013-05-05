@@ -43,7 +43,7 @@ Type::Tiny::Manual::UsingWithMoo - how to use Type::Tiny and Type::Library with 
 
 =head1 DESCRIPTION
 
-Type::Tiny is tested with L<Moo> 1.001000.
+Type::Tiny is tested with L<Moo> 1.001000 and above.
 
 Type::Tiny overloads C<< &{} >>. Moo supports using objects that overload
 C<< &{} >> as C<isa> constraints, so Type::Tiny objects can directly be used
@@ -63,8 +63,9 @@ The usual advice for optimizing type constraints applies: use type constraints
 which can be inlined whenever possible, and define coercions as strings rather
 than coderefs.
 
-There is a patch in the Moo repository that will enable inlining to work
-L<http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=gitmo/Moo.git;a=shortlog;h=refs/heads/coderef-overload>.
+Upgrading to Moo 1.002000 or above should provide a slight increase in speed
+for type constraints, as it allows them to be inlined into accessors and
+constructors.
 
 =head1 SEE ALSO
 

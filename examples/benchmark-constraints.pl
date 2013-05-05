@@ -25,12 +25,7 @@ L<Moose> with L<Moose> type constraints. Class is made immutable.
 
 L<Moose> with L<Type::Tiny> type constraints. Class is made immutable.
 
-=back
-
-In both Moo examples, the following patch was applied, which will hopefully
-make it into mainstream Moo releases soon.
-
-L<http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=gitmo/Moo.git;a=commitdiff;h=2f425b5770149d4ed2e59da001c3be052cbd6bc1>.
+	=back
 
 =head1 RESULTS
 
@@ -38,10 +33,13 @@ For both Moose and Moo, L<Type::Tiny> type constraints are clearly faster
 than the conventional approach:
 
                Rate Moo_MXTML    Moo_TT     Moose  Moose_TT
-   Moo_MXTML 3140/s        --      -47%      -51%      -62%
-   Moo_TT    5947/s       89%        --       -8%      -28%
-   Moose     6458/s      106%        9%        --      -21%
-   Moose_TT  8220/s      162%       38%       27%        --
+   Moo_MXTML 3082/s        --      -49%      -52%      -63%
+   Moo_TT    6053/s       96%        --       -6%      -27%
+   Moose     6458/s      110%        7%        --      -22%
+   Moose_TT  8295/s      169%       37%       28%        --
+
+(Tested versions: Type::Tiny 0.003_16, Moose 2.0604, Moo 1.002000, and
+MooX::Types::MooseLike 0.16.)
 
 =head1 DEPENDENCIES
 

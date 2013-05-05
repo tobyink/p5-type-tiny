@@ -30,10 +30,6 @@ immutable.
 
 =back
 
-In both Moo examples, the following patch was applied, which will hopefully
-make it into mainstream Moo releases soon.
-
-L<http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=gitmo/Moo.git;a=commitdiff;h=2f425b5770149d4ed2e59da001c3be052cbd6bc1>.
 
 =head1 RESULTS
 
@@ -41,10 +37,13 @@ For both Moose and Moo, L<Type::Tiny> type constraints are clearly faster
 than the conventional approach:
 
                Rate Moo_MXTML    Moo_TT     Moose  Moose_TT
-   Moo_MXTML 3459/s        --      -34%      -44%      -56%
-   Moo_TT    5239/s       51%        --      -16%      -33%
-   Moose     6207/s       79%       18%        --      -21%
-   Moose_TT  7859/s      127%       50%       27%        --
+   Moo_MXTML 3412/s        --      -33%      -49%      -60%
+   Moo_TT    5119/s       50%        --      -23%      -39%
+   Moose     6636/s       94%       30%        --      -21%
+   Moose_TT  8452/s      148%       65%       27%        --
+
+(Tested versions: Type::Tiny 0.003_16, Moose 2.0604, Moo 1.002000, and
+MooX::Types::MooseLike 0.16.)
 
 =head1 DEPENDENCIES
 
