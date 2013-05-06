@@ -719,6 +719,8 @@ __END__
 
 =encoding utf-8
 
+=for stopwords datetimes
+
 =head1 NAME
 
 Types::Standard - bundled set of built-in types for Type::Tiny
