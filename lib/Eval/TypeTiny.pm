@@ -42,6 +42,7 @@ sub eval_closure
 	
 	my (%args) = @_;
 	$args{line}   = 1 unless defined $args{line};
+	$args{description} =~ s/[^\w .:-\[\]\(\)\{\}\']//g if defined $args{description};
 	$args{source} = qq{#line $args{line} "$args{description}"\n} . $args{source}
 		if defined $args{description} && !($^P & 0x10);
 	$args{environment} ||= {};
