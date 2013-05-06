@@ -975,6 +975,10 @@ L<Moose::Util::TypeConstraints>,
 L<Mouse::Util::TypeConstraints>,
 L<MooseX::Types::Structured>.
 
+L<Types::XSD> provides some type constraints based on XML Schema's data
+types; this includes constraints for ISO8601-formatted datetimes, integer
+ranges (e.g. C<< PositiveInteger[maxInclusive=>10] >> and so on.
+
 =head1 AUTHOR
 
 Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
