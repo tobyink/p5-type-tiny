@@ -10,11 +10,33 @@ BEGIN {
 }
 
 use Exporter::TypeTiny qw( mkopt _croak );
+use Scalar::Util qw( refaddr );
 use Types::TypeTiny qw( ArrayLike );
+
+use base "Exporter::TypeTiny";
+our @EXPORT_OK = qw(t);
+
+sub _exporter_expand_sub
+{
+	my $class = shift;
+	my ($name, $value, $globals, $permitted) = @_;
+	
+	if ($name eq "t")
+	{
+		my $caller = $globals->{into};
+		my $reg = $class->for_class(
+			ref($caller) ? sprintf('HASH(0x%08X)', refaddr($caller)) : $caller
+		);
+		return t => sub { @_ ? $reg->lookup(@_) : $reg };
+	}
+	
+	return $class->SUPER::_exporter_expand_sub(@_);
+}
 
 sub new
 {
 	my $class = shift;
+	ref($class) and _croak("not an object method");
 	bless {}, $class;
 }
 
@@ -68,8 +90,9 @@ sub add_types
 sub alias_type
 {
 	my $self = shift;
-	my ($old, $new) = @_;
-	$self->{$new} = $self->{$old};
+	my ($old, @new) = @_;
+	$self->{$_} = $self->{$old} for @new;
+	$self;
 }
 
 # A bunch of stuff stolen from Moose::Util::TypeConstraints...
@@ -185,10 +208,8 @@ sub AUTOLOAD
 {
 	my $self = shift;
 	my ($method) = (our $AUTOLOAD =~ /(\w+)$/);
-	
 	my $type = $self->lookup($method);
 	return $type if $type;
-	
 	_croak(q[Can't locate object method "%s" via package "%s"], $method, ref($self));
 }
 
@@ -229,6 +250,30 @@ Type::Registry - a glorified hashref for looking up type constraints
    
    $type->check([1, 2, 3.14159]);  # croaks
 
+Alternatively:
+
+   package Foo::Bar;
+   
+   use Type::Registry qw( t );
+   
+   # Register all types from Types::Standard
+   t->add_types(-Standard);
+   
+   # Register just one type from Types::XSD
+   t->add_types(-XSD => ["NonNegativeInteger"]);
+   
+   # Register all types from MyApp::Types
+   t->add_types("MyApp::Types");
+   
+   # Create a type alias
+   t->alias_type("NonNegativeInteger" => "Count");
+   
+   # Look up a type constraint
+   my $type = t("ArrayRef[Count]");
+   
+   $type->check([1, 2, 3.14159]);  # croaks
+
+
 =head1 DESCRIPTION
 
 A type registry is basically just a hashref mapping type names to type
@@ -240,9 +285,16 @@ constraint objects.
 
 =item C<< new >>
 
+Create a new glorified hashref.
+
 =item C<< for_class($class) >>
 
+Create or return the existing glorified hashref associated with the given
+class.
+
 =item C<< for_me >>
+
+Create or return the existing glorified hashref associated with the caller.
 
 =back
 
@@ -252,11 +304,43 @@ constraint objects.
 
 =item C<< add_types(@libraries) >>
 
+The libraries list is treated as an "optlist" (a la L<Data::OptList>).
+
+Strings are the names of type libraries; if the first character is a
+hyphen, it is expanded to the "Types::" prefix. If followed by an
+arrayref, this is the list of types to import from that library.
+Otherwise
+
+Strings are the names of type libraries; if the first character is a
+hyphen, it is expanded to the "Types::" prefix. If followed by an
+arrayref, this is the list of types to import from that library.
+Otherwise, imports all types from the library.
+
+	use Type::Registry qw(t);
+	
+	t->add_types(-Standard);  # OR: t->add_types("Types::Standard");
+	
+	t->add_types(
+		-TypeTiny => ['HashLike'],
+		-Standard => ['HashRef' => { -as => 'RealHash' }],
+	);
+
 =item C<< alias_type($oldname, $newname) >>
+
+Create an alias for an existing type.
 
 =item C<< lookup($name) >>
 
+Look up a type in the registry by name. Supports a limited level of
+DSL for unions and parameterized types.
+
+	t->lookup("Int|ArrayRef[Int]")
+
+Returns undef if not found.
+
 =item C<< AUTOLOAD >>
+
+Overloaded to call C<lookup>, but croaks if not found.
 
 =back
 
