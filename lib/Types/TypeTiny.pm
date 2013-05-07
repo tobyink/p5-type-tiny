@@ -8,7 +8,7 @@ our $VERSION   = '0.004';
 
 use Scalar::Util qw< blessed >;
 
-our @EXPORT_OK = qw( CodeLike StringLike TypeTiny HashLike to_TypeTiny );
+our @EXPORT_OK = qw( CodeLike StringLike TypeTiny HashLike ArrayLike to_TypeTiny );
 
 my %cache;
 
@@ -40,6 +40,16 @@ sub HashLike ()
 		name       => "HashLike",
 		constraint => sub {    ref($_   ) eq q[HASH] or Scalar::Util::blessed($_   ) && overload::Method($_   , q[%{}])  },
 		inlined    => sub { qq/ref($_[1]) eq q[HASH] or Scalar::Util::blessed($_[1]) && overload::Method($_[1], q[\%{}])/ },
+	);
+}
+
+sub ArrayLike ()
+{
+	require Type::Tiny;
+	$cache{ArrayLike} ||= "Type::Tiny"->new(
+		name       => "ArrayLike",
+		constraint => sub {    ref($_   ) eq q[ARRAY] or Scalar::Util::blessed($_   ) && overload::Method($_   , q[@{}])  },
+		inlined    => sub { qq/ref($_[1]) eq q[ARRAY] or Scalar::Util::blessed($_[1]) && overload::Method($_[1], q[\@{}])/ },
 	);
 }
 
@@ -207,6 +217,8 @@ much circularity. But it exports some type constraint "constants":
 =item C<< StringLike >>
 
 =item C<< HashLike >>
+
+=item C<< ArrayLike >>
 
 =item C<< CodeLike >>
 
