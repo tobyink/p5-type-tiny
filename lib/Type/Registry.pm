@@ -221,6 +221,8 @@ __END__
 
 =encoding utf-8
 
+=for stopwords optlist
+
 =head1 NAME
 
 Type::Registry - a glorified hashref for looking up type constraints
