@@ -341,3 +341,12 @@
 		item "Minor updates to to_TypeTiny following Validation::Class 7.900048 release."^^Change;
 		item "Eval::Closure now strips line breaks and other unsavoury characters from descriptions."^^Bugfix;
 	].
+
+`Type-Tiny 0.005_01 cpan:TOBYINK`
+	issued  2013-05-07;
+	changeset [
+		dcs:versus `Type-Tiny 0.004 cpan:TOBYINK`;
+		item "Type::Library should require Perl 5.8.1, not 5.8.3."^^Bugfix;
+		item "ArrayLike type added to Types::TypeTiny."^^Addition;
+		item "Type::Registry."^^Addition;
+	].

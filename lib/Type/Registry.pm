@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Registry::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Registry::VERSION   = '0.004';
+	$Type::Registry::VERSION   = '0.005_01';
 }
 
 use Exporter::TypeTiny qw( mkopt _croak );
@@ -272,7 +272,6 @@ Alternatively:
    my $type = t("ArrayRef[Count]");
    
    $type->check([1, 2, 3.14159]);  # croaks
-
 
 =head1 DESCRIPTION
 
