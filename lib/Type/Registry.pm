@@ -27,7 +27,7 @@ sub _exporter_expand_sub
 		my $reg = $class->for_class(
 			ref($caller) ? sprintf('HASH(0x%08X)', refaddr($caller)) : $caller
 		);
-		return t => sub { @_ ? $reg->lookup(@_) : $reg };
+		return t => sub (;$) { @_ ? $reg->lookup(@_) : $reg };
 	}
 	
 	return $class->SUPER::_exporter_expand_sub(@_);
@@ -85,6 +85,7 @@ sub add_types
 			$self->{$key} = $hash{$key}->();
 		}
 	}
+	$self;
 }
 
 sub alias_type
@@ -97,6 +98,8 @@ sub alias_type
 
 # A bunch of stuff stolen from Moose::Util::TypeConstraints...
 {
+	no warnings;
+	
 	my $valid_chars = qr{[\w:\.]};
 	my $type_atom   = qr{ (?>$valid_chars+) }x;
 	my $ws          = qr{ (?>\s*) }x;
