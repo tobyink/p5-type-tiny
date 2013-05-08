@@ -92,7 +92,7 @@ Now, where were we...?
 A type library may define a named set of coercions to a particular
 type. For example, let's define that coercion from C<Str> to C<ArrayRef>:
 
-   define_coercion "LinesFromStr",
+   declare_coercion "LinesFromStr",
       to_type ArrayRef,
       from Str, q{ [split /\n/] };
 
