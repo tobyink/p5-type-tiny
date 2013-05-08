@@ -350,3 +350,19 @@
 		item "ArrayLike type added to Types::TypeTiny."^^Addition;
 		item "Type::Registry."^^Addition;
 	].
+
+`Type-Tiny 0.005_02 cpan:TOBYINK`
+	issued  2013-05-09;
+	changeset [
+		dcs:versus `Type-Tiny 0.005_01 cpan:TOBYINK`;
+		item [
+			a dcs:Documentation;
+			label "Fix a typo in declare_coercion in Type::Tiny::Manual::Coercions.";
+			dcs:blame cpan:MMCLERIC;
+		];
+		item [
+			a dcs:Documentation;
+			label "Link to Type::Tiny::Manual::Libraries instead of non-existing Type::Tiny::Intro.";
+			dcs:blame cpan:MMCLERIC;
+		];
+	].
