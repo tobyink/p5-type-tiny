@@ -70,6 +70,8 @@ sub _overload_coderef
 	$self->{_overload_coderef};
 }
 
+our %ALL_TYPES;
+
 my $uniq = 1;
 sub new
 {
@@ -105,11 +107,15 @@ sub new
 			or _croak '"%s" is not a valid type name', $self->name;
 	}
 	
-	if ($self->has_library and !$self->is_anon and !$params{tmp})
+	unless ($params{tmp})
 	{
-		$Moo::HandleMoose::TYPE_MAP{overload::StrVal($self)} = sub { $self };
-	}
+		$Moo::HandleMoose::TYPE_MAP{overload::StrVal($self)} = sub { $self }
+			if $self->has_library && !$self->is_anon;
 		
+		$ALL_TYPES{ $self->{uniq} } = $self;
+		weaken($ALL_TYPES{ $self->{uniq} });
+	}
+	
 	return $self;
 }
 
