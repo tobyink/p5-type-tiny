@@ -127,6 +127,24 @@ sub _clone
 	$self->create_child_type(%opts);
 }
 
+sub _dd
+{
+	require B;
+	
+	my $value = shift;
+	
+	!defined $value      ? 'Undef' :
+	!ref $value          ? sprintf('Value %s', B::perlstring($value)) :
+	do {
+		require Data::Dumper;
+		local $Data::Dumper::Indent   = 0;
+		local $Data::Dumper::Useqq    = 1;
+		local $Data::Dumper::Terse    = 1;
+		local $Data::Dumper::Maxdepth = 2;
+		Data::Dumper::Dumper($value)
+	}
+}
+
 sub name                     { $_[0]{name} }
 sub display_name             { $_[0]{display_name}   ||= $_[0]->_build_display_name }
 sub parent                   { $_[0]{parent} }
@@ -193,9 +211,9 @@ sub _build_coercion
 sub _build_default_message
 {
 	my $self = shift;
-	return sub { sprintf 'value "%s" did not pass type constraint', $_[0] } if $self->is_anon;
+	return sub { sprintf '%s did not pass type constraint', _dd($_[0]) } if $self->is_anon;
 	my $name = "$self";
-	return sub { sprintf 'value "%s" did not pass type constraint "%s"', $_[0], $name };
+	return sub { sprintf '%s did not pass type constraint "%s"', _dd($_[0]), $name };
 }
 
 sub _build_name_generator
@@ -369,7 +387,7 @@ sub assert_valid
 	return !!1 if $self->compiled_check->(@_);
 	
 	local $_ = $_[0];
-	_croak $self->get_message(@_);
+	$self->_failed_check("$self", $_);
 }
 
 sub can_be_inlined
@@ -397,15 +415,45 @@ sub inline_check
 
 sub inline_assert
 {
+	require B;
 	my $self = shift;
 	my $varname = $_[0];
 	my $code = sprintf(
-		q[die qq(value "%s" did not pass type constraint "%s") unless %s;],
+		q[Type::Tiny::_failed_check(%d, %s, %s) unless %s;],
+		$self->{uniq},
+		B::perlstring("$self"),
 		$varname,
-		"$self",
 		$self->inline_check(@_),
 	);
 	return $code;
+}
+
+sub _failed_check
+{
+	require Type::Exception;
+	
+	my ($self, $name, $value, %attrs) = @_;
+	$self = $ALL_TYPES{$self} unless ref $self;
+	
+	my $exception_class = delete($attrs{exception_class}) || "Type::Exception::Assertion";
+	
+	if ($self)
+	{
+		$exception_class->throw(
+			message => $self->get_message($value),
+			type    => $self,
+			value   => $value,
+			%attrs,
+		);
+	}
+	else
+	{
+		$exception_class->throw(
+			message => sprintf('%s did not pass type constraint %s', _dd($value), $name),
+			value   => $value,
+			%attrs,
+		);
+	}
 }
 
 sub coerce
@@ -645,7 +693,7 @@ sub _MONKEY_MAGIC
 	return if $trick_done;
 	$trick_done++;
 	
-	eval q{
+	eval q{#line 1 "Type::Tiny::_MONKEY_MAGIC"
 		package #
 		Moose::Meta::TypeConstraint;
 		my $meta = __PACKAGE__->meta;
