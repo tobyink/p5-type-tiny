@@ -288,7 +288,6 @@ declare "ScalarRef",
 		};
 	},
 	deep_explanation => sub {
-		require B;
 		my ($type, $value, $varname) = @_;
 		my $param = $type->parameters->[0];
 		
