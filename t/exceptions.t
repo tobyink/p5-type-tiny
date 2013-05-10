@@ -26,7 +26,7 @@ use lib qw( ./lib ./t/lib ../inc ./inc );
 use Test::More;
 use Test::Fatal;
 
-use Types::Standard qw( ArrayRef Int );
+use Types::Standard qw( ArrayRef Int Ref Any );
 
 my $v = [];
 my $e = exception { Int->create_child_type->assert_valid($v) };
@@ -87,6 +87,26 @@ is_deeply(
 		'ArrayRef is defined as: (ref($_) eq \'ARRAY\')',
 	],
 	'ArrayRef[Int] deep explanation, given {}',
+);
+
+is_deeply(
+	(exception { (Ref["ARRAY"])->({}) })->explain,
+	[
+		'{} fails type constraint Ref[ARRAY]',
+		'Ref[ARRAY] is defined as: (ref($_) and Scalar::Util::reftype($_) eq q(ARRAY))',
+	],
+	'Ref["ARRAY"] deep explanation, given {}',
+);
+
+my $AlwaysFail = Any->create_child_type(constraint => sub { 0 });
+
+is_deeply(
+	(exception { $AlwaysFail->(1) })->explain,
+	[
+		'Value "1" fails type constraint __ANON__',
+		'__ANON__ is defined as: sub { 0; }',
+	],
+	'$AlwaysFail explanation, given 1',
 );
 
 done_testing;
