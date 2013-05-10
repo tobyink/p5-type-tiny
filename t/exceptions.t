@@ -108,4 +108,27 @@ is_deeply(
 	'$AlwaysFail explanation, given 1',
 );
 
+my $e_where = exception {
+#line 1 "thisfile.plx"
+package Monkey::Nuts;
+"Type::Exception"->throw(message => "Test");
+};
+
+#line 118 "exceptions.t"
+is_deeply(
+	$e_where->context,
+	{
+		package => "Monkey::Nuts",
+		file    => "thisfile.plx",
+		line    => 2,
+	},
+	'$e_where->context',
+);
+
+is(
+	"$e_where",
+	"Test at thisfile.plx line 2.",
+	'"$e_where"',
+);
+
 done_testing;

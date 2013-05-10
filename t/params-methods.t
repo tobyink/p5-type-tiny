@@ -78,19 +78,19 @@ is(
 
 like(
 	exception { Silly::String::new() },
-	qr{^Wrong number of parameters \(0\); expected 2},
+	qr{^Wrong number of parameters; got 0; expected 2},
 	'exception calling new() with no args',
 );
 
 like(
 	exception { Silly::String->new() },
-	qr{^Wrong number of parameters \(1\); expected 2},
+	qr{^Wrong number of parameters; got 1; expected 2},
 	'exception calling ->new() with no args',
 );
 
 like(
 	exception { Silly::String::set() },
-	qr{^Wrong number of parameters \(0\); expected 2},
+	qr{^Wrong number of parameters; got 0; expected 2},
 	'exception calling set() with no args',
 );
 

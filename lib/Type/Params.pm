@@ -13,6 +13,7 @@ use B qw(perlstring);
 use Carp qw(croak);
 use Eval::TypeTiny;
 use Scalar::Util qw(refaddr);
+use Type::Exception;
 use Type::Utils;
 use Types::Standard -types;
 use Types::TypeTiny qw(to_TypeTiny);
@@ -187,15 +188,16 @@ sub compile
 	if ($min_args == $max_args and not $saw_slurpy)
 	{
 		$code[1] = sprintf(
-			'$croaker->("Wrong number of parameters (${\scalar @_}); expected %d") if @_ != %d;',
+			'"Type::Exception::WrongNumberOfParameters"->throw(got => scalar(@_), minimum => %d, maximum => %d) if @_ != %d;',
 			$min_args,
 			$max_args,
+			$min_args,
 		);
 	}
 	elsif ($min_args < $max_args and not $saw_slurpy)
 	{
 		$code[1] = sprintf(
-			'$croaker->("Wrong number of parameters (${\scalar @_}); expected %d to %d") if @_ < %d || @_ > %d;',
+			'"Type::Exception::WrongNumberOfParameters"->throw(got => scalar(@_), minimum => %d, maximum => %d) if @_ < %d || @_ > %d;',
 			$min_args,
 			$max_args,
 			$min_args,
@@ -205,7 +207,7 @@ sub compile
 	elsif ($min_args and $saw_slurpy)
 	{
 		$code[1] = sprintf(
-			'$croaker->("Wrong number of parameters (${\scalar @_}); expected at least %d") if @_ < %d;',
+			'"Type::Exception::WrongNumberOfParameters"->throw(got => scalar(@_), minimum => %d) if @_ < %d;',
 			$min_args,
 			$min_args,
 		);
