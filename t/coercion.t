@@ -116,7 +116,7 @@ is(
 
 like(
 	exception { BigInteger->assert_coerce({}) },
-	qr{^\{\} did not pass type constraint BigInteger},
+	qr{^\{\} did not pass type constraint "BigInteger"},
 	"assert_coerce DOES throw an exception if it can't coerce",
 );
 

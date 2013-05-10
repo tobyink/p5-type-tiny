@@ -29,7 +29,7 @@ sub _build_message
 {
 	my $e = shift;
 	$e->has_type
-		? sprintf('%s did not pass type constraint %s', Type::Tiny::_dd($e->value), $e->type)
+		? sprintf('%s did not pass type constraint "%s"', Type::Tiny::_dd($e->value), $e->type)
 		: sprintf('%s did not pass type constraint', Type::Tiny::_dd($e->value))
 }
 

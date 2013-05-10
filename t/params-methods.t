@@ -95,4 +95,3 @@ like(
 );
 
 done_testing;
-

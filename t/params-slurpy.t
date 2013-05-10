@@ -38,7 +38,7 @@ is_deeply(
 
 like(
 	exception { $chk->("Hello", foo => 1, bar => 2.1) },
-	qr{did not pass type constraint HashRef\[Int\] \(in \$SLURPY\)},
+	qr{did not pass type constraint "HashRef\[Int\]" \(in \$SLURPY\)},
 );
 
 my $chk2 = compile(Str, slurpy HashRef);

@@ -57,7 +57,7 @@ isa_ok($e, 'Type::Exception');
 
 like(
 	$e,
-	qr{^Value "1\.1" did not pass type constraint Int \(in \$_\[0\]\)},
+	qr{^Value "1\.1" did not pass type constraint "Int" \(in \$_\[0\]\)},
 );
 
 done_testing;

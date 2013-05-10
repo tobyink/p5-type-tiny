@@ -53,7 +53,7 @@ is_deeply(
 
 like(
 	exception { $chk->(1.1, 2, {}) },
-	qr{^{} did not pass type constraint Optional\[ArrayRef\] \(in \$_\[2\]\)},
+	qr{^{} did not pass type constraint "Optional\[ArrayRef\]" \(in \$_\[2\]\)},
 );
 
 like(
