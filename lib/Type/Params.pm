@@ -64,7 +64,7 @@ sub _mkslurpy
 			$i,
 		)
 		: sprintf(
-			'%s = (($#_-%d)%%2)==0 ? $croaker->("Odd number of elements in %s") : +{ @_[%d..$#_] };',
+			'%s = (($#_-%d)%%2)==0 ? "Type::Exception::WrongNumberOfParameters"->throw(message => "Odd number of elements in %s") : +{ @_[%d..$#_] };',
 			$name,
 			$i,
 			$tc,
@@ -86,13 +86,6 @@ sub compile
 	my $max_args   = 0;
 	my $saw_opt    = 0;
 	
-	my $level = 3 + ($options{'carp_level'} || 0);
-	$env{'$croaker'} =
-		$options{'carp'}    ? \sub { local $Carp::CarpLevel = $level; Carp::carp(sprintf $_[0], map Type::Tiny::_dd, @_[1..$#_]) } :
-		$options{'cluck'}   ? \sub { local $Carp::CarpLevel = $level; Carp::cluck(sprintf $_[0], map Type::Tiny::_dd, @_[1..$#_]) } :
-		$options{'confess'} ? \sub { local $Carp::CarpLevel = $level; Carp::confess(sprintf $_[0], map Type::Tiny::_dd, @_[1..$#_]) } :
-		\sub { local $Carp::CarpLevel = $level; Carp::croak(sprintf $_[0], map Type::Tiny::_dd, @_[1..$#_]) };
-
 	while (@_)
 	{
 		++$arg;
@@ -330,25 +323,6 @@ Dude, these functions are documented!
 =item Invocant
 
 =end trustme
-
-=head1 EXPORT
-
-It is possible to export versions of the C<compile> and C<validate> functions
-that use C<confess>, C<carp> or C<cluck> instead of the default C<croak> to
-report error messages:
-
-   use Type::Params
-      compile  => { confess => 1 },
-      validate => { cluck   => 1 },
-   ;
-
-You can even export more than one copy of the functions with different
-configurations:
-
-   use Type::Params
-      validate => { croak => 1, -as => "validate_strict" },
-      validate => { cluck => 1, -as => "validate_sloppy" },
-   ;
 
 =head1 COOKBOOK
 

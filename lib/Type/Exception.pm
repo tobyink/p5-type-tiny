@@ -187,11 +187,11 @@ use warnings;
 		our @ISA = qw(Type::Exception);
 	}
 
-	sub minimum    { $_[0]{minimum} ||= 0 };
+	sub minimum    { $_[0]{minimum} };
 	sub maximum    { $_[0]{maximum} };
 	sub got        { $_[0]{got} };
 
-	sub has_minimum { 1 };
+	sub has_minimum { exists $_[0]{minimum} };
 	sub has_maximum { exists $_[0]{maximum} };
 	
 	sub _build_message
@@ -225,7 +225,7 @@ use warnings;
 		else
 		{
 			return sprintf(
-				"Wrong number of parameters; got %d; expected the impossible",
+				"Wrong number of parameters; got %d",
 				$e->got,
 			);
 		}
