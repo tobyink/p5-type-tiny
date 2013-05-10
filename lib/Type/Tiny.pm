@@ -162,6 +162,7 @@ sub coercion_generator       { $_[0]{coercion_generator} }
 sub parameters               { $_[0]{parameters} }
 sub moose_type               { $_[0]{moose_type}     ||= $_[0]->_build_moose_type }
 sub mouse_type               { $_[0]{mouse_type}     ||= $_[0]->_build_mouse_type }
+sub deep_explanation         { $_[0]{deep_explanation} }
 
 sub has_parent               { exists $_[0]{parent} }
 sub has_library              { exists $_[0]{library} }
@@ -172,6 +173,7 @@ sub has_inline_generator     { exists $_[0]{inline_generator} }
 sub has_coercion_generator   { exists $_[0]{coercion_generator} }
 sub has_parameters           { exists $_[0]{parameters} }
 sub has_message              { exists $_[0]{message} }
+sub has_deep_explanation     { exists $_[0]{deep_explanation} }
 
 sub _default_message         { $_[0]{_default_message} ||= $_[0]->_build_default_message }
 

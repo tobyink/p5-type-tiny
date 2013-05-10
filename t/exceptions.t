@@ -26,7 +26,7 @@ use lib qw( ./lib ./t/lib ../inc ./inc );
 use Test::More;
 use Test::Fatal;
 
-use Types::Standard qw(Int);
+use Types::Standard qw( ArrayRef Int );
 
 my $v = [];
 my $e = exception { Int->create_child_type->assert_valid($v) };
@@ -64,6 +64,29 @@ is_deeply(
 		'Value is defined as: (defined($_) and not ref($_))',
 	],
 	'$e->explain is as expected',
+);
+
+is_deeply(
+	(exception { (ArrayRef[Int])->([1, 2, [3]]) })->explain,
+	[
+		'[1,2,[3]] fails type constraint ArrayRef[Int]',
+		'Int is a subtype of Num',
+		'Num is a subtype of Str',
+		'Str is a subtype of Value',
+		'[3] (in $_->[2]) fails type constraint Value',
+		'Value is defined as: (defined($_) and not ref($_))',
+	],
+	'ArrayRef[Int] deep explanation, given [1, 2, [3]]',
+);
+
+is_deeply(
+	(exception { (ArrayRef[Int])->({}) })->explain,
+	[
+		'ArrayRef[Int] is a subtype of ArrayRef',
+		'{} fails type constraint ArrayRef',
+		'ArrayRef is defined as: (ref($_) eq \'ARRAY\')',
+	],
+	'ArrayRef[Int] deep explanation, given {}',
 );
 
 done_testing;
