@@ -47,7 +47,7 @@ is_deeply(
 
 like(
 	exception { $chk->(foo => 1, bar => "Hello") },
-	qr{does not meet type constraint .Dict},
+	qr{did not pass type constraint Dict},
 );
 
 my $chk2 = compile slurpy Dict[
@@ -63,7 +63,7 @@ is_deeply(
 
 like(
 	exception { $chk2->(foo => 1, bar => "Hello", zab => []) },
-	qr{does not meet type constraint .Dict},
+	qr{did not pass type constraint Dict},
 );
 
 done_testing;

@@ -52,7 +52,6 @@ is(
 	'$e->value is as expected',
 );
 
-
 is_deeply(
 	$e->explain,
 	[

@@ -47,7 +47,7 @@ is_deeply(
 
 like(
 	exception { $chk->("Type::Tiny", foo => 1, bar => "Hello") },
-	qr{does not meet type constraint .Dict},
+	qr{did not pass type constraint Dict},
 );
 
 done_testing;

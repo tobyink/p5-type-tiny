@@ -9,6 +9,7 @@ BEGIN {
 	$Type::Params::VERSION   = '0.005_02';
 }
 
+use B qw(perlstring);
 use Carp qw(croak);
 use Eval::TypeTiny;
 use Scalar::Util qw(refaddr);
@@ -96,6 +97,7 @@ sub compile
 		++$arg;
 		my $constraint = shift;
 		my $is_optional;
+		my $is_slurpy;
 		my $varname;
 		
 		if (HashRef->check($constraint))
@@ -109,6 +111,7 @@ sub compile
 				$constraint->is_a_type_of(ArrayRef) ? _mkslurpy('$_', '@', ArrayRef => $arg) :
 				croak("Slurpy parameter not of type HashRef or ArrayRef");
 			$varname = '$_';
+			$is_slurpy++;
 			$saw_slurpy++;
 		}
 		else
@@ -157,22 +160,24 @@ sub compile
 		if ($constraint->can_be_inlined)
 		{
 			push @code, sprintf(
-				'(%s) or $croaker->("%%s in \\$_[%d] does not meet type constraint \\"%s\\"", %s);',
+				'(%s) or Type::Tiny::_failed_check(%d, %s, %s, varname => %s);',
 				$constraint->inline_check($varname),
-				$arg,
-				$constraint,
+				$constraint->{uniq},
+				perlstring($constraint),
 				$varname,
+				$is_slurpy ? 'q{$SLURPY}' : sprintf('q{$_[%d]}', $arg),
 			);
 		}
 		else
 		{
 			$env{'@check'}[$arg] = $constraint->compiled_check;
 			push @code, sprintf(
-				'%s or $croaker->("%%s in \\$_[%d] does not meet type constraint \\"%s\\"", %s);',
+				'%s or Type::Tiny::_failed_check(%d, %s, %s, varname => %s);',
 				sprintf(sprintf '$check[%d]->(%s)', $arg, $varname),
-				$arg,
-				$constraint,
+				$constraint->{uniq},
+				perlstring($constraint),
 				$varname,
+				$is_slurpy ? 'q{$SLURPY}' : sprintf('q{$_[%d]}', $arg),
 			);
 		}
 		

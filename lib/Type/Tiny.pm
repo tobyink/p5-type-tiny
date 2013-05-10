@@ -216,7 +216,7 @@ sub _build_default_message
 	my $self = shift;
 	return sub { sprintf '%s did not pass type constraint', _dd($_[0]) } if $self->is_anon;
 	my $name = "$self";
-	return sub { sprintf '%s did not pass type constraint "%s"', _dd($_[0]), $name };
+	return sub { sprintf '%s did not pass type constraint %s', _dd($_[0]), $name };
 }
 
 sub _build_name_generator

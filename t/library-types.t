@@ -56,7 +56,7 @@ is(
 
 like(
 	exception { Integer->(5.5) },
-	qr{^Value "5\.5" did not pass type constraint "Integer"},
+	qr{^Value "5\.5" did not pass type constraint Integer},
 	"coderef overload works (value that should throw)",
 );
 

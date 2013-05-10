@@ -40,8 +40,17 @@ BEGIN {
 
 sub type       { $_[0]{type} };
 sub value      { $_[0]{value} };
+sub varname    { $_[0]{varname} ||= '$_' };
 
 sub has_type   { defined $_[0]{type} }; # sic
+
+sub message
+{
+	my $e = shift;
+	$e->varname eq '$_'
+		? $e->SUPER::message
+		: sprintf('%s (in %s)', $e->SUPER::message, $e->varname);
+}
 
 sub explain
 {
@@ -63,9 +72,10 @@ sub _explain
 {
 	my $e = shift;
 	my ($type, $value, $varname) = @_;
-	$value   = $e->value if @_ < 2;
-	$varname = '$_' if @_ < 3;
+	$value   = $e->value                    if @_ < 2;
+	$varname = ref($e) ? $e->varname : '$_' if @_ < 3;
 	
+	return unless ref $type;
 	return if $type->check($value);
 	
 	if ($type->has_parent)

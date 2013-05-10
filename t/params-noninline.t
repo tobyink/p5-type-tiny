@@ -63,12 +63,12 @@ is_deeply(
 
 {
 	my $e = exception { nth_root(undef, 1) };
-	like($e, qr{^Undef in \$_\[0\] does not meet type constraint "NumX"}, '(undef, 1)');
+	like($e, qr{^Undef did not pass type constraint NumX \(in \$_\[0\]\)}, '(undef, 1)');
 }
 
 {
 	my $e = exception { nth_root(41, 42) };
-	like($e, qr{^Value "42" in \$_\[1\] does not meet type constraint "NumX"}, '(42)');
+	like($e, qr{^Value "42" did not pass type constraint NumX \(in \$_\[1\]\)}, '(42)');
 }
 
 done_testing;

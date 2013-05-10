@@ -108,7 +108,7 @@ eval { $o->integer(3.14) };
 my $err = $@;
 like(
 	$err,
-	'/integer\(\) value "3.14" did not pass type constraint "Int"/i',
+	'/integer\(\) Value "3.14" did not pass type constraint Int/i',
 	"integer(3.14) dies",
 );
 
