@@ -196,7 +196,7 @@ declare "ArrayRef",
 		{
 			my $item = $value->[$i];
 			next if $param->check($item);
-			require Type::Exception;
+			require Type::Exception::Assertion;
 			return "Type::Exception::Assertion"->_explain(
 				$param,
 				$item,
@@ -249,7 +249,7 @@ declare "HashRef",
 		{
 			my $item = $value->{$k};
 			next if $param->check($item);
-			require Type::Exception;
+			require Type::Exception::Assertion;
 			return "Type::Exception::Assertion"->_explain(
 				$param,
 				$item,
@@ -294,7 +294,7 @@ declare "ScalarRef",
 		for my $item ($$value)
 		{
 			next if $param->check($item);
-			require Type::Exception;
+			require Type::Exception::Assertion;
 			return "Type::Exception::Assertion"->_explain(
 				$param,
 				$item,

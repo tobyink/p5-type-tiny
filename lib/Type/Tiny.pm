@@ -10,7 +10,7 @@ BEGIN {
 }
 
 use Eval::TypeTiny ();
-use Scalar::Util qw< blessed weaken refaddr isweak >;
+use Scalar::Util qw( blessed weaken refaddr isweak );
 use Types::TypeTiny ();
 
 sub _croak ($;@)
@@ -433,7 +433,7 @@ sub inline_assert
 
 sub _failed_check
 {
-	require Type::Exception;
+	require Type::Exception::Assertion;
 	
 	my ($self, $name, $value, %attrs) = @_;
 	$self = $ALL_TYPES{$self} unless ref $self;
@@ -971,13 +971,19 @@ A coderef which generates a new inlining coderef based on parameters.
 
 A coderef which generates a new L<Type::Coercion> object based on parameters.
 
+=item C<< deep_explanation >>
+
+This API is not finalized. Coderef used by L<Type::Exception::Assertion> to
+peek inside parameterized types and figure out why a value doesn't pass the
+constraint.
+
 =back
 
 =head2 Methods
 
 =over
 
-=item C<has_parent>, C<has_library>, C<has_inlined>, C<has_constraint_generator>, C<has_inline_generator>, C<has_coercion_generator>, C<has_parameters>, C<has_message>
+=item C<has_parent>, C<has_library>, C<has_inlined>, C<has_constraint_generator>, C<has_inline_generator>, C<has_coercion_generator>, C<has_parameters>, C<has_message>, C<has_deep_explanation>
 
 Predicate methods.
 
