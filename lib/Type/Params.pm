@@ -71,22 +71,6 @@ sub _mkslurpy
 		);
 }
 
-sub _dd
-{
-	my $value = @_ ? $_[0] : $_;
-	!defined $value ? 'Undef' :
-	!ref $value     ? sprintf('Value %s', B::perlstring($value)) :
-	do {
-		require Data::Dumper;
-		local $Data::Dumper::Indent   = 0;
-		local $Data::Dumper::Useqq    = 1;
-		local $Data::Dumper::Terse    = 1;
-		local $Data::Dumper::Sortkeys = 1;
-		local $Data::Dumper::Maxdepth = 2;
-		Data::Dumper::Dumper($value)
-	}
-}
-
 sub compile
 {
 	my (@code, %env);
@@ -102,10 +86,10 @@ sub compile
 	
 	my $level = 3 + ($options{'carp_level'} || 0);
 	$env{'$croaker'} =
-		$options{'carp'}    ? \sub { local $Carp::CarpLevel = $level; Carp::carp(sprintf $_[0], map _dd, @_[1..$#_]) } :
-		$options{'cluck'}   ? \sub { local $Carp::CarpLevel = $level; Carp::cluck(sprintf $_[0], map _dd, @_[1..$#_]) } :
-		$options{'confess'} ? \sub { local $Carp::CarpLevel = $level; Carp::confess(sprintf $_[0], map _dd, @_[1..$#_]) } :
-		\sub { local $Carp::CarpLevel = $level; Carp::croak(sprintf $_[0], map _dd, @_[1..$#_]) };
+		$options{'carp'}    ? \sub { local $Carp::CarpLevel = $level; Carp::carp(sprintf $_[0], map Type::Tiny::_dd, @_[1..$#_]) } :
+		$options{'cluck'}   ? \sub { local $Carp::CarpLevel = $level; Carp::cluck(sprintf $_[0], map Type::Tiny::_dd, @_[1..$#_]) } :
+		$options{'confess'} ? \sub { local $Carp::CarpLevel = $level; Carp::confess(sprintf $_[0], map Type::Tiny::_dd, @_[1..$#_]) } :
+		\sub { local $Carp::CarpLevel = $level; Carp::croak(sprintf $_[0], map Type::Tiny::_dd, @_[1..$#_]) };
 
 	while (@_)
 	{

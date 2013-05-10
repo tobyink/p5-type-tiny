@@ -131,7 +131,7 @@ sub _dd
 {
 	require B;
 	
-	my $value = shift;
+	my $value = @_ ? $_[0] : $_;
 	
 	!defined $value      ? 'Undef' :
 	!ref $value          ? sprintf('Value %s', B::perlstring($value)) :
@@ -140,6 +140,7 @@ sub _dd
 		local $Data::Dumper::Indent   = 0;
 		local $Data::Dumper::Useqq    = 1;
 		local $Data::Dumper::Terse    = 1;
+		local $Data::Dumper::Sortkeys = 1;
 		local $Data::Dumper::Maxdepth = 2;
 		Data::Dumper::Dumper($value)
 	}

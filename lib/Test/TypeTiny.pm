@@ -13,21 +13,9 @@ our @EXPORT = qw( should_pass should_fail ok_subtype );
 
 sub _mk_message
 {
-	require B;
+	require Type::Tiny;
 	my ($template, $value) = @_;
-	sprintf(
-		$template,
-		!defined $value      ? 'undef' :
-		!ref $value          ? sprintf('value %s', B::perlstring($value)) :
-		do {
-			require Data::Dumper;
-			local $Data::Dumper::Indent   = 0;
-			local $Data::Dumper::Useqq    = 1;
-			local $Data::Dumper::Terse    = 1;
-			local $Data::Dumper::Maxdepth = 2;
-			Data::Dumper::Dumper($value)
-		}
-	);
+	sprintf($template, Type::Tiny::_dd($value));
 }
 
 sub should_pass
