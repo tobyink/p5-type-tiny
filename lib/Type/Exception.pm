@@ -49,8 +49,10 @@ sub throw
 {
 	my $class = shift;
 	my ($level, %ctxt) = 0;
-	while (defined scalar caller($level) and $CarpInternal{scalar caller($level)})
-		{ $level++ };
+	while (
+		(defined scalar caller($level) and $CarpInternal{scalar caller($level)})
+		or ( (caller($level))[0] =~ /^Eval::TypeTiny::/ )
+	) { $level++ };
 	@ctxt{qw/ package file line /} = caller($level);
 	die( $class->new(context => \%ctxt, @_) );
 }
@@ -62,10 +64,11 @@ sub to_string
 {
 	my $e = shift;
 	my $c = $e->context;
+	my $m = $e->message;
 	
-	$c
-		? sprintf('%s at %s line %d.', $e->message, $c->{file}, $c->{line})
-		: $e->message
+	$m =~ /\n\z/s ? $m :
+	$c            ? sprintf("%s at %s line %d.\n", $m, $c->{file}, $c->{line}) :
+	sprintf("%s\n", $m);
 }
 
 sub _build_message
