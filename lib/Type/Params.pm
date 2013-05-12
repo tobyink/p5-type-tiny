@@ -213,7 +213,7 @@ sub compile
 	
 	return eval_closure(
 		source      => $source,
-		description => sprintf("parameter validation for '%s'", [caller(1+$options{caller_level})]->[3] || '__ANON__'),
+		description => sprintf("parameter validation for '%s'", [caller(1+($options{caller_level}||0))]->[3] || '__ANON__'),
 		environment => \%env,
 	);
 }

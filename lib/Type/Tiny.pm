@@ -214,7 +214,7 @@ sub _build_coercion
 sub _build_default_message
 {
 	my $self = shift;
-	return sub { sprintf '%s did not pass type constraint', _dd($_[0]) } if $self->is_anon;
+	return sub { sprintf '%s did not pass type constraint', _dd($_[0]) } if "$self" eq "__ANON__";
 	my $name = "$self";
 	return sub { sprintf '%s did not pass type constraint "%s"', _dd($_[0]), $name };
 }

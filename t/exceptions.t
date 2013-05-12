@@ -127,7 +127,7 @@ is_deeply(
 
 is(
 	"$e_where",
-	"Test at thisfile.plx line 2.",
+	"Test at thisfile.plx line 2.\n",
 	'"$e_where"',
 );
 

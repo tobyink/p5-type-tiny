@@ -48,13 +48,22 @@ sub new
 sub throw
 {
 	my $class = shift;
-	my ($level, %ctxt) = 0;
+	
+	my ($level, @caller, %ctxt) = 0;
 	while (
 		(defined scalar caller($level) and $CarpInternal{scalar caller($level)})
 		or ( (caller($level))[0] =~ /^Eval::TypeTiny::/ )
 	) { $level++ };
+	if ( ((caller($level - 1))[1]||"") =~ /^parameter validation for '(.+?)'$/ )
+	{
+		my ($pkg, $func) = ($1 =~ m{^(.+)::(\w+)$});
+		$level++ if caller($level) eq ($pkg||"");
+	}
 	@ctxt{qw/ package file line /} = caller($level);
-	die( $class->new(context => \%ctxt, @_) );
+	
+	die(
+		$class->new(context => \%ctxt, @_)
+	);
 }
 
 sub message    { $_[0]{message} ||= $_[0]->_build_message };
