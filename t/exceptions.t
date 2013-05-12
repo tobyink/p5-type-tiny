@@ -55,12 +55,12 @@ is(
 is_deeply(
 	$e->explain,
 	[
-		'__ANON__ is a subtype of Int',
-		'Int is a subtype of Num',
-		'Num is a subtype of Str',
-		'Str is a subtype of Value',
-		'[] fails type constraint Value',
-		'Value is defined as: (defined($_) and not ref($_))',
+		'"__ANON__" is a subtype of "Int"',
+		'"Int" is a subtype of "Num"',
+		'"Num" is a subtype of "Str"',
+		'"Str" is a subtype of "Value"',
+		'[] did not pass type constraint "Value"',
+		'"Value" is defined as: (defined($_) and not ref($_))',
 	],
 	'$e->explain is as expected',
 );
@@ -68,12 +68,12 @@ is_deeply(
 is_deeply(
 	(exception { (ArrayRef[Int])->([1, 2, [3]]) })->explain,
 	[
-		'[1,2,[3]] fails type constraint ArrayRef[Int]',
-		'Int is a subtype of Num',
-		'Num is a subtype of Str',
-		'Str is a subtype of Value',
-		'[3] (in $_->[2]) fails type constraint Value',
-		'Value is defined as: (defined($_) and not ref($_))',
+		'[1,2,[3]] did not pass type constraint "ArrayRef[Int]"',
+		'"Int" is a subtype of "Num"',
+		'"Num" is a subtype of "Str"',
+		'"Str" is a subtype of "Value"',
+		'[3] did not pass type constraint "Value" (in $_->[2])',
+		'"Value" is defined as: (defined($_) and not ref($_))',
 	],
 	'ArrayRef[Int] deep explanation, given [1, 2, [3]]',
 );
@@ -81,9 +81,9 @@ is_deeply(
 is_deeply(
 	(exception { (ArrayRef[Int])->({}) })->explain,
 	[
-		'ArrayRef[Int] is a subtype of ArrayRef',
-		'{} fails type constraint ArrayRef',
-		'ArrayRef is defined as: (ref($_) eq \'ARRAY\')',
+		'"ArrayRef[Int]" is a subtype of "ArrayRef"',
+		'{} did not pass type constraint "ArrayRef"',
+		'"ArrayRef" is defined as: (ref($_) eq \'ARRAY\')',
 	],
 	'ArrayRef[Int] deep explanation, given {}',
 );
@@ -91,8 +91,8 @@ is_deeply(
 is_deeply(
 	(exception { (Ref["ARRAY"])->({}) })->explain,
 	[
-		'{} fails type constraint Ref[ARRAY]',
-		'Ref[ARRAY] is defined as: (ref($_) and Scalar::Util::reftype($_) eq q(ARRAY))',
+		'{} did not pass type constraint "Ref[ARRAY]"',
+		'"Ref[ARRAY]" is defined as: (ref($_) and Scalar::Util::reftype($_) eq q(ARRAY))',
 	],
 	'Ref["ARRAY"] deep explanation, given {}',
 );
@@ -102,8 +102,8 @@ my $AlwaysFail = Any->create_child_type(constraint => sub { 0 });
 is_deeply(
 	(exception { $AlwaysFail->(1) })->explain,
 	[
-		'Value "1" fails type constraint __ANON__',
-		'__ANON__ is defined as: sub { 0; }',
+		'Value "1" did not pass type constraint "__ANON__"',
+		'"__ANON__" is defined as: sub { 0; }',
 	],
 	'$AlwaysFail explanation, given 1',
 );

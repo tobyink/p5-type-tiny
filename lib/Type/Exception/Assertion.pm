@@ -54,7 +54,7 @@ sub _explain
 	{
 		my $parent = $e->_explain($type->parent, $value, $varname);
 		return [
-			sprintf('%s is a subtype of %s', $type, $type->parent),
+			sprintf('"%s" is a subtype of "%s"', $type, $type->parent),
 			@$parent,
 		] if $parent;
 	}
@@ -63,14 +63,14 @@ sub _explain
 	{
 		my $deep = $type->parent->deep_explanation->($type, $value, $varname);
 		return [
-			sprintf('%s fails type constraint %s', $e->_displayvar($value, $varname), $type),
+			sprintf('%s did not pass type constraint "%s"%s', Type::Tiny::_dd($value), $type, $e->_displayvar($varname)),
 			@$deep,
 		] if $deep;
 	}
 	
 	return [
-		sprintf('%s fails type constraint %s', $e->_displayvar($value, $varname), $type),
-		sprintf('%s is defined as: %s', $type, $e->_codefor($type)),
+		sprintf('%s did not pass type constraint "%s"%s', Type::Tiny::_dd($value), $type, $e->_displayvar($varname)),
+		sprintf('"%s" is defined as: %s', $type, $e->_codefor($type)),
 	];
 }
 
@@ -78,9 +78,9 @@ sub _displayvar
 {
 	require Type::Tiny;
 	shift;
-	my ($value, $varname) = @_;
-	return Type::Tiny::_dd($value) if $varname eq q{$_};
-	return sprintf('%s (in %s)', Type::Tiny::_dd($value), $varname);
+	my ($varname) = @_;
+	return '' if $varname eq q{$_};
+	return sprintf(' (in %s)', $varname);
 }
 
 my $b;
