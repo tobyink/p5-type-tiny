@@ -47,7 +47,7 @@ sub _exporter_expand_sub
 		my %compiled;
 		return validate => sub {
 			my $arr = shift;
-			($compiled{ join ":", map($_->{uniq}||"\@$_->{slurpy}", @_) } ||= compile(\%opts, @_))
+			($compiled{ join ":", map($_->{uniq}||"\@$_->{slurpy}", @_) } ||= compile({ caller_level => 1, %opts }, @_))
 				->(@$arr);
 		};
 	}
@@ -213,7 +213,7 @@ sub compile
 	
 	return eval_closure(
 		source      => $source,
-		description => sprintf("parameter validation for '%s'", [caller 1]->[3] || '__ANON__'),
+		description => sprintf("parameter validation for '%s'", [caller(1+$options{caller_level})]->[3] || '__ANON__'),
 		environment => \%env,
 	);
 }
@@ -222,7 +222,7 @@ my %compiled;
 sub validate
 {
 	my $arr = shift;
-	my $sub = $compiled{ join ":", map($_->{uniq}||"\@$_->{slurpy}", @_) } ||= compile @_;
+	my $sub = $compiled{ join ":", map($_->{uniq}||"\@$_->{slurpy}", @_) } ||= compile({ caller_level => 1 }, @_);
 	@_ = @$arr;
 	goto $sub;
 }
