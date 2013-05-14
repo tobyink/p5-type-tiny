@@ -10,7 +10,7 @@ BEGIN {
 }
 
 use Eval::TypeTiny ();
-use Scalar::Util qw< blessed weaken refaddr isweak >;
+use Scalar::Util qw( blessed weaken refaddr isweak );
 use Types::TypeTiny ();
 
 sub _croak ($;@)
@@ -70,6 +70,8 @@ sub _overload_coderef
 	$self->{_overload_coderef};
 }
 
+our %ALL_TYPES;
+
 my $uniq = 1;
 sub new
 {
@@ -105,11 +107,15 @@ sub new
 			or _croak '"%s" is not a valid type name', $self->name;
 	}
 	
-	if ($self->has_library and !$self->is_anon and !$params{tmp})
+	unless ($params{tmp})
 	{
-		$Moo::HandleMoose::TYPE_MAP{overload::StrVal($self)} = sub { $self };
-	}
+		$Moo::HandleMoose::TYPE_MAP{overload::StrVal($self)} = sub { $self }
+			if $self->has_library && !$self->is_anon;
 		
+		$ALL_TYPES{ $self->{uniq} } = $self;
+		weaken($ALL_TYPES{ $self->{uniq} });
+	}
+	
 	return $self;
 }
 
@@ -119,6 +125,25 @@ sub _clone
 	my %opts;
 	$opts{$_} = $self->{$_} for qw< name display_name message >;
 	$self->create_child_type(%opts);
+}
+
+sub _dd
+{
+	require B;
+	
+	my $value = @_ ? $_[0] : $_;
+	
+	!defined $value      ? 'Undef' :
+	!ref $value          ? sprintf('Value %s', B::perlstring($value)) :
+	do {
+		require Data::Dumper;
+		local $Data::Dumper::Indent   = 0;
+		local $Data::Dumper::Useqq    = 1;
+		local $Data::Dumper::Terse    = 1;
+		local $Data::Dumper::Sortkeys = 1;
+		local $Data::Dumper::Maxdepth = 2;
+		Data::Dumper::Dumper($value)
+	}
 }
 
 sub name                     { $_[0]{name} }
@@ -137,6 +162,7 @@ sub coercion_generator       { $_[0]{coercion_generator} }
 sub parameters               { $_[0]{parameters} }
 sub moose_type               { $_[0]{moose_type}     ||= $_[0]->_build_moose_type }
 sub mouse_type               { $_[0]{mouse_type}     ||= $_[0]->_build_mouse_type }
+sub deep_explanation         { $_[0]{deep_explanation} }
 
 sub has_parent               { exists $_[0]{parent} }
 sub has_library              { exists $_[0]{library} }
@@ -147,6 +173,7 @@ sub has_inline_generator     { exists $_[0]{inline_generator} }
 sub has_coercion_generator   { exists $_[0]{coercion_generator} }
 sub has_parameters           { exists $_[0]{parameters} }
 sub has_message              { exists $_[0]{message} }
+sub has_deep_explanation     { exists $_[0]{deep_explanation} }
 
 sub _default_message         { $_[0]{_default_message} ||= $_[0]->_build_default_message }
 
@@ -187,9 +214,9 @@ sub _build_coercion
 sub _build_default_message
 {
 	my $self = shift;
-	return sub { sprintf 'value "%s" did not pass type constraint', $_[0] } if $self->is_anon;
+	return sub { sprintf '%s did not pass type constraint', _dd($_[0]) } if "$self" eq "__ANON__";
 	my $name = "$self";
-	return sub { sprintf 'value "%s" did not pass type constraint "%s"', $_[0], $name };
+	return sub { sprintf '%s did not pass type constraint "%s"', _dd($_[0]), $name };
 }
 
 sub _build_name_generator
@@ -363,7 +390,7 @@ sub assert_valid
 	return !!1 if $self->compiled_check->(@_);
 	
 	local $_ = $_[0];
-	_croak $self->get_message(@_);
+	$self->_failed_check("$self", $_);
 }
 
 sub can_be_inlined
@@ -391,15 +418,45 @@ sub inline_check
 
 sub inline_assert
 {
+	require B;
 	my $self = shift;
 	my $varname = $_[0];
 	my $code = sprintf(
-		q[die qq(value "%s" did not pass type constraint "%s") unless %s;],
+		q[Type::Tiny::_failed_check(%d, %s, %s) unless %s;],
+		$self->{uniq},
+		B::perlstring("$self"),
 		$varname,
-		"$self",
 		$self->inline_check(@_),
 	);
 	return $code;
+}
+
+sub _failed_check
+{
+	require Type::Exception::Assertion;
+	
+	my ($self, $name, $value, %attrs) = @_;
+	$self = $ALL_TYPES{$self} unless ref $self;
+	
+	my $exception_class = delete($attrs{exception_class}) || "Type::Exception::Assertion";
+	
+	if ($self)
+	{
+		$exception_class->throw(
+			message => $self->get_message($value),
+			type    => $self,
+			value   => $value,
+			%attrs,
+		);
+	}
+	else
+	{
+		$exception_class->throw(
+			message => sprintf('%s did not pass type constraint "%s"', _dd($value), $name),
+			value   => $value,
+			%attrs,
+		);
+	}
 }
 
 sub coerce
@@ -639,7 +696,7 @@ sub _MONKEY_MAGIC
 	return if $trick_done;
 	$trick_done++;
 	
-	eval q{
+	eval q{#line 1 "Type::Tiny::_MONKEY_MAGIC"
 		package #
 		Moose::Meta::TypeConstraint;
 		my $meta = __PACKAGE__->meta;
@@ -914,13 +971,19 @@ A coderef which generates a new inlining coderef based on parameters.
 
 A coderef which generates a new L<Type::Coercion> object based on parameters.
 
+=item C<< deep_explanation >>
+
+This API is not finalized. Coderef used by L<Type::Exception::Assertion> to
+peek inside parameterized types and figure out why a value doesn't pass the
+constraint.
+
 =back
 
 =head2 Methods
 
 =over
 
-=item C<has_parent>, C<has_library>, C<has_inlined>, C<has_constraint_generator>, C<has_inline_generator>, C<has_coercion_generator>, C<has_parameters>, C<has_message>
+=item C<has_parent>, C<has_library>, C<has_inlined>, C<has_constraint_generator>, C<has_inline_generator>, C<has_coercion_generator>, C<has_parameters>, C<has_message>, C<has_deep_explanation>
 
 Predicate methods.
 

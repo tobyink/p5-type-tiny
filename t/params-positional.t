@@ -59,22 +59,22 @@ is_deeply(
 
 {
 	my $e = exception { nth_root() };
-	like($e, qr{^Wrong number of parameters \(0\); expected 2}, '(1)');
+	like($e, qr{^Wrong number of parameters; got 0; expected 2}, '(1)');
 }
 
 {
 	my $e = exception { nth_root(1) };
-	like($e, qr{^Wrong number of parameters \(1\); expected 2}, '(1)');
+	like($e, qr{^Wrong number of parameters; got 1; expected 2}, '(1)');
 }
 
 {
 	my $e = exception { nth_root(undef, 1) };
-	like($e, qr{^Undef in \$_\[0\] does not meet type constraint "Num"}, '(undef, 1)');
+	like($e, qr{^Undef did not pass type constraint "Num" \(in \$_\[0\]\)}, '(undef, 1)');
 }
 
 {
 	my $e = exception { nth_root(1, 2, 3) };
-	like($e, qr{^Wrong number of parameters \(3\); expected 2}, '(1)');
+	like($e, qr{^Wrong number of parameters; got 3; expected 2}, '(1)');
 }
 
 done_testing;

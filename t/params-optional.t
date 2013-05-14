@@ -53,17 +53,17 @@ is_deeply(
 
 like(
 	exception { $chk->(1.1, 2, {}) },
-	qr{^{} in \$_\[2\] does not meet type constraint "Optional\[ArrayRef\]"},
+	qr{^{} did not pass type constraint "Optional\[ArrayRef\]" \(in \$_\[2\]\)},
 );
 
 like(
 	exception { $chk->() },
-	qr{^Wrong number of parameters \(0\); expected 1 to 4},
+	qr{^Wrong number of parameters; got 0; expected 1 to 4},
 );
 
 like(
 	exception { $chk->(1 .. 5) },
-	qr{^Wrong number of parameters \(5\); expected 1 to 4},
+	qr{^Wrong number of parameters; got 5; expected 1 to 4},
 );
 
 

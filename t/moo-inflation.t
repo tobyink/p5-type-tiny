@@ -58,27 +58,23 @@ for (0..1)
 		"some values that should pass their type constraint - $state",
 	);
 
-	like(
+	ok(
 		exception { "Local::Class"->new(small => 100) },
-		qr{^isa check for "small" failed},
 		"direct violation of type constraint - $state",
 	);
 
-	like(
+	ok(
 		exception { "Local::Class"->new(small => 5.5) },
-		qr{^isa check for "small" failed},
 		"violation of parent type constraint - $state",
 	);
 
-	like(
+	ok(
 		exception { "Local::Class"->new(small => "five point five") },
-		qr{^isa check for "small" failed},
 		"violation of grandparent type constraint - $state",
 	);
 
-	like(
+	ok(
 		exception { "Local::Class"->new(small => []) },
-		qr{^isa check for "small" failed},
 		"violation of great-grandparent type constraint - $state",
 	);
 	

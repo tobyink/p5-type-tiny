@@ -48,7 +48,7 @@ is_deeply(
 
 like(
 	exception { $chk->(1.1, 2.2, 3.3) },
-	qr{^Value "1\.1" in \$_\[0\] does not meet type constraint "Int"},
+	qr{^Value "1\.1" did not pass type constraint "Int" \(in \$_\[0\]\)},
 );
 
 my $chk2 = compile(ArrayRef[$RoundedInt]);
@@ -87,8 +87,7 @@ my $chk3 = compile($RoundedInt->no_coercions);
 
 like(
 	exception { $chk3->(1.1) },
-	qr{^Value "1\.1" in \$_\[0\] does not meet type constraint "__ANON__"},
+	qr{^Value "1\.1" did not pass type constraint "__ANON__" \(in \$_\[0\]\)},
 );
 
 done_testing;
-

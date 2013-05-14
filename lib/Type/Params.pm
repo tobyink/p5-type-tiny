@@ -9,9 +9,12 @@ BEGIN {
 	$Type::Params::VERSION   = '0.005_02';
 }
 
+use B qw(perlstring);
 use Carp qw(croak);
 use Eval::TypeTiny;
 use Scalar::Util qw(refaddr);
+use Type::Exception::Assertion;
+use Type::Exception::WrongNumberOfParameters;
 use Type::Utils;
 use Types::Standard -types;
 use Types::TypeTiny qw(to_TypeTiny);
@@ -44,7 +47,7 @@ sub _exporter_expand_sub
 		my %compiled;
 		return validate => sub {
 			my $arr = shift;
-			($compiled{ join ":", map($_->{uniq}||"\@$_->{slurpy}", @_) } ||= compile(\%opts, @_))
+			($compiled{ join ":", map($_->{uniq}||"\@$_->{slurpy}", @_) } ||= compile({ caller_level => 1, %opts }, @_))
 				->(@$arr);
 		};
 	}
@@ -62,29 +65,13 @@ sub _mkslurpy
 			$i,
 		)
 		: sprintf(
-			'%s = (($#_-%d)%%2)==0 ? $croaker->("Odd number of elements in %s") : +{ @_[%d..$#_] };',
+			'%s = (($#_-%d)%%2)==0 ? "Type::Exception::WrongNumberOfParameters"->throw(message => "Odd number of elements in %s") : +{ @_[%d..$#_] };',
 			$name,
 			$i,
 			$tc,
 			$i,
 			$i,
 		);
-}
-
-sub _dd
-{
-	my $value = @_ ? $_[0] : $_;
-	!defined $value ? 'Undef' :
-	!ref $value     ? sprintf('Value %s', B::perlstring($value)) :
-	do {
-		require Data::Dumper;
-		local $Data::Dumper::Indent   = 0;
-		local $Data::Dumper::Useqq    = 1;
-		local $Data::Dumper::Terse    = 1;
-		local $Data::Dumper::Sortkeys = 1;
-		local $Data::Dumper::Maxdepth = 2;
-		Data::Dumper::Dumper($value)
-	}
 }
 
 sub compile
@@ -100,18 +87,12 @@ sub compile
 	my $max_args   = 0;
 	my $saw_opt    = 0;
 	
-	my $level = 3 + ($options{'carp_level'} || 0);
-	$env{'$croaker'} =
-		$options{'carp'}    ? \sub { local $Carp::CarpLevel = $level; Carp::carp(sprintf $_[0], map _dd, @_[1..$#_]) } :
-		$options{'cluck'}   ? \sub { local $Carp::CarpLevel = $level; Carp::cluck(sprintf $_[0], map _dd, @_[1..$#_]) } :
-		$options{'confess'} ? \sub { local $Carp::CarpLevel = $level; Carp::confess(sprintf $_[0], map _dd, @_[1..$#_]) } :
-		\sub { local $Carp::CarpLevel = $level; Carp::croak(sprintf $_[0], map _dd, @_[1..$#_]) };
-
 	while (@_)
 	{
 		++$arg;
 		my $constraint = shift;
 		my $is_optional;
+		my $is_slurpy;
 		my $varname;
 		
 		if (HashRef->check($constraint))
@@ -125,6 +106,7 @@ sub compile
 				$constraint->is_a_type_of(ArrayRef) ? _mkslurpy('$_', '@', ArrayRef => $arg) :
 				croak("Slurpy parameter not of type HashRef or ArrayRef");
 			$varname = '$_';
+			$is_slurpy++;
 			$saw_slurpy++;
 		}
 		else
@@ -173,22 +155,24 @@ sub compile
 		if ($constraint->can_be_inlined)
 		{
 			push @code, sprintf(
-				'(%s) or $croaker->("%%s in \\$_[%d] does not meet type constraint \\"%s\\"", %s);',
+				'(%s) or Type::Tiny::_failed_check(%d, %s, %s, varname => %s);',
 				$constraint->inline_check($varname),
-				$arg,
-				$constraint,
+				$constraint->{uniq},
+				perlstring($constraint),
 				$varname,
+				$is_slurpy ? 'q{$SLURPY}' : sprintf('q{$_[%d]}', $arg),
 			);
 		}
 		else
 		{
 			$env{'@check'}[$arg] = $constraint->compiled_check;
 			push @code, sprintf(
-				'%s or $croaker->("%%s in \\$_[%d] does not meet type constraint \\"%s\\"", %s);',
+				'%s or Type::Tiny::_failed_check(%d, %s, %s, varname => %s);',
 				sprintf(sprintf '$check[%d]->(%s)', $arg, $varname),
-				$arg,
-				$constraint,
+				$constraint->{uniq},
+				perlstring($constraint),
 				$varname,
+				$is_slurpy ? 'q{$SLURPY}' : sprintf('q{$_[%d]}', $arg),
 			);
 		}
 		
@@ -198,15 +182,16 @@ sub compile
 	if ($min_args == $max_args and not $saw_slurpy)
 	{
 		$code[1] = sprintf(
-			'$croaker->("Wrong number of parameters (${\scalar @_}); expected %d") if @_ != %d;',
+			'"Type::Exception::WrongNumberOfParameters"->throw(got => scalar(@_), minimum => %d, maximum => %d) if @_ != %d;',
 			$min_args,
 			$max_args,
+			$min_args,
 		);
 	}
 	elsif ($min_args < $max_args and not $saw_slurpy)
 	{
 		$code[1] = sprintf(
-			'$croaker->("Wrong number of parameters (${\scalar @_}); expected %d to %d") if @_ < %d || @_ > %d;',
+			'"Type::Exception::WrongNumberOfParameters"->throw(got => scalar(@_), minimum => %d, maximum => %d) if @_ < %d || @_ > %d;',
 			$min_args,
 			$max_args,
 			$min_args,
@@ -216,7 +201,7 @@ sub compile
 	elsif ($min_args and $saw_slurpy)
 	{
 		$code[1] = sprintf(
-			'$croaker->("Wrong number of parameters (${\scalar @_}); expected at least %d") if @_ < %d;',
+			'"Type::Exception::WrongNumberOfParameters"->throw(got => scalar(@_), minimum => %d) if @_ < %d;',
 			$min_args,
 			$min_args,
 		);
@@ -228,7 +213,7 @@ sub compile
 	
 	return eval_closure(
 		source      => $source,
-		description => sprintf("parameter validation for '%s'", [caller 1]->[3] || '__ANON__'),
+		description => sprintf("parameter validation for '%s'", [caller(1+($options{caller_level}||0))]->[3] || '__ANON__'),
 		environment => \%env,
 	);
 }
@@ -237,7 +222,7 @@ my %compiled;
 sub validate
 {
 	my $arr = shift;
-	my $sub = $compiled{ join ":", map($_->{uniq}||"\@$_->{slurpy}", @_) } ||= compile @_;
+	my $sub = $compiled{ join ":", map($_->{uniq}||"\@$_->{slurpy}", @_) } ||= compile({ caller_level => 1 }, @_);
 	@_ = @$arr;
 	goto $sub;
 }
@@ -339,25 +324,6 @@ Dude, these functions are documented!
 =item Invocant
 
 =end trustme
-
-=head1 EXPORT
-
-It is possible to export versions of the C<compile> and C<validate> functions
-that use C<confess>, C<carp> or C<cluck> instead of the default C<croak> to
-report error messages:
-
-   use Type::Params
-      compile  => { confess => 1 },
-      validate => { cluck   => 1 },
-   ;
-
-You can even export more than one copy of the functions with different
-configurations:
-
-   use Type::Params
-      validate => { croak => 1, -as => "validate_strict" },
-      validate => { cluck => 1, -as => "validate_sloppy" },
-   ;
 
 =head1 COOKBOOK
 

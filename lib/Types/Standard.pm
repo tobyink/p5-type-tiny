@@ -187,6 +187,24 @@ declare "ArrayRef",
 			.  "\$ok "
 			."}"
 		};
+	},
+	deep_explanation => sub {
+		my ($type, $value, $varname) = @_;
+		my $param = $type->parameters->[0];
+		
+		for my $i (0 .. $#$value)
+		{
+			my $item = $value->[$i];
+			next if $param->check($item);
+			require Type::Exception::Assertion;
+			return "Type::Exception::Assertion"->_explain(
+				$param,
+				$item,
+				sprintf('%s->[%d]', $varname, $i),
+			);
+		}
+		
+		return;
 	};
 
 declare "HashRef",
@@ -221,6 +239,25 @@ declare "HashRef",
 			.  "\$ok "
 			."}"
 		};
+	},
+	deep_explanation => sub {
+		require B;
+		my ($type, $value, $varname) = @_;
+		my $param = $type->parameters->[0];
+		
+		for my $k (sort keys %$value)
+		{
+			my $item = $value->{$k};
+			next if $param->check($item);
+			require Type::Exception::Assertion;
+			return "Type::Exception::Assertion"->_explain(
+				$param,
+				$item,
+				sprintf('%s->{%d}', $varname, B::perlstring($k)),
+			);
+		}
+		
+		return;
 	};
 
 declare "ScalarRef",
@@ -249,6 +286,23 @@ declare "ScalarRef",
 			my $param_check = $param->inline_check("\${$v}");
 			"(ref($v) eq 'SCALAR' or ref($v) eq 'REF') and $param_check";
 		};
+	},
+	deep_explanation => sub {
+		my ($type, $value, $varname) = @_;
+		my $param = $type->parameters->[0];
+		
+		for my $item ($$value)
+		{
+			next if $param->check($item);
+			require Type::Exception::Assertion;
+			return "Type::Exception::Assertion"->_explain(
+				$param,
+				$item,
+				sprintf('${%s}', $varname),
+			);
+		}
+		
+		return;
 	};
 
 declare "Object",

@@ -53,16 +53,11 @@ my $e = exception {
 	testsub2(1.1);
 };
 
-my @e = split /\r?\n|\r/, $e;
+isa_ok($e, 'Type::Exception');
 
 like(
-	$e[0],
-	qr{^Value "1\.1" in \$_\[0\] does not meet type constraint "Int" at testsub2\.chunk line 3},
-);
-
-like(
-	$e[1],
-	qr{^\s+main::testsub2\(1\.1\) called at params-carping.t line 53},
+	$e,
+	qr{^Value "1\.1" did not pass type constraint "Int" \(in \$_\[0\]\)},
 );
 
 done_testing;
