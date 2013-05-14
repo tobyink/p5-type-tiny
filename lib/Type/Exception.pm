@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Exception::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Exception::VERSION   = '0.005_02';
+	$Type::Exception::VERSION   = '0.005_03';
 }
 
 use overload

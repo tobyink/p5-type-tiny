@@ -366,3 +366,12 @@
 			dcs:blame cpan:MMCLERIC;
 		];
 	].
+
+`Type-Tiny 0.005_03 cpan:TOBYINK`
+	issued  2013-05-14;
+	changeset [
+		dcs:versus `Type-Tiny 0.005_02 cpan:TOBYINK`;
+		item "Many error conditions now throw exception objects instead of string error messages."^^Change;
+		item "Bytes and Chars type constraints removed from Types::Standard."^^Removal;
+		item "Decode and Encode coercions removed from Types::Standard."^^Removal;
+	].
