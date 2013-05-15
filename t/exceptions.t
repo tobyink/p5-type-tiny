@@ -26,7 +26,7 @@ use lib qw( ./lib ./t/lib ../inc ./inc );
 use Test::More;
 use Test::Fatal;
 
-use Types::Standard qw( ArrayRef Int Ref Any );
+use Types::Standard qw( ArrayRef Int Ref Any Num Map );
 
 my $v = [];
 my $e = exception { Int->create_child_type->assert_valid($v) };
@@ -95,6 +95,16 @@ is_deeply(
 		'"Ref[ARRAY]" is defined as: (ref($_) and Scalar::Util::reftype($_) eq q(ARRAY))',
 	],
 	'Ref["ARRAY"] deep explanation, given {}',
+);
+
+is_deeply(
+	(exception { (Map[Int,Num])->({1=>1.1,2.2=>2.3,3.3=>3.4}) })->explain,
+	[
+		'{1 => "1.1","2.2" => "2.3","3.3" => "3.4"} did not pass type constraint "Map[Int,Num]"',
+		'Value "2.2" did not pass type constraint "Int" (in key $_->{"2.2"})',
+		'"Int" is defined as: (defined $_ and $_ =~ /\A-?[0-9]+\z/)',
+	],
+	'Map[Int,Num] deep explanation, given {1=>1.1,2.2=>2.3,3.3=>3.4}',
 );
 
 my $AlwaysFail = Any->create_child_type(constraint => sub { 0 });

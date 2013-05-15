@@ -253,7 +253,7 @@ declare "HashRef",
 			return "Type::Exception::Assertion"->_explain(
 				$param,
 				$item,
-				sprintf('%s->{%d}', $varname, B::perlstring($k)),
+				sprintf('%s->{%s}', $varname, B::perlstring($k)),
 			);
 		}
 		
@@ -375,6 +375,36 @@ declare "Map",
 			.  "\$ok "
 			."}"
 		};
+	},
+	deep_explanation => sub {
+		require B;
+		my ($type, $value, $varname) = @_;
+		my ($kparam, $vparam) = @{ $type->parameters };
+		
+		for my $k (sort keys %$value)
+		{
+			unless ($kparam->check($k))
+			{
+				require Type::Exception::Assertion;
+				return "Type::Exception::Assertion"->_explain(
+					$kparam,
+					$k,
+					sprintf('key %s->{%s}', $varname, B::perlstring($k)),
+				);
+			}
+			
+			unless ($vparam->check($value->{$k}))
+			{
+				require Type::Exception::Assertion;
+				return "Type::Exception::Assertion"->_explain(
+					$vparam,
+					$value->{$k},
+					sprintf('%s->{%s}', $varname, B::perlstring($k)),
+				);
+			}			
+		}
+		
+		return;
 	};
 
 declare "Optional",
