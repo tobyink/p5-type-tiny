@@ -1,12 +1,6 @@
 <map version="0.9.0">
 <!-- To view this file, download free mind mapping software FreeMind from http://freemind.sourceforge.net -->
 <node CREATED="1365159230192" ID="ID_28734446" MODIFIED="1367787864051" TEXT="Type-Tiny">
-<node CREATED="1366904774462" ID="ID_1574254872" MODIFIED="1366904780973" POSITION="left" TEXT="improved error messages">
-<node CREATED="1368653400604" ID="ID_1010731489" MODIFIED="1368653404711" TEXT="Tuple"/>
-<node CREATED="1368653406025" ID="ID_296421665" MODIFIED="1368653408733" TEXT="Dict"/>
-<node CREATED="1368653409202" ID="ID_490679779" MODIFIED="1368653413290" TEXT="Optional"/>
-<node CREATED="1368653426138" ID="ID_864109055" MODIFIED="1368653432167" TEXT="StrMatch??"/>
-</node>
 <node CREATED="1367787794514" ID="ID_1248980001" MODIFIED="1367787813313" POSITION="right" TEXT="Improve API for parameterized coercions"/>
 <node CREATED="1367787818774" ID="ID_1229200854" MODIFIED="1367787837525" POSITION="right" TEXT="Consider ways to reduce duplication when definition a type constraint coderef plus inline code"/>
 <node CREATED="1367787866446" ID="ID_71085740" MODIFIED="1367787870584" POSITION="right" TEXT="Related Projects">
