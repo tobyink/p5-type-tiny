@@ -93,7 +93,8 @@ is_deeply(
 	(exception { (Ref["ARRAY"])->({}) })->explain,
 	[
 		'{} did not pass type constraint "Ref[ARRAY]"',
-		'"Ref[ARRAY]" is defined as: (ref($_) and Scalar::Util::reftype($_) eq q(ARRAY))',
+		'"Ref[ARRAY]" constrains reftype($_) to be equal to "ARRAY"',
+		'reftype($_) is "HASH"',
 	],
 	'Ref["ARRAY"] deep explanation, given {}',
 );
@@ -126,7 +127,7 @@ package Monkey::Nuts;
 "Type::Exception"->throw(message => "Test");
 };
 
-#line 130 "exceptions.t"
+#line 131 "exceptions.t"
 is_deeply(
 	$e_where->context,
 	{

@@ -118,8 +118,19 @@ declare "Ref",
 			my $v = $_[1];
 			"ref($v) and Scalar::Util::reftype($v) eq q($reftype)";
 		};
+	},
+	deep_explanation => sub {
+		require B;
+		my ($type, $value, $varname) = @_;
+		my $param = $type->parameters->[0];
+		return if $type->check($value);
+		my $reftype = Scalar::Util::reftype($value);
+		return [
+			sprintf('"%s" constrains reftype(%s) to be equal to %s', $type, $varname, B::perlstring($param)),
+			sprintf('reftype(%s) is %s', $varname, defined($reftype) ? B::perlstring($reftype) : "undef"),
+		];
 	};
-
+	
 declare "CodeRef",
 	_is_core => 1,
 	as "Ref",

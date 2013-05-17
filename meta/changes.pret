@@ -384,7 +384,7 @@
 		item "Deep explanations for Types::Standard::Map type constraint assertion failures."^^Addition;
 		item "Test::TypeTiny performs more thorough testing if EXTENDED_TESTING environment variable is set."^^Change;
 		item "Fixed bug in non-inlined code for Types::Standard::MkOpt."^^Bugfix;
-		item "Improved deep explanations for Types::Standard::{ArrayRef,HashRef,ScalarRef}."^^Change;
+		item "Improved deep explanations for Types::Standard::{Ref,ArrayRef,HashRef,ScalarRef}."^^Change;
 		item "Throw exception if people attempt to set parent types for Type::Tiny::{Class,Role,Duck,Enum,Union,Intersection}."^^Change;
 		item "Type::Exception::Compilation."^^Addition;
 	].
