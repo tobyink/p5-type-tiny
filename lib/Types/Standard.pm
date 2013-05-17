@@ -421,7 +421,7 @@ declare "Map",
 						)
 					}
 				];
-			}			
+			}
 		}
 		
 		return;
@@ -471,7 +471,7 @@ declare "Tuple",
 			Types::TypeTiny::TypeTiny->check($slurpy)
 				or _croak("Slurpy parameter to Tuple[...] expected to be a type constraint; got $slurpy");
 		}
-
+		
 		@constraints = map Types::TypeTiny::to_TypeTiny($_), @constraints;
 		for (@constraints)
 		{
@@ -612,14 +612,14 @@ declare "StrMatch",
 		
 		ref($regexp) eq 'Regexp'
 			or _croak("First parameter to StrMatch[`a] expected to be a Regexp; got $regexp");
-
+		
 		if (@_ > 1)
 		{
 			$checker = Types::TypeTiny::to_TypeTiny($checker);
 			Types::TypeTiny::TypeTiny->check($checker)
 				or _croak("Second parameter to StrMatch[`a] expected to be a type constraint; got $checker")
 		}
-
+		
 		$checker
 			? sub {
 				my $value = shift;
