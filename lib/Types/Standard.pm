@@ -356,6 +356,22 @@ declare "Maybe",
 			my $param_check = $param->inline_check($v);
 			"!defined($v) or $param_check";
 		};
+	},
+	deep_explanation => sub {
+		my ($type, $value, $varname) = @_;
+		my $param = $type->parameters->[0];
+		
+		return [
+			sprintf('%s is defined', Type::Tiny::_dd($value)),
+			sprintf('"%s" constrains the value with "%s" if it is defined', $type, $param),
+			@{
+				"Type::Exception::Assertion"->_explain(
+					$param,
+					$value,
+					$varname,
+				)
+			}
+		];
 	};
 
 declare "Map",

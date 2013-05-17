@@ -3,9 +3,7 @@
           * Tuple
           * Dict
           * Optional
-          * Maybe
           * StrMatch??
-          * Ref??
       * Improve API for parameterized coercions
       * Consider ways to reduce duplication when definition a type
         constraint coderef plus inline code

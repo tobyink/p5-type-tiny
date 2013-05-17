@@ -26,7 +26,7 @@ use lib qw( ./lib ./t/lib ../inc ./inc );
 use Test::More;
 use Test::Fatal;
 
-use Types::Standard qw( ArrayRef Int Ref Any Num Map );
+use Types::Standard qw( HashRef ArrayRef Int Ref Any Num Map Maybe );
 
 my $v = [];
 my $e = exception { Int->create_child_type->assert_valid($v) };
@@ -100,6 +100,23 @@ is_deeply(
 );
 
 is_deeply(
+	(exception { (HashRef[Maybe[Int]])->({a => undef, b => 42, c => []}) })->explain,
+	[
+		'{"a" => undef,"b" => 42,"c" => []} did not pass type constraint "HashRef[Maybe[Int]]"',
+		'"HashRef[Maybe[Int]]" constrains each value in the hash with "Maybe[Int]"',
+		'[] did not pass type constraint "Maybe[Int]" (in $_->{"c"})',
+		'[] is defined',
+		'"Maybe[Int]" constrains the value with "Int" if it is defined',
+		'"Int" is a subtype of "Num"',
+		'"Num" is a subtype of "Str"',
+		'"Str" is a subtype of "Value"',
+		'[] did not pass type constraint "Value" (in $_->{"c"})',
+		'"Value" is defined as: (defined($_) and not ref($_))',
+	],
+	'HashRef[Maybe[Int]] deep explanation, given {a => undef, b => 42, c => []}',
+);
+
+is_deeply(
 	(exception { (Map[Int,Num])->({1=>1.1,2.2=>2.3,3.3=>3.4}) })->explain,
 	[
 		'{1 => "1.1","2.2" => "2.3","3.3" => "3.4"} did not pass type constraint "Map[Int,Num]"',
@@ -127,7 +144,7 @@ package Monkey::Nuts;
 "Type::Exception"->throw(message => "Test");
 };
 
-#line 131 "exceptions.t"
+#line 148 "exceptions.t"
 is_deeply(
 	$e_where->context,
 	{
