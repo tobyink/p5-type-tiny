@@ -652,6 +652,7 @@ declare "OptList",
 			return unless @$inner == 2;
 			return unless is_Str($inner->[0]);
 		}
+		return !!1;
 	},
 	inline_as {
 		my ($self, $var) = @_;
