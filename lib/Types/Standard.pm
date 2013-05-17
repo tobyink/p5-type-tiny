@@ -197,11 +197,16 @@ declare "ArrayRef",
 			my $item = $value->[$i];
 			next if $param->check($item);
 			require Type::Exception::Assertion;
-			return "Type::Exception::Assertion"->_explain(
-				$param,
-				$item,
-				sprintf('%s->[%d]', $varname, $i),
-			);
+			return [
+				sprintf('"%s" constrains each value in the array with "%s"', $type, $param),
+				@{
+					"Type::Exception::Assertion"->_explain(
+						$param,
+						$item,
+						sprintf('%s->[%d]', $varname, $i),
+					)
+				},
+			]
 		}
 		
 		return;
@@ -250,11 +255,16 @@ declare "HashRef",
 			my $item = $value->{$k};
 			next if $param->check($item);
 			require Type::Exception::Assertion;
-			return "Type::Exception::Assertion"->_explain(
-				$param,
-				$item,
-				sprintf('%s->{%s}', $varname, B::perlstring($k)),
-			);
+			return [
+				sprintf('"%s" constrains each value in the hash with "%s"', $type, $param),
+				@{
+					"Type::Exception::Assertion"->_explain(
+						$param,
+						$item,
+						sprintf('%s->{%s}', $varname, B::perlstring($k)),
+					)
+				}
+			];
 		}
 		
 		return;
@@ -295,11 +305,16 @@ declare "ScalarRef",
 		{
 			next if $param->check($item);
 			require Type::Exception::Assertion;
-			return "Type::Exception::Assertion"->_explain(
-				$param,
-				$item,
-				sprintf('${%s}', $varname),
-			);
+			return [
+				sprintf('"%s" constrains the referenced scalar value with "%s"', $type, $param),
+				@{
+					"Type::Exception::Assertion"->_explain(
+						$param,
+						$item,
+						sprintf('${%s}', $varname),
+					)
+				}
+			];
 		}
 		
 		return;
@@ -386,21 +401,31 @@ declare "Map",
 			unless ($kparam->check($k))
 			{
 				require Type::Exception::Assertion;
-				return "Type::Exception::Assertion"->_explain(
-					$kparam,
-					$k,
-					sprintf('key %s->{%s}', $varname, B::perlstring($k)),
-				);
+				return [
+					sprintf('"%s" constrains each key in the hash with "%s"', $type, $kparam),
+					@{
+						"Type::Exception::Assertion"->_explain(
+							$kparam,
+							$k,
+							sprintf('key %s->{%s}', $varname, B::perlstring($k)),
+						)
+					}
+				];
 			}
 			
 			unless ($vparam->check($value->{$k}))
 			{
 				require Type::Exception::Assertion;
-				return "Type::Exception::Assertion"->_explain(
-					$vparam,
-					$value->{$k},
-					sprintf('%s->{%s}', $varname, B::perlstring($k)),
-				);
+				return [
+					sprintf('"%s" constrains value key in the hash with "%s"', $type, $vparam),
+					@{
+						"Type::Exception::Assertion"->_explain(
+							$vparam,
+							$value->{$k},
+							sprintf('%s->{%s}', $varname, B::perlstring($k)),
+						)
+					}
+				];
 			}			
 		}
 		

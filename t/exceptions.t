@@ -69,6 +69,7 @@ is_deeply(
 	(exception { (ArrayRef[Int])->([1, 2, [3]]) })->explain,
 	[
 		'[1,2,[3]] did not pass type constraint "ArrayRef[Int]"',
+		'"ArrayRef[Int]" constrains each value in the array with "Int"',
 		'"Int" is a subtype of "Num"',
 		'"Num" is a subtype of "Str"',
 		'"Str" is a subtype of "Value"',
@@ -101,6 +102,7 @@ is_deeply(
 	(exception { (Map[Int,Num])->({1=>1.1,2.2=>2.3,3.3=>3.4}) })->explain,
 	[
 		'{1 => "1.1","2.2" => "2.3","3.3" => "3.4"} did not pass type constraint "Map[Int,Num]"',
+		'"Map[Int,Num]" constrains each key in the hash with "Int"',
 		'Value "2.2" did not pass type constraint "Int" (in key $_->{"2.2"})',
 		'"Int" is defined as: (defined $_ and $_ =~ /\A-?[0-9]+\z/)',
 	],
@@ -124,7 +126,7 @@ package Monkey::Nuts;
 "Type::Exception"->throw(message => "Test");
 };
 
-#line 118 "exceptions.t"
+#line 130 "exceptions.t"
 is_deeply(
 	$e_where->context,
 	{
