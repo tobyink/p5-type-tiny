@@ -33,6 +33,9 @@ use strict;
 use warnings;
 use lib qw( ./lib ./t/lib ../inc ./inc );
 
+# Avoid warnings about core version of Object::Accessor in Perl 5.18
+no warnings qw(deprecated);
+
 use Test::More;
 use Test::Requires { "Object::Accessor" => 0.30 };
 use Test::Fatal;
