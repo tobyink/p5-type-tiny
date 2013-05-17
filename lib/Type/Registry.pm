@@ -36,7 +36,7 @@ sub _exporter_expand_sub
 sub new
 {
 	my $class = shift;
-	ref($class) and _croak("not an object method");
+	ref($class) and _croak("Not an object method");
 	bless {}, $class;
 }
 

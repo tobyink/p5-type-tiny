@@ -12,12 +12,7 @@ BEGIN {
 use Scalar::Util qw< blessed >;
 use Types::TypeTiny ();
 
-sub _croak ($;@)
-{
-	require Carp;
-	@_ = sprintf($_[0], @_[1..$#_]) if @_ > 1;
-	goto \&Carp::croak;
-}
+sub _croak ($;@) { require Type::Exception; goto \&Type::Exception::croak }
 
 use base "Type::Coercion";
 
@@ -41,7 +36,7 @@ sub type_coercion_map
 sub add_type_coercions
 {
 	my $self = shift;
-	_croak "adding coercions to Type::Coercion::Union not currently supported";
+	_croak "Adding coercions to Type::Coercion::Union not currently supported";
 }
 
 # sub _build_moose_coercion ???

@@ -12,12 +12,7 @@ BEGIN {
 use Scalar::Util qw< blessed >;
 use Types::TypeTiny ();
 
-sub _croak ($;@)
-{
-	require Carp;
-	@_ = sprintf($_[0], @_[1..$#_]) if @_ > 1;
-	goto \&Carp::croak;
-}
+sub _croak ($;@) { require Type::Exception; goto \&Type::Exception::croak }
 
 use overload q[@{}] => 'type_constraints';
 

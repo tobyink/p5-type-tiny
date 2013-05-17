@@ -16,12 +16,7 @@ use Types::TypeTiny qw< TypeTiny to_TypeTiny >;
 
 use base qw< Exporter::TypeTiny >;
 
-sub _croak ($;@)
-{
-	require Carp;
-	@_ = sprintf($_[0], @_[1..$#_]) if @_ > 1;
-	goto \&Carp::croak;
-}
+sub _croak ($;@) { require Type::Exception; goto \&Type::Exception::croak }
 
 {
 	my $got_subname;
@@ -183,7 +178,7 @@ sub _exporter_fail
 			my $type = $into->get_type($name);
 			unless ($type)
 			{
-				_croak "cannot parameterize a non-existant type" if $params;
+				_croak "Cannot parameterize a non-existant type" if $params;
 				$type = $name;
 			}
 			

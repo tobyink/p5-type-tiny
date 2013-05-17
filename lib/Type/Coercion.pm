@@ -13,12 +13,7 @@ use Eval::TypeTiny ();
 use Scalar::Util qw< blessed >;
 use Types::TypeTiny ();
 
-sub _croak ($;@)
-{
-	require Carp;
-	@_ = sprintf($_[0], @_[1..$#_]) if @_ > 1;
-	goto \&Carp::croak;
-}
+sub _croak ($;@) { require Type::Exception; goto \&Type::Exception::croak }
 
 use overload
 	q("")      => sub { caller =~ m{^(Moo::HandleMoose|Sub::Quote)} ? overload::StrVal($_[0]) : $_[0]->display_name },
@@ -404,7 +399,7 @@ sub parameterize
 	my $self = shift;
 	return $self unless @_;
 	$self->is_parameterizable
-		or _croak "constraint '%s' does not accept parameters", "$self";
+		or _croak "Constraint '%s' does not accept parameters", "$self";
 	
 	@_ = map Types::TypeTiny::to_TypeTiny($_), @_;
 	

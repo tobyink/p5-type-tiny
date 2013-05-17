@@ -85,6 +85,16 @@ sub _build_message
 	return 'An exception has occurred';
 }
 
+sub croak
+{
+	my ($fmt, @args) = @_;
+	@_ = (
+		__PACKAGE__,
+		message => sprintf($fmt, @args),
+	);
+	goto \&throw;
+}
+
 1;
 
 __END__
@@ -136,6 +146,17 @@ Hashref containing the package, file and line that generated the error.
 =item C<to_string>
 
 Returns the message, followed by the context if it is set.
+
+=back
+
+=head2 Functions
+
+=over
+
+=item C<< Type::Exception::croak($format, @args) >>
+
+Functional-style shortcut to C<throw> method. Takes an C<sprintf>-style
+format string and optional arguments to construct the C<message>.
 
 =back
 
