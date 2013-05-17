@@ -576,7 +576,7 @@ declare "Tuple",
 		if (exists $constraints[-1] and ref $constraints[-1] eq "HASH")
 		{
 			$slurpy = Types::TypeTiny::to_TypeTiny(pop(@constraints)->{slurpy});
-		}		
+		}
 		@constraints = map Types::TypeTiny::to_TypeTiny($_), @constraints;
 		
 		if ($#constraints < $#$value and not $slurpy)
