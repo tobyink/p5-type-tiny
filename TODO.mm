@@ -21,6 +21,5 @@
 <node CREATED="1367788018564" ID="ID_716920082" MODIFIED="1367788041234" TEXT="See what questions users come up with, and write more documentation if necessary"/>
 </node>
 <node CREATED="1368653462599" ID="ID_1417938282" MODIFIED="1368653501960" POSITION="right" TEXT="Die if people try to set parent type constraints for TT:Class, TT:Role, etc"/>
-<node CREATED="1368769330871" ID="ID_1659163993" MODIFIED="1368769421978" POSITION="left" TEXT="EXTENDED_TESTING mode for Test::TypeTiny which promotes each should_pass/should_fail into a subtest, testing compiled and non-compiled behaviour."/>
 </node>
 </map>

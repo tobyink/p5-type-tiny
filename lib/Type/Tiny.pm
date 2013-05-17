@@ -364,6 +364,25 @@ sub check
 	$self->compiled_check->(@_);
 }
 
+sub _strict_check
+{
+	my $self = shift;
+	local $_ = $_[0];
+
+	my @constraints =
+		reverse
+		map  { $_->constraint }
+		grep { not $_->_is_null_constraint }
+		($self, $self->parents);
+	
+	for my $c (@constraints)
+	{
+		return unless $c->(@_);
+	}
+	
+	return !!1;
+}
+
 sub get_message
 {
 	my $self = shift;

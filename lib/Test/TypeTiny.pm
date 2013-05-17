@@ -6,10 +6,14 @@ use warnings;
 use Test::More ();
 use base qw< Exporter::TypeTiny >;
 
+BEGIN {
+	*EXTENDED_TESTING = $ENV{EXTENDED_TESTING} ? sub(){!!1} : sub(){!!0};
+};
+
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.005_03';
-
-our @EXPORT = qw( should_pass should_fail ok_subtype );
+our @EXPORT    = qw( should_pass should_fail ok_subtype );
+our @EXPORT_OK = qw( EXTENDED_TESTING );
 
 sub _mk_message
 {
@@ -17,6 +21,52 @@ sub _mk_message
 	my ($template, $value) = @_;
 	sprintf($template, Type::Tiny::_dd($value));
 }
+
+sub ok_subtype
+{
+	my ($type, @s) = @_;
+	@_ = (
+		not(scalar grep !$_->is_subtype_of($type), @s),
+		sprintf("%s subtype: %s", $type, join q[, ], @s),
+	);
+	goto \&Test::More::ok;
+}
+
+eval(EXTENDED_TESTING ? <<'SLOW' : <<'FAST');
+
+sub should_pass
+{
+	my ($value, $type, $message) = @_;
+	
+	local $Test::Builder::Level = $Test::Builder::Level + 1;
+	
+	my $test = "Test::Builder"->new->child(
+		$message || _mk_message("%s passes type constraint $type", $value),
+	);
+	$test->plan(tests => 2);
+	$test->ok(!!$type->check($value), '->check');
+	$test->ok(!!$type->_strict_check($value), '->_strict_check');
+	$test->finalize;
+	return $test->is_passing;
+}
+
+sub should_fail
+{
+	my ($value, $type, $message) = @_;
+	
+	local $Test::Builder::Level = $Test::Builder::Level + 1;
+	
+	my $test = "Test::Builder"->new->child(
+		$message || _mk_message("%s fails type constraint $type", $value),
+	);
+	$test->plan(tests => 2);
+	$test->ok(!$type->check($value), '->check');
+	$test->ok(!$type->_strict_check($value), '->_strict_check');
+	$test->finalize;
+	return $test->is_passing;
+}
+
+SLOW
 
 sub should_pass
 {
@@ -38,15 +88,7 @@ sub should_fail
 	goto \&Test::More::ok;
 }
 
-sub ok_subtype
-{
-	my ($type, @s) = @_;
-	@_ = (
-		not(scalar grep !$_->is_subtype_of($type), @s),
-		sprintf("%s subtype: %s", $type, join q[, ], @s),
-	);
-	goto \&Test::More::ok;
-}
+FAST
 
 1;
 
@@ -90,13 +132,33 @@ L<Test::TypeTiny> provides a few handy functions for testing type constraints.
 
 =item C<< should_pass($value, $type) >>
 
+Test that passes iff C<< $value >> passes << $type->check >>.
+
 =item C<< should_fail($value, $type, $test_name) >>
 
 =item C<< should_fail($value, $type) >>
 
+Test that passes iff C<< $value >> fails << $type->check >>.
+
 =item C<< ok_subtype($type, @subtypes) >>
 
+Test that passes iff all C<< @subtypes >> are subtypes of << $type >>.
+
+=item C<< EXTENDED_TESTING >>
+
+Exportable boolean constant.
+
 =back
+
+=head1 ENVIRONMENT
+
+If the C<EXTENDED_TESTING> environment variable is set to true, this
+module will promote each C<should_pass> or C<should_fail> test into a
+subtest block and test the type constraint in both an inlined and
+non-inlined manner.
+
+This variable must be set at compile time (i.e. before this module is
+loaded).
 
 =head1 BUGS
 
