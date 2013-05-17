@@ -26,7 +26,7 @@ use lib qw( ./lib ./t/lib ../inc ./inc );
 use Test::More;
 use Test::Fatal;
 
-use Types::Standard qw( HashRef ArrayRef Int Ref Any Num Map Maybe );
+use Types::Standard slurpy => -types;
 
 my $v = [];
 my $e = exception { Int->create_child_type->assert_valid($v) };
@@ -116,6 +116,42 @@ is_deeply(
 	'HashRef[Maybe[Int]] deep explanation, given {a => undef, b => 42, c => []}',
 );
 
+my $dict = Dict[a => Int, b => Optional[ArrayRef[Str]]];
+
+is_deeply(
+	(exception { $dict->({c => 1}) })->explain,
+	[
+		'{"c" => 1} did not pass type constraint "Dict[a=>Int,b=>Optional[ArrayRef[Str]]]"',
+		'"Dict[a=>Int,b=>Optional[ArrayRef[Str]]]" does not allow key "c" to appear in hash',
+	],
+	'$dict deep explanation, given {c => 1}',
+);
+
+is_deeply(
+	(exception { $dict->({b => 1}) })->explain,
+	[
+		'{"b" => 1} did not pass type constraint "Dict[a=>Int,b=>Optional[ArrayRef[Str]]]"',
+		'"Dict[a=>Int,b=>Optional[ArrayRef[Str]]]" requires key "a" to appear in hash',
+	],
+	'$dict deep explanation, given {b => 1}',
+);
+
+is_deeply(
+	(exception { $dict->({a => 1, b => 2}) })->explain,
+	[
+		'{"a" => 1,"b" => 2} did not pass type constraint "Dict[a=>Int,b=>Optional[ArrayRef[Str]]]"',
+		'"Dict[a=>Int,b=>Optional[ArrayRef[Str]]]" constrains value at key "b" of hash with "Optional[ArrayRef[Str]]"',
+		'Value "2" did not pass type constraint "Optional[ArrayRef[Str]]" (in $_->{"b"})',
+		'$_->{"b"} exists',
+		'"Optional[ArrayRef[Str]]" constrains $_->{"b"} with "ArrayRef[Str]" if it exists',
+		'"ArrayRef[Str]" is a subtype of "ArrayRef"',
+		'"ArrayRef" is a subtype of "Ref"',
+		'Value "2" did not pass type constraint "Ref" (in $_->{"b"})',
+		'"Ref" is defined as: (!!ref($_))',
+	],
+	'$dict deep explanation, given {a => 1, b => 2}',
+);
+
 is_deeply(
 	(exception { (Map[Int,Num])->({1=>1.1,2.2=>2.3,3.3=>3.4}) })->explain,
 	[
@@ -136,6 +172,34 @@ is_deeply(
 		'"__ANON__" is defined as: sub { 0; }',
 	],
 	'$AlwaysFail explanation, given 1',
+);
+
+my $SlurpyThing = Tuple[ Num, slurpy Map[Int, ArrayRef] ];
+
+is_deeply(
+	(exception { $SlurpyThing->(1) })->explain,
+	[
+		'"Tuple[Num,slurpy Map[Int,ArrayRef]]" is a subtype of "Tuple"',
+		'"Tuple" is a subtype of "ArrayRef"',
+		'"ArrayRef" is a subtype of "Ref"',
+		'Value "1" did not pass type constraint "Ref"',
+		'"Ref" is defined as: (!!ref($_))',
+	],
+	'$SlurpyThing explanation, given 1',
+);
+
+is_deeply(
+	(exception { $SlurpyThing->([1.1, 2 => "Hello"]) })->explain,
+	[
+		'["1.1",2,"Hello"] did not pass type constraint "Tuple[Num,slurpy Map[Int,ArrayRef]]"',
+		'Array elements from index 1 are slurped into a hashref which is constrained with "Map[Int,ArrayRef]"',
+		'{2 => "Hello"} did not pass type constraint "Map[Int,ArrayRef]" (in $SLURPY)',
+		'"Map[Int,ArrayRef]" constrains each value in the hash with "ArrayRef"',
+		'"ArrayRef" is a subtype of "Ref"',
+		'Value "Hello" did not pass type constraint "Ref" (in $SLURPY->{"2"})',
+		'"Ref" is defined as: (!!ref($_))',
+	],
+	'$SlurpyThing explanation, given [1.1, 2 => "Hello"]',
 );
 
 my $e_where = exception {

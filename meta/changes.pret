@@ -381,10 +381,11 @@
 	changeset [
 		dcs:versus `Type-Tiny 0.005_03 cpan:TOBYINK`;
 		item "All error conditions now throw exception objects instead of string error messages."^^Change;
-		item "Deep explanations for Types::Standard::{Map,Maybe,Ref} type constraint assertion failures."^^Addition;
+		item "Deep explanations for Types::Standard::{Map,Maybe,Ref,Dict,Tuple} type constraint assertion failures."^^Addition;
 		item "Test::TypeTiny performs more thorough testing if EXTENDED_TESTING environment variable is set."^^Change;
 		item "Fixed bug in non-inlined code for Types::Standard::MkOpt."^^Bugfix;
 		item "Improved deep explanations for Types::Standard::{ArrayRef,HashRef,ScalarRef}."^^Change;
 		item "Throw exception if people attempt to set parent types for Type::Tiny::{Class,Role,Duck,Enum,Union,Intersection}."^^Change;
 		item "Type::Exception::Compilation."^^Addition;
+		item "Allow the slurpy tail of a Types::Standard::Tuple to be a treated as a hashref rather than an arrayref."^^Change;
 	].

@@ -439,7 +439,7 @@ declare "Map",
 			{
 				require Type::Exception::Assertion;
 				return [
-					sprintf('"%s" constrains value key in the hash with "%s"', $type, $vparam),
+					sprintf('"%s" constrains each value in the hash with "%s"', $type, $vparam),
 					@{
 						"Type::Exception::Assertion"->_explain(
 							$vparam,
@@ -472,6 +472,22 @@ declare "Optional",
 			my $param_check = $param->inline_check($v);
 			"!exists($v) or $param_check";
 		};
+	},
+	deep_explanation => sub {
+		my ($type, $value, $varname) = @_;
+		my $param = $type->parameters->[0];
+		
+		return [
+			sprintf('%s exists', $varname),
+			sprintf('"%s" constrains %s with "%s" if it exists', $type, $varname, $param),
+			@{
+				"Type::Exception::Assertion"->_explain(
+					$param,
+					$value,
+					$varname,
+				)
+			}
+		];
 	};
 
 sub slurpy {
@@ -511,8 +527,11 @@ declare "Tuple",
 			my $value = $_[0];
 			if ($#constraints < $#$value)
 			{
-				$slurpy or return;
-				$slurpy->check([@$value[$#constraints+1 .. $#$value]]) or return;
+				defined($slurpy) && $slurpy->check(
+					$slurpy->is_a_type_of(HashRef())
+						? +{@$value[$#constraints+1 .. $#$value]}
+						: +[@$value[$#constraints+1 .. $#$value]]
+				) or return;
 			}
 			for my $i (0 .. $#constraints)
 			{
@@ -533,17 +552,81 @@ declare "Tuple",
 		return if grep { not $_->can_be_inlined } @constraints;
 		return if defined $slurpy && !$slurpy->can_be_inlined;
 		
+		my $tmpl = defined($slurpy) && $slurpy->is_a_type_of(HashRef())
+			? "do { my \$tmp = +{\@{%s}[%d..\$#{%s}]}; %s }"
+			: "do { my \$tmp = +[\@{%s}[%d..\$#{%s}]]; %s }";
+		
 		return sub
 		{
 			my $v = $_[1];
 			join " and ",
 				"ref($v) eq 'ARRAY'",
 				($slurpy
-					? sprintf("do { my \$tmp = [\@{$v}[%d..\$#{$v}]]; %s }", $#constraints+1, $slurpy->inline_check('$tmp'))
+					? sprintf($tmpl, $v, $#constraints+1, $v, $slurpy->inline_check('$tmp'))
 					: sprintf("\@{$v} <= %d", scalar @constraints)
 				),
 				map { $constraints[$_]->inline_check("$v\->[$_]") } 0 .. $#constraints;
 		};
+	},
+	deep_explanation => sub {
+		my ($type, $value, $varname) = @_;
+		
+		my @constraints = @{ $type->parameters };
+		my $slurpy;
+		if (exists $constraints[-1] and ref $constraints[-1] eq "HASH")
+		{
+			$slurpy = Types::TypeTiny::to_TypeTiny(pop(@constraints)->{slurpy});
+		}		
+		@constraints = map Types::TypeTiny::to_TypeTiny($_), @constraints;
+		
+		if ($#constraints < $#$value and not $slurpy)
+		{
+			return [
+				sprintf('"%s" expects at most %d values in the array', $type, $#constraints),
+				sprintf('%d values found; too many', $#$value),
+			];
+		}
+		
+		for my $i (0 .. $#constraints)
+		{
+			next if $constraints[$i]->parent == Optional() && $i > $#$value;
+			next if $constraints[$i]->check($value->[$i]);
+			
+			return [
+				sprintf('"%s" constrains value at index %d of array with "%s"', $type, $i, $constraints[$i]),
+				@{
+					"Type::Exception::Assertion"->_explain(
+						$constraints[$i],
+						$value->[$i],
+						sprintf('%s->[%s]', $varname, $i),
+					)
+				}
+			];
+		}
+		
+		if (defined($slurpy))
+		{
+			my $tmp = $slurpy->is_a_type_of(HashRef())
+				? +{@$value[$#constraints+1 .. $#$value]}
+				: +[@$value[$#constraints+1 .. $#$value]];
+			$slurpy->check($tmp) or return [
+				sprintf(
+					'Array elements from index %d are slurped into a %s which is constrained with "%s"',
+					$#constraints+1,
+					$slurpy->is_a_type_of(HashRef()) ? 'hashref' : 'arrayref',
+					$slurpy,
+				),
+				@{
+					"Type::Exception::Assertion"->_explain(
+						$slurpy,
+						$tmp,
+						'$SLURPY',
+					)
+				},
+			];
+		}
+		
+		return;
 	};
 
 declare "Dict",
@@ -598,6 +681,41 @@ declare "Dict",
 				}
 				sort keys %constraints;
 		}
+	},
+	deep_explanation => sub {
+		require B;
+		my ($type, $value, $varname) = @_;
+		my %constraints = @{ $type->parameters };
+		
+		for my $k (sort keys %$value)
+		{
+			return [
+				sprintf('"%s" does not allow key %s to appear in hash', $type, B::perlstring($k))
+			] unless exists $constraints{$k};
+		}
+		
+		for my $k (sort keys %constraints)
+		{
+			next if $constraints{$k}->parent == Optional() && !exists $value->{$k};
+			next if $constraints{$k}->check($value->{$k});
+			
+			return [
+				sprintf('"%s" requires key %s to appear in hash', $type, B::perlstring($k))
+			] unless exists $value->{$k};
+			
+			return [
+				sprintf('"%s" constrains value at key %s of hash with "%s"', $type, B::perlstring($k), $constraints{$k}),
+				@{
+					"Type::Exception::Assertion"->_explain(
+						$constraints{$k},
+						$value->{$k},
+						sprintf('%s->{%s}', $varname, B::perlstring($k)),
+					)
+				}
+			];
+		}
+		
+		return;
 	};
 
 use overload ();

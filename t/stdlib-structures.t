@@ -87,4 +87,11 @@ TODO: {
 };
 ok(!$opt1->check('xxx'), "$opt1 check ('xxx')");
 
+my $slurper = Tuple[ArrayRef, slurpy Map[Num, Int]];
+
+should_pass([ [], 1.1 => 1, 2.1 => 2 ], $slurper);
+should_pass([ [] ], $slurper);
+should_fail([ [], 1.1 => 1, xxx => 2 ], $slurper);
+should_fail([ [], 1.1 => 1, 2.1 => undef ], $slurper);
+
 done_testing;
