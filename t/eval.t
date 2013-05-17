@@ -65,10 +65,28 @@ is_deeply(
 
 my $e = exception { eval_closure(source => 'sub { 1 ]') };
 
+isa_ok(
+	$e,
+	'Type::Exception::Compilation',
+	'$e',
+);
+
 like(
 	$e,
 	qr{^Failed to compile source because: syntax error},
 	'throw exception when code does not compile',
+);
+
+like(
+	$e->errstr,
+	qr{^syntax error},
+	'$e->errstr',
+);
+
+like(
+	$e->code,
+	qr{sub \{ 1 \]},
+	'$e->code',
 );
 
 my $c1 = eval_closure(source => 'sub { die("BANG") }', description => 'test1');

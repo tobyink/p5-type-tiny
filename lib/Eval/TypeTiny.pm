@@ -17,13 +17,6 @@ our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.005_04';
 our @EXPORT    = qw( eval_closure );
 
-sub _croak ($;@)
-{
-	require Carp;
-	@_ = sprintf($_[0], @_[1..$#_]) if @_ > 1;
-	goto \&Carp::croak;
-}
-
 sub import
 {
 	# do the shuffle!
@@ -41,10 +34,11 @@ sub eval_closure
 	$sandbox++;
 	
 	my (%args) = @_;
+	my $src    = ref $args{source} eq "ARRAY" ? join("\n", @{$args{source}}) : $args{source};
+	
 	$args{line}   = 1 unless defined $args{line};
 	$args{description} =~ s/[^\w .:-\[\]\(\)\{\}\']//g if defined $args{description};
-	$args{source} = qq{#line $args{line} "$args{description}"\n} . $args{source}
-		if defined $args{description} && !($^P & 0x10);
+	$src = qq{#line $args{line} "$args{description}"\n$src} if defined $args{description} && !($^P & 0x10);
 	$args{environment} ||= {};
 	
 	for my $k (sort keys %{$args{environment}})
@@ -52,7 +46,9 @@ sub eval_closure
 		next if $k =~ /^\$/ && ref($args{environment}{$k}) =~ /^(SCALAR|REF)$/;
 		next if $k =~ /^\@/ && ref($args{environment}{$k}) eq q(ARRAY);
 		next if $k =~ /^\%/ && ref($args{environment}{$k}) eq q(HASH);
-		_croak "Expected a variable name and ref; got $k => $args{environment}{$k}";
+		
+		require Type::Exception;
+		Type::Exception::croak("Expected a variable name and ref; got %s => %s", $k, $args{environment}{$k});
 	}
 	
 	my @keys      = sort keys %{$args{environment}};
@@ -61,12 +57,21 @@ sub eval_closure
 		"package Eval::TypeTiny::Sandbox$sandbox;",
 		"sub {",
 		map(sprintf('my %s = %s{$_[%d]};', $_, substr($_, 0, 1), $i++), @keys),
-		$args{source},
+		$src,
 		"}",
 	);
 	
 	my ($compiler, $e) = _clean_eval($source);
-	_croak "Failed to compile source because: $e\n\nSOURCE: $source" if $e;
+	if ($e)
+	{
+		chomp $e;
+		require Type::Exception::Compilation;
+		"Type::Exception::Compilation"->throw(
+			code        => (ref $args{source} eq "ARRAY" ? join("\n", @{$args{source}}) : $args{source}),
+			errstr      => $e,
+			environment => $args{environment},
+		);
+	}
 	
 	return $compiler->(@{$args{environment}}{@keys});
 }
@@ -103,7 +108,7 @@ L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
 
 =head1 SEE ALSO
 
-L<Eval::Closure>.
+L<Eval::Closure>, L<Type::Exception::Compilation>.
 
 =head1 AUTHOR
 
