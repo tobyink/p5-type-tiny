@@ -375,3 +375,12 @@
 		item "Bytes and Chars type constraints removed from Types::Standard."^^Removal;
 		item "Decode and Encode coercions removed from Types::Standard."^^Removal;
 	].
+
+`Type-Tiny 0.005_04 cpan:TOBYINK`
+	issued  2013-05-17;
+	changeset [
+		dcs:versus `Type-Tiny 0.005_03 cpan:TOBYINK`;
+		item "Deep explanations for Types::Standard::Map type constraint assertion failures."^^Addition;
+		item "Test::TypeTiny performs more thorough testing if EXTENDED_TESTING environment variable is set."^^Change;
+		item "Fixed bug in non-inlined code for Types::Standard::MkOpt."^^Bugfix;
+	].

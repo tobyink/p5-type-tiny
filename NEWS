@@ -25,3 +25,10 @@
  - Better Mouse support.
  - Types::TypeTiny::to_TypeTiny is able to built a type constraint from
    Validation::Class::Simple
+
+2013-05-28 Type-Tiny version 0.006 released!
+
+ - String error messages replaced with exceptions.
+    - Assertion exceptions have an ->explain method.
+ - Bytes, Chars, Encode and Decode split from Types::Standard to
+   Types::Encodings
