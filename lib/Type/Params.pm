@@ -10,9 +10,9 @@ BEGIN {
 }
 
 use B qw(perlstring);
-use Carp qw(croak);
 use Eval::TypeTiny;
 use Scalar::Util qw(refaddr);
+use Type::Exception;
 use Type::Exception::Assertion;
 use Type::Exception::WrongNumberOfParameters;
 use Type::Utils;
@@ -25,35 +25,29 @@ our @EXPORT_OK = qw( validate Invocant );
 
 use constant Invocant => union Invocant => [Object, ClassName];
 
-sub _exporter_expand_sub
-{
-	my $class = shift;
-	my ($name, $value, $globals, $permitted) = @_;
-	$permitted ||= $class->_exporter_permitted_regexp($globals);
-	
-	my %opts;
-	for (qw/ carp_level carp cluck confess /)
-	{
-		$opts{$_} = $globals->{$_} if exists $globals->{$_};
-		$opts{$_} = $value->{$_}   if exists $value->{$_};
-	}
-
-	if ($name eq 'compile' and keys %opts)
-	{
-		return compile => sub { unshift @_, \%opts; goto \&compile };
-	}
-	elsif ($name eq 'validate' and keys %opts)
-	{
-		my %compiled;
-		return validate => sub {
-			my $arr = shift;
-			($compiled{ join ":", map($_->{uniq}||"\@$_->{slurpy}", @_) } ||= compile({ caller_level => 1, %opts }, @_))
-				->(@$arr);
-		};
-	}
-
-	return $class->SUPER::_exporter_expand_sub(@_);
-}
+#sub _exporter_expand_sub
+#{
+#	my $class = shift;
+#	my ($name, $value, $globals, $permitted) = @_;
+#	$permitted ||= $class->_exporter_permitted_regexp($globals);
+#	
+#	my %opts;
+#	if ($name eq 'compile' and keys %opts)
+#	{
+#		return compile => sub { unshift @_, \%opts; goto \&compile };
+#	}
+#	elsif ($name eq 'validate' and keys %opts)
+#	{
+#		my %compiled;
+#		return validate => sub {
+#			my $arr = shift;
+#			($compiled{ join ":", map($_->{uniq}||"\@$_->{slurpy}", @_) } ||= compile({ caller_level => 1, %opts }, @_))
+#				->(@$arr);
+#		};
+#	}
+#
+#	return $class->SUPER::_exporter_expand_sub(@_);
+#}
 
 sub _mkslurpy
 {
@@ -104,14 +98,14 @@ sub compile
 				$constraint->is_a_type_of(Tuple)    ? _mkslurpy('$_', '@', Tuple    => $arg) :
 				$constraint->is_a_type_of(HashRef)  ? _mkslurpy('$_', '%', HashRef  => $arg) :
 				$constraint->is_a_type_of(ArrayRef) ? _mkslurpy('$_', '@', ArrayRef => $arg) :
-				croak("Slurpy parameter not of type HashRef or ArrayRef");
+				Type::Exception::croak("Slurpy parameter not of type HashRef or ArrayRef");
 			$varname = '$_';
 			$is_slurpy++;
 			$saw_slurpy++;
 		}
 		else
 		{
-			croak("Parameter following slurpy parameter") if $saw_slurpy;
+			Type::Exception::croak("Parameter following slurpy parameter") if $saw_slurpy;
 			
 			$is_optional = grep $_->{uniq} == Optional->{uniq}, $constraint->parents;
 			
@@ -123,7 +117,7 @@ sub compile
 			}
 			else
 			{
-				croak("Non-Optional parameter following Optional parameter") if $saw_opt;
+				Type::Exception::croak("Non-Optional parameter following Optional parameter") if $saw_opt;
 				$min_args++;
 				$max_args++;
 			}
