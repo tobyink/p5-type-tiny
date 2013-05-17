@@ -25,7 +25,8 @@ sub new {
 	return $proto->class->new(@_) if blessed $proto; # DWIM
 	
 	my %opts = @_;
-	_croak "need to supply class name" unless exists $opts{class};
+	_croak "Class type constraints cannot have a parent constraint" if exists $opts{parent};
+	_croak "Need to supply class name" unless exists $opts{class};
 	return $proto->SUPER::new(%opts);
 }
 

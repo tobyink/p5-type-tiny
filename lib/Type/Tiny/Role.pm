@@ -23,7 +23,8 @@ use base "Type::Tiny";
 sub new {
 	my $proto = shift;
 	my %opts = @_;
-	_croak "need to supply role name" unless exists $opts{role};
+	_croak "Role type constraints cannot have a parent constraint" if exists $opts{parent};
+	_croak "Need to supply role name" unless exists $opts{role};
 	return $proto->SUPER::new(%opts);
 }
 

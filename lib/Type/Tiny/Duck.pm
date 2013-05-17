@@ -23,7 +23,8 @@ use base "Type::Tiny";
 sub new {
 	my $proto = shift;
 	my %opts = @_;
-	_croak "need to supply list of methods" unless exists $opts{methods};
+	_croak "Duck type constraints cannot have a parent constraint" if exists $opts{parent};
+	_croak "Need to supply list of methods" unless exists $opts{methods};
 	$opts{methods} = [$opts{methods}] unless ref $opts{methods};
 	return $proto->SUPER::new(%opts);
 }

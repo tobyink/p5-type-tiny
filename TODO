@@ -16,5 +16,3 @@
       * Documentation
           * See what questions users come up with, and write more
             documentation if necessary
-      * Die if people try to set parent type constraints for TT:Class,
-        TT:Role, etc

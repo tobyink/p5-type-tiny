@@ -24,7 +24,8 @@ sub new
 {
 	my $proto = shift;
 	my %opts = @_;
-	_croak "need to supply list of values" unless exists $opts{values};
+	_croak "Enum type constraints cannot have a parent constraint" if exists $opts{parent};
+	_croak "Need to supply list of values" unless exists $opts{values};
 	my %tmp =
 		map { $_ => 1 }
 		@{ ref $opts{values} eq "ARRAY" ? $opts{values} : [$opts{values}] };
