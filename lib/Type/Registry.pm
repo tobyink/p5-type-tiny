@@ -313,21 +313,16 @@ The libraries list is treated as an "optlist" (a la L<Data::OptList>).
 Strings are the names of type libraries; if the first character is a
 hyphen, it is expanded to the "Types::" prefix. If followed by an
 arrayref, this is the list of types to import from that library.
-Otherwise
-
-Strings are the names of type libraries; if the first character is a
-hyphen, it is expanded to the "Types::" prefix. If followed by an
-arrayref, this is the list of types to import from that library.
 Otherwise, imports all types from the library.
 
-	use Type::Registry qw(t);
-	
-	t->add_types(-Standard);  # OR: t->add_types("Types::Standard");
-	
-	t->add_types(
-		-TypeTiny => ['HashLike'],
-		-Standard => ['HashRef' => { -as => 'RealHash' }],
-	);
+   use Type::Registry qw(t);
+   
+   t->add_types(-Standard);  # OR: t->add_types("Types::Standard");
+   
+   t->add_types(
+      -TypeTiny => ['HashLike'],
+      -Standard => ['HashRef' => { -as => 'RealHash' }],
+   );
 
 =item C<< alias_type($oldname, $newname) >>
 
@@ -338,13 +333,26 @@ Create an alias for an existing type.
 Look up a type in the registry by name. Supports a limited level of
 DSL for unions and parameterized types.
 
-	t->lookup("Int|ArrayRef[Int]")
+   t->lookup("Int|ArrayRef[Int]")
 
 Returns undef if not found.
 
 =item C<< AUTOLOAD >>
 
 Overloaded to call C<lookup>, but croaks if not found.
+
+   $registry->Str;  # like $registry->lookup("Str")
+
+=back
+
+=head2 Functions
+
+=over
+
+=item C<< t >>
+
+This class can export a function C<< t >> which acts like
+C<< "Type::Registry"->for_class($importing_class) >>.
 
 =back
 
