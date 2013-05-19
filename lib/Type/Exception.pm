@@ -107,7 +107,26 @@ __END__
 
 Type::Exception - exceptions for Type::Tiny and friends
 
+=head1 SYNOPSIS
+
+   use Data::Dumper;
+   use Try::Tiny;
+   use Types::Standard qw(Str);
+   
+   try {
+      Str->assert_valid(undef);
+   }
+   catch {
+      my $exception = shift;
+      warn "Encountered Error: $exception";
+      warn Dumper($exception->explain)
+         if $exception->isa("Type::Exception::Assertion");
+   };
+
 =head1 DESCRIPTION
+
+When Type::Tiny and its related modules encounter an error, they throw an
+exception object. These exception objects inherit from Type::Exception.
 
 =head2 Constructors
 
@@ -180,6 +199,17 @@ Serves a similar purpose to C<< %Carp::CarpInternal >>.
 
 =back
 
+=head1 CAVEATS
+
+Although Type::Exception objects are thrown for errors produced by
+Type::Tiny, that doesn't mean every time you use Type::Tiny you'll get
+Type::Exceptions whenever you want.
+
+For example, if you use a Type::Tiny type constraint in a Moose attribute,
+Moose will not call the constraint's C<assert_valid> method (which throws
+an exception). Instead it will call C<check> and C<get_message> (which do
+not), and will C<confess> an error message of its own.
+
 =head1 BUGS
 
 Please report any bugs to
@@ -189,6 +219,8 @@ L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
 
 L<Type::Exception::Assertion>,
 L<Type::Exception::WrongNumberOfParameters>.
+
+L<Try::Tiny>, L<Try::Tiny::ByClass>.
 
 =head1 AUTHOR
 
