@@ -84,7 +84,7 @@ be changed by setting C<< $Object::Accessor::FATAL = 1 >>.
 
 =head2 Validation::Class
 
-You want L<Validation::Class> 7.900000 or above.
+You want L<Validation::Class> 7.900017 or above.
 
 The C<to_TypeTiny> function from L<Types::TypeTiny> can be used to create
 a Type::Tiny type constraint from a Validation::Class::Simple object (and

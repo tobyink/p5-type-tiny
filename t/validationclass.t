@@ -9,13 +9,7 @@ as type constraints.
 
 =head1 DEPENDENCIES
 
-Test is skipped if Validation::Class 7.900000 is not available.
-
-=head1 CAVEATS
-
-As of Perl 5.17.x, the Object::Accessor module is being de-cored, so will
-issue deprecation warnings. These can safely be ignored for the purposes
-of this test case. Object::Accessor from CPAN does not have these warnings.
+Test is skipped if Validation::Class 7.900017 is not available.
 
 =head1 AUTHOR
 
@@ -35,7 +29,7 @@ use warnings;
 use lib qw( ./lib ./t/lib ../inc ./inc );
 
 use Test::More;
-use Test::Requires { "Validation::Class" => "7.900000" };
+use Test::Requires { "Validation::Class" => "7.900017" };
 use Test::TypeTiny;
 
 use Types::TypeTiny qw( to_TypeTiny );
