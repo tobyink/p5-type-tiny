@@ -43,8 +43,8 @@ constraints, then an exception will be thrown.
    
    sub set_name
    {
-      $Invocant->(my $self = shift);
-      Str->(my $name = shift);
+      my $self = $Invocant->(shift);
+      my $name = Str->(shift);
       
       ...;
    }
@@ -74,8 +74,8 @@ functions:
    
    sub set_name
    {
-      $Invocant->assert_valid(my $self = shift);
-      assert_Str(my $name = shift);
+      my $self = $Invocant->assert_return(shift);
+      my $name = assert_Str(shift);
       
       ...;
    }
