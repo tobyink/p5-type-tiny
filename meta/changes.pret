@@ -389,3 +389,13 @@
 		item "Type::Exception::Compilation."^^Addition;
 		item "Allow the slurpy tail of a Types::Standard::Tuple to be a treated as a hashref rather than an arrayref."^^Change;
 	].
+
+`Type-Tiny 0.005_05 cpan:TOBYINK`
+	issued  2013-05-24;
+	changeset [
+		dcs:versus `Type-Tiny 0.005_04 cpan:TOBYINK`;
+		item "Fix warnings under Perl 5.18."^^Change;
+		item "Suggest newer version of Validation::Class."^^Update;
+		item "Type::Tiny now has an assert_return method, which is used in most places in preference to assert_valid."^^Addition;
+		item "Removed Type::Registry from the release; it will return at a later date."^^Removal;
+	].
