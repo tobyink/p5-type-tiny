@@ -51,13 +51,19 @@ is(DemoLib::Integer."", "Integer", "DemoLib::Integer has correct stringification
 is(
 	exception { Integer->(5) },
 	undef,
-	"coderef overload works (value that should pass)",
+	"coderef overload (with value that should pass type constraint) does not die",
+);
+
+is(
+	Integer->(5),
+	5,
+	"coderef overload returns correct value",
 );
 
 like(
 	exception { Integer->(5.5) },
 	qr{^Value "5\.5" did not pass type constraint "Integer"},
-	"coderef overload works (value that should throw)",
+	"coderef overload (value that should fail type constraint) dies",
 );
 
 use DemoLib String => {

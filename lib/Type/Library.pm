@@ -224,7 +224,7 @@ sub add_type
 	*{"$class\::$name"}        = $class->_mksub($type);
 	*{"$class\::is_$name"}     = _subname "is_"    .$type->qualified_name, $type->compiled_check;
 	*{"$class\::to_$name"}     = _subname "to_"    .$type->qualified_name, sub ($) { $type->coerce($_[0]) };
-	*{"$class\::assert_$name"} = _subname "assert_".$type->qualified_name, sub ($) { $type->assert_valid($_[0]) };
+	*{"$class\::assert_$name"} = _subname "assert_".$type->qualified_name, $type->_overload_coderef;
 	
 	return $type;
 }
@@ -377,7 +377,7 @@ Returns true iff $value passes the type constraint.
 
 =item C<< assert_Foo($value) >>
 
-Returns true iff $value passes the type constraint. Dies otherwise.
+Returns $value iff $value passes the type constraint. Dies otherwise.
 
 =item C<< to_Foo($value) >>
 
@@ -464,7 +464,7 @@ assume that the C<Types::Mine> library defines types C<Number> and C<String>.
    use Types::Mine qw( :is );
    
    # Exports a sub "assert_String" so that "assert_String($foo)" is
-   # equivalent to "String->assert_valid($foo)".
+   # equivalent to "String->assert_return($foo)".
    #
    use Types::Mine qw( assert_String );
    

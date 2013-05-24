@@ -59,7 +59,7 @@ sub _overload_coderef
 	}
 	else
 	{
-		$self->{_overload_coderef} ||= sub { $self->assert_valid(@_) };
+		$self->{_overload_coderef} ||= sub { $self->assert_return(@_) };
 	}
 	
 	$self->{_overload_coderef};
@@ -407,6 +407,16 @@ sub assert_valid
 	$self->_failed_check("$self", $_);
 }
 
+sub assert_return
+{
+	my $self = shift;
+	
+	return $_[0] if $self->compiled_check->(@_);
+	
+	local $_ = $_[0];
+	$self->_failed_check("$self", $_);
+}
+
 sub can_be_inlined
 {
 	my $self = shift;
@@ -436,11 +446,12 @@ sub inline_assert
 	my $self = shift;
 	my $varname = $_[0];
 	my $code = sprintf(
-		q[Type::Tiny::_failed_check(%d, %s, %s) unless %s;],
+		q[%s ? %s : Type::Tiny::_failed_check(%d, %s, %s);],
+		$self->inline_check(@_),
 		$self->{uniq},
 		B::perlstring("$self"),
 		$varname,
-		$self->inline_check(@_),
+		$varname,
 	);
 	return $code;
 }
@@ -1046,6 +1057,15 @@ constraint.
 Yes, that's three very similar methods. Blame L<Moose::Meta::TypeConstraint>
 whose API I'm attempting to emulate. :-)
 
+=item C<< assert_return($value) >>
+
+Like C<< assert_valid($value) >> but returns the value if it passes the type
+constraint.
+
+This seems a more useful behaviour than C<< assert_valid($value) >>. I would
+have just changed C<< assert_valid($value) >> to do this, except that there
+are edge cases where it could break Moose compatibility.
+
 =item C<< get_message($value) >>
 
 Returns the error message for the value; even if the value passes the type
@@ -1159,7 +1179,7 @@ Boolification is overloaded to always return true.
 
 =item *
 
-Coderefification is overloaded to call C<assert_value>.
+Coderefification is overloaded to call C<assert_return>.
 
 =item *
 
