@@ -399,3 +399,11 @@
 		item "Type::Tiny now has an assert_return method, which is used in most places in preference to assert_valid."^^Addition;
 		item "Removed Type::Registry from the release; it will return at a later date."^^Removal;
 	].
+
+`Type-Tiny 0.005_06 cpan:TOBYINK`
+	issued  2013-05-26;
+	changeset [
+		dcs:versus `Type-Tiny 0.005_05 cpan:TOBYINK`;
+		item "Fold Types::Standard::DeepCoercion into Types::Standard."^^Change;
+		item "Fix StrMatch to properly support regexps containing slashes."^^Bugfix;
+	].
