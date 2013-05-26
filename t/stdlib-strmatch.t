@@ -62,4 +62,8 @@ should_pass("1", $Boolean);
 should_fail("True ", $Boolean);
 should_fail("11", $Boolean);
 
+my $SecureUrl = declare SecureUrl => as StrMatch[qr{^https://}];
+should_pass("https://www.google.com/", $SecureUrl);
+should_fail("http://www.google.com/", $SecureUrl);
+
 done_testing;

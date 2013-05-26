@@ -749,6 +749,7 @@ declare "Overload",
 		};
 	};
 
+our %_StrMatch;
 declare "StrMatch",
 	as "Str",
 	constraint_generator => sub
@@ -783,7 +784,7 @@ declare "StrMatch",
 		require B;
 		my ($regexp, $checker) = @_;
 		my $regexp_string = "$regexp";
-		$regexp_string =~ s/\\\//\\\\\//g; # toothpicks
+		$_StrMatch{$regexp_string} = $regexp;
 		if ($checker)
 		{
 			return unless $checker->can_be_inlined;
@@ -791,8 +792,8 @@ declare "StrMatch",
 			{
 				my $v = $_[1];
 				sprintf
-					"!ref($v) and do { my \$m = [$v =~ /%s/]; %s }",
-					$regexp_string,
+					"!ref($v) and do { my \$m = [$v =~ \$Types::Standard::_StrMatch{%s}]; %s }",
+					B::perlstring($regexp_string),
 					$checker->inline_check('$m'),
 				;
 			};
@@ -803,8 +804,8 @@ declare "StrMatch",
 			{
 				my $v = $_[1];
 				sprintf
-					"!ref($v) and $v =~ /%s/",
-					$regexp_string,
+					"!ref($v) and $v =~ \$Types::Standard::_StrMatch{%s}",
+					B::perlstring($regexp_string),
 				;
 			};
 		}
