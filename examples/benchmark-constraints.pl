@@ -4,7 +4,7 @@
 
 =head1 PURPOSE
 
-Compares the speed of the constructor in four equivalent classes built
+Compares the speed of the constructor in six equivalent classes built
 using different tools:
 
 =over
@@ -25,25 +25,37 @@ L<Moose> with L<Moose> type constraints. Class is made immutable.
 
 L<Moose> with L<Type::Tiny> type constraints. Class is made immutable.
 
-	=back
+=item B<Mouse>
+
+L<Mouse> with L<Mouse> type constraints. Class is made immutable.
+B<< XS is switched off using C<MOUSE_PUREPERL> environment variable. >>
+
+=item B<Mouse_TT>
+
+L<Mouse> with L<Type::Tiny> type constraints. Class is made immutable.
+B<< XS is switched off using C<MOUSE_PUREPERL> environment variable. >>
+
+=back
 
 =head1 RESULTS
 
-For both Moose and Moo, L<Type::Tiny> type constraints are clearly faster
+In all cases, L<Type::Tiny> type constraints are clearly faster
 than the conventional approach:
 
-               Rate Moo_MXTML    Moo_TT     Moose  Moose_TT
-   Moo_MXTML 3082/s        --      -49%      -52%      -63%
-   Moo_TT    6053/s       96%        --       -6%      -27%
-   Moose     6458/s      110%        7%        --      -22%
-   Moose_TT  8295/s      169%       37%       28%        --
+             Rate Moo_MXTML     Mouse     Moose    Moo_TT  Mouse_TT  Moose_TT
+ Moo_MXTML 2999/s        --      -32%      -52%      -56%      -68%      -69%
+ Mouse     4436/s       48%        --      -29%      -34%      -52%      -54%
+ Moose     6279/s      109%       42%        --       -7%      -33%      -35%
+ Moo_TT    6762/s      125%       52%        8%        --      -27%      -30%
+ Mouse_TT  9309/s      210%      110%       48%       38%        --       -4%
+ Moose_TT  9686/s      223%      118%       54%       43%        4%        --
 
-(Tested versions: Type::Tiny 0.003_16, Moose 2.0604, Moo 1.002000, and
-MooX::Types::MooseLike 0.16.)
+(Tested versions: Type::Tiny 0.005_06, Moose 2.0604, Moo 1.002000,
+MooX::Types::MooseLike 0.16, and Mouse 1.11)
 
 =head1 DEPENDENCIES
 
-L<Moo>, L<MooX::Types::MooseLike::Base>, L<Moose>.
+L<Moo>, L<MooX::Types::MooseLike::Base>, L<Moose>, L<Mouse>.
 
 =head1 AUTHOR
 
@@ -61,6 +73,8 @@ the same terms as the Perl 5 programming language system itself.
 use strict;
 use warnings;
 use Benchmark ':all';
+
+BEGIN { $ENV{MOUSE_PUREPERL} = 1 };
 
 {
 	package Local::Moo_MXTML;
@@ -95,6 +109,23 @@ use Benchmark ':all';
 	__PACKAGE__->meta->make_immutable;
 }
 
+{
+	package Local::Mouse;
+	use Mouse;
+	has attr1 => (is  => "ro", isa => "ArrayRef[Int]");
+	has attr2 => (is  => "ro", isa => "HashRef[ArrayRef[Int]]");
+	__PACKAGE__->meta->make_immutable;
+}
+
+{
+	package Local::Mouse_TT;
+	use Mouse;
+	use Types::Standard qw(HashRef ArrayRef Int);
+	has attr1 => (is  => "ro", isa => ArrayRef[Int]);
+	has attr2 => (is  => "ro", isa => HashRef[ArrayRef[Int]]);
+	__PACKAGE__->meta->make_immutable;
+}
+
 our %data = (
 	attr1  => [1..10],
 	attr2  => {
@@ -107,6 +138,8 @@ our %data = (
 cmpthese(-1, {
 	Moo_MXTML => q{ Local::Moo_MXTML->new(%::data) },
 	Moose     => q{ Local::Moose->new(%::data) },
+	Mouse     => q{ Local::Mouse->new(%::data) },
 	Moo_TT    => q{ Local::Moo_TT->new(%::data) },
 	Moose_TT  => q{ Local::Moose_TT->new(%::data) },
+	Mouse_TT  => q{ Local::Moose_TT->new(%::data) },
 });
