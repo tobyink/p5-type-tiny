@@ -89,4 +89,12 @@ like(
 	);
 };
 
+my $opthash = Exporter::TypeTiny::mkopt_hash([ foo => [], "bar" ]);
+
+is_deeply(
+	$opthash,
+	{ foo => [], bar => undef },
+	'mkopt_hash',
+) or diag explain($opthash);
+
 done_testing;

@@ -176,7 +176,7 @@ sub mkopt
 sub mkopt_hash
 {
 	my $in  = shift or return;
-	my %out = map @$_, mkopt($in);
+	my %out = map +($_->[0] => $_->[1]), @{ mkopt($in) };
 	\%out;
 }
 
