@@ -423,3 +423,10 @@
 		item "Use JSON::PP instead of JSON in test cases, because JSON::PP is a core module since Perl 5.14."^^Update;
 		item "Rearrange test cases; add 00-begin.t."^^Packaging;
 	].
+
+`Type-Tiny 0.006 cpan:TOBYINK`
+	issued  2013-05-28;
+	changeset [
+		dcs:versus `Type-Tiny 0.005_08 cpan:TOBYINK`;
+		item "Exporter::TypeTiny::mkopt_hash now works."^^Packaging;
+	].
