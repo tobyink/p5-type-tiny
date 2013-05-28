@@ -6,6 +6,11 @@
 
 Checks Type::Coercion can be inlined.
 
+=head1 DEPENDENCIES
+
+Requires JSON::PP 2.27105. Test is skipped if this module is not present.
+Note that this is bundled with Perl v5.13.11 and above.
+
 =head1 AUTHOR
 
 Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
@@ -23,7 +28,7 @@ use strict;
 use warnings;
 use lib qw( ./lib ./t/lib ../inc ./inc );
 
-use Test::Requires { JSON => 2.01 };
+use Test::Requires { "JSON::PP" => "2.27105" };
 
 use Test::More;
 use Test::Fatal;
@@ -31,7 +36,7 @@ use Test::Fatal;
 {
 	package T;
 	
-	require JSON;
+	require JSON::PP;
 	
 	use Type::Library -base, -declare => qw/ JsonHash JsonArray /;
 	use Type::Utils;
@@ -41,10 +46,10 @@ use Test::Fatal;
 	declare JsonArray, as ArrayRef;
 	
 	coerce JsonHash,
-		from Str, 'JSON::from_json($_)';
+		from Str, 'JSON::PP::decode_json($_)';
 	
 	coerce ArrayRef,
-		from Str, 'JSON::from_json($_)';
+		from Str, 'JSON::PP::decode_json($_)';
 }
 
 my $code = T::ArrayRef->coercion->inline_coercion('$::foo');
