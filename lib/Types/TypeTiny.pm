@@ -77,6 +77,9 @@ sub to_TypeTiny
 {
 	my $t = $_[0];
 	
+	return $t
+		if (blessed($t) and $t->isa("Type::Tiny"));
+	
 	goto \&_TypeTinyFromMoose
 		if (blessed($t) and ref($t)->isa("Moose::Meta::TypeConstraint"));
 	
@@ -85,6 +88,9 @@ sub to_TypeTiny
 	
 	goto \&_TypeTinyFromValidationClass
 		if (blessed($t) and ref($t)->isa("Validation::Class::Simple") || ref($t)->isa("Validation::Class"));
+	
+#	goto \&_TypeTinyFromCodeRef
+#		if (ref($t) and ref($t) eq q(CODE));
 	
 	$t;
 }
@@ -191,6 +197,23 @@ sub _TypeTinyFromValidationClass
 	return $new;
 }
 
+sub _TypeTinyFromCodeRef
+{
+	my $t = $_[0];
+	
+	require Type::Tiny;
+	return "Type::Tiny"->new(
+		constraint => sub {
+			return !!eval { $t->($_) };
+		},
+		message => sub {
+			local $@;
+			eval { $t->($_); 1 } or do { chomp $@; return $@ if $@ };
+			return sprintf('%s did not pass type constraint', Type::Tiny::_dd($_));
+		},
+	);
+}
+
 1;
 
 __END__
@@ -240,6 +263,15 @@ Validation::Class objects deliberately I<ignore> field filters when they
 do constraint checking (and go to great lengths to do so); using filters for
 coercion only. (The behaviour of C<coerce> if we don't do that is just too
 weird!)
+
+=begin not_supported_yet
+
+Can also handle coderefs (but not blessed coderefs or objects overloading
+C<< &{} >>). Coderefs are expected to return true iff C<< $_ >> passes the
+constraint. If C<< $_ >> fails the type constraint, they may either return
+false, or die with a helpful error message.
+
+=end not_supported_yet
 
 =back
 

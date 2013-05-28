@@ -28,6 +28,7 @@ use warnings;
 use lib qw( ./lib ./t/lib ../inc ./inc );
 
 use Test::More;
+use Test::TypeTiny -all;
 
 use Types::Standard -types;
 
@@ -37,5 +38,36 @@ my $p3 = ArrayRef[Int->create_child_type()];
 
 is($p1->{uniq}, $p2->{uniq}, "Avoid duplicating parameterized types");
 isnt($p1->{uniq}, $p3->{uniq}, "... except when necessary!");
+
+=pod
+
+=begin not_yet_implemented
+
+my $p4 = ArrayRef[sub { $_ eq "Bob" }];
+my $p5 = ArrayRef[sub { $_ eq "Bob" or die "not Bob" }];
+
+should_pass(["Bob"], $p4);
+should_pass(["Bob", "Bob"], $p4);
+should_fail(["Bob", "Bob", "Suzie"], $p4);
+
+should_pass(["Bob"], $p5);
+should_pass(["Bob", "Bob"], $p5);
+should_fail(["Bob", "Bob", "Suzie"], $p5);
+
+is(
+	$p4->parameters->[0]->validate("Suzie"),
+	'Value "Suzie" did not pass type constraint',
+	'error message when a coderef returns false',
+);
+
+like(
+	$p5->parameters->[0]->validate("Suzie"),
+	qr{^not Bob},
+	'error message when a coderef dies',
+);
+
+=end not_yet_implemented
+
+=cut
 
 done_testing;
