@@ -407,3 +407,11 @@
 		item "Fold Types::Standard::DeepCoercion into Types::Standard."^^Change;
 		item "Fix StrMatch to properly support regexps containing slashes."^^Bugfix;
 	].
+
+`Type-Tiny 0.005_07 cpan:TOBYINK`
+	issued  2013-05-26;
+	changeset [
+		dcs:versus `Type-Tiny 0.005_06 cpan:TOBYINK`;
+		item "Add pure-Perl Mouse to examples/benchmark-constraints.pl."^^Addition;
+		item "Assertions using the assert_return pattern were triggering FATAL warnings when inlined with Sub::Quote. Inlined assertions are now prefixed with 'no warnings \"void\";'."^^Bugfix;
+	].
