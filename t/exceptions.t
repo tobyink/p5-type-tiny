@@ -28,6 +28,8 @@ use Test::Fatal;
 
 use Types::Standard slurpy => -types;
 
+my $supernum = Types::Standard::STRICTNUM ? "StrictNum" : "LaxNum";
+
 my $v = [];
 my $e = exception { Int->create_child_type->assert_valid($v) };
 
@@ -57,7 +59,8 @@ is_deeply(
 	[
 		'"__ANON__" is a subtype of "Int"',
 		'"Int" is a subtype of "Num"',
-		'"Num" is a subtype of "Str"',
+		'"Num" is a subtype of "'.$supernum.'"',
+		'"'.$supernum.'" is a subtype of "Str"',
 		'"Str" is a subtype of "Value"',
 		'[] did not pass type constraint "Value"',
 		'"Value" is defined as: (defined($_) and not ref($_))',
@@ -71,7 +74,8 @@ is_deeply(
 		'[1,2,[3]] did not pass type constraint "ArrayRef[Int]"',
 		'"ArrayRef[Int]" constrains each value in the array with "Int"',
 		'"Int" is a subtype of "Num"',
-		'"Num" is a subtype of "Str"',
+		'"Num" is a subtype of "'.$supernum.'"',
+		'"'.$supernum.'" is a subtype of "Str"',
 		'"Str" is a subtype of "Value"',
 		'[3] did not pass type constraint "Value" (in $_->[2])',
 		'"Value" is defined as: (defined($_) and not ref($_))',
@@ -108,7 +112,8 @@ is_deeply(
 		'[] is defined',
 		'"Maybe[Int]" constrains the value with "Int" if it is defined',
 		'"Int" is a subtype of "Num"',
-		'"Num" is a subtype of "Str"',
+		'"Num" is a subtype of "'.$supernum.'"',
+		'"'.$supernum.'" is a subtype of "Str"',
 		'"Str" is a subtype of "Value"',
 		'[] did not pass type constraint "Value" (in $_->{"c"})',
 		'"Value" is defined as: (defined($_) and not ref($_))',

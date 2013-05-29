@@ -157,4 +157,24 @@ like(
 	qq{Ref[{}] is not a valid type constraint},
 );
 
+ok(
+	!!Num->check("Inf") == !Types::Standard::STRICTNUM,
+	"'Inf' passes Num unless Types::Standard::STRICTNUM",
+);
+
+ok(
+	!!Num->check("-Inf") == !Types::Standard::STRICTNUM,
+	"'-Inf' passes Num unless Types::Standard::STRICTNUM",
+);
+
+ok(
+	!!Num->check("Nan") == !Types::Standard::STRICTNUM,
+	"'Nan' passes Num unless Types::Standard::STRICTNUM",
+);
+
+ok(
+	!!Num->check("0.") == !Types::Standard::STRICTNUM,
+	"'0.' passes Num unless Types::Standard::STRICTNUM",
+);
+
 done_testing;

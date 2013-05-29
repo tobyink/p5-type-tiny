@@ -32,6 +32,8 @@ sub _croak ($;@) { require Type::Exception; goto \&Type::Exception::croak }
 
 no warnings;
 
+BEGIN { *STRICTNUM = $ENV{PERL_TYPES_STANDARD_STRICTNUM} ? sub(){!!1} : sub(){!!0} };
+
 declare "Any",
 	_is_core => 1,
 	inline_as { "!!1" };
@@ -72,11 +74,36 @@ declare "Str",
 		"defined($_) and do { ref(\\$_) eq 'SCALAR' or ref(\\(my \$val = $_)) eq 'SCALAR' }"
 	};
 
-declare "Num",
-	_is_core => 1,
+declare "LaxNum",
 	as "Str",
 	where { looks_like_number $_ },
 	inline_as { "!ref($_) && Scalar::Util::looks_like_number($_)" };
+
+declare "StrictNum",
+	as "Str",
+	where {
+		my $val = $_;
+		($val =~ /\A[+-]?[0-9]+\z/) ||
+		( $val =~ /\A(?:[+-]?)                #matches optional +- in the beginning
+		(?=[0-9]|\.[0-9])                     #matches previous +- only if there is something like 3 or .3
+		[0-9]*                                #matches 0-9 zero or more times
+		(?:\.[0-9]+)?                         #matches optional .89 or nothing
+		(?:[Ee](?:[+-]?[0-9]+))?              #matches E1 or e1 or e-1 or e+1 etc
+		\z/x );
+	},
+	inline_as {
+		'my $val = '.$_[1].';'.
+		Value()->inline_check('$val')
+		.' && ( $val =~ /\A[+-]?[0-9]+\z/ || '
+		. '$val =~ /\A(?:[+-]?)              # matches optional +- in the beginning
+			(?=[0-9]|\.[0-9])                 # matches previous +- only if there is something like 3 or .3
+			[0-9]*                            # matches 0-9 zero or more times
+			(?:\.[0-9]+)?                     # matches optional .89 or nothing
+			(?:[Ee](?:[+-]?[0-9]+))?          # matches E1 or e1 or e-1 or e+1 etc
+		\z/x ); '
+	};
+
+declare "Num", _is_core => 1, as(STRICTNUM ? "StrictNum" : "LaxNum");
 
 declare "Int",
 	_is_core => 1,
@@ -1534,6 +1561,25 @@ You can optionally provide a type constraint for the array of subexpressions:
 
 An arrayref of arrayrefs in the style of L<Data::OptList> output.
 
+=item C<< LaxNum >>, C<< StrictNum >>
+
+In Moose 2.09, the C<Num> type constraint implementation was changed from
+being a wrapper around L<Scalar::Util>'s C<looks_like_number> function to
+a stricter regexp (which disallows things like "-Inf" and "Nan").
+
+Types::Standard provides I<both> implementations. C<LaxNum> is measurably
+faster.
+
+The C<Num> type constraint is currently an alias for C<LaxNum> unless you
+set the C<PERL_TYPES_STANDARD_STRICTNUM> environment variable to true before
+loading Types::Standard, in which case it becomes an alias for C<StrictNum>.
+The constant C<< Types::Standard::STRICTNUM >> can be used to check if
+C<Num> is being strict.
+
+Most people should probably use C<Num> or C<StrictNum>. Don't explicitly
+use C<LaxNum> unless you specifically need an attribute which will accept
+things like "Inf".
+
 =back
 
 =head2 Coercions
@@ -1582,6 +1628,17 @@ Join an array of strings with a delimiter.
       isa    => $FileLines,
       coerce => 1,
    );
+
+=back
+
+=head2 Constants
+
+=over
+
+=item C<< Types::Standard::STRICTNUM >>
+
+Indicates whether C<Num> is an alias for C<StrictNum>. (It is usually an
+alias for C<LaxNum>.)
 
 =back
 

@@ -29,17 +29,17 @@ sub diag_version
 	my ($module, $version) = @_;
 	$version = eval "require $module; $module->VERSION" unless defined $version;
 	
-	return diag sprintf('  %-25s    undef', $module) unless defined $version;
+	return diag sprintf('  %-30s    undef', $module) unless defined $version;
 	
 	my ($major, $rest) = split /\./, $version;
-	return diag sprintf('  %-25s % 4d.%s', $module, $major, $rest);
+	return diag sprintf('  %-30s % 4d.%s', $module, $major, $rest);
 }
 
 sub diag_env
 {
 	require B;
 	my $var = shift;
-	return diag sprintf('  $%-25s   %s', $var, exists $ENV{$var} ? B::perlstring($ENV{$var}) : "undef");
+	return diag sprintf('  $%-30s   %s', $var, exists $ENV{$var} ? B::perlstring($ENV{$var}) : "undef");
 }
 
 while (<DATA>)
@@ -98,6 +98,7 @@ $EXTENDED_TESTING
 $AUTHOR_TESTING
 $RELEASE_TESTING
 
+$PERL_TYPES_STANDARD_STRICTNUM
 $MOO_XS_DISABLE
 $MOOSE_ERROR_STYLE
 $MOUSE_XS
