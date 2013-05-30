@@ -430,3 +430,10 @@
 		dcs:versus `Type-Tiny 0.005_08 cpan:TOBYINK`;
 		item "Exporter::TypeTiny::mkopt_hash now works."^^Packaging;
 	].
+
+`Type-Tiny 0.007_01 cpan:TOBYINK`
+	issued  2013-05-31;
+	changeset [
+		dcs:versus `Type-Tiny 0.006 cpan:TOBYINK`;
+		item "Fix $VERSION defined in Type::Library."^^Bugfix;
+	].
