@@ -11,6 +11,7 @@ BEGIN {
 
 use Exporter::TypeTiny qw( mkopt _croak );
 use Scalar::Util qw( refaddr );
+use Type::Parser qw( eval_type );
 use Types::TypeTiny qw( ArrayLike );
 
 use base "Exporter::TypeTiny";
@@ -96,122 +97,33 @@ sub alias_type
 	$self;
 }
 
-# A bunch of stuff stolen from Moose::Util::TypeConstraints...
+sub simple_lookup
 {
-	no warnings;
+	my $self = shift;
 	
-	my $valid_chars = qr{[\w:\.]};
-	my $type_atom   = qr{ (?>$valid_chars+) }x;
-	my $ws          = qr{ (?>\s*) }x;
-	my $op_union    = qr{ $ws \| $ws }x;
-	my ($type, $type_capture_parts, $type_with_parameter, $union, $any);
-	if ($] >= 5.010)
+	my ($tc) = @_;
+	$tc =~ s/(^\s+|\s+$)//g;
+	
+	if (exists $self->{$tc})
 	{
-		my $type_pattern    = q{  (?&type_atom)  (?: \[ (?&ws)  (?&any)  (?&ws) \] )? };
-		my $type_capture_parts_pattern   = q{ ((?&type_atom)) (?: \[ (?&ws) ((?&any)) (?&ws) \] )? };
-		my $type_with_parameter_pattern  = q{  (?&type_atom)      \[ (?&ws)  (?&any)  (?&ws) \]    };
-		my $union_pattern   = q{ (?&type) (?> (?: (?&op_union) (?&type) )+ ) };
-		my $any_pattern     = q{ (?&type) | (?&union) };
-		
-		my $defines = qr{(?(DEFINE)
-			(?<valid_chars>         $valid_chars)
-			(?<type_atom>           $type_atom)
-			(?<ws>                  $ws)
-			(?<op_union>            $op_union)
-			(?<type>                $type_pattern)
-			(?<type_capture_parts>  $type_capture_parts_pattern)
-			(?<type_with_parameter> $type_with_parameter_pattern)
-			(?<union>               $union_pattern)
-			(?<any>                 $any_pattern)
-		)}x;
-		
-		$type                = qr{ $type_pattern                $defines }x;
-		$type_capture_parts  = qr{ $type_capture_parts_pattern  $defines }x;
-		$type_with_parameter = qr{ $type_with_parameter_pattern $defines }x;
-		$union               = qr{ $union_pattern               $defines }x;
-		$any                 = qr{ $any_pattern                 $defines }x;
-	}
-	else
-	{
-		use re 'eval';
-		
-		$type                = qr{  $type_atom  (?: \[ $ws  (??{$any})  $ws \] )? }x;
-		$type_capture_parts  = qr{ ($type_atom) (?: \[ $ws ((??{$any})) $ws \] )? }x;
-		$type_with_parameter = qr{  $type_atom      \[ $ws  (??{$any})  $ws \]    }x;
-		$union               = qr{ $type (?> (?: $op_union $type )+ ) }x;
-		$any                 = qr{ $type | $union }x;
+		return $self->{$tc};
 	}
 	
-	sub _parse_parameterized_type_constraint {
-		{ no warnings 'void'; $any; }  # force capture of interpolated lexical
-		my $self = shift;
-		$_[0] =~ m{ $type_capture_parts }x;
-		return ( $1, $2 );
-	}
+	return;
+}
+
+sub lookup
+{
+	my $self = shift;
 	
-	sub _detect_parameterized_type_constraint {
-		{ no warnings 'void'; $any; }  # force capture of interpolated lexical
-		my $self = shift;
-		$_[0] =~ m{ ^ $type_with_parameter $ }x;
-	}
-	
-	sub _parse_type_constraint_union {
-		{ no warnings 'void'; $any; }  # force capture of interpolated lexical
-		my $self  = shift;
-		my $given = shift;
-		my @rv;
-		while ( $given =~ m{ \G (?: $op_union )? ($type) }gcx ) {
-			push @rv => $1;
-		}
-		( pos($given) eq length($given) )
-		|| __PACKAGE__->_throw_error( "'$given' didn't parse (parse-pos="
-			. pos($given)
-			. " and str-length="
-			. length($given)
-			. ")" );
-		@rv;
-	}
-	
-	sub _detect_type_constraint_union {
-		{ no warnings 'void'; $any; }  # force capture of interpolated lexical
-		my $self = shift;
-		$_[0] =~ m{^ $type $op_union $type ( $op_union .* )? $}x;
-	}
-	
-	sub lookup
-	{
-		my $self = shift;
-		
-		my ($tc) = @_;
-		$tc =~ s/(^\s+|\s+$)//g;
-		
-		if (exists $self->{$tc})
-		{
-			return $self->{$tc};
-		}
-		
-		elsif ($self->_detect_type_constraint_union($tc))
-		{
-			require Type::Utils;
-			my @tc = grep defined, map $self->lookup($_), $self->_parse_type_constraint_union($tc);
-			return Type::Utils::union(\@tc);
-		}
-		
-		elsif ($self->_detect_parameterized_type_constraint($tc))
-		{
-			my ($outer, @inner) = map $self->lookup($_)||$_, $self->_parse_parameterized_type_constraint($tc);
-			return $outer->parameterize(@inner);
-		}
-		
-		return;
-	}
+	$self->simple_lookup(@_) or eval_type($_[0], $self);
 }
 
 sub AUTOLOAD
 {
 	my $self = shift;
 	my ($method) = (our $AUTOLOAD =~ /(\w+)$/);
-	my $type = $self->lookup($method);
+	my $type = $self->simple_lookup($method);
 	return $type if $type;
 	_croak(q[Can't locate object method "%s" via package "%s"], $method, ref($self));
 }
@@ -328,18 +240,34 @@ Otherwise, imports all types from the library.
 
 Create an alias for an existing type.
 
-=item C<< lookup($name) >>
+=item C<< simple_lookup($name) >>
 
-Look up a type in the registry by name. Supports a limited level of
-DSL for unions and parameterized types.
-
-   t->lookup("Int|ArrayRef[Int]")
+Look up a type in the registry by name. 
 
 Returns undef if not found.
 
+=item C<< lookup($name) >>
+
+Look up by name, with a DSL.
+
+   t->lookup("Int|ArrayRef[Int]")
+
+The DSL can be summed up as:
+
+   X               type from this registry
+   My::Lib::X      type from a type library
+   ~X              complementary type
+   X | Y           union
+   X & Y           intersection
+   X[...]          parameterized type
+   slurpy X        slurpy type
+   Foo::Bar::      class type
+
+Croaks if not found.
+
 =item C<< AUTOLOAD >>
 
-Overloaded to call C<lookup>, but croaks if not found.
+Overloaded to call C<lookup>.
 
    $registry->Str;  # like $registry->lookup("Str")
 

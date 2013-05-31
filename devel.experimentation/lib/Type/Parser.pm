@@ -20,6 +20,135 @@ sub NOT       () { "NOT" };
 use Carp qw(croak confess);
 use Text::Balanced qw(extract_quotelike);
 
+our @EXPORT_OK = qw( parse eval_type );
+use base "Exporter::TypeTiny";
+
+Evaluate: {
+	
+	sub eval_type
+	{
+		my ($str, $reg) = @_;
+		my $parsed = parse($str);
+		return _eval_type($parsed, $reg);
+	}
+	
+	sub _eval_type
+	{
+		my ($node, $reg) = @_;
+		
+		$node = simplify_expression($node);
+		
+		if ($node->{type} eq "list")
+		{
+			return map _eval_type($_, $reg), @{$node->{list}};
+		}
+		
+		if ($node->{type} eq "union")
+		{
+			require Type::Tiny::Union;
+			return "Type::Tiny::Union"->new(
+				type_constraints => [ map _eval_type($_, $reg), @{$node->{union}} ],
+			);
+		}
+		
+		if ($node->{type} eq "intersect")
+		{
+			require Type::Tiny::Intersection;
+			return "Type::Tiny::Intersection"->new(
+				type_constraints => [ map _eval_type($_, $reg), @{$node->{intersect}} ],
+			);
+		}
+		
+		if ($node->{type} eq "slurpy")
+		{
+			return +{ slurpy => _eval_type($node->{of}, $reg) };
+		}
+		
+		if ($node->{type} eq "complement")
+		{
+			return _eval_type($node->{of}, $reg)->complementary_type;
+		}
+		
+		if ($node->{type} eq "parameterized")
+		{
+			return _eval_type($node->{base}, $reg)->parameterize(_eval_type($node->{params}, $reg));
+		}
+		
+		if ($node->{type} eq "primary" and $node->{token}->type eq CLASS)
+		{
+			my $class = substr($node->{token}->spelling, 0, length($node->{token}->spelling) - 2);
+			require Type::Tiny::Class;
+			return "Type::Tiny::Class"->new(class => $class);
+		}
+		
+		if ($node->{type} eq "primary" and $node->{token}->type eq QUOTELIKE)
+		{
+			return eval($node->{token}->spelling);
+		}
+		
+		if ($node->{type} eq "primary" and $node->{token}->type eq STRING)
+		{
+			return $node->{token}->spelling;
+		}
+		
+		if ($node->{type} eq "primary" and $node->{token}->type eq TYPE)
+		{
+			my $t = $node->{token}->spelling;
+			if ($t =~ /^(.+)::(\w+)$/)
+			{
+				my $library = $1; $t = $2;
+				eval "require $library;";
+				return $library->get_type($t);
+			}
+			return $reg->simple_lookup($t);
+		}
+	}
+	
+	sub simplify_expression
+	{
+		my $expr = shift;
+		
+		if ($expr->{type} eq "expression" and $expr->{op}[0] eq COMMA)
+		{
+			return simplify("list", COMMA, $expr);
+		}
+		
+		if ($expr->{type} eq "expression" and $expr->{op}[0] eq UNION)
+		{
+			return simplify("union", UNION, $expr);
+		}
+		
+		if ($expr->{type} eq "expression" and $expr->{op}[0] eq INTERSECT)
+		{
+			return simplify("intersect", INTERSECT, $expr);
+		}
+		
+		return $expr;
+	}
+	
+	sub simplify
+	{
+		my $type = shift;
+		my $op   = shift;
+		
+		my @list;
+		for my $expr ($_[0]{lhs}, $_[0]{rhs})
+		{
+			if ($expr->{type} eq "expression" and $expr->{op}[0] eq $op)
+			{
+				my $simple = simplify($type, $op, $expr);
+				push @list, @{ $simple->{$type} };
+			}
+			else
+			{
+				push @list, $expr;
+			}
+		}
+		
+		return { type => $type, $type => \@list };
+	}
+}
+
 Parsing: {
 	our @tokens;
 	
@@ -38,7 +167,7 @@ Parsing: {
 			shift @tokens;
 			return {
 				type  => "complement",
-				of    => { type => "primary", token => parse_primary() },
+				of    => parse_primary(),
 			};
 		}
 		
@@ -47,7 +176,7 @@ Parsing: {
 			shift @tokens;
 			return {
 				type  => "slurpy",
-				of    => { type => "primary", token => parse_primary() },
+				of    => parse_primary(),
 			};
 		}
 		
@@ -107,50 +236,6 @@ Parsing: {
 	}
 	
 	sub parse_expression
-	{
-		my $expr = parse_expression_0();
-		
-		if ($expr->{type} eq "expression" and $expr->{op}[0] eq COMMA)
-		{
-			return simplify("list", COMMA, $expr);
-		}
-		
-		if ($expr->{type} eq "expression" and $expr->{op}[0] eq UNION)
-		{
-			return simplify("union", UNION, $expr);
-		}
-		
-		if ($expr->{type} eq "expression" and $expr->{op}[0] eq INTERSECT)
-		{
-			return simplify("intersect", INTERSECT, $expr);
-		}
-		
-		return $expr;
-	}
-	
-	sub simplify
-	{
-		my $type = shift;
-		my $op   = shift;
-		
-		my @list;
-		for my $expr ($_[0]{lhs}, $_[0]{rhs})
-		{
-			if ($expr->{type} eq "expression" and $expr->{op}[0] eq $op)
-			{
-				my $simple = simplify($type, $op, $expr);
-				push @list, @{ $simple->{$type} };
-			}
-			else
-			{
-				push @list, $expr;
-			}
-		}
-		
-		return { type => $type, $type => \@list };
-	}
-	
-	sub parse_expression_0
 	{
 		return parse_expression_1(parse_primary(), 0);
 	}
@@ -223,7 +308,7 @@ Tokenization: {
 			}
 			elsif ($str =~ /\s*=>$/sm) # peek ahead
 			{
-				return bless([ QUOTELIKE, "'$spelling'" ], "Type::Parser::Token"),;
+				return bless([ STRING, $spelling ], "Type::Parser::Token"),;
 			}
 			
 			return bless([ TYPE, $spelling ], "Type::Parser::Token"),;
@@ -256,12 +341,5 @@ Tokenization: {
 		}
 	}
 }
-
-use Data::Dumper;
-local $Data::Dumper::Sortkeys = 1;
-local $Data::Dumper::Indent   = 1;
-print Dumper(
-	parse("Str & ~Int | Tuple[Str, Num, Num, slurpy Int] | HashRef[Foo::Bar::]"),
-);
 
 1;
