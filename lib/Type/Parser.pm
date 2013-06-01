@@ -20,7 +20,7 @@ sub NOT       () { "NOT" };
 use Carp qw(croak confess);
 use Text::Balanced qw(extract_quotelike);
 
-our @EXPORT_OK = qw( parse eval_type );
+our @EXPORT_OK = qw( tokens parse eval_type );
 use base "Exporter::TypeTiny";
 
 Evaluate: {
@@ -36,7 +36,7 @@ Evaluate: {
 	{
 		my ($node, $reg) = @_;
 		
-		$node = simplify_expression($node);
+		$node = _simplify_expression($node);
 		
 		if ($node->{type} eq "list")
 		{
@@ -104,29 +104,29 @@ Evaluate: {
 		}
 	}
 	
-	sub simplify_expression
+	sub _simplify_expression
 	{
 		my $expr = shift;
 		
 		if ($expr->{type} eq "expression" and $expr->{op}[0] eq COMMA)
 		{
-			return simplify("list", COMMA, $expr);
+			return _simplify("list", COMMA, $expr);
 		}
 		
 		if ($expr->{type} eq "expression" and $expr->{op}[0] eq UNION)
 		{
-			return simplify("union", UNION, $expr);
+			return _simplify("union", UNION, $expr);
 		}
 		
 		if ($expr->{type} eq "expression" and $expr->{op}[0] eq INTERSECT)
 		{
-			return simplify("intersect", INTERSECT, $expr);
+			return _simplify("intersect", INTERSECT, $expr);
 		}
 		
 		return $expr;
 	}
 	
-	sub simplify
+	sub _simplify
 	{
 		my $type = shift;
 		my $op   = shift;
@@ -136,7 +136,7 @@ Evaluate: {
 		{
 			if ($expr->{type} eq "expression" and $expr->{op}[0] eq $op)
 			{
-				my $simple = simplify($type, $op, $expr);
+				my $simple = _simplify($type, $op, $expr);
 				push @list, @{ $simple->{$type} };
 			}
 			else
@@ -159,7 +159,7 @@ Parsing: {
 		+NOT       => 4,
 	);
 	
-	sub parse_primary
+	sub _parse_primary
 	{
 		confess "ARGH" unless @tokens;
 		if ($tokens[0]->type eq NOT)
@@ -167,7 +167,7 @@ Parsing: {
 			shift @tokens;
 			return {
 				type  => "complement",
-				of    => parse_primary(),
+				of    => _parse_primary(),
 			};
 		}
 		
@@ -176,7 +176,7 @@ Parsing: {
 			shift @tokens;
 			return {
 				type  => "slurpy",
-				of    => parse_primary(),
+				of    => _parse_primary(),
 			};
 		}
 		
@@ -191,7 +191,7 @@ Parsing: {
 			}
 			else
 			{
-				$params = parse_expression();
+				$params = _parse_expression();
 				$params = { type => "list", list => [$params] } unless $params->{type} eq "list";
 				$tokens[0]->type eq R_BRACKET or die;
 				shift @tokens;
@@ -211,18 +211,18 @@ Parsing: {
 		die;
 	}
 	
-	sub parse_expression_1
+	sub _parse_expression_1
 	{
 		my ($lhs, $min_p) = @_;
 		while (@tokens and exists $precedence{$tokens[0]->type} and $precedence{$tokens[0]->type} >= $min_p)
 		{
 			my $op  = shift @tokens;
-			my $rhs = parse_primary();
+			my $rhs = _parse_primary();
 			
 			while (@tokens and exists $precedence{$tokens[0]->type} and $precedence{$tokens[0]->type} > $precedence{$op->type})
 			{
 				my $lookahead = shift @tokens;
-				$rhs = parse_expression_1($rhs, $precedence{$lookahead->type});
+				$rhs = _parse_expression_1($rhs, $precedence{$lookahead->type});
 			}
 			
 			$lhs = {
@@ -235,15 +235,15 @@ Parsing: {
 		return $lhs;
 	}
 	
-	sub parse_expression
+	sub _parse_expression
 	{
-		return parse_expression_1(parse_primary(), 0);
+		return _parse_expression_1(_parse_primary(), 0);
 	}
 	
 	sub parse
 	{
 		local @tokens = tokens($_[0]);
-		return parse_expression();
+		return _parse_expression();
 	}
 }
 
@@ -257,7 +257,7 @@ Tokenization: {
 		
 		my @tokens;
 		my $count;
-		while (my $token = token())
+		while (my $token = _token())
 		{
 			die "ETOOBIG" if $count++ > 1000;
 			push @tokens, $token;
@@ -276,7 +276,7 @@ Tokenization: {
 		'~'       => bless([ NOT,       "~" ], "Type::Parser::Token"),
 	);
 	
-	sub token
+	sub _token
 	{
 		$str =~ s/^\s*//sm;
 		
