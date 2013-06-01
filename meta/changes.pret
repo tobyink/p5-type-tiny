@@ -441,4 +441,5 @@
 		item "Type::Parser."^^Addition;
 		item "Types::Standard now has LaxNum/StrictNum type constraints, and Num selects between them."^^Addition;
 		item "Implemented Types::TypeTiny->meta->get_type."^^Change;
+		item "Generate README from Type::Tiny::Manual instead of Type::Tiny."^^Packaging;
 	].
