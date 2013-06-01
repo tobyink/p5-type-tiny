@@ -2,10 +2,19 @@
       * Improve API for parameterized coercions
       * Consider ways to reduce duplication when definition a type
         constraint coderef plus inline code
-      * Related Projects
-          * Type-Tiny could be used as a backend for Scalar::Does?
-              * if not, certainly a SEE ALSO
       * Maybe[`a] should have a coercion if `a does???
       * Documentation
           * See what questions users come up with, and write more
             documentation if necessary
+          * Document usage with Scalar::Does
+          * Document usage with Function::Parameters
+      * Test cases
+          * Type::Registry needs a few more test cases
+          * Type::Parser needs lots of test cases
+              * Check every type of token in the grammar, inclusing
+                qr{}, qq{}, q{}, fat comma, class types, etc
+              * Test precedence works - e.g. Foo|~Bar&Baz
+      * Hassle mst about exception API for constraints and coercions in
+        Moo
+          * Implement what needs to be implemented at Type::Exception's
+            end
