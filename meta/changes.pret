@@ -439,4 +439,6 @@
 		item "Fix $VERSION defined in Type::Library."^^Bugfix;
 		item "Re-introduce Type::Registry, with improved parsing thanks to Type::Parser."^^Change;
 		item "Type::Parser."^^Addition;
+		item "Types::Standard now has LaxNum/StrictNum type constraints, and Num selects between them."^^Addition;
+		item "Implemented Types::TypeTiny->meta->get_type."^^Change;
 	].
