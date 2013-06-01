@@ -343,3 +343,81 @@ Tokenization: {
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Type::Parser - parse type constraint strings
+
+=head1 SYNOPSIS
+
+ use v5.10;
+ use strict;
+ use warnings;
+ 
+ use Type::Parser qw( eval_type );
+ use Type::Registry;
+ 
+ my $reg = Type::Registry->for_me;
+ $reg->add_types("Types::Standard");
+ 
+ my $type = eval_type("Int | ArrayRef[Int]", $reg);
+ 
+ $type->check(10);        # true
+ $type->check([1..4]);    # true
+ $type->check({foo=>1});  # false
+
+=head1 DESCRIPTION
+
+Generally speaking, you probably don't want to be using this module directly.
+Instead use the C<< lookup >> method from L<Type::Registry> which wraps it.
+
+=head2 Functions
+
+=over
+
+=item C<< tokens($string) >>
+
+Tokenize the type constraint string; returns a list of tokens.
+
+=item C<< parse($string) >>, C<< parse($arrayref_of_tokens) >>
+
+Parse the type constraint string into something like an AST.
+
+=item C<< eval_type($string, $registry) >>, C<< eval_type($arrayref_of_tokens, $registry) >>
+
+Compile the type constraint string into a L<Type::Tiny> object.
+
+=back
+
+=head1 BUGS
+
+Please report any bugs to
+L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
+
+=head1 SEE ALSO
+
+L<Type::Registry>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
