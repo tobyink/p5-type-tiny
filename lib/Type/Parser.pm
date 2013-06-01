@@ -398,6 +398,36 @@ Compile the type constraint string into a L<Type::Tiny> object.
 
 =back
 
+=head2 Constants
+
+The following constants correspond to values returned by C<< $token->type >>.
+
+=over
+
+=item C<< TYPE >>
+
+=item C<< QUOTELIKE >>
+
+=item C<< STRING >>
+
+=item C<< CLASS >>
+
+=item C<< L_BRACKET >>
+
+=item C<< R_BRACKET >>
+
+=item C<< COMMA >>
+
+=item C<< SLURPY >>
+
+=item C<< UNION >>
+
+=item C<< INTERSECT >>
+
+=item C<< NOT >>
+
+=back
+
 =head1 BUGS
 
 Please report any bugs to
