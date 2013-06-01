@@ -3,7 +3,7 @@
 `Type-Tiny`
 	perl_version_from m`Type::Tiny`;
 	version_from      m`Type::Tiny`;
-	readme_from       m`Type::Tiny::Manual`;
+	readme_from       f`lib/Type/Tiny/Manual.pod`;
 	test_requires     p`Test::More 0.96`;
 .
 
