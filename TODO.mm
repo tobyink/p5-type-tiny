@@ -8,6 +8,7 @@
 <node CREATED="1367788018564" ID="ID_716920082" MODIFIED="1367788041234" TEXT="See what questions users come up with, and write more documentation if necessary"/>
 <node CREATED="1370096440797" ID="ID_1410085323" MODIFIED="1370096448687" TEXT="Document usage with Scalar::Does"/>
 <node CREATED="1370096465025" ID="ID_1832897513" MODIFIED="1370096473773" TEXT="Document usage with Function::Parameters"/>
+<node CREATED="1370122955378" ID="ID_847106785" MODIFIED="1370122993013" TEXT="Make front page of Type::Tiny::Manual, because it&apos;s now being used for README"/>
 </node>
 <node CREATED="1370096488520" ID="ID_1984680804" MODIFIED="1370096493794" POSITION="right" TEXT="Test cases">
 <node CREATED="1370096494999" ID="ID_557686619" MODIFIED="1370096504892" TEXT="Type::Registry needs a few more test cases"/>
