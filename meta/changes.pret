@@ -432,8 +432,11 @@
 	].
 
 `Type-Tiny 0.007_01 cpan:TOBYINK`
-	issued  2013-05-31;
+	issued  2013-06-01;
+	label   "Happy birthday to me...";
 	changeset [
 		dcs:versus `Type-Tiny 0.006 cpan:TOBYINK`;
 		item "Fix $VERSION defined in Type::Library."^^Bugfix;
+		item "Re-introduce Type::Registry, with improved parsing thanks to Type::Parser."^^Change;
+		item "Type::Parser."^^Addition;
 	].

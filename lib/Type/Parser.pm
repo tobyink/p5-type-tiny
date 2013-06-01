@@ -3,6 +3,9 @@ package Type::Parser;
 use strict;
 use warnings;
 
+our $AUTHORITY = 'cpan:TOBYINK';
+our $VERSION   = '0.007_01';
+
 # Token types
 # 
 sub TYPE      () { "TYPE" };
