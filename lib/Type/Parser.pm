@@ -3,6 +3,8 @@ package Type::Parser;
 use strict;
 use warnings;
 
+sub _croak ($;@) { require Type::Exception; goto \&Type::Exception::croak }
+
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.007_01';
 
@@ -20,7 +22,6 @@ sub UNION     () { "UNION" };
 sub INTERSECT () { "INTERSECT" };
 sub NOT       () { "NOT" };
 
-use Carp qw(croak confess);
 use Text::Balanced qw(extract_quotelike);
 
 our @EXPORT_OK = qw( tokens parse eval_type );
@@ -164,7 +165,9 @@ Parsing: {
 	
 	sub _parse_primary
 	{
-		confess "ARGH" unless @tokens;
+		_croak "Expected token, but got nothing"
+			unless @tokens;
+		
 		if ($tokens[0]->type eq NOT)
 		{
 			shift @tokens;
@@ -317,7 +320,7 @@ Tokenization: {
 			return bless([ TYPE, $spelling ], "Type::Parser::Token"),;
 		}
 		
-		croak "Unexpected token parsing type constraint; remaining '$str'";
+		_croak "Unexpected token parsing type constraint; remaining '$str'";
 	}
 	
 	{
