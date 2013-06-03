@@ -15,6 +15,7 @@
 <node CREATED="1370096525033" ID="ID_1258560264" MODIFIED="1370096558143" TEXT="Check every type of token in the grammar, inclusing qr{}, qq{}, q{}, fat comma, class types, etc"/>
 <node CREATED="1370096559888" ID="ID_740384364" MODIFIED="1370096605958" TEXT="Test precedence works - e.g. Foo|~Bar&amp;Baz"/>
 </node>
+<node CREATED="1370291516050" ID="ID_1412275140" MODIFIED="1370291547591" TEXT="Test cases for InstanceOf, ConsumerOf, HasMethods, Enum type constraints"/>
 </node>
 <node CREATED="1370096643105" ID="ID_1810538719" MODIFIED="1370096660882" POSITION="left" TEXT="Hassle mst about exception API for constraints and coercions in Moo">
 <node CREATED="1370096662733" ID="ID_407676023" MODIFIED="1370096674044" TEXT="Implement what needs to be implemented at Type::Exception&apos;s end"/>

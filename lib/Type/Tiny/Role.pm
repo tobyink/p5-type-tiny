@@ -23,12 +23,7 @@ sub new {
 	_croak "Role type constraints cannot have a parent constraint passed to the constructor" if exists $opts{parent};
 	_croak "Need to supply role name" unless exists $opts{role};
 	
-	return $cache{$opts{role}} if defined $cache{$opts{role}};
-	
-	my $self = $proto->SUPER::new(%opts);
-	$cache{$opts{role}} = $self;
-	weaken($cache{$opts{role}});
-	return $self;
+	return $proto->SUPER::new(%opts);
 }
 
 sub role        { $_[0]{role} }

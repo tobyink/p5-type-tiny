@@ -924,6 +924,66 @@ declare "Tied",
 		};
 	};
 
+declare "InstanceOf",
+	as "Object",
+	constraint_generator => sub {
+		require Type::Tiny::Class;
+		my @classes = map {
+			Types::TypeTiny::TypeTiny->check($_)
+				? $_
+				: "Type::Tiny::Class"->new(class => $_, display_name => sprintf('InstanceOf[%s]', B::perlstring($_)))
+		} @_;
+		return $classes[0] if @classes == 1;
+		
+		require B;
+		require Type::Tiny::Union;
+		return "Type::Tiny::Union"->new(
+			type_constraints => \@classes,
+			display_name     => sprintf('InstanceOf[%s]', join q[,], map B::perlstring($_->class), @classes),
+		);
+	};
+
+declare "ConsumerOf",
+	as "Object",
+	constraint_generator => sub {
+		require B;
+		require Type::Tiny::Role;
+		my @roles = map {
+			Types::TypeTiny::TypeTiny->check($_)
+				? $_
+				: "Type::Tiny::Role"->new(role => $_, display_name => sprintf('ConsumerOf[%s]', B::perlstring($_)))
+		} @_;
+		return $roles[0] if @roles == 1;
+		
+		require Type::Tiny::Intersection;
+		return "Type::Tiny::Intersection"->new(
+			type_constraints => \@roles,
+			display_name     => sprintf('ConsumerOf[%s]', join q[,], map B::perlstring($_->role), @roles),
+		);
+	};
+
+declare "HasMethods",
+	as "Object",
+	constraint_generator => sub {
+		require B;
+		require Type::Tiny::Duck;
+		return "Type::Tiny::Duck"->new(
+			methods      => \@_,
+			display_name => sprintf('HasMethods[%s]', join q[,], map B::perlstring($_), @_),
+		);
+	};
+
+declare "Enum",
+	as "Str",
+	constraint_generator => sub {
+		require B;
+		require Type::Tiny::Enum;
+		return "Type::Tiny::Enum"->new(
+			values       => \@_,
+			display_name => sprintf('Enum[%s]', join q[,], map B::perlstring($_), @_),
+		);
+	};
+
 declare_coercion "MkOpt",
 	to_type "OptList",
 	from    "ArrayRef", q{ Exporter::TypeTiny::mkopt($_) },
@@ -1488,6 +1548,20 @@ This module also exports a C<slurpy> function.
 
 =end trustme
 
+=head2 Objects
+
+OK, so I stole some ideas from L<MooX::Types::MooseLike::Base>.
+
+=over
+
+=item C<< InstanceOf[`a] >>
+
+=item C<< ConsumerOf[`a] >>
+
+=item C<< HasMethods[`a] >>
+
+=back
+
 =head2 More
 
 There are a few other types exported by this function:
@@ -1556,6 +1630,12 @@ You can optionally provide a type constraint for the array of subexpressions:
             enum(DistanceUnit => [qw/ mm cm m km /]),
          ],
       ];
+
+=item C<< Enum[`a] >>
+
+As per MooX::Types::MooseLike::Base:
+
+   has size => (is => "ro", isa => Enum[qw( S M L XL XXL )]);
 
 =item C<< OptList >>
 
