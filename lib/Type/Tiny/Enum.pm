@@ -69,6 +69,17 @@ sub _instantiate_moose_type
 	return "Moose::Meta::TypeConstraint::Enum"->new(%opts, values => $self->values);
 }
 
+sub has_parent
+{
+	!!1;
+}
+
+sub parent
+{
+	require Types::Standard;
+	Types::Standard::Str();
+}
+
 1;
 
 __END__
@@ -106,6 +117,11 @@ constructor. Instead rely on the default.
 
 Unlike Type::Tiny, you should generally I<not> pass an inlining coderef to
 the constructor. Instead rely on the default.
+
+=item C<parent>
+
+Parent is always Types::Standard::Str, and cannot be passed to the
+constructor.
 
 =back
 
