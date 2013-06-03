@@ -63,6 +63,16 @@ sub inline_check
 	sprintf '(%s)', join " and ", map $_->inline_check($_[0]), @$self;
 }
 
+sub has_parent
+{
+	!!@{ $_[0]{type_constraints} };
+}
+
+sub parent
+{
+	$_[0]{type_constraints}[0];
+}
+
 1;
 
 __END__
@@ -103,6 +113,13 @@ constructor. Instead rely on the default.
 
 Unlike Type::Tiny, you should generally I<not> pass an inlining coderef to
 the constructor. Instead rely on the default.
+
+=item C<parent>
+
+Parent is automatically calculated, and cannot be passed to the constructor.
+
+(Technically any of the types in the intersection could be treated as a
+parent type; we choose the first arbitrarily.)
 
 =back
 
