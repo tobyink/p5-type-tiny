@@ -8,8 +8,6 @@
             documentation if necessary
           * Document usage with Scalar::Does
           * Document usage with Function::Parameters
-          * Make front page of Type::Tiny::Manual, because it's now
-            being used for README
       * Test cases
           * Type::Registry needs a few more test cases
           * Type::Parser needs lots of test cases
