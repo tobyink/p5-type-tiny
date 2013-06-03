@@ -18,7 +18,7 @@ use base "Type::Tiny";
 sub new {
 	my $proto = shift;
 	my %opts = @_;
-	_croak "Role type constraints cannot have a parent constraint" if exists $opts{parent};
+	_croak "Role type constraints cannot have a parent constraint passed to the constructor" if exists $opts{parent};
 	_croak "Need to supply role name" unless exists $opts{role};
 	return $proto->SUPER::new(%opts);
 }
@@ -52,6 +52,17 @@ sub _build_default_message
 	return sub { sprintf 'value "%s" did not pass type constraint (not DOES %s)', $_[0], $c } if $self->is_anon;
 	my $name = "$self";
 	return sub { sprintf 'value "%s" did not pass type constraint "%s" (not DOES %s)', $_[0], $name, $c };
+}
+
+sub has_parent
+{
+	!!1;
+}
+
+sub parent
+{
+	require Types::Standard;
+	Types::Standard::Object();
 }
 
 1;
@@ -94,6 +105,11 @@ constructor. Instead rely on the default.
 
 Unlike Type::Tiny, you should generally I<not> pass an inlining coderef to
 the constructor. Instead rely on the default.
+
+=item C<parent>
+
+Parent is always Types::Standard::Object, and cannot be passed to the
+constructor.
 
 =back
 

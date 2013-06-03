@@ -20,7 +20,7 @@ sub new {
 	return $proto->class->new(@_) if blessed $proto; # DWIM
 	
 	my %opts = @_;
-	_croak "Class type constraints cannot have a parent constraint" if exists $opts{parent};
+	_croak "Class type constraints cannot have a parent constraint passed to the constructor" if exists $opts{parent};
 	_croak "Need to supply class name" unless exists $opts{class};
 	return $proto->SUPER::new(%opts);
 }
@@ -99,6 +99,40 @@ sub plus_constructors
 	return $self->plus_coercions(\@r);
 }
 
+sub has_parent
+{
+	!!1;
+}
+
+sub parent
+{
+	$_[0]{parent} ||= $_[0]->_build_parent;
+}
+
+sub _build_parent
+{
+	my $self  = shift;
+	my $class = $self->class;
+	
+	my @isa = do { no strict "refs"; no warnings; @{"$class\::ISA"} };
+	
+	if (@isa == 0)
+	{
+		require Types::Standard;
+		return Types::Standard::Object();
+	}
+	
+	if (@isa == 1)
+	{
+		return ref($self)->new(class => $isa[0])
+	}
+	
+	require Type::Tiny::Union;
+	"Type::Tiny::Union"->new(
+		type_constraints => [ map ref($self)->new(class => $_), @isa ],
+	);
+}
+
 1;
 
 __END__
@@ -154,6 +188,10 @@ constructor. Instead rely on the default.
 
 Unlike Type::Tiny, you should generally I<not> pass an inlining coderef to
 the constructor. Instead rely on the default.
+
+=item C<parent>
+
+Parent is automatically calculated, and cannot be passed to the constructor.
 
 =back
 
