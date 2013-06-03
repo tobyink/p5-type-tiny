@@ -9,18 +9,26 @@ BEGIN {
 	$Type::Tiny::Role::VERSION   = '0.007_01';
 }
 
-use Scalar::Util qw< blessed >;
+use Scalar::Util qw< blessed weaken >;
 
 sub _croak ($;@) { require Type::Exception; goto \&Type::Exception::croak }
 
 use base "Type::Tiny";
+
+my %cache;
 
 sub new {
 	my $proto = shift;
 	my %opts = @_;
 	_croak "Role type constraints cannot have a parent constraint passed to the constructor" if exists $opts{parent};
 	_croak "Need to supply role name" unless exists $opts{role};
-	return $proto->SUPER::new(%opts);
+	
+	return $cache{$opts{role}} if defined $cache{$opts{role}};
+	
+	my $self = $proto->SUPER::new(%opts);
+	$cache{$opts{role}} = $self;
+	weaken($cache{$opts{role}});
+	return $self;
 }
 
 sub role        { $_[0]{role} }

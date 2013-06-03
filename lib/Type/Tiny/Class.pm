@@ -9,11 +9,13 @@ BEGIN {
 	$Type::Tiny::Class::VERSION   = '0.007_01';
 }
 
-use Scalar::Util qw< blessed >;
+use Scalar::Util qw< blessed weaken >;
 
 sub _croak ($;@) { require Type::Exception; goto \&Type::Exception::croak }
 
 use base "Type::Tiny";
+
+my %cache;
 
 sub new {
 	my $proto = shift;
@@ -22,7 +24,13 @@ sub new {
 	my %opts = @_;
 	_croak "Class type constraints cannot have a parent constraint passed to the constructor" if exists $opts{parent};
 	_croak "Need to supply class name" unless exists $opts{class};
-	return $proto->SUPER::new(%opts);
+	
+	return $cache{$opts{class}} if defined $cache{$opts{class}};
+	
+	my $self = $proto->SUPER::new(%opts);
+	$cache{$opts{class}} = $self;
+	weaken($cache{$opts{class}});
+	return $self;
 }
 
 sub class       { $_[0]{class} }
@@ -127,8 +135,8 @@ sub _build_parent
 		return ref($self)->new(class => $isa[0])
 	}
 	
-	require Type::Tiny::Union;
-	"Type::Tiny::Union"->new(
+	require Type::Tiny::Intersection;
+	"Type::Tiny::Intersection"->new(
 		type_constraints => [ map ref($self)->new(class => $_), @isa ],
 	);
 }

@@ -31,7 +31,7 @@ use Test::More;
 use Test::TypeTiny;
 
 use BiggerLib qw( :types );
-use Type::Utils qw( union );
+use Type::Utils qw( union class_type );
 
 { my $x; sub FooBarOrDoesQuux () { $x ||= union(FooBarOrDoesQuux => [FooBar, DoesQuux]) } }
 
@@ -91,6 +91,35 @@ is(
 	scalar @{+NotherUnion},
 	4,
 	"unions don't get unnecessarily deep",
+);
+
+{ package Local::A }
+{ package Local::B }
+{ package Local::C }
+{ package Local::A::A; our @ISA = qw(Local::A) }
+{ package Local::A::B; our @ISA = qw(Local::A) }
+{ package Local::A::AB; our @ISA = qw(Local::A::A Local::A::B) }
+{ package Local::A::X; our @ISA = qw(Local::A)  }
+
+my $c1 = union [
+	class_type({ class => "Local::A::AB" }),
+	class_type({ class => "Local::A::X" }),
+];
+
+ok(
+	$c1->parent == class_type({ class => "Local::A" }),
+	"can climb up parents of union type constraints to find best common ancestor",
+);
+
+my $c2 = union [
+	class_type({ class => "Local::A" }),
+	class_type({ class => "Local::B" }),
+	class_type({ class => "Local::C" }),
+];
+
+ok(
+	$c2->parent == Types::Standard::Object(),
+	"can climb up parents of union type constraints to find best common ancestor (again)",
 );
 
 done_testing;
