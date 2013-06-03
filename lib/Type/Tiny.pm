@@ -527,24 +527,36 @@ sub parameterize
 	
 	return $param_cache{$key} if defined $key && defined $param_cache{$key};
 	
+	local $Type::Tiny::parameterize_type = $self;
 	local $_ = $_[0];
-	my %options = (
-		constraint   => $self->constraint_generator->(@_),
-		display_name => $self->name_generator->($self, @_),
-		parameters   => [@_],
-	);
-	$options{inlined} = $self->inline_generator->(@_)
-		if $self->has_inline_generator;
-	exists $options{$_} && !defined $options{$_} && delete $options{$_}
-		for keys %options;
+	my $P;
 	
-	my $P = $self->create_child_type(%options);
-
-	my $coercion;
-	$coercion = $self->coercion_generator->($self, $P, @_)
-		if $self->has_coercion_generator;
-	$P->coercion->add_type_coercions( @{$coercion->type_coercion_map} )
-		if $coercion;
+	my $constraint = $self->constraint_generator->(@_);
+	
+	if (Types::TypeTiny::TypeTiny->check($constraint))
+	{
+		$P = $constraint;
+	}
+	else
+	{
+		my %options = (
+			constraint   => $constraint,
+			display_name => $self->name_generator->($self, @_),
+			parameters   => [@_],
+		);
+		$options{inlined} = $self->inline_generator->(@_)
+			if $self->has_inline_generator;
+		exists $options{$_} && !defined $options{$_} && delete $options{$_}
+			for keys %options;
+		
+		$P = $self->create_child_type(%options);
+		
+		my $coercion;
+		$coercion = $self->coercion_generator->($self, $P, @_)
+			if $self->has_coercion_generator;
+		$P->coercion->add_type_coercions( @{$coercion->type_coercion_map} )
+			if $coercion;		
+	}
 	
 	if (defined $key)
 	{
