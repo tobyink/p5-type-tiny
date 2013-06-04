@@ -555,7 +555,7 @@ sub parameterize
 		$coercion = $self->coercion_generator->($self, $P, @_)
 			if $self->has_coercion_generator;
 		$P->coercion->add_type_coercions( @{$coercion->type_coercion_map} )
-			if $coercion;		
+			if $coercion;
 	}
 	
 	if (defined $key)
