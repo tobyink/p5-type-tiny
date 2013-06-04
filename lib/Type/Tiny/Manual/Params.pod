@@ -32,52 +32,114 @@ See the COOKBOOK section of L<Type::Params> for further information.
 
 =head2 The Somewhat More Manual Way...
 
-Type::Tiny objects overload coderef calls to assert. For example, the
-following is a method that takes a string; if the parameters fail their
-constraints, then an exception will be thrown.
+In general, Type::Params should be sufficient to cover most needs, and
+will probably run faster than almost anything you could cook up yourself.
+However, sometimes you need to deal with unusual function signatures that
+it does not support. For example, imagine function C<< format_string >>
+takes an optional hashref of formatting instructions, followed by a
+required string. You might expect to be able to handle it like this:
 
-   use Types::Standard qw( Str );
-   use Type::Utils;
-   
-   my $Invocant = class_type { class => __PACKAGE__ };
-   
-   sub set_name
+   sub format_string
    {
-      my $self = $Invocant->(shift);
-      my $name = Str->(shift);
+      state $check = compile(Optional[HashRef], Str);
+      my ($instructions, $string) = $check->(@_);
       
       ...;
    }
 
-Alternatively, remember that type libraries also export check (C<< is_* >>)
-functions:
+However, this won't work, as Type::Params expects required parameters to
+always precede optional ones. So there are times you need to handle
+parameters more manually.
 
-   use Types::Standard qw( is_Str );
-   use Type::Utils;
-   
-   my $Invocant = class_type { class => __PACKAGE__ };
-   
-   sub set_name
+In these cases, bear in mind that for any type constraint object you
+have several useful checking methods available:
+
+  Str->check($var)            # returns a boolean
+  is_Str($var)                # ditto
+  Str->($var)                 # returns $var or dies
+  assert_Str($var)            # ditto
+
+Here's how you might handle the C<format_string> function:
+
+   sub format_string
    {
-      $Invocant->check(my $self = shift) or die;
-      is_Str(my $name = shift) or die;
+      my $instructions;
+      $instructions = shift if HashRef->check($_[0]);
+      
+      my $string = Str->(shift);
       
       ...;
    }
 
-... and assertion (C<< assert_* >>) functions:
+Alternatively, you could manipulate @_ before passing it to the compiled
+check:
 
-   use Types::Standard qw( assert_Str );
-   use Type::Utils;
-   
-   my $Invocant = class_type { class => __PACKAGE__ };
-   
-   sub set_name
+   sub format_string
    {
-      my $self = $Invocant->assert_return(shift);
-      my $name = assert_Str(shift);
+      state $check = compile(HashRef, Str);
+      my ($instructions, $str) = $check->(@_==1 ? ({}, @_) : @_);
       
       ...;
+   }
+
+=head2 Signatures
+
+Don't you wish your subs could look like this?
+
+   sub set_name (Object $self, Str $name)
+   {
+      $self->{name} = $name;
+   }
+
+Well; here are a few solutions for sub signatures that work with
+L<Type::Tiny>...
+
+=head3 Attribute::Contract
+
+At the time of writing, there is no released version of L<Attribute::Contract>
+that supports Type::Tiny, but support exists in the respository.
+
+   use Attribute::Contract -types => [qw/Object Str/];
+   
+   sub set_name :ContractRequires(Object, Str)
+   {
+      my ($self, $name) = @_;
+      $self->{name} = $name;
+   }
+
+Attribute::Contract also includes support for type checking of the returned
+value.
+
+=head3 Function::Parameters
+
+The following should work from L<Function::Parameters> 1.0101:
+
+   use Function::Parameters qw(:strict);
+   use Types::Standard;
+   use Moose ();
+   
+   fun set_name ((Object) $self, (Str) $name)
+   {
+      $self->{name} = $name;
+   }
+   
+   # or...
+   method set_name ((Str) $name)
+   {
+      $self->{name} = $name;
+   }
+
+As of 1.0102, L<Moose> is required to be loaded for this to work (even though
+it's not actually being used for type checks). This has been reported as a
+bug (L<RT#85851|https://rt.cpan.org/Ticket/Display.html?id=85851>) so will
+hopefully be resolved soon.
+
+Note the parentheses around the type names are required, because without
+parentheses, Function::Parameters will use Moose type constraints:
+
+   method set_name (Str $name)  # Moose type constraint
+   {
+      $self->{name} = $name;
    }
 
 =head1 AUTHOR

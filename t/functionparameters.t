@@ -33,12 +33,8 @@ use Test::Requires { "Function::Parameters" => "1.0101" };
 use Test::Requires { "Moose"                => "2.0000" };
 use Test::Fatal;
 
-BEGIN {
-	plan skip_all => "need mauke to fix something... :-(";
-}
-
 use Types::Standard -types;
-use Function::Parameters;
+use Function::Parameters qw(:strict);
 use Moose ();
 
 fun foo ((Int) $x)
@@ -54,7 +50,7 @@ is(
 
 like(
 	exception { foo(4.1) },
-	qr{^Monkey nuts},
+	qr{^In fun foo: parameter 1 \(\$x\): Value "4\.1" did not pass type constraint "Int"},
 	'foo(4.1) throws',
 );
 

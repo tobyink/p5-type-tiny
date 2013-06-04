@@ -7,7 +7,6 @@
           * See what questions users come up with, and write more
             documentation if necessary
           * Document usage with Scalar::Does
-          * Document usage with Function::Parameters
       * Test cases
           * Type::Registry needs a few more test cases
           * Type::Parser needs lots of test cases
