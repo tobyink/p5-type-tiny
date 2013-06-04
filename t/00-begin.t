@@ -82,6 +82,7 @@ Test::More
 # Optional:
 
 Class::InsideOut
+Function::Parameters
 Moo
 Moose
 Mouse
