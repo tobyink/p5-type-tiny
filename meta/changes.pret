@@ -443,3 +443,25 @@
 		item "Implemented Types::TypeTiny->meta->get_type."^^Change;
 		item "Generate README from Type::Tiny::Manual instead of Type::Tiny."^^Packaging;
 	].
+
+`Type-Tiny 0.007_02 cpan:TOBYINK`
+	issued  2013-06-04;
+	changeset [
+		dcs:versus `Type-Tiny 0.007_01 cpan:TOBYINK`;
+		item "Drop use of Carp in Type::Parser."^^Change;
+		item "Improvements to Type::Tiny::Manual."^^Documentation;
+		item "Improvements to Type::Tiny::Manual::Params, including rewritten manual processing section, and processing type constraints in function signatures via Function::Parameters/Attribute::Constract."^^Documentation;
+		item "Test cases for usage with Function::Parameters."^^Packaging;
+		item "Allow constraint_generators (for parameterizable type constraints) to return full Type::Tiny objects instead of plain coderefs."^^Change;
+		item "Type::Tiny::Duck types now have a parent type constraint of Types::Standard::Object."^^Change;
+		item "Type::Tiny::Role types now have a parent type constraint of Types::Standard::Object."^^Change;
+		item "Type::Tiny::Enum types now have a parent type constraint of Types::Standard::Str."^^Change;
+		item "Type::Tiny::Class types now have an automatically calculated parent type constraint based on @ISA."^^Change;
+		item "Type::Tiny::Union types now have an automatically calculated parent type constraint based on the most specific common parent type constraint."^^Change;
+		item "Type::Tiny::Intersection types now have an arbitrary parent type constraint."^^Change;
+		item [
+			a dcs:Addition;
+			label "New constraints added to Types::Standard: InstanceOf, ConsumerOf, HasMethods and Enum.";
+			dcs:thanks cpan:HAARG;
+		];
+	].

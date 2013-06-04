@@ -20,6 +20,9 @@ cpan:MMCLERIC
 cpan:DJERIUS
 	:name "Diab Jerius".
 
+cpan:HAARG
+	:name "Graham Knop".
+
 # We bundle some files made by these dudes...
 
 cpan:RJBS
