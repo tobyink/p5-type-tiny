@@ -1045,7 +1045,18 @@ C<< "Library::Type" >> sort of name. Otherwise, returns the same as C<name>.
 
 =item C<< parents >>
 
-Returns a list of all this type constraint's all ancestor constraints.
+Returns a list of all this type constraint's ancestor constraints. For
+example, if called on the C<Str> type constraint would return the list
+C<< (Value, Defined, Item, Any) >>.
+
+B<< Due to a historical misunderstanding, this differs from the Moose
+implementation of the C<parents> method. In Moose, C<parents> only returns the
+immediate parent type constraints, and because type constraints only have
+one immediate parent, this is effectively an alias for C<parent>. The
+extension module L<MooseX::Meta::TypeConstraint::Intersection> is the only
+place where multiple type constraints are returned; and they are returned
+as an arrayref in violation of the base class' documentation. I'm keeping
+my behaviour as it seems more useful. >>
 
 =item C<< equals($other) >>, C<< is_subtype_of($other) >>, C<< is_supertype_of($other) >>, C<< is_a_type_of($other) >>
 
