@@ -27,7 +27,7 @@ use Test::More;
 use Test::Fatal;
 
 use Type::Params qw(compile);
-use Types::Standard qw(Num);
+use Types::Standard qw(Num ArrayRef);
 use Type::Utils;
 
 my $NumX = declare NumX => as Num, where { $_ != 42 };
@@ -69,6 +69,36 @@ is_deeply(
 {
 	my $e = exception { nth_root(41, 42) };
 	like($e, qr{^Value "42" did not pass type constraint "NumX" \(in \$_\[1\]\)}, '(42)');
+}
+
+my $check2;
+sub nth_root_coerce
+{
+	$check2 ||= compile(
+		$NumX->plus_coercions(
+			Num,      sub { 21 },            # non-inline
+			ArrayRef, q   { scalar(@$_) },   # inline
+		),
+		$NumX,
+	);
+	[ $check2->(@_) ];
+}
+
+is_deeply(
+	nth_root_coerce(42, 11),
+	[21, 11],
+	'(42, 11)'
+);
+
+is_deeply(
+	nth_root_coerce([1..3], 11),
+	[3, 11],
+	'([1..3], 11)'
+);
+
+{
+	my $e = exception { nth_root_coerce([1..41], 42) };
+	like($e, qr{^Value "42" did not pass type constraint "NumX" \(in \$_\[1\]\)}, '([1..41], 42)');
 }
 
 done_testing;
