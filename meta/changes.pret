@@ -465,3 +465,16 @@
 			dcs:thanks cpan:HAARG;
 		];
 	].
+
+`Type-Tiny 0.007_03 cpan:TOBYINK`
+	issued  2013-06-08;
+	changeset [
+		dcs:versus `Type-Tiny 0.007_02 cpan:TOBYINK`;
+		item "Better document Type::Tiny's 'parents' method which differs from the Moose method of the same name."^^Documentation;
+		item [
+			a dcs:Bugfix;
+			dcs:fixes RT#85911;
+			label "Inlining of certain deep Dict, Tuple and Map coercions was broken, but Type::Params attempted to inline them anyway, leading to death.";
+			dcs:thanks cpan:DJERIUS;
+		];
+	].
