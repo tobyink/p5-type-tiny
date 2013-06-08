@@ -1329,10 +1329,12 @@ $lib->get_type("Tuple")->{coercion_generator} = sub
 		$slurpy = pop(@tuple)->{slurpy};
 	}
 
-	my $all_inlinable = $slurpy ? ($slurpy->has_coercion && $slurpy->can_be_inlined) : 1;
-	for my $tc (@tuple)
+	my $all_inlinable = 1;
+	for my $tc (@tuple, ($slurpy ? $slurpy : ()))
 	{
 		$all_inlinable = 0 if $tc->has_coercion && !$tc->can_be_inlined;
+		$all_inlinable = 0 if $tc->has_coercion && !$tc->coercion->can_be_inlined;
+		last if!$all_inlinable;
 	}
 
 	if ($all_inlinable)
