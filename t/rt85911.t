@@ -6,6 +6,10 @@
 
 Test L<Type::Params> with deep Dict coercion.
 
+=head1 SEE ALSO
+
+L<https://rt.cpan.org/Ticket/Display.html?id=85911>.
+
 =head1 AUTHOR
 
 Diab Jerius E<lt>djerius@cpan.orgE<gt>.
