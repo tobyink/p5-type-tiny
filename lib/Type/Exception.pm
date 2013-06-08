@@ -26,7 +26,7 @@ $CarpInternal{$_}++ for qw(
 	Type::Params
 	Type::Registry
 	Types::Standard
-	Types::Standard::DeepCoercion
+	Types::Standard::_Stringable
 	Types::TypeTiny
 	Type::Tiny
 	Type::Tiny::Class
