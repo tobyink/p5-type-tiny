@@ -1032,7 +1032,7 @@ $lib->get_type("ArrayRef")->{coercion_generator} = sub
 	my $coercable_item = $param->coercion->_source_type_union;
 	my $C = "Type::Coercion"->new(type_constraint => $child);
 	
-	if ($param->coercion->can_be_inlined)
+	if ($param->coercion->can_be_inlined and $coercable_item->can_be_inlined)
 	{
 		$C->add_type_coercions($parent => Stringable {
 			my @code;
@@ -1073,7 +1073,7 @@ $lib->get_type("HashRef")->{coercion_generator} = sub
 	my $coercable_item = $param->coercion->_source_type_union;
 	my $C = "Type::Coercion"->new(type_constraint => $child);
 	
-	if ($param->coercion->can_be_inlined)
+	if ($param->coercion->can_be_inlined and $coercable_item->can_be_inlined)
 	{
 		$C->add_type_coercions($parent => Stringable {
 			my @code;
@@ -1114,7 +1114,7 @@ $lib->get_type("ScalarRef")->{coercion_generator} = sub
 	my $coercable_item = $param->coercion->_source_type_union;
 	my $C = "Type::Coercion"->new(type_constraint => $child);
 	
-	if ($param->coercion->can_be_inlined)
+	if ($param->coercion->can_be_inlined and $coercable_item->can_be_inlined)
 	{
 		$C->add_type_coercions($parent => Stringable {
 			my @code;
@@ -1157,7 +1157,9 @@ $lib->get_type("Map")->{coercion_generator} = sub
 	my $C = "Type::Coercion"->new(type_constraint => $child);
 	
 	if ((!$kparam->has_coercion or $kparam->coercion->can_be_inlined)
-	and (!$vparam->has_coercion or $vparam->coercion->can_be_inlined))
+	and (!$vparam->has_coercion or $vparam->coercion->can_be_inlined)
+	and $kcoercable_item->can_be_inlined
+	and $vcoercable_item->can_be_inlined)
 	{
 		$C->add_type_coercions($parent => Stringable {
 			my @code;
