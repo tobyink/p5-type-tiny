@@ -34,13 +34,13 @@ BEGIN {
 	use Type::Utils;
 	use Types::Standard qw[ ArrayRef Str ];
 	declare StrList, as ArrayRef [Str];
-	coerce StrList, from Str, '[$_]';
+	coerce StrList, from Str, q { [$_] };
 };
 
 use Test::More;
 use Test::Fatal;
 
-use Type::Params qw[ validate ];
+use Type::Params qw[ validate compile ];
 use Types::Standard -all;
 
 sub a {
@@ -108,5 +108,18 @@ my $expect = {
 	
 	is_deeply( $opts, $expect, "StrList scalar" );
 }
+
+note do {
+	require B::Deparse;
+	"B::Deparse"->new->coderef2text(
+		compile(
+			slurpy Dict [
+				connect  => Optional [Bool],
+				encoding => Optional [Str],
+				hg       => Optional [Types::StrList],
+			],
+		),
+	);
+};
 
 done_testing;
