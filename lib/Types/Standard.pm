@@ -1300,7 +1300,7 @@ $lib->get_type("Dict")->{coercion_generator} = sub
 						my $x = $ct->coerce($value->{$k});
 						@accept = $x if $ct->check($x);
 					}
-					else
+					elsif (exists $value->{$k})
 					{
 						return $value;
 					}

@@ -14,6 +14,8 @@ L<https://rt.cpan.org/Ticket/Display.html?id=86004>.
 
 Diab Jerius E<lt>djerius@cpan.orgE<gt>.
 
+(Minor changes by Toby Inkster E<lt>tobyink@cpan.orgE<gt>.)
+
 =head1 COPYRIGHT AND LICENCE
 
 This software is copyright (c) 2013 by Diab Jerius.
