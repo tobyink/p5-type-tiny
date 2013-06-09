@@ -74,4 +74,9 @@ use DemoLib String => {
 
 is(foobarbaz->qualified_name, "DemoLib::String", "Sub::Exporter-style export renaming");
 
+ok(
+	Integer eq Integer,
+	'eq works',
+);
+
 done_testing;
