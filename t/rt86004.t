@@ -64,9 +64,25 @@ sub b {
 	);
 }
 
+sub c {
+	validate(
+		\@_,
+		slurpy Dict [
+			connect  => Optional [Bool],
+			encoding => Optional [Str],
+			hg2      => Optional [Types::StrList->no_coercions->plus_coercions(Types::Standard::Str, sub {[$_]})],
+		]
+	);
+}
+
 my $expect = {
 	connect => 1,
 	hg      => ['a'],
+};
+
+my $expect2 = {
+	connect => 1,
+	hg2     => ['a'],
 };
 
 # 1
@@ -108,6 +124,27 @@ my $expect = {
 	
 	is_deeply( $opts, $expect, "StrList scalar" );
 }
+
+# 5
+{
+	my ( $opts, $e );
+	
+	$e = exception { ( $opts ) = c( connect => 1, hg2 => ['a'] ) }
+		and diag $e;
+		
+	is_deeply( $opts, $expect2, "StrList ArrayRef - noninline" );
+}
+
+# 6
+{
+	my ( $opts, $e );
+	
+	$e = exception { ( $opts ) = c( connect => 1, hg2 => 'a' ) }
+		and diag $e;
+	
+	is_deeply( $opts, $expect2, "StrList scalar  - noninline" );
+}
+
 
 #note compile(
 #	{ want_source => 1 },
