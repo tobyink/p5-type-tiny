@@ -8,8 +8,7 @@ Check type constraints work with L<Function::Parameters>.
 
 =head1 DEPENDENCIES
 
-Test is skipped if Function::Parameters 1.0101 or Moose 2.0000 is
-not available.
+Test is skipped if Function::Parameters 1.0103 is not available.
 
 =head1 AUTHOR
 
@@ -29,13 +28,11 @@ use warnings;
 use lib qw( ./lib ./t/lib ../inc ./inc );
 
 use Test::More;
-use Test::Requires { "Function::Parameters" => "1.0101" };
-use Test::Requires { "Moose"                => "2.0000" };
+use Test::Requires { "Function::Parameters" => "1.0103" };
 use Test::Fatal;
 
 use Types::Standard -types;
 use Function::Parameters qw(:strict);
-use Moose ();
 
 fun foo ((Int) $x)
 {
@@ -53,5 +50,10 @@ like(
 	qr{^In fun foo: parameter 1 \(\$x\): Value "4\.1" did not pass type constraint "Int"},
 	'foo(4.1) throws',
 );
+
+my $info = Function::Parameters::info(\&foo);
+my ($x)  = $info->positional_required;
+is($x->name, '$x', '$x->name');
+ok($x->type == Int, '$x->type');
 
 done_testing;

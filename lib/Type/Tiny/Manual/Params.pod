@@ -116,7 +116,6 @@ The following should work from L<Function::Parameters> 1.0101:
 
    use Function::Parameters qw(:strict);
    use Types::Standard;
-   use Moose ();
    
    fun set_name ((Object) $self, (Str) $name)
    {
@@ -129,10 +128,9 @@ The following should work from L<Function::Parameters> 1.0101:
       $self->{name} = $name;
    }
 
-As of 1.0102, L<Moose> is required to be loaded for this to work (even though
-it's not actually being used for type checks). This has been reported as a
-bug (L<RT#85851|https://rt.cpan.org/Ticket/Display.html?id=85851>) so will
-hopefully be resolved soon.
+In Function::Parameters 1.0101 and 1.0102, L<Moose> was required to be
+loaded for this to work (even though it's not actually being used for type
+checks). Since Function::Parameters 1.0103, Moose is no longer required.
 
 Note the parentheses around the type names are required, because without
 parentheses, Function::Parameters will use Moose type constraints:
