@@ -478,3 +478,21 @@
 			dcs:thanks cpan:DJERIUS;
 		];
 	].
+
+`Type-Tiny 0.007_04 cpan:TOBYINK`
+	issued  2013-06-09;
+	changeset [
+		dcs:versus `Type-Tiny 0.007_03 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix;
+			dcs:fixes RT#86001;
+			label "The combination of Dict, Optional and coercions seems to have been broken in certain circumstances.";
+			dcs:thanks cpan:DJERIUS;
+		];
+		item [
+			a dcs:Bugfix;
+			dcs:fixes RT#85895;
+			label "Overloading of `$type eq $type` now works in Perl 5.8.";
+			dcs:thanks cpan:MMCLERIC;
+		];
+	].

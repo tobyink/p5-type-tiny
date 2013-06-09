@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.007_03';
+our $VERSION   = '0.007_04';
 
 use Scalar::Util qw< blessed >;
 
