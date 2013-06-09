@@ -205,6 +205,8 @@ sub compile
 	
 	my $source  = "sub { no warnings; ".join("\n", @code)." };";
 	
+	return $source if $options{want_source};
+	
 	return eval_closure(
 		source      => $source,
 		description => sprintf("parameter validation for '%s'", [caller(1+($options{caller_level}||0))]->[3] || '__ANON__'),

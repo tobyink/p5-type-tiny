@@ -109,17 +109,13 @@ my $expect = {
 	is_deeply( $opts, $expect, "StrList scalar" );
 }
 
-note do {
-	require B::Deparse;
-	"B::Deparse"->new->coderef2text(
-		compile(
-			slurpy Dict [
-				connect  => Optional [Bool],
-				encoding => Optional [Str],
-				hg       => Optional [Types::StrList],
-			],
-		),
-	);
-};
+#note compile(
+#	{ want_source => 1 },
+#	slurpy Dict [
+#		connect  => Optional[Bool],
+#		encoding => Optional[Str],
+#		hg       => Optional[Types::StrList],
+#	],
+#);
 
 done_testing;

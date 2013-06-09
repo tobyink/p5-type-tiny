@@ -1241,6 +1241,7 @@ $lib->get_type("Dict")->{coercion_generator} = sub
 				my $ct_optional = $ct->is_a_type_of(Types::Standard::Optional());
 				my $K = B::perlstring($k);
 				
+				push @code, "if (exists \$orig->{$K}) {" if $ct_optional;
 				if ($ct_coerce)
 				{
 					push @code, sprintf('%%tmp = (); $tmp{x} = %s;', $ct->coercion->inline_coercion("\$orig->{$K}"));
@@ -1265,10 +1266,12 @@ $lib->get_type("Dict")->{coercion_generator} = sub
 						$label,
 					);
 				}
+				push @code, '}' if $ct_optional;
 			}
 			push @code,       '}';
 			push @code,    '$return_orig ? $orig : \\%new';
 			push @code, '}';
+			#warn "CODE:: @code";
 			"@code";
 		});
 	}
