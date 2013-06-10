@@ -1486,52 +1486,120 @@ L<Moose::Util::TypeConstraints>.
 
 =item C<< Any >>
 
+Absolutely any value passes this type constraint (even undef).
+
 =item C<< Item >>
+
+Essentially the same as C<Any>. All other type constraints in this library
+inherit directly or indirectly from C<Item>.
 
 =item C<< Bool >>
 
+Values that are reasonable booleans. Accepts 1, 0, the empty string and
+undef.
+
 =item C<< Maybe[`a] >>
+
+Given another type constraint, also accepts undef. For example,
+C<< Maybe[Int] >> accepts all integers plus undef.
 
 =item C<< Undef >>
 
+Only undef passes this type constraint.
+
 =item C<< Defined >>
+
+Only undef fails this type constraint.
 
 =item C<< Value >>
 
+Any defined, non-reference value.
+
 =item C<< Str >>
+
+Can't say I'm massively sure what the difference is between C<Str> and
+C<Value>.
 
 =item C<< Num >>
 
+See C<LaxNum> and C<StrictNum> below.
+
 =item C<< Int >>
+
+An integer; that is a string of digits 0 to 9, optionally prefixed with a
+hyphen-minus character.
 
 =item C<< ClassName >>
 
+The name of a loaded package. The package must have C<< @ISA >> or
+C<< $VERSION >> defined, or must define at least one sub to be considered
+a loaded package.
+
 =item C<< RoleName >>
+
+Like C<< ClassName >>, but the package must I<not> define a method called
+C<new>. This is subtly different from Moose's type constraint of the same
+name; let me know if this causes you any problems. (I can't promise I'll
+change anything though.)
 
 =item C<< Ref[`a] >>
 
-=item C<< ScalarRef[`a] >>
-
-=item C<< ArrayRef[`a] >>
-
-=item C<< HashRef[`a] >>
-
-=item C<< CodeRef >>
-
-=item C<< RegexpRef >>
-
-=item C<< GlobRef >>
-
-=item C<< FileHandle >>
-
-=item C<< Object >>
-
-=back
+Any defined reference value, including blessed objects.
 
 Unlike Moose, C<Ref> is a parameterized type, allowing Scalar::Util::reftype
 checks, a la
 
    Ref["HASH"]  # hashrefs, including blessed hashrefs
+
+=item C<< ScalarRef[`a] >>
+
+A value where C<< ref($value) eq "SCALAR" or ref($value) eq "REF" >>.
+
+If parameterized, the referred value must pass the additional constraint.
+For example, C<< ScalarRef[Int] >> must be a reference to a scalar which
+holds an integer value.
+
+=item C<< ArrayRef[`a] >>
+
+A value where C<< ref($value) eq "ARRAY" >>.
+
+If parameterized, the elements of the array must pass the additional
+constraint. For example, C<< ArrayRef[Num] >> must be a reference to an
+array of numbers.
+
+=item C<< HashRef[`a] >>
+
+A value where C<< ref($value) eq "HASH" >>.
+
+If parameterized, the values of the hash must pass the additional
+constraint. For example, C<< HashRef[Num] >> must be a reference to an
+hash where the values are numbers. The hash keys are not constrained,
+but Perl limits them to strings; see C<Map> below if you need to further
+constrain the hash values.
+
+=item C<< CodeRef >>
+
+A value where C<< ref($value) eq "CODE" >>.
+
+=item C<< RegexpRef >>
+
+A value where C<< ref($value) eq "Regexp" >>.
+
+=item C<< GlobRef >>
+
+A value where C<< ref($value) eq "GLOB" >>.
+
+=item C<< FileHandle >>
+
+A file handle.
+
+=item C<< Object >>
+
+A blessed object.
+
+(This also accepts regexp refs.)
+
+=back
 
 =head2 Structured
 
@@ -1539,17 +1607,44 @@ OK, so I stole some ideas from L<MooseX::Types::Structured>.
 
 =over
 
-=item C<< Map[`a] >>
+=item C<< Map[`k, `v] >>
 
-=item C<< Tuple[`a] >>
+Similar to C<HashRef> but parameterized with type constraints for both the
+key and value. The constraint for keys would typically be a subtype of
+C<Str>.
 
-=item C<< Dict[`a] >>
+=item C<< Tuple[...] >>
+
+Subtype of C<ArrayRef>, accepting an list of type constraints for
+each slot in the array.
+
+C<< Tuple[Int, HashRef] >> would match C<< [1, {}] >> but not C<< [{}, 1] >>.
+
+=item C<< Dict[...] >>
+
+Subtype of C<HashRef>, accepting an list of type constraints for
+each slot in the hash.
+
+For example C<< Dict[name => Str, id => Int] >> allows
+C<< { name => "Bob", id => 42 } >>.
 
 =item C<< Optional[`a] >>
 
+Used in conjunction with C<Dict> and C<Tuple> to specify slots that are
+optional and may be omitted (but not necessarily set to an explicit undef).
+
+C<< Dict[name => Str, id => Optional[Int]] >> allows C<< { name => "Bob" } >>
+but not C<< { name => "Bob", id => "BOB" } >>.
+
 =back
 
-This module also exports a C<slurpy> function.
+This module also exports a C<slurpy> function, which can be used as follows:
+
+   my $type = Tuple[Str, slurpy ArrayRef[Int]];
+   
+   $type->( ["Hello"] );                # ok
+   $type->( ["Hello", 1, 2, 3] );       # ok
+   $type->( ["Hello", [1, 2, 3]] );     # not ok
 
 =begin trustme
 
@@ -1565,9 +1660,30 @@ OK, so I stole some ideas from L<MooX::Types::MooseLike::Base>.
 
 =item C<< InstanceOf[`a] >>
 
+Shortcut for a union of L<Type::Tiny::Class> constraints.
+
+C<< InstanceOf["Foo", "Bar"] >> allows objects blessed into the C<Foo>
+or C<Bar> classes, or subclasses of those.
+
+Given no parameters, just equivalent to C<Object>.
+
 =item C<< ConsumerOf[`a] >>
 
+Shortcut for an intersection of L<Type::Tiny::Role> constraints.
+
+C<< ConsumerOf["Foo", "Bar"] >> allows objects where C<< $o->DOES("Foo") >>
+and C<< $o->DOES("Bar") >> both return true.
+
+Given no parameters, just equivalent to C<Object>.
+
 =item C<< HasMethods[`a] >>
+
+Shortcut for a L<Type::Tiny::Duck> constraint.
+
+C<< HasMethods["foo", "bar"] >> allows objects where C<< $o->can("foo") >>
+and C<< $o->can("bar") >> both return true.
+
+Given no parameters, just equivalent to C<Object>.
 
 =back
 
