@@ -77,6 +77,17 @@ use Type::Tiny pretty easily.
 
 Type::Tiny is faster and supports coercions.
 
+=head2 Scalar::Does
+
+L<Scalar::Does> is somewhat of a precursor to Type::Tiny, but has now been
+rewritten to use Type::Tiny internally.
+
+It gives you a C<< does($value, $type) >> function that is roughly equivalent
+to C<< $type->check($value) >> except that C<< $type >> may be one of a list
+of pre-defined strings (instead of a Type::Tiny type constraint); or may be
+a package name in which case it will be assumed to be a role and checked with
+C<< $value->DOES($type) >>.
+
 =head1 BUGS
 
 Please report any bugs to

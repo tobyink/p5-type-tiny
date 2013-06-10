@@ -6,7 +6,6 @@
       * Documentation
           * See what questions users come up with, and write more
             documentation if necessary
-          * Document usage with Scalar::Does
           * Document Type::Utils - don't just point people at Moose
           * Document Types::Standard - don't just point people at
             Moose, MooseX::Types::Structured and
