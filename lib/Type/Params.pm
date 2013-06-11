@@ -89,6 +89,11 @@ sub compile
 		my $is_slurpy;
 		my $varname;
 		
+		if (Bool->check($constraint))
+		{
+			$constraint = $constraint ? Any : Optional[Any];
+		}
+		
 		if (HashRef->check($constraint))
 		{
 			$constraint = to_TypeTiny($constraint->{slurpy});

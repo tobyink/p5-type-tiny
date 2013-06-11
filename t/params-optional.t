@@ -66,6 +66,11 @@ like(
 	qr{^Wrong number of parameters; got 5; expected 1 to 4},
 );
 
+my $chk2 = compile(1, 0, 0);
+like(
+	exception { $chk2->() },
+	qr{^Wrong number of parameters; got 0; expected 1 to 3},
+);
 
 done_testing;
 
