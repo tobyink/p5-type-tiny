@@ -315,6 +315,7 @@ sub match_on_type
 			}
 			eval "$code";
 			die $@ if $@;
+			return;
 		}
 		else
 		{
