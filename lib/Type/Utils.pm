@@ -14,7 +14,7 @@ sub _croak ($;@) { require Type::Exception; goto \&Type::Exception::croak }
 use Scalar::Util qw< blessed >;
 use Type::Library;
 use Type::Tiny;
-use Types::TypeTiny qw< TypeTiny to_TypeTiny HashLike >;
+use Types::TypeTiny qw< TypeTiny to_TypeTiny HashLike StringLike CodeLike >;
 
 our @EXPORT = qw<
 	extends declare as where message inline_as
@@ -22,7 +22,13 @@ our @EXPORT = qw<
 	coerce from via
 	declare_coercion to_type
 >;
-our @EXPORT_OK = (@EXPORT, qw< type subtype >);
+our @EXPORT_OK = (
+	@EXPORT,
+	qw<
+		type subtype
+		match_on_type compile_match_on_type
+	>,
+);
 
 use base qw< Exporter::TypeTiny >;
 
@@ -274,6 +280,113 @@ sub via (&;@)
 	return @_;
 }
 
+sub match_on_type
+{
+	my $value = shift;
+	
+	while (@_)
+	{
+		my ($type, $code);
+		if (@_ == 1)
+		{
+			require Types::Standard;
+			($type, $code) = (Types::Standard::Any(), shift);
+		}
+		else
+		{
+			($type, $code) = splice(@_, 0, 2);
+			TypeTiny->($type);
+		}
+		
+		$type->check($value) or next;
+		
+		if (StringLike->check($code))
+		{
+			local $_ = $value;
+			if (wantarray) {
+				my @r = eval "$code";
+				die $@ if $@;
+				return @r;
+			}
+			if (defined wantarray) {
+				my $r = eval "$code";
+				die $@ if $@;
+				return $r;
+			}
+			eval "$code";
+			die $@ if $@;
+		}
+		else
+		{
+			CodeLike->($code);
+			local $_ = $value;
+			return $code->($value);
+		}
+	}
+	
+	_croak("No cases matched for %s", Type::Tiny::_dd($value));
+}
+
+sub compile_match_on_type
+{
+	my @code = 'sub {';
+	my @checks;
+	my @actions;
+	
+	my $els = '';
+	
+	while (@_)
+	{
+		my ($type, $code);
+		if (@_ == 1)
+		{
+			require Types::Standard;
+			($type, $code) = (Types::Standard::Any(), shift);
+		}
+		else
+		{
+			($type, $code) = splice(@_, 0, 2);
+			TypeTiny->($type);
+		}
+		
+		if ($type->can_be_inlined)
+		{
+			push @code, sprintf('%sif (%s)', $els, $type->inline_check('$_[0]'));
+		}
+		else
+		{
+			push @checks, $type;
+			push @code, sprintf('%sif ($checks[%d]->check($_[0]))', $els, $#checks);
+		}
+		
+		$els = 'els';
+		
+		if (StringLike->check($code))
+		{
+			push @code, sprintf('  { local $_ = $_[0]; %s }', $code);
+		}
+		else
+		{
+			CodeLike->($code);
+			push @actions, $code;
+			push @code, sprintf('  { local $_ = $_[0]; $actions[%d]->(@_) }', $#actions);
+		}
+	}
+	
+	push @code, 'else', '  { Type::Util::_croak("No cases matched for %s", Type::Tiny::_dd($_[0])) }';
+	
+	push @code, '}';  # /sub
+	
+	require Eval::TypeTiny;
+	return Eval::TypeTiny::eval_closure(
+		source      => \@code,
+		environment => {
+			'@actions' => \@actions,
+			'@checks'  => \@checks,
+		},
+	);
+}
+
 1;
 
 __END__
@@ -357,6 +470,8 @@ L<Moose::Util::TypeConstraints>.
 
 =item C<< via { BLOCK } >>
 
+=item C<< match_on_type $value => ($type => \&action, ..., \&default?) >>
+
 =back
 
 =head2 Other
@@ -417,12 +532,20 @@ it will coerce to - this allows it to skip coercion when no coercion is
 needed (e.g. avoiding coercing C<< [] >> to C<< [ [] ] >>) and allows
 C<assert_coerce> to work properly.
 
+=item C<< my $coderef = compile_match_on_type($type => \&action, ..., \&default?) >>
+
+Generate an accelerated match_on_type coderef.
+
+(For a benchmark, set the C<EXTENDED_TESTING> environment variable to true,
+and run the bundled C<< t/match-on-type.t >> test case.)
+
 =back
 
 =head1 EXPORT
 
 By default, all of the functions documented above are exported, except
-C<subtype> and C<type> (prefer C<declare> instead).
+C<subtype> and C<type> (prefer C<declare> instead), and C<match_on_type>
+and C<compile_match_on_type>.
 
 This module uses L<Exporter::TypeTiny>; see the documentation of that module
 for tips and tricks importing from Type::Utils.
