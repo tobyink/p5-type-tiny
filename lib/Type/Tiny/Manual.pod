@@ -57,6 +57,10 @@ Type::Tiny and friends don't need to be used within an OO framework. See L<FreeM
 
 L<Processing arguments to subs|Type::Tiny::Manual::Params> - coerce and validate arguments to functions and methods.
 
+=item *
+
+Other modules using Type::Tiny in interesting ways: L<Type::Tie>, L<Scalar::Does>...
+
 =back
 
 =head1 TYPE::TINY VERSUS X
