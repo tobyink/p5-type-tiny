@@ -1465,6 +1465,8 @@ __END__
 
 =pod
 
+=for stopwords booleans
+
 =encoding utf-8
 
 =for stopwords datetimes
