@@ -101,6 +101,34 @@ from L<Eval::Closure>:
 
 =back
 
+=head1 EVALUATION ENVIRONMENT
+
+The evaluation is performed in the presence of L<strict>, but the absence of
+L<warnings>. (This is different to L<Eval::Closure> which enables warnings for
+compiled closures.)
+
+The L<feature> pragma is not active in the evaluation environment, so the
+following will not work:
+
+   use feature qw(say);
+   use Eval::TypeTiny qw(eval_closure);
+   
+   my $say_all = eval_closure(
+      source => 'sub { say for @_ }',
+   );
+   $say_all->("Hello", "World");
+
+The L<feature> pragma does not "carry over" into the stringy eval. It is
+of course possible to import pragmas into the evaluated string as part of the
+string itself:
+
+   use Eval::TypeTiny qw(eval_closure);
+   
+   my $say_all = eval_closure(
+      source => 'sub { use feature qw(say); say for @_ }',
+   );
+   $say_all->("Hello", "World");
+
 =head1 BUGS
 
 Please report any bugs to
