@@ -132,17 +132,17 @@ L<Test::TypeTiny> provides a few handy functions for testing type constraints.
 
 =item C<< should_pass($value, $type) >>
 
-Test that passes iff C<< $value >> passes << $type->check >>.
+Test that passes iff C<< $value >> passes C<< $type->check >>.
 
 =item C<< should_fail($value, $type, $test_name) >>
 
 =item C<< should_fail($value, $type) >>
 
-Test that passes iff C<< $value >> fails << $type->check >>.
+Test that passes iff C<< $value >> fails C<< $type->check >>.
 
 =item C<< ok_subtype($type, @subtypes) >>
 
-Test that passes iff all C<< @subtypes >> are subtypes of << $type >>.
+Test that passes iff all C<< @subtypes >> are subtypes of C<< $type >>.
 
 =item C<< EXTENDED_TESTING >>
 
