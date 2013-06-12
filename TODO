@@ -6,7 +6,6 @@
       * Documentation
           * See what questions users come up with, and write more
             documentation if necessary
-          * Document Type::Utils - don't just point people at Moose
       * Test cases
           * Type::Registry needs a few more test cases
           * Type::Parser needs lots of test cases
