@@ -496,3 +496,15 @@
 			dcs:thanks cpan:MMCLERIC;
 		];
 	].
+
+`Type-Tiny 0.007_05 cpan:TOBYINK`
+	issued  2013-06-12;
+	changeset [
+		dcs:versus `Type-Tiny 0.007_04 cpan:TOBYINK`;
+		item "Add match_on_type and compile_match_on_type to Type::Utils."^^Addition;
+		item "Vastly improved documentation for Type::Utils."^^Documentation;
+		item "Vastly improved documentation for Types::Standard."^^Documentation;
+		item "Mention Scalar::Does and Type::Tie in manual."^^Documentation;
+		item "Test cases for InstanceOf, ConsumerOf, HasMethods and Enum types defined by Types::Standard."^^Addition;
+		item "Support '0' and '1' as shortcuts for Optional[Any] and Any in Type::Params. (Not documented yet.)"^^Change;
+	].
