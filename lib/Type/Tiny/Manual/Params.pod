@@ -96,8 +96,7 @@ L<Type::Tiny>...
 
 =head3 Attribute::Contract
 
-At the time of writing, there is no released version of L<Attribute::Contract>
-that supports Type::Tiny, but support exists in the repository.
+You want Attribute::Contract 0.03 or above.
 
    use Attribute::Contract -types => [qw/Object Str/];
    
