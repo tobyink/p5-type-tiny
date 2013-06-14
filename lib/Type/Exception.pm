@@ -61,13 +61,27 @@ sub throw
 	}
 	@ctxt{qw/ package file line /} = caller($level);
 	
+	my $stack = undef;
+	if (our $StackTrace)
+	{
+		require Devel::StackTrace;
+		$stack = "Devel::StackTrace"->new(
+			ignore_package => [ keys %CarpInternal ],
+		);
+	}
+	
 	die(
-		$class->new(context => \%ctxt, @_)
+		our $LastError = $class->new(
+			context     => \%ctxt,
+			stack_trace => $stack,
+			@_,
+		)
 	);
 }
 
-sub message    { $_[0]{message} ||= $_[0]->_build_message };
-sub context    { $_[0]{context} };
+sub message     { $_[0]{message} ||= $_[0]->_build_message };
+sub context     { $_[0]{context} };
+sub stack_trace { $_[0]{stack_trace} };
 
 sub to_string
 {
@@ -140,7 +154,7 @@ Moose-style constructor function.
 
 Constructs an exception and passes it to C<die>.
 
-Automatically populates C<context>.
+Automatically populates C<context> and C<stack_trace> if appropriate.
 
 =back
 
@@ -155,6 +169,11 @@ The error message.
 =item C<context>
 
 Hashref containing the package, file and line that generated the error.
+
+=item C<stack_trace>
+
+A more complete stack trace. This feature requires L<Devel::StackTrace>;
+use the C<< $StackTrace >> package variable to switch it on.
 
 =back
 
@@ -197,6 +216,14 @@ Stringification is overloaded to call C<to_string>.
 
 Serves a similar purpose to C<< %Carp::CarpInternal >>.
 
+=item C<< $Type::Tiny::StackTrace >>
+
+Boolean to toggle stack trace generation.
+
+=item C<< $Type::Tiny::LastError >>
+
+A reference to the last exception object thrown.
+
 =back
 
 =head1 CAVEATS
@@ -208,7 +235,8 @@ Type::Exceptions whenever you want.
 For example, if you use a Type::Tiny type constraint in a Moose attribute,
 Moose will not call the constraint's C<assert_valid> method (which throws
 an exception). Instead it will call C<check> and C<get_message> (which do
-not), and will C<confess> an error message of its own.
+not), and will C<confess> an error message of its own. (The C<< $LastError >>
+package variable may save your bacon.)
 
 =head1 BUGS
 

@@ -26,6 +26,7 @@ use lib qw( ./lib ./t/lib ../inc ./inc );
 use Test::More;
 use Test::Fatal;
 
+use Scalar::Util qw(refaddr);
 use Types::Standard slurpy => -types;
 
 my $supernum = Types::Standard::STRICTNUM ? "StrictNum" : "LaxNum";
@@ -34,6 +35,8 @@ my $v = [];
 my $e = exception { Int->create_child_type->assert_valid($v) };
 
 isa_ok($e, "Type::Exception", '$e');
+
+is(refaddr($e), refaddr($Type::Exception::LastError), '$Type::Exception::LastError');
 
 is(
 	$e->message,
