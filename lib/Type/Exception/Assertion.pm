@@ -11,11 +11,35 @@ BEGIN {
 
 use base "Type::Exception";
 
-sub type       { $_[0]{type} };
-sub value      { $_[0]{value} };
-sub varname    { $_[0]{varname} ||= '$_' };
+sub type               { $_[0]{type} };
+sub value              { $_[0]{value} };
+sub varname            { $_[0]{varname} ||= '$_' };
+sub attribute_step     { $_[0]{attribute_step} };
+sub attribute_name     { $_[0]{attribute_name} };
+sub argument_name      { $_[0]{argument_name} };
 
-sub has_type   { defined $_[0]{type} }; # sic
+sub has_type           { defined $_[0]{type} }; # sic
+sub has_attribute_step { exists $_[0]{attribute_step} };
+sub has_attribute_name { exists $_[0]{attribute_name} };
+
+sub new
+{
+	my $class = shift;
+	my $self  = $class->SUPER::new(@_);
+	
+	if (ref $Method::Generate::Accessor::CurrentAttribute)
+	{
+		require B;
+		my %d = %{$Method::Generate::Accessor::CurrentAttribute};
+		$self->{attribute_name} = $d{name} if defined $d{name};
+		$self->{attribute_step} = $d{step} if defined $d{step};
+		
+		$self->{varname} = sprintf '$self->{%s}', B::perlstring($d{init_arg})
+			if defined $d{init_arg};
+	}
+	
+	return $self;
+}
 
 sub message
 {
@@ -140,15 +164,31 @@ The value that was tested.
 
 The name of the variable that was checked, if known. Defaults to C<< '$_' >>.
 
+=item C<attribute_name>
+
+If this exception was thrown as the result of an isa check or a failed
+coercion for a Moo attribute, then this will tell you which attribute (if
+your Moo is new enough).
+
+(Hopefully one day this will support other OO frameworks.)
+
+=item C<attribute_step>
+
+If this exception was thrown as the result of an isa check or a failed
+coercion for a Moo attribute, then this will contain either C<< "isa check" >>
+or C<< "coercion" >> to indicate which went wrong (if your Moo is new enough).
+
+(Hopefully one day this will support other OO frameworks.)
+
 =back
 
 =head2 Methods
 
 =over
 
-=item C<has_type>
+=item C<has_type>, C<has_attribute_name>, C<has_attribute_step>
 
-Predicate method.
+Predicate methods.
 
 =item C<message>
 

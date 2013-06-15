@@ -4,7 +4,11 @@
 
 =head1 PURPOSE
 
-Tests L<Type::Exception>.
+Tests that L<Type::Exception> is capable of providing stack traces.
+
+=head1 DEPENDENCIES
+
+Requires L<Devel::StackTrace>; skipped otherwise.
 
 =head1 AUTHOR
 
