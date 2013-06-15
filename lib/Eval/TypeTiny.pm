@@ -84,6 +84,8 @@ __END__
 
 =encoding utf-8
 
+=for stopwords pragmas
+
 =head1 NAME
 
 Eval::TypeTiny - utility to evaluate a string of Perl code in a clean environment
