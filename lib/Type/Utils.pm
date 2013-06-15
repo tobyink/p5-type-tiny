@@ -17,7 +17,7 @@ use Type::Tiny;
 use Types::TypeTiny qw< TypeTiny to_TypeTiny HashLike StringLike CodeLike >;
 
 our @EXPORT = qw<
-	extends declare as where message inline_as
+	declare as where message inline_as
 	class_type role_type duck_type union intersection enum
 	coerce from via
 	declare_coercion to_type
@@ -25,7 +25,7 @@ our @EXPORT = qw<
 our @EXPORT_OK = (
 	@EXPORT,
 	qw<
-		type subtype
+		extends type subtype
 		match_on_type compile_match_on_type
 	>,
 );
@@ -57,10 +57,10 @@ sub declare
 		_croak "Cannot provide two names for type" if exists $opts{name};
 		$opts{name} = $name;
 	}
-
+	
 	my $caller = caller($opts{_caller_level} || 0);
 	$opts{library} = $caller;
-
+	
 	if (defined $opts{parent})
 	{
 		$opts{parent} = to_TypeTiny($opts{parent});
@@ -73,7 +73,7 @@ sub declare
 				or _croak("Could not find parent type");
 		}
 	}
-		
+	
 	my $type;
 	if (defined $opts{parent})
 	{
@@ -398,16 +398,16 @@ __END__
 
 =head1 NAME
 
-Type::Utils - utility functions to make defining type constraints a little easier
+Type::Utils - utility functions to make defining and using type constraints a little easier
 
 =head1 SYNOPSIS
 
    package Types::Mine;
    
    use Type::Library -base;
-   use Type::Utils;
+   use Type::Utils -all;
    
-   extends "Types::Standard";
+   BEGIN { extends "Types::Standard" };
    
    declare "AllCaps",
       as "Str",
@@ -419,15 +419,35 @@ Type::Utils - utility functions to make defining type constraints a little easie
 
 =head1 DESCRIPTION
 
-This module provides utility functions to make defining type constraints a
-little easier. 
+This module provides utility functions to make defining and using type
+constraints a little easier. 
 
-=head2 Moose::Util::TypeConstraints-like
+=head2 Type declaration functions
 
-The following are similar to the similarly named functions described in
-L<Moose::Util::TypeConstraints>.
+Many of the following are similar to the similarly named functions described
+in L<Moose::Util::TypeConstraints>.
 
 =over
+
+=item C<< declare $name, %options >>
+
+=item C<< declare %options >>
+
+Declare a named or anonymous type constraint. Use C<as> and C<where> to
+specify the parent type (if any) and (possibly) refine its definition.
+
+   declare EvenInt, as Int, where { $_ % 2 == 0 };
+
+   my $EvenInt = declare as Int, where { $_ % 2 == 0 };
+
+B<< NOTE: >>
+If the caller package inherits from L<Type::Library> then any non-anonymous
+types declared in the package will be automatically installed into the
+library.
+
+Hidden gem: if you're inheriting from a type constraint that includes some
+coercions, you can include C<< coerce => 1 >> in the C<< %options >> hash
+to inherit the coercions.
 
 =item C<< subtype $name, %options >>
 
@@ -437,11 +457,9 @@ Declare a named or anonymous type constraint which is descended from an
 existing type constraint. Use C<as> and C<where> to specify the parent
 type and refine its definition.
 
-Actually, you should use C<declare> instead (see below).
+Actually, you should use C<declare> instead; this is just an alias.
 
-If the caller package inherits from L<Type::Library> then any non-anonymous
-types declared in the package will be automatically installed into the
-library.
+This function is not exported by default.
 
 =item C<< type $name, %options >>
 
@@ -451,23 +469,19 @@ Declare a named or anonymous type constraint which is not descended from
 an existing type constraint. Use C<where> to provide a coderef that
 constrains values.
 
-Actually, you should use C<declare> instead (see below).
+Actually, you should use C<declare> instead; this is just an alias.
 
-If the caller package inherits from L<Type::Library> then any non-anonymous
-types declared in the package will be automatically installed into the
-library.
+This function is not exported by default.
 
 =item C<< as $parent >>
 
-Used with C<declare> (and C<subtype> which is just an alias) to specify
-a parent type constraint:
+Used with C<declare> to specify a parent type constraint:
 
    declare EvenInt, as Int, where { $_ % 2 == 0 };
 
 =item C<< where { BLOCK } >>
 
-Used with C<declare> (and C<subtype> which is just an alias) to provide
-the constraint coderef:
+Used with C<declare> to provide the constraint coderef:
 
    declare EvenInt, as Int, where { $_ % 2 == 0 };
 
@@ -537,6 +551,21 @@ Shortcut for declaring a L<Type::Tiny::Union> type constraint.
 
 Shortcut for declaring a L<Type::Tiny::Enum> type constraint.
 
+=item C<< intersection $name, \@constraints >>
+
+=item C<< intersection \@constraints >>
+
+Shortcut for declaring a L<Type::Tiny::Intersection> type constraint.
+
+=back
+
+=head2 Coercion declaration functions
+
+Many of the following are similar to the similarly named functions described
+in L<Moose::Util::TypeConstraints>.
+
+=over
+
 =item C<< coerce $target, @coercions >>
 
 Add coercions to the target type constraint. The list of coercions is a
@@ -554,6 +583,60 @@ Sugar to specify a type constraint in a list of coercions:
 =item C<< via { BLOCK } >>
 
 Sugar to specify a coderef in a list of coercions.
+
+=item C<< declare_coercion $name, \%opts, $type1, $code1, ... >>
+
+=item C<< declare_coercion \%opts, $type1, $code1, ... >>
+
+Declares a coercion that is not explicitly attached to any type in the
+library. For example:
+
+   declare_coercion "ArrayRefFromAny", from "Any", via { [$_] };
+
+This coercion will be exportable from the library as a L<Type::Coercion>
+object, but the ArrayRef type exported by the library won't automatically
+use it.
+
+Coercions declared this way are immutable (frozen).
+
+=item C<< to_type $type >>
+
+Used with C<declare_coercion> to declare the target type constraint for
+a coercion, but still without explicitly attaching the coercion to the
+type constraint:
+
+   declare_coercion "ArrayRefFromAny",
+      to_type "ArrayRef",
+      from "Any", via { [$_] };
+
+You should pretty much always use this when declaring an unattached
+coercion because it's exceedingly useful for a type coercion to know what
+it will coerce to - this allows it to skip coercion when no coercion is
+needed (e.g. avoiding coercing C<< [] >> to C<< [ [] ] >>) and allows
+C<assert_coerce> to work properly.
+
+=back
+
+=head2 Type library management
+
+=over
+
+=item C<< extends @libraries >>
+
+Indicates that this type library extends other type libraries, importing
+their type constraints.
+
+Should usually be executed in a C<< BEGIN >> block.
+
+This is not exported by default because it's not fun to export it to Moo,
+Moose or Mouse classes! C<< use Type::Utils -all >> can be used to import
+it into your type library.
+
+=back
+
+=head2 Other
+
+=over
 
 =item C<< match_on_type $value => ($type => \&action, ..., \&default?) >>
 
@@ -591,65 +674,7 @@ coderef. (e.g. for C<Num>, C<Str> and C<Undef> above.)
 
 For improved performance, try C<compile_match_on_type>.
 
-=back
-
-=head2 Other
-
-=over
-
-=item C<< declare $name, %options >>
-
-=item C<< declare %options >>
-
-C<declare> is a function which works like C<subtype> and C<type>. In fact,
-the latter pair are just aliases for the former.
-
-If the caller package inherits from L<Type::Library> then any non-anonymous
-types declared in the package will be automatically installed into the
-library.
-
-=item C<< intersection $name, \@constraints >>
-
-=item C<< intersection \@constraints >>
-
-Defines a type constraint which is the intersection of several existing
-constraints.
-
-=item C<< extends @library >>
-
-Indicates that this type library extends other type libraries, importing
-their type constraints.
-
-=item C<< declare_coercion $name, \%opts, $type1, $code1, ... >>
-
-=item C<< declare_coercion \%opts, $type1, $code1, ... >>
-
-Declares a coercion that is not explicitly attached to any type in the
-library. For example:
-
-   declare_coercion "ArrayRefFromAny", from "Any", via { [$_] };
-
-This coercion will be exportable from the library as a L<Type::Coercion>
-object, but the ArrayRef type exported by the library won't automatically
-use it.
-
-Coercions declared this way are immutable (frozen).
-
-=item C<< to_type $type >>
-
-Used with C<declare_coercion> to declare the target type constraint for
-a coercion, but still without explicitly attaching the coercion to the
-type constraint:
-
-   declare_coercion "ArrayRefFromAny",
-      to_type "ArrayRef",
-      from "Any", via { [$_] };
-
-You should pretty much always use this when declaring an unattached
-coercion because it's exceedingly useful for a type coercion to know what
-it will coerce to - this allows it to skip coercion when no coercion is
-needed (e.g. avoiding coercing C<< [] >> to C<< [ [] ] >>) and allows
-C<assert_coerce> to work properly.
+This function is not exported by default.
 
 =item C<< my $coderef = compile_match_on_type($type => \&action, ..., \&default?) >>
 
@@ -682,13 +707,15 @@ Remember to store the coderef somewhere fairly permanent so that you
 don't compile it over and over. C<state> variables (in Perl >= 5.10)
 are good for this. (Same sort of idea as L<Type::Params>.)
 
+This function is not exported by default.
+
 =back
 
 =head1 EXPORT
 
 By default, all of the functions documented above are exported, except
-C<subtype> and C<type> (prefer C<declare> instead), and C<match_on_type>
-and C<compile_match_on_type>.
+C<subtype> and C<type> (prefer C<declare> instead), C<extends>, and
+C<match_on_type>/C<compile_match_on_type>.
 
 This module uses L<Exporter::TypeTiny>; see the documentation of that module
 for tips and tricks importing from Type::Utils.

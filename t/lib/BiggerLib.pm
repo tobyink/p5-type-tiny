@@ -31,7 +31,7 @@ package BiggerLib;
 use strict;
 use warnings;
 
-use Type::Utils;
+use Type::Utils qw(:all);
 
 use base "Type::Library";
 
