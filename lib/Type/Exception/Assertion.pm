@@ -16,7 +16,6 @@ sub value              { $_[0]{value} };
 sub varname            { $_[0]{varname} ||= '$_' };
 sub attribute_step     { $_[0]{attribute_step} };
 sub attribute_name     { $_[0]{attribute_name} };
-sub argument_name      { $_[0]{argument_name} };
 
 sub has_type           { defined $_[0]{type} }; # sic
 sub has_attribute_step { exists $_[0]{attribute_step} };
