@@ -79,7 +79,7 @@ sub _mksub
 	my $source = $type->is_parameterizable
 		? sprintf(
 			q{
-				sub (;@) {
+				sub (;$) {
 					my $params; $params = shift if ref($_[0]) eq q(ARRAY);
 					my $t = $params ? $type->parameterize(@$params) : $type;
 					@_ && wantarray ? return($t%s, @_) : return $t%s;
@@ -172,7 +172,7 @@ sub _exporter_fail
 	
 	if ($globals->{declare})
 	{
-		return($name, _subname("$class\::$name", sub (;@)
+		return($name, _subname("$class\::$name", sub (;$)
 		{
 			my $params; $params = shift if ref($_[0]) eq "ARRAY";
 			my $type = $into->get_type($name);
