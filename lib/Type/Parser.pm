@@ -324,7 +324,8 @@ Tokenization: {
 	}
 	
 	{
-		package Type::Parser::Token;
+		package # hide from CPAN
+		Type::Parser::Token;
 		
 		sub is_primary
 		{
