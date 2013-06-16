@@ -508,3 +508,18 @@
 		item "Test cases for InstanceOf, ConsumerOf, HasMethods and Enum types defined by Types::Standard."^^Addition;
 		item "Support '0' and '1' as shortcuts for Optional[Any] and Any in Type::Params. (Not documented yet.)"^^Change;
 	].
+
+`Type-Tiny 0.007_06 cpan:TOBYINK`
+	issued  2013-06-16;
+	changeset [
+		dcs:versus `Type-Tiny 0.007_05 cpan:TOBYINK`;
+		item "Rearranged documentation for Type::Utils, avoiding previous split into Moose-like and non-Moose-like functions."^^Documentation;
+		item "Document the evaluation environment used by Eval::TypeTiny."^^Documentation;
+		item "Type::Exception is now capable of supplying stack traces (requires Devel::StackTrace)."^^Addition;
+		item "Exceptions thrown for Moo isa/coerce now indicate which attribute was involved."^^Change;
+		item "Type::Utils no longer exports 'extends' by default!!"^^Change;
+		item [
+			label "Better prototypes (was `;@`, now `;$`) for parameterizable type 'constants' exported by type libraries.";
+			dcs:thanks cpan:MSTROUT;
+		];
+	].
