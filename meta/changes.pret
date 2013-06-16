@@ -523,3 +523,10 @@
 			dcs:thanks cpan:MSTROUT;
 		];
 	].
+
+`Type-Tiny 0.007_07 cpan:TOBYINK`
+	issued  2013-06-16;
+	changeset [
+		dcs:versus `Type-Tiny 0.007_06 cpan:TOBYINK`;
+		item "Partly roll back prototype changes. Now we use `;$` for Perl since 5.14, but `;@`, for older Perls that don't support `;$` so well."^^Bugfix;
+	].
