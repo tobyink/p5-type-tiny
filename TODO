@@ -12,7 +12,3 @@
               * Check every type of token in the grammar, inclusing
                 qr{}, qq{}, q{}, fat comma, class types, etc
               * Test precedence works - e.g. Foo|~Bar&Baz
-      * Hassle mst about exception API for constraints and coercions in
-        Moo
-          * Implement what needs to be implemented at Type::Exception's
-            end
