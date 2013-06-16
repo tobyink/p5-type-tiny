@@ -16,6 +16,8 @@ use Types::TypeTiny qw< TypeTiny to_TypeTiny >;
 
 use base qw< Exporter::TypeTiny >;
 
+BEGIN { *NICE_PROTOTYPES = ($] >= 5.014) ? sub () { !!1 } : sub () { !!0 } };
+
 sub _croak ($;@) { require Type::Exception; goto \&Type::Exception::croak }
 
 {
@@ -79,12 +81,13 @@ sub _mksub
 	my $source = $type->is_parameterizable
 		? sprintf(
 			q{
-				sub (;$) {
+				sub (%s) {
 					my $params; $params = shift if ref($_[0]) eq q(ARRAY);
 					my $t = $params ? $type->parameterize(@$params) : $type;
 					@_ && wantarray ? return($t%s, @_) : return $t%s;
 				}
 			},
+			NICE_PROTOTYPES ? q(;$) : q(;@),
 			$post_method,
 			$post_method,
 		)
@@ -172,7 +175,7 @@ sub _exporter_fail
 	
 	if ($globals->{declare})
 	{
-		return($name, _subname("$class\::$name", sub (;$)
+		my $declared = sub (;$)
 		{
 			my $params; $params = shift if ref($_[0]) eq "ARRAY";
 			my $type = $into->get_type($name);
@@ -184,7 +187,15 @@ sub _exporter_fail
 			
 			my $t = $params ? $type->parameterize(@$params) : $type;
 			@_ && wantarray ? return($t, @_) : return $t;
-		}));
+		};
+		
+		return(
+			$name,
+			_subname(
+				"$class\::$name",
+				NICE_PROTOTYPES ? sub (;$) { goto $declared } : sub (;@) { goto $declared },
+			),
+		);
 	}
 	
 	return $class->SUPER::_exporter_fail(@_);
@@ -429,6 +440,23 @@ List all standalone coercions defined by the library.
 =item C<< import(@args) >>
 
 Type::Library-based libraries are exporters.
+
+=back
+
+=head2 Constants
+
+=over
+
+=item C<< NICE_PROTOTYPES >>
+
+If this is true, then Type::Library will give parameterizable type constraints
+slightly the nicer prototype of C<< (;$) >> instead of the default C<< (;@) >>.
+This allows constructs like:
+
+   ArrayRef[Int] | HashRef[Int]
+
+... to "just work". Sadly, this constant is false on Perl < 5.14, and
+expressions like the above need lots of parentheses to do what you mean.
 
 =back
 
