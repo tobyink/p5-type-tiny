@@ -23,6 +23,9 @@ cpan:DJERIUS
 cpan:HAARG
 	:name "Graham Knop".
 
+cpan:PJFL
+	:name "Peter Flanigan".
+
 # We bundle some files made by these dudes...
 
 cpan:RJBS

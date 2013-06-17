@@ -6,7 +6,7 @@ use warnings;
 sub _croak ($;@) { require Type::Exception; goto \&Type::Exception::croak }
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.007_07';
+our $VERSION   = '0.007_08';
 
 # Token types
 # 
