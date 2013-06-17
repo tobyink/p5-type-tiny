@@ -457,7 +457,26 @@ sub AUTOLOAD
 	_croak q[Can't locate object method "%s" via package "%s"], $m, ref($self)||$self;
 }
 
-*_compiled_type_coercion = \&compiled_coercion;
+# Private Moose method, but Moo uses this...
+sub _compiled_type_coercion
+{
+	my $self = shift;
+	if (@_)
+	{
+		my $thing = $_[0];
+		if (blessed($thing) and $thing->isa("Type::Coercion"))
+		{
+			$self->add_type_coercions(@{$thing->type_coercion_map});
+		}
+		elsif (Types::TypeTiny::CodeLike->check($thing))
+		{
+			require Types::Standard;
+			$self->add_type_coercions(Types::Standard::Any(), $thing);
+		}
+	}
+	$self->compiled_coercion;
+}
+
 *compile_type_coercion = \&compiled_coercion;
 sub meta { _croak("Not really a Moose::Meta::TypeCoercion. Sorry!") }
 
