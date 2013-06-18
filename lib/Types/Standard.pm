@@ -1216,11 +1216,11 @@ $lib->get_type("Dict")->{coercion_generator} = sub
 	my $all_inlinable = 1;
 	for my $tc (values %dict)
 	{
-		$all_inlinable = 0 if $tc->has_coercion && !$tc->can_be_inlined;
+		$all_inlinable = 0 if !$tc->can_be_inlined;
 		$all_inlinable = 0 if $tc->has_coercion && !$tc->coercion->can_be_inlined;
 		last if!$all_inlinable;
 	}
-
+	
 	if ($all_inlinable)
 	{
 		$C->add_type_coercions($parent => Stringable {
