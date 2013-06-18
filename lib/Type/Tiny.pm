@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Tiny::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::VERSION   = '0.007_08';
+	$Type::Tiny::VERSION   = '0.007_09';
 }
 
 use Eval::TypeTiny ();

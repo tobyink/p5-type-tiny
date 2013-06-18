@@ -542,3 +542,21 @@
 			dcs:thanks cpan:PJFL;
 		];
 	].
+
+`Type-Tiny 0.007_09 cpan:TOBYINK`
+	issued  2013-06-18;
+	changeset [
+		dcs:versus `Type-Tiny 0.007_08 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix;
+			label "Fix problems inlining Dict deep coercions where the target constraint could not be inlined.";
+			dcs:fixes RT#86233;
+			dcs:thanks cpan:MMCLERIC;
+		];
+		item [
+			a dcs:Bugfix;
+			label "Fix unintuitive Dict deep coercions.";
+			dcs:fixes RT#86239;
+			dcs:thanks cpan:MMCLERIC;
+		];
+	].
