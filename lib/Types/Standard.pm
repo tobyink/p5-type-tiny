@@ -1246,9 +1246,10 @@ $lib->get_type("Dict")->{coercion_generator} = sub
 				{
 					push @code, sprintf('%%tmp = (); $tmp{x} = %s;', $ct->coercion->inline_coercion("\$orig->{$K}"));
 					push @code, sprintf(
-						$ct_optional
-							? 'if (%s) { $new{%s}=$tmp{x} }'
-							: 'if (%s) { $new{%s}=$tmp{x} } else { $return_orig = 1; last %s }',
+#						$ct_optional
+#							? 'if (%s) { $new{%s}=$tmp{x} }'
+#							:
+						'if (%s) { $new{%s}=$tmp{x} } else { $return_orig = 1; last %s }',
 						$ct->inline_check('$tmp{x}'),
 						$K,
 						$label,
@@ -1257,9 +1258,10 @@ $lib->get_type("Dict")->{coercion_generator} = sub
 				else
 				{
 					push @code, sprintf(
-						$ct_optional
-							? 'if (%s) { $new{%s}=$orig->{%s} }'
-							: 'if (%s) { $new{%s}=$orig->{%s} } else { $return_orig = 1; last %s }',
+#						$ct_optional
+#							? 'if (%s) { $new{%s}=$orig->{%s} }'
+#							:
+						'if (%s) { $new{%s}=$orig->{%s} } else { $return_orig = 1; last %s }',
 						$ct->inline_check("\$orig->{$K}"),
 						$K,
 						$K,
