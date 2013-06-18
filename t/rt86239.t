@@ -30,7 +30,7 @@ use warnings;
 
 use Test::More;
 use Test::Fatal;
-use Type::Params qw(validate compile); 
+use Type::Params qw(validate compile);
 use Types::Standard qw(ArrayRef Dict Optional Str);
 
 my $i = 0;
