@@ -101,7 +101,7 @@ Evaluate: {
 		
 		if ($node->{type} eq "primary" and $node->{token}->type eq QUOTELIKE)
 		{
-			return eval($node->{token}->spelling);
+			return eval($node->{token}->spelling); #ARGH
 		}
 		
 		if ($node->{type} eq "primary" and $node->{token}->type eq STRING)
@@ -179,12 +179,13 @@ Parsing: {
 	
 	sub _parse_primary
 	{
-		_croak "Expected token, but got nothing"
-			unless @tokens;
+		@tokens or _croak "Expected primary type expression; got nothing";
 		
 		if ($tokens[0]->type eq NOT)
 		{
 			shift @tokens;
+			@tokens
+				or _croak("Unexpected end of string following type complement; expected type; got nothing");
 			return {
 				type  => "complement",
 				of    => _parse_primary(),
@@ -194,6 +195,8 @@ Parsing: {
 		if ($tokens[0]->type eq SLURPY)
 		{
 			shift @tokens;
+			@tokens
+				or _croak("Unexpected end of string following slurpy type modifier; expected type; got nothing");
 			return {
 				type  => "slurpy",
 				of    => _parse_primary(),
@@ -204,7 +207,10 @@ Parsing: {
 		{
 			shift @tokens;
 			my $r = _parse_expression();
-			($tokens[0]->type eq R_PAREN) or die;
+			@tokens
+				or _croak("Unexpected end of string parsing parenthetical type expression; expected ')'; got nothing");
+			$tokens[0]->type eq R_PAREN
+				or _croak("Unexpected token parsing parenthetical type expression; expected ')'; got '%s'", $tokens[0]->spelling);
 			return $r;
 		}
 		
@@ -213,7 +219,7 @@ Parsing: {
 			my $base = { type  => "primary", token => shift @tokens };
 			shift @tokens;
 			my $params = undef;
-			if ($tokens[0]->type eq R_BRACKET)
+			if (@tokens and $tokens[0]->type eq R_BRACKET)
 			{
 				shift @tokens;
 			}
@@ -221,7 +227,10 @@ Parsing: {
 			{
 				$params = _parse_expression();
 				$params = { type => "list", list => [$params] } unless $params->{type} eq "list";
-				$tokens[0]->type eq R_BRACKET or die;
+				@tokens
+					or _croak("Unexpected end of string following bracketted type expression; expected ']'; got nothing");
+				$tokens[0]->type eq R_BRACKET
+					or _croak("Unexpected token following bracketted type expression; expected ']'; got '%s'", $tokens[0]->spelling);
 				shift @tokens;
 			}
 			return {
@@ -239,7 +248,7 @@ Parsing: {
 			return { type  => "primary", token => shift @tokens };
 		}
 		
-		die;
+		_croak("Unexpected token in primary type expression; got '%s'", $tokens[0]->spelling);
 	}
 	
 	sub _parse_expression_1
