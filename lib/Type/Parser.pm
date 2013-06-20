@@ -231,7 +231,10 @@ Parsing: {
 			};
 		}
 		
-		if ($tokens[0]->is_primary)
+		if ($tokens[0][0] eq Type::Parser::TYPE
+		or  $tokens[0][0] eq Type::Parser::QUOTELIKE
+		or  $tokens[0][0] eq Type::Parser::STRING
+		or  $tokens[0][0] eq Type::Parser::CLASS)
 		{
 			return { type  => "primary", token => shift @tokens };
 		}
@@ -350,26 +353,8 @@ Tokenization: {
 	{
 		package # hide from CPAN
 		Type::Parser::Token;
-		
-		sub is_primary
-		{
-			my $self = shift;
-			return 1 if $self->[0] eq Type::Parser::TYPE;
-			return 1 if $self->[0] eq Type::Parser::QUOTELIKE;
-			return 1 if $self->[0] eq Type::Parser::STRING;
-			return 1 if $self->[0] eq Type::Parser::CLASS;
-			return;
-		}
-		
-		sub type
-		{
-			return $_[0][0];
-		}
-		
-		sub spelling
-		{
-			return $_[0][1];
-		}
+		sub type     { $_[0][0] }
+		sub spelling { $_[0][1] }
 	}
 }
 
