@@ -102,7 +102,7 @@ cmpthese(-3, {
 
 # Now we'll just do a simple check of argument count; not checking any types!
 print "\n----\n\n";
-our $CHK  = compile(Any, Any, Optional[Any]);
+our $CHK  = compile(1, 1, 0);
 our @ARGS = 1..2;
 cmpthese(-3, {
 	TypeParamsSimple     => q { $::CHK->(@::ARGS) },
