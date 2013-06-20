@@ -21,10 +21,12 @@ sub SLURPY    () { "SLURPY" };
 sub UNION     () { "UNION" };
 sub INTERSECT () { "INTERSECT" };
 sub NOT       () { "NOT" };
+sub L_PAREN   () { "L_PAREN" };
+sub R_PAREN   () { "R_PAREN" };
 
 use Text::Balanced qw(extract_quotelike);
 
-our @EXPORT_OK = qw( tokens parse eval_type );
+our @EXPORT_OK = qw( tokens parse eval_type _std_eval );
 use base "Exporter::TypeTiny";
 
 Evaluate: {
@@ -34,6 +36,18 @@ Evaluate: {
 		my ($str, $reg) = @_;
 		my $parsed = parse($str);
 		return _eval_type($parsed, $reg);
+	}
+	
+	my $std;
+	sub _std_eval
+	{
+		require Type::Registry;
+		unless ($std)
+		{
+			$std = "Type::Registry"->new;
+			$std->add_types(-Standard);
+		}
+		eval_type($_[0], $std);
 	}
 	
 	sub _eval_type
@@ -186,6 +200,14 @@ Parsing: {
 			};
 		}
 		
+		if ($tokens[0]->type eq L_PAREN)
+		{
+			shift @tokens;
+			my $r = _parse_expression();
+			($tokens[0]->type eq R_PAREN) or die;
+			return $r;
+		}
+		
 		if (@tokens > 1 and $tokens[0]->type eq TYPE and $tokens[1]->type eq L_BRACKET)
 		{
 			my $base = { type  => "primary", token => shift @tokens };
@@ -220,7 +242,7 @@ Parsing: {
 	sub _parse_expression_1
 	{
 		my ($lhs, $min_p) = @_;
-		while (@tokens and exists $precedence{$tokens[0]->type} and $precedence{$tokens[0]->type} >= $min_p)
+		while (@tokens and do {warn $tokens[0]->spelling; 1} and exists $precedence{$tokens[0]->type} and $precedence{$tokens[0]->type} >= $min_p)
 		{
 			my $op  = shift @tokens;
 			my $rhs = _parse_primary();
@@ -274,6 +296,8 @@ Tokenization: {
 	my %punctuation = (
 		'['       => bless([ L_BRACKET, "[" ], "Type::Parser::Token"),
 		']'       => bless([ R_BRACKET, "]" ], "Type::Parser::Token"),
+		'('       => bless([ L_PAREN,   "[" ], "Type::Parser::Token"),
+		')'       => bless([ R_PAREN,   "]" ], "Type::Parser::Token"),
 		','       => bless([ COMMA,     "," ], "Type::Parser::Token"),
 		'=>'      => bless([ COMMA,     "=>" ], "Type::Parser::Token"),
 		'slurpy'  => bless([ SLURPY,    "slurpy" ], "Type::Parser::Token"),
@@ -291,7 +315,7 @@ Tokenization: {
 		# Punctuation
 		# 
 		
-		if ($str =~ /^( slurpy | => | [\]\[|&~,] )/xsm)
+		if ($str =~ /^( slurpy | => | [()\]\[|&~,] )/xsm)
 		{
 			my $spelling = $1;
 			$str = substr($str, length $spelling);
@@ -429,6 +453,10 @@ The following constants correspond to values returned by C<< $token->type >>.
 =item C<< INTERSECT >>
 
 =item C<< NOT >>
+
+=item C<< L_PAREN >>
+
+=item C<< R_PAREN >>
 
 =back
 
