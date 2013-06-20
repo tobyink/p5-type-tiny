@@ -190,6 +190,29 @@ Alternatively:
    
    $type->check([1, 2, 3.14159]);  # croaks
 
+=head1 STATUS
+
+Type::Registry (and L<Type::Parser>) is currently a pretty isolated part
+of this distribution. It seems like something that would be useful, but
+it's not heavily integrated with everything else. In particular, if you
+do:
+
+   use Type::Registry qw(t);
+   use Types::Standard -types;
+
+Then the C<Str>, C<Num>, etc keywords imported from L<Types::Standard> will
+work fine, but C<< t->lookup("Str") >> and C<< t->lookup("Num") >> will fail,
+because importing types from a library does not automatically add them to
+your registry.
+
+Clearly some kind of integration is desirable between Type::Registry and
+L<Type::Library>, but exactly what form that will take is still to be
+decided.
+
+So if you decide to use Type::Registry, be aware of its somewhat experimental
+status. It's not likely to disappear completely, but there may be changes
+ahead.
+
 =head1 DESCRIPTION
 
 A type registry is basically just a hashref mapping type names to type
