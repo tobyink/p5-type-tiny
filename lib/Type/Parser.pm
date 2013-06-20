@@ -242,14 +242,14 @@ Parsing: {
 	sub _parse_expression_1
 	{
 		my ($lhs, $min_p) = @_;
-		while (@tokens and do {warn $tokens[0]->spelling; 1} and exists $precedence{$tokens[0]->type} and $precedence{$tokens[0]->type} >= $min_p)
+		while (@tokens and exists $precedence{$tokens[0]->type} and $precedence{$tokens[0]->type} >= $min_p)
 		{
 			my $op  = shift @tokens;
 			my $rhs = _parse_primary();
 			
 			while (@tokens and exists $precedence{$tokens[0]->type} and $precedence{$tokens[0]->type} > $precedence{$op->type})
 			{
-				my $lookahead = shift @tokens;
+				my $lookahead = $tokens[0];
 				$rhs = _parse_expression_1($rhs, $precedence{$lookahead->type});
 			}
 			
