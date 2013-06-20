@@ -299,7 +299,7 @@ Tokenization: {
 		my $count;
 		while (my $token = _token())
 		{
-			die "ETOOBIG" if $count++ > 1000;
+			_croak "ETOOBIG" if $count++ > 1000;
 			push @tokens, $token;
 		}
 		return @tokens;
