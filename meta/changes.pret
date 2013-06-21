@@ -560,3 +560,21 @@
 			dcs:thanks cpan:MMCLERIC;
 		];
 	].
+
+`Type-Tiny 0.007_10 cpan:TOBYINK`
+	issued  2013-06-21;
+	changeset [
+		dcs:versus `Type-Tiny 0.007_09 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix;
+			label "MooseX::Types objects used in Type::Tiny::Union, Type::Tiny::Intersection and parameterized Type::Tiny type constraints would break in some circumstances, as Types::TypeTiny::to_TypeTiny was failing to convert them to native Type::Tiny type constraints.";
+			dcs:fixes RT#86303;
+		];
+		item "Type::Parser now supports parentheses in its DSL."^^Addition;
+		item "Type::Parser now exports a _std_eval function useful for testing."^^Addition;
+		item "Fixed many small parsing bugs in Type::Parser."^^Bugfix;
+		item "Improved error messages from Type::Parser."^^Change;
+		item "Test cases for Type::Parser."^^Packaging;
+		item "Better test cases for Type::Registry."^^Packaging;
+		item "Document status of Type::Registry."^^Documentation;
+	].
