@@ -89,6 +89,7 @@ Evaluate: {
 		
 		if ($node->{type} eq "parameterized")
 		{
+			return _eval_type($node->{base}, $reg) unless $node->{params};
 			return _eval_type($node->{base}, $reg)->parameterize(_eval_type($node->{params}, $reg));
 		}
 		
