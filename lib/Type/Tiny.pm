@@ -258,12 +258,9 @@ sub _build_compiled_check
 		description => sprintf("compiled check '%s'", $self),
 	) if $self->can_be_inlined;
 	
-	my @constraints =
-		reverse
-		map  { $_->constraint }
-		grep { not $_->_is_null_constraint }
-		($self, $self->parents);
-	
+	my @constraints;
+	push @constraints, $self->constraint if !$self->_is_null_constraint;
+	push @constraints, $self->parent->compiled_check if $self->has_parent;
 	return $null_constraint unless @constraints;
 	
 	return sub ($)
@@ -391,7 +388,7 @@ sub validate
 {
 	my $self = shift;
 	
-	return undef if $self->compiled_check->(@_);
+	return undef if ($self->{compiled_check} ||= $self->_build_compiled_check)->(@_);
 	
 	local $_ = $_[0];
 	return $self->get_message(@_);
@@ -401,7 +398,7 @@ sub assert_valid
 {
 	my $self = shift;
 	
-	return !!1 if $self->compiled_check->(@_);
+	return !!1 if ($self->{compiled_check} ||= $self->_build_compiled_check)->(@_);
 	
 	local $_ = $_[0];
 	$self->_failed_check("$self", $_);
@@ -411,7 +408,7 @@ sub assert_return
 {
 	my $self = shift;
 	
-	return $_[0] if $self->compiled_check->(@_);
+	return $_[0] if ($self->{compiled_check} ||= $self->_build_compiled_check)->(@_);
 	
 	local $_ = $_[0];
 	$self->_failed_check("$self", $_);
