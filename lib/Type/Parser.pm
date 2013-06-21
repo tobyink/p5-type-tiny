@@ -350,7 +350,7 @@ Tokenization: {
 			{
 				return bless([ CLASS, $spelling ], "Type::Parser::Token"),;
 			}
-			elsif ($str =~ /\s*=>$/sm) # peek ahead
+			elsif ($str =~ /^\s*=>/sm) # peek ahead
 			{
 				return bless([ STRING, $spelling ], "Type::Parser::Token"),;
 			}
