@@ -1,11 +1,9 @@
 package Eval::TypeTiny;
 
 use strict;
-use warnings;
 
 sub _clean_eval
 {
-	no warnings;
 	local $@;
 	local $SIG{__DIE__};
 	my $r = eval $_[0];
@@ -20,13 +18,14 @@ our @EXPORT    = qw( eval_closure );
 sub import
 {
 	# do the shuffle!
-	no warnings "redefine";
 	our @ISA = qw( Exporter::TypeTiny );
 	require Exporter::TypeTiny;
 	my $next = \&Exporter::TypeTiny::import;
 	*import = $next;
 	goto $next;
 }
+
+use warnings;
 
 my $sandbox = 0;
 sub eval_closure
@@ -41,15 +40,15 @@ sub eval_closure
 	$src = qq{#line $args{line} "$args{description}"\n$src} if defined $args{description} && !($^P & 0x10);
 	$args{environment} ||= {};
 	
-	for my $k (sort keys %{$args{environment}})
-	{
-		next if $k =~ /^\$/ && ref($args{environment}{$k}) =~ /^(SCALAR|REF)$/;
-		next if $k =~ /^\@/ && ref($args{environment}{$k}) eq q(ARRAY);
-		next if $k =~ /^\%/ && ref($args{environment}{$k}) eq q(HASH);
-		
-		require Type::Exception;
-		Type::Exception::croak("Expected a variable name and ref; got %s => %s", $k, $args{environment}{$k});
-	}
+#	for my $k (sort keys %{$args{environment}})
+#	{
+#		next if $k =~ /^\$/ && ref($args{environment}{$k}) =~ /^(SCALAR|REF)$/;
+#		next if $k =~ /^\@/ && ref($args{environment}{$k}) eq q(ARRAY);
+#		next if $k =~ /^\%/ && ref($args{environment}{$k}) eq q(HASH);
+#		
+#		require Type::Exception;
+#		Type::Exception::croak("Expected a variable name and ref; got %s => %s", $k, $args{environment}{$k});
+#	}
 	
 	my @keys      = sort keys %{$args{environment}};
 	my $i         = 0;
