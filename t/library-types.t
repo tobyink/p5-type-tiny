@@ -79,4 +79,28 @@ ok(
 	'eq works',
 );
 
+use Types::Standard qw(ArrayRef Int);
+
+my $int          = Int;
+my $arrayref     = ArrayRef;
+my $arrayref_int = ArrayRef[Int];
+
+is_deeply(
+	[ 1, 2, Int,  3, 4 ],
+	[ 1, 2, $int, 3, 4 ],
+	'type constant in list context',
+);
+
+is_deeply(
+	[ 1, 2, ArrayRef,  3, 4 ],
+	[ 1, 2, $arrayref, 3, 4 ],
+	'parameterizable type constant in list context',
+);
+
+is_deeply(
+	[ 1, 2, ArrayRef[Int], 3, 4 ],
+	[ 1, 2, $arrayref_int, 3, 4 ],
+	'parameterized type constant in list context',
+);
+
 done_testing;
