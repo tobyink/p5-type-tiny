@@ -32,3 +32,14 @@
     - Assertion exceptions have an ->explain method.
  - Bytes, Chars, Encode and Decode split from Types::Standard to
    Types::Encodings
+
+2013-06-21 Type-Tiny version 0.008 released!
+
+ - New types added to Types::Standard: InstanceOf, ConsumerOf, HasMethods,
+   Enum, StrictNum and LaxNum.
+ - New module: Type::Registry.
+ - New module: Type::Parser.
+ - Many bug fixes, large and small.
+ - Much improved documentation, especially Types::Standard and Type::Utils.
+ - Type::Utils now has "match_on_type"/"compile_match_on_type" functions.
+ - Type::Utils no longer exports "extends" function by default.
