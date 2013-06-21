@@ -216,7 +216,7 @@ package Monkey::Nuts;
 "Type::Exception"->throw(message => "Test");
 };
 
-#line 148 "exceptions.t"
+#line 220 "exceptions.t"
 is_deeply(
 	$e_where->context,
 	{
@@ -231,6 +231,23 @@ is(
 	"$e_where",
 	"Test at thisfile.plx line 2.\n",
 	'"$e_where"',
+);
+
+BEGIN {
+	package MyTypes;
+	use Type::Library -base, -declare => qw(HttpMethod);
+	use Type::Utils -all;
+	use Types::Standard qw(Enum);
+	
+	declare HttpMethod,
+		as Enum[qw/ HEAD GET POST PUT DELETE OPTIONS PATCH /],
+		message { "$_ is not a HttpMethod" };
+};
+
+like(
+	exception { MyTypes::HttpMethod->("FOOL") },
+	qr{^FOOL is not a HttpMethod},
+	"correct exception from type with null constraint",
 );
 
 done_testing;
