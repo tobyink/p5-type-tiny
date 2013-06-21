@@ -28,6 +28,7 @@ use Test::TypeTiny;
 
 use Type::Parser qw(_std_eval);
 use Types::Standard -types;
+use Type::Utils;
 
 sub types_equal
 {
@@ -75,7 +76,7 @@ types_equal("ArrayRef[Int]&Defined", (ArrayRef[Int]) & Defined);
 types_equal("Int&Num|ArrayRef", (Int & Num) | ArrayRef);
 types_equal("(Int&Num)|ArrayRef", (Int & Num) | ArrayRef);
 types_equal("Int&(Num|ArrayRef)", Int & (Num | ArrayRef));
-types_equal("Int&Num|ArrayRef&Ref", (Int & Num) | (ArrayRef & Ref));
+types_equal("Int&Num|ArrayRef&Ref", intersection([Int, Num]) | intersection([ArrayRef, Ref]));
 
 # complementary types
 types_equal("~Int", ~Int);
