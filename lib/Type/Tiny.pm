@@ -259,8 +259,8 @@ sub _build_compiled_check
 	) if $self->can_be_inlined;
 	
 	my @constraints;
-	push @constraints, $self->constraint if !$self->_is_null_constraint;
 	push @constraints, $self->parent->compiled_check if $self->has_parent;
+	push @constraints, $self->constraint if !$self->_is_null_constraint;
 	return $null_constraint unless @constraints;
 	
 	return sub ($)
