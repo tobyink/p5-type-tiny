@@ -322,14 +322,14 @@ Tokenization: {
 	
 	sub _token
 	{
-		$str =~ s/^\s*//sm;
+		$str =~ s/^[\s\n\r]*//sm;
 		
 		return if $str eq "";
 		
 		# Punctuation
 		# 
 		
-		if ($str =~ /^( slurpy | => | [()\]\[|&~,] )/xsm)
+		if ($str =~ /^( => | [()\]\[|&~,] )/xsm)
 		{
 			my $spelling = $1;
 			$str = substr($str, length $spelling);
@@ -353,6 +353,10 @@ Tokenization: {
 			elsif ($str =~ /^\s*=>/sm) # peek ahead
 			{
 				return bless([ STRING, $spelling ], "Type::Parser::Token"),;
+			}
+			elsif ($spelling eq "slurpy")
+			{
+				return $punctuation{$spelling};
 			}
 			
 			return bless([ TYPE, $spelling ], "Type::Parser::Token"),;

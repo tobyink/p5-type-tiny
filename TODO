@@ -8,7 +8,3 @@
             documentation if necessary
       * Test cases
           * Type::Registry needs a few more test cases
-          * Type::Parser needs lots of test cases
-              * Check every type of token in the grammar, inclusing
-                qr{}, qq{}, q{}, fat comma, class types, etc
-              * Test precedence works - e.g. Foo|~Bar&Baz
