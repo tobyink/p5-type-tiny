@@ -77,7 +77,9 @@ sub new
 	
 	if (exists $params{parent})
 	{
-		$params{parent} = Types::TypeTiny::to_TypeTiny($params{parent});
+		$params{parent} = ref($params{parent}) =~ /^Type::Tiny\b/
+			? $params{parent}
+			: Types::TypeTiny::to_TypeTiny($params{parent});
 		
 		_croak "Parent must be an instance of %s", __PACKAGE__
 			unless blessed($params{parent}) && $params{parent}->isa(__PACKAGE__);
@@ -85,6 +87,14 @@ sub new
 	
 	$params{name} = "__ANON__" unless exists $params{name};
 	$params{uniq} = $uniq++;
+	
+	if ($params{name} ne "__ANON__")
+	{
+		# First try a fast ASCII-only expression, but fall back to Unicode
+		$params{name} =~ /^[A-Z][A-Za-z0-9_]+$/sm
+			or eval q( $params{name} =~ /^\p{Lu}[\p{L}0-9_]+$/sm )
+			or _croak '"%s" is not a valid type name', $params{name};
+	}
 	
 	if (exists $params{coercion} and !ref $params{coercion} and $params{coercion})
 	{
@@ -95,14 +105,6 @@ sub new
 	}
 	
 	my $self = bless \%params, $class;
-	
-	unless ($self->is_anon)
-	{
-		# First try a fast ASCII-only expression, but fall back to Unicode
-		$self->name =~ /^[A-Z][A-Za-z0-9_]+$/sm
-			or eval q( $self->name =~ /^\p{Lu}[\p{L}0-9_]+$/sm )
-			or _croak '"%s" is not a valid type name', $self->name;
-	}
 	
 	unless ($params{tmp})
 	{

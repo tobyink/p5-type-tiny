@@ -212,8 +212,12 @@ sub meta
 sub add_type
 {
 	my $meta = shift->meta;
-	my $type = blessed($_[0]) ? to_TypeTiny($_[0]) : "Type::Tiny"->new(@_);
-	my $name = $type->name;
+	
+	my $type =
+		ref($_[0]) =~ /^Type::Tiny\b/  ? $_[0] :
+		blessed($_[0])                 ? to_TypeTiny($_[0]) :
+		"Type::Tiny"->new(@_);
+	my $name = $type->{name};
 	
 	$meta->{types} ||= {};
 	_croak 'Type %s already exists in this library', $name if $meta->has_type($name);
