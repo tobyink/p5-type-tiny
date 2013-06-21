@@ -23,6 +23,8 @@ use strict;
 use warnings;
 use lib qw( ./lib ./t/lib ../inc ./inc );
 
+local $Type::Exception::LastError;
+
 use Test::More;
 use Test::Fatal;
 

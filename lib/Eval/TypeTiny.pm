@@ -18,6 +18,7 @@ our @EXPORT    = qw( eval_closure );
 sub import
 {
 	# do the shuffle!
+	no warnings "redefine";
 	our @ISA = qw( Exporter::TypeTiny );
 	require Exporter::TypeTiny;
 	my $next = \&Exporter::TypeTiny::import;

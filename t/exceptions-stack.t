@@ -27,6 +27,8 @@ use strict;
 use warnings;
 use lib qw( ./lib ./t/lib ../inc ./inc );
 
+local $Type::Exception::StackTrace;
+
 use Test::More;
 use Test::Fatal;
 use Test::Requires { "Devel::StackTrace" => 0 };
