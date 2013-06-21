@@ -593,3 +593,17 @@
 		item "Fix error messages from type constraints with null constraint coderefs."^^Bugfix;
 		item "Reply::Plugin::TypeTiny."^^Addition;
 	].
+
+`Type-Tiny 0.009_02 cpan:TOBYINK`
+	issued  2013-06-22;
+	changeset [
+		dcs:versus `Type-Tiny 0.009_01 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix;
+			label "Fix for compiled_checks for type constraints inheriting from Type::Tiny::Class, etc.";
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/1>;
+			dcs:thanks cpan:RSIMOES;
+		];
+		item "Various minor optimizations for Eval::TypeTiny, Type::Tiny, etc."^^Change;
+		item "Types::Standard no longer uses Type::Utils."^^Change;
+	].

@@ -26,6 +26,9 @@ cpan:HAARG
 cpan:PJFL
 	:name "Peter Flanigan".
 
+cpan:RSIMOES
+	:name "Richard Simões".
+
 # We bundle some files made by these dudes...
 
 cpan:RJBS
