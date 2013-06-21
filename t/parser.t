@@ -84,4 +84,13 @@ types_equal("~ArrayRef[Int]", ArrayRef([Int])->complementary_type);
 types_equal("~Int|CodeRef", (~Int)|CodeRef);
 types_equal("~(Int|CodeRef)", ~(Int|CodeRef), 'precedence of "~" versus "|"');
 
+# comma
+types_equal("Map[Num,Int]", Map[Num,Int]);
+types_equal("Map[Int,Num]", Map[Int,Num]);
+types_equal("Map[Int,Int|ArrayRef[Int]]", Map[Int,Int|ArrayRef[Int]]);
+types_equal("Map[Int,ArrayRef[Int]|Int]", Map[Int,ArrayRef([Int])|Int]);
+
+# fat comma
+types_equal("Dict[foo=>Int,bar=>Num]", Dict[foo=>Int,bar=>Num]);
+
 done_testing;
