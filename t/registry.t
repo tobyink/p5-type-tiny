@@ -33,6 +33,8 @@ use Test::TypeTiny;
 	t->alias_type(Int => "Integer");
 	
 	::ok(t->Integer == Types::Standard::Int(), 'alias works');
+	::ok(t("Integer") == Types::Standard::Int(), 'alias works via simple_lookup');
+	::ok(t("Integer[]") == Types::Standard::Int(), 'alias works via lookup');
 }
 
 {
