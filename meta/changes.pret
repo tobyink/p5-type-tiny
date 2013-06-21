@@ -578,3 +578,10 @@
 		item "Better test cases for Type::Registry."^^Packaging;
 		item "Document status of Type::Registry."^^Documentation;
 	].
+
+`Type-Tiny 0.008 cpan:TOBYINK`
+	issued  2013-06-21;
+	changeset [
+		dcs:versus `Type-Tiny 0.007_10 cpan:TOBYINK`;
+		item "Updated NEWS file."^^Documentation;
+	].
