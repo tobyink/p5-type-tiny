@@ -212,6 +212,7 @@ Parsing: {
 				or _croak("Unexpected end of string parsing parenthetical type expression; expected ')'; got nothing");
 			$tokens[0]->type eq R_PAREN
 				or _croak("Unexpected token parsing parenthetical type expression; expected ')'; got '%s'", $tokens[0]->spelling);
+			shift @tokens;
 			return $r;
 		}
 		
