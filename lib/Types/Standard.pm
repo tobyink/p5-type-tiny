@@ -148,7 +148,7 @@ $meta->add_type({
 	name       => "RoleName",
 	parent     => $_classn,
 	constraint => sub { not $_->can("new") },
-	inlined    => sub { "Types::Standard::_is_class_loaded($_[1]) and not $_[1]->can('new')" },
+	inlined    => sub { "Types::Standard::_is_class_loaded($_[1]) and not $_[1]\->can('new')" },
 });
 
 my $_ref = $meta->add_type({
@@ -223,7 +223,7 @@ $meta->add_type({
 	},
 	inlined    => sub {
 		"(ref($_[1]) eq \"GLOB\" && Scalar::Util::openhandle($_[1])) ".
-		"or (Scalar::Util::blessed($_[1]) && $_[1]->isa(\"IO::Handle\"))"
+		"or (Scalar::Util::blessed($_[1]) && $_[1]\->isa(\"IO::Handle\"))"
 	},
 });
 
