@@ -49,11 +49,12 @@ sub _overload_coderef
 	my $self = shift;
 	$self->message unless exists $self->{message};
 	
-	if ($self->has_parent && $self->_is_null_constraint)
-	{
-		$self->{_overload_coderef} ||= $self->parent->_overload_coderef;
-	}
-	elsif ($self->{_default_message} && "Sub::Quote"->can("quote_sub") && $self->can_be_inlined)
+#	if ($self->has_parent && $self->_is_null_constraint)
+#	{
+#		$self->{_overload_coderef} ||= $self->parent->_overload_coderef;
+#	}
+#	els
+	if ($self->{_default_message} && "Sub::Quote"->can("quote_sub") && $self->can_be_inlined)
 	{
 		$self->{_overload_coderef} = Sub::Quote::quote_sub($self->inline_assert('$_[0]'))
 			if !$self->{_overload_coderef} || !$self->{_sub_quoted}++;
