@@ -95,7 +95,7 @@ sub _mksub
 			q{ sub () { $type%s if $] } },
 			$post_method,
 		);
-	
+		
 	return _subname(
 		$type->qualified_name,
 		eval_closure(
@@ -264,6 +264,7 @@ sub type_names
 
 sub add_coercion
 {
+	require Type::Coercion;
 	my $meta = shift->meta;
 	my $c    = blessed($_[0]) ? $_[0] : "Type::Coercion"->new(@_);
 	my $name = $c->name;

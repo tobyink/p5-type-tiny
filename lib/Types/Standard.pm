@@ -8,12 +8,11 @@ BEGIN {
 	$Types::Standard::VERSION   = '0.009_01';
 }
 
-use base "Type::Library";
+use Type::Library -base;
 
 our @EXPORT_OK = qw( slurpy );
 
 use Scalar::Util qw( blessed looks_like_number );
-use Type::Utils;
 use Types::TypeTiny ();
 
 sub _is_class_loaded {
@@ -34,54 +33,73 @@ no warnings;
 
 BEGIN { *STRICTNUM = $ENV{PERL_TYPES_STANDARD_STRICTNUM} ? sub(){!!1} : sub(){!!0} };
 
-declare "Any",
-	_is_core => 1,
-	inline_as { "!!1" };
+my $meta = __PACKAGE__->meta;
 
-declare "Item",
-	_is_core => 1,
-	inline_as { "!!1" };
+$meta->add_type({
+	name       => "Any",
+	_is_core   => 1,
+	inlined    => sub { "!!1" },
+});
 
-declare "Bool",
-	_is_core => 1,
-	as "Item",
-	where { !defined $_ or $_ eq q() or $_ eq '0' or $_ eq '1' },
-	inline_as { "!defined $_ or $_ eq q() or $_ eq '0' or $_ eq '1'" };
+my $_item = $meta->add_type({
+	name       => "Item",
+	_is_core   => 1,
+	inlined    => sub { "!!1" },
+});
 
-declare "Undef",
-	_is_core => 1,
-	as "Item",
-	where { !defined $_ },
-	inline_as { "!defined($_)" };
+$meta->add_type({
+	name       => "Bool",
+	_is_core   => 1,
+	parent     => $_item,
+	constraint => sub { !defined $_ or $_ eq q() or $_ eq '0' or $_ eq '1' },
+	inlined    => sub { "!defined $_[1] or $_[1] eq q() or $_[1] eq '0' or $_[1] eq '1'" },
+});
 
-declare "Defined",
-	_is_core => 1,
-	as "Item",
-	where { defined $_ },
-	inline_as { "defined($_)" };
+my $_undef = $meta->add_type({
+	name       => "Undef",
+	_is_core   => 1,
+	parent     => $_item,
+	constraint => sub { !defined $_ },
+	inlined    => sub { "!defined($_[1])" },
+});
 
-declare "Value",
-	_is_core => 1,
-	as "Defined",
-	where { not ref $_ },
-	inline_as { "defined($_) and not ref($_)" };
+my $_def = $meta->add_type({
+	name       => "Defined",
+	_is_core   => 1,
+	parent     => $_item,
+	constraint => sub { defined $_ },
+	inlined    => sub { "defined($_[1])" },
+});
 
-declare "Str",
-	_is_core => 1,
-	as "Value",
-	where { ref(\$_) eq 'SCALAR' or ref(\(my $val = $_)) eq 'SCALAR' },
-	inline_as {
-		"defined($_) and do { ref(\\$_) eq 'SCALAR' or ref(\\(my \$val = $_)) eq 'SCALAR' }"
-	};
+my $_val = $meta->add_type({
+	name       => "Value",
+	_is_core   => 1,
+	parent     => $_def,
+	constraint => sub { not ref $_ },
+	inlined    => sub { "defined($_[1]) and not ref($_[1])" },
+});
 
-declare "LaxNum",
-	as "Str",
-	where { looks_like_number $_ },
-	inline_as { "!ref($_) && Scalar::Util::looks_like_number($_)" };
+my $_str = $meta->add_type({
+	name       => "Str",
+	_is_core   => 1,
+	parent     => $_val,
+	constraint => sub { ref(\$_) eq 'SCALAR' or ref(\(my $val = $_)) eq 'SCALAR' },
+	inlined    => sub {
+		"defined($_[1]) and do { ref(\\$_[1]) eq 'SCALAR' or ref(\\(my \$val = $_[1])) eq 'SCALAR' }"
+	},
+});
 
-declare "StrictNum",
-	as "Str",
-	where {
+my $_laxnum = $meta->add_type({
+	name       => "LaxNum",
+	parent     => $_str,
+	constraint => sub { looks_like_number $_ },
+	inlined    => sub { "!ref($_[1]) && Scalar::Util::looks_like_number($_[1])" },
+});
+
+my $_strictnum = $meta->add_type({
+	name       => "StrictNum",
+	parent     => $_str,
+	constraint => sub {
 		my $val = $_;
 		($val =~ /\A[+-]?[0-9]+\z/) ||
 		( $val =~ /\A(?:[+-]?)                #matches optional +- in the beginning
@@ -91,7 +109,7 @@ declare "StrictNum",
 		(?:[Ee](?:[+-]?[0-9]+))?              #matches E1 or e1 or e-1 or e+1 etc
 		\z/x );
 	},
-	inline_as {
+	inlined    => sub {
 		'my $val = '.$_[1].';'.
 		Value()->inline_check('$val')
 		.' && ( $val =~ /\A[+-]?[0-9]+\z/ || '
@@ -101,32 +119,44 @@ declare "StrictNum",
 			(?:\.[0-9]+)?                     # matches optional .89 or nothing
 			(?:[Ee](?:[+-]?[0-9]+))?          # matches E1 or e1 or e-1 or e+1 etc
 		\z/x ); '
-	};
+	},
+});
 
-declare "Num", _is_core => 1, as(STRICTNUM ? "StrictNum" : "LaxNum");
+my $_num = $meta->add_type({
+	name       => "Num",
+	_is_core   => 1,
+	parent     => (STRICTNUM ? $_strictnum : $_laxnum),
+});
 
-declare "Int",
-	_is_core => 1,
-	as "Num",
-	where { /\A-?[0-9]+\z/ },
-	inline_as { "defined $_ and $_ =~ /\\A-?[0-9]+\\z/" };
+$meta->add_type({
+	name       => "Int",
+	_is_core   => 1,
+	parent     => $_num,
+	constraint => sub { /\A-?[0-9]+\z/ },
+	inlined    => sub { "defined $_[1] and $_[1] =~ /\\A-?[0-9]+\\z/" },
+});
 
-declare "ClassName",
-	_is_core => 1,
-	as "Str",
-	where { goto \&_is_class_loaded },
-	inline_as { "Types::Standard::_is_class_loaded($_)" };
+my $_classn = $meta->add_type({
+	name       => "ClassName",
+	_is_core   => 1,
+	parent     => $_str,
+	constraint => sub { goto \&_is_class_loaded },
+	inlined    => sub { "Types::Standard::_is_class_loaded($_[1])" },
+});
 
-declare "RoleName",
-	as "ClassName",
-	where { not $_->can("new") },
-	inline_as { "Types::Standard::_is_class_loaded($_) and not $_->can('new')" };
+$meta->add_type({
+	name       => "RoleName",
+	parent     => $_classn,
+	constraint => sub { not $_->can("new") },
+	inlined    => sub { "Types::Standard::_is_class_loaded($_[1]) and not $_[1]->can('new')" },
+});
 
-declare "Ref",
-	_is_core => 1,
-	as "Defined",
-	where { ref $_ },
-	inline_as { "!!ref($_)" },
+my $_ref = $meta->add_type({
+	name       => "Ref",
+	_is_core   => 1,
+	parent     => $_def,
+	constraint => sub { ref $_ },
+	inlined    => sub { "!!ref($_[1])" },
 	constraint_generator => sub
 	{
 		my $reftype = shift;
@@ -156,43 +186,53 @@ declare "Ref",
 			sprintf('"%s" constrains reftype(%s) to be equal to %s', $type, $varname, B::perlstring($param)),
 			sprintf('reftype(%s) is %s', $varname, defined($reftype) ? B::perlstring($reftype) : "undef"),
 		];
-	};
-	
-declare "CodeRef",
-	_is_core => 1,
-	as "Ref",
-	where { ref $_ eq "CODE" },
-	inline_as { "ref($_) eq 'CODE'" };
+	},
+});
 
-declare "RegexpRef",
-	_is_core => 1,
-	as "Ref",
-	where { ref $_ eq "Regexp" },
-	inline_as { "ref($_) eq 'Regexp'" };
+$meta->add_type({
+	name       => "CodeRef",
+	_is_core   => 1,
+	parent     => $_ref,
+	constraint => sub { ref $_ eq "CODE" },
+	inlined    => sub { "ref($_[1]) eq 'CODE'" },
+});
 
-declare "GlobRef",
-	_is_core => 1,
-	as "Ref",
-	where { ref $_ eq "GLOB" },
-	inline_as { "ref($_) eq 'GLOB'" };
+$meta->add_type({
+	name       => "RegexpRef",
+	_is_core   => 1,
+	parent     => $_ref,
+	constraint => sub { ref $_ eq "Regexp" },
+	inlined    => sub { "ref($_[1]) eq 'Regexp'" },
+});
 
-declare "FileHandle",
-	_is_core => 1,
-	as "Ref",
-	where {
+$meta->add_type({
+	name       => "GlobRef",
+	_is_core   => 1,
+	parent     => $_ref,
+	constraint => sub { ref $_ eq "GLOB" },
+	inlined    => sub { "ref($_[1]) eq 'GLOB'" },
+});
+
+$meta->add_type({
+	name       => "FileHandle",
+	_is_core   => 1,
+	parent     => $_ref,
+	constraint => sub {
 		(ref($_) eq "GLOB" && Scalar::Util::openhandle($_))
 		or (blessed($_) && $_->isa("IO::Handle"))
 	},
-	inline_as {
-		"(ref($_) eq \"GLOB\" && Scalar::Util::openhandle($_)) ".
-		"or (Scalar::Util::blessed($_) && $_->isa(\"IO::Handle\"))"
-	};
+	inlined    => sub {
+		"(ref($_[1]) eq \"GLOB\" && Scalar::Util::openhandle($_[1])) ".
+		"or (Scalar::Util::blessed($_[1]) && $_[1]->isa(\"IO::Handle\"))"
+	},
+});
 
-declare "ArrayRef",
-	_is_core => 1,
-	as "Ref",
-	where { ref $_ eq "ARRAY" },
-	inline_as { "ref($_) eq 'ARRAY'" },
+my $_arr = $meta->add_type({
+	name       => "ArrayRef",
+	_is_core   => 1,
+	parent     => $_ref,
+	constraint => sub { ref $_ eq "ARRAY" },
+	inlined    => sub { "ref($_[1]) eq 'ARRAY'" },
 	constraint_generator => sub
 	{
 		my $param = Types::TypeTiny::to_TypeTiny(shift);
@@ -243,13 +283,15 @@ declare "ArrayRef",
 		}
 		
 		return;
-	};
+	},
+});
 
-declare "HashRef",
-	_is_core => 1,
-	as "Ref",
-	where { ref $_ eq "HASH" },
-	inline_as { "ref($_) eq 'HASH'" },
+my $_hash = $meta->add_type({
+	name       => "HashRef",
+	_is_core   => 1,
+	parent     => $_ref,
+	constraint => sub { ref $_ eq "HASH" },
+	inlined    => sub { "ref($_[1]) eq 'HASH'" },
 	constraint_generator => sub
 	{
 		my $param = Types::TypeTiny::to_TypeTiny(shift);
@@ -301,13 +343,15 @@ declare "HashRef",
 		}
 		
 		return;
-	};
+	},
+});
 
-declare "ScalarRef",
-	_is_core => 1,
-	as "Ref",
-	where { ref $_ eq "SCALAR" or ref $_ eq "REF" },
-	inline_as { "ref($_) eq 'SCALAR' or ref($_) eq 'REF'" },
+$meta->add_type({
+	name       => "ScalarRef",
+	_is_core   => 1,
+	parent     => $_ref,
+	constraint => sub { ref $_ eq "SCALAR" or ref $_ eq "REF" },
+	inlined    => sub { "ref($_[1]) eq 'SCALAR' or ref($_[1]) eq 'REF'" },
 	constraint_generator => sub
 	{
 		my $param = Types::TypeTiny::to_TypeTiny(shift);
@@ -351,17 +395,21 @@ declare "ScalarRef",
 		}
 		
 		return;
-	};
+	},
+});
 
-declare "Object",
-	_is_core => 1,
-	as "Ref",
-	where { blessed $_ },
-	inline_as { "Scalar::Util::blessed($_)" };
+my $_obj = $meta->add_type({
+	name       => "Object",
+	_is_core   => 1,
+	parent     => $_ref,
+	constraint => sub { blessed $_ },
+	inlined    => sub { "Scalar::Util::blessed($_[1])" },
+});
 
-declare "Maybe",
-	_is_core => 1,
-	as "Item",
+$meta->add_type({
+	name       => "Maybe",
+	_is_core   => 1,
+	parent     => $_item,
 	constraint_generator => sub
 	{
 		my $param = Types::TypeTiny::to_TypeTiny(shift);
@@ -399,12 +447,12 @@ declare "Maybe",
 				)
 			}
 		];
-	};
+	},
+});
 
-declare "Map",
-	as "HashRef",
-	where { ref $_ eq "HASH" },
-	inline_as { "ref($_) eq 'HASH'" },
+$meta->add_type({
+	name       => "Map",
+	parent     => $_hash,
 	constraint_generator => sub
 	{
 		my ($keys, $values) = map Types::TypeTiny::to_TypeTiny($_), @_;
@@ -479,10 +527,12 @@ declare "Map",
 		}
 		
 		return;
-	};
+	},
+});
 
-declare "Optional",
-	as "Item",
+$meta->add_type({
+	name       => "Optional",
+	parent     => $_item,
 	constraint_generator => sub
 	{
 		my $param = Types::TypeTiny::to_TypeTiny(shift);
@@ -515,17 +565,17 @@ declare "Optional",
 				)
 			}
 		];
-	};
+	},
+});
 
 sub slurpy {
 	my $t = shift;
 	wantarray ? (+{ slurpy => $t }, @_) : +{ slurpy => $t };
 }
 
-declare "Tuple",
-	as "ArrayRef",
-	where { ref $_ eq "ARRAY" },
-	inline_as { "ref($_) eq 'ARRAY'" },
+$meta->add_type({
+	name       => "Tuple",
+	parent     => $_arr,
 	name_generator => sub
 	{
 		my ($s, @a) = @_;
@@ -654,12 +704,12 @@ declare "Tuple",
 		}
 		
 		return;
-	};
+	},
+});
 
-declare "Dict",
-	as "HashRef",
-	where { ref $_ eq "HASH" },
-	inline_as { "ref($_) eq 'HASH'" },
+$meta->add_type({
+	name       => "Dict",
+	parent     => $_hash,
 	name_generator => sub
 	{
 		my ($s, %a) = @_;
@@ -743,13 +793,15 @@ declare "Dict",
 		}
 		
 		return;
-	};
+	},
+});
 
 use overload ();
-declare "Overload",
-	as "Object",
-	where { overload::Overloaded($_) },
-	inline_as { "Scalar::Util::blessed($_) and overload::Overloaded($_)" },
+$meta->add_type({
+	name       => "Overload",
+	parent     => $_obj,
+	constraint => sub { overload::Overloaded($_) },
+	inlined    => sub { "Scalar::Util::blessed($_[1]) and overload::Overloaded($_[1])" },
 	constraint_generator => sub
 	{
 		my @operations = map {
@@ -774,11 +826,13 @@ declare "Overload",
 				"Scalar::Util::blessed($v)",
 				map "overload::Method($v, q[$_])", @operations;
 		};
-	};
+	},
+});
 
 our %_StrMatch;
-declare "StrMatch",
-	as "Str",
+$meta->add_type({
+	name       => "StrMatch",
+	parent     => $_str,
 	constraint_generator => sub
 	{
 		my ($regexp, $checker) = @_;
@@ -836,18 +890,20 @@ declare "StrMatch",
 				;
 			};
 		}
-	};
+	},
+});
 
-declare "OptList",
-	as ArrayRef([ArrayRef()]),
-	where {
+$meta->add_type({
+	name       => "OptList",
+	parent     => $_arr->parameterize($_arr),
+	constraint => sub {
 		for my $inner (@$_) {
 			return unless @$inner == 2;
 			return unless is_Str($inner->[0]);
 		}
 		return !!1;
 	},
-	inline_as {
+	inlined     => sub {
 		my ($self, $var) = @_;
 		my $Str_check = __PACKAGE__->meta->get_type("Str")->inline_check('$inner->[0]');
 		my @code = 'do { my $ok = 1; ';
@@ -861,18 +917,20 @@ declare "OptList",
 			$self->parent->inline_check($var),
 			join(q( ), @code),
 		);
-	};
+	},
+});
 
-declare "Tied",
-	as "Ref",
-	where {
+$meta->add_type({
+	name       => "Tied",
+	parent     => $_ref,
+	constraint => sub {
 		!!tied(Scalar::Util::reftype($_) eq 'HASH' ?  %{$_} : Scalar::Util::reftype($_) eq 'ARRAY' ?  @{$_} :  ${$_})
-	}
-	inline_as {
-		my $self = shift;
-		$self->parent->inline_check(@_)
-		. " and !!tied(Scalar::Util::reftype($_) eq 'HASH' ? \%{$_} : Scalar::Util::reftype($_) eq 'ARRAY' ? \@{$_} : \${$_})"
-	}
+	},
+	inlined    => sub {
+		my ($self, $var) = @_;
+		$self->parent->inline_check($var)
+		. " and !!tied(Scalar::Util::reftype($var) eq 'HASH' ? \%{$var} : Scalar::Util::reftype($var) eq 'ARRAY' ? \@{$var} : \${$var})"
+	},
 	name_generator => sub
 	{
 		my $self  = shift;
@@ -922,10 +980,12 @@ declare "Tied",
 				$param->inline_check('$TIED')
 			);
 		};
-	};
+	},
+});
 
-declare "InstanceOf",
-	as "Object",
+$meta->add_type({
+	name       => "InstanceOf",
+	parent     => $_obj,
 	constraint_generator => sub {
 		require Type::Tiny::Class;
 		my @classes = map {
@@ -941,10 +1001,12 @@ declare "InstanceOf",
 			type_constraints => \@classes,
 			display_name     => sprintf('InstanceOf[%s]', join q[,], map B::perlstring($_->class), @classes),
 		);
-	};
+	},
+});
 
-declare "ConsumerOf",
-	as "Object",
+$meta->add_type({
+	name       => "ConsumerOf",
+	parent     => $_obj,
 	constraint_generator => sub {
 		require B;
 		require Type::Tiny::Role;
@@ -960,10 +1022,12 @@ declare "ConsumerOf",
 			type_constraints => \@roles,
 			display_name     => sprintf('ConsumerOf[%s]', join q[,], map B::perlstring($_->role), @roles),
 		);
-	};
+	},
+});
 
-declare "HasMethods",
-	as "Object",
+$meta->add_type({
+	name       => "HasMethods",
+	parent     => $_obj,
 	constraint_generator => sub {
 		require B;
 		require Type::Tiny::Duck;
@@ -971,10 +1035,12 @@ declare "HasMethods",
 			methods      => \@_,
 			display_name => sprintf('HasMethods[%s]', join q[,], map B::perlstring($_), @_),
 		);
-	};
+	},
+});
 
-declare "Enum",
-	as "Str",
+$meta->add_type({
+	name       => "Enum",
+	parent     => $_str,
 	constraint_generator => sub {
 		require B;
 		require Type::Tiny::Enum;
@@ -982,15 +1048,22 @@ declare "Enum",
 			values       => \@_,
 			display_name => sprintf('Enum[%s]', join q[,], map B::perlstring($_), @_),
 		);
-	};
+	},
+});
 
-declare_coercion "MkOpt",
-	to_type "OptList",
-	from    "ArrayRef", q{ Exporter::TypeTiny::mkopt($_) },
-	from    "HashRef",  q{ Exporter::TypeTiny::mkopt($_) },
-	from    "Undef",    q{ [] };
+$meta->add_coercion({
+	name               => "MkOpt",
+	type_constraint    => $meta->get_type("OptList"),
+	type_coercion_map  => [
+		$_arr,    q{ Exporter::TypeTiny::mkopt($_) },
+		$_hash,   q{ Exporter::TypeTiny::mkopt($_) },
+		$_undef,  q{ [] },
+	],
+});
 
-declare_coercion "Join", to_type "Str" => {
+$meta->add_coercion({
+	name               => "Join",
+	type_constraint    => $_str,
 	coercion_generator => sub {
 		my ($self, $target, $sep) = @_;
 		Types::TypeTiny::StringLike->check($sep)
@@ -999,9 +1072,11 @@ declare_coercion "Join", to_type "Str" => {
 		$sep = B::perlstring($sep);
 		return (ArrayRef(), qq{ join($sep, \@\$_) });
 	},
-};
+});
 
-declare_coercion "Split", to_type ArrayRef() => {
+$meta->add_coercion({
+	name               => "Split",
+	type_constraint    => $_arr,
 	coercion_generator => sub {
 		my ($self, $target, $re) = @_;
 		ref($re) eq q(Regexp)
@@ -1010,7 +1085,7 @@ declare_coercion "Split", to_type ArrayRef() => {
 		$regexp_string =~ s/\\\//\\\\\//g; # toothpicks
 		return (Str(), qq{ [split /$regexp_string/, \$_] });
 	},
-};
+});
 
 #### Deep coercion stuff...
 

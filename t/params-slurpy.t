@@ -50,14 +50,14 @@ is_deeply(
 
 like(
 	exception { $chk2->("Hello", foo => 1, "bar") },
-	qr{Odd number of elements in HashRef},
+	qr{^Odd number of elements in HashRef},
 );
 
 my $chk3 = compile(Str, slurpy Map);
 
 like(
 	exception { $chk3->("Hello", foo => 1, "bar") },
-	qr{Odd number of elements in Map},
+	qr{^Odd number of elements in Map},
 );
 
 my $chk4 = compile(Str, slurpy Tuple[Str, Int, Str]);
