@@ -97,6 +97,9 @@ sub to_TypeTiny
 	goto \&_TypeTinyFromMoose
 		if (blessed($t) and ref($t)->isa("Moose::Meta::TypeConstraint"));
 	
+	goto \&_TypeTinyFromMoose
+		if (blessed($t) and ref($t)->isa("MooseX::Types::TypeDecorator"));
+	
 	goto \&_TypeTinyFromMouse
 		if (blessed($t) and ref($t)->isa("Mouse::Meta::TypeConstraint"));
 	
