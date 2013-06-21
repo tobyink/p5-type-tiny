@@ -12,7 +12,7 @@ sub _clean_eval
 }
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.009_02';
+our $VERSION   = '0.009_03';
 our @EXPORT    = qw( eval_closure );
 
 sub import

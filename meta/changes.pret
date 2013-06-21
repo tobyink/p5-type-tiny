@@ -607,3 +607,10 @@
 		item "Various minor optimizations for Eval::TypeTiny, Type::Tiny, etc."^^Change;
 		item "Types::Standard no longer uses Type::Utils."^^Change;
 	].
+
+`Type-Tiny 0.009_03 cpan:TOBYINK`
+	issued  2013-06-22;
+	changeset [
+		dcs:versus `Type-Tiny 0.009_02 cpan:TOBYINK`;
+		item "Fix Types::Standard compilation errors under Perl 5.8.x."^^Bugfix;
+	].
