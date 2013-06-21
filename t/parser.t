@@ -27,6 +27,7 @@ use Test::More;
 use Test::TypeTiny;
 
 use Type::Parser qw(_std_eval);
+use Types::Standard -types;
 
 sub types_equal
 {
@@ -39,6 +40,6 @@ sub types_equal
 
 types_equal("Int", "Int");
 types_equal("(Int)", "Int");
-types_equal(
+types_equal("Int", Int);
 
 done_testing;
