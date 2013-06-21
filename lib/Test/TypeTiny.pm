@@ -40,12 +40,14 @@ sub should_pass
 	
 	local $Test::Builder::Level = $Test::Builder::Level + 1;
 	
+	my $strictures = $type->can("_strict_check");
+	
 	my $test = "Test::Builder"->new->child(
 		$message || _mk_message("%s passes type constraint $type", $value),
 	);
-	$test->plan(tests => 2);
+	$test->plan(tests => ($strictures ? 2 : 1));
 	$test->ok(!!$type->check($value), '->check');
-	$test->ok(!!$type->_strict_check($value), '->_strict_check');
+	$test->ok(!!$type->_strict_check($value), '->_strict_check') if $strictures;
 	$test->finalize;
 	return $test->is_passing;
 }
@@ -56,12 +58,14 @@ sub should_fail
 	
 	local $Test::Builder::Level = $Test::Builder::Level + 1;
 	
+	my $strictures = $type->can("_strict_check");
+	
 	my $test = "Test::Builder"->new->child(
 		$message || _mk_message("%s fails type constraint $type", $value),
 	);
-	$test->plan(tests => 2);
+	$test->plan(tests => ($strictures ? 2 : 1));
 	$test->ok(!$type->check($value), '->check');
-	$test->ok(!$type->_strict_check($value), '->_strict_check');
+	$test->ok(!$type->_strict_check($value), '->_strict_check') if $strictures;
 	$test->finalize;
 	return $test->is_passing;
 }
