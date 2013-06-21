@@ -591,4 +591,5 @@
 	changeset [
 		dcs:versus `Type-Tiny 0.008 cpan:TOBYINK`;
 		item "Fix error messages from type constraints with null constraint coderefs."^^Bugfix;
+		item "Reply::Plugin::TypeTiny."^^Addition;
 	].
