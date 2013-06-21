@@ -333,13 +333,9 @@ sub is_a_type_of
 sub qualified_name
 {
 	my $self = shift;
-	
-	if ($self->has_library and not $self->is_anon)
-	{
-		return sprintf("%s::%s", $self->library, $self->name);
-	}
-	
-	return $self->name;
+	(exists $self->{library} and $self->name ne "__ANON__")
+		? "$self->{library}::$self->{name}"
+		: $self->{name};
 }
 
 sub is_anon
@@ -358,7 +354,7 @@ sub parents
 sub check
 {
 	my $self = shift;
-	$self->compiled_check->(@_);
+	($self->{compiled_check} ||= $self->_build_compiled_check)->(@_);
 }
 
 sub _strict_check

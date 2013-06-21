@@ -92,6 +92,9 @@ sub to_TypeTiny
 	my $t = $_[0];
 	
 	return $t
+		if (ref($t) =~ /^Type::Tiny\b/);
+	
+	return $t
 		if (blessed($t) and $t->isa("Type::Tiny"));
 	
 	goto \&_TypeTinyFromMoose
