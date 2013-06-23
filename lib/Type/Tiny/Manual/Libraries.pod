@@ -198,6 +198,14 @@ Note that if you're subtyping an existing type constraint, your C<inline_as>
 block is also responsible for checking the parent type's constraint. This
 can be done quite easily, as shown in the example above.
 
+Note that defining a type constraint in terms of a constraint coderef and an
+inlining coderef can be a little repetitive. L<Sub::Quote> provides an
+alternative that reduces repetition (though the inlined code might not be as
+compact/good/fast).
+
+   declare NonEmptyHash, as HashLike,
+      constraint => quote_sub q{ scalar values %$_ };
+
 =head2 Parameterized Constraints
 
 Parameterized type constraints are those that can generate simple child type
