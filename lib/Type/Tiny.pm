@@ -1172,6 +1172,12 @@ a Moose::Meta::TypeConstraint.
 
 If Mouse is loaded, then C<isa> mocks Mouse::Meta::TypeConstraint.
 
+=item C<< DOES($role) >>
+
+Overridden to advertise support for various roles.
+
+See also L<Type::API::Constraint>, etc.
+
 =back
 
 The following methods exist for Moose/Mouse compatibility, but do not do
