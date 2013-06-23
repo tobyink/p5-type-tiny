@@ -1,5 +1,5 @@
 language: perl
-script: HARNESS_IS_VERBOSE=1 prove -v -Ilib t
+script: HARNESS_IS_VERBOSE=1 prove -Ilib t
 install:
   - cpanm Test::Requires Test::Fatal Moo
 perl:
