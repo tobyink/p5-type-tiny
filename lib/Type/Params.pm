@@ -15,7 +15,7 @@ use Scalar::Util qw(refaddr);
 use Type::Exception;
 use Type::Exception::Assertion;
 use Type::Exception::WrongNumberOfParameters;
-use Type::Utils;
+use Type::Tiny::Union;
 use Types::Standard -types;
 use Types::TypeTiny qw(to_TypeTiny);
 
@@ -23,7 +23,10 @@ use base qw< Exporter::TypeTiny >;
 our @EXPORT = qw( compile );
 our @EXPORT_OK = qw( validate Invocant );
 
-use constant Invocant => union Invocant => [Object, ClassName];
+use constant Invocant => "Type::Tiny::Union"->new(
+	name             => "Invocant",
+	type_constraints => [Object, ClassName],
+);
 
 #sub _exporter_expand_sub
 #{
