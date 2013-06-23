@@ -36,12 +36,12 @@ use Test::TypeTiny;
 BEGIN {
 	package MooseX::Types::Not;
 	use Type::Library -base;
-	use Types::TypeTiny qw(to_TypeTiny);
+	use Types::TypeTiny;
 	__PACKAGE__->add_type({
 		name                 => "Not",
 		constraint           => sub {  !!0  },
 		inlined              => sub { "!!0" },
-		constraint_generator => sub { to_TypeTiny(shift)->complementary_type },
+		constraint_generator => sub { Types::TypeTiny::to_TypeTiny(shift)->complementary_type },
 	});
 	$INC{"MooseX/Types/Not.pm"} = __FILE__;
 };
