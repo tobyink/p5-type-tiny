@@ -805,9 +805,11 @@ sub AUTOLOAD
 sub DOES
 {
 	my $self = shift;
+	
 	return !!1 if  ref($self) && $_[0] =~ m{^ Type::API::Constraint (?: ::Coercible | ::Inlinable )? $}x;
 	return !!1 if !ref($self) && $_[0] eq 'Type::API::Constraint::Constructor';
-	return $self->SUPER::DOES(@_);
+	
+	"UNIVERSAL"->can("DOES") ? $self->SUPER::DOES(@_) : $self->isa(@_);
 }
 
 # fill out Moose-compatible API
