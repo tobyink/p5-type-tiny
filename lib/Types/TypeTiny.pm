@@ -125,12 +125,12 @@ sub _TypeTinyFromMoose
 	}
 	
 	my %opts;
-	$opts{name}       = $t->name;
-	$opts{constraint} = $t->constraint;
-	$opts{parent}     = to_TypeTiny($t->parent)              if $t->has_parent;
-	$opts{inlined}    = sub { shift; $t->_inline_check(@_) } if $t->can_be_inlined;
-	$opts{message}    = sub { $t->get_message($_) }          if $t->has_message;
-	$opts{moose_type} = $t;
+	$opts{display_name} = $t->name;
+	$opts{constraint}   = $t->constraint;
+	$opts{parent}       = to_TypeTiny($t->parent)              if $t->has_parent;
+	$opts{inlined}      = sub { shift; $t->_inline_check(@_) } if $t->can_be_inlined;
+	$opts{message}      = sub { $t->get_message($_) }          if $t->has_message;
+	$opts{moose_type}   = $t;
 	
 	require Type::Tiny;
 	return "Type::Tiny"->new(%opts);
@@ -141,11 +141,11 @@ sub _TypeTinyFromMouse
 	my $t = $_[0];
 	
 	my %opts;
-	$opts{name}       = $t->name;
-	$opts{constraint} = $t->constraint;
-	$opts{parent}     = to_TypeTiny($t->parent)              if $t->has_parent;
-	$opts{message}    = sub { $t->get_message($_) }          if $t->has_message;
-	$opts{mouse_type} = $t;
+	$opts{display_name} = $t->name;
+	$opts{constraint}   = $t->constraint;
+	$opts{parent}       = to_TypeTiny($t->parent)              if $t->has_parent;
+	$opts{message}      = sub { $t->get_message($_) }          if $t->has_message;
+	$opts{mouse_type}   = $t;
 	
 	require Type::Tiny;
 	return "Type::Tiny"->new(%opts);

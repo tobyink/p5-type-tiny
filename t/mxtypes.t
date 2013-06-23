@@ -61,4 +61,13 @@ should_pass([], $param2);
 should_fail({}, $param2);
 should_fail(["x"], $param2);
 
+my $param_union = MyArrayRef[Int | ArrayRef];
+
+should_pass([], $param_union);
+should_pass([1,2,3], $param_union);
+should_pass([[],[]], $param_union);
+should_pass([11,[]], $param_union);
+should_pass([[],11], $param_union);
+should_fail([1.111], $param_union);
+
 done_testing;
