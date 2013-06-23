@@ -115,7 +115,7 @@ sub _build_parent
 	my $self  = shift;
 	my $class = $self->class;
 	
-	my @isa = do { no strict "refs"; no warnings; @{"$class\::ISA"} };
+	my @isa = grep $class->isa($_), do { no strict "refs"; no warnings; @{"$class\::ISA"} };
 	
 	if (@isa == 0)
 	{

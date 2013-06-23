@@ -6,13 +6,6 @@
 
 Test that subtypes of Type::Tiny::Class work.
 
-=head1 CAVEATS
-
-Math::BigFloat does silly stuff with C<< @ISA >> so we disabled
-C<< $ENV{EXTENDED_TESTING} >> in this test case, because that could
-cause C<< should_pass >> and C<< should_fail >> to walk up the
-superclass tree.
-
 =head1 SEE ALSO
 
 L<https://github.com/tobyink/p5-type-tiny/issues/1>,
@@ -32,8 +25,6 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-BEGIN { $ENV{EXTENDED_TESTING} = 0 };
 
 use strict;
 use warnings;
