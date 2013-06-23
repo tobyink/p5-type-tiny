@@ -20,14 +20,18 @@ use base "Type::Tiny";
 
 sub new {
 	my $proto = shift;
+	
 	my %opts = @_;
 	_croak "Intersection type constraints cannot have a parent constraint" if exists $opts{parent};
+	_croak "Intersection type constraints cannot have a constraint coderef passed to the constructor" if exists $opts{constraint};
 	_croak "Need to supply list of type constraints" unless exists $opts{type_constraints};
+	
 	$opts{type_constraints} = [
 		map Types::TypeTiny::to_TypeTiny($_),
 		map { $_->isa(__PACKAGE__) ? @$_ : $_ }
 		@{ ref $opts{type_constraints} eq "ARRAY" ? $opts{type_constraints} : [$opts{type_constraints}] }
 	];
+	
 	return $proto->SUPER::new(%opts);
 }
 
