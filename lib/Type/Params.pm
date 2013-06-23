@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Params::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Params::VERSION   = '0.009_05';
+	$Type::Params::VERSION   = '0.009_06';
 }
 
 use B qw(perlstring);

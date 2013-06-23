@@ -631,3 +631,10 @@
 		item "Type::Registry does the AUTOLOAD thing, so ought to provide a DESTROY method."^^Bugfix;
 	].
 
+`Type-Tiny 0.009_06 cpan:TOBYINK`
+	issued  2013-06-23;
+	changeset [
+		dcs:versus `Type-Tiny 0.009_05 cpan:TOBYINK`;
+		item "Careful calling the DOES method (it doesn't exist in Perl 5.8)."^^Bugfix;
+	].
+
