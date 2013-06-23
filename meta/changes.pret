@@ -624,3 +624,10 @@
 		item "Support Type::API interfaces."^^Update;
 	].
 
+`Type-Tiny 0.009_05 cpan:TOBYINK`
+	issued  2013-06-23;
+	changeset [
+		dcs:versus `Type-Tiny 0.009_04 cpan:TOBYINK`;
+		item "Type::Registry does the AUTOLOAD thing, so ought to provide a DESTROY method."^^Bugfix;
+	].
+
