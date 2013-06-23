@@ -128,6 +128,12 @@ sub AUTOLOAD
 	_croak(q[Can't locate object method "%s" via package "%s"], $method, ref($self));
 }
 
+# Prevent AUTOLOAD being called for DESTROY!
+sub DESTROY
+{
+	return;
+}
+
 1;
 
 __END__
