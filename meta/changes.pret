@@ -614,3 +614,13 @@
 		dcs:versus `Type-Tiny 0.009_02 cpan:TOBYINK`;
 		item "Fix Types::Standard compilation errors under Perl 5.8.x."^^Bugfix;
 	].
+
+`Type-Tiny 0.009_04 cpan:TOBYINK`
+	issued  2013-06-23;
+	changeset [
+		dcs:versus `Type-Tiny 0.009_03 cpan:TOBYINK`;
+		item "Type::Tiny::Class shouldn't completely trust @ISA when establishing parent class heirarchies."^^Bugfix;
+		item "Constructors for Type::Tiny subclasses no longer accept the 'constraint' parameter; it doesn't make sense."^^Change;
+		item "Support Type::API interfaces."^^Update;
+	].
+
