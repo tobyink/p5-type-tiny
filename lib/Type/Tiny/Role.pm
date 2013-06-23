@@ -23,6 +23,7 @@ sub new {
 	my %opts = @_;
 	_croak "Role type constraints cannot have a parent constraint passed to the constructor" if exists $opts{parent};
 	_croak "Role type constraints cannot have a constraint coderef passed to the constructor" if exists $opts{constraint};
+	_croak "Role type constraints cannot have a inlining coderef passed to the constructor" if exists $opts{inlined};
 	_croak "Need to supply role name" unless exists $opts{role};
 	
 	return $proto->SUPER::new(%opts);

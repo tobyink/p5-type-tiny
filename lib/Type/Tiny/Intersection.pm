@@ -24,6 +24,7 @@ sub new {
 	my %opts = @_;
 	_croak "Intersection type constraints cannot have a parent constraint" if exists $opts{parent};
 	_croak "Intersection type constraints cannot have a constraint coderef passed to the constructor" if exists $opts{constraint};
+	_croak "Intersection type constraints cannot have a inlining coderef passed to the constructor" if exists $opts{inlined};
 	_croak "Need to supply list of type constraints" unless exists $opts{type_constraints};
 	
 	$opts{type_constraints} = [

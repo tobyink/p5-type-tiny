@@ -22,6 +22,7 @@ sub new
 	my %opts = @_;
 	_croak "Enum type constraints cannot have a parent constraint passed to the constructor" if exists $opts{parent};
 	_croak "Enum type constraints cannot have a constraint coderef passed to the constructor" if exists $opts{constraint};
+	_croak "Enum type constraints cannot have a inlining coderef passed to the constructor" if exists $opts{inlined};
 	_croak "Need to supply list of values" unless exists $opts{values};
 	
 	my %tmp =

@@ -21,6 +21,7 @@ sub new {
 	my %opts = @_;
 	_croak "Duck type constraints cannot have a parent constraint passed to the constructor" if exists $opts{parent};
 	_croak "Duck type constraints cannot have a constraint coderef passed to the constructor" if exists $opts{constraint};
+	_croak "Duck type constraints cannot have a inlining coderef passed to the constructor" if exists $opts{inlined};
 	_croak "Need to supply list of methods" unless exists $opts{methods};
 	
 	$opts{methods} = [$opts{methods}] unless ref $opts{methods};
