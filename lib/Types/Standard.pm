@@ -1542,7 +1542,7 @@ __END__
 
 =pod
 
-=for stopwords booleans
+=for stopwords booleans vstrings typeglobs
 
 =encoding utf-8
 
@@ -1596,8 +1596,10 @@ Any defined, non-reference value.
 
 =item C<< Str >>
 
-Can't say I'm massively sure what the difference is between C<Str> and
-C<Value>.
+Any string.
+
+(The only difference between C<Value> and C<Str> is that the former accepts
+typeglobs and vstrings.)
 
 =item C<< Num >>
 
