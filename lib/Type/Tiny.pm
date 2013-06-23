@@ -104,6 +104,24 @@ sub new
 		$params{coercion} = $params{parent}->coercion;
 	}
 	
+	if (!exists $params{inlined}
+	and exists $params{constraint}
+	and ( !exists $params{parent} or $params{parent}->can_be_inlined )
+	and my $qfs = "Sub::Quote"->can("quoted_from_sub"))
+	{
+		my (undef, $perlstring, $captures) = @{ $qfs->($params{constraint}) || [] };
+		
+		$params{inlined} = sub {
+			my ($self, $var) = @_;
+			my $code = Sub::Quote::inlinify(
+				$var eq q($_) ? $perlstring : "local \$_ = $var; $perlstring",
+				$var,
+			);
+			$code = sprintf('%s and %s', $self->parent->inline_check($var), $code) if $self->has_parent;
+			return $code;
+		} if $perlstring && !$captures;
+	}
+	
 	my $self = bless \%params, $class;
 	
 	unless ($params{tmp})
@@ -944,6 +962,9 @@ against the type constraint. Optional (there's a vaguely sensible default.)
 
 A coderef which returns a string of Perl code suitable for inlining this
 type. Optional.
+
+If C<constraint> (above) is a coderef generated via L<Sub::Quote>, then
+Type::Tiny I<may> be able to automatically generate C<inlined> for you.
 
 =item C<< library >>
 
