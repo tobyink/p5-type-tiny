@@ -69,6 +69,7 @@ sub _overload_coderef
 
 our %ALL_TYPES;
 
+my $QFS;
 my $uniq = 1;
 sub new
 {
@@ -107,9 +108,9 @@ sub new
 	if (!exists $params{inlined}
 	and exists $params{constraint}
 	and ( !exists $params{parent} or $params{parent}->can_be_inlined )
-	and my $qfs = "Sub::Quote"->can("quoted_from_sub"))
+	and $QFS ||= "Sub::Quote"->can("quoted_from_sub"))
 	{
-		my (undef, $perlstring, $captures) = @{ $qfs->($params{constraint}) || [] };
+		my (undef, $perlstring, $captures) = @{ $QFS->($params{constraint}) || [] };
 		
 		$params{inlined} = sub {
 			my ($self, $var) = @_;
