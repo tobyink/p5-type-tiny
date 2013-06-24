@@ -203,12 +203,17 @@ sub _TypeTinyFromGeneric
 	# XXX - handle coercions
 	# XXX - handle inlining??
 	# XXX - handle display_name????
-	
-	require Type::Tiny;
-	return "Type::Tiny"->new(
-		constraint => sub { $t->check($_) },
-		message    => sub { $t->get_message($_) },
+
+	my %opts = (
+		constraint => sub { $t->check(@_ ? @_ : $_) },
+		message    => sub { $t->get_message(@_ ? @_ : $_) },
 	);
+	
+	$opts{coercion} = sub { $t->coerce(@_ ? @_ : $_) }
+		if $t->can("has_coercion") && $t->has_coercion && $t->can("coerce");
+
+	require Type::Tiny;
+	return "Type::Tiny"->new(%opts);
 }
 
 sub _TypeTinyFromCodeRef
@@ -279,7 +284,8 @@ coercion only. (The behaviour of C<coerce> if we don't do that is just too
 weird!)
 
 Can also handle any object providing C<check> and C<get_message> methods.
-(This includes L<Mouse::Meta::TypeConstraint> objects.)
+(This includes L<Mouse::Meta::TypeConstraint> objects.) If the object also
+provides C<has_coercion> and C<coerce> methods, these will be used too.
 
 Can also handle coderefs (but not blessed coderefs or objects overloading
 C<< &{} >>). Coderefs are expected to return true iff C<< $_ >> passes the
