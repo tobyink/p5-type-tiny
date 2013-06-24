@@ -94,20 +94,15 @@ sub to_TypeTiny
 	return $t
 		if (ref($t) =~ /^Type::Tiny\b/);
 	
-	return $t
-		if (blessed($t) and $t->isa("Type::Tiny"));
-	
-	goto \&_TypeTinyFromMoose
-		if (blessed($t) and ref($t)->isa("Moose::Meta::TypeConstraint"));
-	
-	goto \&_TypeTinyFromMoose
-		if (blessed($t) and ref($t)->isa("MooseX::Types::TypeDecorator"));
-	
-	goto \&_TypeTinyFromMouse
-		if (blessed($t) and ref($t)->isa("Mouse::Meta::TypeConstraint"));
-	
-	goto \&_TypeTinyFromValidationClass
-		if (blessed($t) and ref($t)->isa("Validation::Class::Simple") || ref($t)->isa("Validation::Class"));
+	if (my $class = blessed $t)
+	{
+		return $t                           if $class->isa("Type::Tiny");
+		goto \&_TypeTinyFromMoose           if $class->isa("Moose::Meta::TypeConstraint");
+		goto \&_TypeTinyFromMoose           if $class->isa("MooseX::Types::TypeDecorator");		
+		goto \&_TypeTinyFromMouse           if $class->isa("Mouse::Meta::TypeConstraint");
+		goto \&_TypeTinyFromValidationClass if $class->isa("Validation::Class::Simple");
+		goto \&_TypeTinyFromValidationClass if $class->isa("Validation::Class");
+	}
 	
 #	goto \&_TypeTinyFromCodeRef
 #		if (ref($t) and ref($t) eq q(CODE));
