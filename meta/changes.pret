@@ -638,3 +638,15 @@
 		item "Careful calling the DOES method (it doesn't exist in Perl 5.8)."^^Bugfix;
 	].
 
+`Type-Tiny 0.009_07 cpan:TOBYINK`
+	issued  2013-06-24;
+	changeset [
+		dcs:versus `Type-Tiny 0.009_06 cpan:TOBYINK`;
+		item "Types::Standard::to_TypeTiny now sets 'display_name' instead of 'name' on generated type constraints."^^Change;
+		item "More test cases for interacting with MooseX::Types type constraints."^^Packaging;
+		item "Type::Params no longer uses Type::Utils."^^Change;
+		item "Subclasses of Type::Tiny reject 'inlined' coderef, just like they already reject 'constraint' coderef."^^Change;
+		item "Make rt86172.t an 'xt' test case because it's causing random CPAN testers failures unrelated to the feature it's supposed to be testing."^^Packaging;
+		item "If a Type::Tiny object is instantiated with a Sub::Quote quoted constraint coderef, and no inlined coderef, then Type::Tiny will use Sub::Quote to make an inlined coderef."^^Change;
+	].
+
