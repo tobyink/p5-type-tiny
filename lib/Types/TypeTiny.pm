@@ -98,9 +98,7 @@ sub to_TypeTiny
 	{
 		return $t                           if $class->isa("Type::Tiny");
 		goto \&_TypeTinyFromMoose           if $class->isa("Moose::Meta::TypeConstraint");
-		goto \&_TypeTinyFromMoose           if $class->isa("MooseX::Types::TypeDecorator");		
-		goto \&_TypeTinyFromMouse           if $class->isa("Mouse::Meta::TypeConstraint");
-		goto \&_TypeTinyFromMouse           if $class->isa("MouseX::Types::TypeDecorator");
+		goto \&_TypeTinyFromMoose           if $class->isa("MooseX::Types::TypeDecorator");
 		goto \&_TypeTinyFromValidationClass if $class->isa("Validation::Class::Simple");
 		goto \&_TypeTinyFromValidationClass if $class->isa("Validation::Class");
 		goto \&_TypeTinyFromGeneric         if $t->can("check") && $t->can("get_message"); # i.e. Type::API::Constraint
@@ -131,23 +129,6 @@ sub _TypeTinyFromMoose
 	
 	require Type::Tiny;
 	return "Type::Tiny"->new(%opts);
-}
-
-sub _TypeTinyFromMouse
-{
-	my $t = $_[0];
-	
-	my %opts;
-	$opts{display_name} = $t->name;
-	$opts{constraint}   = $t->{constraint}; # sic
-	$opts{parent}       = to_TypeTiny($t->parent)              if exists $t->{parent};
-	$opts{message}      = sub { $t->get_message($_) }          if exists $t->{message};
-	$opts{mouse_type}   = $t;
-	
-	require Type::Tiny;
-	my $T = "Type::Tiny"->new(%opts);
-	$T->compiled_check;
-	return $T;
 }
 
 sub _TypeTinyFromValidationClass
@@ -285,7 +266,7 @@ much circularity. But it exports some type constraint "constants":
 
 =item C<< to_TypeTiny($constraint) >>
 
-Promotes (or "demotes" if you prefer) a Moose/Mouse::Meta::TypeConstraint object
+Promotes (or "demotes" if you prefer) a Moose::Meta::TypeConstraint object
 to a Type::Tiny object.
 
 Can also handle L<Validation::Class> objects. Type constraints built from 
@@ -293,6 +274,9 @@ Validation::Class objects deliberately I<ignore> field filters when they
 do constraint checking (and go to great lengths to do so); using filters for
 coercion only. (The behaviour of C<coerce> if we don't do that is just too
 weird!)
+
+Can also handle any object providing C<check> and C<get_message> methods.
+(This includes L<Mouse::Meta::TypeConstraint> objects.)
 
 =begin not_supported_yet
 
