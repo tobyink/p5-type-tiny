@@ -67,9 +67,23 @@ Other modules using Type::Tiny in interesting ways: L<Type::Tie>, L<Scalar::Does
 
 =head2 Specio 
 
-Type::Tiny is similar in aim to L<Specio>. The major differences are that
-Type::Tiny is "tiny"; and Type::Tiny dispenses with the idea of a type
-registry and stringy access to type constraints.
+Type::Tiny is similar in aim to L<Specio>. The major differences are
+
+=over
+
+=item *
+
+Type::Tiny is "tiny" (Specio will eventually have fewer dependencies
+than it currently does, but is unlikely to ever have zero);
+
+=item *
+
+Specio has a somewhat nicer API, and its API is likely to improve further.
+Type::Tiny's aims at complete compatbility with current versions of Moose
+and Mouse, so there is a limit to how much I can deviate from the existing
+APIs of (Moose|Mouse)::Meta::TypeConstraint.
+
+=back
 
 =head2 MooseX::Types
 

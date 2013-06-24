@@ -43,3 +43,10 @@
  - Much improved documentation, especially Types::Standard and Type::Utils.
  - Type::Utils now has "match_on_type"/"compile_match_on_type" functions.
  - Type::Utils no longer exports "extends" function by default.
+
+2013-06-24 Type-Tiny version 0.010 released!
+
+ - Includes Reply::Plugin::TypeTiny.
+ - Type::API support.
+ - Improved Sub::Quote integration.
+ - Many small bug fixes and optimizations.
