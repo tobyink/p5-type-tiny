@@ -22,6 +22,7 @@ use overload
 	q(+)       => sub { __PACKAGE__->add(@_) },
 	fallback   => 1,
 ;
+
 BEGIN {
 	require Type::Tiny;
 	overload->import(q(~~) => sub { $_[0]->has_coercion_for_value($_[1]) })
@@ -50,10 +51,14 @@ sub new
 	my $class  = shift;
 	my %params = (@_==1) ? %{$_[0]} : @_;
 	
-	$params{name} = '__ANON__' unless exists $params{name};
+	$params{name} = '__ANON__' unless exists($params{name});
+	my $C = delete($params{type_coercion_map}) || [];
+	my $F = delete($params{frozen});
 	
-	my $self   = bless \%params, $class;
+	my $self = bless \%params, $class;
+	$self->add_type_coercions(@$C) if @$C;
 	Scalar::Util::weaken($self->{type_constraint}); # break ref cycle
+	$self->{frozen} = $F if $F;
 	
 	unless ($self->is_anon)
 	{
@@ -99,6 +104,13 @@ sub add
 	if ($x->has_type_constraint and $y->has_type_constraint and $x->type_constraint == $y->type_constraint)
 	{
 		$opts{type_constraint} = $x->type_constraint;
+	}
+	elsif ($x->has_type_constraint and $y->has_type_constraint)
+	{
+#		require Type::Tiny::Union;
+#		$opts{type_constraint} = "Type::Tiny::Union"->new(
+#			type_constraints => [ $x->type_constraint, $y->type_constraint ],
+#		);
 	}
 	$opts{display_name} ||= "$x+$y";
 	delete $opts{display_name} if $opts{display_name} eq '__ANON__+__ANON__';
@@ -162,11 +174,11 @@ sub has_coercion_for_type
 	return "0 but true"
 		if $self->has_type_constraint && $type->is_a_type_of($self->type_constraint);
 	
-	for my $has (@{$self->type_coercion_map})
+	my $c = $self->type_coercion_map;
+	for (my $i = 0; $i <= $#$c; $i += 2)
 	{
-		return !!1 if Types::TypeTiny::TypeTiny->check($has) && $type->is_a_type_of($has);
+		return !!1 if $type->is_a_type_of($c->[$i]);
 	}
-	
 	return;
 }
 
@@ -191,8 +203,7 @@ sub add_type_coercions
 	my $self = shift;
 	my @args = @_;
 	
-	_croak "Attempt to add coercion code to a Type::Coercion which has been frozen"
-		if $self->frozen;
+	_croak "Attempt to add to a Type::Coercion which has been frozen" if $self->frozen;
 	
 	while (@args)
 	{
@@ -269,10 +280,11 @@ sub _build_compiled_coercion
 sub can_be_inlined
 {
 	my $self = shift;
-	my @mishmash = @{$self->type_coercion_map};
 	return
 		if $self->has_type_constraint
 		&& !$self->type_constraint->can_be_inlined;
+	
+	my @mishmash = @{$self->type_coercion_map};
 	while (@mishmash)
 	{
 		my ($type, $converter) = splice(@mishmash, 0, 2);

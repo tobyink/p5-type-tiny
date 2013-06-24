@@ -91,8 +91,8 @@ sub to_TypeTiny
 {
 	my $t = $_[0];
 	
-	return $t
-		if (ref($t) =~ /^Type::Tiny\b/);
+	return $t unless ref $t;
+	return $t if ref($t) =~ /^Type::Tiny\b/;
 	
 	if (my $class = blessed $t)
 	{
@@ -104,8 +104,7 @@ sub to_TypeTiny
 		goto \&_TypeTinyFromGeneric         if $t->can("check") && $t->can("get_message"); # i.e. Type::API::Constraint
 	}
 	
-#	goto \&_TypeTinyFromCodeRef
-#		if (ref($t) and ref($t) eq q(CODE));
+	goto \&_TypeTinyFromCodeRef if ref($t) eq q(CODE);
 	
 	$t;
 }
@@ -200,6 +199,10 @@ sub _TypeTinyFromValidationClass
 sub _TypeTinyFromGeneric
 {
 	my $t = $_[0];
+	
+	# XXX - handle coercions
+	# XXX - handle inlining??
+	# XXX - handle display_name????
 	
 	require Type::Tiny;
 	return "Type::Tiny"->new(

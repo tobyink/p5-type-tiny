@@ -140,8 +140,9 @@ sub _exporter_install_sub
 	require B;
 	for (grep ref, $into->can($name))
 	{
-		my $cv = B::svref_2object($_);
-		$cv->STASH->NAME eq $into
+		my $stash = B::svref_2object($_)->STASH;
+		next unless $stash->can("NAME");
+		$stash->NAME eq $into
 			and _croak("Refusing to overwrite local sub '$name' with export from $class");
 	}
 	
