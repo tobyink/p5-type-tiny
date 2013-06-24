@@ -103,6 +103,7 @@ sub to_TypeTiny
 		goto \&_TypeTinyFromMouse           if $class->isa("MouseX::Types::TypeDecorator");
 		goto \&_TypeTinyFromValidationClass if $class->isa("Validation::Class::Simple");
 		goto \&_TypeTinyFromValidationClass if $class->isa("Validation::Class");
+		goto \&_TypeTinyFromGeneric         if $t->can("check") && $t->can("get_message"); # i.e. Type::API::Constraint
 	}
 	
 #	goto \&_TypeTinyFromCodeRef
@@ -213,6 +214,17 @@ sub _TypeTinyFromValidationClass
 	);
 	
 	return $new;
+}
+
+sub _TypeTinyFromGeneric
+{
+	my $t = $_[0];
+	
+	require Type::Tiny;
+	return "Type::Tiny"->new(
+		constraint => sub { $t->check($_) },
+		message    => sub { $t->get_message($_) },
+	);
 }
 
 sub _TypeTinyFromCodeRef
