@@ -229,13 +229,17 @@ sub declare_coercion
 	eval "require $bless";
 	my $c = $bless->new(%opts);
 	
-	my @C = @_;
+	my @C;
 	
 	if ($caller->isa("Type::Library"))
 	{
 		my $meta = $caller->meta;
 		$meta->add_coercion($c) unless $c->is_anon;
-		@C = map { ref($_) ? to_TypeTiny($_) : $meta->get_type($_)||$_ } @C;
+		while (@_)
+		{
+			push @C, map { ref($_) ? to_TypeTiny($_) : $meta->get_type($_)||$_ } shift;
+			push @C, shift;
+		}
 	}
 	
 	$c->add_type_coercions(@C);
@@ -248,7 +252,13 @@ sub coerce
 	if ((scalar caller)->isa("Type::Library"))
 	{
 		my $meta = (scalar caller)->meta;
-		my ($type, @opts) = map { ref($_) ? to_TypeTiny($_) : $meta->get_type($_)||$_ } @_;
+		my ($type) = map { ref($_) ? to_TypeTiny($_) : $meta->get_type($_)||$_ } shift;
+		my @opts;
+		while (@_)
+		{
+			push @opts, map { ref($_) ? to_TypeTiny($_) : $meta->get_type($_)||$_ } shift;
+			push @opts, shift;
+		}
 		return $type->coercion->add_type_coercions(@opts);
 	}
 	

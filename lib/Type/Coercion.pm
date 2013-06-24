@@ -9,9 +9,9 @@ BEGIN {
 	$Type::Coercion::VERSION   = '0.010';
 }
 
-use Eval::TypeTiny ();
+use Eval::TypeTiny qw<>;
 use Scalar::Util qw< blessed >;
-use Types::TypeTiny ();
+use Types::TypeTiny qw<>;
 
 sub _croak ($;@) { require Type::Exception; goto \&Type::Exception::croak }
 
@@ -203,7 +203,7 @@ sub add_type_coercions
 	my $self = shift;
 	my @args = @_;
 	
-	_croak "Attempt to add to a Type::Coercion which has been frozen" if $self->frozen;
+	_croak "Attempt to add coercion code to a Type::Coercion which has been frozen" if $self->frozen;
 	
 	while (@args)
 	{

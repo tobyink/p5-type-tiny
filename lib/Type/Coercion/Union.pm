@@ -36,7 +36,7 @@ sub type_coercion_map
 sub add_type_coercions
 {
 	my $self = shift;
-	_croak "Adding coercions to Type::Coercion::Union not currently supported";
+	_croak "Adding coercions to Type::Coercion::Union not currently supported" if @_;
 }
 
 # sub _build_moose_coercion ???
