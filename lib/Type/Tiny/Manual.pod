@@ -78,10 +78,11 @@ than it currently does, but is unlikely to ever have zero);
 
 =item *
 
-Specio has a somewhat nicer API, and its API is likely to improve further.
-Type::Tiny's aims at complete compatbility with current versions of Moose
-and Mouse, so there is a limit to how much I can deviate from the existing
-APIs of (Moose|Mouse)::Meta::TypeConstraint.
+Specio has a somewhat nicer API (better method names; less duplication),
+and its API is likely to improve further. Type::Tiny's aims at complete
+compatibility with current versions of Moose and Mouse, so there is a
+limit to how much I can deviate from the existing APIs of
+(Moose|Mouse)::Meta::TypeConstraint.
 
 =back
 
