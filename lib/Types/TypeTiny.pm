@@ -100,6 +100,7 @@ sub to_TypeTiny
 		goto \&_TypeTinyFromMoose           if $class->isa("Moose::Meta::TypeConstraint");
 		goto \&_TypeTinyFromMoose           if $class->isa("MooseX::Types::TypeDecorator");		
 		goto \&_TypeTinyFromMouse           if $class->isa("Mouse::Meta::TypeConstraint");
+		goto \&_TypeTinyFromMouse           if $class->isa("MouseX::Types::TypeDecorator");
 		goto \&_TypeTinyFromValidationClass if $class->isa("Validation::Class::Simple");
 		goto \&_TypeTinyFromValidationClass if $class->isa("Validation::Class");
 	}
@@ -137,13 +138,15 @@ sub _TypeTinyFromMouse
 	
 	my %opts;
 	$opts{display_name} = $t->name;
-	$opts{constraint}   = $t->constraint;
-	$opts{parent}       = to_TypeTiny($t->parent)              if $t->has_parent;
-	$opts{message}      = sub { $t->get_message($_) }          if $t->has_message;
+	$opts{constraint}   = $t->{constraint}; # sic
+	$opts{parent}       = to_TypeTiny($t->parent)              if exists $t->{parent};
+	$opts{message}      = sub { $t->get_message($_) }          if exists $t->{message};
 	$opts{mouse_type}   = $t;
 	
 	require Type::Tiny;
-	return "Type::Tiny"->new(%opts);
+	my $T = "Type::Tiny"->new(%opts);
+	$T->compiled_check;
+	return $T;
 }
 
 sub _TypeTinyFromValidationClass

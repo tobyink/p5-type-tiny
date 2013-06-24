@@ -134,6 +134,8 @@ sub new
 		weaken($ALL_TYPES{ $self->{uniq} });
 	}
 	
+	$self->{type_constraints} ||= [];
+	
 	return $self;
 }
 
