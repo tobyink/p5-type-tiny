@@ -281,14 +281,10 @@ weird!)
 Can also handle any object providing C<check> and C<get_message> methods.
 (This includes L<Mouse::Meta::TypeConstraint> objects.)
 
-=begin not_supported_yet
-
 Can also handle coderefs (but not blessed coderefs or objects overloading
 C<< &{} >>). Coderefs are expected to return true iff C<< $_ >> passes the
 constraint. If C<< $_ >> fails the type constraint, they may either return
 false, or die with a helpful error message.
-
-=end not_supported_yet
 
 =back
 
