@@ -667,3 +667,10 @@
 		item "Types::Standard::to_TypeTiny now accepts unblessed coderefs and converts them to type constraints. This allows things like `Int & sub { $_ < 10 }` to work."^^Addition;
 	].
 
+`Type-Tiny 0.011_02 cpan:TOBYINK`
+	issued  2013-06-25;
+	changeset [
+		dcs:versus `Type-Tiny 0.011_02 cpan:TOBYINK`;
+		item "Types::Standard 0.009_02 stopped including 'library' attribute in its types, and thus broke MooX::late. Type::Library modified to make 'library' attribute more automatic, and less reliant on Type::Utils to do the right thing."^^Bugfix;
+	].
+
