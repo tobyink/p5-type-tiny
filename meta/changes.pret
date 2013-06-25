@@ -665,6 +665,12 @@
 		item "Cleanups within Type::Coercion. Necessary because in some places the entire type_coercion_map (including conversion coderefs) was passed through Types::Standard::to_TypeTiny, when really only the type constraints should have been."^^Change;
 		item "Types::Standard::to_TypeTiny now accepts any object implementing the Type::API::Constraint or Type::API::Constraint::Coercion interfaces. As Mouse::Meta::TypeConstraint implements this interface, specific support for importing Mouse types has been dropped; the generic Type::API import 'just works' for Mouse types."^^Addition;
 		item "Types::Standard::to_TypeTiny now accepts unblessed coderefs and converts them to type constraints. This allows things like `Int & sub { $_ < 10 }` to work."^^Addition;
+		item [
+			a dcs:Bugfix;
+			label "B::SPECIAL-related fix.";
+			dcs:fixes RT#86383;
+			dcs:thanks cpan:PJFL;
+		];
 	].
 
 `Type-Tiny 0.011_02 cpan:TOBYINK`
