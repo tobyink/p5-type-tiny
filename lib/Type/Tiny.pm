@@ -134,7 +134,7 @@ sub new
 		weaken($ALL_TYPES{ $self->{uniq} });
 	}
 	
-	$self->{type_constraints} ||= [];
+	$self->{type_constraints} = undef;
 	
 	return $self;
 }
@@ -170,7 +170,7 @@ sub name                     { $_[0]{name} }
 sub display_name             { $_[0]{display_name}   ||= $_[0]->_build_display_name }
 sub parent                   { $_[0]{parent} }
 sub constraint               { $_[0]{constraint}     ||= $_[0]->_build_constraint }
-sub compiled_check           { $_[0]{compiled_check} ||= $_[0]->_build_compiled_check }
+sub compiled_check           { $_[0]{compiled_type_constraint} ||= $_[0]->_build_compiled_check }
 sub coercion                 { $_[0]{coercion}       ||= $_[0]->_build_coercion }
 sub message                  { $_[0]{message} }
 sub library                  { $_[0]{library} }
@@ -374,7 +374,7 @@ sub parents
 sub check
 {
 	my $self = shift;
-	($self->{compiled_check} ||= $self->_build_compiled_check)->(@_);
+	($self->{compiled_type_constraint} ||= $self->_build_compiled_check)->(@_);
 }
 
 sub _strict_check
@@ -409,7 +409,7 @@ sub validate
 {
 	my $self = shift;
 	
-	return undef if ($self->{compiled_check} ||= $self->_build_compiled_check)->(@_);
+	return undef if ($self->{compiled_type_constraint} ||= $self->_build_compiled_check)->(@_);
 	
 	local $_ = $_[0];
 	return $self->get_message(@_);
@@ -419,7 +419,7 @@ sub assert_valid
 {
 	my $self = shift;
 	
-	return !!1 if ($self->{compiled_check} ||= $self->_build_compiled_check)->(@_);
+	return !!1 if ($self->{compiled_type_constraint} ||= $self->_build_compiled_check)->(@_);
 	
 	local $_ = $_[0];
 	$self->_failed_check("$self", $_);
@@ -429,7 +429,7 @@ sub assert_return
 {
 	my $self = shift;
 	
-	return $_[0] if ($self->{compiled_check} ||= $self->_build_compiled_check)->(@_);
+	return $_[0] if ($self->{compiled_type_constraint} ||= $self->_build_compiled_check)->(@_);
 	
 	local $_ = $_[0];
 	$self->_failed_check("$self", $_);

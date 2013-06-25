@@ -40,16 +40,16 @@ isa_ok($union1, "Mouse::Meta::TypeConstraint");
 isa_ok($union1, "Mouse::Meta::TypeConstraint");
 isa_ok($union2, "Type::Tiny");
 
+should_pass([], $union1);
+should_pass(2, $union1);
+should_fail({}, $union1);
+
 TODO: {
 	local $TODO = "Mouse::Meta::TypeConstraint and Type::Tiny union not working";
-	should_pass([], $union1);
-	should_pass(2, $union1);
-	should_fail({}, $union1);
+	should_pass([], $union2);
+	should_pass(2, $union2);
+	should_fail({}, $union2);
 }
-
-should_pass([], $union2);
-should_pass(2, $union2);
-should_fail({}, $union2);
 
 my $param1 = MyArrayRef[Int];
 my $param2 = ArrayRef[MyInt];
