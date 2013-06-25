@@ -670,7 +670,14 @@
 `Type-Tiny 0.011_02 cpan:TOBYINK`
 	issued  2013-06-25;
 	changeset [
-		dcs:versus `Type-Tiny 0.011_02 cpan:TOBYINK`;
+		dcs:versus `Type-Tiny 0.011_01 cpan:TOBYINK`;
 		item "Types::Standard 0.009_02 stopped including 'library' attribute in its types, and thus broke MooX::late. Type::Library modified to make 'library' attribute more automatic, and less reliant on Type::Utils to do the right thing."^^Bugfix;
+	].
+
+`Type-Tiny 0.011_03 cpan:TOBYINK`
+	issued  2013-06-25;
+	changeset [
+		dcs:versus `Type-Tiny 0.011_02 cpan:TOBYINK`;
+		item "Type::Tiny now overloads `cmp`. Necessary because Mouse does a sort on type constraints in a union, and overload's fallback doesn't seem to cover `cmp` on Perl prior to 5.12."^^Bugfix;
 	].
 
