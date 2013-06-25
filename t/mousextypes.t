@@ -28,7 +28,6 @@ use warnings;
 
 use Test::More;
 use Test::Requires { "MouseX::Types" => "0.06" };
-use Test::Requires "5.012";  # improvements to overloading
 use Test::TypeTiny;
 
 use MouseX::Types::Moose qw(Int ArrayRef);
