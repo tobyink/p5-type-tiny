@@ -50,3 +50,8 @@
  - Type::API support.
  - Improved Sub::Quote integration.
  - Many small bug fixes and optimizations.
+
+2013-06-25 Type-Tiny version 0.012 released!
+
+ - Better Mouse support.
+ - Can now coerce Type::Tiny objects from coderefs (via to_TypeTiny).

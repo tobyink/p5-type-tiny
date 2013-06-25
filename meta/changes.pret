@@ -681,3 +681,10 @@
 		item "Type::Tiny now overloads `cmp`. Necessary because Mouse does a sort on type constraints in a union, and overload's fallback doesn't seem to cover `cmp` on Perl prior to 5.12."^^Bugfix;
 	].
 
+`Type-Tiny 0.012 cpan:TOBYINK`
+	issued  2013-06-25;
+	changeset [
+		dcs:versus `Type-Tiny 0.011_03 cpan:TOBYINK`;
+		item "Updated NEWS file."^^Documentation;
+	].
+
