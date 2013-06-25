@@ -606,6 +606,7 @@
 		];
 		item "Various minor optimizations for Eval::TypeTiny, Type::Tiny, etc."^^Change;
 		item "Types::Standard no longer uses Type::Utils."^^Change;
+		item "Types::Standard types no longer have 'library' attribute set; this subtly breaks Moo type inflation, and breaks the MooX::late test suite which relies on type inflation working correctly."^^Regression;
 	].
 
 `Type-Tiny 0.009_03 cpan:TOBYINK`
@@ -677,7 +678,11 @@
 	issued  2013-06-25;
 	changeset [
 		dcs:versus `Type-Tiny 0.011_01 cpan:TOBYINK`;
-		item "Types::Standard 0.009_02 stopped including 'library' attribute in its types, and thus broke MooX::late. Type::Library modified to make 'library' attribute more automatic, and less reliant on Type::Utils to do the right thing."^^Bugfix;
+		item [
+			a dcs:Bugfix;
+			label "Types::Standard 0.009_02 stopped including 'library' attribute in its types, and thus broke MooX::late. Type::Library modified to make 'library' attribute more automatic, and less reliant on Type::Utils to do the right thing.";
+			dcs:thanks cpan:HAARG;
+		];
 	].
 
 `Type-Tiny 0.011_03 cpan:TOBYINK`
