@@ -211,12 +211,14 @@ sub meta
 
 sub add_type
 {
-	my $meta = shift->meta;
+	my $meta  = shift->meta;
+	my $class = blessed($meta);
 	
 	my $type =
 		ref($_[0]) =~ /^Type::Tiny\b/  ? $_[0] :
 		blessed($_[0])                 ? to_TypeTiny($_[0]) :
-		"Type::Tiny"->new(@_);
+		ref($_[0]) eq q(HASH)          ? "Type::Tiny"->new(library => $class, %{$_[0]}) :
+		"Type::Tiny"->new(library => $class, @_);
 	my $name = $type->{name};
 	
 	$meta->{types} ||= {};
@@ -228,7 +230,6 @@ sub add_type
 	no strict "refs";
 	no warnings "redefine", "prototype";
 	
-	my $class = blessed($meta);
 	
 	# There is an inlined coercion available, but don't use that because
 	# additional coercions can be added *after* the type has been installed
