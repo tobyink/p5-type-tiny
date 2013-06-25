@@ -134,7 +134,7 @@ sub new
 		weaken($ALL_TYPES{ $self->{uniq} });
 	}
 	
-	$self->{type_constraints} = undef;
+	$self->{type_constraints} ||= undef;
 	
 	return $self;
 }
