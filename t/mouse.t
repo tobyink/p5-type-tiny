@@ -74,4 +74,11 @@ like(
 	"violation of great-grandparent type constraint",
 );
 
+use Mouse::Util;
+
+ok(
+	Mouse::Util::is_a_type_constraint(BiggerLib::SmallInteger),
+	"Mouse::Util::is_a_type_constraint accepts Type::Tiny type constraints",
+);
+
 done_testing;
