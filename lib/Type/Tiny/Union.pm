@@ -28,8 +28,8 @@ sub new {
 	_croak "Need to supply list of type constraints" unless exists $opts{type_constraints};
 	
 	$opts{type_constraints} = [
-		map Types::TypeTiny::to_TypeTiny($_),
 		map { $_->isa(__PACKAGE__) ? @$_ : $_ }
+		map Types::TypeTiny::to_TypeTiny($_),
 		@{ ref $opts{type_constraints} eq "ARRAY" ? $opts{type_constraints} : [$opts{type_constraints}] }
 	];
 	
