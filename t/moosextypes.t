@@ -4,7 +4,7 @@
 
 =head1 PURPOSE
 
-Complex checks between Type::Tine and L<MooseX::Types>.
+Complex checks between Type::Tiny and L<MooseX::Types>.
 
 =head1 DEPENDENCIES
 
@@ -37,7 +37,7 @@ my $union1 = Int | MyArrayRef;
 my $union2 = MyArrayRef | Int;
 
 isa_ok($union1, "Moose::Meta::TypeConstraint");
-isa_ok($union1, "Moose::Meta::TypeConstraint");
+isa_ok($union2, "Moose::Meta::TypeConstraint");
 isa_ok($union2, "Type::Tiny");
 
 should_pass([], $union1);
