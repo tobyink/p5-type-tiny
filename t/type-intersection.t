@@ -100,4 +100,12 @@ note NotherSect->inline_check('$X');
 should_pass(bless([], "Foo::Baz"), NotherSect);
 should_fail(bless({}, "Foo::Baz"), NotherSect);
 
+my $SmallEven = SmallInteger & sub { $_ % 2 == 0 };
+
+isa_ok($SmallEven, "Type::Tiny::Intersection");
+ok(!$SmallEven->can_be_inlined, "not ($SmallEven)->can_be_inlined");
+should_pass(2, $SmallEven);
+should_fail(20, $SmallEven);
+should_fail(3, $SmallEven);
+
 done_testing;
