@@ -44,6 +44,7 @@ sub StringLike ()
 		name       => "StringLike",
 		constraint => sub {    !ref($_   ) or Scalar::Util::blessed($_   ) && overload::Method($_   , q[""])  },
 		inlined    => sub { qq/!ref($_[1]) or Scalar::Util::blessed($_[1]) && overload::Method($_[1], q[""])/ },
+		library    => __PACKAGE__,
 	);
 }
 
@@ -54,6 +55,7 @@ sub HashLike ()
 		name       => "HashLike",
 		constraint => sub {    ref($_   ) eq q[HASH] or Scalar::Util::blessed($_   ) && overload::Method($_   , q[%{}])  },
 		inlined    => sub { qq/ref($_[1]) eq q[HASH] or Scalar::Util::blessed($_[1]) && overload::Method($_[1], q[\%{}])/ },
+		library    => __PACKAGE__,
 	);
 }
 
@@ -64,6 +66,7 @@ sub ArrayLike ()
 		name       => "ArrayLike",
 		constraint => sub {    ref($_   ) eq q[ARRAY] or Scalar::Util::blessed($_   ) && overload::Method($_   , q[@{}])  },
 		inlined    => sub { qq/ref($_[1]) eq q[ARRAY] or Scalar::Util::blessed($_[1]) && overload::Method($_[1], q[\@{}])/ },
+		library    => __PACKAGE__,
 	);
 }
 
@@ -74,6 +77,7 @@ sub CodeLike ()
 		name       => "CodeLike",
 		constraint => sub {    ref($_   ) eq q[CODE] or Scalar::Util::blessed($_   ) && overload::Method($_   , q[&{}])  },
 		inlined    => sub { qq/ref($_[1]) eq q[CODE] or Scalar::Util::blessed($_[1]) && overload::Method($_[1], q[\&{}])/ },
+		library    => __PACKAGE__,
 	);
 }
 
@@ -84,6 +88,7 @@ sub TypeTiny ()
 		name       => "TypeTiny",
 		constraint => sub {  Scalar::Util::blessed($_   ) && $_   ->isa(q[Type::Tiny])  },
 		inlined    => sub { my $var = $_[1]; "Scalar::Util::blessed($var) && $var\->isa(q[Type::Tiny])" },
+		library    => __PACKAGE__,
 	);
 }
 

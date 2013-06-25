@@ -29,6 +29,8 @@ use Test::TypeTiny;
 
 use Types::Standard -all;
 
+is(Num->library, "Types::Standard", "->library method");
+
 my $var = 123;
 should_pass(\$var, ScalarRef);
 should_pass([], ArrayRef);
