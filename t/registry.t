@@ -25,6 +25,7 @@ use lib qw( ./lib ./t/lib ../inc ./inc );
 
 use Test::More;
 use Test::TypeTiny;
+use Test::Fatal;
 
 {
 	package Local::Pkg1;
@@ -45,11 +46,53 @@ use Test::TypeTiny;
 	::ok(t->XYZ_Int == Types::Standard::Int(), 'prefix works');
 }
 
-is(Local::Pkg2::t->lookup("Integer"), undef, 'type registries are separate');
+ok(
+	exception { Local::Pkg2::t->lookup("Integer") },
+	'type registries are separate',
+);
 
 my $r = Type::Registry->for_class("Local::Pkg1");
 
 should_pass([1, 2, 3], $r->lookup("ArrayRef[Integer]"));
 should_fail([1, 2, 3.14159], $r->lookup("ArrayRef[Integer]"));
+
+like(
+	exception { $r->lookup('%foo') },
+	qr{^Unexpected token in primary type expression; got '\%foo'},
+	'type constraint invalid syntax',
+);
+
+like(
+	exception { $r->lookup('MonkeyNuts') },
+	qr{^MonkeyNuts is not a known type constraint },
+	'type constraint unknown type',
+);
+
+is(
+	$r->lookup('MonkeyNuts::')->class,
+	'MonkeyNuts',
+	'class type',
+);
+
+{
+	package Type::Registry::DWIM;
+	use base "Type::Registry";
+	sub simple_lookup
+	{
+		my $self = shift;
+		my $orig = $self->SUPER::simple_lookup(@_);
+		return "Type::Tiny::Class"->new(class => $_[0]) if $_[1] && !$orig;
+		return $orig;
+	}
+}
+
+my $r2 = "Type::Registry::DWIM"->new;
+$r2->add_types(-Standard);
+
+is(
+	$r2->lookup('MonkeyNuts')->class,
+	'MonkeyNuts',
+	'class type',
+);
 
 done_testing;

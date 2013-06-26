@@ -128,15 +128,21 @@ Evaluate: {
 		if ($node->{type} eq "primary" and $node->{token}->type eq TYPE)
 		{
 			my $t = $node->{token}->spelling;
+			my $r;
 			if ($t =~ /^(.+)::(\w+)$/)
 			{
 				my $library = $1; $t = $2;
 				eval "require $library;";
-				return $library->can("get_type")
+				$r = $library->can("get_type")
 					? $library->get_type($t)
-					: $reg->simple_lookup("$library\::$t");
+					: $reg->simple_lookup("$library\::$t", 1);
 			}
-			return $reg->simple_lookup($t);
+			else
+			{
+				$r = $reg->simple_lookup($t, 1);
+			}
+			$r or _croak("%s is not a known type constraint", $node->{token}->spelling);
+			return $r;
 		}
 	}
 	
