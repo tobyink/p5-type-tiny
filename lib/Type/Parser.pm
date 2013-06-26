@@ -23,8 +23,7 @@ sub INTERSECT () { "INTERSECT" };
 sub NOT       () { "NOT" };
 sub L_PAREN   () { "L_PAREN" };
 sub R_PAREN   () { "R_PAREN" };
-
-use Text::Balanced qw(extract_quotelike);
+sub MYSTERY   () { "MYSTERY" };
 
 our @EXPORT_OK = qw( tokens parse eval_type _std_eval );
 use base "Exporter::TypeTiny";
@@ -169,7 +168,7 @@ Evaluate: {
 }
 
 Parsing: {
-	our @tokens;
+	our $tokens;
 	
 	my %precedence = (
 		+COMMA     => 1,
@@ -180,60 +179,52 @@ Parsing: {
 	
 	sub _parse_primary
 	{
-		@tokens or _croak "Expected primary type expression; got nothing";
+		$tokens->assert_not_empty;
 		
-		if ($tokens[0]->type eq NOT)
+		if ($tokens->peek(0)->type eq NOT)
 		{
-			shift @tokens;
-			@tokens
-				or _croak("Unexpected end of string following type complement; expected type; got nothing");
+			$tokens->eat(NOT);
+			$tokens->assert_not_empty;
 			return {
 				type  => "complement",
 				of    => _parse_primary(),
 			};
 		}
 		
-		if ($tokens[0]->type eq SLURPY)
+		if ($tokens->peek(0)->type eq SLURPY)
 		{
-			shift @tokens;
-			@tokens
-				or _croak("Unexpected end of string following slurpy type modifier; expected type; got nothing");
+			$tokens->eat(SLURPY);
+			$tokens->assert_not_empty;
 			return {
 				type  => "slurpy",
 				of    => _parse_primary(),
 			};
 		}
 		
-		if ($tokens[0]->type eq L_PAREN)
+		if ($tokens->peek(0)->type eq L_PAREN)
 		{
-			shift @tokens;
+			$tokens->eat(L_PAREN);
 			my $r = _parse_expression();
-			@tokens
-				or _croak("Unexpected end of string parsing parenthetical type expression; expected ')'; got nothing");
-			$tokens[0]->type eq R_PAREN
-				or _croak("Unexpected token parsing parenthetical type expression; expected ')'; got '%s'", $tokens[0]->spelling);
-			shift @tokens;
+			$tokens->eat(R_PAREN);
 			return $r;
 		}
 		
-		if (@tokens > 1 and $tokens[0]->type eq TYPE and $tokens[1]->type eq L_BRACKET)
+		if ($tokens->peek(1) and $tokens->peek(0)->type eq TYPE and $tokens->peek(1)->type eq L_BRACKET)
 		{
-			my $base = { type  => "primary", token => shift @tokens };
-			shift @tokens;
+			my $base = { type  => "primary", token => $tokens->eat(TYPE) };
+			$tokens->eat(L_BRACKET);
+			$tokens->assert_not_empty;
+			
 			my $params = undef;
-			if (@tokens and $tokens[0]->type eq R_BRACKET)
+			if ($tokens->peek(0)->type eq R_BRACKET)
 			{
-				shift @tokens;
+				$tokens->eat(R_BRACKET);
 			}
 			else
 			{
 				$params = _parse_expression();
 				$params = { type => "list", list => [$params] } unless $params->{type} eq "list";
-				@tokens
-					or _croak("Unexpected end of string following bracketted type expression; expected ']'; got nothing");
-				$tokens[0]->type eq R_BRACKET
-					or _croak("Unexpected token following bracketted type expression; expected ']'; got '%s'", $tokens[0]->spelling);
-				shift @tokens;
+				$tokens->eat(R_BRACKET);
 			}
 			return {
 				type   => "parameterized",
@@ -242,28 +233,29 @@ Parsing: {
 			};
 		}
 		
-		if ($tokens[0][0] eq Type::Parser::TYPE
-		or  $tokens[0][0] eq Type::Parser::QUOTELIKE
-		or  $tokens[0][0] eq Type::Parser::STRING
-		or  $tokens[0][0] eq Type::Parser::CLASS)
+		my $type = $tokens->peek(0)->type;
+		if ($type eq Type::Parser::TYPE
+		or  $type eq Type::Parser::QUOTELIKE
+		or  $type eq Type::Parser::STRING
+		or  $type eq Type::Parser::CLASS)
 		{
-			return { type  => "primary", token => shift @tokens };
+			return { type  => "primary", token => $tokens->eat };
 		}
 		
-		_croak("Unexpected token in primary type expression; got '%s'", $tokens[0]->spelling);
+		_croak("Unexpected token in primary type expression; got '%s'", $tokens->peek(0)->spelling);
 	}
 	
 	sub _parse_expression_1
 	{
 		my ($lhs, $min_p) = @_;
-		while (@tokens and exists $precedence{$tokens[0]->type} and $precedence{$tokens[0]->type} >= $min_p)
+		while (!$tokens->empty and exists $precedence{$tokens->peek(0)->type} and $precedence{$tokens->peek(0)->type} >= $min_p)
 		{
-			my $op  = shift @tokens;
+			my $op  = $tokens->eat;
 			my $rhs = _parse_primary();
 			
-			while (@tokens and exists $precedence{$tokens[0]->type} and $precedence{$tokens[0]->type} > $precedence{$op->type})
+			while (!$tokens->empty and exists $precedence{$tokens->peek(0)->type} and $precedence{$tokens->peek(0)->type} > $precedence{$op->type})
 			{
-				my $lookahead = $tokens[0];
+				my $lookahead = $tokens->peek(0);
 				$rhs = _parse_expression_1($rhs, $precedence{$lookahead->type});
 			}
 			
@@ -284,93 +276,163 @@ Parsing: {
 	
 	sub parse
 	{
-		local @tokens = tokens($_[0]);
+		local $tokens = "Type::Parser::TokenStream"->new(remaining => $_[0]);
 		return _parse_expression();
 	}
 }
 
-Tokenization: {
-	our $str;
+{
+	package # hide from CPAN
+	Type::Parser::Token;
+	sub type     { $_[0][0] }
+	sub spelling { $_[0][1] }
+}
+
+{
+	package # hide from CPAN
+	Type::Parser::TokenStream;
 	
-	sub tokens
+	use Text::Balanced qw(extract_quotelike);
+	
+	sub new
 	{
-		local $str = shift;
-		return @$str if ref $str;
+		my $class = shift;
+		bless { stack => [], done => [], @_ }, $class;
+	}
+	
+	sub peek
+	{
+		my $self  = shift;
+		my $ahead = $_[0];
 		
-		my @tokens;
-		my $count;
-		while (my $token = _token())
+		while ($self->_stack_size <= $ahead and length $self->{remaining})
 		{
-			_croak "ETOOBIG" if $count++ > 1000;
-			push @tokens, $token;
+			$self->_stack_extend;
 		}
-		return @tokens;
+		
+		my @tokens = grep ref, @{ $self->{stack} };
+		return $tokens[$ahead];
+	}
+	
+	sub empty
+	{
+		my $self = shift;
+		not $self->peek(0);
+	}
+	
+	sub eat
+	{
+		my $self = shift;
+		$self->_stack_extend unless $self->_stack_size;
+		my $r;
+		while (defined(my $item = shift @{$self->{stack}}))
+		{
+			push @{ $self->{done} }, $item;
+			if (ref $item)
+			{
+				$r = $item;
+				last;
+			}
+		}
+		
+		if (@_ and $_[0] ne $r->type)
+		{
+			unshift @{$self->{stack}}, pop @{$self->{done}};
+			Type::Parser::_croak("Expected $_[0]; got ".$r->type);
+		}
+		
+		return $r;
+	}
+	
+	sub assert_not_empty
+	{
+		my $self = shift;
+		Type::Parser::_croak("Expected token; got empty string") if $self->empty;
+	}
+	
+	sub _stack_size
+	{
+		my $self = shift;
+		scalar grep ref, @{ $self->{stack} };
+	}
+	
+	sub _stack_extend
+	{
+		my $self = shift;
+		push @{ $self->{stack} }, $self->_read_token;
+		my ($space) = ($self->{remaining} =~ m/^([\s\n\r]*)/sm);
+		return unless length $space;
+		push @{ $self->{stack} }, $space;
+		substr($self->{remaining}, 0, length $space) = "";
+	}
+	
+	sub remainder
+	{
+		my $self = shift;
+		return join "",
+			map { ref($_) ? $_->spelling : $_ }
+			(@{$self->{stack}}, $self->{remaining})
 	}
 	
 	my %punctuation = (
-		'['       => bless([ L_BRACKET, "[" ], "Type::Parser::Token"),
-		']'       => bless([ R_BRACKET, "]" ], "Type::Parser::Token"),
-		'('       => bless([ L_PAREN,   "[" ], "Type::Parser::Token"),
-		')'       => bless([ R_PAREN,   "]" ], "Type::Parser::Token"),
-		','       => bless([ COMMA,     "," ], "Type::Parser::Token"),
-		'=>'      => bless([ COMMA,     "=>" ], "Type::Parser::Token"),
-		'slurpy'  => bless([ SLURPY,    "slurpy" ], "Type::Parser::Token"),
-		'|'       => bless([ UNION,     "|" ], "Type::Parser::Token"),
-		'&'       => bless([ INTERSECT, "&" ], "Type::Parser::Token"),
-		'~'       => bless([ NOT,       "~" ], "Type::Parser::Token"),
+		'['       => bless([ Type::Parser::L_BRACKET, "[" ], "Type::Parser::Token"),
+		']'       => bless([ Type::Parser::R_BRACKET, "]" ], "Type::Parser::Token"),
+		'('       => bless([ Type::Parser::L_PAREN,   "[" ], "Type::Parser::Token"),
+		')'       => bless([ Type::Parser::R_PAREN,   "]" ], "Type::Parser::Token"),
+		','       => bless([ Type::Parser::COMMA,     "," ], "Type::Parser::Token"),
+		'=>'      => bless([ Type::Parser::COMMA,     "=>" ], "Type::Parser::Token"),
+		'slurpy'  => bless([ Type::Parser::SLURPY,    "slurpy" ], "Type::Parser::Token"),
+		'|'       => bless([ Type::Parser::UNION,     "|" ], "Type::Parser::Token"),
+		'&'       => bless([ Type::Parser::INTERSECT, "&" ], "Type::Parser::Token"),
+		'~'       => bless([ Type::Parser::NOT,       "~" ], "Type::Parser::Token"),
 	);
 	
-	sub _token
+	sub _read_token
 	{
-		$str =~ s/^[\s\n\r]*//sm;
+		my $self = shift;
 		
-		return if $str eq "";
+		return if $self->{remaining} eq "";
 		
 		# Punctuation
 		# 
 		
-		if ($str =~ /^( => | [()\]\[|&~,] )/xsm)
+		if ($self->{remaining} =~ /^( => | [()\]\[|&~,] )/xsm)
 		{
 			my $spelling = $1;
-			$str = substr($str, length $spelling);
+			substr($self->{remaining}, 0, length $spelling) = "";
 			return $punctuation{$spelling};
 		}
 		
-		if (my $quotelike = extract_quotelike $str)
+		if (my $quotelike = extract_quotelike $self->{remaining})
 		{
-			return bless([ QUOTELIKE, $quotelike ], "Type::Parser::Token"),;
+			return bless([ Type::Parser::QUOTELIKE, $quotelike ], "Type::Parser::Token"),;
 		}
 		
-		if ($str =~ /^([\w:]+)/sm)
+		if ($self->{remaining} =~ /^([\w:]+)/sm)
 		{
 			my $spelling = $1;
-			$str = substr($str, length $spelling);
+			substr($self->{remaining}, 0, length $spelling) = "";
 			
 			if ($spelling =~ /::$/sm)
 			{
-				return bless([ CLASS, $spelling ], "Type::Parser::Token"),;
+				return bless([ Type::Parser::CLASS, $spelling ], "Type::Parser::Token"),;
 			}
-			elsif ($str =~ /^\s*=>/sm) # peek ahead
+			elsif ($self->{remaining} =~ /^\s*=>/sm) # peek ahead
 			{
-				return bless([ STRING, $spelling ], "Type::Parser::Token"),;
+				return bless([ Type::Parser::STRING, $spelling ], "Type::Parser::Token"),;
 			}
 			elsif ($spelling eq "slurpy")
 			{
 				return $punctuation{$spelling};
 			}
 			
-			return bless([ TYPE, $spelling ], "Type::Parser::Token"),;
+			return bless([ Type::Parser::TYPE, $spelling ], "Type::Parser::Token");
 		}
 		
-		_croak "Unexpected token parsing type constraint; remaining '$str'";
-	}
-	
-	{
-		package # hide from CPAN
-		Type::Parser::Token;
-		sub type     { $_[0][0] }
-		sub spelling { $_[0][1] }
-	}
+		my $rest = $self->{remaining};
+		$self->{remaining} = "";
+		return bless([ Type::Parser::MYSTERY, $rest ], "Type::Parser::Token");
+	}	
 }
 
 1;
