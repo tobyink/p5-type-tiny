@@ -25,10 +25,20 @@ sub L_PAREN   () { "L_PAREN" };
 sub R_PAREN   () { "R_PAREN" };
 sub MYSTERY   () { "MYSTERY" };
 
-our @EXPORT_OK = qw( tokens parse eval_type _std_eval );
+our @EXPORT_OK = qw( eval_type _std_eval );
 use base "Exporter::TypeTiny";
 
 Evaluate: {
+	
+	sub parse
+	{
+		my $str = $_[0];
+		
+		my $parser = "Type::Parser::AstBuilder"->new(input => $str);
+		$parser->build;
+		
+		wantarray ? ($parser->ast, $parser->remainder) : $parser->ast;
+	}
 	
 	sub eval_type
 	{
@@ -167,64 +177,76 @@ Evaluate: {
 	}
 }
 
-Parsing: {
-	our $tokens;
+{
+	package # hide from CPAN
+	Type::Parser::AstBuilder;
+	
+	sub new
+	{
+		my $class = shift;
+		bless { @_ }, $class;
+	}
 	
 	my %precedence = (
-		+COMMA     => 1,
-		+UNION     => 2,
-		+INTERSECT => 3,
-		+NOT       => 4,
+		+Type::Parser::COMMA     => 1,
+		+Type::Parser::UNION     => 2,
+		+Type::Parser::INTERSECT => 3,
+		+Type::Parser::NOT       => 4,
 	);
 	
 	sub _parse_primary
 	{
+		my $self   = shift;
+		my $tokens = $self->{tokens};
+		
 		$tokens->assert_not_empty;
 		
-		if ($tokens->peek(0)->type eq NOT)
+		if ($tokens->peek(0)->type eq Type::Parser::NOT)
 		{
-			$tokens->eat(NOT);
+			$tokens->eat(Type::Parser::NOT);
 			$tokens->assert_not_empty;
 			return {
 				type  => "complement",
-				of    => _parse_primary(),
+				of    => $self->_parse_primary,
 			};
 		}
 		
-		if ($tokens->peek(0)->type eq SLURPY)
+		if ($tokens->peek(0)->type eq Type::Parser::SLURPY)
 		{
-			$tokens->eat(SLURPY);
+			$tokens->eat(Type::Parser::SLURPY);
 			$tokens->assert_not_empty;
 			return {
 				type  => "slurpy",
-				of    => _parse_primary(),
+				of    => $self->_parse_primary,
 			};
 		}
 		
-		if ($tokens->peek(0)->type eq L_PAREN)
+		if ($tokens->peek(0)->type eq Type::Parser::L_PAREN)
 		{
-			$tokens->eat(L_PAREN);
-			my $r = _parse_expression();
-			$tokens->eat(R_PAREN);
+			$tokens->eat(Type::Parser::L_PAREN);
+			my $r = $self->_parse_expression;
+			$tokens->eat(Type::Parser::R_PAREN);
 			return $r;
 		}
 		
-		if ($tokens->peek(1) and $tokens->peek(0)->type eq TYPE and $tokens->peek(1)->type eq L_BRACKET)
+		if ($tokens->peek(1)
+		and $tokens->peek(0)->type eq Type::Parser::TYPE
+		and $tokens->peek(1)->type eq Type::Parser::L_BRACKET)
 		{
-			my $base = { type  => "primary", token => $tokens->eat(TYPE) };
-			$tokens->eat(L_BRACKET);
+			my $base = { type  => "primary", token => $tokens->eat(Type::Parser::TYPE) };
+			$tokens->eat(Type::Parser::L_BRACKET);
 			$tokens->assert_not_empty;
 			
 			my $params = undef;
-			if ($tokens->peek(0)->type eq R_BRACKET)
+			if ($tokens->peek(0)->type eq Type::Parser::R_BRACKET)
 			{
-				$tokens->eat(R_BRACKET);
+				$tokens->eat(Type::Parser::R_BRACKET);
 			}
 			else
 			{
-				$params = _parse_expression();
+				$params = $self->_parse_expression;
 				$params = { type => "list", list => [$params] } unless $params->{type} eq "list";
-				$tokens->eat(R_BRACKET);
+				$tokens->eat(Type::Parser::R_BRACKET);
 			}
 			return {
 				type   => "parameterized",
@@ -247,16 +269,19 @@ Parsing: {
 	
 	sub _parse_expression_1
 	{
+		my $self   = shift;
+		my $tokens = $self->{tokens};
+		
 		my ($lhs, $min_p) = @_;
 		while (!$tokens->empty and exists $precedence{$tokens->peek(0)->type} and $precedence{$tokens->peek(0)->type} >= $min_p)
 		{
 			my $op  = $tokens->eat;
-			my $rhs = _parse_primary();
+			my $rhs = $self->_parse_primary;
 			
 			while (!$tokens->empty and exists $precedence{$tokens->peek(0)->type} and $precedence{$tokens->peek(0)->type} > $precedence{$op->type})
 			{
 				my $lookahead = $tokens->peek(0);
-				$rhs = _parse_expression_1($rhs, $precedence{$lookahead->type});
+				$rhs = $self->_parse_expression_1($rhs, $precedence{$lookahead->type});
 			}
 			
 			$lhs = {
@@ -271,13 +296,27 @@ Parsing: {
 	
 	sub _parse_expression
 	{
-		return _parse_expression_1(_parse_primary(), 0);
+		my $self   = shift;
+		my $tokens = $self->{tokens};
+		
+		return $self->_parse_expression_1($self->_parse_primary, 0);
 	}
 	
-	sub parse
+	sub build
 	{
-		local $tokens = "Type::Parser::TokenStream"->new(remaining => $_[0]);
-		return _parse_expression();
+		my $self = shift;
+		$self->{tokens} = "Type::Parser::TokenStream"->new(remaining => $self->{input});
+		$self->{ast}    = $self->_parse_expression;
+	}
+	
+	sub ast
+	{
+		$_[0]{ast};
+	}
+	
+	sub remainder
+	{
+		$_[0]{tokens}->remainder;
 	}
 }
 
@@ -473,10 +512,6 @@ Instead use the C<< lookup >> method from L<Type::Registry> which wraps it.
 =head2 Functions
 
 =over
-
-=item C<< tokens($string) >>
-
-Tokenize the type constraint string; returns a list of tokens.
 
 =item C<< parse($string) >>, C<< parse($arrayref_of_tokens) >>
 
