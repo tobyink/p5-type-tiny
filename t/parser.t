@@ -25,8 +25,9 @@ use lib qw( ./lib ./t/lib ../inc ./inc );
 
 use Test::More;
 use Test::TypeTiny;
+use Test::Fatal;
 
-use Type::Parser qw(_std_eval);
+use Type::Parser qw(_std_eval parse);
 use Types::Standard qw(-types slurpy);
 use Type::Utils;
 
@@ -109,5 +110,26 @@ types_equal(
 	ArrayRef([InstanceOf["DateTime"]]) | HashRef([Int|InstanceOf["DateTime"]]) | CodeRef,
 	"gratuitous whitespace",
 );
+
+note "Bad expressions";
+like(
+	exception { _std_eval('%hello') },
+	qr{^Unexpected token in primary type expression; got '%hello'},
+	'weird token'
+);
+like(
+	exception { _std_eval('Str Int') },
+	qr{^Unexpected tail on type expression:  Int},
+	'weird stuff 1'
+);
+like(
+	exception { _std_eval('ArrayRef(Int)') },
+	qr{^Unexpected tail on type expression: .Int.},
+	'weird stuff 2'
+);
+
+note "Tail retention";
+my ($ast, $remaining) = parse("ArrayRef   [DateTime::]  |HashRef[ Int|\tDateTime::]|CodeRef monkey nuts ");
+is($remaining, " monkey nuts ", "remainder is ok");
 
 done_testing;

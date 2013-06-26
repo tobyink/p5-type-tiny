@@ -25,7 +25,7 @@ sub L_PAREN   () { "L_PAREN" };
 sub R_PAREN   () { "R_PAREN" };
 sub MYSTERY   () { "MYSTERY" };
 
-our @EXPORT_OK = qw( eval_type _std_eval );
+our @EXPORT_OK = qw( eval_type _std_eval parse );
 use base "Exporter::TypeTiny";
 
 Evaluate: {
@@ -33,17 +33,23 @@ Evaluate: {
 	sub parse
 	{
 		my $str = $_[0];
-		
 		my $parser = "Type::Parser::AstBuilder"->new(input => $str);
 		$parser->build;
-		
 		wantarray ? ($parser->ast, $parser->remainder) : $parser->ast;
+	}
+	
+	sub extract_type
+	{
+		my ($str, $reg) = @_;
+		my ($parsed, $tail) = parse($str);
+		wantarray ? (_eval_type($parsed, $reg), $tail) : _eval_type($parsed, $reg);
 	}
 	
 	sub eval_type
 	{
 		my ($str, $reg) = @_;
-		my $parsed = parse($str);
+		my ($parsed, $tail) = parse($str);
+		_croak("Unexpected tail on type expression: $tail") if $tail =~ /\S/sm;
 		return _eval_type($parsed, $reg);
 	}
 	
@@ -126,7 +132,9 @@ Evaluate: {
 			{
 				my $library = $1; $t = $2;
 				eval "require $library;";
-				return $library->get_type($t);
+				return $library->can("get_type")
+					? $library->get_type($t)
+					: $reg->simple_lookup("$library\::$t");
 			}
 			return $reg->simple_lookup($t);
 		}
@@ -264,7 +272,7 @@ Evaluate: {
 			return { type  => "primary", token => $tokens->eat };
 		}
 		
-		_croak("Unexpected token in primary type expression; got '%s'", $tokens->peek(0)->spelling);
+		Type::Parser::_croak("Unexpected token in primary type expression; got '%s'", $tokens->peek(0)->spelling);
 	}
 	
 	sub _parse_expression_1
@@ -513,13 +521,23 @@ Instead use the C<< lookup >> method from L<Type::Registry> which wraps it.
 
 =over
 
-=item C<< parse($string) >>, C<< parse($arrayref_of_tokens) >>
+=item C<< parse($string) >>
 
 Parse the type constraint string into something like an AST.
 
-=item C<< eval_type($string, $registry) >>, C<< eval_type($arrayref_of_tokens, $registry) >>
+If called in list context, also returns any "tail" found on the original string.
 
-Compile the type constraint string into a L<Type::Tiny> object.
+=item C<< extract_type($string, $registry) >>
+
+Compile a type constraint string into a L<Type::Tiny> object.
+
+If called in list context, also returns any "tail" found on the original string.
+
+=item C<< eval_type($string, $registry) >>
+
+Compile a type constraint string into a L<Type::Tiny> object.
+
+Throws an error if the "tail" contains any non-whitespace character.
 
 =back
 
