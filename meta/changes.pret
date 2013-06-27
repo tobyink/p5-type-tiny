@@ -699,3 +699,12 @@
 		item "Updated NEWS file."^^Documentation;
 	].
 
+`Type-Tiny 0.013_01 cpan:TOBYINK`
+	issued  2013-06-27;
+	changeset [
+		dcs:versus `Type-Tiny 0.012 cpan:TOBYINK`;
+		item "Type::Parser's tokenization is now done on a pull basis, allowing one-pass building of the AST."^^Change;
+		item "Type::Parser no longer provides a `tokens` function as it no longer pre-emptively tokenizes the whole string it is given."^^Removal;
+		item "Type::Parser functions no longer accept an arrayref of tokens, as they expect to pull tokens from a stream as required."^^Removal;
+		item "Type::Parser now provides a `extract_type` function which parses a type constraint expression from the head of a string and returns a Type::Tiny object, plus the tail of the string. (This is designed to make it easier to use Type::Parser to parse things like function signatures.)"^^Addition;
+	].
