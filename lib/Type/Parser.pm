@@ -485,7 +485,7 @@ Evaluate: {
 		my $rest = $self->{remaining};
 		$self->{remaining} = "";
 		return bless([ Type::Parser::MYSTERY, $rest ], "Type::Parser::Token");
-	}	
+	}
 }
 
 1;
@@ -495,6 +495,8 @@ __END__
 =pod
 
 =encoding utf-8
+
+=for stopwords non-whitespace
 
 =head1 NAME
 
@@ -578,6 +580,8 @@ The following constants correspond to values returned by C<< $token->type >>.
 =item C<< L_PAREN >>
 
 =item C<< R_PAREN >>
+
+=item C<< MYSTERY >>
 
 =back
 
