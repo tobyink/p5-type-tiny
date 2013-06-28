@@ -55,3 +55,7 @@
 
  - Better Mouse support.
  - Can now coerce Type::Tiny objects from coderefs (via to_TypeTiny).
+
+2013-06-28 Type-Tiny version 0.014 released!
+
+ - Improvements to Type::Parser and Type::Registry.

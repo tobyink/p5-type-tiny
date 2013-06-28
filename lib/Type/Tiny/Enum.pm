@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Tiny::Enum::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::Enum::VERSION   = '0.013_01';
+	$Type::Tiny::Enum::VERSION   = '0.014';
 }
 
 sub _croak ($;@) { require Type::Exception; goto \&Type::Exception::croak }
