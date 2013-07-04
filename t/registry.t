@@ -74,25 +74,24 @@ is(
 	'class type',
 );
 
-{
-	package Type::Registry::DWIM;
-	use base "Type::Registry";
-	sub simple_lookup
-	{
-		my $self = shift;
-		my $orig = $self->SUPER::simple_lookup(@_);
-		return "Type::Tiny::Class"->new(class => $_[0]) if $_[1] && !$orig;
-		return $orig;
-	}
-}
-
-my $r2 = "Type::Registry::DWIM"->new;
-$r2->add_types(-Standard);
+use Type::Utils qw(dwim_type role_type class_type);
 
 is(
-	$r2->lookup('MonkeyNuts')->class,
+	dwim_type('MonkeyNuts')->class,
 	'MonkeyNuts',
-	'class type',
+	'DWIM - class type',
+);
+
+is(
+	dwim_type('MonkeyNuts', does => 1)->role,
+	'MonkeyNuts',
+	'DWIM - role type',
+);
+
+is(
+	dwim_type('ArrayRef[MonkeyNuts | Foo::]', does => 1)->inline_check('$X'),
+	Types::Standard::ArrayRef()->parameterize(role_type({role=>"MonkeyNuts"}) | class_type({class=>"Foo"}))->inline_check('$X'),
+	'DWIM - complex type',
 );
 
 done_testing;

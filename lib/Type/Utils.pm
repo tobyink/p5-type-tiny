@@ -27,6 +27,7 @@ our @EXPORT_OK = (
 	qw<
 		extends type subtype
 		match_on_type compile_match_on_type
+		dwim_type
 	>,
 );
 
@@ -398,6 +399,23 @@ sub compile_match_on_type
 	);
 }
 
+our $dwimmer;
+sub dwim_type
+{
+	my ($string, %opts) = @_;
+	$opts{for} = caller unless defined $opts{for};
+	
+	$dwimmer ||= do {
+		require Type::Registry;
+		'Type::Registry::DWIM'->new;
+	};
+	
+	local $dwimmer->{'~~chained'} = $opts{for};
+	local $dwimmer->{'~~assume'}  = $opts{does} ? 'Type::Tiny::Role' : 'Type::Tiny::Class';
+	
+	$dwimmer->lookup($string);
+}
+
 1;
 
 __END__
@@ -719,13 +737,43 @@ are good for this. (Same sort of idea as L<Type::Params>.)
 
 This function is not exported by default.
 
+=item C<< dwim_type($string, %options) >>
+
+Given a string like "ArrayRef[Int|CodeRef]", turns it into a type constraint
+object, hopefully doing what you mean.
+
+It uses the syntax of L<Type::Parser>. Firstly L<Types::Standard> is
+consulted for type constraint names; if that doesn't have a match, the
+L<Type::Registry> for the caller package is consulted; and if there's
+still no match, then if a type constraint looks like a class name, a new
+L<Type::Tiny::Class> object is created for it.
+
+You can specify an alternative for the caller using the C<for> option.
+If you'd rather create a L<Type::Tiny::Role> object, set the C<does>
+option to true.
+
+   # An arrayref of objects, each of which must do role Foo.
+   my $type = dwim_type("ArrayRef[Foo]", does => 1);
+   
+   Type::Registry->for_me->add_types("-Standard");
+   Type::Registry->for_me->alias_type("Int" => "Foo");
+   
+   # An arrayref of integers.
+   my $type = dwim_type("ArrayRef[Foo]", does => 1);
+
+While it's probably better overall to use the proper L<Type::Registry>
+interface for resolving type constraint strings, this function often does
+what you want.
+
+This function is not exported by default.
+
 =back
 
 =head1 EXPORT
 
 By default, all of the functions documented above are exported, except
-C<subtype> and C<type> (prefer C<declare> instead), C<extends>, and
-C<match_on_type>/C<compile_match_on_type>.
+C<subtype> and C<type> (prefer C<declare> instead), C<extends>, C<dwim_type>,
+and C<match_on_type>/C<compile_match_on_type>.
 
 This module uses L<Exporter::TypeTiny>; see the documentation of that module
 for tips and tricks importing from Type::Utils.
