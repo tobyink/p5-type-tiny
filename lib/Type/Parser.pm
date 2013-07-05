@@ -133,10 +133,11 @@ Evaluate: {
 			{
 				my $library = $1; $t = $2;
 				eval "require $library;";
-				$r = $library->can("get_type")
-					? $library->get_type($t)
-					: $reg->simple_lookup("$library\::$t", 1);
-			}
+				$r =
+					$library->isa('MooseX::Types::Base')  ? ( $library->has_type($t) ? $library->can($t)->() : () ) :
+					$library->can("get_type")             ? $library->get_type($t) :
+					$reg->simple_lookup("$library\::$t", 1);
+				}
 			else
 			{
 				$r = $reg->simple_lookup($t, 1);

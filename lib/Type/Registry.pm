@@ -166,12 +166,16 @@ sub DESTROY
 			return $r if defined $r;
 		}
 		
+		return unless $_[1];
+		return unless $_[0] =~ /^\s*(\w+(::\w+)*)\s*$/sm;
+		my $classlike = $1;
+		
 		# If Moose is loaded...
 		if ($INC{'Moose.pm'})
 		{
 			require Moose::Util::TypeConstraints;
 			require Types::TypeTiny;
-			$r = Moose::Util::TypeConstraints::find_type_constraint(@_);
+			$r = Moose::Util::TypeConstraints::find_type_constraint($classlike);
 			return Types::TypeTiny::to_TypeTiny($r);
 		}
 		
@@ -180,30 +184,29 @@ sub DESTROY
 		{
 			require Mouse::Util::TypeConstraints;
 			require Types::TypeTiny;
-			$r = Mouse::Util::TypeConstraints::find_type_constraint(@_);
+			$r = Mouse::Util::TypeConstraints::find_type_constraint($classlike);
 			return Types::TypeTiny::to_TypeTiny($r);
 		}
 		
-		# Lastly, if it looks like a class name, assume it's
-		# supposed to be a class type.
+		return unless defined $self->{"~~assume"};
+		
+		# Lastly, if it looks like a class/role name, assume it's
+		# supposed to be a class/role type.
 		#
-		if ($_[0] =~ /^\s*(\w+(::\w+)*)\s*$/sm and defined $self->{"~~assume"})
+		
+		if ($self->{"~~assume"} eq "Type::Tiny::Class")
 		{
-			if ($self->{"~~assume"} eq "Type::Tiny::Class")
-			{
-				require Type::Tiny::Class;
-				return "Type::Tiny::Class"->new(class => $1);
-			}
-			elsif ($self->{"~~assume"} eq "Type::Tiny::Role")
-			{
-				require Type::Tiny::Role;
-				return "Type::Tiny::Role"->new(role => $1);
-			}
-			die;
+			require Type::Tiny::Class;
+			return "Type::Tiny::Class"->new(class => $classlike);
 		}
 		
-		# Give up already!
-		return;
+		if ($self->{"~~assume"} eq "Type::Tiny::Role")
+		{
+			require Type::Tiny::Role;
+			return "Type::Tiny::Role"->new(role => $classlike);
+		}
+		
+		die;
 	}
 }
 
