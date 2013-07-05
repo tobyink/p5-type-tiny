@@ -718,3 +718,11 @@
 		dcs:versus `Type-Tiny 0.013_01 cpan:TOBYINK`;
 		item "Updated NEWS file."^^Documentation;
 	].
+
+`Type-Tiny 0.015_01 cpan:TOBYINK`
+	issued  2013-07-05;
+	changeset [
+		dcs:versus `Type-Tiny 0.014 cpan:TOBYINK`;
+		item "Type::Parser can now pull in types from MooseX::Types libraries properly."^^Change;
+		item "Type::Utils now provides a `dwim_type` function; this is powered by a hidden Type::Registry::DWIM package."^^Addition;
+	].
