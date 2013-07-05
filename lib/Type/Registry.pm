@@ -166,6 +166,24 @@ sub DESTROY
 			return $r if defined $r;
 		}
 		
+		# If Moose is loaded...
+		if ($INC{'Moose.pm'})
+		{
+			require Moose::Util::TypeConstraints;
+			require Types::TypeTiny;
+			$r = Moose::Util::TypeConstraints::find_type_constraint(@_);
+			return Types::TypeTiny::to_TypeTiny($r);
+		}
+		
+		# If Mouse is loaded...
+		if ($INC{'Mouse.pm'})
+		{
+			require Mouse::Util::TypeConstraints;
+			require Types::TypeTiny;
+			$r = Mouse::Util::TypeConstraints::find_type_constraint(@_);
+			return Types::TypeTiny::to_TypeTiny($r);
+		}
+		
 		# Lastly, if it looks like a class name, assume it's
 		# supposed to be a class type.
 		#
