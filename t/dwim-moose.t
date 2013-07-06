@@ -63,11 +63,7 @@ should_fail([2, 3, 2], $twos);
 my $three = dwim_type("MyTypes::Three");
 my $threes = dwim_type("ArrayRef[MyTypes::Three]");
 
-TODO: {
-	local $TODO = 'this probably needs fixing';
-	isa_ok($three, 'Type::Tiny', '$three');
-}
-
+isa_ok($three, 'Type::Tiny', '$three');
 isa_ok($threes, 'Type::Tiny', '$threes');
 
 should_pass(3, $three);

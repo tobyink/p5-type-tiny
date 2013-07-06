@@ -131,10 +131,11 @@ Evaluate: {
 			my $r;
 			if ($t =~ /^(.+)::(\w+)$/)
 			{
+				require Types::TypeTiny;
 				my $library = $1; $t = $2;
 				eval "require $library;";
 				$r =
-					$library->isa('MooseX::Types::Base')  ? ( $library->has_type($t) ? $library->can($t)->() : () ) :
+					$library->isa('MooseX::Types::Base')  ? Types::TypeTiny::to_TypeTiny( $library->has_type($t) ? $library->can($t)->() : () ) :
 					$library->can("get_type")             ? $library->get_type($t) :
 					$reg->simple_lookup("$library\::$t", 1);
 				}
