@@ -726,3 +726,11 @@
 		item "Type::Parser can now pull in types from MooseX::Types libraries properly."^^Change;
 		item "Type::Utils now provides a `dwim_type` function; this is powered by a hidden Type::Registry::DWIM package."^^Addition;
 	].
+
+`Type-Tiny 0.015_02 cpan:TOBYINK`
+	issued  2013-07-06;
+	changeset [
+		dcs:versus `Type-Tiny 0.015_01 cpan:TOBYINK`;
+		item "Improvements to DWIMness of Type::Parser for the benefit of `dwim_type`."^^Change;
+		item "Better test cases for `dwim_type`."^^Change;
+	].
