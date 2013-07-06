@@ -1210,6 +1210,17 @@ Overridden to advertise support for various roles.
 
 See also L<Type::API::Constraint>, etc.
 
+=item C<< TIESCALAR >>, C<< TIEARRAY >>, C<< TIEHASH >>
+
+These are provided as hooks that wrap L<Type::Tie>. (Type::Tie is distributed
+separately, and can be used with non-Type::Tiny type constraints too.) They
+allow the following to work:
+
+   use Types::Standard qw(Int);
+   tie my @list, Int;
+   push @list, 123, 456;   # ok
+   push @list, "Hello";    # dies
+
 =back
 
 The following methods exist for Moose/Mouse compatibility, but do not do
