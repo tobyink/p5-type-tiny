@@ -838,7 +838,7 @@ interface for resolving type constraint strings, this function often does
 what you want.
 
 It should never die if it fails to find a type constraint (but may die
-if the type constraint string is syntactically malfomed), preferring to
+if the type constraint string is syntactically malformed), preferring to
 return undef.
 
 This function is not exported by default.
