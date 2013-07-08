@@ -399,6 +399,75 @@ sub compile_match_on_type
 	);
 }
 
+{
+	package #hide
+	Type::Registry::DWIM;
+	
+	our @ISA = qw(Type::Registry);
+	
+	sub simple_lookup
+	{
+		my $self = shift;
+		my $r;
+		
+		# If the lookup is chained to a class, then the class' own
+		# type registry gets first refusal.
+		#
+		if (defined $self->{"~~chained"})
+		{
+			my $chained = "Type::Registry"->for_class($self->{"~~chained"});
+			$r = eval { $chained->simple_lookup(@_) } unless $self == $chained;
+			return $r if defined $r;
+		}
+		
+		# Fall back to types in Types::Standard.
+		require Types::Standard;
+		return 'Types::Standard'->get_type($_[0]) if 'Types::Standard'->has_type($_[0]);
+		
+		# Only continue any further if we've been called from Type::Parser.
+		return unless $_[1];
+		
+		# If Moose is loaded...
+		if ($INC{'Moose.pm'})
+		{
+			require Moose::Util::TypeConstraints;
+			require Types::TypeTiny;
+			$r = Moose::Util::TypeConstraints::find_type_constraint($_[0]);
+			return Types::TypeTiny::to_TypeTiny($r) if defined $r;
+		}
+		
+		# If Mouse is loaded...
+		if ($INC{'Mouse.pm'})
+		{
+			require Mouse::Util::TypeConstraints;
+			require Types::TypeTiny;
+			$r = Mouse::Util::TypeConstraints::find_type_constraint($_[0]);
+			return Types::TypeTiny::to_TypeTiny($r) if defined $r;
+		}
+		
+		return unless $_[0] =~ /^\s*(\w+(::\w+)*)\s*$/sm;
+		return unless defined $self->{"~~assume"};
+		
+		# Lastly, if it looks like a class/role name, assume it's
+		# supposed to be a class/role type.
+		#
+		
+		if ($self->{"~~assume"} eq "Type::Tiny::Class")
+		{
+			require Type::Tiny::Class;
+			return "Type::Tiny::Class"->new(class => $_[0]);
+		}
+		
+		if ($self->{"~~assume"} eq "Type::Tiny::Role")
+		{
+			require Type::Tiny::Role;
+			return "Type::Tiny::Role"->new(role => $_[0]);
+		}
+		
+		die;
+	}
+}
+
 our $dwimmer;
 sub dwim_type
 {
