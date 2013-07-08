@@ -341,7 +341,7 @@ sub match_on_type
 
 sub compile_match_on_type
 {
-	my @code = 'sub {';
+	my @code = 'sub { local $_ = $_[0]; ';
 	my @checks;
 	my @actions;
 	
@@ -363,25 +363,25 @@ sub compile_match_on_type
 		
 		if ($type->can_be_inlined)
 		{
-			push @code, sprintf('%sif (%s)', $els, $type->inline_check('$_[0]'));
+			push @code, sprintf('%sif (%s)', $els, $type->inline_check('$_'));
 		}
 		else
 		{
 			push @checks, $type;
-			push @code, sprintf('%sif ($checks[%d]->check($_[0]))', $els, $#checks);
+			push @code, sprintf('%sif ($checks[%d]->check($_))', $els, $#checks);
 		}
 		
 		$els = 'els';
 		
 		if (StringLike->check($code))
 		{
-			push @code, sprintf('  { local $_ = $_[0]; %s }', $code);
+			push @code, sprintf('  { %s }', $code);
 		}
 		else
 		{
 			CodeLike->($code);
 			push @actions, $code;
-			push @code, sprintf('  { local $_ = $_[0]; $actions[%d]->(@_) }', $#actions);
+			push @code, sprintf('  { $actions[%d]->(@_) }', $#actions);
 		}
 	}
 	
