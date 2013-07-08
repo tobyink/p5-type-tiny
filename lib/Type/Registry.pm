@@ -140,24 +140,13 @@ sub DESTROY
 	
 	our @ISA = qw(Type::Registry);
 	
-	sub new
-	{
-		my $class = shift;
-		my $self = $class->SUPER::new(@_);
-		$self->add_types(-Standard);
-		return $self;
-	}
-	
 	sub simple_lookup
 	{
 		my $self = shift;
+		my $r;
 		
-		my $r = $self->SUPER::simple_lookup(@_);
-		return $r if defined $r;
-		
-		# Chaining! This is a fallback which looks up the
-		# type constraint in the class' Type::Registry if
-		# we couldn't find it ourselves.
+		# If the lookup is chained to a class, then the class' own
+		# type registry gets first refusal.
 		#
 		if (defined $self->{"~~chained"})
 		{
@@ -166,17 +155,20 @@ sub DESTROY
 			return $r if defined $r;
 		}
 		
+		# Fall back to types in Types::Standard.
+		require Types::Standard;
+		return 'Types::Standard'->get_type($_[0]) if 'Types::Standard'->has_type($_[0]);
+		
+		# Only continue any further if we've been called from Type::Parser.
 		return unless $_[1];
-		return unless $_[0] =~ /^\s*(\w+(::\w+)*)\s*$/sm;
-		my $classlike = $1;
 		
 		# If Moose is loaded...
 		if ($INC{'Moose.pm'})
 		{
 			require Moose::Util::TypeConstraints;
 			require Types::TypeTiny;
-			$r = Moose::Util::TypeConstraints::find_type_constraint($classlike);
-			return Types::TypeTiny::to_TypeTiny($r);
+			$r = Moose::Util::TypeConstraints::find_type_constraint($_[0]);
+			return Types::TypeTiny::to_TypeTiny($r) if defined $r;
 		}
 		
 		# If Mouse is loaded...
@@ -184,10 +176,11 @@ sub DESTROY
 		{
 			require Mouse::Util::TypeConstraints;
 			require Types::TypeTiny;
-			$r = Mouse::Util::TypeConstraints::find_type_constraint($classlike);
-			return Types::TypeTiny::to_TypeTiny($r);
+			$r = Mouse::Util::TypeConstraints::find_type_constraint($_[0]);
+			return Types::TypeTiny::to_TypeTiny($r) if defined $r;
 		}
 		
+		return unless $_[0] =~ /^\s*(\w+(::\w+)*)\s*$/sm;
 		return unless defined $self->{"~~assume"};
 		
 		# Lastly, if it looks like a class/role name, assume it's
@@ -197,13 +190,13 @@ sub DESTROY
 		if ($self->{"~~assume"} eq "Type::Tiny::Class")
 		{
 			require Type::Tiny::Class;
-			return "Type::Tiny::Class"->new(class => $classlike);
+			return "Type::Tiny::Class"->new(class => $_[0]);
 		}
 		
 		if ($self->{"~~assume"} eq "Type::Tiny::Role")
 		{
 			require Type::Tiny::Role;
-			return "Type::Tiny::Role"->new(role => $classlike);
+			return "Type::Tiny::Role"->new(role => $_[0]);
 		}
 		
 		die;

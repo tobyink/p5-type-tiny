@@ -742,11 +742,14 @@ This function is not exported by default.
 Given a string like "ArrayRef[Int|CodeRef]", turns it into a type constraint
 object, hopefully doing what you mean.
 
-It uses the syntax of L<Type::Parser>. Firstly L<Types::Standard> is
-consulted for type constraint names; if that doesn't have a match, the
-L<Type::Registry> for the caller package is consulted; and if there's
-still no match, then if a type constraint looks like a class name, a new
-L<Type::Tiny::Class> object is created for it.
+It uses the syntax of L<Type::Parser>. Firstly the L<Type::Registry>
+for the caller package is consulted; if that doesn't have a match,
+L<Types::Standard> is consulted for type constraint names; and if
+there's still no match, then if a type constraint looks like a class
+name, a new L<Type::Tiny::Class> object is created for it.
+
+Somewhere along the way, it also checks Moose/Mouse's type constraint
+registries if they are loaded.
 
 You can specify an alternative for the caller using the C<for> option.
 If you'd rather create a L<Type::Tiny::Role> object, set the C<does>
@@ -764,6 +767,10 @@ option to true.
 While it's probably better overall to use the proper L<Type::Registry>
 interface for resolving type constraint strings, this function often does
 what you want.
+
+It should never die if it fails to find a type constraint (but may die
+if the type constraint string is syntactically malfomed), preferring to
+return undef.
 
 This function is not exported by default.
 
