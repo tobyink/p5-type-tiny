@@ -734,3 +734,12 @@
 		item "Improvements to DWIMness of Type::Parser for the benefit of `dwim_type`."^^Change;
 		item "Better test cases for `dwim_type`."^^Change;
 	].
+
+`Type-Tiny 0.015_03 cpan:TOBYINK`
+	issued  2013-07-08;
+	changeset [
+		dcs:versus `Type-Tiny 0.015_02 cpan:TOBYINK`;
+		item "The `dwim_type` function now prioritizes lookups within the caller class' type registry over Types::Standard's built-in types."^^Change;
+		item "Slight speed improvements for `compile_match_on_type`."^^Change;
+		item "Implement TIESCALAR, TIEARRAY and TIEHASH methods for Type::Tiny; this improves Type::Tie integration."^^Addition;
+	].
