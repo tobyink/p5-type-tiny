@@ -17,7 +17,7 @@ The following is an example type library:
    use Type::Library
       -base,
       -declare => qw( Datetime DatetimeHash EpochHash );
-   use Type::Utils;
+   use Type::Utils -all;
    use Types::Standard -types;
    
    class_type Datetime, { class => "DateTime" };
@@ -69,7 +69,7 @@ us to use them as barewords later on. (Note that in code which I<uses>
 our type library, the types will always be available as barewords. The
 declaration above just allows us to use them within the library itself.)
 
-   use Type::Utils;
+   use Type::Utils -all;
 
 Imports some utility functions from L<Type::Utils>. These will be useful
 for defining our types and the relationships between them.
@@ -86,6 +86,8 @@ people won't be able to re-import C<Str> from our library. If you actually
 want your library to I<extend> another library, do this instead:
 
    BEGIN { extends "Types::AnotherLibrary" };
+
+Disclaimer: if your code breaks here when you upgrade from version 0.006 or below, saying that the 'extends' keyword has not been predeclared, just add '-all' after use Type::Utils.
 
 OK, now we're ready to declare a few types.
 
