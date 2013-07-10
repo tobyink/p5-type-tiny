@@ -87,7 +87,9 @@ want your library to I<extend> another library, do this instead:
 
    BEGIN { extends "Types::AnotherLibrary" };
 
-Disclaimer: if your code breaks here when you upgrade from version 0.006 or below, saying that the 'extends' keyword has not been predeclared, just add '-all' after use Type::Utils.
+(Note: if your code breaks here when you upgrade from version 0.006 or
+below, saying that the 'extends' keyword has not been predeclared, just add
+'-all' after use Type::Utils.)
 
 OK, now we're ready to declare a few types.
 
