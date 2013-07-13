@@ -210,6 +210,20 @@ compact/good/fast).
    declare NonEmptyHash, as HashLike,
       constraint => quote_sub q{ scalar values %$_ };
 
+Aside: it's been pointed out that "might not be as fast" above is a bit
+hand-wavy. When Type::Tiny does inlining from Sub::Quote coderefs, it needs
+to inline all the ancestor type constraints, and smush them together with
+C<< && >>. This may result in duplicate checks. For example, if 'MyArray'
+inherits from 'MyRef' which inherits from 'MyDef', the inlined code might
+end up as:
+
+   defined($_)              # check MyDef
+   && ref($_)               # check MyRef
+   && ref($_) eq 'ARRAY'    # check MyArray
+
+When just the last check would have been sufficient. A custom C<inline_as>
+allows you finer control over how the type constraint is inlined.
+
 =head2 Parameterized Constraints
 
 Parameterized type constraints are those that can generate simple child type
