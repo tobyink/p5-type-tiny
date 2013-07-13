@@ -29,6 +29,13 @@ cpan:PJFL
 cpan:RSIMOES
 	:name "Richard Simões".
 
+<urn:uuid:382de9f9-3ec0-4aa1-ba60-aa80709e75ac>
+	:name "Pierre Masci";
+	:page <http://www.perlmonks.org/?node_id=946673>.
+
+cpan:TIMB
+	:name "Tim Bunce".
+
 # We bundle some files made by these dudes...
 
 cpan:RJBS

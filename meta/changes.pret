@@ -743,3 +743,28 @@
 		item "Slight speed improvements for `compile_match_on_type`."^^Change;
 		item "Implement TIESCALAR, TIEARRAY and TIEHASH methods for Type::Tiny; this improves Type::Tie integration."^^Addition;
 	].
+
+`Type-Tiny 0.015_04 cpan:TOBYINK`
+	issued  2013-07-13;
+	changeset [
+		dcs:versus `Type-Tiny 0.015_03 cpan:TOBYINK`;
+		item [
+			a dcs:Documentation;
+			label "Mention in Type::Tiny::Manual::Libraries that the `extends` function is no longer exported by default; update example code.";
+			dcs:blame <urn:uuid:382de9f9-3ec0-4aa1-ba60-aa80709e75ac>;
+			dcs:fixes RT#86813;
+			seealso <https://github.com/tobyink/p5-type-tiny/pull/2>;
+		];
+		item [
+			a dcs:Documentation;
+			label "Allow an inline_as block to return a list of strings (which are implictly joined with &&); allow the first item on the list to be undef, which is treated as the inlined parent type constraint.";
+			dcs:thanks cpan:TIMB;
+			dcs:fixes RT#86891;
+		];
+		item [
+			a dcs:Documentation;
+			label "Clarify when inlining via Sub::Quote may be less efficient than hand-written inlining.";
+			dcs:thanks cpan:TIMB;
+			dcs:fixes RT#86893;
+		];
+	].
