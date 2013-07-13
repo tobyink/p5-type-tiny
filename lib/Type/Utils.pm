@@ -492,6 +492,8 @@ __END__
 
 =encoding utf-8
 
+=for stopwords smush smushed
+
 =head1 NAME
 
 Type::Utils - utility functions to make defining and using type constraints a little easier
