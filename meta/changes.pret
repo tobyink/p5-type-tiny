@@ -756,7 +756,6 @@
 			seealso <https://github.com/tobyink/p5-type-tiny/pull/2>;
 		];
 		item [
-			a dcs:Documentation;
 			label "Allow an inline_as block to return a list of strings (which are implictly joined with &&); allow the first item on the list to be undef, which is treated as the inlined parent type constraint.";
 			dcs:thanks cpan:TIMB;
 			dcs:fixes RT#86891;
