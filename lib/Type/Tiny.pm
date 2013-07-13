@@ -451,12 +451,22 @@ sub inline_check
 	my $self = shift;
 	_croak 'Cannot inline type constraint check for "%s"', $self
 		unless $self->can_be_inlined;
+	
 	return $self->parent->inline_check(@_)
 		if $self->has_parent && $self->_is_null_constraint;
 	return '(!!1)'
 		if !$self->has_parent && $self->_is_null_constraint;
-	my $r = $self->inlined->($self, @_);
-	$r =~ /[;{}]/ ? "(do { $r })" : "($r)";
+	
+	local $_ = $_[0];
+	my @r = $self->inlined->($self, @_);
+	if (@r and not defined $r[0])
+	{
+		_croak 'Inlining type constraint check for "%s" returned undef!', $self
+			unless $self->has_parent;
+		$r[0] = $self->parent->inline_check(@_);
+	}
+	my $r = join " && " => map { /[;{}]/ ? "do { $_ }" : "($_)" } @r;
+	return @r==1 ? $r : "($r)";
 }
 
 sub inline_assert

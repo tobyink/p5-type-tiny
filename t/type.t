@@ -97,4 +97,23 @@ ok(!$Below->has_parameters, 'has_parameters method works - negative');
 ok($Below5->has_parameters, 'has_parameters method works - positive');
 is_deeply($Below5->parameters, [5], 'parameters method works');
 
+my $Ref = "Type::Tiny"->new(
+	name       => "Ref",
+	constraint => sub {  ref($_)  },
+	inlined    => sub { "ref($_)" },
+);
+
+my $ArrayRef = "Type::Tiny"->new(
+	name       => "ArrayRef",
+	parent     => $Ref,
+	constraint => sub {         ref($_) eq 'ARRAY'  },
+	inlined    => sub { undef, "ref($_) eq 'ARRAY'" },
+);
+
+is(
+	$ArrayRef->inline_check('$xxx'),
+	q[(((ref($xxx))) && (ref($xxx) eq 'ARRAY'))],
+	'inlining stuff can return a list',
+);
+
 done_testing;
