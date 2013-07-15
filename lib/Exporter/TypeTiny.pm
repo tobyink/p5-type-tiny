@@ -1,6 +1,6 @@
 package Exporter::TypeTiny;
 
-use 5.008001;
+use 5.006001;
 use strict;
 use warnings; no warnings qw(void once uninitialized numeric redefine);
 
