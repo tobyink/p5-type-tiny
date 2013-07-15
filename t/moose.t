@@ -95,9 +95,9 @@ is(
 	"Type::Tiny::Class provides meta information to Moose::Meta::TypeConstraint::Class",
 );
 isa_ok(
-	$classtype->tt_type,
+	$classtype->Types::TypeTiny::to_TypeTiny,
 	'Type::Tiny::Class',
-	'$classtype->tt_type',
+	'$classtype->Types::TypeTiny::to_TypeTiny',
 );
 
 my $roletype = Type::Utils::role_type(LocalRole => { class => "Local::Role" })->moose_type;
@@ -111,9 +111,9 @@ ok(
 	"NB! Type::Tiny::Role does not inflate to Moose::Meta::TypeConstraint::Role because of differing notions as to what constitutes a role.",
 );
 isa_ok(
-	$roletype->tt_type,
+	$roletype->Types::TypeTiny::to_TypeTiny,
 	'Type::Tiny::Role',
-	'$roletype->tt_type',
+	'$roletype->Types::TypeTiny::to_TypeTiny',
 );
 
 my $ducktype = Type::Utils::duck_type(Darkwing => [qw/ foo bar baz /])->moose_type;
@@ -128,9 +128,9 @@ is_deeply(
 	"Type::Tiny::Duck provides meta information to Moose::Meta::TypeConstraint::DuckType",
 );
 isa_ok(
-	$ducktype->tt_type,
+	$ducktype->Types::TypeTiny::to_TypeTiny,
 	'Type::Tiny::Duck',
-	'$ducktype->tt_type',
+	'$ducktype->Types::TypeTiny::to_TypeTiny',
 );
 
 my $enumtype = Type::Utils::enum(MyEnum => [qw/ foo bar baz /])->moose_type;
@@ -145,12 +145,12 @@ is_deeply(
 	"Type::Tiny::Enum provides meta information to Moose::Meta::TypeConstraint::Enum",
 );
 isa_ok(
-	$enumtype->tt_type,
+	$enumtype->Types::TypeTiny::to_TypeTiny,
 	'Type::Tiny::Enum',
-	'$enumtype->tt_type',
+	'$enumtype->Types::TypeTiny::to_TypeTiny',
 );
 
-my $union = Type::Utils::union(ICU => [$classtype->tt_type, $roletype->tt_type])->moose_type;
+my $union = Type::Utils::union(ICU => [$classtype->Types::TypeTiny::to_TypeTiny, $roletype->Types::TypeTiny::to_TypeTiny])->moose_type;
 isa_ok(
 	$union,
 	"Moose::Meta::TypeConstraint::Union",
@@ -162,26 +162,32 @@ is_deeply(
 	"Type::Tiny::Union provides meta information to Moose::Meta::TypeConstraint::Union",
 );
 isa_ok(
-	$union->tt_type,
+	$union->Types::TypeTiny::to_TypeTiny,
 	'Type::Tiny::Union',
-	'$union->tt_type',
+	'$union->Types::TypeTiny::to_TypeTiny',
 );
 is(
-	[sort @{$union->type_constraints}]->[0]->tt_type->{uniq},
-	$classtype->tt_type->{uniq},
-	'$union->type_constraints->[$i]->tt_type provides access to underlying Type::Tiny objects'
+	[sort @{$union->type_constraints}]->[0]->Types::TypeTiny::to_TypeTiny->{uniq},
+	$classtype->Types::TypeTiny::to_TypeTiny->{uniq},
+	'$union->type_constraints->[$i]->Types::TypeTiny::to_TypeTiny provides access to underlying Type::Tiny objects'
 );
 
-my $intersect = Type::Utils::intersection(Chuck => [$classtype->tt_type, $roletype->tt_type])->moose_type;
+my $intersect = Type::Utils::intersection(Chuck => [$classtype->Types::TypeTiny::to_TypeTiny, $roletype->Types::TypeTiny::to_TypeTiny])->moose_type;
 isa_ok(
 	$intersect,
 	"Moose::Meta::TypeConstraint",
 	'$intersect',
 );
 isa_ok(
-	$intersect->tt_type,
+	$intersect->Types::TypeTiny::to_TypeTiny,
 	'Type::Tiny::Intersection',
-	'$intersect->tt_type',
+	'$intersect->Types::TypeTiny::to_TypeTiny',
+);
+
+is(
+	Scalar::Util::refaddr( $intersect->Types::TypeTiny::to_TypeTiny ),
+	Scalar::Util::refaddr( $intersect->Types::TypeTiny::to_TypeTiny->moose_type->Types::TypeTiny::to_TypeTiny->moose_type->Types::TypeTiny::to_TypeTiny ),
+	'round-tripping between ->moose_type and ->Types::TypeTiny::to_TypeTiny preserves reference address'
 );
 
 done_testing;

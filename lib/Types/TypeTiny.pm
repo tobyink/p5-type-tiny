@@ -118,9 +118,9 @@ sub _TypeTinyFromMoose
 {
 	my $t = $_[0];
 	
-	if ($t->can("tt_type") and my $tt = $t->tt_type)
+	if (ref $t->{"Types::TypeTiny::to_TypeTiny"})
 	{
-		return $tt;
+		return $t->{"Types::TypeTiny::to_TypeTiny"};
 	}
 	
 	my %opts;

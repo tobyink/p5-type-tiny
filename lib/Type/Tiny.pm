@@ -636,19 +636,17 @@ sub _instantiate_moose_type
 	return "Moose::Meta::TypeConstraint"->new(%opts);
 }
 
-my $trick_done = 0;
 sub _build_moose_type
 {
 	my $self = shift;
-	
-	_MONKEY_MAGIC() unless $trick_done;
 	
 	my $r;
 	if ($self->{_is_core})
 	{
 		require Moose::Util::TypeConstraints;
 		$r = Moose::Util::TypeConstraints::find_type_constraint($self->name);
-		$r->_set_tt_type($self);
+		$r->{"Types::TypeTiny::to_TypeTiny"} = $self;
+		Scalar::Util::weaken($r->{"Types::TypeTiny::to_TypeTiny"});
 	}
 	else
 	{
@@ -660,7 +658,8 @@ sub _build_moose_type
 		$opts{inlined}    = $self->inlined            if $self->has_inlined;
 		
 		$r = $self->_instantiate_moose_type(%opts);
-		$r->_set_tt_type($self);
+		$r->{"Types::TypeTiny::to_TypeTiny"} = $self;
+		Scalar::Util::weaken($r->{"Types::TypeTiny::to_TypeTiny"});
 		$self->{moose_type} = $r;  # prevent recursion
 		$r->coercion($self->coercion->moose_coercion) if $self->has_coercion;
 	}
@@ -754,33 +753,6 @@ sub minus_coercions
 sub no_coercions
 {
 	shift->_clone;
-}
-
-# Monkey patch Moose::Meta::TypeConstraint to refer to Type::Tiny
-sub _MONKEY_MAGIC
-{
-	return if $trick_done;
-	$trick_done++;
-	
-	eval q{#line 1 "Type::Tiny::_MONKEY_MAGIC"
-		package #
-		Moose::Meta::TypeConstraint;
-		my $meta = __PACKAGE__->meta;
-		$meta->make_mutable;
-		$meta->add_attribute(
-			"Moose::Meta::Attribute"->new(
-				tt_type => (
-					reader    => "tt_type",
-					writer    => "_set_tt_type",
-					predicate => "has_tt_type",
-					weak_ref  => 1,
-					Class::MOP->can("_definition_context") ? Class::MOP::_definition_context() : (),
-				),
-			),
-		);
-		$meta->make_immutable(inline_constructor => 0);
-		1;
-	} or _croak("Could not perform magic Moose trick: $@");
 }
 
 sub isa
