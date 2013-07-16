@@ -45,6 +45,11 @@ is_deeply(
 	[ { foo => 1, bar => "Hello", baz => [] } ]
 );
 
+is_deeply(
+	[ $chk->({bar => "Hello", baz => [], foo => 1}) ],
+	[ { foo => 1, bar => "Hello", baz => [] } ]
+);
+
 like(
 	exception { $chk->(foo => 1, bar => "Hello") },
 	qr{did not pass type constraint "Dict},
