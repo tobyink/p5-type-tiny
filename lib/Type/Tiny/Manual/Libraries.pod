@@ -286,6 +286,42 @@ four key-value pairs. Here's how you'd do it:
          };
       };
 
+=head1 SEE ALSO
+
+Some type libraries on CPAN:
+
+=over
+
+=item *
+
+L<Types::Standard>
+
+=item *
+
+L<Types::Encodings>
+
+=item *
+
+L<Types::Path::Tiny>
+
+=item *
+
+L<Unexpected::Types>
+
+=item *
+
+L<Geo::JSON::Types>
+
+=item *
+
+L<Types::XSD> / L<Types::XSD::Lite>
+
+=item *
+
+L<Types::Set>
+
+=back
+
 =head1 AUTHOR
 
 Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
