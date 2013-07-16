@@ -775,3 +775,11 @@
 		item "Experimentally drop required version of Perl from 5.8.1 to 5.6.1. I've not been able to extensively test Type-Tiny on Perl 5.6.x, but I believe it should mostly work. (The only feature that seems unlikely to work is non-ASCII names for type constraints and coercions.)"^^Change;
 		item "Stop monkey-patching Moose::Meta::TypeContraint; it's not necessary and has never been documented."^^Change;
 	].
+
+`Type-Tiny 0.016 cpan:TOBYINK`
+	issued  2013-07-16;
+	changeset [
+		dcs:versus `Type-Tiny 0.015_05 cpan:TOBYINK`;
+		item "Add some pod links."^^Documentation;
+		item "Updated NEWS file."^^Documentation;
+	].

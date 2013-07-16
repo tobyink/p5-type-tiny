@@ -59,3 +59,8 @@
 2013-06-28 Type-Tiny version 0.014 released!
 
  - Improvements to Type::Parser and Type::Registry.
+
+2013-07-16 Type-Tiny version 0.016 released!
+
+ - Type::Utils::dwim_type() function.
+ - Experimental support for Perl 5.6.x.
