@@ -1821,7 +1821,7 @@ a tied hash, use an intersection:
 
 =item C<< StrMatch[`a] >>
 
-A string that matches a regular exception:
+A string that matches a regular expression:
 
    declare "Distance",
       as StrMatch[ qr{^([0-9]+)\s*(mm|cm|m|km)$} ];
