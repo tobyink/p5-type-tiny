@@ -815,5 +815,9 @@
 			label "Hopefully improved workaround for missing B::perlstring() using Data::Dumper instead of quotemeta().";
 			dcs:thanks cpan:RIBASUSHI;
 		];
+		item [
+			a dcs:Bugfix;
+			label "Further changes for Perl 5.6.x support.";
+		];
 	].
 
