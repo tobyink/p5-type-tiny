@@ -2,6 +2,8 @@ package Eval::TypeTiny;
 
 use strict;
 
+BEGIN { *HAS_LEXICAL_SUBS = ($] >= 5.018) ? sub(){!!1} : sub(){!!0} };
+
 sub _clean_eval
 {
 	local $@;
@@ -14,6 +16,7 @@ sub _clean_eval
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.016';
 our @EXPORT    = qw( eval_closure );
+our @EXPORT_OK = qw( HAS_LEXICAL_SUBS );
 
 sub import
 {
@@ -56,7 +59,12 @@ sub eval_closure
 	my $source    = join "\n" => (
 		"package Eval::TypeTiny::Sandbox$sandbox;",
 		"sub {",
-		map(sprintf('my %s = %s{$_[%d]};', $_, substr($_, 0, 1), $i++), @keys),
+		map(
+			HAS_LEXICAL_SUBS
+				? _make_lexical_assignment($_, $i++)
+				: sprintf('my %s = %s{$_[%d]};', $_, substr($_, 0, 1), $i++),
+			@keys
+		),
 		$src,
 		"}",
 	);
@@ -76,6 +84,25 @@ sub eval_closure
 	return $compiler->(@{$args{environment}}{@keys});
 }
 
+HAS_LEXICAL_SUBS and eval <<'SUPPORT_LEXICAL_SUBS';
+my $tmp;
+sub _make_lexical_assignment
+{
+	my ($key, $index) = @_;
+	if (HAS_LEXICAL_SUBS and $key =~ /^\&/) {
+		$tmp++;
+		my $tmpname = '$__LEXICAL_SUB__'.$tmp;
+		my $name    = substr($key, 1);
+		return
+			"no warnings 'experimental::lexical_subs';".
+			"use feature 'lexical_subs';".
+			"my $tmpname = \$_[$index];".
+			"my sub $name { goto $tmpname };";
+	}
+	sprintf('my %s = %s{$_[%d]};', $key, substr($key, 0, 1), $index);
+}
+SUPPORT_LEXICAL_SUBS
+
 1;
 
 __END__
@@ -94,12 +121,27 @@ Eval::TypeTiny - utility to evaluate a string of Perl code in a clean environmen
 
 This is not considered part of Type::Tiny's public API.
 
-It exports one function, which works much like the similarly named function
-from L<Eval::Closure>:
+=head2 Functions
+
+This module exports one function, which works much like the similarly named
+function from L<Eval::Closure>:
 
 =over
 
 =item C<< eval_closure(source => $source, environment => \%env, %opt) >>
+
+=back
+
+=head2 Constants
+
+The following constant may be exported, but is not exported by default.
+
+=over
+
+=item C<< HAS_LEXICAL_SUBS >>
+
+Boolean indicating whether Eval::TypeTiny has support for lexical subs.
+(This feature requires Perl 5.18.)
 
 =back
 
