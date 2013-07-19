@@ -26,6 +26,7 @@ use lib qw( . ./t ../inc ./inc );
 use utf8;
 
 use Test::More;
+use Test::Requires { "Encode" => 0 };
 use Test::TypeTiny;
 
 use Encode;
