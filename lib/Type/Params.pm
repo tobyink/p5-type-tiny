@@ -27,10 +27,13 @@ use base qw< Exporter::TypeTiny >;
 our @EXPORT = qw( compile );
 our @EXPORT_OK = qw( validate Invocant );
 
-use constant Invocant => "Type::Tiny::Union"->new(
-	name             => "Invocant",
-	type_constraints => [Object, ClassName],
-);
+BEGIN {
+	my $Invocant = 'Type::Tiny::Union'->new(
+		name             => 'Invocant',
+		type_constraints => [Object, ClassName],
+	);
+	sub Invocant () { $Invocant };
+};
 
 #sub _exporter_expand_sub
 #{
