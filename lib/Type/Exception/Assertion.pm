@@ -5,6 +5,10 @@ use strict;
 use warnings;
 
 BEGIN {
+	if ($] < 5.008) { require Devel::TypeTiny::Perl56Compat };
+}
+
+BEGIN {
 	$Type::Exception::Assertion::AUTHORITY = 'cpan:TOBYINK';
 	$Type::Exception::Assertion::VERSION   = '0.017_01';
 }

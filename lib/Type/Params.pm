@@ -5,6 +5,10 @@ use strict;
 use warnings;
 
 BEGIN {
+	if ($] < 5.008) { require Devel::TypeTiny::Perl56Compat };
+}
+
+BEGIN {
 	$Type::Params::AUTHORITY = 'cpan:TOBYINK';
 	$Type::Params::VERSION   = '0.017_01';
 }

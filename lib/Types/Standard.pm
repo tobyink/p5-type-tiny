@@ -1,7 +1,12 @@
 package Types::Standard;
 
+use 5.006001
 use strict;
 use warnings;
+
+BEGIN {
+	if ($] < 5.008) { require Devel::TypeTiny::Perl56Compat };
+}
 
 BEGIN {
 	$Types::Standard::AUTHORITY = 'cpan:TOBYINK';
