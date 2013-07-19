@@ -752,7 +752,7 @@
 			a dcs:Documentation;
 			label "Mention in Type::Tiny::Manual::Libraries that the `extends` function is no longer exported by default; update example code.";
 			dcs:blame <urn:uuid:382de9f9-3ec0-4aa1-ba60-aa80709e75ac>;
-			dcs:fixes RT#86813;
+			dcs:fixes RT#86813, <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/2>;
 			seealso <https://github.com/tobyink/p5-type-tiny/pull/2>;
 		];
 		item [
@@ -785,16 +785,23 @@
 	].
 
 `Type-Tiny 0.017_01 cpan:TOBYINK`
-	issued  2013-07-05;
+	issued  2013-07-19;
 	changeset [
 		dcs:versus `Type-Tiny 0.016 cpan:TOBYINK`;
 		item "Eval::TypeTiny now supports lexical subs under Perl 5.18."^^Update;
 		item [
 			a dcs:Documentation;
-			label "Improve example of custom type constraint error message in Type::Utils.";
+			label "Improve examples of custom type constraint error message in Type::Utils and Type::Tiny::Manual::Libraries.";
 			dcs:thanks cpan:TIMB;
-			dcs:fixes RT#00000;  # !!!
+			dcs:fixes RT#86892;
 		];
 		item "Give an example of the default error messages thrown by Type::Tiny."^^Documentation;
+		item [
+			a dcs:Documentation;
+			label "Fix typo in Types::Standard 'regular exception' -> 'regular expression'.";
+			dcs:blame cpan:MARKSTOS;
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/4>;
+			seealso <https://github.com/tobyink/p5-type-tiny/pull/4>;
+		];
 	].
 

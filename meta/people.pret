@@ -36,6 +36,9 @@ cpan:RSIMOES
 cpan:TIMB
 	:name "Tim Bunce".
 
+cpan:MARKSTOS
+	:name "Mark Stosberg".
+
 # We bundle some files made by these dudes...
 
 cpan:RJBS
