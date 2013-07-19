@@ -13,7 +13,7 @@ BEGIN {
 };
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.017_01';
+our $VERSION   = '0.017_02';
 our @EXPORT    = qw( should_pass should_fail ok_subtype );
 our @EXPORT_OK = qw( EXTENDED_TESTING );
 

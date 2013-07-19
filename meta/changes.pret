@@ -806,3 +806,14 @@
 		item "Work around lack of B::perlstring() function in Perl 5.6.x."^^Bugfix;
 	].
 
+`Type-Tiny 0.017_02 cpan:TOBYINK`
+	issued  2013-07-20;
+	changeset [
+		dcs:versus `Type-Tiny 0.017_01 cpan:TOBYINK`;
+		item [
+			a dcs:Change;
+			label "Hopefully improved workaround for missing B::perlstring() using Data::Dumper instead of quotemeta().";
+			dcs:thanks cpan:RIBASUSHI;
+		];
+	].
+
