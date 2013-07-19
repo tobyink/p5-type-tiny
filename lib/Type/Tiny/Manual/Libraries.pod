@@ -145,13 +145,17 @@ L<Type::Tiny::Manual::Coercions>.
 It is sometimes nice to be able to emit a more useful error message than
 the standard:
 
-   value "Foo" did not pass type constraint "Bar"
+   Value "Foo" did not pass type constraint "Bar"
 
 It is possible to define custom error messages for types.
 
    declare MediumInteger, as Integer,
       where   { $_ >= 10 and $_ < 20 },
-      message { $_ < 10  ? "$_ is too small" : "$_ is too big" };
+      message {
+         return Integer->get_message($_) if !Integer->check($_);
+         return "$_ is too small!"       if $_ < 10;
+         return "$_ is so very, very big!";
+      };
 
 =head2 Inlining
 
