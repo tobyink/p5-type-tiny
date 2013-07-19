@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Tiny::Role::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::Role::VERSION   = '0.016';
+	$Type::Tiny::Role::VERSION   = '0.017_01';
 }
 
 use Scalar::Util qw< blessed weaken >;

@@ -783,3 +783,18 @@
 		item "Add some pod links."^^Documentation;
 		item "Updated NEWS file."^^Documentation;
 	].
+
+`Type-Tiny 0.017_01 cpan:TOBYINK`
+	issued  2013-07-05;
+	changeset [
+		dcs:versus `Type-Tiny 0.016 cpan:TOBYINK`;
+		item "Eval::TypeTiny now supports lexical subs under Perl 5.18."^^Update;
+		item [
+			a dcs:Documentation;
+			label "Improve example of custom type constraint error message in Type::Utils.";
+			dcs:thanks cpan:TIMB;
+			dcs:fixes RT#00000;  # !!!
+		];
+		item "Give an example of the default error messages thrown by Type::Tiny."^^Documentation;
+	].
+
