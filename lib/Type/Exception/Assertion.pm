@@ -122,7 +122,7 @@ sub _codefor
 	$b ||= do {
 		require B::Deparse;
 		my $tmp = "B::Deparse"->new;
-		$tmp->ambient_pragmas(strict => "all", warnings => "all");
+		$tmp->ambient_pragmas(strict => "all", warnings => "all") if $tmp->can('ambient_pragmas');
 		$tmp;
 	};
 	
