@@ -5,5 +5,7 @@
 	version_from      m`Type::Tiny`;
 	readme_from       f`lib/Type/Tiny/Manual.pod`;
 	test_requires     p`Test::More 0.96`;
+	recommends        p`Type::Tie`;
+	recommends        p`Devel::StackTrace`;
 .
 
