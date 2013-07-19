@@ -1,6 +1,0 @@
-  * Type-Tiny
-      * Improve API for parameterized coercions
-      * Maybe[`a] should have a coercion if `a does???
-      * Documentation
-          * See what questions users come up with, and write more
-            documentation if necessary
