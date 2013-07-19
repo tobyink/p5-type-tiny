@@ -803,5 +803,6 @@
 			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/4>;
 			seealso <https://github.com/tobyink/p5-type-tiny/pull/4>;
 		];
+		item "Work around lack of B::perlstring() function in Perl 5.6.x."^^Bugfix;
 	].
 
