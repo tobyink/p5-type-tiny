@@ -33,7 +33,7 @@ my $a = do {
 	package MyTie::Array;
 	require Tie::Array;
 	our @ISA = qw(Tie::StdArray);
-	tie my @A, __PACKAGE__;
+	tie my(@A), __PACKAGE__;
 	\@A;
 };
 
@@ -41,7 +41,7 @@ my $h = do {
 	package MyTie::Hash;
 	require Tie::Hash;
 	our @ISA = qw(Tie::StdHash);
-	tie my %H, __PACKAGE__;
+	tie my(%H), __PACKAGE__;
 	\%H
 };
 

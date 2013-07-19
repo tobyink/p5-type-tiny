@@ -159,20 +159,24 @@ like(
 	qq{Ref[{}] is not a valid type constraint},
 );
 
-ok(
-	!!Num->check("Inf") == !Types::Standard::STRICTNUM,
-	"'Inf' passes Num unless Types::Standard::STRICTNUM",
-);
+SKIP: {
+	skip "requires Perl 5.8", 3 if $] < 5.008;
+	
+	ok(
+		!!Num->check("Inf") == !Types::Standard::STRICTNUM,
+		"'Inf' passes Num unless Types::Standard::STRICTNUM",
+	);
 
-ok(
-	!!Num->check("-Inf") == !Types::Standard::STRICTNUM,
-	"'-Inf' passes Num unless Types::Standard::STRICTNUM",
-);
+	ok(
+		!!Num->check("-Inf") == !Types::Standard::STRICTNUM,
+		"'-Inf' passes Num unless Types::Standard::STRICTNUM",
+	);
 
-ok(
-	!!Num->check("Nan") == !Types::Standard::STRICTNUM,
-	"'Nan' passes Num unless Types::Standard::STRICTNUM",
-);
+	ok(
+		!!Num->check("Nan") == !Types::Standard::STRICTNUM,
+		"'Nan' passes Num unless Types::Standard::STRICTNUM",
+	);
+}
 
 ok(
 	!!Num->check("0.") == !Types::Standard::STRICTNUM,
