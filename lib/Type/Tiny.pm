@@ -98,7 +98,7 @@ sub new
 	{
 		# First try a fast ASCII-only expression, but fall back to Unicode
 		$params{name} =~ /^[A-Z][A-Za-z0-9_]+$/sm
-			or eval q( $params{name} =~ /^\p{Lu}[\p{L}0-9_]+$/sm )
+			or eval q( use 5.008; $params{name} =~ /^\p{Lu}[\p{L}0-9_]+$/sm )
 			or _croak '"%s" is not a valid type name', $params{name};
 	}
 	
