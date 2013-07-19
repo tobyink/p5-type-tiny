@@ -2,10 +2,9 @@
 
 use B ();
 
-sub B::perlstring
-{
+*B::perlstring = sub {
 	sprintf('"%s"', quotemeta($_[0]))
-}
+} unless exists &B::perlstring;
 
 push @B::EXPORT_OK, 'perlstring';
 
