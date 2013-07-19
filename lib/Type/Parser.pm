@@ -204,10 +204,10 @@ Evaluate: {
 	}
 	
 	my %precedence = (
-		+Type::Parser::COMMA     => 1,
-		+Type::Parser::UNION     => 2,
-		+Type::Parser::INTERSECT => 3,
-		+Type::Parser::NOT       => 4,
+		Type::Parser::COMMA()     , 1 ,
+		Type::Parser::UNION()     , 2 ,
+		Type::Parser::INTERSECT() , 3 ,
+		Type::Parser::NOT()       , 4 ,
 	);
 	
 	sub _parse_primary
