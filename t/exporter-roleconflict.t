@@ -8,7 +8,8 @@ Tests exporting to two roles; tries to avoid reporting conflicts.
 
 =head1 DEPENDENCIES
 
-Requires L<Role::Tiny> 1.000000; test skipped otherwise.
+Requires L<Exporter> 5.59 and L<Role::Tiny> 1.000000;
+test skipped otherwise.
 
 =head1 AUTHOR
 
@@ -31,6 +32,7 @@ use strict;
 use warnings;
 use lib qw( ./lib ./t/lib ../inc ./inc );
 
+use Test::Requires { "Exporter"   => 5.59 };
 use Test::Requires { "Role::Tiny" => 1.000000 };
 use Test::More;
 use Test::Fatal;
