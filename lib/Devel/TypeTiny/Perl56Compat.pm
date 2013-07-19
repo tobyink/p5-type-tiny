@@ -11,7 +11,7 @@ unless (exists &B::perlstring)
 	require Data::Dumper;
 	my $d = 'Data::Dumper'->new([])->Indent(0)->Purity(0)->Pad('')->Useqq(1)->Terse(1)->Freezer('')->Toaster('');
 	*B::perlstring = sub {
-		$d->Values([shift])->Dump
+		$d->Values([''.shift])->Dump
 	};
 }
 
