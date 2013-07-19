@@ -593,10 +593,7 @@ Generate a custom error message when a value fails validation.
       as Int,
       where { $_ % 2 == 0 },
       message {
-         if (Int->check($_))
-            { "$_ is an integer, but not even" }
-         else
-            { "$_ is not an integer" }
+         Int->validate($_) or "$_ is not divisible by two";
       };
 
 =item C<< inline_as { BLOCK } >>
