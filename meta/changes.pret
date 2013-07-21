@@ -821,3 +821,10 @@
 		];
 	].
 
+`Type-Tiny 0.018 cpan:TOBYINK`
+	issued  2013-07-21;
+	changeset [
+		dcs:versus `Type-Tiny 0.017_02 cpan:TOBYINK`;
+		item "Updated NEWS file."^^Documentation;
+	].
+
