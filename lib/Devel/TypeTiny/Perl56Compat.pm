@@ -8,9 +8,10 @@ use B ();
 
 unless (exists &B::perlstring)
 {
-	require Data::Dumper;
-	my $d = 'Data::Dumper'->new([])->Indent(0)->Purity(0)->Pad('')->Useqq(1)->Terse(1)->Freezer('')->Toaster('');
+	my $d;
 	*B::perlstring = sub {
+		require Data::Dumper;
+		$d ||= 'Data::Dumper'->new([])->Indent(0)->Purity(0)->Pad('')->Useqq(1)->Terse(1)->Freezer('')->Toaster('');
 		my $perlstring = $d->Values([''.shift])->Dump;
 		($perlstring =~ /^"/) ? $perlstring : qq["$perlstring"];
 	};
