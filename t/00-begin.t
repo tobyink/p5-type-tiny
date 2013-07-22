@@ -38,6 +38,7 @@ sub diag_version
 sub diag_env
 {
 	require B;
+	require Devel::TypeTiny::Perl56Compat;
 	my $var = shift;
 	return diag sprintf('  $%-30s   %s', $var, exists $ENV{$var} ? B::perlstring($ENV{$var}) : "undef");
 }
