@@ -828,3 +828,11 @@
 		item "Updated NEWS file."^^Documentation;
 	].
 
+`Type-Tiny 0.019_01 cpan:TOBYINK`
+	issued  2013-07-23;
+	changeset [
+		dcs:versus `Type-Tiny 0.018 cpan:TOBYINK`;
+		item "Work around lack of B::perlstring() function in Perl 5.6.x in test suite."^^Bugfix;
+		item "Eval::TypeTiny now closes over variables properly."^^Bugfix;
+	].
+

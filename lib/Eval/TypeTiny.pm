@@ -14,7 +14,7 @@ sub _clean_eval
 }
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.018';
+our $VERSION   = '0.019_01';
 our @EXPORT    = qw( eval_closure );
 our @EXPORT_OK = qw( HAS_LEXICAL_SUBS );
 
