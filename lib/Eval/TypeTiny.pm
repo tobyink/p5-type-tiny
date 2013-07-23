@@ -83,10 +83,11 @@ my $tmp;
 sub _make_lexical_assignment
 {
 	my ($key, $index) = @_;
+	my $name = substr($key, 1);
+	
 	if (HAS_LEXICAL_SUBS and $key =~ /^\&/) {
 		$tmp++;
 		my $tmpname = '$__LEXICAL_SUB__'.$tmp;
-		my $name    = substr($key, 1);
 		return
 			"no warnings 'experimental::lexical_subs';".
 			"use feature 'lexical_subs';".
@@ -97,7 +98,7 @@ sub _make_lexical_assignment
 	sprintf(
 		'our %s; *%s = $_[%d];',
 		$key,
-		substr($key, 1),
+		$name,
 		$index,
 	);
 }
