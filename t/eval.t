@@ -63,6 +63,15 @@ is_deeply(
 	'closure over hash',
 );
 
+my $external = 40;
+my $closure2 = eval_closure(
+	source      => 'sub { $xxx += 2 }',
+	environment => { '$xxx' => \$external },
+);
+
+$closure2->();
+is($external, 42, 'closing over variables really really really works!');
+
 my $e = exception { eval_closure(source => 'sub { 1 ]') };
 
 isa_ok(
