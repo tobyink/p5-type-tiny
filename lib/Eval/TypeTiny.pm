@@ -59,12 +59,7 @@ sub eval_closure
 	my $source    = join "\n" => (
 		"package Eval::TypeTiny::Sandbox$sandbox;",
 		"sub {",
-		map(
-			HAS_LEXICAL_SUBS
-				? _make_lexical_assignment($_, $i++)
-				: sprintf('my %s = %s{$_[%d]};', $_, substr($_, 0, 1), $i++),
-			@keys
-		),
+		map(_make_lexical_assignment($_, $i++), @keys),
 		$src,
 		"}",
 	);
@@ -84,7 +79,6 @@ sub eval_closure
 	return $compiler->(@{$args{environment}}{@keys});
 }
 
-HAS_LEXICAL_SUBS and eval <<'SUPPORT_LEXICAL_SUBS';
 my $tmp;
 sub _make_lexical_assignment
 {
@@ -99,9 +93,14 @@ sub _make_lexical_assignment
 			"my $tmpname = \$_[$index];".
 			"my sub $name { goto $tmpname };";
 	}
-	sprintf('my %s = %s{$_[%d]};', $key, substr($key, 0, 1), $index);
+	
+	sprintf(
+		'our %s; *%s = $_[%d];',
+		$key,
+		substr($key, 1),
+		$index,
+	);
 }
-SUPPORT_LEXICAL_SUBS
 
 1;
 
