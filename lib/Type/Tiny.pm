@@ -1086,6 +1086,14 @@ my behaviour as it seems more useful. >>
 Compare two types. See L<Moose::Meta::TypeConstraint> for what these all mean.
 (OK, Moose doesn't define C<is_supertype_of>, but you get the idea, right?)
 
+Note that these have a slightly DWIM side to them. If you create two
+L<Type::Tiny::Class> objects which test the same class, they're considered
+equal. And:
+
+   my $subtype_of_Num = Types::Standard::Num->create_child_type;
+   my $subtype_of_Int = Types::Standard::Int->create_child_type;
+   $subtype_of_Int->is_subtype_of( $subtype_of_Num );  # true
+
 =item C<< check($value) >>
 
 Returns true iff the value passes the type constraint.

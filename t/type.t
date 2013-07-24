@@ -116,4 +116,14 @@ is(
 	'inlining stuff can return a list',
 );
 
+use Types::Standard ();
+
+my $subtype_of_Num = Types::Standard::Num->create_child_type;
+my $subtype_of_Int = Types::Standard::Int->create_child_type;
+ok(
+	$subtype_of_Int->is_subtype_of( $subtype_of_Num ),
+	'loose type comparison',
+);
+
+
 done_testing;
