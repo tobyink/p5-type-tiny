@@ -109,6 +109,7 @@ is($external, 42, 'closing over variables really really really works!');
 			push @store, $_[0];
 			$self->SUPER::STORE(@_);
 		}
+		sub my_method { 42 }
 	}
 	
 	tie(my($var), 'MyTie');
@@ -116,11 +117,11 @@ is($external, 42, 'closing over variables really really really works!');
 	$var = 1;
 	
 	my $closure = eval_closure(
-		source       => 'sub { $xxx = $_[0] }',
+		source       => 'sub { $xxx = $_[0]; tied($xxx)->my_method }',
 		environment  => { '$xxx' => \$var },
 	);
 	
-	$closure->(2);
+	is($closure->(2), 42, 'tied()->AUTOLOAD');
 	$closure->(3);
 	
 	is_deeply(

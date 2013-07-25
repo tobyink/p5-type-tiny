@@ -136,10 +136,17 @@ no warnings qw(void once uninitialized numeric);
 		my $class = shift;
 		bless $_[0] => $class;
 	}
+	sub AUTOLOAD {
+		my $self = shift;
+		my ($method) = (our $AUTOLOAD =~ /(\w+)$/);
+		defined tied(@$self) and return tied(@$self)->$method(@_);
+		require Carp;
+		Carp::croak(q[Can't call method "$method" on an undefined value]);
+	}
 	use overload
-		q[bool]  => sub { !!   tied ${$_[0]} },
-		q[""]    => sub { '' . tied ${$_[0]} },
-		q[0+]    => sub { 0  + tied ${$_[0]} },
+		q[bool]  => sub { !!   tied @{$_[0]} },
+		q[""]    => sub { '' . tied @{$_[0]} },
+		q[0+]    => sub { 0  + tied @{$_[0]} },
 		fallback => 1,
 	;
 }
@@ -151,6 +158,13 @@ no warnings qw(void once uninitialized numeric);
 	sub TIEHASH {
 		my $class = shift;
 		bless $_[0] => $class;
+	}
+	sub AUTOLOAD {
+		my $self = shift;
+		my ($method) = (our $AUTOLOAD =~ /(\w+)$/);
+		defined tied(%$self) and return tied(%$self)->$method(@_);
+		require Carp;
+		Carp::croak(q[Can't call method "$method" on an undefined value]);
 	}
 	use overload
 		q[bool]  => sub { !!   tied %{$_[0]} },
@@ -168,10 +182,17 @@ no warnings qw(void once uninitialized numeric);
 		my $class = shift;
 		bless $_[0] => $class;
 	}
+	sub AUTOLOAD {
+		my $self = shift;
+		my ($method) = (our $AUTOLOAD =~ /(\w+)$/);
+		defined tied($$self) and return tied($$self)->$method(@_);
+		require Carp;
+		Carp::croak(q[Can't call method "$method" on an undefined value]);
+	}
 	use overload
-		q[bool]  => sub { !!   tied @{$_[0]} },
-		q[""]    => sub { '' . tied @{$_[0]} },
-		q[0+]    => sub { 0  + tied @{$_[0]} },
+		q[bool]  => sub { !!   tied ${$_[0]} },
+		q[""]    => sub { '' . tied ${$_[0]} },
+		q[0+]    => sub { 0  + tied ${$_[0]} },
 		fallback => 1,
 	;
 }
