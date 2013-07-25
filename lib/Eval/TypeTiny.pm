@@ -125,35 +125,55 @@ sub _make_lexical_assignment
 }
 
 HAS_LEXICAL_VARS or eval <<'FALLBACK';
+no warnings qw(void once uninitialized numeric);
+
 {
 	package #
 		Eval::TypeTiny::_TieArray;
 	require Tie::Array;
-	our @ISA = 'Tie::StdArray';
+	our @ISA = qw( Tie::StdArray );
 	sub TIEARRAY {
 		my $class = shift;
 		bless $_[0] => $class;
 	}
+	use overload
+		q[bool]  => sub { !!   tied ${$_[0]} },
+		q[""]    => sub { '' . tied ${$_[0]} },
+		q[0+]    => sub { 0  + tied ${$_[0]} },
+		fallback => 1,
+	;
 }
 {
 	package #
 		Eval::TypeTiny::_TieHash;
 	require Tie::Hash;
-	our @ISA = 'Tie::StdHash';
+	our @ISA = qw( Tie::StdHash );
 	sub TIEHASH {
 		my $class = shift;
 		bless $_[0] => $class;
 	}
+	use overload
+		q[bool]  => sub { !!   tied %{$_[0]} },
+		q[""]    => sub { '' . tied %{$_[0]} },
+		q[0+]    => sub { 0  + tied %{$_[0]} },
+		fallback => 1,
+	;
 }
 {
 	package #
 		Eval::TypeTiny::_TieScalar;
 	require Tie::Scalar;
-	our @ISA = 'Tie::StdScalar';
+	our @ISA = qw( Tie::StdScalar );
 	sub TIESCALAR {
 		my $class = shift;
 		bless $_[0] => $class;
 	}
+	use overload
+		q[bool]  => sub { !!   tied @{$_[0]} },
+		q[""]    => sub { '' . tied @{$_[0]} },
+		q[0+]    => sub { 0  + tied @{$_[0]} },
+		fallback => 1,
+	;
 }
 FALLBACK
 
