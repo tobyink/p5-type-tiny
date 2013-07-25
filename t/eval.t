@@ -121,13 +121,21 @@ is($external, 42, 'closing over variables really really really works!');
 		environment  => { '$xxx' => \$var },
 	);
 	
-	is($closure->(2), 42, 'tied()->AUTOLOAD');
+	is($closure->(2), 42, 'can close over tied variables ... AUTOLOAD stuff');
 	$closure->(3);
 	
+	my $nother_closure = eval_closure(
+		source       => 'sub { tied($xxx)->can(@_) }',
+		environment  => { '$xxx' => \$var },
+	);
+	
+	ok( $nother_closure->('my_method'), '... can');
+	ok(!$nother_closure->('your_method'), '... !can');
+
 	is_deeply(
 		\@store,
 		[ 1 .. 3],
-		'can close over tied variables'
+		'... tie still works',
 	);
 
 	{
@@ -138,7 +146,7 @@ is($external, 42, 'closing over variables really really really works!');
 	
 	tie($var, 'OtherTie');
 	is($closure->(4), 666, '... can be retied');
-	
+
 	untie($var);
 	my $e = exception { $closure->(5) };
 	like($e, qr{^Can't call method "my_method" on an undefined value}, '... can be untied');
