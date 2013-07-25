@@ -97,6 +97,39 @@ is($external, 42, 'closing over variables really really really works!');
 	is($destroyed, 1, 'closed over variables disappear on cue');
 }
 
+{
+	my @store;
+	
+	{
+		package MyTie;
+		use Tie::Scalar ();
+		our @ISA = 'Tie::StdScalar';
+		sub STORE {
+			my $self = shift;
+			push @store, $_[0];
+			$self->SUPER::STORE(@_);
+		}
+	}
+	
+	tie(my($var), 'MyTie');
+	
+	$var = 1;
+	
+	my $closure = eval_closure(
+		source       => 'sub { $xxx = $_[0] }',
+		environment  => { '$xxx' => \$var },
+	);
+	
+	$closure->(2);
+	$closure->(3);
+	
+	is_deeply(
+		\@store,
+		[ 1 .. 3],
+		'can close over tied variables'
+	);
+}
+
 my $e = exception { eval_closure(source => 'sub { 1 ]') };
 
 isa_ok(
