@@ -188,7 +188,7 @@ function from L<Eval::Closure>:
 
 =head2 Constants
 
-The following constant may be exported, but is not exported by default.
+The following constants may be exported, but are not by default.
 
 =over
 
@@ -196,6 +196,13 @@ The following constant may be exported, but is not exported by default.
 
 Boolean indicating whether Eval::TypeTiny has support for lexical subs.
 (This feature requires Perl 5.18.)
+
+=item C<< HAS_LEXICAL_VARS >>
+
+Don't worry; closing over lexical variables in the closures is always
+supported! However, if this constant is true, it means that
+L<Devel::LexAlias> is available, which makes them slightly faster than
+the fallback solution which uses tied variables.
 
 =back
 

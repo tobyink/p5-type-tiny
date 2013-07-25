@@ -80,7 +80,8 @@ Certain features require additional modules. Tying a variable to a
 type constraint (e.g. C<< tie my $count, Int >>) requires L<Type::Tie>;
 stack traces on exceptions require L<Devel::StackTrace>. The
 L<Reply::Plugin::TypeTiny> plugin for L<Reply> requires L<Reply>
-(obviously).
+(obviously). L<Devel::LexAlias> may I<slightly> increase the speed
+of some of Type::Tiny's compiled coderefs.
 
 The test suite additionally requires L<Test::More>, L<Test::Fatal>
 and L<Test::Requires>. Test::More comes bundled with Perl, but if
