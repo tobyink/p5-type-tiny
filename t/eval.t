@@ -129,6 +129,19 @@ is($external, 42, 'closing over variables really really really works!');
 		[ 1 .. 3],
 		'can close over tied variables'
 	);
+
+	{
+		package OtherTie;
+		our @ISA = 'MyTie';
+		sub my_method { 666 }
+	}
+	
+	tie($var, 'OtherTie');
+	is($closure->(4), 666, '... can be retied');
+	
+	untie($var);
+	my $e = exception { $closure->(5) };
+	like($e, qr{^Can't call method "my_method" on an undefined value}, '... can be untied');
 }
 
 my $e = exception { eval_closure(source => 'sub { 1 ]') };
