@@ -143,6 +143,12 @@ no warnings qw(void once uninitialized numeric);
 		require Carp;
 		Carp::croak(qq[Can't call method "$method" on an undefined value]);
 	}
+	sub can {
+		my $self = shift;
+		my $code = $self->SUPER::can(@_)
+			|| (defined tied(@$self) and tied(@$self)->can(@_));
+		return $code;
+	}
 	use overload
 		q[bool]  => sub { !!   tied @{$_[0]} },
 		q[""]    => sub { '' . tied @{$_[0]} },
@@ -166,6 +172,12 @@ no warnings qw(void once uninitialized numeric);
 		require Carp;
 		Carp::croak(qq[Can't call method "$method" on an undefined value]);
 	}
+	sub can {
+		my $self = shift;
+		my $code = $self->SUPER::can(@_)
+			|| (defined tied(%$self) and tied(%$self)->can(@_));
+		return $code;
+	}
 	use overload
 		q[bool]  => sub { !!   tied %{$_[0]} },
 		q[""]    => sub { '' . tied %{$_[0]} },
@@ -188,6 +200,12 @@ no warnings qw(void once uninitialized numeric);
 		defined tied($$self) and return tied($$self)->$method(@_);
 		require Carp;
 		Carp::croak(qq[Can't call method "$method" on an undefined value]);
+	}
+	sub can {
+		my $self = shift;
+		my $code = $self->SUPER::can(@_)
+			|| (defined tied($$self) and tied($$self)->can(@_));
+		return $code;
 	}
 	use overload
 		q[bool]  => sub { !!   tied ${$_[0]} },
