@@ -141,7 +141,7 @@ no warnings qw(void once uninitialized numeric);
 		my ($method) = (our $AUTOLOAD =~ /(\w+)$/);
 		defined tied(@$self) and return tied(@$self)->$method(@_);
 		require Carp;
-		Carp::croak(q[Can't call method "$method" on an undefined value]);
+		Carp::croak(qq[Can't call method "$method" on an undefined value]);
 	}
 	use overload
 		q[bool]  => sub { !!   tied @{$_[0]} },
@@ -164,7 +164,7 @@ no warnings qw(void once uninitialized numeric);
 		my ($method) = (our $AUTOLOAD =~ /(\w+)$/);
 		defined tied(%$self) and return tied(%$self)->$method(@_);
 		require Carp;
-		Carp::croak(q[Can't call method "$method" on an undefined value]);
+		Carp::croak(qq[Can't call method "$method" on an undefined value]);
 	}
 	use overload
 		q[bool]  => sub { !!   tied %{$_[0]} },
@@ -187,7 +187,7 @@ no warnings qw(void once uninitialized numeric);
 		my ($method) = (our $AUTOLOAD =~ /(\w+)$/);
 		defined tied($$self) and return tied($$self)->$method(@_);
 		require Carp;
-		Carp::croak(q[Can't call method "$method" on an undefined value]);
+		Carp::croak(qq[Can't call method "$method" on an undefined value]);
 	}
 	use overload
 		q[bool]  => sub { !!   tied ${$_[0]} },
