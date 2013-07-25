@@ -83,6 +83,8 @@ Test::More
 # Optional:
 
 Class::InsideOut
+Devel::LexAlias
+Devel::StackTrace
 Function::Parameters
 Moo
 Moose

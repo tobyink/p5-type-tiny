@@ -72,6 +72,31 @@ my $closure2 = eval_closure(
 $closure2->();
 is($external, 42, 'closing over variables really really really works!');
 
+{
+	my $destroyed = 0;
+	
+	{
+		package MyIndicator;
+		sub DESTROY { $destroyed++ }
+	}
+	
+	{
+		my $number = bless \(my $foo), "MyIndicator";
+		$$number = 40;
+		my $closure = eval_closure(
+			source       => 'sub { $$xxx += 2 }',
+			environment  => { '$xxx' => \$number },
+		);
+		
+		$closure->();
+		
+		is($$number, 42);
+		is($destroyed, 0);
+	}
+	
+	is($destroyed, 1, 'closed over variables disappear on cue');
+}
+
 my $e = exception { eval_closure(source => 'sub { 1 ]') };
 
 isa_ok(

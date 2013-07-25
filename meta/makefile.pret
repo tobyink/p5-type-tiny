@@ -7,5 +7,6 @@
 	test_requires     p`Test::More 0.96`;
 	recommends        p`Type::Tie`;
 	recommends        p`Devel::StackTrace`;
+	recommends        p`Devel::LexAlias 0.05`;
 .
 
