@@ -853,3 +853,10 @@
 		item "Type::Tiny is_strictly_a_type_of method."^^Addition;
 	].
 
+`Type-Tiny 0.021_02 cpan:TOBYINK`
+	issued  2013-07-26;
+	changeset [
+		dcs:versus `Type-Tiny 0.021_01 cpan:TOBYINK`;
+		item "Use real lexicals again for Eval::TypeTiny; this requires Devel::LexAlias, but there's a fallback to using tied variables."^^Change;
+	].
+
