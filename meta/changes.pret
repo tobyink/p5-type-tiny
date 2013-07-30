@@ -860,3 +860,11 @@
 		item "Use real lexicals again for Eval::TypeTiny; this requires Devel::LexAlias, but there's a fallback to using tied variables."^^Change;
 	].
 
+`Type-Tiny 0.021_03 cpan:TOBYINK`
+	issued  2013-07-30;
+	changeset [
+		dcs:versus `Type-Tiny 0.021_02 cpan:TOBYINK`;
+		item "Restore Eval::TypeTiny's pre-0.019_01 behaviour re closing over lexicals, but enable the 0.021_02 behaviour if alias=>1 option is passed in."^^Change;
+		item "Improve compatibility between Type::Tiny and Moose attribute native traits."^^Change;
+	].
+
