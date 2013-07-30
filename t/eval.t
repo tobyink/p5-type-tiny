@@ -67,6 +67,7 @@ my $external = 40;
 my $closure2 = eval_closure(
 	source      => 'sub { $xxx += 2 }',
 	environment => { '$xxx' => \$external },
+	alias       => 1,
 );
 
 $closure2->();
@@ -86,6 +87,7 @@ is($external, 42, 'closing over variables really really really works!');
 		my $closure = eval_closure(
 			source       => 'sub { $$xxx += 2 }',
 			environment  => { '$xxx' => \$number },
+			alias        => 1,
 		);
 		
 		$closure->();
@@ -119,6 +121,7 @@ is($external, 42, 'closing over variables really really really works!');
 	my $closure = eval_closure(
 		source       => 'sub { $xxx = $_[0]; tied($xxx)->my_method }',
 		environment  => { '$xxx' => \$var },
+		alias        => 1,
 	);
 	
 	is($closure->(2), 42, 'can close over tied variables ... AUTOLOAD stuff');
@@ -127,6 +130,7 @@ is($external, 42, 'closing over variables really really really works!');
 	my $nother_closure = eval_closure(
 		source       => 'sub { tied($xxx)->can(@_) }',
 		environment  => { '$xxx' => \$var },
+		alias        => 1,
 	);
 	
 	ok( $nother_closure->('my_method'), '... can');

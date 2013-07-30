@@ -3,9 +3,16 @@ package Eval::TypeTiny;
 use strict;
 
 BEGIN {
-	*HAS_LEXICAL_SUBS = ($] >= 5.018)                    ? sub(){!!1} : sub(){!!0};
-	*HAS_LEXICAL_VARS = eval { require Devel::LexAlias } ? sub(){!!1} : sub(){!!0};
+	*HAS_LEXICAL_SUBS = ($] >= 5.018) ? sub(){!!1} : sub(){!!0};
 };
+
+{
+	my $hlv;
+	sub HAS_LEXICAL_VARS () {
+		$hlv = !! eval { require Devel::LexAlias } unless defined $hlv;
+		return $hlv;
+	}
+}
 
 sub _clean_eval
 {
@@ -42,6 +49,7 @@ sub eval_closure
 	my (%args) = @_;
 	my $src    = ref $args{source} eq "ARRAY" ? join("\n", @{$args{source}}) : $args{source};
 	
+	$args{alias}  = 0 unless defined $args{alias};
 	$args{line}   = 1 unless defined $args{line};
 	$args{description} =~ s/[^\w .:-\[\]\(\)\{\}\']//g if defined $args{description};
 	$src = qq{#line $args{line} "$args{description}"\n$src} if defined $args{description} && !($^P & 0x10);
@@ -57,15 +65,18 @@ sub eval_closure
 #		Type::Exception::croak("Expected a variable name and ref; got %s => %s", $k, $args{environment}{$k});
 #	}
 	
+	my $alias     = exists($args{alias}) ? $args{alias} : 0;
 	my @keys      = sort keys %{$args{environment}};
 	my $i         = 0;
 	my $source    = join "\n" => (
 		"package Eval::TypeTiny::Sandbox$sandbox;",
 		"sub {",
-		map(_make_lexical_assignment($_, $i++), @keys),
+		map(_make_lexical_assignment($_, $i++, $alias), @keys),
 		$src,
 		"}",
 	);
+	
+	_manufacture_ties() if $alias && !HAS_LEXICAL_VARS;
 	
 	my ($compiler, $e) = _clean_eval($source);
 	if ($e)
@@ -81,8 +92,7 @@ sub eval_closure
 	
 	my $code = $compiler->(@{$args{environment}}{@keys});
 
-	if (HAS_LEXICAL_VARS)
-	{
+	if ($alias && HAS_LEXICAL_VARS) {
 		Devel::LexAlias::lexalias($code, $_, $args{environment}{$_}) for grep !/^\&/, @keys;
 	}
 	
@@ -92,7 +102,7 @@ sub eval_closure
 my $tmp;
 sub _make_lexical_assignment
 {
-	my ($key, $index) = @_;
+	my ($key, $index, $alias) = @_;
 	my $name = substr($key, 1);
 	
 	if (HAS_LEXICAL_SUBS and $key =~ /^\&/) {
@@ -105,7 +115,11 @@ sub _make_lexical_assignment
 			"my sub $name { goto $tmpname };";
 	}
 	
-	if (HAS_LEXICAL_VARS) {
+	if (!$alias) {
+		my $sigil = substr($key, 0, 1);
+		return "my $key = $sigil\{ \$_[$index] };";
+	}
+	elsif (HAS_LEXICAL_VARS) {
 		return "my $key;";
 	}
 	else {
@@ -124,7 +138,7 @@ sub _make_lexical_assignment
 	}
 }
 
-HAS_LEXICAL_VARS or eval <<'FALLBACK';
+{ my $tie; sub _manufacture_ties { $tie ||= eval <<'FALLBACK'; } }
 no warnings qw(void once uninitialized numeric);
 
 {
@@ -214,6 +228,8 @@ no warnings qw(void once uninitialized numeric);
 		fallback => 1,
 	;
 }
+
+1;
 FALLBACK
 
 1;
@@ -261,7 +277,8 @@ Boolean indicating whether Eval::TypeTiny has support for lexical subs.
 Don't worry; closing over lexical variables in the closures is always
 supported! However, if this constant is true, it means that
 L<Devel::LexAlias> is available, which makes them slightly faster than
-the fallback solution which uses tied variables.
+the fallback solution which uses tied variables. (This only makes any
+difference when the C<< alias => 1 >> option is used.)
 
 =back
 
