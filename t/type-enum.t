@@ -38,7 +38,9 @@ should_pass("baz", FBB);
 
 should_fail("quux", FBB);
 should_fail(" foo", FBB);
-should_fail("foo ", FBB);
+should_fail("foo\n", FBB);
+should_fail("\nfoo", FBB);
+should_fail("\nfoo\n", FBB);
 should_fail("foo|", FBB);
 should_fail("|foo", FBB);
 should_fail(undef, FBB);
