@@ -34,6 +34,8 @@ use Test::More;
 use Test::Requires { Moose => 2.0000 };
 use Test::Fatal;
 
+note "The basics";
+
 {
 	package Local::Class;
 	
@@ -73,6 +75,8 @@ like(
 	qr{^Attribute \(small\) does not pass the type constraint},
 	"violation of great-grandparent type constraint",
 );
+
+note "Introspection, comparisons, conversions...";
 
 require Types::Standard;
 ok(
@@ -188,6 +192,33 @@ is(
 	Scalar::Util::refaddr( $intersect->Types::TypeTiny::to_TypeTiny ),
 	Scalar::Util::refaddr( $intersect->Types::TypeTiny::to_TypeTiny->moose_type->Types::TypeTiny::to_TypeTiny->moose_type->Types::TypeTiny::to_TypeTiny ),
 	'round-tripping between ->moose_type and ->Types::TypeTiny::to_TypeTiny preserves reference address'
+);
+
+note "Native attribute traits";
+
+{
+	package MyCollection;
+	use Moose;
+	use Types::Standard qw( ArrayRef Object );
+	has things => (
+		is      => 'ro',
+		isa     => ArrayRef[ Object ],
+		traits  => [ 'Array' ],
+		handles => { add => 'push' },
+	);
+}
+
+my $coll = MyCollection->new(things => []);
+
+ok(
+	!exception { $coll->add(bless {}, "Monkey") },
+	'pushing ok value',
+);
+
+like(
+	exception { $coll->add({})},
+	qr{^A new member value for things does not pass its type constraint because:},
+	'pushing not ok value',
 );
 
 done_testing;

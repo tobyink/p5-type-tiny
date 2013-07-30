@@ -123,6 +123,12 @@ sub _TypeTinyFromMoose
 		return $t->{"Types::TypeTiny::to_TypeTiny"};
 	}
 	
+	if ($t->name ne '__ANON__') {
+		require Types::Standard;
+		my $ts = 'Types::Standard'->get_type($t->name);
+		return $ts if $ts->{_is_core};
+	}
+	
 	my %opts;
 	$opts{display_name} = $t->name;
 	$opts{constraint}   = $t->constraint;

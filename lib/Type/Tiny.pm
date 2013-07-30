@@ -171,6 +171,15 @@ sub _dd
 	}
 }
 
+sub _loose_to_TypeTiny
+{
+	map +(
+		ref($_)
+			? Types::TypeTiny::to_TypeTiny($_)
+			: do { require Type::Utils; Type::Utils::dwim_type($_) }
+	), @_;
+}
+
 sub name                     { $_[0]{name} }
 sub display_name             { $_[0]{display_name}   ||= $_[0]->_build_display_name }
 sub parent                   { $_[0]{parent} }
@@ -302,7 +311,7 @@ sub _build_compiled_check
 
 sub equals
 {
-	my ($self, $other) = map Types::TypeTiny::to_TypeTiny($_), @_;
+	my ($self, $other) = _loose_to_TypeTiny(@_);
 	return unless blessed($self)  && $self->isa("Type::Tiny");
 	return unless blessed($other) && $other->isa("Type::Tiny");
 	
@@ -324,7 +333,7 @@ sub equals
 
 sub is_subtype_of
 {
-	my ($self, $other) = map Types::TypeTiny::to_TypeTiny($_), @_;
+	my ($self, $other) = _loose_to_TypeTiny(@_);
 	return unless blessed($self)  && $self->isa("Type::Tiny");
 	return unless blessed($other) && $other->isa("Type::Tiny");
 
@@ -339,7 +348,7 @@ sub is_subtype_of
 
 sub is_supertype_of
 {
-	my ($self, $other) = map Types::TypeTiny::to_TypeTiny($_), @_;
+	my ($self, $other) = _loose_to_TypeTiny(@_);
 	return unless blessed($self)  && $self->isa("Type::Tiny");
 	return unless blessed($other) && $other->isa("Type::Tiny");
 	
@@ -348,7 +357,7 @@ sub is_supertype_of
 
 sub is_a_type_of
 {
-	my ($self, $other) = map Types::TypeTiny::to_TypeTiny($_), @_;
+	my ($self, $other) = _loose_to_TypeTiny(@_);
 	return unless blessed($self)  && $self->isa("Type::Tiny");
 	return unless blessed($other) && $other->isa("Type::Tiny");
 	
@@ -357,7 +366,7 @@ sub is_a_type_of
 
 sub strictly_equals
 {
-	my ($self, $other) = map Types::TypeTiny::to_TypeTiny($_), @_;
+	my ($self, $other) = _loose_to_TypeTiny(@_);
 	return unless blessed($self)  && $self->isa("Type::Tiny");
 	return unless blessed($other) && $other->isa("Type::Tiny");
 	$self->{uniq} == $other->{uniq};
@@ -365,7 +374,7 @@ sub strictly_equals
 
 sub is_strictly_subtype_of
 {
-	my ($self, $other) = map Types::TypeTiny::to_TypeTiny($_), @_;
+	my ($self, $other) = _loose_to_TypeTiny(@_);
 	return unless blessed($self)  && $self->isa("Type::Tiny");
 	return unless blessed($other) && $other->isa("Type::Tiny");
 
@@ -380,7 +389,7 @@ sub is_strictly_subtype_of
 
 sub is_strictly_supertype_of
 {
-	my ($self, $other) = map Types::TypeTiny::to_TypeTiny($_), @_;
+	my ($self, $other) = _loose_to_TypeTiny(@_);
 	return unless blessed($self)  && $self->isa("Type::Tiny");
 	return unless blessed($other) && $other->isa("Type::Tiny");
 	
@@ -389,7 +398,7 @@ sub is_strictly_supertype_of
 
 sub is_strictly_a_type_of
 {
-	my ($self, $other) = map Types::TypeTiny::to_TypeTiny($_), @_;
+	my ($self, $other) = _loose_to_TypeTiny(@_);
 	return unless blessed($self)  && $self->isa("Type::Tiny");
 	return unless blessed($other) && $other->isa("Type::Tiny");
 	
@@ -804,9 +813,11 @@ sub isa
 {
 	my $self = shift;
 	
-	if ($INC{"Moose.pm"} and ref($self) and $_[0] eq 'Moose::Meta::TypeConstraint')
+	if ($INC{"Moose.pm"} and ref($self))
 	{
-		return !!1;
+		return !!1                       if $_[0] eq 'Moose::Meta::TypeConstraint';
+		return $self->is_parameterized   if $_[0] eq 'Moose::Meta::TypeConstraint::Parameterized';
+		return $self->is_parameterizable if $_[0] eq 'Moose::Meta::TypeConstraint::Parameterizable';
 	}
 	
 	if ($INC{"Moose.pm"} and ref($self) and $_[0] =~ /^Moose/ and my $r = $self->moose_type->isa(@_))
@@ -825,6 +836,8 @@ sub isa
 sub can
 {
 	my $self = shift;
+	
+	return !!0 if $_[0] eq 'type_parameter' && blessed($_[0]) && $_[0]->has_parameters;
 	
 	my $can = $self->SUPER::can(@_);
 	return $can if $can;
@@ -870,6 +883,7 @@ sub compile_type_constraint    { shift->compiled_check }
 sub _actually_compile_type_constraint   { shift->_build_compiled_check }
 sub hand_optimized_type_constraint      { shift->{hand_optimized_type_constraint} }
 sub has_hand_optimized_type_constraint  { exists(shift->{hand_optimized_type_constraint}) }
+sub type_parameter             { my @p = @{ shift->parameters || [] }; @p==1 ? $p[0] : @p }
 
 # some stuff for Mouse-compatible API
 sub __is_parameterized         { shift->is_parameterized(@_) }
@@ -878,7 +892,6 @@ sub _as_string                 { shift->qualified_name(@_) }
 sub _compiled_type_coercion    { shift->coercion->compiled_coercion(@_) };
 sub _identity                  { refaddr(shift) };
 sub _unite                     { require Type::Tiny::Union; "Type::Tiny::Union"->new(type_constraints => \@_) };
-sub type_parameter             { my @p = @{ shift->parameters || [] }; @p==1 ? $p[0] : @p }
 
 # Hooks for Type::Tie
 sub TIESCALAR  { require Type::Tie; unshift @_, 'Type::Tie::SCALAR'; goto \&Type::Tie::SCALAR::TIESCALAR };
