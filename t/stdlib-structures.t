@@ -94,4 +94,17 @@ should_pass([ [] ], $slurper);
 should_fail([ [], 1.1 => 1, xxx => 2 ], $slurper);
 should_fail([ [], 1.1 => 1, 2.1 => undef ], $slurper);
 
+my $struct5 = Dict[ i => Maybe[Int], b => Bool ];
+should_pass({ i => 42, b => undef }, $struct5);
+should_pass({ i => 42, b => '' }, $struct5);
+should_pass({ i => 42, b => 0 }, $struct5);
+should_pass({ i => 42, b => 1 }, $struct5);
+should_pass({ i => undef, b => 1 }, $struct5);
+should_fail({ b => 42, i => 1 }, $struct5);
+should_fail({ i => 42 }, $struct5);
+should_fail({ b => 1 }, $struct5);
+should_fail({ i => 42, b => 1, a => 1 }, $struct5);
+should_fail({ i => 42, a => 1 }, $struct5);
+should_fail({ a => 42, b => 1 }, $struct5);
+
 done_testing;
