@@ -10,3 +10,7 @@ if ($] < 5.007003) {
 	requires "Scalar::Util"   => "1.13";
 	requires "Text::Balanced" => "1.95";
 }
+
+if ($] < 5.009001) {
+	requires "Exporter"       => "5.57";
+}
