@@ -1,12 +1,26 @@
 # This file provides instructions for packaging.
 
+@prefix deps: <http://ontologi.es/doap-deps#> .
+
 `Type-Tiny`
 	perl_version_from m`Type::Tiny`;
 	version_from      m`Type::Tiny`;
 	readme_from       f`lib/Type/Tiny/Manual.pod`;
-	test_requires     p`Test::More 0.96`;
-	recommends        p`Type::Tie`;
-	recommends        p`Devel::StackTrace`;
-	recommends        p`Devel::LexAlias 0.05`;
+	
+	deps:test-requirement [
+		deps:on "Test::More 0.96"^^deps:CpanId;
+		comment "I don't have the patience to maintain a test suite that runs on ancient versions of Test::More."@en;
+	];
+	deps:runtime-recommends [
+		deps:on "Type::Tie"^^deps:CpanId;
+		comment "Type::Tie is needed if you want to constrain the type of a scalar, array or hash variable."@en;
+	];
+	deps:runtime-recommends [
+		deps:on "Devel::StackTrace"^^deps:CpanId;
+		comment "Type::Exception can use Devel::StackTrace for stack traces."@en;
+	];
+	deps:runtime-recommends [
+		deps:on "Devel::LexAlias 0.05"^^deps:CpanId;
+		comment "Devel::LexAlias is useful for some Eval::TypeTiny features."@en;
+	];
 .
-
