@@ -671,7 +671,7 @@ $meta->add_type({
 		
 		for my $i (0 .. $#constraints)
 		{
-			next if $constraints[$i]->parent == Optional() && $i > $#$value;
+			next if $constraints[$i]->is_strictly_a_type_of( Optional() ) && $i > $#$value;
 			next if $constraints[$i]->check($value->[$i]);
 			
 			return [
@@ -734,8 +734,12 @@ $meta->add_type({
 		return sub
 		{
 			my $value = $_[0];
-			exists ($constraints{$_}) || return for sort keys %$value;
-			$constraints{$_}->check(exists $value->{$_} ? $value->{$_} : ()) || return for sort keys %constraints;
+			exists($constraints{$_}) || return for sort keys %$value;
+			for (sort keys %constraints) {
+				my $c = $constraints{$_};
+				return unless exists($value->{$_}) || $c->is_strictly_a_type_of(Optional());
+				return unless $c->check( exists $value->{$_} ? $value->{$_} : () );
+			}
 			return !!1;
 		};
 	},
@@ -757,11 +761,12 @@ $meta->add_type({
 			join " and ",
 				"ref($h) eq 'HASH'",
 				"not(grep !/^($regexp)\$/, keys \%{$h})",
-				map {
+				( map {
 					my $k = B::perlstring($_);
-					$constraints{$_}->inline_check("$h\->{$k}");
-				}
-				sort keys %constraints;
+					$constraints{$_}->is_strictly_a_type_of( Optional() )
+						? $constraints{$_}->inline_check("$h\->{$k}")
+						: ( "exists($h\->{$k})", $constraints{$_}->inline_check("$h\->{$k}") )
+				} sort keys %constraints ),
 		}
 	},
 	deep_explanation => sub {
