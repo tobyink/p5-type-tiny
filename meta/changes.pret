@@ -868,3 +868,17 @@
 		item "Improve compatibility between Type::Tiny and Moose attribute native traits."^^Change;
 	].
 
+`Type-Tiny 0.021_04 cpan:TOBYINK`
+	issued  2013-07-30;
+	changeset [
+		dcs:versus `Type-Tiny 0.021_03 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix;
+			label "Fix Types::Standard::Dict differentiating between undef and not exists.";
+			dcs:thanks cpan:TIMB;
+			dcs:fixes RT#87443;
+		];
+		item "Fix Type::Parser's handling of numeric parameters; they shouldn't need quoting."^^Bugfix;
+		item "Add dependency on Exporter 5.57 for older versions of Perl."^^Packaging;
+	].
+
