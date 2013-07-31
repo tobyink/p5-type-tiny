@@ -132,4 +132,136 @@ note "Tail retention";
 my ($ast, $remaining) = parse("ArrayRef   [DateTime::]  |HashRef[ Int|\tDateTime::]|CodeRef monkey nuts ");
 is($remaining, " monkey nuts ", "remainder is ok");
 
+note "Parsing edge cases";
+is_deeply(
+	scalar parse('Xyzzy[Foo]'),
+	{
+		'type' => 'parameterized',
+		'base' => {
+			'type' => 'primary',
+			'token' => bless( [
+				'TYPE',
+				'Xyzzy'
+			], 'Type::Parser::Token' ),
+		},
+		'params' => {
+			'type' => 'list',
+			'list' => [
+				{
+					'type' => 'primary',
+					'token' => bless( [
+						'TYPE',
+						'Foo'
+					], 'Type::Parser::Token' ),
+				}
+			],
+		},
+	},
+	'Xyzzy[Foo] - parameter is treated as a type constraint'
+);
+is_deeply(
+	scalar parse('Xyzzy["Foo"]'),
+	{
+		'type' => 'parameterized',
+		'base' => {
+			'type' => 'primary',
+			'token' => bless( [
+				'TYPE',
+				'Xyzzy'
+			], 'Type::Parser::Token' ),
+		},
+		'params' => {
+			'type' => 'list',
+			'list' => [
+				{
+					'type' => 'primary',
+					'token' => bless( [
+						'QUOTELIKE',
+						'"Foo"'
+					], 'Type::Parser::Token' ),
+				}
+			],
+		},
+	},
+	'Xyzzy["Foo"] - parameter is treated as a string'
+);
+is_deeply(
+	scalar parse('Xyzzy[-100]'),
+	{
+		'type' => 'parameterized',
+		'base' => {
+			'type' => 'primary',
+			'token' => bless( [
+				'TYPE',
+				'Xyzzy'
+			], 'Type::Parser::Token' ),
+		},
+		'params' => {
+			'type' => 'list',
+			'list' => [
+				{
+					'type' => 'primary',
+					'token' => bless( [
+						'STRING',
+						'-100'
+					], 'Type::Parser::Token' ),
+				}
+			],
+		},
+	},
+	'Xyzzy[-100] - parameter is treated as a string'
+);
+is_deeply(
+	scalar parse('Xyzzy[200]'),
+	{
+		'type' => 'parameterized',
+		'base' => {
+			'type' => 'primary',
+			'token' => bless( [
+				'TYPE',
+				'Xyzzy'
+			], 'Type::Parser::Token' ),
+		},
+		'params' => {
+			'type' => 'list',
+			'list' => [
+				{
+					'type' => 'primary',
+					'token' => bless( [
+						'STRING',
+						'200'
+					], 'Type::Parser::Token' ),
+				}
+			],
+		},
+	},
+	'Xyzzy[200] - parameter is treated as a string'
+);
+is_deeply(
+	scalar parse('Xyzzy[+20.0]'),
+	{
+		'type' => 'parameterized',
+		'base' => {
+			'type' => 'primary',
+			'token' => bless( [
+				'TYPE',
+				'Xyzzy'
+			], 'Type::Parser::Token' ),
+		},
+		'params' => {
+			'type' => 'list',
+			'list' => [
+				{
+					'type' => 'primary',
+					'token' => bless( [
+						'STRING',
+						'+20.0'
+					], 'Type::Parser::Token' ),
+				}
+			],
+		},
+	},
+	'Xyzzy[+20.0] - parameter is treated as a string'
+);
+
 done_testing;
