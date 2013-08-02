@@ -1,4 +1,9 @@
 package Devel::TypeTiny::Perl56Compat;
+
+use 5.006;
+use strict;
+use warnings;
+
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.021_04';
 
