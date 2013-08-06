@@ -882,3 +882,10 @@
 		item "Add dependency on Exporter 5.57 for older versions of Perl."^^Packaging;
 	].
 
+`Type-Tiny 0.022 cpan:TOBYINK`
+	issued  2013-08-06;
+	changeset [
+		dcs:versus `Type-Tiny 0.021_04 cpan:TOBYINK`;
+		item "In Devel::TypeTiny::Perl56Compat, `use strict` and `use warnings`."^^Change;
+		item "Updated NEWS file."^^Documentation;
+	].
