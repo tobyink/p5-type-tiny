@@ -345,7 +345,7 @@ sub is_subtype_of
 #	}
 #	return;
 
-	return unless $self->has_parent;	
+	return unless $self->has_parent;
 	$self->parent->equals($other) or $self->parent->is_subtype_of($other);
 }
 
@@ -389,7 +389,7 @@ sub is_strictly_subtype_of
 #	}
 #	return;
 
-	return unless $self->has_parent;	
+	return unless $self->has_parent;
 	$self->parent->strictly_equals($other) or $self->parent->is_strictly_subtype_of($other);
 }
 
