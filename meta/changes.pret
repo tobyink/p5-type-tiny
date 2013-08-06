@@ -887,5 +887,6 @@
 	changeset [
 		dcs:versus `Type-Tiny 0.021_04 cpan:TOBYINK`;
 		item "In Devel::TypeTiny::Perl56Compat, `use strict` and `use warnings`."^^Change;
+		item "Improved implementations of is_subtype_of/is_strictly_subtype_of; better for subclassing."^^Change;
 		item "Updated NEWS file."^^Documentation;
 	].
