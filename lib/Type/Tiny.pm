@@ -132,8 +132,8 @@ sub new
 	
 	unless ($params{tmp})
 	{
-		$Moo::HandleMoose::TYPE_MAP{overload::StrVal($self)} = sub { $self }
-			if $self->has_library && !$self->is_anon;
+		$Moo::HandleMoose::TYPE_MAP{overload::StrVal($self)} = sub { $self };
+#			if $self->has_library && !$self->is_anon;
 		
 		$ALL_TYPES{ $self->{uniq} } = $self;
 		weaken($ALL_TYPES{ $self->{uniq} });
