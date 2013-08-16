@@ -890,3 +890,15 @@
 		item "Improved implementations of is_subtype_of/is_strictly_subtype_of; better for subclassing."^^Change;
 		item "Updated NEWS file."^^Documentation;
 	].
+
+`Type-Tiny 0.023_01 cpan:TOBYINK`
+	issued  2013-08-16;
+	changeset [
+		dcs:versus `Type-Tiny 0.022 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix;
+			label "Fix Moo -> Moose type inflation issue.";
+			dcs:thanks cpan:MATTP;
+		];
+	].
+

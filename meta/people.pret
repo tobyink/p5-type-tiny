@@ -42,6 +42,9 @@ cpan:MARKSTOS
 cpan:RIBASUSHI
 	:name "Peter Rabbitson".
 
+cpan:MATTP
+	:name "Matt Phillips".
+
 # We bundle some files made by these dudes...
 
 cpan:RJBS
