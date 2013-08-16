@@ -87,7 +87,7 @@ my $chk3 = compile($RoundedInt->no_coercions);
 
 like(
 	exception { $chk3->(1.1) },
-	qr{^Value "1\.1" did not pass type constraint "__ANON__" \(in \$_\[0\]\)},
+	qr{^Value "1\.1" did not pass type constraint \(in \$_\[0\]\)},
 );
 
 done_testing;
