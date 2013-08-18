@@ -23,4 +23,20 @@
 		deps:on "Devel::LexAlias 0.05"^^deps:CpanId;
 		comment "Devel::LexAlias is useful for some Eval::TypeTiny features."@en;
 	];
+	deps:runtime-suggestion [
+		deps:on "Moose 2.0400"^^deps:CpanId;
+		comment "Type::Tiny works nicely with Moose."@en;
+	];
+	deps:runtime-suggestion [
+		deps:on "Mouse 1.00"^^deps:CpanId;
+		comment "Type::Tiny works nicely with Mouse."@en;
+	];
+	deps:runtime-suggestion [
+		deps:on "Moo 1.000000"^^deps:CpanId;
+		comment "Type::Tiny works nicely with Moo."@en;
+	];
+	deps:runtime-suggestion [
+		deps:on "Reply"^^deps:CpanId;
+		comment "Type::Tiny bundles a plugin for Reply."@en;
+	];
 .
