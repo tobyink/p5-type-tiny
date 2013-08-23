@@ -5,7 +5,9 @@ use strict;
 use warnings;
 
 BEGIN {
+	eval { require re };
 	if ($] < 5.008) { require Devel::TypeTiny::Perl56Compat };
+	if ($] < 5.010) { require Devel::TypeTiny::Perl58Compat };
 }
 
 BEGIN {
@@ -206,8 +208,8 @@ $meta->add_type({
 	name       => "RegexpRef",
 	_is_core   => 1,
 	parent     => $_ref,
-	constraint => sub { ref($_) && Scalar::Util::reftype($_) eq "REGEXP" },
-	inlined    => sub { "ref($_[1]) && Scalar::Util::reftype($_[1]) eq 'REGEXP'" },
+	constraint => sub { ref($_) && !!re::is_regexp($_) },
+	inlined    => sub { "ref($_[1]) && !!re::is_regexp($_[1])" },
 });
 
 $meta->add_type({
