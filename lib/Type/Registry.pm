@@ -81,15 +81,37 @@ sub add_types
 			$lib->import({into => \%hash}, @$types);
 			$hash{$_} = &{$hash{$_}}() for keys %hash;
 		}
-		elsif ($lib->isa("MooseX::Types::Base") or $lib->isa("MouseX::Types::Base"))
+		elsif ($lib->isa("MooseX::Types::Base"))
 		{
 			$types ||= [];
 			ArrayLike->check($types) && (@$types == 0)
-				or _croak("Library '%s', is a non-Type::Library type constraint library. No import options currently supported", $lib);
+				or _croak("Library '%s' is a MooseX::Types type constraint library. No import options currently supported", $lib);
 			
-			%hash = %{ $lib->type_storage };
-			no strict 'refs';
-			$hash{$_} = &{$hash{$_}}() for keys %hash;
+			require Moose::Util::TypeConstraints;
+			my $moosextypes = $lib->type_storage;
+			for my $name (sort keys %$moosextypes)
+			{
+				my $tt = to_TypeTiny(
+					Moose::Util::TypeConstraints::find_type_constraint($moosextypes->{$name})
+				);
+				$hash{$name} = $tt;
+			}
+		}
+		elsif ($lib->isa("MouseX::Types::Base"))
+		{
+			$types ||= [];
+			ArrayLike->check($types) && (@$types == 0)
+				or _croak("Library '%s' is a MouseX::Types type constraint library. No import options currently supported", $lib);
+			
+			require Mouse::Util::TypeConstraints;
+			my $moosextypes = $lib->type_storage;
+			for my $name (sort keys %$moosextypes)
+			{
+				my $tt = to_TypeTiny(
+					Mouse::Util::TypeConstraints::find_type_constraint($moosextypes->{$name})
+				);
+				$hash{$name} = $tt;
+			}
 		}
 		else
 		{
@@ -99,10 +121,8 @@ sub add_types
 		for my $key (sort keys %hash)
 		{
 			exists($self->{$key})
-				and _croak("Duplicate type name: %s", $key);
-			
-			my $type = $hash{$key};
-			$self->{$key} = $type->isa('Type::Tiny') ? $type : to_TypeTiny($type);
+				and _croak("Duplicate type name: %s", $key);			
+			$self->{$key} = $hash{$key};
 		}
 	}
 	$self;
