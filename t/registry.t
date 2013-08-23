@@ -74,6 +74,13 @@ is(
 	'class type',
 );
 
+require Type::Tiny::Enum;
+$r->add_type('Type::Tiny::Enum'->new(values => [qw/Monkey Nuts/]), 'MonkeyNuts');
+my $mn = $r->lookup('MonkeyNuts');
+should_pass('Monkey', $mn);
+should_pass('Nuts', $mn);
+should_fail('Cashews', $mn);
+
 use Type::Utils qw(dwim_type role_type class_type);
 
 is(

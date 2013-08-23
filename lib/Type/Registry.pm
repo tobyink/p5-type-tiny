@@ -12,7 +12,7 @@ BEGIN {
 use Exporter::TypeTiny qw( mkopt _croak );
 use Scalar::Util qw( refaddr );
 use Type::Parser qw( eval_type );
-use Types::TypeTiny qw( ArrayLike );
+use Types::TypeTiny qw( ArrayLike to_TypeTiny );
 
 use base "Exporter::TypeTiny";
 our @EXPORT_OK = qw(t);
@@ -86,6 +86,24 @@ sub add_types
 			$self->{$key} = $hash{$key}->();
 		}
 	}
+	$self;
+}
+
+sub add_type
+{
+	my $self = shift;
+	my ($type, $name) = @_;
+	$type = to_TypeTiny($type);
+	$name ||= do {
+		$type->is_anon
+			and _croak("Expected named type constraint; got anonymous type constraint");
+		$type->name;
+	};
+	
+	exists($self->{$name})
+		and _croak("Duplicate type name: %s", $name);
+	
+	$self->{$name} = $type;
 	$self;
 }
 
@@ -264,6 +282,20 @@ Otherwise, imports all types from the library.
       -TypeTiny => ['HashLike'],
       -Standard => ['HashRef' => { -as => 'RealHash' }],
    );
+
+=item C<< add_type($type, $name) >>
+
+The long-awaited singular form of C<add_types>. Given a type constraint
+object, adds it to the registry with a given name. The name may be
+omitted, in which case C<< $type->name >> is called, and Type::Registry
+will throw an error if C<< $type >> is anonymous. If a name is explicitly
+given, Type::Registry cares not one wit whether the type constraint is
+anonymous.
+
+This method can even add L<MooseX::Types> and L<MouseX::Types> type
+constraints; indeed anything that can be handled by L<Types::TypeTiny>'s
+C<to_TypeTiny> function. (Bear in mind that to_TypeTiny I<always> results
+in an anonymous type constraint, so C<< $name >> will be required.)
 
 =item C<< alias_type($oldname, $newname) >>
 
