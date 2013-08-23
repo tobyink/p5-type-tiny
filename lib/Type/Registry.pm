@@ -121,7 +121,7 @@ sub add_types
 		for my $key (sort keys %hash)
 		{
 			exists($self->{$key})
-				and _croak("Duplicate type name: %s", $key);			
+				and _croak("Duplicate type name: %s", $key);
 			$self->{$key} = $hash{$key};
 		}
 	}
