@@ -923,3 +923,27 @@
 		item "Type::Utils' `extend` function now supports extending MooseX::Types and MouseX::Types libraries."^^Change;
 	].
 
+`Type-Tiny 0.023_03 cpan:TOBYINK`
+	issued  2013-08-23;
+	changeset [
+		dcs:versus `Type-Tiny 0.023_02 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix;
+			label "Constructors for some subclasses of Type::Tiny rejected hashrefs of paramaters.";
+			dcs:thanks cpan:BBYRD;
+			dcs:fixes RT#88064;
+		];
+		item [
+			a dcs:Change;
+			label "Implementation of RegexpRef in Types::Standard is now closer to Moose's implementation (accepts blessed Regexps).";
+		];
+		item [
+			a dcs:Bugfix;
+			label "Stop considering the empty string to be a valid package name.";
+		];
+		item [
+			a dcs:Packaging;
+			label "Include additional test cases stolen from Moose.";
+		];
+	].
+
