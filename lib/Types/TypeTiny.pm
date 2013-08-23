@@ -39,7 +39,7 @@ sub get_type
 
 sub type_names
 {
-	 qw( CodeLike StringLike TypeTiny HashLike ArrayLike );
+	qw( CodeLike StringLike TypeTiny HashLike ArrayLike );
 }
 
 sub StringLike ()
@@ -321,6 +321,8 @@ works, for rough compatibility with a real L<Type::Library> type library.
 =item C<< meta >>
 
 =item C<< get_type($name) >>
+
+=item C<< type_names >>
 
 =back
 
