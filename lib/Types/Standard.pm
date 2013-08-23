@@ -22,7 +22,7 @@ use Types::TypeTiny ();
 
 sub _is_class_loaded {
 	return !!0 if ref $_[0];
-	return !!0 if !defined $_[0];
+	return !!0 if not $_[0];
 	my $stash = do { no strict 'refs'; \%{"$_[0]\::"} };
 	return !!1 if exists $stash->{'ISA'};
 	return !!1 if exists $stash->{'VERSION'};
