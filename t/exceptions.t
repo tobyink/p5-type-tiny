@@ -42,7 +42,7 @@ is(refaddr($e), refaddr($Type::Exception::LastError), '$Type::Exception::LastErr
 
 is(
 	$e->message,
-	q{[] did not pass type constraint},
+	q{Reference [] did not pass type constraint},
 	'$e->message is as expected',
 );
 
@@ -67,7 +67,7 @@ is_deeply(
 		'"Num" is a subtype of "'.$supernum.'"',
 		'"'.$supernum.'" is a subtype of "Str"',
 		'"Str" is a subtype of "Value"',
-		'[] did not pass type constraint "Value"',
+		'Reference [] did not pass type constraint "Value"',
 		'"Value" is defined as: (defined($_) and not ref($_))',
 	],
 	'$e->explain is as expected',
@@ -76,13 +76,13 @@ is_deeply(
 is_deeply(
 	(exception { (ArrayRef[Int])->([1, 2, [3]]) })->explain,
 	[
-		'[1,2,[3]] did not pass type constraint "ArrayRef[Int]"',
+		'Reference [1,2,[3]] did not pass type constraint "ArrayRef[Int]"',
 		'"ArrayRef[Int]" constrains each value in the array with "Int"',
 		'"Int" is a subtype of "Num"',
 		'"Num" is a subtype of "'.$supernum.'"',
 		'"'.$supernum.'" is a subtype of "Str"',
 		'"Str" is a subtype of "Value"',
-		'[3] did not pass type constraint "Value" (in $_->[2])',
+		'Reference [3] did not pass type constraint "Value" (in $_->[2])',
 		'"Value" is defined as: (defined($_) and not ref($_))',
 	],
 	'ArrayRef[Int] deep explanation, given [1, 2, [3]]',
@@ -92,7 +92,7 @@ is_deeply(
 	(exception { (ArrayRef[Int])->({}) })->explain,
 	[
 		'"ArrayRef[Int]" is a subtype of "ArrayRef"',
-		'{} did not pass type constraint "ArrayRef"',
+		'Reference {} did not pass type constraint "ArrayRef"',
 		'"ArrayRef" is defined as: (ref($_) eq \'ARRAY\')',
 	],
 	'ArrayRef[Int] deep explanation, given {}',
@@ -101,7 +101,7 @@ is_deeply(
 is_deeply(
 	(exception { (Ref["ARRAY"])->({}) })->explain,
 	[
-		'{} did not pass type constraint "Ref[ARRAY]"',
+		'Reference {} did not pass type constraint "Ref[ARRAY]"',
 		'"Ref[ARRAY]" constrains reftype($_) to be equal to "ARRAY"',
 		'reftype($_) is "HASH"',
 	],
@@ -111,16 +111,16 @@ is_deeply(
 is_deeply(
 	(exception { (HashRef[Maybe[Int]])->({a => undef, b => 42, c => []}) })->explain,
 	[
-		'{"a" => undef,"b" => 42,"c" => []} did not pass type constraint "HashRef[Maybe[Int]]"',
+		'Reference {"a" => undef,"b" => 42,"c" => []} did not pass type constraint "HashRef[Maybe[Int]]"',
 		'"HashRef[Maybe[Int]]" constrains each value in the hash with "Maybe[Int]"',
-		'[] did not pass type constraint "Maybe[Int]" (in $_->{"c"})',
-		'[] is defined',
+		'Reference [] did not pass type constraint "Maybe[Int]" (in $_->{"c"})',
+		'Reference [] is defined',
 		'"Maybe[Int]" constrains the value with "Int" if it is defined',
 		'"Int" is a subtype of "Num"',
 		'"Num" is a subtype of "'.$supernum.'"',
 		'"'.$supernum.'" is a subtype of "Str"',
 		'"Str" is a subtype of "Value"',
-		'[] did not pass type constraint "Value" (in $_->{"c"})',
+		'Reference [] did not pass type constraint "Value" (in $_->{"c"})',
 		'"Value" is defined as: (defined($_) and not ref($_))',
 	],
 	'HashRef[Maybe[Int]] deep explanation, given {a => undef, b => 42, c => []}',
@@ -131,7 +131,7 @@ my $dict = Dict[a => Int, b => Optional[ArrayRef[Str]]];
 is_deeply(
 	(exception { $dict->({c => 1}) })->explain,
 	[
-		'{"c" => 1} did not pass type constraint "Dict[a=>Int,b=>Optional[ArrayRef[Str]]]"',
+		'Reference {"c" => 1} did not pass type constraint "Dict[a=>Int,b=>Optional[ArrayRef[Str]]]"',
 		'"Dict[a=>Int,b=>Optional[ArrayRef[Str]]]" does not allow key "c" to appear in hash',
 	],
 	'$dict deep explanation, given {c => 1}',
@@ -140,7 +140,7 @@ is_deeply(
 is_deeply(
 	(exception { $dict->({b => 1}) })->explain,
 	[
-		'{"b" => 1} did not pass type constraint "Dict[a=>Int,b=>Optional[ArrayRef[Str]]]"',
+		'Reference {"b" => 1} did not pass type constraint "Dict[a=>Int,b=>Optional[ArrayRef[Str]]]"',
 		'"Dict[a=>Int,b=>Optional[ArrayRef[Str]]]" requires key "a" to appear in hash',
 	],
 	'$dict deep explanation, given {b => 1}',
@@ -149,7 +149,7 @@ is_deeply(
 is_deeply(
 	(exception { $dict->({a => 1, b => 2}) })->explain,
 	[
-		'{"a" => 1,"b" => 2} did not pass type constraint "Dict[a=>Int,b=>Optional[ArrayRef[Str]]]"',
+		'Reference {"a" => 1,"b" => 2} did not pass type constraint "Dict[a=>Int,b=>Optional[ArrayRef[Str]]]"',
 		'"Dict[a=>Int,b=>Optional[ArrayRef[Str]]]" constrains value at key "b" of hash with "Optional[ArrayRef[Str]]"',
 		'Value "2" did not pass type constraint "Optional[ArrayRef[Str]]" (in $_->{"b"})',
 		'$_->{"b"} exists',
@@ -168,7 +168,7 @@ TODO: {
 	is_deeply(
 		(exception { (Map[Int,Num])->({1=>1.1,2.2=>2.3,3.3=>3.4}) })->explain,
 		[
-			'{1 => "1.1","2.2" => "2.3","3.3" => "3.4"} did not pass type constraint "Map[Int,Num]"',
+			'Reference {1 => "1.1","2.2" => "2.3","3.3" => "3.4"} did not pass type constraint "Map[Int,Num]"',
 			'"Map[Int,Num]" constrains each key in the hash with "Int"',
 			'Value "2.2" did not pass type constraint "Int" (in key $_->{"2.2"})',
 			'"Int" is defined as: (defined $_ and $_ =~ /\A-?[0-9]+\z/)',
@@ -208,9 +208,9 @@ TODO: {
 	is_deeply(
 		(exception { $SlurpyThing->([1.1, 2 => "Hello"]) })->explain,
 		[
-			'["1.1",2,"Hello"] did not pass type constraint "Tuple[Num,slurpy Map[Int,ArrayRef]]"',
+			'Reference ["1.1",2,"Hello"] did not pass type constraint "Tuple[Num,slurpy Map[Int,ArrayRef]]"',
 			'Array elements from index 1 are slurped into a hashref which is constrained with "Map[Int,ArrayRef]"',
-			'{2 => "Hello"} did not pass type constraint "Map[Int,ArrayRef]" (in $SLURPY)',
+			'Reference {2 => "Hello"} did not pass type constraint "Map[Int,ArrayRef]" (in $SLURPY)',
 			'"Map[Int,ArrayRef]" constrains each value in the hash with "ArrayRef"',
 			'"ArrayRef" is a subtype of "Ref"',
 			'Value "Hello" did not pass type constraint "Ref" (in $SLURPY->{"2"})',

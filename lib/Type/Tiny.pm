@@ -167,7 +167,10 @@ sub _dd
 		local $Data::Dumper::Terse    = 1;
 		local $Data::Dumper::Sortkeys = 1;
 		local $Data::Dumper::Maxdepth = 2;
-		Data::Dumper::Dumper($value)
+		my $str = Data::Dumper::Dumper($value);
+		$str = substr($str, 0, 60).'...'.substr($str, -1, 1)
+			if length($str) >= 72;
+		"Reference $str";
 	}
 }
 
