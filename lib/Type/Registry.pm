@@ -72,7 +72,7 @@ sub add_types
 		
 		my %hash;
 		
-		if ($lib->isa("Type::Library") || $lib eq 'Types::TypeTiny')
+		if ($lib->isa("Type::Library") or $lib eq 'Types::TypeTiny')
 		{
 			$types ||= [qw/-types/];
 			ArrayLike->check($types)
@@ -81,11 +81,11 @@ sub add_types
 			$lib->import({into => \%hash}, @$types);
 			$hash{$_} = &{$hash{$_}}() for keys %hash;
 		}
-		elsif ($lib->isa("MooseX::Types::Base"))
+		elsif ($lib->isa("MooseX::Types::Base") or $lib->isa("MouseX::Types::Base"))
 		{
 			$types ||= [];
 			ArrayLike->check($types) && (@$types == 0)
-				or _croak("Library '%s', is a Moose type constraint library. No import options currently supported", $lib);
+				or _croak("Library '%s', is a non-Type::Library type constraint library. No import options currently supported", $lib);
 			
 			%hash = %{ $lib->type_storage };
 			no strict 'refs';
