@@ -56,6 +56,7 @@ sub _build_inlined
 
 sub _build_default_message
 {
+	no warnings 'uninitialized';
 	my $self = shift;
 	my $c = $self->class;
 	return sub { sprintf 'value "%s" did not pass type constraint (not isa %s)', $_[0], $c } if $self->is_anon;
