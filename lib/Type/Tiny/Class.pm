@@ -23,7 +23,7 @@ sub new {
 	my $proto = shift;
 	return $proto->class->new(@_) if blessed $proto; # DWIM
 	
-	my %opts = @_;
+	my %opts = (@_==1) ? %{$_[0]} : @_;
 	_croak "Class type constraints cannot have a parent constraint passed to the constructor" if exists $opts{parent};
 	_croak "Class type constraints cannot have a constraint coderef passed to the constructor" if exists $opts{constraint};
 	_croak "Class type constraints cannot have a inlining coderef passed to the constructor" if exists $opts{inlined};
