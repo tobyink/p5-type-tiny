@@ -69,10 +69,10 @@ sub _mkslurpy
 			$i,
 		)
 		: sprintf(
-			'%s = (($#_-%d)%%2)==0 ? "Type::Exception::WrongNumberOfParameters"->throw(message => "Odd number of elements in %s") : +{ @_[%d..$#_] };',
+			'%s = (($#_-%d)%%2)==0 ? "Type::Exception::WrongNumberOfParameters"->throw(message => sprintf("Odd number of elements in %%s", %s)) : +{ @_[%d..$#_] };',
 			$name,
 			$i,
-			$tc,
+			perlstring("$tc"),
 			$i,
 			$i,
 		);
