@@ -12,7 +12,7 @@ BEGIN {
 use Exporter::TypeTiny qw( mkopt _croak );
 use Scalar::Util qw( refaddr );
 use Type::Parser qw( eval_type );
-use Types::TypeTiny qw( ArrayLike to_TypeTiny );
+use Types::TypeTiny qw( CodeLike ArrayLike to_TypeTiny );
 
 use base "Exporter::TypeTiny";
 our @EXPORT_OK = qw(t);
@@ -66,24 +66,44 @@ sub add_types
 	for my $opt (@$opts)
 	{
 		my ($lib, $types) = @_;
-		$types ||= [qw/-types/];
 		
 		$lib =~ s/^-/Types::/;
 		eval "require $lib";
-		$lib->isa("Type::Library") || $lib eq 'Types::TypeTiny'
-			or _croak("%s is not a type library", $lib);
-		
-		ArrayLike->check($types)
-			or _croak("Expected arrayref following '%s'; got %s", $lib, $types);
 		
 		my %hash;
-		$lib->import({into => \%hash}, @$types);
+		
+		if ($lib->isa("Type::Library") || $lib eq 'Types::TypeTiny')
+		{
+			$types ||= [qw/-types/];
+			ArrayLike->check($types)
+				or _croak("Expected arrayref following '%s'; got %s", $lib, $types);
+			
+			$lib->import({into => \%hash}, @$types);
+			$hash{$_} = &{$hash{$_}}() for keys %hash;
+		}
+		elsif ($lib->isa("MooseX::Types::Base"))
+		{
+			$types ||= [];
+			ArrayLike->check($types) && (@$types == 0)
+				or _croak("Library '%s', is a Moose type constraint library. No import options currently supported", $lib);
+			
+			%hash = %{ $lib->type_storage };
+			
+			no strict 'refs';
+			$hash{$_} = &{$hash{$_}}() for keys %hash;
+		}
+		else
+		{
+			_croak("%s is not a type library", $lib);
+		}
 		
 		for my $key (sort keys %hash)
 		{
 			exists($self->{$key})
 				and _croak("Duplicate type name: %s", $key);
-			$self->{$key} = $hash{$key}->();
+			
+			my $type = $hash{$key};
+			$self->{$key} = $type->isa('Type::Tiny') ? $type : to_TypeTiny($type);
 		}
 	}
 	$self;
