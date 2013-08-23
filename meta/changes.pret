@@ -902,3 +902,24 @@
 		];
 	].
 
+`Type-Tiny 0.023_02 cpan:TOBYINK`
+	issued  2013-08-23;
+	changeset [
+		dcs:versus `Type-Tiny 0.023_01 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix;
+			label "Fix quoting in error messages which caused Type::Params to be unable to compile some coderefs.";
+			dcs:thanks cpan:TIMB;
+			dcs:fixes RT#87846;
+		];
+		item [
+			a dcs:Bugfix;
+			label "Improve ugly type assertion failure messages when given structures of nested references.";
+			dcs:thanks cpan:TIMB;
+			dcs:fixes RT#87999;
+		];
+		item "Type::Registry now has an `add_type` method, for adding a single type constraint to a registry."^^Addition;
+		item "Type::Registry's `add_types` method now supports importing MooseX::Types and MouseX::Types libraries."^^Change;
+		item "Type::Utils' `extend` function now supports extending MooseX::Types and MouseX::Types libraries."^^Change;
+	].
+
