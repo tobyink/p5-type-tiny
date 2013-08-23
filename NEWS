@@ -64,7 +64,7 @@
 
  - Support for Perl 5.6.x.
 
-2013-08-06 Type-Tiny version 0.020 released!
+2013-08-06 Type-Tiny version 0.022 released!
 
  - Strict comparison methods in Type::Tiny.
  - Improved compatibility with Moose attribute native traits.
