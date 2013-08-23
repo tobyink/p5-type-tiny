@@ -8,7 +8,7 @@ our $VERSION   = '0.023_01';
 
 use Scalar::Util qw< blessed >;
 
-our @EXPORT_OK = qw( CodeLike StringLike TypeTiny HashLike ArrayLike to_TypeTiny );
+our @EXPORT_OK = ( __PACKAGE__->type_names, qw/to_TypeTiny/ );
 
 my %cache;
 
@@ -35,6 +35,11 @@ sub get_type
 	my $type = $func->();
 	return $type if blessed($type) && $type->isa("Type::Tiny");
 	return;
+}
+
+sub type_names
+{
+	 qw( CodeLike StringLike TypeTiny HashLike ArrayLike );
 }
 
 sub StringLike ()

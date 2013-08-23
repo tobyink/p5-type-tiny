@@ -40,8 +40,41 @@ sub extends
 	
 	foreach my $lib (@_)
 	{
-		eval "require $lib" or _croak "Could not load library '$lib': $@";
-		$caller->add_type($lib->get_type($_)) for $lib->meta->type_names;
+		eval "use $lib; 1" or _croak "Could not load library '$lib': $@";
+		
+		if ($lib->isa("Type::Library") or $lib eq 'Types::TypeTiny')
+		{
+			$caller->add_type( $lib->get_type($_) )
+				for sort $lib->meta->type_names;
+		}
+		elsif ($lib->isa('MooseX::Types::Base'))
+		{
+			require Moose::Util::TypeConstraints;
+			my $types = $lib->type_storage;
+			for my $name (sort keys %$types)
+			{
+				my $tt = Types::TypeTiny::to_TypeTiny(
+					Moose::Util::TypeConstraints::find_type_constraint($types->{$name})
+				);
+				$caller->add_type($tt->create_child_type(library => $caller, name => $name));
+			}
+		}
+		elsif ($lib->isa('MouseX::Types::Base'))
+		{
+			require Mouse::Util::TypeConstraints;
+			my $types = $lib->type_storage;
+			for my $name (sort keys %$types)
+			{
+				my $tt = Types::TypeTiny::to_TypeTiny(
+					Mouse::Util::TypeConstraints::find_type_constraint($types->{$name})
+				);
+				$caller->add_type($tt->create_child_type(library => $caller, name => $name));
+			}
+		}
+		else
+		{
+			_croak("'$lib' is not a type constraint library");
+		}
 	}
 }
 
