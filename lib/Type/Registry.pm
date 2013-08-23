@@ -88,7 +88,6 @@ sub add_types
 				or _croak("Library '%s', is a Moose type constraint library. No import options currently supported", $lib);
 			
 			%hash = %{ $lib->type_storage };
-			
 			no strict 'refs';
 			$hash{$_} = &{$hash{$_}}() for keys %hash;
 		}
@@ -302,6 +301,10 @@ Otherwise, imports all types from the library.
       -TypeTiny => ['HashLike'],
       -Standard => ['HashRef' => { -as => 'RealHash' }],
    );
+
+L<MooseX::Types> (and experimentally, L<MouseX::Types>) libraries can
+also be added this way, but I<< cannot be followed by an arrayref of
+types to import >>.
 
 =item C<< add_type($type, $name) >>
 
