@@ -206,8 +206,8 @@ $meta->add_type({
 	name       => "RegexpRef",
 	_is_core   => 1,
 	parent     => $_ref,
-	constraint => sub { ref $_ eq "Regexp" },
-	inlined    => sub { "ref($_[1]) eq 'Regexp'" },
+	constraint => sub { ref($_) && Scalar::Util::reftype($_) eq "REGEXP" },
+	inlined    => sub { "ref($_[1]) && Scalar::Util::reftype($_[1]) eq 'REGEXP'" },
 });
 
 $meta->add_type({
