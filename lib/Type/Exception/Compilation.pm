@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Exception::Compilation::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Exception::Compilation::VERSION   = '0.023_03';
+	$Type::Exception::Compilation::VERSION   = '0.024';
 }
 
 use base "Type::Exception";
