@@ -107,4 +107,15 @@ should_fail({ i => 42, b => 1, a => 1 }, $struct5);
 should_fail({ i => 42, a => 1 }, $struct5);
 should_fail({ a => 42, b => 1 }, $struct5);
 
+my $anyany = Tuple[Any, Any];
+
+should_pass([1,1], $anyany);
+should_pass([1,undef], $anyany);
+should_pass([undef,undef], $anyany);
+should_pass([undef,1], $anyany);
+should_fail([1], $anyany);
+should_fail([undef], $anyany);
+should_fail([1,1,1], $anyany);
+should_fail([1,1,undef], $anyany);
+
 done_testing;

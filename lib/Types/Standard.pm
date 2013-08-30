@@ -537,7 +537,7 @@ $meta->add_type({
 	},
 });
 
-$meta->add_type({
+my $_Optional = $meta->add_type({
 	name       => "Optional",
 	parent     => $_item,
 	constraint_generator => sub
@@ -619,6 +619,7 @@ $meta->add_type({
 			}
 			for my $i (0 .. $#constraints)
 			{
+				$i <= $#$value or $constraints[$i]->is_strictly_a_type_of($_Optional) or return;
 				$constraints[$i]->check(exists $value->[$i] ? $value->[$i] : ()) or return;
 			}
 			return !!1;
@@ -640,11 +641,14 @@ $meta->add_type({
 			? "do { my \$tmp = +{\@{%s}[%d..\$#{%s}]}; %s }"
 			: "do { my \$tmp = +[\@{%s}[%d..\$#{%s}]]; %s }";
 		
+		my $min = 0 + grep !$_->is_strictly_a_type_of($_Optional), @constraints;
+		
 		return sub
 		{
 			my $v = $_[1];
 			join " and ",
 				"ref($v) eq 'ARRAY'",
+				"scalar(\@{$v}) >= $min",
 				($slurpy
 					? sprintf($tmpl, $v, $#constraints+1, $v, $slurpy->inline_check('$tmp'))
 					: sprintf("\@{$v} <= %d", scalar @constraints)
