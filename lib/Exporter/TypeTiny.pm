@@ -105,12 +105,11 @@ sub _exporter_expand_sub
 	
 	if ($name =~ $permitted)
 	{
-		my $generator = "_generate_$name";
-		return $name => $class->$generator($name, $value, $globals)
-			if $class->can($generator);
+		my $generator = $class->can("_generate_$name");
+		return $name => $class->$generator($name, $value, $globals) if $generator;
 		
-		return $name => \&{"$class\::$name"}
-			if exists &{"$class\::$name"};
+		my $sub = $class->can($name);
+		return $name => $sub if $sub;
 	}
 	
 	$class->_exporter_fail(@_);
