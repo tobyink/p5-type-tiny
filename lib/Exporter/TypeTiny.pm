@@ -63,6 +63,9 @@ sub _exporter_expand_tag
 	my ($name, $value, $globals) = @_;
 	my $tags  = \%{"$class\::EXPORT_TAGS"};
 	
+	return map [$_ => $value], $tags->{$name}->($class, @_)
+		if ref($tags->{$name}) eq q(CODE);
+	
 	return map [$_ => $value], @{$tags->{$name}}
 		if exists $tags->{$name};
 	
