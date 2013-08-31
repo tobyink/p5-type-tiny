@@ -99,9 +99,18 @@ sub _exporter_expand_sub
 	$permitted ||= $class->_exporter_permitted_regexp($globals);
 	
 	no strict qw(refs);
-	exists &{"$class\::$name"} && $name =~ $permitted
-		? ($name => \&{"$class\::$name"})
-		: $class->_exporter_fail(@_);
+	
+	if ($name =~ $permitted)
+	{
+		my $generator = "_generate_$name";
+		return $name => $class->$generator($name, $value, $globals)
+			if $class->can($generator);
+		
+		return $name => \&{"$class\::$name"}
+			if exists &{"$class\::$name"};
+	}
+	
+	$class->_exporter_fail(@_);
 }
 
 # Called by _exporter_expand_sub if it is unable to generate a key-value
