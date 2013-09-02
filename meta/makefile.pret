@@ -3,10 +3,6 @@
 @prefix deps: <http://ontologi.es/doap-deps#> .
 
 `Type-Tiny`
-	perl_version_from m`Type::Tiny`;
-	version_from      m`Type::Tiny`;
-	readme_from       f`lib/Type/Tiny/Manual.pod`;
-	
 	deps:test-requirement [
 		deps:on "Test::More 0.96"^^deps:CpanId;
 		comment "I don't have the patience to maintain a test suite that runs on ancient versions of Test::More."@en;
