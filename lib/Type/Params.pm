@@ -163,7 +163,7 @@ sub compile
 		
 		push @code, sprintf 'push @R, %s;', $varname;
 	}
-
+	
 	if ($min_args == $max_args and not $saw_slurpy)
 	{
 		$code[1] = sprintf(
@@ -263,6 +263,8 @@ __END__
 
 =encoding utf-8
 
+=for stopwords evals
+
 =head1 NAME
 
 Type::Params - Params::Validate-like parameter validation using Type::Tiny type constraints and coercions
@@ -350,6 +352,8 @@ Dude, these functions are documented!
 =item validate
 
 =item Invocant
+
+=item multisig
 
 =end trustme
 
