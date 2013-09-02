@@ -21,11 +21,11 @@ use Type::Exception::Assertion;
 use Type::Exception::WrongNumberOfParameters;
 use Type::Tiny::Union;
 use Types::Standard -types;
-use Types::TypeTiny qw(to_TypeTiny);
+use Types::TypeTiny qw(CodeLike ArrayLike to_TypeTiny);
 
 use base qw< Exporter::TypeTiny >;
 our @EXPORT = qw( compile );
-our @EXPORT_OK = qw( validate Invocant );
+our @EXPORT_OK = qw( multisig validate Invocant );
 
 BEGIN {
 	my $Invocant = 'Type::Tiny::Union'->new(
@@ -198,11 +198,19 @@ sub compile
 	
 	return $source if $options{want_source};
 	
-	return eval_closure(
+	my $closure = eval_closure(
 		source      => $source,
 		description => sprintf("parameter validation for '%s'", [caller(1+($options{caller_level}||0))]->[3] || '__ANON__'),
 		environment => \%env,
 	);
+	
+	return {
+		min_args   => $min_args,
+		max_args   => $saw_slurpy ? $max_args : undef,
+		closure    => $closure,
+	} if $options{want_details};
+	
+	return $closure;
 }
 
 my %compiled;
@@ -212,6 +220,39 @@ sub validate
 	my $sub = $compiled{ join ":", map($_->{uniq}||"\@$_->{slurpy}", @_) } ||= compile({ caller_level => 1 }, @_);
 	@_ = @$arr;
 	goto $sub;
+}
+
+sub multisig
+{
+	my %options = (ref($_[0]) eq "HASH" && !$_[0]{slurpy}) ? %{+shift} : ();
+	my @multi = map {
+		CodeLike->check($_)  ? { closure => $_ } :
+		ArrayLike->check($_) ? compile({ want_details => 1 }, @$_) :
+		$_;
+	} @_;
+	
+	my @code = 'sub { my $r; ';
+	
+	for my $i (0 .. $#multi)
+	{
+		my $sig = $multi[$i];
+		my @cond;
+		push @cond, sprintf('@_ >= %s', $sig->{min_args}) if defined $sig->{min_args};
+		push @cond, sprintf('@_ <= %s', $sig->{max_args}) if defined $sig->{max_args};
+		push @code, sprintf('if (%s){', join('and', @cond)) if @cond;
+		push @code, sprintf('eval { $r = [ $multi[%d]{closure}->(@_) ] };', $i);
+		push @code, 'return(@$r) if $r;';
+		push @code, '}' if @cond;
+	}
+	
+	push @code, '"Type::Exception"->throw(message => "Parameter validation failed");';
+	push @code, '}';
+	
+	eval_closure(
+		source      => \@code,
+		description => sprintf("parameter validation for '%s'", [caller(1+($options{caller_level}||0))]->[3] || '__ANON__'),
+		environment => { '@multi' => \@multi },
+	);
 }
 
 1;
@@ -493,6 +534,34 @@ Or maybe add an extra coercion:
 Note that the coercion is specified as a string of Perl code. This is usually
 the fastest way to do it, but a coderef is also accepted. Either way, the
 value to be coerced is C<< $_ >>.
+
+=head2 Alternatives
+
+Type::Params can export a C<multisig> function that compiles multiple
+alternative signatures into one, and uses the first one that works:
+
+   state $check = multisig(
+      [ Int, ArrayRef ],
+      [ HashRef, Num ],
+      [ CodeRef ],
+   );
+   
+   my ($int, $arrayref) = $check->( 1, [] );
+   my ($hashref, $num)  = $check->( {}, 1.1 );
+   my ($code)           = $check->( sub { 1 } );
+   
+   $check->( sub { 1 }, 1.1 );  # throws an exception
+
+Coercions, slurpy parameters, etc still work.
+
+There's currently no indication of which of the multiple signatures
+succeeded.
+
+The present implementation involves compiling each signature independently,
+and trying them each (in their given order!) in an C<eval> block. The only
+slightly intelligent part is that it checks if C<< scalar(@_) >> fits into
+the signature properly (taking into account optional and slurpy parameters),
+and skips evals which couldn't possibly succeed.
 
 =head1 COMPARISON WITH PARAMS::VALIDATE
 
