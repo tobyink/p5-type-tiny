@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Exception::WrongNumberOfParameters::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Exception::WrongNumberOfParameters::VERSION   = '0.024';
+	$Type::Exception::WrongNumberOfParameters::VERSION   = '0.025_01';
 }
 
 use base "Type::Exception";

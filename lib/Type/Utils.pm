@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Utils::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Utils::VERSION   = '0.024';
+	$Type::Utils::VERSION   = '0.025_01';
 }
 
 sub _croak ($;@) { require Type::Exception; goto \&Type::Exception::croak }

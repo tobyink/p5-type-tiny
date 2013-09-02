@@ -954,3 +954,34 @@
 		item "Updated NEWS file."^^Documentation;
 	].
 
+`Type-Tiny 0.025_01 cpan:TOBYINK`
+	issued  2013-09-02;
+	changeset [
+		dcs:versus `Type-Tiny 0.024 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix;
+			label "The Tuple structured type was treating arrays with missing required elements as if they were present but undef.";
+			dcs:thanks cpan:STEVENL;
+			dcs:fixes RT#88277;
+		];
+		item [
+			a dcs:Change;
+			label "Make Exporter::TypeTiny support generators with less internals-hacking.";
+		];
+		item [
+			a dcs:Documentation;
+			label "Document the internals of Exporter::TypeTiny.";
+		];
+		item [
+			a dcs:Change;
+			label "Exporter::TypeTiny will now use method-style resolution when searching for a sub to export.";
+		];
+		item [
+			a dcs:Packaging;
+			label "use Dist-Inkt";
+		];
+		item [
+			a dcs:Packaging;
+			label "Take advantage of dynamic_config to ask automated testers to test Type::Tiny with Moose present, but only if the Type::Tiny version number includes an underscore.";
+		];
+	].
