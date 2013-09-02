@@ -985,3 +985,19 @@
 			label "Take advantage of dynamic_config to ask automated testers to test Type::Tiny with Moose present, but only if the Type::Tiny version number includes an underscore.";
 		];
 	].
+
+`Type-Tiny 0.025_02 cpan:TOBYINK`
+	issued  2013-09-02;
+	changeset [
+		dcs:versus `Type-Tiny 0.025_01 cpan:TOBYINK`;
+		item [
+			a dcs:Addition;
+			label "Type::Params now provides a multisig() function, allowing you to define multiple function signatures, and attempt to validate @_ against them each in turn.";
+			dcs:thanks cpan:DJERIUS;
+			dcs:fixes RT#88291;
+		];
+		item [
+			a dcs:Packaging;
+			label "functionparameters.t now requires Moo or Moose and is skipped otherwise.";
+		];
+	].
