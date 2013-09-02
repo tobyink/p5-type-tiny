@@ -35,30 +35,6 @@ BEGIN {
 	sub Invocant () { $Invocant };
 };
 
-#sub _exporter_expand_sub
-#{
-#	my $class = shift;
-#	my ($name, $value, $globals, $permitted) = @_;
-#	$permitted ||= $class->_exporter_permitted_regexp($globals);
-#	
-#	my %opts;
-#	if ($name eq 'compile' and keys %opts)
-#	{
-#		return compile => sub { unshift @_, \%opts; goto \&compile };
-#	}
-#	elsif ($name eq 'validate' and keys %opts)
-#	{
-#		my %compiled;
-#		return validate => sub {
-#			my $arr = shift;
-#			($compiled{ join ":", map($_->{uniq}||"\@$_->{slurpy}", @_) } ||= compile({ caller_level => 1, %opts }, @_))
-#				->(@$arr);
-#		};
-#	}
-#
-#	return $class->SUPER::_exporter_expand_sub(@_);
-#}
-
 sub _mkslurpy
 {
 	my ($name, $type, $tc, $i) = @_;
