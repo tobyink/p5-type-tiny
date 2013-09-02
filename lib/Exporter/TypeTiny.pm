@@ -229,13 +229,10 @@ Its internal-facing interface is closer to Exporter.pm, with configuration
 done through the C<< @EXPORT >>, C<< @EXPORT_OK >> and C<< %EXPORT_TAGS >>
 package variables.
 
-Although generators are not an explicit part of the interface,
 Exporter::TypeTiny performs most of its internal duties (including resolution
-of tag names to function names, resolution of function names to coderefs, and
+of tag names to sub names, resolution of sub names to coderefs, and
 installation of coderefs into the target package) as method calls, which
-means they can be overridden to provide interesting behaviour, including an
-equivalent to Sub::Exporter's generators. (Type::Library does this.) These
-methods are not currently documented, and are still subject to change.
+means they can be overridden to provide interesting behaviour.
 
 =head2 Utility Functions
 
@@ -255,7 +252,7 @@ Similar to C<mkopt_hash> from L<Data::OptList>. See also C<mkopt>.
 
 =back
 
-=head1 TIPS AND TRICKS
+=head1 TIPS AND TRICKS IMPORTING FROM EXPORTER::TYPETINY
 
 For the purposes of this discussion we'll assume we have a module called
 C<< MyUtils >> which exports one function, C<< frobnicate >>. C<< MyUtils >>
@@ -322,6 +319,139 @@ OK, Sub::Exporter doesn't do this...
    
    $funcs{frobnicate}->(...);
 
+=head1 TIPS AND TRICKS EXPORTING USING EXPORTER::TYPETINY
+
+Simple configuration works the same as L<Exporter>; inherit from this module,
+and use the C<< @EXPORT >>, C<< @EXPORT_OK >> and C<< %EXPORT_TAGS >>
+package variables to list subs to export.
+
+=head2 Generators
+
+Exporter::TypeTiny has always allowed exported subs to be generated (like
+L<Sub::Exporter>), but until version 0.025 did not have an especially nice
+API for it.
+
+Now, it's easy. If you want to generate a sub C<foo> to export, list it in
+C<< @EXPORT >> or C<< @EXPORT_OK >> as usual, and then simply give your
+exporter module a class method called C<< _generate_foo >>.
+
+   push @EXPORT_OK, 'foo';
+   
+   sub _generate_foo {
+      my $class = shift;
+      my ($name, $args, $globals) = @_;
+      
+      return sub {
+         ...;
+      }
+   }
+
+You can also generate tags:
+
+   my %constants = (FOO => 1, BAR => 2);
+   use constant \%constants;
+   
+   $EXPORT_TAGS{constants} = sub {
+      my $class = shift;
+      my ($name, $args, $globals) = @_;
+      
+      return keys(%constants);
+   };
+
+=head2 Overriding Internals
+
+An important difference between L<Exporter> and Exporter::TypeTiny is that
+the latter calls all its internal functions as I<< class methods >>. This
+means that you subclass can I<< override them >> to alter their behaviour.
+
+The following methods are available to be overridden. Despite being named
+with a leading underscore, they are considered public methods. (The underscore
+is there to avoid accidentally colliding with any of your own function names.)
+
+=over
+
+=item C<< _exporter_validate_opts($globals) >>
+
+This method is called once each time C<import> is called. It is passed a
+reference to the global options hash. (That is, the optional leading hashref
+in the C<use> statement, where the C<into> and C<installer> options can be
+provided.)
+
+You may use this method to munge the global options, or validate them,
+throwing an exception or printing a warning.
+
+The default implementation does nothing interesting.
+
+=item C<< _exporter_expand_tag($name, $args, $globals) >>
+
+This method is called to expand an import tag (e.g. C<< ":constants" >>).
+It is passed the tag name (minus the leading ":"), an optional hashref
+of options (like C<< { -prefix => "foo_" } >>), and the global options
+hashref.
+
+It is expected to return a list of ($name, $args) arrayref pairs. These
+names can be sub names to export, or further tag names (which must have
+their ":"). If returning tag names, be careful to avoid creating a tag
+expansion loop!
+
+The default implementation uses C<< %EXPORT_TAGS >> to expand tags, and
+provides fallbacks for the C<< :default >> and C<< :all >> tags.
+
+=item C<< _exporter_expand_sub($name, $args, $globals) >>
+
+This method is called to translate a sub name to a hash of name => coderef
+pairs for exporting to the caller. In general, this would just be a hash with
+one key and one value, but, for example, Type::Library overrides this method
+so that C<< "+Foo" >> gets expanded to:
+
+   (
+      Foo         => sub { $type },
+      is_Foo      => sub { $type->check(@_) },
+      to_Foo      => sub { $type->assert_coerce(@_) },
+      assert_Foo  => sub { $type->assert_return(@_) },
+   )
+
+The default implementation checks that the name is allowed to be exported
+(using the C<_exporter_permitted_regexp> method), gets the coderef using
+the generator if there is one (or by calling C<< can >> on your exporter
+otherwise) and calls C<_exporter_fail> if it's unable to generate or
+retrieve a coderef.
+
+=item C<< _exporter_permitted_regexp($globals) >>
+
+This method is called to retrieve a regexp for validating the names of
+exportable subs. If a sub doesn't match the regexp, then the default
+implementation of C<_exporter_expand_sub> will refuse to export it. (Of
+course, you may override the default C<_exporter_expand_sub>.)
+
+The default implementation of this method assembles the regexp from
+C<< @EXPORT >> and C<< @EXPORT_OK >>.
+
+=item C<< _exporter_fail($name, $args, $globals) >>
+
+Called by C<_exporter_expand_sub> if it can't find a coderef to export.
+
+The default implementation just throws an exception. But you could emit
+a warning instead, or just ignore the failed export.
+
+If you don't throw an exception then you should be aware that this
+method is called in list context, and any list it returns will be treated
+as an C<_exporter_expand_sub>-style hash of names and coderefs for
+export.
+
+=item C<< _exporter_install_sub($name, $args, $globals, $coderef) >>
+
+This method actually installs the exported sub into its new destination.
+Its return value is ignored.
+
+The default implementation handles sub renaming (i.e. the C<< -as >>,
+C<< -prefix >> and C<< -suffix >> functions. This method does a lot of
+stuff; if you need to override it, it's probably a good idea to just
+pre-process the arguments and then call the super method rather than
+trying to handle all of it yourself.
+
+=back
+
 =head1 HISTORY
 
 B<< Why >> bundle an exporter with Type-Tiny?
@@ -387,7 +517,7 @@ B<< Features: >>
  Can be passed an "into" parameter...         Yes     Yes     Maybe    
  Can be passed an "installer" sub....         Yes     Yes     Maybe    
  Supports generators.................         Yes     Yes              
- Sane API for generators.............                 Yes              
+ Sane API for generators.............         Yes     Yes              
 
 (Certain Sub::Exporter::Progressive features are only available if
 Sub::Exporter is installed.)
