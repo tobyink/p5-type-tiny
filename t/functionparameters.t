@@ -8,7 +8,8 @@ Check type constraints work with L<Function::Parameters>.
 
 =head1 DEPENDENCIES
 
-Test is skipped if Function::Parameters 1.0103 is not available.
+Requires Function::Parameters 1.0103, and either Moo 1.000000
+or Moose 2.0000; skipped otherwise.
 
 =head1 AUTHOR
 
@@ -30,6 +31,12 @@ use lib qw( ./lib ./t/lib ../inc ./inc );
 use Test::More;
 use Test::Requires { "Function::Parameters" => "1.0103" };
 use Test::Fatal;
+
+BEGIN {
+	eval 'use Moo 1.000000; 1'
+	or eval 'use Moose 2.0000; 1'
+	or plan skip_all => "this test requires Moo 1.000000 or Moose 2.0000";
+};
 
 use Types::Standard -types;
 use Function::Parameters qw(:strict);
