@@ -11,8 +11,8 @@
 		item "Beginnings of Type::Tiny::Manual."^^Documentation;
 		item "Anchor enum regexps to beginning and end of string."^^Bugfix;
 		item "StrMatch added to Type::Standard."^^Addition;
-		item "use Type::Library -base"^^Addition;
-		item "use Type::Library -declare"^^Addition;
+		item "use Type::Library -base"^^Change;
+		item "use Type::Library -declare"^^Change;
 	].
 
 `Type-Tiny 0.000_03 cpan:TOBYINK`
@@ -21,9 +21,9 @@
 		dcs:versus `Type-Tiny 0.000_02 cpan:TOBYINK`;
 		item "Document Type::Coercion's overloading."^^Documentation;
 		item "Create and use compiled type constraint checks; much faster!"^^Change;
-		item "Inlined type constraints for all of Type::Standard."^^Addition;
-		item "Test cases for ScalarRef[`a]."^^Addition;
-		item "Fix the crashing t/moo-inflation.t test case."^^Bugfix;
+		item "All of Type::Standard cannow be inlined."^^Change;
+		item "Add test cases for ScalarRef[`a]."^^Tests;
+		item [ label "Fix the crashing t/moo-inflation.t test case."; a dcs:Tests, dcs:Bugfix ];
 		item "Use more unique stringification for %Moo::HandleMoose::TYPE_MAP keys."^^Change;
 		item "Make sure Type::Standard's Moose-like built-ins get inflated to real Moose built-in types."^^Change;
 	].
@@ -43,12 +43,12 @@
 	issued  2013-04-04;
 	changeset [
 		dcs:versus `Type-Tiny 0.000_04 cpan:TOBYINK`;
-		item "Factor out some functions from test suite into a new module: Test::TypeTiny."^^Addition;
-		item "Rearrange test suite slightly."^^Packaging;
-		item "Rename Type::Standard module to Types::Standard."^^Change;
+		item "Factor out some functions from test suite into a new module: Test::TypeTiny."^^Tests;
+		item "Rearrange test suite slightly."^^Tests;
+		item "Rename Type::Standard module to Types::Standard."^^BackCompat;
 		item "Types::TypeTiny bootstrapping library now takes care of vaious internal type checking requirements."^^Change;
 		item "Sanity checks for type constraint names."^^Change;
-		item "Fix is_parameterized."^^Bugfix;
+		item "Fix is_parameterized method."^^Bugfix;
 		item "Allow null type constraints with no parent type (e.g. 'Any' in Types::Standard) to be inlined."^^Change;
 		item "Don't die with full stack trace."^^Change;
 		item "Get Mouse coercions working."^^Bugfix;
@@ -58,14 +58,14 @@
 	issued  2013-04-05;
 	changeset [
 		dcs:versus `Type-Tiny 0.000_05 cpan:TOBYINK`;
-		item "Monkey patch Moose::Meta::TypeConstraint to be able to retrieve Type::Tiny constraints from inflated Moose constraints."^^Addition;
-		item "More test cases."^^Packaging;
+		item "Monkey patch Moose::Meta::TypeConstraint to be able to retrieve Type::Tiny constraints from inflated Moose constraints."^^Change;
+		item "More test cases."^^Tests;
 		item "Improved documentation of parameterization attributes."^^Documentation;
 		item "Footprint reduction: Type::Tiny, Type::Library and Type::Coerce no longer automatically load Types::Standard and Type::Utils."^^Change;
 		item "Footprint reduction: Type::Tiny and Type::Coercion no longer use if.pm."^^Change;
 		item "Footprint reduction: Type::Tiny no longer triggers Perl to load its Unicode tables (unless you create a type constraint with a non-ASCII type name)."^^Change;
 		item [
-			a dcs:Addition;
+			a dcs:Change;
 			label "In Moo, type assertions and coercions are now inlined.";
 			dcs:thanks cpan:MSTROUT;
 		];
@@ -78,11 +78,11 @@
 	issued  2013-04-06;
 	changeset [
 		dcs:versus `Type-Tiny 0.000_06 cpan:TOBYINK`;
-		item "More test cases."^^Packaging;
+		item "More test cases."^^Tests;
 		item "Document constructor for Type::Tiny::Class."^^Documentation;
 		item "Fix inlining for Type::Tiny::Intersection."^^Bugfix;
 		item "Types within libraries, if accessed directly rather than exported, did not accept parameters."^^Bugfix;
-		item "Type::Coercion::Union - automatically handles coercion to union types."^^Addition;
+		item "New module Type::Coercion::Union automatically handles coercion to union types."^^Addition;
 		item "Fix inlining of certain conditionals into coercion code."^^Bugfix;
 	].
 
@@ -92,16 +92,16 @@
 		dcs:versus `Type-Tiny 0.000_07 cpan:TOBYINK`;
 		item "Rewrite most of the functions exported by Type::Library-based type libraries to cope better with being used mid-list."^^Change;
 		item "Most parts of the API that accept Type::Tiny objects (e.g. Type::Utils::from()) now also accept Moose::Meta::TypeConstraint objects."^^Change;
-		item "Types::TypeTiny::to_TypeTiny can be used to coerce a Moose type constraint object to Type::Tiny."^^Addition;
+		item "Types::TypeTiny::to_TypeTiny can be used to coerce a Moose type constraint object to Type::Tiny."^^Change;
 	].
 
 `Type-Tiny 0.000_09 cpan:TOBYINK`
 	issued  2013-04-08;
 	changeset [
 		dcs:versus `Type-Tiny 0.000_08 cpan:TOBYINK`;
-		item "Bundle benchmarking scripts."^^Addition;
+		item "Bundle benchmarking scripts."^^Documentation;
 		item "Tidy up the 'examples' directory."^^Packaging;
-		item "When generating Moose/Mouse constraints from Type::Tiny objects, prefer to generate anonymous ones."^^Packaging;
+		item "When generating Moose/Mouse constraints from Type::Tiny objects, prefer to generate anonymous ones."^^Change;
 		item "Fill in the Usage with Moose section of the fine manual."^^Documentation;
 	].
 
@@ -110,7 +110,7 @@
 	changeset [
 		dcs:versus `Type-Tiny 0.000_09 cpan:TOBYINK`;
 		item "Improvements to has_coercion_for_{type,value} from Type::Coercion."^^Change;
-		item "Fix incorrect Test::Requires line in 'mouse-coercion.t'."^^Bugfix;
+		item [ label "Fix incorrect Test::Requires line in 'mouse-coercion.t'."; a dcs:Bugfix, dcs:Tests ];
 	].
 
 `Type-Tiny 0.000_11 cpan:TOBYINK`
@@ -136,7 +136,7 @@
 		item "Minor improvements."^^Documentation;
 		item "Some inline code assumed that it would be compiled in a package that had 'blessed' imported."^^Bugfix;
 		item "Some inline code wasn't wrapped in parentheses."^^Bugfix;
-		item "More test cases for Optional[`a] within Dict[`a]."^^Addition;
+		item "More test cases for Optional[`a] within Dict[`a]."^^Tests;
 		item "Weaken the reference from a Moose::Meta::TypeConstraint object to its Type::Tiny origin."^^Change;
 		item "Parameterized type constraints in Types::Standard now do some sanity checking on their arguments."^^Change;
 		item "Improve test names generated by Test::TypeTiny; allow test scripts to provide test names."^^Change;
@@ -165,10 +165,10 @@
 		dcs:versus `Type-Tiny 0.001 cpan:TOBYINK`;
 		item "Link from Test::TypeTiny to Test::Deep::Type."^^Documentation;
 		item "Allow a Type::Tiny object to \"freeze\" its coercions. This prevents a Type::Tiny object from becoming out of sync with its equivalent Mouse or Moose constraint objects."^^Change;
-		item "Type::Library packages can now include \"standalone\" Type::Coercion objects, not attached to a type constraint. These can be exported on request."^^Addition;
-		item "Overload \"+\" operator for Type::Coercion and Type::Tiny allows coercions to be added to each other, and added to type constraints."^^Addition;
-		item "Build coercions automatically for certain type parameterized constraints. Say there's a Num->Int coercion defined; then we should be able to coerce ArrayRef[Num]->ArrayRef[Int]."^^Addition;
-		item "Allow subtypes to inherit coercions from their parent type constraint. (They do not by default.)"^^Addition;
+		item "Type::Library packages can now include \"standalone\" Type::Coercion objects, not attached to a type constraint. These can be exported on request."^^Change;
+		item "Overload \"+\" operator for Type::Coercion and Type::Tiny allows coercions to be added to each other, and added to type constraints."^^Change;
+		item "Build coercions automatically for certain type parameterized constraints. Say there's a Num->Int coercion defined; then we should be able to coerce ArrayRef[Num]->ArrayRef[Int]."^^Change;
+		item "Allow subtypes to inherit coercions from their parent type constraint. (They do not by default.)"^^Change;
 	].
 
 `Type-Tiny 0.003_02 cpan:TOBYINK`
@@ -200,11 +200,11 @@
 	changeset [
 		dcs:versus `Type-Tiny 0.003_04 cpan:TOBYINK`;
 		item "Chars and Bytes types added to Types::Standard."^^Addition;
-		item "Allow coercions to accept parameters."^^Addition;
+		item "Allow coercions to accept parameters."^^Change;
 		item "Encode, Decode, Join and Split coercions added to Types::Standard."^^Addition;
 		item "Prevent warnings (about 'my $val' masking a previously declared variable) when several Str checks are being inlined in close proximity, such as Tuple[Str,Str]"^^Bugfix;
 		item "Type::Tiny::Class now has a plus_constructors method."^^Addition;
-		item "Type::Tiny::Manual::Coercions."^^Documentation;
+		item "Create a new manual page Type::Tiny::Manual::Coercions."^^Documentation;
 		item "Document Exporter::TypeTiny."^^Documentation;
 	].
 
@@ -217,7 +217,7 @@
 		item "Document deep coercions (feature added in 0.003_01)."^^Documentation;
 		item "Add a bunch of stub methods to Type::Tiny and Type::Coercion in order to make it less necessary to inflate to Moose/Mouse meta objects."^^Change;
 		item "Various minor changes to Exporter::TypeTiny to make it more Sub::Exporter compatible."^^Change;
-		item "Types::TypeTiny::to_TypeTiny can now coerce from a Mouse::Meta::TypeConstraint."^^Addition;
+		item "Types::TypeTiny::to_TypeTiny can now coerce from a Mouse::Meta::TypeConstraint."^^Change;
 	].
 
 `Type-Tiny 0.003_07 cpan:TOBYINK`
@@ -240,7 +240,7 @@
 		dcs:versus `Type-Tiny 0.003_07 cpan:TOBYINK`;
 		item "ASCII-only strings are now accepted by the Chars constraint in Types::Standard."^^Change;
 		item "More Exporter::TypeTiny docs, including usage with Sub::Exporter::Lexical."^^Documentation;
-		item "Test case using Exporter::TypeTiny with Sub::Exporter::Lexical."^^Addition;
+		item "Add test case using Exporter::TypeTiny with Sub::Exporter::Lexical."^^Tests;
 		item "Type::Tiny, Type::Coercion and their subclasses no longer call Types::TypeTiny->import method."^^Change;
 		item "Types::TypeTiny lazily loads Exporter::TypeTiny - i.e. it loads Exporter::TypeTiny when Types::TypeTiny->import is first called."^^Change;
 	].
@@ -263,7 +263,8 @@
 		item "Bump version of Test::More dependency fom 0.88 to 0.96."^^Packaging;
 		item "General code tidy-up."^^Change;
 		item "Type::Tiny::SUPPORT_SMARTMATCH constant."^^Addition;
-		item "Much of the stringy eval stuff has been factored out to a new module: Eval::TypeTiny."^^Addition;
+		item "New module, Eval::TypeTiny"^^Addition;
+		item "Much of the stringy eval stuff has been factored out into Eval::TypeTiny."^^Change;
 		item "Bundle Type::Params, which had previously appeared on CPAN in a separate developer release."^^Addition;
 	].
 
@@ -281,7 +282,7 @@
 			seealso <http://play-perl.org/quest/51682ae05efa74c95c00001e>;
 			dcs:thanks cpan:MMCLERIC;
 		];
-		item "Test cases for Eval::TypeTiny."^^Addition;
+		item "Test cases for Eval::TypeTiny."^^Tests;
 	].
 
 `Type-Tiny 0.003_12 cpan:TOBYINK`
@@ -306,10 +307,11 @@
 			label "Fix typo in Type::Params documentation.";
 			seealso <https://bitbucket.org/tobyink/p5-type-tiny/pull-request/1/fix-typo-in-docs/diff>;
 			dcs:blame cpan:DJERIUS;
+			a dcs:Documentation;
 		];
 		item "Don't crash in old versions of Moose that have no Class::MOP::_definition_context() function."^^Bugfix;
 		item "Better documentation and tests of Moose/Mouse-compatible API."^^Change;
-		item "BAIL_OUT in test suite if 00-compile.t or 01-api.t fail."^^Change;
+		item "BAIL_OUT in test suite if 00-compile.t or 01-api.t fail."^^Tests;
 	].
 
 `Type-Tiny 0.003_14 cpan:TOBYINK`
@@ -320,7 +322,7 @@
 	issued  2013-05-03;
 	changeset [
 		dcs:versus `Type-Tiny 0.003_13 cpan:TOBYINK`; # !!!
-		item "Improvements to to_TypeTiny function, including accepting Validation::Class::Simple objects."^^Addition;
+		item "Improvements to to_TypeTiny function, including accepting Validation::Class::Simple objects."^^Change;
 	].
 
 `Type-Tiny 0.003_16 cpan:TOBYINK`
@@ -381,7 +383,7 @@
 	changeset [
 		dcs:versus `Type-Tiny 0.005_03 cpan:TOBYINK`;
 		item "All error conditions now throw exception objects instead of string error messages."^^Change;
-		item "Deep explanations for Types::Standard::{Map,Maybe,Ref,Dict,Tuple} type constraint assertion failures."^^Addition;
+		item "Deep explanations for Types::Standard::{Map,Maybe,Ref,Dict,Tuple} type constraint assertion failures."^^Change;
 		item "Test::TypeTiny performs more thorough testing if EXTENDED_TESTING environment variable is set."^^Change;
 		item "Fixed bug in non-inlined code for Types::Standard::MkOpt."^^Bugfix;
 		item "Improved deep explanations for Types::Standard::{ArrayRef,HashRef,ScalarRef}."^^Change;
@@ -395,7 +397,7 @@
 	changeset [
 		dcs:versus `Type-Tiny 0.005_04 cpan:TOBYINK`;
 		item "Fix warnings under Perl 5.18."^^Change;
-		item "Suggest newer version of Validation::Class."^^Update;
+		item "Suggest newer version of Validation::Class."^^Documentation;
 		item "Type::Tiny now has an assert_return method, which is used in most places in preference to assert_valid."^^Addition;
 		item "Removed Type::Registry from the release; it will return at a later date."^^Removal;
 	].
@@ -412,7 +414,7 @@
 	issued  2013-05-28;
 	changeset [
 		dcs:versus `Type-Tiny 0.005_06 cpan:TOBYINK`;
-		item "Add pure-Perl Mouse to examples/benchmark-constraints.pl."^^Addition;
+		item "Add pure-Perl Mouse to examples/benchmark-constraints.pl."^^Documentation;
 		item "Assertions using the assert_return pattern were triggering FATAL warnings when inlined with Sub::Quote. Inlined assertions are now prefixed with 'no warnings \"void\";'."^^Bugfix;
 	].
 
@@ -420,15 +422,16 @@
 	issued  2013-05-28;
 	changeset [
 		dcs:versus `Type-Tiny 0.005_07 cpan:TOBYINK`;
-		item "Use JSON::PP instead of JSON in test cases, because JSON::PP is a core module since Perl 5.14."^^Update;
-		item "Rearrange test cases; add 00-begin.t."^^Packaging;
+		item "Use JSON::PP instead of JSON in test cases, because JSON::PP is a core module since Perl 5.14."^^Tests;
+		item "Rearrange test cases"^^Tests;
+		item "Add 00-begin.t."^^Tests;
 	].
 
 `Type-Tiny 0.006 cpan:TOBYINK`
 	issued  2013-05-28;
 	changeset [
 		dcs:versus `Type-Tiny 0.005_08 cpan:TOBYINK`;
-		item "Exporter::TypeTiny::mkopt_hash now works."^^Packaging;
+		item "Exporter::TypeTiny::mkopt_hash now works."^^Bugfix;
 	].
 
 `Type-Tiny 0.007_01 cpan:TOBYINK`
@@ -439,7 +442,8 @@
 		item "Fix $VERSION defined in Type::Library."^^Bugfix;
 		item "Re-introduce Type::Registry, with improved parsing thanks to Type::Parser."^^Change;
 		item "Type::Parser."^^Addition;
-		item "Types::Standard now has LaxNum/StrictNum type constraints, and Num selects between them."^^Addition;
+		item "Types::Standard now has LaxNum/StrictNum type constraints."^^Addition;
+		item "Types::Standard's Num constraint is now a subtype of either LaxNum and StrictNum (depending on environment)."^^BackCompat;
 		item "Implemented Types::TypeTiny->meta->get_type."^^Change;
 		item "Generate README from Type::Tiny::Manual instead of Type::Tiny."^^Packaging;
 	].
@@ -451,7 +455,7 @@
 		item "Drop use of Carp in Type::Parser."^^Change;
 		item "Improvements to Type::Tiny::Manual."^^Documentation;
 		item "Improvements to Type::Tiny::Manual::Params, including rewritten manual processing section, and processing type constraints in function signatures via Function::Parameters/Attribute::Constract."^^Documentation;
-		item "Test cases for usage with Function::Parameters."^^Packaging;
+		item "Test cases for usage with Function::Parameters."^^Tests;
 		item "Allow constraint_generators (for parameterizable type constraints) to return full Type::Tiny objects instead of plain coderefs."^^Change;
 		item "Type::Tiny::Duck types now have a parent type constraint of Types::Standard::Object."^^Change;
 		item "Type::Tiny::Role types now have a parent type constraint of Types::Standard::Object."^^Change;
@@ -505,7 +509,7 @@
 		item "Vastly improved documentation for Type::Utils."^^Documentation;
 		item "Vastly improved documentation for Types::Standard."^^Documentation;
 		item "Mention Scalar::Does and Type::Tie in manual."^^Documentation;
-		item "Test cases for InstanceOf, ConsumerOf, HasMethods and Enum types defined by Types::Standard."^^Addition;
+		item "Added test cases for InstanceOf, ConsumerOf, HasMethods and Enum types defined by Types::Standard."^^Tests;
 		item "Support '0' and '1' as shortcuts for Optional[Any] and Any in Type::Params. (Not documented yet.)"^^Change;
 	].
 
@@ -517,10 +521,11 @@
 		item "Document the evaluation environment used by Eval::TypeTiny."^^Documentation;
 		item "Type::Exception is now capable of supplying stack traces (requires Devel::StackTrace)."^^Addition;
 		item "Exceptions thrown for Moo isa/coerce now indicate which attribute was involved."^^Change;
-		item "Type::Utils no longer exports 'extends' by default!!"^^Change;
+		item "Type::Utils no longer exports 'extends' by default."^^BackCompat;
 		item [
 			label "Better prototypes (was `;@`, now `;$`) for parameterizable type 'constants' exported by type libraries.";
 			dcs:thanks cpan:MSTROUT;
+			a dcs:BackCompat;
 		];
 	].
 
@@ -570,12 +575,12 @@
 			label "MooseX::Types objects used in Type::Tiny::Union, Type::Tiny::Intersection and parameterized Type::Tiny type constraints would break in some circumstances, as Types::TypeTiny::to_TypeTiny was failing to convert them to native Type::Tiny type constraints.";
 			dcs:fixes RT#86303;
 		];
-		item "Type::Parser now supports parentheses in its DSL."^^Addition;
+		item "Type::Parser now supports parentheses in its DSL."^^Change;
 		item "Type::Parser now exports a _std_eval function useful for testing."^^Addition;
 		item "Fixed many small parsing bugs in Type::Parser."^^Bugfix;
 		item "Improved error messages from Type::Parser."^^Change;
-		item "Test cases for Type::Parser."^^Packaging;
-		item "Better test cases for Type::Registry."^^Packaging;
+		item "Add test cases for Type::Parser."^^Tests;
+		item "Better test cases for Type::Registry."^^Tests;
 		item "Document status of Type::Registry."^^Documentation;
 	].
 
@@ -647,10 +652,10 @@
 	changeset [
 		dcs:versus `Type-Tiny 0.009_06 cpan:TOBYINK`;
 		item "Types::Standard::to_TypeTiny now sets 'display_name' instead of 'name' on generated type constraints."^^Change;
-		item "More test cases for interacting with MooseX::Types type constraints."^^Packaging;
+		item "More test cases for interacting with MooseX::Types type constraints."^^Tests;
 		item "Type::Params no longer uses Type::Utils."^^Change;
 		item "Subclasses of Type::Tiny reject 'inlined' coderef, just like they already reject 'constraint' coderef."^^Change;
-		item "Make rt86172.t an 'xt' test case because it's causing random CPAN testers failures unrelated to the feature it's supposed to be testing."^^Packaging;
+		item "Make rt86172.t an 'xt' test case because it's causing random CPAN testers failures unrelated to the feature it's supposed to be testing."^^Tests;
 		item "If a Type::Tiny object is instantiated with a Sub::Quote quoted constraint coderef, and no inlined coderef, then Type::Tiny will use Sub::Quote to make an inlined coderef."^^Change;
 	].
 
@@ -667,8 +672,8 @@
 		dcs:versus `Type-Tiny 0.010 cpan:TOBYINK`;
 		item "Unions of Type::Tiny and Mouse::Meta::TypeConstraints now work properly. This makes Type::Tiny and MouseX::Types play nice together (much like Type::Tiny already plays nice with MooseX::Types)."^^Bugfix;
 		item "Cleanups within Type::Coercion. Necessary because in some places the entire type_coercion_map (including conversion coderefs) was passed through Types::Standard::to_TypeTiny, when really only the type constraints should have been."^^Change;
-		item "Types::Standard::to_TypeTiny now accepts any object implementing the Type::API::Constraint or Type::API::Constraint::Coercion interfaces. As Mouse::Meta::TypeConstraint implements this interface, specific support for importing Mouse types has been dropped; the generic Type::API import 'just works' for Mouse types."^^Addition;
-		item "Types::Standard::to_TypeTiny now accepts unblessed coderefs and converts them to type constraints. This allows things like `Int & sub { $_ < 10 }` to work."^^Addition;
+		item "Types::Standard::to_TypeTiny now accepts any object implementing the Type::API::Constraint or Type::API::Constraint::Coercion interfaces. As Mouse::Meta::TypeConstraint implements this interface, specific support for importing Mouse types has been dropped; the generic Type::API import 'just works' for Mouse types."^^Change;
+		item "Types::Standard::to_TypeTiny now accepts unblessed coderefs and converts them to type constraints. This allows things like `Int & sub { $_ < 10 }` to work."^^Change;
 		item [
 			a dcs:Bugfix;
 			label "B::SPECIAL-related fix.";
@@ -707,8 +712,8 @@
 	changeset [
 		dcs:versus `Type-Tiny 0.012 cpan:TOBYINK`;
 		item "Type::Parser's tokenization is now done on a pull basis, allowing one-pass building of the AST."^^Change;
-		item "Type::Parser no longer provides a `tokens` function as it no longer pre-emptively tokenizes the whole string it is given."^^Removal;
-		item "Type::Parser functions no longer accept an arrayref of tokens, as they expect to pull tokens from a stream as required."^^Removal;
+		item "Type::Parser no longer provides a `tokens` function as it no longer pre-emptively tokenizes the whole string it is given."^^BackCompat;
+		item "Type::Parser functions no longer accept an arrayref of tokens, as they expect to pull tokens from a stream as required."^^BackCompat;
 		item "Type::Parser now provides a `extract_type` function which parses a type constraint expression from the head of a string and returns a Type::Tiny object, plus the tail of the string. (This is designed to make it easier to use Type::Parser to parse things like function signatures.)"^^Addition;
 	].
 
@@ -772,7 +777,7 @@
 	issued  2013-07-15;
 	changeset [
 		dcs:versus `Type-Tiny 0.015_04 cpan:TOBYINK`;
-		item "Experimentally drop required version of Perl from 5.8.1 to 5.6.1. I've not been able to extensively test Type-Tiny on Perl 5.6.x, but I believe it should mostly work. (The only feature that seems unlikely to work is non-ASCII names for type constraints and coercions.)"^^Change;
+		item "Experimentally drop required version of Perl from 5.8.1 to 5.6.1. I've not been able to extensively test Type-Tiny on Perl 5.6.x, but I believe it should mostly work. (The only feature that seems unlikely to work is non-ASCII names for type constraints and coercions.)"^^Packaging;
 		item "Stop monkey-patching Moose::Meta::TypeContraint; it's not necessary and has never been documented."^^Change;
 	].
 
@@ -942,7 +947,7 @@
 			label "Stop considering the empty string to be a valid package name.";
 		];
 		item [
-			a dcs:Packaging;
+			a dcs:Tests;
 			label "Include additional test cases stolen from Moose.";
 		];
 	].
@@ -997,7 +1002,8 @@
 			dcs:fixes RT#88291;
 		];
 		item [
-			a dcs:Packaging;
+			a dcs:Tests;
+			a dcs:Bugfix;
 			label "functionparameters.t now requires Moo or Moose and is skipped otherwise.";
 		];
 	].

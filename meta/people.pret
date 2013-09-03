@@ -48,6 +48,9 @@ cpan:MATTP
 cpan:STEVENL
 	:name "Steven Lee".
 
+cpan:BBYRD
+	:name "Brendan Byrd".
+
 # We bundle some files made by these dudes...
 
 cpan:RJBS
