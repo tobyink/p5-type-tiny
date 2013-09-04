@@ -35,4 +35,8 @@
 		deps:on "Reply"^^deps:CpanId;
 		comment "Type::Tiny bundles a plugin for Reply."@en;
 	];
+	deps:develop-suggestion [
+		deps:on "Dist::Inkt 0.007"^^deps:CpanId;
+		comment "This is used for building the release tarball."@en;
+	];
 .
