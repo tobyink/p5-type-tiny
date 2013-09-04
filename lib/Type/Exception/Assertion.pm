@@ -10,7 +10,7 @@ BEGIN {
 
 BEGIN {
 	$Type::Exception::Assertion::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Exception::Assertion::VERSION   = '0.025_02';
+	$Type::Exception::Assertion::VERSION   = '0.025_03';
 }
 
 use base "Type::Exception";

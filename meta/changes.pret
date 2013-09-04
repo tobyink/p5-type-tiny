@@ -1007,3 +1007,17 @@
 			label "functionparameters.t now requires Moo or Moose and is skipped otherwise.";
 		];
 	].
+
+`Type-Tiny 0.025_03 cpan:TOBYINK`
+	issued  2013-09-04;
+	changeset [
+		dcs:versus `Type-Tiny 0.025_02 cpan:TOBYINK`;
+		item [
+			a dcs:Documentation;
+			label "Document that multisig() accepts coderefs.";
+		];
+		item [
+			a dcs:Packaging;
+			label "Use a newer version of RDF::DOAP to process this changelog.";
+		];
+	].
