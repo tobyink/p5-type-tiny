@@ -1021,3 +1021,10 @@
 			label "Use a newer version of RDF::DOAP to process this changelog.";
 		];
 	].
+
+`Type-Tiny 0.026 cpan:TOBYINK`
+	issued  2013-09-05;
+	changeset [
+		dcs:versus `Type-Tiny 0.025_03 cpan:TOBYINK`;
+		item "Updated NEWS file."^^Documentation;
+	].

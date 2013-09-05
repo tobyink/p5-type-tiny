@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Tiny::Duck::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::Duck::VERSION   = '0.025_03';
+	$Type::Tiny::Duck::VERSION   = '0.026';
 }
 
 use Scalar::Util qw< blessed >;
