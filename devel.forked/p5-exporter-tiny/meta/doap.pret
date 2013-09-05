@@ -1,0 +1,20 @@
+# This file contains general metadata about the project.
+
+@prefix : <http://usefulinc.com/ns/doap#>.
+
+`Exporter-Tiny`
+	rdfs:seeAlso          `Type-Tiny`;
+	:programming-language "Perl" ;
+	:shortdesc            "an exporter with the features of Sub::Exporter but only core dependencies";
+	:homepage             <https://metacpan.org/release/Exporter-Tiny>;
+	:download-page        <https://metacpan.org/release/Exporter-Tiny>;
+	:bug-database         <http://rt.cpan.org/Dist/Display.html?Queue=Exporter-Tiny>;
+	:repository           [ a :GitRepository; :browse <https://github.com/tobyink/p5-type-tiny> ];
+	:created              2013-09-05;
+	:license              <http://dev.perl.org/licenses/>;
+	:maintainer           cpan:TOBYINK;
+	:developer            cpan:TOBYINK.
+
+<http://dev.perl.org/licenses/>
+	dc:title  "the same terms as the perl 5 programming language system itself".
+

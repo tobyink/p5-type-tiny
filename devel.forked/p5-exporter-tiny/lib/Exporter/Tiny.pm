@@ -1,4 +1,4 @@
-package Exporter::TypeTiny;
+package Exporter::Tiny;
 
 use 5.006001;
 use strict;
@@ -8,7 +8,7 @@ our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.026';
 our @EXPORT_OK = qw< mkopt mkopt_hash _croak >;
 
-sub _croak ($;@) { require Type::Exception; goto \&Type::Exception::croak }
+sub _croak ($;@) { require Carp; my $fmt = shift; @_ = sprintf($fmt, @_); goto \&Carp::croak }
 
 sub import
 {
@@ -202,12 +202,12 @@ __END__
 
 =head1 NAME
 
-Exporter::TypeTiny - a small exporter used internally by Type::Library and friends
+Exporter::Tiny - an exporter with the features of Sub::Exporter but only core dependencies
 
 =head1 SYNOPSIS
 
    package MyUtils;
-   use base "Exporter::TypeTiny";
+   use base "Exporter::Tiny";
    our @EXPORT = qw(frobnicate);
    sub frobnicate { my $n = shift; ... }
    1;
@@ -219,7 +219,7 @@ Exporter::TypeTiny - a small exporter used internally by Type::Library and frien
 
 =head1 DESCRIPTION
 
-Exporter::TypeTiny supports many of Sub::Exporter's external-facing features
+Exporter::Tiny supports many of Sub::Exporter's external-facing features
 including renaming imported functions with the C<< -as >>, C<< -prefix >> and
 C<< -suffix >> options; explicit destinations with the C<< into >> option;
 and alternative installers with the C<< installler >> option. But it's written
@@ -229,7 +229,7 @@ Its internal-facing interface is closer to Exporter.pm, with configuration
 done through the C<< @EXPORT >>, C<< @EXPORT_OK >> and C<< %EXPORT_TAGS >>
 package variables.
 
-Exporter::TypeTiny performs most of its internal duties (including resolution
+Exporter::Tiny performs most of its internal duties (including resolution
 of tag names to sub names, resolution of sub names to coderefs, and
 installation of coderefs into the target package) as method calls, which
 means they can be overridden to provide interesting behaviour.
@@ -252,14 +252,14 @@ Similar to C<mkopt_hash> from L<Data::OptList>. See also C<mkopt>.
 
 =back
 
-=head1 TIPS AND TRICKS IMPORTING FROM EXPORTER::TYPETINY
+=head1 TIPS AND TRICKS IMPORTING FROM EXPORTER::TINY
 
 For the purposes of this discussion we'll assume we have a module called
 C<< MyUtils >> which exports one function, C<< frobnicate >>. C<< MyUtils >>
-inherits from Exporter::TypeTiny.
+inherits from Exporter::Tiny.
 
 Many of these tricks may seem familiar from L<Sub::Exporter>. That is
-intentional. Exporter::TypeTiny doesn't attempt to provide every feature of
+intentional. Exporter::Tiny doesn't attempt to provide every feature of
 Sub::Exporter, but where it does it usually uses a fairly similar API.
 
 =head2 Basic importing
@@ -319,7 +319,7 @@ OK, Sub::Exporter doesn't do this...
    
    $funcs{frobnicate}->(...);
 
-=head1 TIPS AND TRICKS EXPORTING USING EXPORTER::TYPETINY
+=head1 TIPS AND TRICKS EXPORTING USING EXPORTER::TINY
 
 Simple configuration works the same as L<Exporter>; inherit from this module,
 and use the C<< @EXPORT >>, C<< @EXPORT_OK >> and C<< %EXPORT_TAGS >>
@@ -327,7 +327,7 @@ package variables to list subs to export.
 
 =head2 Generators
 
-Exporter::TypeTiny has always allowed exported subs to be generated (like
+Exporter::Tiny has always allowed exported subs to be generated (like
 L<Sub::Exporter>), but until version 0.025 did not have an especially nice
 API for it.
 
@@ -360,7 +360,7 @@ You can also generate tags:
 
 =head2 Overriding Internals
 
-An important difference between L<Exporter> and Exporter::TypeTiny is that
+An important difference between L<Exporter> and Exporter::Tiny is that
 the latter calls all its internal functions as I<< class methods >>. This
 means that you subclass can I<< override them >> to alter their behaviour.
 
@@ -454,89 +454,33 @@ trying to handle all of it yourself.
 
 =head1 HISTORY
 
-B<< Why >> bundle an exporter with Type-Tiny?
+Exporter::Tiny is a fork of L<Exporter::TypeTiny>. CHOCOLATEBOY convinced
+me that the Exporter from Type-Tiny was mature enough to live a life of its
+own.
 
-Well, it wasn't always that way. L<Type::Library> had a bunch of custom
-exporting code which poked coderefs into its caller's stash. It needed this
-so that it could switch between exporting Moose, Mouse and Moo-compatible
-objects on request.
+The two modules should stay fairly synchronized in terms of features,
+bug fixes and so on.
 
-Meanwhile L<Type::Utils>, L<Types::TypeTiny> and L<Test::TypeTiny> each
-used the venerable L<Exporter.pm|Exporter>. However, this meant they were
-unable to use the features like L<Sub::Exporter>-style function renaming
-which I'd built into Type::Library:
-
-   ## import "Str" but rename it to "String".
-   use Types::Standard "Str" => { -as => "String" };
-
-And so I decided to factor out code that could be shared by all Type-Tiny's
-exporters into a single place.
-
-As of version 0.026, this module is also available as L<Exporter::Tiny>,
-distributed independently on CPAN.
+See L<Exporter::TypeTiny/HISTORY> for further history and rationale.
 
 =head1 OBLIGATORY EXPORTER COMPARISON
 
-Exporting is unlikely to be your application's performance bottleneck, but
-nonetheless here are some comparisons.
+Exporter::Tiny offers almost all Sub::Exporter's features, but runs more
+than twice as fast; uses less than half the memory and has no non-core
+dependencies.
 
-B<< Comparative sizes according to L<Devel::SizeMe>: >>
-
-   Exporter                     217.1Kb
-   Sub::Exporter::Progressive   263.2Kb
-   Exporter::TypeTiny           267.7Kb
-   Exporter + Exporter::Heavy   281.5Kb
-   Exporter::Renaming           406.2Kb
-   Sub::Exporter                701.0Kb
-
-B<< Performance exporting a single sub: >>
-
-              Rate     SubExp      ExpTT SubExpProg      ExpPM
-SubExp      2489/s         --       -56%       -85%       -88%
-ExpTT       5635/s       126%         --       -67%       -72%
-SubExpProg 16905/s       579%       200%         --       -16%
-ExpPM      20097/s       707%       257%        19%         --
-
-(Exporter::Renaming globally changes the behaviour of Exporter.pm, so could
-not be included in the same benchmarks.)
-
-B<< (Non-Core) Depenendencies: >>
-
-   Exporter                    -1
-   Exporter::Renaming           0
-   Exporter::TypeTiny           0
-   Sub::Exporter::Progressive   0   
-   Sub::Exporter                3
-
-B<< Features: >>
-
-                                      ExpPM   ExpTT   SubExp  SubExpProg
- Can export code symbols............. Yes     Yes     Yes     Yes      
- Can export non-code symbols......... Yes                              
- Groups/tags......................... Yes     Yes     Yes     Yes      
- Config avoids package variables.....                 Yes              
- Allows renaming of subs.............         Yes     Yes     Maybe    
- Install code into scalar refs.......         Yes     Yes     Maybe    
- Can be passed an "into" parameter...         Yes     Yes     Maybe    
- Can be passed an "installer" sub....         Yes     Yes     Maybe    
- Supports generators.................         Yes     Yes              
- Sane API for generators.............         Yes     Yes              
-
-(Certain Sub::Exporter::Progressive features are only available if
-Sub::Exporter is installed.)
+See L<Exporter::TypeTiny/OBLIGATORY EXPORTER COMPARISON> details.
 
 =head1 BUGS
 
 Please report any bugs to
-L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
+L<http://rt.cpan.org/Dist/Display.html?Queue=Exporter-Tiny>.
 
 =head1 SEE ALSO
 
-L<Type::Library>.
-
-L<Exporter>,
+L<Exporter::TypeTiny>,
 L<Sub::Exporter>,
-L<Sub::Exporter::Progressive>.
+L<Exporter>.
 
 =head1 AUTHOR
 

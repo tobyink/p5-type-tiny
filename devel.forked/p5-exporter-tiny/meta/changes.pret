@@ -1,0 +1,14 @@
+# This file acts as the project's changelog.
+
+`Exporter-Tiny 0.026 cpan:TOBYINK`
+	issued  2013-09-05;
+	label   "Initial release";
+	changeset [
+		dcs:versus `Type-Tiny 0.026 cpan:TOBYINK`;
+		item [
+			a dcs:Packaging;
+			label "Split Exporter::Tiny out from Exporter::TypeTiny.";
+			dcs:thanks cpan:CHOCOLATEBOY;
+		];
+	].
+
