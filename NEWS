@@ -1,65 +1,3 @@
-2013-04-15 Type-Tiny version 0.001 released!
-
- - Contains over 2000 lines of code, over 3000 lines of documentation,
-   and over 650 tests.
-
-2013-05-06 Type-Tiny version 0.004 released!
-
- - Contains over 3500 lines of code, over 5000 lines of documentation,
-   and over 1000 tests.
- - Improved manual.
- - Many improvements to coercions:
-    - can be made immutable
-    - can be added to type libraries as standalone coercions
-    - overload "+"
-    - "deep" coercions
-    - parameterizable coercions
- - Type::Params is a new module providing ultra-fast parameter checking for
-   subroutines
- - Exporter::TypeTiny pulls all the weird exporting code from various
-   modules together into one place
- - Eval::TypeTiny pulls all the weird string evaluation from various
-   modules together into one place
- - OptList, Bytes and Chars types added to Types::Standard
- - MkOpt, Encode, Decode, Join and Split coercions added to Types::Standard
- - Better Mouse support.
- - Types::TypeTiny::to_TypeTiny is able to built a type constraint from
-   Validation::Class::Simple
-
-2013-05-28 Type-Tiny version 0.006 released!
-
- - String error messages replaced with exceptions.
-    - Assertion exceptions have an ->explain method.
- - Bytes, Chars, Encode and Decode split from Types::Standard to
-   Types::Encodings
-
-2013-06-21 Type-Tiny version 0.008 released!
-
- - New types added to Types::Standard: InstanceOf, ConsumerOf, HasMethods,
-   Enum, StrictNum and LaxNum.
- - New module: Type::Registry.
- - New module: Type::Parser.
- - Many bug fixes, large and small.
- - Much improved documentation, especially Types::Standard and Type::Utils.
- - Type::Utils now has "match_on_type"/"compile_match_on_type" functions.
- - Type::Utils no longer exports "extends" function by default.
-
-2013-06-24 Type-Tiny version 0.010 released!
-
- - Includes Reply::Plugin::TypeTiny.
- - Type::API support.
- - Improved Sub::Quote integration.
- - Many small bug fixes and optimizations.
-
-2013-06-25 Type-Tiny version 0.012 released!
-
- - Better Mouse support.
- - Can now coerce Type::Tiny objects from coderefs (via to_TypeTiny).
-
-2013-07-16 Type-Tiny version 0.016 released!
-
- - Type::Utils::dwim_type() function.
-
 2013-07-23 Type-Tiny version 0.020 released!
 
  - Support for Perl 5.6.x.
@@ -74,3 +12,12 @@
  - Improved compatibility between Types::Standard and Moose built-in type
    constraints.
  - Better MooseX::Types/MouseX::Type integration.
+
+2013-09-05 Type-Tiny version 0.026 released!
+
+ - Type::Params now provides a multisig() function.
+ - Cleaned up and documented the internals of Exporter::TypeTiny; this module
+   is likely to be split out as a separate CPAN distribution in the near
+   future.
+ - Type-Tiny is now packaged using Dist::Inkt.
+ - Various bugfixes.
