@@ -167,4 +167,16 @@ is_deeply(
 	"Type \$sum4 coercion works",
 );
 
+use Test::TypeTiny;
+
+my $arrayref_from_piped = (ArrayRef) + (ArrayRefFromPiped);
+my $coercible           = $arrayref_from_piped->coercible;
+should_pass([],      $coercible);
+should_pass('1|2|3', $coercible);
+should_fail({},      $coercible);
+
+should_pass([],      ArrayRef->coercible);
+should_fail('1|2|3', ArrayRef->coercible);
+should_fail({},      ArrayRef->coercible);
+
 done_testing;
