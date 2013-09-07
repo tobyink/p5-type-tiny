@@ -132,11 +132,12 @@ sub new
 	
 	unless ($params{tmp})
 	{
-		$Moo::HandleMoose::TYPE_MAP{overload::StrVal($self)} = sub { $self };
-#			if $self->has_library && !$self->is_anon;
+		my $uniq = $self->{uniq};
 		
-		$ALL_TYPES{ $self->{uniq} } = $self;
-		weaken($ALL_TYPES{ $self->{uniq} });
+		$ALL_TYPES{$uniq} = $self;
+		weaken( $ALL_TYPES{$uniq} );
+		
+		$Moo::HandleMoose::TYPE_MAP{overload::StrVal($self)} = sub { $ALL_TYPES{$uniq} };
 	}
 	
 	$self->{type_constraints} ||= undef;
@@ -259,8 +260,8 @@ sub _build_coercion
 sub _build_default_message
 {
 	my $self = shift;
-	return sub { sprintf '%s did not pass type constraint', _dd($_[0]) } if "$self" eq "__ANON__";
 	my $name = "$self";
+	return sub { sprintf '%s did not pass type constraint', _dd($_[0]) } if $name eq "__ANON__";
 	return sub { sprintf '%s did not pass type constraint "%s"', _dd($_[0]), $name };
 }
 
