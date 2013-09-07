@@ -179,6 +179,6 @@ should_pass([],      ArrayRef->coercibles);
 should_fail('1|2|3', ArrayRef->coercibles);
 should_fail({},      ArrayRef->coercibles);
 
-is(ArrayRef->coercibles, ArrayRef->coercibles, 'ArrayRef->coercibles == ArrayRef->coercibles');
+is($arrayref_from_piped->coercibles, $arrayref_from_piped->coercibles, '$arrayref_from_piped->coercibles == $arrayref_from_piped->coercibles');
 
 done_testing;
