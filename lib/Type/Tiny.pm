@@ -827,7 +827,7 @@ sub no_coercions
 	shift->_clone;
 }
 
-sub coercible
+sub coercibles
 {
 	my $self = shift;
 	$self->has_coercion ? $self->coercion->_source_type_union : $self;
@@ -1221,7 +1221,7 @@ Attempt to coerce C<< $value >> to this type.
 Attempt to coerce C<< $value >> to this type. Throws an exception if this is
 not possible.
 
-=item C<< coercible >>
+=item C<< coercibles >>
 
 Return a type constraint which is the union of type constraints that can be
 coerced to this one (including this one). If this type constraint has no

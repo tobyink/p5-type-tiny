@@ -170,13 +170,15 @@ is_deeply(
 use Test::TypeTiny;
 
 my $arrayref_from_piped = (ArrayRef) + (ArrayRefFromPiped);
-my $coercible           = $arrayref_from_piped->coercible;
-should_pass([],      $coercible);
-should_pass('1|2|3', $coercible);
-should_fail({},      $coercible);
+my $coercibles          = $arrayref_from_piped->coercibles;
+should_pass([],      $coercibles);
+should_pass('1|2|3', $coercibles);
+should_fail({},      $coercibles);
 
-should_pass([],      ArrayRef->coercible);
-should_fail('1|2|3', ArrayRef->coercible);
-should_fail({},      ArrayRef->coercible);
+should_pass([],      ArrayRef->coercibles);
+should_fail('1|2|3', ArrayRef->coercibles);
+should_fail({},      ArrayRef->coercibles);
+
+is(ArrayRef->coercibles, ArrayRef->coercibles, 'ArrayRef->coercibles == ArrayRef->coercibles');
 
 done_testing;
