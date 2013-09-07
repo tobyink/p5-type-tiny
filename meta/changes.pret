@@ -1035,7 +1035,7 @@
 		dcs:versus `Type-Tiny 0.026 cpan:TOBYINK`;
 		item "Fixed some memory leaks. Still some work to do in this area."^^Bugfix;
 		item [
-			"Added `coercible` method to Type::Tiny."^^Addition;
+			label "Added `coercible` method to Type::Tiny.";
 			dcs:thanks cpan:DJERIUS;
 			seealso RT#88452;
 		];
