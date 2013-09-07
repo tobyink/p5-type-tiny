@@ -41,7 +41,7 @@ no_leaks_ok {
 } 'Type::Tiny->new';
 
 no_leaks_ok {
-	my $x = Type::Tiny->new->coercible;
+	my $x = Type::Tiny->new->coercibles;
 	undef($x);
 } 'Type::Tiny->new->coercible';
 
