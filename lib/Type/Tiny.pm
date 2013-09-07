@@ -731,7 +731,6 @@ sub _build_moose_type
 		
 		$r = $self->_instantiate_moose_type(%opts);
 		$r->{"Types::TypeTiny::to_TypeTiny"} = $self;
-		Scalar::Util::weaken($r->{"Types::TypeTiny::to_TypeTiny"});
 		$self->{moose_type} = $r;  # prevent recursion
 		$r->coercion($self->coercion->moose_coercion) if $self->has_coercion;
 	}

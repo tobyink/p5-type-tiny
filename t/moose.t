@@ -98,14 +98,11 @@ is(
 	"Local::Class",
 	"Type::Tiny::Class provides meta information to Moose::Meta::TypeConstraint::Class",
 );
-{
-	local $TODO = 'broken by weakening stuff';
-	isa_ok(
-		$classtype->Types::TypeTiny::to_TypeTiny,
-		'Type::Tiny::Class',
-		'$classtype->Types::TypeTiny::to_TypeTiny',
-	);
-}
+isa_ok(
+	$classtype->Types::TypeTiny::to_TypeTiny,
+	'Type::Tiny::Class',
+	'$classtype->Types::TypeTiny::to_TypeTiny',
+);
 
 my $roletype = Type::Utils::role_type(LocalRole => { class => "Local::Role" })->moose_type;
 isa_ok(
@@ -117,14 +114,11 @@ ok(
 	!$roletype->isa("Moose::Meta::TypeConstraint::Role"),
 	"NB! Type::Tiny::Role does not inflate to Moose::Meta::TypeConstraint::Role because of differing notions as to what constitutes a role.",
 );
-{
-	local $TODO = 'broken by weakening stuff';
-	isa_ok(
-		$roletype->Types::TypeTiny::to_TypeTiny,
-		'Type::Tiny::Role',
-		'$roletype->Types::TypeTiny::to_TypeTiny',
-	);
-}
+isa_ok(
+	$roletype->Types::TypeTiny::to_TypeTiny,
+	'Type::Tiny::Role',
+	'$roletype->Types::TypeTiny::to_TypeTiny',
+);
 
 my $ducktype = Type::Utils::duck_type(Darkwing => [qw/ foo bar baz /])->moose_type;
 isa_ok(
@@ -137,14 +131,11 @@ is_deeply(
 	[sort qw/ foo bar baz /],
 	"Type::Tiny::Duck provides meta information to Moose::Meta::TypeConstraint::DuckType",
 );
-{
-	local $TODO = 'broken by weakening stuff';
-	isa_ok(
-		$ducktype->Types::TypeTiny::to_TypeTiny,
-		'Type::Tiny::Duck',
-		'$ducktype->Types::TypeTiny::to_TypeTiny',
-	);
-}
+isa_ok(
+	$ducktype->Types::TypeTiny::to_TypeTiny,
+	'Type::Tiny::Duck',
+	'$ducktype->Types::TypeTiny::to_TypeTiny',
+);
 
 my $enumtype = Type::Utils::enum(MyEnum => [qw/ foo bar baz /])->moose_type;
 isa_ok(
@@ -157,14 +148,11 @@ is_deeply(
 	[sort qw/ foo bar baz /],
 	"Type::Tiny::Enum provides meta information to Moose::Meta::TypeConstraint::Enum",
 );
-{
-	local $TODO = 'broken by weakening stuff';
-	isa_ok(
-		$enumtype->Types::TypeTiny::to_TypeTiny,
-		'Type::Tiny::Enum',
-		'$enumtype->Types::TypeTiny::to_TypeTiny',
-	);
-}
+isa_ok(
+	$enumtype->Types::TypeTiny::to_TypeTiny,
+	'Type::Tiny::Enum',
+	'$enumtype->Types::TypeTiny::to_TypeTiny',
+);
 
 my $union = Type::Utils::union(ICU => [$classtype->Types::TypeTiny::to_TypeTiny, $roletype->Types::TypeTiny::to_TypeTiny])->moose_type;
 isa_ok(
@@ -177,19 +165,16 @@ is_deeply(
 	[sort $classtype, $roletype],
 	"Type::Tiny::Union provides meta information to Moose::Meta::TypeConstraint::Union",
 );
-{
-	local $TODO = 'broken by weakening stuff';
-	isa_ok(
-		$union->Types::TypeTiny::to_TypeTiny,
-		'Type::Tiny::Union',
-		'$union->Types::TypeTiny::to_TypeTiny',
-	);
-	is(
-		[sort @{$union->type_constraints}]->[0]->Types::TypeTiny::to_TypeTiny->{uniq},
-		$classtype->Types::TypeTiny::to_TypeTiny->{uniq},
-		'$union->type_constraints->[$i]->Types::TypeTiny::to_TypeTiny provides access to underlying Type::Tiny objects'
-	);
-}
+isa_ok(
+	$union->Types::TypeTiny::to_TypeTiny,
+	'Type::Tiny::Union',
+	'$union->Types::TypeTiny::to_TypeTiny',
+);
+is(
+	[sort @{$union->type_constraints}]->[0]->Types::TypeTiny::to_TypeTiny->{uniq},
+	$classtype->Types::TypeTiny::to_TypeTiny->{uniq},
+	'$union->type_constraints->[$i]->Types::TypeTiny::to_TypeTiny provides access to underlying Type::Tiny objects'
+);
 
 my $intersect = Type::Utils::intersection(Chuck => [$classtype->Types::TypeTiny::to_TypeTiny, $roletype->Types::TypeTiny::to_TypeTiny])->moose_type;
 isa_ok(
@@ -197,19 +182,16 @@ isa_ok(
 	"Moose::Meta::TypeConstraint",
 	'$intersect',
 );
-{
-	local $TODO = 'broken by weakening stuff';
-	isa_ok(
-		$intersect->Types::TypeTiny::to_TypeTiny,
-		'Type::Tiny::Intersection',
-		'$intersect->Types::TypeTiny::to_TypeTiny',
-	);
-	is(
-		Scalar::Util::refaddr( $intersect->Types::TypeTiny::to_TypeTiny ),
-		Scalar::Util::refaddr( $intersect->Types::TypeTiny::to_TypeTiny->moose_type->Types::TypeTiny::to_TypeTiny->moose_type->Types::TypeTiny::to_TypeTiny ),
-		'round-tripping between ->moose_type and ->Types::TypeTiny::to_TypeTiny preserves reference address'
-	);
-}
+isa_ok(
+	$intersect->Types::TypeTiny::to_TypeTiny,
+	'Type::Tiny::Intersection',
+	'$intersect->Types::TypeTiny::to_TypeTiny',
+);
+is(
+	Scalar::Util::refaddr( $intersect->Types::TypeTiny::to_TypeTiny ),
+	Scalar::Util::refaddr( $intersect->Types::TypeTiny::to_TypeTiny->moose_type->Types::TypeTiny::to_TypeTiny->moose_type->Types::TypeTiny::to_TypeTiny ),
+	'round-tripping between ->moose_type and ->Types::TypeTiny::to_TypeTiny preserves reference address'
+);
 
 note "Native attribute traits";
 
