@@ -144,6 +144,14 @@ sub new
 	return $self;
 }
 
+sub DESTROY
+{
+	my $self = shift;
+	delete( $ALL_TYPES{$self->{uniq}} );
+	delete( $Moo::HandleMoose::TYPE_MAP{overload::StrVal($self)} );
+	return;
+}
+
 sub _clone
 {
 	my $self = shift;
