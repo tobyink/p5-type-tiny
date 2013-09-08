@@ -221,6 +221,81 @@ C<Optional>
 
 =back
 
+=head2 Chained Coercions
+
+Consider the following type library:
+
+   {
+      package Types::Geometric;
+      use Type::Library -base, -declare => qw(
+         VectorArray
+         VectorArray3D
+         Point
+         Point3D
+      );
+      use Type::Utils;
+      use Types::Standard qw( Num Tuple InstanceOf );
+      
+      declare VectorArray,
+         as Tuple[Num, Num];
+      
+      declare VectorArray3D,
+         as Tuple[Num, Num, Num];
+      
+      coerce VectorArray3D,
+         from VectorArray, via {
+            [ @$_, 0 ];
+         };
+      
+      class_type Point, { class => "Point" };
+      
+      coerce Point,
+         from VectorArray, via {
+            Point->new(x => $_->[0], y => $_->[1]);
+         };
+      
+      class_type Point3D, { class => "Point3D" };
+      
+      coerce Point3D,
+         from VectorArray3D, via {
+            Point3D->new(x => $_->[0], y => $_->[1], z => $_->[2]);
+         },
+         from Point, via {
+            Point3D->new(x => $_->x, y => $_->y, z => 0);
+         };
+   }
+
+Given an arrayref C<< [1, 1] >> you might reasonably expect it to be
+coercible to a C<Point3D> object; it matches the type constraint
+C<VectorArray> so can be coerced to C<VectorArray3D> and thus to
+C<Point3D>.
+
+However, L<Type::Coercion> does not automatically chain coercions
+like this. Firstly, it would be incompatible with Moose's type coercion
+system which does not chain coercions. Secondly, it's ambiguous; in our
+example, the arrayref could be coerced along two different paths (via
+C<VectorArray3D> or via C<Point>); in this case the end result would be
+the same, but in other cases it might not. Thirdly, it runs the risk of
+accidentally creating loops.
+
+Doing the chaining manually though is pretty simple. Firstly, we'll
+take note of the C<coercibles> method in L<Type::Tiny>. This method
+called as C<< VectorArray3D->coercibles >> returns a type constraint
+meaning "anything that can be coerced to a C<VectorArray3D>".
+
+So we can define the coercions for C<Point3D> as:
+
+   coerce Point3D,
+      from VectorArray3D->coercibles, via {
+         my $tmp = to_VectorArray3D($_);
+         Point3D->new(x => $tmp->[0], y => $tmp->[1], z => $tmp->[2]);
+      },
+      from Point, via {
+         Point3D->new(x => $_->x, y => $_->y, z => 0);
+      };
+
+... and now coercing from C<< [1, 1] >> will work.
+
 =head1 SEE ALSO
 
 L<Moose::Manual::BestPractices>,
