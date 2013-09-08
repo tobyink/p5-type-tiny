@@ -31,7 +31,7 @@ use Test::More;
 use Test::Requires 'Test::LeakTrace';
 use Test::LeakTrace;
 
-use Types::Standard 'Str';
+use Types::Standard qw( ArrayRef HashRef );
 
 eval { require Moo };
 
@@ -44,5 +44,29 @@ no_leaks_ok {
 	my $x = Type::Tiny->new->coercibles;
 	undef($x);
 } 'Type::Tiny->new->coercible';
+
+no_leaks_ok {
+	my $x = ArrayRef | HashRef;
+	my $y = HashRef | ArrayRef;
+	undef($_) for $x, $y;
+} 'ArrayRef | HashRef';
+
+no_leaks_ok {
+	my $x = ArrayRef[HashRef];
+	my $y = HashRef[ArrayRef];
+	undef($_) for $x, $y;
+} 'ArrayRef[HashRef]';
+
+no_leaks_ok {
+	my $x = Type::Tiny->new;
+	$x->check(1);
+	undef($x);
+} 'Type::Tiny->new->check';
+
+no_leaks_ok {
+	my $x = ArrayRef->plus_coercions(HashRef, sub { [sort keys %$_] });
+	my $a = $x->coerce({bar => 1, baz => 2});
+	undef($_) for $x, $a;
+} 'ArrayRef->plus_coercions->coerce';
 
 done_testing;

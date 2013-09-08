@@ -65,11 +65,12 @@ sub eval_closure
 #		Type::Exception::croak("Expected a variable name and ref; got %s => %s", $k, $args{environment}{$k});
 #	}
 	
+	my $sandpkg   = "Eval::TypeTiny::Sandbox$sandbox";
 	my $alias     = exists($args{alias}) ? $args{alias} : 0;
 	my @keys      = sort keys %{$args{environment}};
 	my $i         = 0;
 	my $source    = join "\n" => (
-		"package Eval::TypeTiny::Sandbox$sandbox;",
+		"package $sandpkg;",
 		"sub {",
 		map(_make_lexical_assignment($_, $i++, $alias), @keys),
 		$src,
@@ -91,9 +92,19 @@ sub eval_closure
 	}
 	
 	my $code = $compiler->(@{$args{environment}}{@keys});
+	undef($compiler);
 
 	if ($alias && HAS_LEXICAL_VARS) {
 		Devel::LexAlias::lexalias($code, $_, $args{environment}{$_}) for grep !/^\&/, @keys;
+	}
+	
+	# Wipe away the temporary package
+	{
+		no strict 'refs';
+		my $symtab = $sandpkg.'::';
+		%$symtab = ();
+		my $parent = __PACKAGE__.'::';
+		delete($parent->{'Sandbox'.$sandbox.'::'});
 	}
 	
 	return $code;
