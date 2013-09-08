@@ -1039,4 +1039,12 @@
 			dcs:thanks cpan:DJERIUS;
 			seealso RT#88452;
 		];
+		item "Weakening various references to fix memory leaks led to breaking Type::Tiny -> Moose -> Type::Tiny round-tripping via Types::TypeTiny::to_TypeTiny. Test cases for this marked TODO."^^Regression;
+	].
+
+`Type-Tiny 0.027_02 cpan:TOBYINK`
+	issued  2013-09-08;
+	changeset [
+		dcs:versus `Type-Tiny 0.027_01 cpan:TOBYINK`;
+		item "Restore Type::Tiny -> Moose -> Type::Tiny round-tripping broken in previous release."^^Bugfix;
 	].
