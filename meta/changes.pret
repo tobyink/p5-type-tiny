@@ -1053,3 +1053,17 @@
 			seealso RT#88452;
 		]
 	].
+
+`Type-Tiny 0.027_03 cpan:TOBYINK`
+	issued  2013-09-09;
+	changeset [
+		dcs:versus `Type-Tiny 0.027_02 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix, dcs:Tests;
+			label "Fix the ultra-finicky t/02-api.t to cope with changes to Moose::Meta::TypeConstraint API in Moose 2.1100.";
+		];
+		item [
+			a dcs:Bugfix;
+			label "Prevent Eval::TypeTiny from leaking stashes by deleting packages once they're finished with.";
+		];
+	].
