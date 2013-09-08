@@ -29,7 +29,6 @@ my $HAVE_MOOSE = eval { require Moose };
 my @MOOSE_WANTS = qw(
 	_actually_compile_type_constraint
 	_collect_all_parents
-	_compile_hand_optimized_type_constraint
 	_compile_subtype
 	_compile_type
 	_compiled_type_constraint
@@ -52,9 +51,7 @@ my @MOOSE_WANTS = qw(
 	create_child_type
 	equals
 	get_message
-	hand_optimized_type_constraint
 	has_coercion
-	has_hand_optimized_type_constraint
 	has_message
 	has_parent
 	inline_environment
