@@ -1047,4 +1047,9 @@
 	changeset [
 		dcs:versus `Type-Tiny 0.027_01 cpan:TOBYINK`;
 		item "Restore Type::Tiny -> Moose -> Type::Tiny round-tripping broken in previous release."^^Bugfix;
+		item [
+			a dcs:Documentation;
+			label "In Type::Tiny::Manual::Coercions, explain how to chain coercions.";
+			seealso RT#88452;
+		]
 	].
