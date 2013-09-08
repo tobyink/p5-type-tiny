@@ -34,7 +34,7 @@ use Test::TypeTiny;
 
 use Moose;
 use Moose::Util::TypeConstraints qw(:all);
-use Type::Utils 0.015 qw(dwim_type);
+use Type::Utils qw(dwim_type);
 
 # Creating a type constraint with Moose
 subtype "Two", as "Int", where { $_ eq 2 };
