@@ -41,11 +41,8 @@ sub import
 
 use warnings;
 
-my $sandbox = 0;
 sub eval_closure
 {
-	$sandbox++;
-	
 	my (%args) = @_;
 	my $src    = ref $args{source} eq "ARRAY" ? join("\n", @{$args{source}}) : $args{source};
 	
@@ -65,7 +62,7 @@ sub eval_closure
 #		Type::Exception::croak("Expected a variable name and ref; got %s => %s", $k, $args{environment}{$k});
 #	}
 	
-	my $sandpkg   = "Eval::TypeTiny::Sandbox$sandbox";
+	my $sandpkg   = 'Eval::TypeTiny::Sandbox';
 	my $alias     = exists($args{alias}) ? $args{alias} : 0;
 	my @keys      = sort keys %{$args{environment}};
 	my $i         = 0;
@@ -96,15 +93,6 @@ sub eval_closure
 
 	if ($alias && HAS_LEXICAL_VARS) {
 		Devel::LexAlias::lexalias($code, $_, $args{environment}{$_}) for grep !/^\&/, @keys;
-	}
-	
-	# Wipe away the temporary package
-	{
-		no strict 'refs';
-		my $symtab = $sandpkg.'::';
-		%$symtab = ();
-		my $parent = __PACKAGE__.'::';
-		delete($parent->{'Sandbox'.$sandbox.'::'});
 	}
 	
 	return $code;

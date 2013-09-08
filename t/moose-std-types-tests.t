@@ -1187,6 +1187,7 @@ sub test_constraint {
 	}
 	
 	my $name = $type->name;
+	note "TYPE: $name";
 	
 	my $unoptimized
 		= $type->has_parent

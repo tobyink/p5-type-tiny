@@ -1064,6 +1064,6 @@
 		];
 		item [
 			a dcs:Bugfix;
-			label "Prevent Eval::TypeTiny from leaking stashes by deleting packages once they're finished with.";
+			label "Prevent Eval::TypeTiny from leaking stashes by recycling the sandbox.";
 		];
 	].
