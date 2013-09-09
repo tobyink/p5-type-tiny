@@ -1059,11 +1059,21 @@
 	changeset [
 		dcs:versus `Type-Tiny 0.027_02 cpan:TOBYINK`;
 		item [
-			a dcs:Bugfix, dcs:Tests;
+			a dcs:Update, dcs:Tests;
 			label "Fix the ultra-finicky t/02-api.t to cope with changes to Moose::Meta::TypeConstraint API in Moose 2.1100.";
 		];
 		item [
 			a dcs:Bugfix;
 			label "Prevent Eval::TypeTiny from leaking stashes by recycling the sandbox.";
+		];
+	].
+
+`Type-Tiny 0.027_04 cpan:TOBYINK`
+	issued  2013-09-09;
+	changeset [
+		dcs:versus `Type-Tiny 0.027_03 cpan:TOBYINK`;
+		item [
+			a dcs:Update, dcs:Tests;
+			label "The file t/moose-coercion.t was checking a particular Moose warning message. In Moose 2.1100, this warning has been upgraded to an exception. For now, disable that particular check.";
 		];
 	].
