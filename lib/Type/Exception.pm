@@ -17,6 +17,7 @@ use overload
 our %CarpInternal;
 $CarpInternal{$_}++ for qw(
 	Eval::TypeTiny
+	Eval::TypeTiny::Sandbox
 	Exporter::TypeTiny
 	Test::TypeTiny
 	Type::Coercion
@@ -51,8 +52,7 @@ sub throw
 	
 	my ($level, @caller, %ctxt) = 0;
 	while (
-		(defined scalar caller($level) and $CarpInternal{scalar caller($level)})
-		or ( (caller($level))[0]||'' =~ /^Eval::TypeTiny::/ )
+		defined scalar caller($level) and $CarpInternal{scalar caller($level)}
 	) { $level++ };
 	if ( ((caller($level - 1))[1]||"") =~ /^parameter validation for '(.+?)'$/ )
 	{
@@ -90,7 +90,7 @@ sub to_string
 	my $m = $e->message;
 	
 	$m =~ /\n\z/s ? $m :
-	$c            ? sprintf("%s at %s line %d.\n", $m, $c->{file}||'file?', $c->{line}||'NaN') :
+	$c            ? sprintf("%s at %s line %s.\n", $m, $c->{file}||'file?', $c->{line}||'NaN') :
 	sprintf("%s\n", $m);
 }
 
