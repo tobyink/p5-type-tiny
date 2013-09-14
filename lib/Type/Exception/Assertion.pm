@@ -60,6 +60,23 @@ sub _build_message
 		: sprintf('%s did not pass type constraint', Type::Tiny::_dd($e->value))
 }
 
+sub to_string
+{
+	my $e = shift;
+	
+	my $explain = $e->explain;
+	my $msg     = $e->message;
+	
+	return $msg unless @{ $explain || [] };
+	
+	$msg .= "\n";
+	for my $line (@$explain) {
+		$msg .= "    $line\n";
+	}
+	
+	return $msg;
+}
+
 sub explain
 {
 	my $e = shift;
@@ -90,13 +107,13 @@ sub _explain
 	{
 		my $deep = $type->parent->deep_explanation->($type, $value, $varname);
 		return [
-			sprintf('%s did not pass type constraint "%s"%s', Type::Tiny::_dd($value), $type, $e->_displayvar($varname)),
+			sprintf('%s%s', $type->get_message($value), $e->_displayvar($varname)),
 			@$deep,
 		] if $deep;
 	}
 	
 	return [
-		sprintf('%s did not pass type constraint "%s"%s', Type::Tiny::_dd($value), $type, $e->_displayvar($varname)),
+		sprintf('%s%s', $type->get_message($value), $e->_displayvar($varname)),
 		sprintf('"%s" is defined as: %s', $type, $e->_codefor($type)),
 	];
 }

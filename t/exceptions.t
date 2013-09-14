@@ -182,7 +182,7 @@ my $AlwaysFail = Any->create_child_type(constraint => sub { 0 });
 is_deeply(
 	(exception { $AlwaysFail->(1) })->explain,
 	[
-		'Value "1" did not pass type constraint "__ANON__"',
+		'Value "1" did not pass type constraint',
 		'"__ANON__" is defined as: sub { 0; }',
 	],
 	'$AlwaysFail explanation, given 1',
