@@ -114,6 +114,17 @@ sub _build_parent
 	return;
 }
 
+sub find_type_for
+{
+	my @types = @{+shift};
+	for my $type (@types)
+	{
+		return $type if $type->check(@_);
+	}
+	return;
+}
+
+
 1;
 
 __END__
@@ -157,6 +168,17 @@ the constructor. Instead rely on the default.
 =item C<coercion>
 
 Will typically be a L<Type::Coercion::Union>.
+
+=back
+
+=head2 Methods
+
+=over
+
+=item C<< find_type_for($value) >>
+
+Returns the first individual type constraint in the union which
+C<< $value >> passes.
 
 =back
 

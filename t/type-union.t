@@ -122,4 +122,28 @@ ok(
 	"can climb up parents of union type constraints to find best common ancestor (again)",
 );
 
+is(
+	$c2->find_type_for( bless({}, 'Local::B') )->class,
+	'Local::B',
+	'Union find_type_for',
+);
+
+is(
+	$c2->find_type_for( bless({}, 'Local::A::A') )->class,
+	'Local::A',
+	'Union find_type_for (less obvious)',
+);
+
+is(
+	$c2->find_type_for( bless({}, 'Local::A::AB') )->class,
+	'Local::A',
+	'Union find_type_for (ambiguous)',
+);
+
+is(
+	$c2->find_type_for( bless({}, 'Local::D') ),
+	undef,
+	'Union find_type_for (none)',
+);
+
 done_testing;
