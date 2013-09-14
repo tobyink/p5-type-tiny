@@ -56,11 +56,11 @@ sub _build_coercion
 
 sub _build_constraint
 {
-	my @tcs = @{+shift};
+	my @checks = map $_->compiled_check, @{+shift};
 	return sub
 	{
 		my $val = $_;
-		$_->check($val) && return !!1 for @tcs;
+		$_->($val) && return !!1 for @checks;
 		return;
 	}
 }

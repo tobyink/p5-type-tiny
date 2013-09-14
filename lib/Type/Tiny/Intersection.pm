@@ -47,11 +47,11 @@ sub _build_display_name
 
 sub _build_constraint
 {
-	my @tcs = @{+shift};
+	my @checks = map $_->compiled_check, @{+shift};
 	return sub
 	{
 		my $val = $_;
-		$_->check($val) || return for @tcs;
+		$_->($val) || return for @checks;
 		return !!1;
 	}
 }
