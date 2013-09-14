@@ -1243,11 +1243,14 @@ Returns true iff the value passes the type constraint.
 Returns the error message for the value; returns an explicit undef if the
 value passes the type constraint.
 
-=item C<< validate_explain($value) >>
+=item C<< validate_explain($value, $varname) >>
 
 Like C<validate> but instead of a string error message, returns an arrayref
 of strings explaining the reasoning why the value does not meet the type
 constraint, examining parent types, etc.
+
+The C<< $varname >> is an optional string like C<< '$foo' >> indicating the
+name of the variable being checked.
 
 =item C<< assert_valid($value) >>
 
