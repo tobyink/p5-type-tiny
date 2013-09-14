@@ -488,6 +488,60 @@ sub validate
 	return $self->get_message(@_);
 }
 
+sub validate_explain
+{
+	my $self = shift;
+	my ($value, $varname) = @_;
+	$varname = '$_' unless defined $varname;
+	
+	return undef if $self->check($value);
+	
+	if ($self->has_parent)
+	{
+		my $parent = $self->parent->validate_explain($value, $varname);
+		return [
+			sprintf('"%s" is a subtype of "%s"', $self, $self->parent),
+			@$parent,
+		] if $parent;
+	}
+	
+	my $display_var = $varname eq q{$_} ? '' : sprintf(' (in %s)', $varname);
+	
+	if ($self->is_parameterized and $self->parent->has_deep_explanation)
+	{
+		my $deep = $self->parent->deep_explanation->($self, $value, $varname);
+		return [
+			sprintf('%s%s', $self->get_message($value), $display_var),
+			@$deep,
+		] if $deep;
+	}
+	
+	return [
+		sprintf('%s%s', $self->get_message($value), $display_var),
+		sprintf('"%s" is defined as: %s', $self, $self->_perlcode),
+	];
+}
+
+my $b;
+sub _perlcode
+{
+	my $self = shift;
+	
+	return $self->inline_check('$_')
+		if $self->can_be_inlined;
+	
+	$b ||= do {
+		require B::Deparse;
+		my $tmp = "B::Deparse"->new;
+		$tmp->ambient_pragmas(strict => "all", warnings => "all") if $tmp->can('ambient_pragmas');
+		$tmp;
+	};
+	
+	my $code = $b->coderef2text($self->constraint);
+	$code =~ s/\s+/ /g;
+	return "sub $code";
+}
+
 sub assert_valid
 {
 	my $self = shift;
@@ -1188,6 +1242,12 @@ Returns true iff the value passes the type constraint.
 
 Returns the error message for the value; returns an explicit undef if the
 value passes the type constraint.
+
+=item C<< validate_explain($value) >>
+
+Like C<validate> but instead of a string error message, returns an arrayref
+of strings explaining the reasoning why the value does not meet the type
+constraint, examining parent types, etc.
 
 =item C<< assert_valid($value) >>
 

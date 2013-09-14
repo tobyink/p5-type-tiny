@@ -276,16 +276,9 @@ my $_arr = $meta->add_type({
 		{
 			my $item = $value->[$i];
 			next if $param->check($item);
-			require Type::Exception::Assertion;
 			return [
 				sprintf('"%s" constrains each value in the array with "%s"', $type, $param),
-				@{
-					"Type::Exception::Assertion"->_explain(
-						$param,
-						$item,
-						sprintf('%s->[%d]', $varname, $i),
-					)
-				},
+				@{ $param->validate_explain($item, sprintf('%s->[%d]', $varname, $i)) },
 			]
 		}
 		
@@ -336,16 +329,9 @@ my $_hash = $meta->add_type({
 		{
 			my $item = $value->{$k};
 			next if $param->check($item);
-			require Type::Exception::Assertion;
 			return [
 				sprintf('"%s" constrains each value in the hash with "%s"', $type, $param),
-				@{
-					"Type::Exception::Assertion"->_explain(
-						$param,
-						$item,
-						sprintf('%s->{%s}', $varname, B::perlstring($k)),
-					)
-				}
+				@{ $param->validate_explain($item, sprintf('%s->{%s}', $varname, B::perlstring($k))) },
 			];
 		}
 		
@@ -388,16 +374,9 @@ $meta->add_type({
 		for my $item ($$value)
 		{
 			next if $param->check($item);
-			require Type::Exception::Assertion;
 			return [
 				sprintf('"%s" constrains the referenced scalar value with "%s"', $type, $param),
-				@{
-					"Type::Exception::Assertion"->_explain(
-						$param,
-						$item,
-						sprintf('${%s}', $varname),
-					)
-				}
+				@{ $param->validate_explain($item, sprintf('${%s}', $varname)) },
 			];
 		}
 		
@@ -446,13 +425,7 @@ $meta->add_type({
 		return [
 			sprintf('%s is defined', Type::Tiny::_dd($value)),
 			sprintf('"%s" constrains the value with "%s" if it is defined', $type, $param),
-			@{
-				"Type::Exception::Assertion"->_explain(
-					$param,
-					$value,
-					$varname,
-				)
-			}
+			@{ $param->validate_explain($value, $varname) },
 		];
 	},
 });
@@ -504,31 +477,17 @@ $meta->add_type({
 		{
 			unless ($kparam->check($k))
 			{
-				require Type::Exception::Assertion;
 				return [
 					sprintf('"%s" constrains each key in the hash with "%s"', $type, $kparam),
-					@{
-						"Type::Exception::Assertion"->_explain(
-							$kparam,
-							$k,
-							sprintf('key %s->{%s}', $varname, B::perlstring($k)),
-						)
-					}
+					@{ $kparam->validate_explain($k, sprintf('key %s->{%s}', $varname, B::perlstring($k))) },
 				];
 			}
 			
 			unless ($vparam->check($value->{$k}))
 			{
-				require Type::Exception::Assertion;
 				return [
 					sprintf('"%s" constrains each value in the hash with "%s"', $type, $vparam),
-					@{
-						"Type::Exception::Assertion"->_explain(
-							$vparam,
-							$value->{$k},
-							sprintf('%s->{%s}', $varname, B::perlstring($k)),
-						)
-					}
+					@{ $vparam->validate_explain($value->{$k}, sprintf('%s->{%s}', $varname, B::perlstring($k))) },
 				];
 			}
 		}
@@ -564,13 +523,7 @@ my $_Optional = $meta->add_type({
 		return [
 			sprintf('%s exists', $varname),
 			sprintf('"%s" constrains %s with "%s" if it exists', $type, $varname, $param),
-			@{
-				"Type::Exception::Assertion"->_explain(
-					$param,
-					$value,
-					$varname,
-				)
-			}
+			@{ $param->validate_explain($value, $varname) },
 		];
 	},
 });
@@ -682,13 +635,7 @@ $meta->add_type({
 			
 			return [
 				sprintf('"%s" constrains value at index %d of array with "%s"', $type, $i, $constraints[$i]),
-				@{
-					"Type::Exception::Assertion"->_explain(
-						$constraints[$i],
-						$value->[$i],
-						sprintf('%s->[%s]', $varname, $i),
-					)
-				}
+				@{ $constraints[$i]->validate_explain($value->[$i], sprintf('%s->[%s]', $varname, $i)) },
 			];
 		}
 		
@@ -704,13 +651,7 @@ $meta->add_type({
 					$slurpy->is_a_type_of(HashRef()) ? 'hashref' : 'arrayref',
 					$slurpy,
 				),
-				@{
-					"Type::Exception::Assertion"->_explain(
-						$slurpy,
-						$tmp,
-						'$SLURPY',
-					)
-				},
+				@{ $slurpy->validate_explain($tmp, '$SLURPY') },
 			];
 		}
 		
@@ -798,13 +739,7 @@ $meta->add_type({
 			
 			return [
 				sprintf('"%s" constrains value at key %s of hash with "%s"', $type, B::perlstring($k), $constraints{$k}),
-				@{
-					"Type::Exception::Assertion"->_explain(
-						$constraints{$k},
-						$value->{$k},
-						sprintf('%s->{%s}', $varname, B::perlstring($k)),
-					)
-				}
+				@{ $constraints{$k}->validate_explain($value->{$k}, sprintf('%s->{%s}', $varname, B::perlstring($k))) },
 			];
 		}
 		
