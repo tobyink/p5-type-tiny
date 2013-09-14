@@ -84,6 +84,23 @@ sub parent
 	Types::Standard::Object();
 }
 
+sub validate_explain
+{
+	my $self = shift;
+	my ($value, $varname) = @_;
+	$varname = '$_' unless defined $varname;
+	
+	return undef if $self->check($value);
+	return ["Not blessed"] unless blessed($value);
+	
+	return [
+		map  sprintf('The object does not have a "%s" method', $_),
+		grep !$value->can($_),
+		@{$self->methods}
+	];
+	
+}
+
 1;
 
 __END__
