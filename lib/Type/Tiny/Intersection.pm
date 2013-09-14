@@ -78,6 +78,27 @@ sub parent
 	$_[0]{type_constraints}[0];
 }
 
+sub validate_explain
+{
+	my $self = shift;
+	my ($value, $varname) = @_;
+	$varname = '$_' unless defined $varname;
+	
+	return undef if $self->check($value);
+	
+	for my $type (@$self)
+	{
+		my $deep = $type->validate_explain($value, $varname);
+		return [
+			sprintf('"%s" requires values to pass type constraint "%s"', $self, $type),
+			@$deep,
+		] if $deep;
+	}
+	
+	return ["Mysterious!"];
+}
+
+
 1;
 
 __END__

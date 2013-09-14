@@ -124,6 +124,21 @@ sub find_type_for
 	return;
 }
 
+sub validate_explain
+{
+	my $self = shift;
+	my ($value, $varname) = @_;
+	$varname = '$_' unless defined $varname;
+	
+	return undef if $self->check($value);
+	
+	return [
+		map {
+			$_->get_message($value),
+			map("    $_", @{ $_->validate_explain || []}),
+		} @$self
+	];
+}
 
 1;
 
