@@ -1077,3 +1077,12 @@
 			label "The file t/moose-coercion.t was checking a particular Moose warning message. In Moose 2.1100, this warning has been upgraded to an exception. For now, disable that particular check.";
 		];
 	].
+
+`Type-Tiny 0.027_05 cpan:TOBYINK`
+	issued  2013-09-15;
+	changeset [
+		dcs:versus `Type-Tiny 0.027_04 cpan:TOBYINK`;
+		item "Include a detailed explanation in the stringification of Type::Exception::Assertion."^^Change;
+		item "Refactor the explanation generation mechanism."^^Change;
+		item "Provide a `validate_explain` method as part of Type::Tiny's public API."^^Addition;
+	].
