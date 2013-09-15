@@ -92,17 +92,26 @@ sub validate_explain
 	$varname = '$_' unless defined $varname;
 	
 	return undef if $self->check($value);
-	return ["Not defined"] unless defined($value);
 	
 	require Type::Utils;
+	!defined($value) ? [
+		sprintf(
+			'"%s" requires that the value is defined',
+			$self,
+		),
+	] :
 	@$self < 13 ? [
 		sprintf(
 			'"%s" requires that the value is equal to %s',
 			$self,
 			Type::Utils::english_list(\"or", map B::perlstring($_), @$self),
-		)
-	] : [
+		),
+	] :
+	[
+		sprintf(
 			'"%s" requires that the value is one of an enumerated list of strings',
+			$self,
+		),
 	];
 }
 
