@@ -132,7 +132,13 @@ sub validate_explain
 	
 	return undef if $self->check($value);
 	
+	require Type::Utils;
 	return [
+		sprintf(
+			'"%s" requires that the value pass %s',
+			$self,
+			Type::Utils::english_list(\"or", map qq["$_"], @$self),
+		),
 		map {
 			$_->get_message($value),
 			map("    $_", @{ $_->validate_explain || []}),

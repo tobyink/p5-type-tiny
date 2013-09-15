@@ -86,11 +86,16 @@ sub validate_explain
 	
 	return undef if $self->check($value);
 	
+	require Type::Utils;
 	for my $type (@$self)
 	{
 		my $deep = $type->validate_explain($value, $varname);
 		return [
-			sprintf('"%s" requires values to pass type constraint "%s"', $self, $type),
+			sprintf(
+				'"%s" requires that the value pass %s',
+				$self,
+				Type::Utils::english_list(map qq["$_"], @$self),
+			),
 			@$deep,
 		] if $deep;
 	}

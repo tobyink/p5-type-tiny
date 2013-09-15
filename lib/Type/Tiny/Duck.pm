@@ -52,15 +52,6 @@ sub _build_inlined
 	};
 }
 
-sub _build_default_message
-{
-	no warnings 'uninitialized';
-	my $self = shift;
-	return sub { sprintf 'value "%s" did not pass type constraint', $_[0] } if $self->is_anon;
-	my $name = "$self";
-	return sub { sprintf 'value "%s" did not pass type constraint "%s"', $_[0], $name };
-}
-
 sub _instantiate_moose_type
 {
 	my $self = shift;
@@ -91,14 +82,19 @@ sub validate_explain
 	$varname = '$_' unless defined $varname;
 	
 	return undef if $self->check($value);
-	return ["Not blessed"] unless blessed($value);
+	return ["Not a blessed reference"] unless blessed($value);
 	
+	require Type::Utils;
 	return [
-		map  sprintf('The object does not have a "%s" method', $_),
+		sprintf(
+			'"%s" requires that the reference can %s',
+			$self,
+			Type::Utils::english_list(map qq["$_"], @{$self->methods}),
+		),
+		map  sprintf('The reference cannot "%s"', $_),
 		grep !$value->can($_),
 		@{$self->methods}
-	];
-	
+	];	
 }
 
 1;
