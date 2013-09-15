@@ -70,4 +70,12 @@ should_pass([11,[]], $param_union);
 should_pass([[],11], $param_union);
 should_fail([1.111], $param_union);
 
+use Types::TypeTiny 'to_TypeTiny';
+
+my $moosey = ArrayRef[HashRef[Int]];
+my $tt1    = to_TypeTiny($moosey);
+my $tt2    = to_TypeTiny($moosey);
+
+is($tt1->{uniq}, $tt2->{uniq}, "to_TypeTiny caches results");
+
 done_testing;
