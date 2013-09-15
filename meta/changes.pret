@@ -1086,3 +1086,15 @@
 		item "Refactor the explanation generation mechanism."^^Change;
 		item "Provide a `validate_explain` method as part of Type::Tiny's public API."^^Addition;
 	].
+
+`Type-Tiny 0.027_06 cpan:TOBYINK`
+	issued  2013-09-17;
+	changeset [
+		dcs:versus `Type-Tiny 0.027_05 cpan:TOBYINK`;
+		item "Override `validate_explain` in all the bundled subclasses of Type::Tiny."^^Addition;
+		item "Memoize Types::TypeTiny::to_TypeTiny."^^Change;
+		item "Type::Tiny::Union now provides a `find_type_for` method which should be compatible with Moose's equivalent method."^^Addition;
+		item "Type::Tiny::Union's compiled checks no longer close over the type constraints which are in the union."^^Change;
+		item "Type::Utils now provides an `english_list` function like Moose::Util does. This was useful internally for implementing `validate_explain` methods."^^Addition;
+		item "Add a draft Stability Policy to Type::Tiny::Manual."^^Documentation;
+	].
