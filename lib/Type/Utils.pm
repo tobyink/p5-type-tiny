@@ -27,7 +27,7 @@ our @EXPORT_OK = (
 	qw<
 		extends type subtype
 		match_on_type compile_match_on_type
-		dwim_type
+		dwim_type english_list
 	>,
 );
 
@@ -517,6 +517,18 @@ sub dwim_type
 	$dwimmer->lookup($string);
 }
 
+sub english_list
+{
+	my $conjunction = ref($_[0]) eq 'SCALAR' ? ${+shift} : 'and';
+	my @items = sort @_;
+	
+	return $items[0] if @items == 1;
+	return "$items[0] $conjunction $items[1]" if @items == 2;
+	
+	my $tail = pop @items;
+	join(', ', @items, "$conjunction $tail");
+}
+
 1;
 
 __END__
@@ -891,6 +903,16 @@ what you want.
 It should never die if it fails to find a type constraint (but may die
 if the type constraint string is syntactically malformed), preferring to
 return undef.
+
+This function is not exported by default.
+
+=item C<< english_list(\$conjunction, @items) >>
+
+Joins the items with commas, placing a conjunction before the final item.
+The conjunction is optional, defaulting to "and".
+
+   english_list(qw/foo bar baz/);       # "foo, bar, and baz"
+   english_list(\"or", qw/quux quuux/); # "quux or quuux"
 
 This function is not exported by default.
 
