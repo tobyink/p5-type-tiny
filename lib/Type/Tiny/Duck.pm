@@ -94,7 +94,7 @@ sub validate_explain
 		map  sprintf('The reference cannot "%s"', $_),
 		grep !$value->can($_),
 		@{$self->methods}
-	];	
+	];
 }
 
 1;
