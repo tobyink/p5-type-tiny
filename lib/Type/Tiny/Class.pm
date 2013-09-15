@@ -59,9 +59,9 @@ sub _build_default_message
 	no warnings 'uninitialized';
 	my $self = shift;
 	my $c = $self->class;
-	return sub { sprintf 'value "%s" did not pass type constraint (not isa %s)', $_[0], $c } if $self->is_anon;
+	return sub { sprintf '%s did not pass type constraint (not isa %s)', Type::Tiny::_dd($_[0]), $c } if $self->is_anon;
 	my $name = "$self";
-	return sub { sprintf 'value "%s" did not pass type constraint "%s" (not isa %s)', $_[0], $name, $c };
+	return sub { sprintf '%s did not pass type constraint "%s" (not isa %s)', Type::Tiny::_dd($_[0]), $name, $c };
 }
 
 sub _instantiate_moose_type
@@ -139,6 +139,35 @@ sub _build_parent
 	"Type::Tiny::Intersection"->new(
 		type_constraints => [ map ref($self)->new(class => $_), @isa ],
 	);
+}
+
+sub validate_explain
+{
+	my $self = shift;
+	my ($value, $varname) = @_;
+	$varname = '$_' unless defined $varname;
+	
+	return undef if $self->check($value);
+	return ["Not a blessed reference"] unless blessed($value);
+	
+	my @isa;
+	if (eval { require mro })
+	{
+		@isa = @{ mro::get_linear_isa(ref $value) };
+	}
+	else
+	{
+		require Class::ISA;
+		@isa = Class::ISA::super_path(ref $value);
+	}
+	
+	my $display_var = $varname eq q{$_} ? '' : sprintf(' (in %s)', $varname);
+	
+	require Type::Utils;
+	return [
+		sprintf('"%s" requires that the reference isa %s', $self, $self->class),
+		sprintf('The reference%s isa %s', $display_var, Type::Utils::english_list(@isa)),
+	];
 }
 
 1;

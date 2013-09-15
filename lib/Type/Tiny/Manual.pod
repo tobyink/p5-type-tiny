@@ -71,10 +71,12 @@ versions of Perl.
 
 At run-time, Type::Tiny requires the following modules: L<B>,
 L<B::Deparse>, L<Data::Dumper>, L<Scalar::Util>, L<Text::Balanced>,
-L<base>, L<overload>, L<strict> and L<warnings>. All of these come
-bundled with Perl itself. (Prior to Perl 5.8, L<Scalar::Util> and
+L<base>, L<mro>, L<overload>, L<strict> and L<warnings>. All of these
+come bundled with Perl itself. Prior to Perl 5.8, L<Scalar::Util> and
 L<Text::Balanced> do not come bundled with Perl and will need installing
-separately from the CPAN.)
+separately from the CPAN. Prior to Perl 5.10, L<Class::ISA> is used
+instead of L<mro>; this is bundled with Perl 5.8 and above, and available
+from CPAN for earlier versions of Perl.
 
 Certain features require additional modules. Tying a variable to a
 type constraint (e.g. C<< tie my $count, Int >>) requires L<Type::Tie>;
