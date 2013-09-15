@@ -82,8 +82,30 @@ sub has_parent
 sub parent
 {
 	require Types::Standard;
-	Types::Standard::Str();
+	Types::Standard::Defined();
 }
+
+sub validate_explain
+{
+	my $self = shift;
+	my ($value, $varname) = @_;
+	$varname = '$_' unless defined $varname;
+	
+	return undef if $self->check($value);
+	return ["Not defined"] unless defined($value);
+	
+	require Type::Utils;
+	@$self < 13 ? [
+		sprintf(
+			'"%s" requires that the value is equal to %s',
+			$self,
+			Type::Utils::english_list(\"or", map B::perlstring($_), @$self),
+		)
+	] : [
+			'"%s" requires that the value is one of an enumerated list of strings',
+	];
+}
+
 
 1;
 
