@@ -1100,4 +1100,5 @@
 		item "Loosen the rules for Type::Tiny and Type::Coercion name attributes; allow them to begin with one or two leading underscores."^^Change;
 		item "Types::TypeTiny::to_TypeTiny now uses Type::Coercion::FromMoose to ensure Moose type constraints converted to Type::Tiny constraints retain their coercions."^^Change;
 		item "Type::Coercion::FromMoose"^^Addition;
+		item "Stop using base.pm."^^Changes;
 	].
