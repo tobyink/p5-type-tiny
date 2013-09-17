@@ -97,8 +97,8 @@ sub new
 	if ($params{name} ne "__ANON__")
 	{
 		# First try a fast ASCII-only expression, but fall back to Unicode
-		$params{name} =~ /^[A-Z][A-Za-z0-9_]+$/sm
-			or eval q( use 5.008; $params{name} =~ /^\p{Lu}[\p{L}0-9_]+$/sm )
+		$params{name} =~ /^_{0,2}[A-Z][A-Za-z0-9_]+$/sm
+			or eval q( use 5.008; $params{name} =~ /^_{0,2}\p{Lu}[\p{L}0-9_]+$/sm )
 			or _croak '"%s" is not a valid type name', $params{name};
 	}
 	
@@ -212,7 +212,7 @@ sub deep_explanation         { $_[0]{deep_explanation} }
 
 sub has_parent               { exists $_[0]{parent} }
 sub has_library              { exists $_[0]{library} }
-sub has_coercion             { exists $_[0]{coercion} and !!@{ $_[0]{coercion}->type_coercion_map } }
+sub has_coercion             {        $_[0]{coercion} and !!@{ $_[0]{coercion}->type_coercion_map } }
 sub has_inlined              { exists $_[0]{inlined} }
 sub has_constraint_generator { exists $_[0]{constraint_generator} }
 sub has_inline_generator     { exists $_[0]{inline_generator} }
