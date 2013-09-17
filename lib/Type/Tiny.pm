@@ -499,27 +499,22 @@ sub validate_explain
 	if ($self->has_parent)
 	{
 		my $parent = $self->parent->validate_explain($value, $varname);
-		return [
-			sprintf('"%s" is a subtype of "%s"', $self, $self->parent),
-			@$parent,
-		] if $parent;
+		return [ sprintf('"%s" is a subtype of "%s"', $self, $self->parent), @$parent ] if $parent;
 	}
 	
-	my $display_var = $varname eq q{$_} ? '' : sprintf(' (in %s)', $varname);
+	my $message = sprintf(
+		'%s%s',
+		$self->get_message($value),
+		$varname eq q{$_} ? '' : sprintf(' (in %s)', $varname),
+	);
 	
 	if ($self->is_parameterized and $self->parent->has_deep_explanation)
 	{
 		my $deep = $self->parent->deep_explanation->($self, $value, $varname);
-		return [
-			sprintf('%s%s', $self->get_message($value), $display_var),
-			@$deep,
-		] if $deep;
+		return [ $message, @$deep ] if $deep;
 	}
 	
-	return [
-		sprintf('%s%s', $self->get_message($value), $display_var),
-		sprintf('"%s" is defined as: %s', $self, $self->_perlcode),
-	];
+	return [ $message, sprintf('"%s" is defined as: %s', $self, $self->_perlcode) ];
 }
 
 my $b;
