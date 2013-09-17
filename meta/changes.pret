@@ -1088,7 +1088,7 @@
 	].
 
 `Type-Tiny 0.027_06 cpan:TOBYINK`
-	issued  2013-09-17;
+	issued  2013-09-18;
 	changeset [
 		dcs:versus `Type-Tiny 0.027_05 cpan:TOBYINK`;
 		item "Override `validate_explain` in all the bundled subclasses of Type::Tiny."^^Addition;
@@ -1097,4 +1097,7 @@
 		item "Type::Tiny::Union's compiled checks no longer close over the type constraints which are in the union."^^Change;
 		item "Type::Utils now provides an `english_list` function like Moose::Util does. This was useful internally for implementing `validate_explain` methods."^^Addition;
 		item "Add a draft Stability Policy to Type::Tiny::Manual."^^Documentation;
+		item "Loosen the rules for Type::Tiny and Type::Coercion name attributes; allow them to begin with one or two leading underscores."^^Change;
+		item "Types::TypeTiny::to_TypeTiny now uses Type::Coercion::FromMoose to ensure Moose type constraints converted to Type::Tiny constraints retain their coercions."^^Change;
+		item "Type::Coercion::FromMoose"^^Addition;
 	].

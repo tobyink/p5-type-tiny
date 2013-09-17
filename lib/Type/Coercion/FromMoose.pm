@@ -59,6 +59,8 @@ The major differences are that C<add_type_coercions> always throws an
 exception, and the C<type_coercion_map> is automatically populated from
 Moose.
 
+This is mostly for internal purposes.
+
 =head1 BUGS
 
 Please report any bugs to
