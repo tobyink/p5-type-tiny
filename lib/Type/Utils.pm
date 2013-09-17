@@ -53,10 +53,11 @@ sub extends
 			my $types = $lib->type_storage;
 			for my $name (sort keys %$types)
 			{
-				my $tt = Types::TypeTiny::to_TypeTiny(
-					Moose::Util::TypeConstraints::find_type_constraint($types->{$name})
+				my $moose = Moose::Util::TypeConstraints::find_type_constraint($types->{$name});
+				my $tt    = Types::TypeTiny::to_TypeTiny($moose);
+				$caller->add_type(
+					$tt->create_child_type(library => $caller, name => $name, coercion => $moose->has_coercion ? 1 : 0)
 				);
-				$caller->add_type($tt->create_child_type(library => $caller, name => $name));
 			}
 		}
 		elsif ($lib->isa('MouseX::Types::Base'))

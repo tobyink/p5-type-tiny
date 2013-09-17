@@ -76,6 +76,20 @@ like(
 	"violation of great-grandparent type constraint",
 );
 
+note "Coercion...";
+
+{
+	package TmpNS1;
+	use Moose::Util::TypeConstraints;
+	subtype 'MyInt', as 'Int';
+	coerce 'MyInt', from 'ArrayRef', via { scalar(@$_) };
+	
+	my $type = Types::TypeTiny::to_TypeTiny(find_type_constraint('MyInt'));
+	
+	::ok($type->has_coercion, 'types converted from Moose retain coercions');
+	::is($type->coerce([qw/a b c/]), 3, '... which work');
+}
+
 note "Introspection, comparisons, conversions...";
 
 require Types::Standard;

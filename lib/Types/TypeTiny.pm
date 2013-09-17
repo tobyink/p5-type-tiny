@@ -132,7 +132,8 @@ sub _TypeTinyFromMoose
 		return $t->{"Types::TypeTiny::to_TypeTiny"};
 	}
 	
-	if ($t->name ne '__ANON__') {
+	if ($t->name ne '__ANON__')
+	{
 		require Types::Standard;
 		my $ts = 'Types::Standard'->get_type($t->name);
 		return $ts if $ts->{_is_core};
@@ -147,9 +148,15 @@ sub _TypeTinyFromMoose
 	$opts{moose_type}   = $t;
 	
 	require Type::Tiny;
-	my $new = "Type::Tiny"->new(%opts);
+	my $new = 'Type::Tiny'->new(%opts);
 	$ttt_cache{ refaddr($t) } = $new;
 	weaken($ttt_cache{ refaddr($t) });
+	
+	$new->{coercion} = do {
+		require Type::Coercion::FromMoose;
+		'Type::Coercion::FromMoose'->new(type_constraint => $new);
+	} if $t->has_coercion;
+	
 	return $new;
 }
 
