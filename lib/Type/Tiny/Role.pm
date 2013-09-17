@@ -13,7 +13,8 @@ use Scalar::Util qw< blessed weaken >;
 
 sub _croak ($;@) { require Type::Exception; goto \&Type::Exception::croak }
 
-use base "Type::Tiny";
+require Type::Tiny;
+our @ISA = 'Type::Tiny';
 
 my %cache;
 

@@ -31,7 +31,8 @@ our @EXPORT_OK = (
 	>,
 );
 
-use base qw< Exporter::TypeTiny >;
+require Exporter::TypeTiny;
+our @ISA = 'Exporter::TypeTiny';
 
 sub extends
 {

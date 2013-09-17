@@ -9,7 +9,8 @@ BEGIN {
 	$Type::Exception::Compilation::VERSION   = '0.027_06';
 }
 
-use base "Type::Exception";
+require Type::Exception;
+our @ISA = 'Type::Exception';
 
 sub code        { $_[0]{code} };
 sub environment { $_[0]{environment} ||= {} };

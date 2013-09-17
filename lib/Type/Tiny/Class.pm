@@ -17,7 +17,8 @@ use Scalar::Util qw< blessed >;
 
 sub _croak ($;@) { require Type::Exception; goto \&Type::Exception::croak }
 
-use base "Type::Tiny";
+require Type::Tiny;
+our @ISA = 'Type::Tiny';
 
 sub new {
 	my $proto = shift;

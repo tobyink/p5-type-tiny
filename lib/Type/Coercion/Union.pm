@@ -14,7 +14,8 @@ use Types::TypeTiny ();
 
 sub _croak ($;@) { require Type::Exception; goto \&Type::Exception::croak }
 
-use base "Type::Coercion";
+require Type::Coercion;
+our @ISA = 'Type::Coercion';
 
 sub type_coercion_map
 {

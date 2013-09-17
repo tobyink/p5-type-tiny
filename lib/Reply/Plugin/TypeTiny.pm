@@ -8,7 +8,8 @@ BEGIN {
 	$Reply::Plugin::TypeTiny::VERSION   = '0.027_06';
 };
 
-use base 'Reply::Plugin';
+require Reply::Plugin;
+our @ISA = 'Reply::Plugin';
 
 use Scalar::Util qw(blessed);
 use Term::ANSIColor;

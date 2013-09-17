@@ -16,7 +16,8 @@ sub _croak ($;@) { require Type::Exception; goto \&Type::Exception::croak }
 
 use overload q[@{}] => sub { $_[0]{type_constraints} ||= [] };
 
-use base "Type::Tiny";
+require Type::Tiny;
+our @ISA = 'Type::Tiny';
 
 sub new {
 	my $proto = shift;

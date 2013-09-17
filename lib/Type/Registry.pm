@@ -14,7 +14,7 @@ use Scalar::Util qw( refaddr );
 use Type::Parser qw( eval_type );
 use Types::TypeTiny qw( CodeLike ArrayLike to_TypeTiny );
 
-use base "Exporter::TypeTiny";
+our @ISA = 'Exporter::TypeTiny';
 our @EXPORT_OK = qw(t);
 
 sub _exporter_expand_sub

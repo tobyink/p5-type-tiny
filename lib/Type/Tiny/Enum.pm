@@ -13,7 +13,8 @@ sub _croak ($;@) { require Type::Exception; goto \&Type::Exception::croak }
 
 use overload q[@{}] => 'values';
 
-use base "Type::Tiny";
+require Type::Tiny;
+our @ISA = 'Type::Tiny';
 
 sub new
 {

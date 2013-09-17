@@ -9,7 +9,8 @@ BEGIN {
 	$Type::Exception::WrongNumberOfParameters::VERSION   = '0.027_06';
 }
 
-use base "Type::Exception";
+require Type::Exception;
+our @ISA = 'Type::Exception';
 
 sub minimum    { $_[0]{minimum} };
 sub maximum    { $_[0]{maximum} };
