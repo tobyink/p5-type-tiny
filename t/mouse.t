@@ -81,4 +81,18 @@ ok(
 	"Mouse::Util::is_a_type_constraint accepts Type::Tiny type constraints",
 );
 
+note "Coercion...";
+
+{
+	package TmpNS1;
+	use Mouse::Util::TypeConstraints;
+	subtype 'MyInt', as 'Int';
+	coerce 'MyInt', from 'ArrayRef', via { scalar(@$_) };
+	
+	my $type = Types::TypeTiny::to_TypeTiny(find_type_constraint('MyInt'));
+	
+	::ok($type->has_coercion, 'types converted from Mouse retain coercions');
+	::is($type->coerce([qw/a b c/]), 3, '... which work');
+}
+
 done_testing;

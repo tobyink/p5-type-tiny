@@ -140,6 +140,20 @@ sub new
 		$Moo::HandleMoose::TYPE_MAP{overload::StrVal($self)} = sub { $ALL_TYPES{$uniq} };
 	}
 	
+	if (ref($params{coercion}) eq q(CODE))
+	{
+		require Types::Standard;
+		my $code = delete($params{coercion});
+		$self->{coercion} = $self->_build_coercion;
+		$self->coercion->add_type_coercions(Types::Standard::Any(), $code);
+	}
+	elsif (ref($params{coercion}) eq q(ARRAY))
+	{
+		my $arr = delete($params{coercion});
+		$self->{coercion} = $self->_build_coercion;
+		$self->coercion->add_type_coercions(@$arr);
+	}
+	
 	$self->{type_constraints} ||= undef;
 	
 	return $self;
