@@ -5,8 +5,8 @@ use strict;
 use warnings;
 
 BEGIN {
-	$Type::Coercion::Union::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Coercion::Union::VERSION   = '0.027_06';
+	$Type::Coercion::FromMoose::AUTHORITY = 'cpan:TOBYINK';
+	$Type::Coercion::FromMoose::VERSION   = '0.027_06';
 }
 
 use Scalar::Util qw< blessed >;
