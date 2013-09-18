@@ -75,24 +75,21 @@ __END__
 # Required:
 
 perl
-base
 Encode
 Scalar::Util
 Test::More
 
 # Optional:
 
-Class::InsideOut
 Devel::LexAlias
 Devel::StackTrace
 Function::Parameters
 Moo
 Moose
+MooseX::Types
 Mouse
-Object::Accessor
+MouseX::Types
 Role::Tiny
-Sub::Exporter::Lexical
-Validation::Class::Simple
 
 # Environment:
 
