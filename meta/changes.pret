@@ -1107,7 +1107,7 @@
 	issued  2013-09-18;
 	changeset [
 		dcs:versus `Type-Tiny 0.027_06 cpan:TOBYINK`;
-		item "Also ensure Moose type constraints converted to Type::Tiny constraints retain their coercions."^^Change;
+		item "Also ensure Mouse type constraints converted to Type::Tiny constraints retain their coercions."^^Change;
 		item "Fix missing version number in Type::Coercion::FromMoose"^^Bugfix;
 		item "Changes to version numbers reported by 00-begin.t."^^Tests;
 	].
