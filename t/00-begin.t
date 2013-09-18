@@ -75,7 +75,6 @@ __END__
 # Required:
 
 perl
-Encode
 Scalar::Util
 Test::More
 
