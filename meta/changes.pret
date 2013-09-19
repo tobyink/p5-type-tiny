@@ -1127,4 +1127,5 @@
 			dcs:thanks cpan:DJERIUS;
 		];
 		item "Explicitly overload boolification (always true!) in Type::Exception."^^Change;
+		item "Type::Exception::Assertion changes from 0.027_05 are now conditional upon Perl version; only take effect on Perl 5.8+; they just weren't working on Perl 5.6."^^Bugfix;
 	].
