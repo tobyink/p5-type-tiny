@@ -61,13 +61,15 @@ sub _build_message
 		: sprintf('%s did not pass type constraint', Type::Tiny::_dd($e->value))
 }
 
-sub to_string
+*to_string = sub
 {
 	my $e = shift;
+	my $msg = $e->message;
+	
+	my $c = $e->context;
+	$msg .= sprintf("at %s line %s", $c->{file}||'file?', $c->{line}||'NaN') if $c;
 	
 	my $explain = $e->explain;
-	my $msg     = $e->message;
-	
 	return $msg unless @{ $explain || [] };
 	
 	$msg .= "\n";
@@ -76,7 +78,7 @@ sub to_string
 	}
 	
 	return $msg;
-}
+} if $] >= 5.008;
 
 sub explain
 {
