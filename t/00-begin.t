@@ -77,9 +77,11 @@ __END__
 perl
 Scalar::Util
 Test::More
+Text::Balanced
 
 # Optional:
 
+Class::ISA
 Devel::LexAlias
 Devel::StackTrace
 Function::Parameters
