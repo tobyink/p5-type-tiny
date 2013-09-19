@@ -11,6 +11,7 @@ BEGIN {
 
 use overload
 	q[""]    => sub { $_[0]->to_string },
+	q[bool]  => sub { 1 },
 	fallback => 1,
 ;
 
