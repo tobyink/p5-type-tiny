@@ -67,7 +67,7 @@ sub _build_message
 	my $msg = $e->message;
 	
 	my $c = $e->context;
-	$msg .= sprintf("at %s line %s", $c->{file}||'file?', $c->{line}||'NaN') if $c;
+	$msg .= sprintf(" at %s line %s", $c->{file}||'file?', $c->{line}||'NaN') if $c;
 	
 	my $explain = $e->explain;
 	return $msg unless @{ $explain || [] };
