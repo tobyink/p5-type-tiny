@@ -1111,3 +1111,20 @@
 		item "Fix missing version number in Type::Coercion::FromMoose"^^Bugfix;
 		item "Changes to version numbers reported by 00-begin.t."^^Tests;
 	].
+
+`Type-Tiny 0.027_08 cpan:TOBYINK`
+	issued  2013-09-19;
+	changeset [
+		dcs:versus `Type-Tiny 0.027_07 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix, dcs:Documentation;
+			label "Fix typo in changelog for previous developer release.";
+		];
+		item [
+			a dcs:Bugfix, dcs:Documentation;
+			label "Fix typo in Type::Utils for coerce=>1 --> coercion=>1.";
+			dcs:fixes RT#88798;
+			dcs:thanks cpan:DJERIUS;
+		];
+		item "Explicitly overload boolification (always true!) in Type::Exception."^^Change;
+	].

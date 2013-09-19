@@ -5,7 +5,7 @@ use strict;
 use warnings; no warnings qw(void once uninitialized numeric redefine);
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.027_07';
+our $VERSION   = '0.027_08';
 our @EXPORT_OK = qw< mkopt mkopt_hash _croak >;
 
 sub _croak ($;@) { require Type::Exception; goto \&Type::Exception::croak }
