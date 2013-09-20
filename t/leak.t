@@ -28,6 +28,9 @@ use warnings;
 use lib qw( ./lib ./t/lib ../inc ./inc );
 
 use Test::More;
+
+BEGIN { plan skip_all => 'Perl 5.10.0' if $] == 5.010 };
+
 use Test::Requires 'Test::LeakTrace';
 use Test::LeakTrace;
 
