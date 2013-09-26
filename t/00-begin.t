@@ -75,6 +75,7 @@ __END__
 # Required:
 
 perl
+Exporter::Tiny
 Scalar::Util
 Test::More
 Text::Balanced
