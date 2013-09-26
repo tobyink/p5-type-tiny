@@ -1,8 +1,0 @@
-Exporter::Tiny is a fork of Exporter::TypeTiny, which is part of the
-Type-Tiny distribution on CPAN.
-
-If you have any patches or other suggestions, please base them on
-Exporter::TypeTiny, not Exporter::Tiny directly. I'll then port them
-to Exporter::Tiny.
-
-https://github.com/tobyink/p5-type-tiny
