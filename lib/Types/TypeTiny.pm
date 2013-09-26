@@ -16,9 +16,9 @@ sub import
 {
 	# do the shuffle!
 	no warnings "redefine";
-	our @ISA = qw( Exporter::TypeTiny );
-	require Exporter::TypeTiny;
-	my $next = \&Exporter::TypeTiny::import;
+	our @ISA = qw( Exporter::Tiny );
+	require Exporter::Tiny;
+	my $next = \&Exporter::Tiny::import;
 	*import = $next;
 	goto $next;
 }

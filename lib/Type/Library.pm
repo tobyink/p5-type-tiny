@@ -14,8 +14,8 @@ use Scalar::Util qw< blessed >;
 use Type::Tiny;
 use Types::TypeTiny qw< TypeTiny to_TypeTiny >;
 
-require Exporter::TypeTiny;
-our @ISA = 'Exporter::TypeTiny';
+require Exporter::Tiny;
+our @ISA = 'Exporter::Tiny';
 
 BEGIN { *NICE_PROTOTYPES = ($] >= 5.014) ? sub () { !!1 } : sub () { !!0 } };
 
@@ -524,7 +524,7 @@ assume that the C<Types::Mine> library defines types C<Number> and C<String>.
    #
    use Types::Mine qw( :all );
 
-Type libraries automatically inherit from L<Exporter::TypeTiny>; see the
+Type libraries automatically inherit from L<Exporter::Tiny>; see the
 documentation of that module for tips and tricks importing from libraries.
 
 =head1 BUGS

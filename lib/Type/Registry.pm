@@ -9,13 +9,15 @@ BEGIN {
 	$Type::Registry::VERSION   = '0.028';
 }
 
-use Exporter::TypeTiny qw( mkopt _croak );
+use Exporter::Tiny qw( mkopt );
 use Scalar::Util qw( refaddr );
 use Type::Parser qw( eval_type );
 use Types::TypeTiny qw( CodeLike ArrayLike to_TypeTiny );
 
-our @ISA = 'Exporter::TypeTiny';
+our @ISA = 'Exporter::Tiny';
 our @EXPORT_OK = qw(t);
+
+sub _croak ($;@) { require Type::Exception; goto \&Type::Exception::croak }
 
 sub _exporter_expand_sub
 {

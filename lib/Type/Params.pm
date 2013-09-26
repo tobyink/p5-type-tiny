@@ -23,8 +23,8 @@ use Type::Tiny::Union;
 use Types::Standard -types;
 use Types::TypeTiny qw(CodeLike ArrayLike to_TypeTiny);
 
-require Exporter::TypeTiny;
-our @ISA = 'Exporter::TypeTiny';
+require Exporter::Tiny;
+our @ISA = 'Exporter::Tiny';
 
 our @EXPORT = qw( compile );
 our @EXPORT_OK = qw( multisig validate Invocant );

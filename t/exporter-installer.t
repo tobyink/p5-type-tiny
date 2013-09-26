@@ -4,7 +4,7 @@
 
 =head1 PURPOSE
 
-Tests L<Exporter::TypeTiny> works with Sub::Exporter plugins.
+Tests L<Type::Library> libraries work with Sub::Exporter plugins.
 
 =head1 AUTHOR
 

@@ -31,8 +31,8 @@ our @EXPORT_OK = (
 	>,
 );
 
-require Exporter::TypeTiny;
-our @ISA = 'Exporter::TypeTiny';
+require Exporter::Tiny;
+our @ISA = 'Exporter::Tiny';
 
 sub extends
 {
@@ -927,7 +927,7 @@ By default, all of the functions documented above are exported, except
 C<subtype> and C<type> (prefer C<declare> instead), C<extends>, C<dwim_type>,
 and C<match_on_type>/C<compile_match_on_type>.
 
-This module uses L<Exporter::TypeTiny>; see the documentation of that module
+This module uses L<Exporter::Tiny>; see the documentation of that module
 for tips and tricks importing from Type::Utils.
 
 =head1 BUGS

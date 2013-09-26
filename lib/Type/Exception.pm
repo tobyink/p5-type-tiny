@@ -19,7 +19,7 @@ our %CarpInternal;
 $CarpInternal{$_}++ for qw(
 	Eval::TypeTiny
 	Eval::TypeTiny::Sandbox
-	Exporter::TypeTiny
+	Exporter::Tiny
 	Test::TypeTiny
 	Type::Coercion
 	Type::Coercion::Union

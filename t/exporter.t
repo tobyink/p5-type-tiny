@@ -4,7 +4,7 @@
 
 =head1 PURPOSE
 
-Tests L<Exporter::TypeTiny>.
+Tests L<Exporter::Tiny> has the features Type::Tiny needs.
 
 =head1 AUTHOR
 
@@ -89,7 +89,7 @@ like(
 	);
 };
 
-my $opthash = Exporter::TypeTiny::mkopt_hash([ foo => [], "bar" ]);
+my $opthash = Exporter::Tiny::mkopt_hash([ foo => [], "bar" ]);
 
 is_deeply(
 	$opthash,

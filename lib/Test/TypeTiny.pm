@@ -7,8 +7,8 @@ use Test::More qw();
 use Scalar::Util qw(blessed);
 use Types::TypeTiny qw(to_TypeTiny);
 
-require Exporter::TypeTiny;
-our @ISA = 'Exporter::TypeTiny';
+require Exporter::Tiny;
+our @ISA = 'Exporter::Tiny';
 
 BEGIN {
 	*EXTENDED_TESTING = $ENV{EXTENDED_TESTING} ? sub(){!!1} : sub(){!!0};
