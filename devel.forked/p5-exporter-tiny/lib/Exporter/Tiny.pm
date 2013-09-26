@@ -362,7 +362,7 @@ You can also generate tags:
 
 An important difference between L<Exporter> and Exporter::Tiny is that
 the latter calls all its internal functions as I<< class methods >>. This
-means that you subclass can I<< override them >> to alter their behaviour.
+means that your subclass can I<< override them >> to alter their behaviour.
 
 The following methods are available to be overridden. Despite being named
 with a leading underscore, they are considered public methods. (The underscore
@@ -401,8 +401,8 @@ provides fallbacks for the C<< :default >> and C<< :all >> tags.
 
 This method is called to translate a sub name to a hash of name => coderef
 pairs for exporting to the caller. In general, this would just be a hash with
-one key and one value, but, for example, Type::Library overrides this method
-so that C<< "+Foo" >> gets expanded to:
+one key and one value, but, for example, L<Type::Library> overrides this
+method so that C<< "+Foo" >> gets expanded to:
 
    (
       Foo         => sub { $type },
@@ -454,12 +454,11 @@ trying to handle all of it yourself.
 
 =head1 HISTORY
 
-B<< Why >> bundle an exporter with Type-Tiny?
-
-Well, it wasn't always that way. L<Type::Library> had a bunch of custom
-exporting code which poked coderefs into its caller's stash. It needed this
-so that it could switch between exporting Moose, Mouse and Moo-compatible
-objects on request.
+L<Type::Library> had a bunch of custom exporting code which poked coderefs
+into its caller's stash. It needed this to be something more powerful than
+most exporters so that it could switch between exporting Moose, Mouse and
+Moo-compatible objects on request. L<Sub::Exporter> would have been capable,
+but had too many dependencies for the Type::Tiny project.
 
 Meanwhile L<Type::Utils>, L<Types::TypeTiny> and L<Test::TypeTiny> each
 used the venerable L<Exporter.pm|Exporter>. However, this meant they were
@@ -470,11 +469,14 @@ which I'd built into Type::Library:
    use Types::Standard "Str" => { -as => "String" };
 
 And so I decided to factor out code that could be shared by all Type-Tiny's
-exporters into a single place.
+exporters into a single place: L<Exporter::TypeTiny>.
 
-As of version 0.026, this module is also available as L<Exporter::Tiny>,
-distributed independently on CPAN. The long-term future of the bundled
-L<Exporter::Tiny> module is uncertain.
+As of version 0.026, L<Exporter::TypeTiny> was also made available as
+L<Exporter::Tiny>, distributed independently on CPAN. CHOCOLATEBOY had
+convinced me that it was mature enough to live a life of its own.
+
+As of version 0.030, Type-Tiny depends on Exporter::Tiny and
+L<Exporter::TypeTiny> is being phased out.
 
 =head1 OBLIGATORY EXPORTER COMPARISON
 
@@ -485,33 +487,33 @@ B<< Comparative sizes according to L<Devel::SizeMe>: >>
 
    Exporter                     217.1Kb
    Sub::Exporter::Progressive   263.2Kb
-   Exporter::Tiny           267.7Kb
+   Exporter::Tiny               267.7Kb
    Exporter + Exporter::Heavy   281.5Kb
    Exporter::Renaming           406.2Kb
    Sub::Exporter                701.0Kb
 
 B<< Performance exporting a single sub: >>
 
-              Rate     SubExp      ExpTT SubExpProg      ExpPM
+              Rate     SubExp    ExpTiny SubExpProg      ExpPM
 SubExp      2489/s         --       -56%       -85%       -88%
-ExpTT       5635/s       126%         --       -67%       -72%
+ExpTiny     5635/s       126%         --       -67%       -72%
 SubExpProg 16905/s       579%       200%         --       -16%
 ExpPM      20097/s       707%       257%        19%         --
 
 (Exporter::Renaming globally changes the behaviour of Exporter.pm, so could
 not be included in the same benchmarks.)
 
-B<< (Non-Core) Depenendencies: >>
+B<< (Non-Core) Dependencies: >>
 
    Exporter                    -1
    Exporter::Renaming           0
-   Exporter::Tiny           0
-   Sub::Exporter::Progressive   0   
+   Exporter::Tiny               0
+   Sub::Exporter::Progressive   0
    Sub::Exporter                3
 
 B<< Features: >>
 
-                                      ExpPM   ExpTT   SubExp  SubExpProg
+                                      ExpPM   ExpTiny SubExp  SubExpProg
  Can export code symbols............. Yes     Yes     Yes     Yes      
  Can export non-code symbols......... Yes                              
  Groups/tags......................... Yes     Yes     Yes     Yes      
