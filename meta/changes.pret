@@ -1138,3 +1138,16 @@
 		item "Fix whitespace in error messages."^^Bugfix;
 		item "Skip leak.t on Perl 5.10.0."^^Tests;
 	].
+
+`Type-Tiny 0.028 cpan:TOBYINK`
+	issued  2013-09-26;
+	changeset [
+		dcs:versus `Type-Tiny 0.027_09 cpan:TOBYINK`;
+		item [
+			a dcs:Documentation;
+			dcs:fixes RT#88655;
+			dcs:thanks cpan:BBYRD;
+			label "Note in documentation for Type::Tiny::Union, etc that constraint/inlining coderefs not only should not be provided to the constructor, but cannot!";
+		];
+		item "Updated NEWS file."^^Documentation;
+	].

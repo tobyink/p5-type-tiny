@@ -15,9 +15,19 @@
 
 2013-09-05 Type-Tiny version 0.026 released!
 
- - Type::Params now provides a multisig() function.
+ - Type::Params now provides a `multisig` function.
  - Cleaned up and documented the internals of Exporter::TypeTiny; this module
    is likely to be split out as a separate CPAN distribution in the near
    future.
  - Type-Tiny is now packaged using Dist::Inkt.
  - Various bugfixes.
+
+2013-09-26 Type-Tiny version 0.028 released!
+
+ - Fix some places where Type::Tiny could leak memory via circular references.
+ - Type::Tiny now provides a `coercibles` method, useful for manually chaining
+   coercions (and there's documentation about this in the manual).
+ - More verbose stringification for Type::Exception::Assertion.
+ - Types::TypeTiny::to_TypeTiny now preserves coercions on Moose type
+   constraints.
+ - Stop using base.pm.
