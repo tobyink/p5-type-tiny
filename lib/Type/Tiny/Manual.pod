@@ -9,8 +9,10 @@ Type::Tiny::Manual - an overview of Type::Tiny
 =head1 SYNOPSIS
 
 L<Type::Tiny> is a small class for writing type constraints, inspired by
-L<Moose>'s type constraint API. It has no non-core dependencies, and can be
-used with L<Moose>, L<Mouse> and L<Moo> (or none of the above).
+L<Moose>'s type constraint API. It has only one non-core dependency (and even
+that is simply a module that was previously distributed as part of Type::Tiny
+but has since been spun off), and can be used with L<Moose>, L<Mouse> and
+L<Moo> (or none of the above).
 
 Type::Tiny is bundled with L<Type::Library> a framework for organizing type
 constraints into collections.
@@ -69,7 +71,11 @@ Type::Tiny requires at least Perl 5.6.1, though certain Unicode-related
 features (e.g. non-ASCII type constraint names) may work better in newer
 versions of Perl.
 
-At run-time, Type::Tiny requires the following modules: L<B>,
+Type::Tiny requires L<Exporter::Tiny>, a module that was previously
+bundled in this distribution, but has since been spun off as a separate
+distribution. Don't worry - it's quick and easy to install.
+
+At run-time, Type::Tiny also requires the following modules: L<B>,
 L<B::Deparse>, L<Data::Dumper>, L<Scalar::Util>, L<Text::Balanced>,
 L<base>, L<mro>, L<overload>, L<strict> and L<warnings>. All of these
 come bundled with Perl itself. Prior to Perl 5.8, L<Scalar::Util> and
@@ -107,7 +113,7 @@ Type::Tiny is similar in aim to L<Specio>. The major differences are
 =item *
 
 Type::Tiny is "tiny" (Specio will eventually have fewer dependencies
-than it currently does, but is unlikely to ever have zero);
+than it currently does, but is unlikely to ever have as few as Type::Tiny);
 
 =item *
 
