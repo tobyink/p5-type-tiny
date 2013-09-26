@@ -127,13 +127,13 @@ An arrayref of method names.
 
 =item C<constraint>
 
-Unlike Type::Tiny, you should generally I<not> pass a constraint to the
-constructor. Instead rely on the default.
+Unlike Type::Tiny, you I<cannot> pass a constraint coderef to the constructor.
+Instead rely on the default.
 
 =item C<inlined>
 
-Unlike Type::Tiny, you should generally I<not> pass an inlining coderef to
-the constructor. Instead rely on the default.
+Unlike Type::Tiny, you I<cannot> pass an inlining coderef to the constructor.
+Instead rely on the default.
 
 =item C<parent>
 
