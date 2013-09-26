@@ -17,29 +17,6 @@ Exporter::Tiny - an exporter with the features of Sub::Exporter but only core de
 
 POD
 
-'HISTORY'=><<POD,
-
-Exporter::Tiny is a fork of L<Exporter::TypeTiny>. CHOCOLATEBOY convinced
-me that the Exporter from Type-Tiny was mature enough to live a life of its
-own.
-
-The two modules should stay fairly synchronized in terms of features,
-bug fixes and so on.
-
-See L<Exporter::TypeTiny/HISTORY> for further history and rationale.
-
-POD
-
-'OBLIGATORY EXPORTER COMPARISON'=><<POD,
-
-Exporter::Tiny offers almost all Sub::Exporter's features, but runs more
-than twice as fast; uses less than half the memory and has no non-core
-dependencies.
-
-See L<Exporter::TypeTiny/OBLIGATORY EXPORTER COMPARISON> details.
-
-POD
-
 'SEE ALSO'=><<POD,
 
 L<Exporter::TypeTiny>,
