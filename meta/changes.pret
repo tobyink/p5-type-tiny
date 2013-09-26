@@ -1151,3 +1151,11 @@
 		];
 		item "Updated NEWS file."^^Documentation;
 	].
+
+`Type-Tiny 0.029_01 cpan:TOBYINK`
+	issued  2013-09-26;
+	doap:branch "exporter-tiny";
+	changeset [
+		dcs:versus `Type-Tiny 0.028 cpan:TOBYINK`;
+		item "Replace Exporter::TypeTiny with Exporter::Tiny (an external dependency)."^^Change;
+	].
