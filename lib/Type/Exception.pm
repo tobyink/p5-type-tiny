@@ -213,15 +213,15 @@ Stringification is overloaded to call C<to_string>.
 
 =over
 
-=item C<< %Type::Tiny::CarpInternal >>
+=item C<< %Type::Exception::CarpInternal >>
 
 Serves a similar purpose to C<< %Carp::CarpInternal >>.
 
-=item C<< $Type::Tiny::StackTrace >>
+=item C<< $Type::Exception::StackTrace >>
 
 Boolean to toggle stack trace generation.
 
-=item C<< $Type::Tiny::LastError >>
+=item C<< $Type::Exception::LastError >>
 
 A reference to the last exception object thrown.
 
