@@ -183,4 +183,6 @@ ok(
 	"'0.' passes Num unless Types::Standard::STRICTNUM",
 );
 
+ok_subtype(Any, Item);
+
 done_testing;
