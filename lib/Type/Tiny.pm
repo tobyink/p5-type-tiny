@@ -175,14 +175,18 @@ sub _clone
 	$self->create_child_type(%opts);
 }
 
+our $DD;
 sub _dd
 {
+	@_ = $_ unless @_;
+	my ($value) = @_;
+	
+	goto $DD if ref($DD) eq q(CODE);
+	
 	require B;
 	
-	my $value = @_ ? $_[0] : $_;
-	
-	!defined $value      ? 'Undef' :
-	!ref $value          ? sprintf('Value %s', B::perlstring($value)) :
+	!defined $value ? 'Undef' :
+	!ref $value     ? sprintf('Value %s', B::perlstring($value)) :
 	do {
 		require Data::Dumper;
 		local $Data::Dumper::Indent   = 0;
@@ -1458,6 +1462,22 @@ C<plus_fallback_coercions> as appropriate.
 
 Indicates whether the smart match overload is supported on your
 version of Perl.
+
+=back
+
+=head2 Package Variables
+
+=over
+
+=item C<< $Type::Tiny::DD >>
+
+This in undef by default but may be set to a coderef that Type::Tiny
+and related modules will use to dump data structures in things like
+error messages. Otherwise Type::Tiny uses it's own routine to dump data
+structures.
+
+This is a package variable (rather than get/set class methods) to allow
+for easy localization.
 
 =back
 

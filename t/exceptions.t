@@ -260,4 +260,14 @@ like(
 	"correct exception from type with null constraint",
 );
 
+{
+	local $Type::Tiny::DD = sub { substr("$_[0]", 0, 5) };
+	
+	like(
+		exception { Types::Standard::Str->([]) },
+		qr{^ARRAY did not pass type constraint},
+		"local \$Type::Tiny::DD",
+	);
+}
+
 done_testing;
