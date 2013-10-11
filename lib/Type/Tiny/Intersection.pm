@@ -12,7 +12,7 @@ BEGIN {
 use Scalar::Util qw< blessed >;
 use Types::TypeTiny ();
 
-sub _croak ($;@) { require Type::Exception; goto \&Type::Exception::croak }
+sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
 use overload q[@{}] => sub { $_[0]{type_constraints} ||= [] };
 

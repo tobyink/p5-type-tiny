@@ -19,7 +19,7 @@ our @ISA = 'Exporter::Tiny';
 
 BEGIN { *NICE_PROTOTYPES = ($] >= 5.014) ? sub () { !!1 } : sub () { !!0 } };
 
-sub _croak ($;@) { require Type::Exception; goto \&Type::Exception::croak }
+sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
 {
 	my $got_subname;

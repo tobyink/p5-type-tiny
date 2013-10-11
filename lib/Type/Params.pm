@@ -16,9 +16,9 @@ BEGIN {
 use B qw(perlstring);
 use Eval::TypeTiny;
 use Scalar::Util qw(refaddr);
-use Type::Exception;
-use Type::Exception::Assertion;
-use Type::Exception::WrongNumberOfParameters;
+use Error::TypeTiny;
+use Error::TypeTiny::Assertion;
+use Error::TypeTiny::WrongNumberOfParameters;
 use Type::Tiny::Union;
 use Types::Standard -types;
 use Types::TypeTiny qw(CodeLike ArrayLike to_TypeTiny);
@@ -47,7 +47,7 @@ sub _mkslurpy
 			$i,
 		)
 		: sprintf(
-			'%s = (($#_-%d)%%2)==0 ? "Type::Exception::WrongNumberOfParameters"->throw(message => sprintf("Odd number of elements in %%s", %s)) : +{ @_[%d..$#_] };',
+			'%s = (($#_-%d)%%2)==0 ? "Error::TypeTiny::WrongNumberOfParameters"->throw(message => sprintf("Odd number of elements in %%s", %s)) : +{ @_[%d..$#_] };',
 			$name,
 			$i,
 			perlstring("$tc"),
@@ -91,14 +91,14 @@ sub compile
 				$constraint->is_a_type_of(Tuple)    ? _mkslurpy('$_', '@', $constraint => $arg) :
 				$constraint->is_a_type_of(HashRef)  ? _mkslurpy('$_', '%', $constraint => $arg) :
 				$constraint->is_a_type_of(ArrayRef) ? _mkslurpy('$_', '@', $constraint => $arg) :
-				Type::Exception::croak("Slurpy parameter not of type HashRef or ArrayRef");
+				Error::TypeTiny::croak("Slurpy parameter not of type HashRef or ArrayRef");
 			$varname = '$_';
 			$is_slurpy++;
 			$saw_slurpy++;
 		}
 		else
 		{
-			Type::Exception::croak("Parameter following slurpy parameter") if $saw_slurpy;
+			Error::TypeTiny::croak("Parameter following slurpy parameter") if $saw_slurpy;
 			
 			$is_optional = grep $_->{uniq} == Optional->{uniq}, $constraint->parents;
 			
@@ -110,7 +110,7 @@ sub compile
 			}
 			else
 			{
-				Type::Exception::croak("Non-Optional parameter following Optional parameter") if $saw_opt;
+				Error::TypeTiny::croak("Non-Optional parameter following Optional parameter") if $saw_opt;
 				$min_args++;
 				$max_args++;
 			}
@@ -169,7 +169,7 @@ sub compile
 	if ($min_args == $max_args and not $saw_slurpy)
 	{
 		$code[1] = sprintf(
-			'"Type::Exception::WrongNumberOfParameters"->throw(got => scalar(@_), minimum => %d, maximum => %d) if @_ != %d;',
+			'"Error::TypeTiny::WrongNumberOfParameters"->throw(got => scalar(@_), minimum => %d, maximum => %d) if @_ != %d;',
 			$min_args,
 			$max_args,
 			$min_args,
@@ -178,7 +178,7 @@ sub compile
 	elsif ($min_args < $max_args and not $saw_slurpy)
 	{
 		$code[1] = sprintf(
-			'"Type::Exception::WrongNumberOfParameters"->throw(got => scalar(@_), minimum => %d, maximum => %d) if @_ < %d || @_ > %d;',
+			'"Error::TypeTiny::WrongNumberOfParameters"->throw(got => scalar(@_), minimum => %d, maximum => %d) if @_ < %d || @_ > %d;',
 			$min_args,
 			$max_args,
 			$min_args,
@@ -188,7 +188,7 @@ sub compile
 	elsif ($min_args and $saw_slurpy)
 	{
 		$code[1] = sprintf(
-			'"Type::Exception::WrongNumberOfParameters"->throw(got => scalar(@_), minimum => %d) if @_ < %d;',
+			'"Error::TypeTiny::WrongNumberOfParameters"->throw(got => scalar(@_), minimum => %d) if @_ < %d;',
 			$min_args,
 			$min_args,
 		);
@@ -247,7 +247,7 @@ sub multisig
 		push @code, '}' if @cond;
 	}
 	
-	push @code, '"Type::Exception"->throw(message => "Parameter validation failed");';
+	push @code, '"Error::TypeTiny"->throw(message => "Parameter validation failed");';
 	push @code, '}';
 	
 	eval_closure(

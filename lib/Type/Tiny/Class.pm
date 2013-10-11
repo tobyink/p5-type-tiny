@@ -15,7 +15,7 @@ BEGIN {
 
 use Scalar::Util qw< blessed >;
 
-sub _croak ($;@) { require Type::Exception; goto \&Type::Exception::croak }
+sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
 require Type::Tiny;
 our @ISA = 'Type::Tiny';

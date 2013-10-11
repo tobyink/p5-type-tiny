@@ -17,7 +17,7 @@ use Types::TypeTiny qw( CodeLike ArrayLike to_TypeTiny );
 our @ISA = 'Exporter::Tiny';
 our @EXPORT_OK = qw(t);
 
-sub _croak ($;@) { require Type::Exception; goto \&Type::Exception::croak }
+sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
 sub _exporter_expand_sub
 {

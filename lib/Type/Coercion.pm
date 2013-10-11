@@ -13,7 +13,7 @@ use Eval::TypeTiny qw<>;
 use Scalar::Util qw< blessed >;
 use Types::TypeTiny qw<>;
 
-sub _croak ($;@) { require Type::Exception; goto \&Type::Exception::croak }
+sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
 use overload
 	q("")      => sub { caller =~ m{^(Moo::HandleMoose|Sub::Quote)} ? overload::StrVal($_[0]) : $_[0]->display_name },

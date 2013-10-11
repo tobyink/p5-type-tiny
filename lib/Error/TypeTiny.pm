@@ -1,12 +1,12 @@
-package Type::Exception;
+package Error::TypeTiny;
 
 use 5.006001;
 use strict;
 use warnings;
 
 BEGIN {
-	$Type::Exception::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Exception::VERSION   = '0.029_01';
+	$Error::TypeTiny::AUTHORITY = 'cpan:TOBYINK';
+	$Error::TypeTiny::VERSION   = '0.029_01';
 }
 
 use overload
@@ -23,7 +23,7 @@ $CarpInternal{$_}++ for qw(
 	Test::TypeTiny
 	Type::Coercion
 	Type::Coercion::Union
-	Type::Exception
+	Error::TypeTiny
 	Type::Library
 	Type::Params
 	Type::Registry
@@ -120,7 +120,7 @@ __END__
 
 =head1 NAME
 
-Type::Exception - exceptions for Type::Tiny and friends
+Error::TypeTiny - exceptions for Type::Tiny and friends
 
 =head1 SYNOPSIS
 
@@ -135,13 +135,13 @@ Type::Exception - exceptions for Type::Tiny and friends
       my $exception = shift;
       warn "Encountered Error: $exception";
       warn Dumper($exception->explain)
-         if $exception->isa("Type::Exception::Assertion");
+         if $exception->isa("Error::TypeTiny::Assertion");
    };
 
 =head1 DESCRIPTION
 
 When Type::Tiny and its related modules encounter an error, they throw an
-exception object. These exception objects inherit from Type::Exception.
+exception object. These exception objects inherit from Error::TypeTiny.
 
 =head2 Constructors
 
@@ -192,7 +192,7 @@ Returns the message, followed by the context if it is set.
 
 =over
 
-=item C<< Type::Exception::croak($format, @args) >>
+=item C<< Error::TypeTiny::croak($format, @args) >>
 
 Functional-style shortcut to C<throw> method. Takes an C<sprintf>-style
 format string and optional arguments to construct the C<message>.
@@ -213,15 +213,15 @@ Stringification is overloaded to call C<to_string>.
 
 =over
 
-=item C<< %Type::Exception::CarpInternal >>
+=item C<< %Error::TypeTiny::CarpInternal >>
 
 Serves a similar purpose to C<< %Carp::CarpInternal >>.
 
-=item C<< $Type::Exception::StackTrace >>
+=item C<< $Error::TypeTiny::StackTrace >>
 
 Boolean to toggle stack trace generation.
 
-=item C<< $Type::Exception::LastError >>
+=item C<< $Error::TypeTiny::LastError >>
 
 A reference to the last exception object thrown.
 
@@ -229,9 +229,9 @@ A reference to the last exception object thrown.
 
 =head1 CAVEATS
 
-Although Type::Exception objects are thrown for errors produced by
+Although Error::TypeTiny objects are thrown for errors produced by
 Type::Tiny, that doesn't mean every time you use Type::Tiny you'll get
-Type::Exceptions whenever you want.
+Error::TypeTinys whenever you want.
 
 For example, if you use a Type::Tiny type constraint in a Moose attribute,
 Moose will not call the constraint's C<assert_valid> method (which throws
@@ -246,8 +246,8 @@ L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
 
 =head1 SEE ALSO
 
-L<Type::Exception::Assertion>,
-L<Type::Exception::WrongNumberOfParameters>.
+L<Error::TypeTiny::Assertion>,
+L<Error::TypeTiny::WrongNumberOfParameters>.
 
 L<Try::Tiny>, L<Try::Tiny::ByClass>.
 

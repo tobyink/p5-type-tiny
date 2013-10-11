@@ -18,13 +18,13 @@ sub mangle_error {
 	my $self  = shift;
 	my ($err) = @_;
 	
-	if (blessed $err and $err->isa("Type::Exception::Assertion"))
+	if (blessed $err and $err->isa("Error::TypeTiny::Assertion"))
 	{
 		my $explain = $err->explain;
 		if ($explain)
 		{
 			print color("cyan");
-			print "Type::Exception::Assertion explain:\n";
+			print "Error::TypeTiny::Assertion explain:\n";
 			$self->_explanation($explain, "");
 			local $| = 1;
 			print "\n";
@@ -84,7 +84,7 @@ L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
 
 =head1 SEE ALSO
 
-L<Type::Exception::Assertion>, L<Reply>.
+L<Error::TypeTiny::Assertion>, L<Reply>.
 
 =head1 AUTHOR
 

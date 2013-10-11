@@ -1,16 +1,16 @@
-package Type::Exception::WrongNumberOfParameters;
+package Error::TypeTiny::WrongNumberOfParameters;
 
 use 5.006001;
 use strict;
 use warnings;
 
 BEGIN {
-	$Type::Exception::WrongNumberOfParameters::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Exception::WrongNumberOfParameters::VERSION   = '0.029_01';
+	$Error::TypeTiny::WrongNumberOfParameters::AUTHORITY = 'cpan:TOBYINK';
+	$Error::TypeTiny::WrongNumberOfParameters::VERSION   = '0.029_01';
 }
 
-require Type::Exception;
-our @ISA = 'Type::Exception';
+require Error::TypeTiny;
+our @ISA = 'Error::TypeTiny';
 
 sub minimum    { $_[0]{minimum} };
 sub maximum    { $_[0]{maximum} };
@@ -66,14 +66,14 @@ __END__
 
 =head1 NAME
 
-Type::Exception::WrongNumberOfParameters - exception for Type::Params
+Error::TypeTiny::WrongNumberOfParameters - exception for Type::Params
 
 =head1 DESCRIPTION
 
 Thrown when a Type::Params compiled check is called with the wrong number
 of parameters.
 
-This package inherits from L<Type::Exception>; see that for most
+This package inherits from L<Error::TypeTiny>; see that for most
 documentation. Major differences are listed below:
 
 =head2 Attributes
@@ -111,7 +111,7 @@ L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
 
 =head1 SEE ALSO
 
-L<Type::Exception>.
+L<Error::TypeTiny>.
 
 =head1 AUTHOR
 

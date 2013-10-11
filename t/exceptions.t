@@ -4,7 +4,7 @@
 
 =head1 PURPOSE
 
-Tests L<Type::Exception>.
+Tests L<Error::TypeTiny>.
 
 =head1 AUTHOR
 
@@ -23,7 +23,7 @@ use strict;
 use warnings;
 use lib qw( ./lib ./t/lib ../inc ./inc );
 
-local $Type::Exception::LastError;
+local $Error::TypeTiny::LastError;
 
 use Test::More;
 use Test::Fatal;
@@ -36,9 +36,9 @@ my $supernum = Types::Standard::STRICTNUM ? "StrictNum" : "LaxNum";
 my $v = [];
 my $e = exception { Int->create_child_type->assert_valid($v) };
 
-isa_ok($e, "Type::Exception", '$e');
+isa_ok($e, "Error::TypeTiny", '$e');
 
-is(refaddr($e), refaddr($Type::Exception::LastError), '$Type::Exception::LastError');
+is(refaddr($e), refaddr($Error::TypeTiny::LastError), '$Error::TypeTiny::LastError');
 
 is(
 	$e->message,
@@ -46,7 +46,7 @@ is(
 	'$e->message is as expected',
 );
 
-isa_ok($e, "Type::Exception::Assertion", '$e');
+isa_ok($e, "Error::TypeTiny::Assertion", '$e');
 
 cmp_ok(
 	$e->type, '==', Int,
@@ -223,7 +223,7 @@ TODO: {
 my $e_where = exception {
 #line 1 "thisfile.plx"
 package Monkey::Nuts;
-"Type::Exception"->throw(message => "Test");
+"Error::TypeTiny"->throw(message => "Test");
 };
 
 #line 230 "exceptions.t"

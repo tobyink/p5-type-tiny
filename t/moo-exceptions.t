@@ -4,7 +4,7 @@
 
 =head1 PURPOSE
 
-Tests L<Type::Exception> interaction with L<Moo>.
+Tests L<Error::TypeTiny> interaction with L<Moo>.
 
 =head1 DEPENDENCIES
 
@@ -46,7 +46,7 @@ BEGIN {
 
 my $e_constructor = exception { Goo->new(number => "too") };
 
-isa_ok($e_constructor, 'Type::Exception::Assertion', '$e_constructor');
+isa_ok($e_constructor, 'Error::TypeTiny::Assertion', '$e_constructor');
 is($e_constructor->attribute_name, 'number', '$e_constructor->attribute_name');
 is($e_constructor->attribute_step, 'isa check', '$e_constructor->attribute_step');
 is($e_constructor->varname, '$self->{"number"}', '$e_constructor->varname');
@@ -55,7 +55,7 @@ is($e_constructor->type, Types::Standard::Int, '$e_constructor->type');
 
 my $e_accessor    = exception { Goo->new->number("too") };
 
-isa_ok($e_accessor, 'Type::Exception::Assertion', '$e_accessor');
+isa_ok($e_accessor, 'Error::TypeTiny::Assertion', '$e_accessor');
 is($e_accessor->attribute_name, 'number', '$e_accessor->attribute_name');
 is($e_accessor->attribute_step, 'isa check', '$e_accessor->attribute_step');
 is($e_accessor->value, "too", '$e_accessor->value');

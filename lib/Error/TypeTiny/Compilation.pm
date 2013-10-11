@@ -1,16 +1,16 @@
-package Type::Exception::Compilation;
+package Error::TypeTiny::Compilation;
 
 use 5.006001;
 use strict;
 use warnings;
 
 BEGIN {
-	$Type::Exception::Compilation::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Exception::Compilation::VERSION   = '0.029_01';
+	$Error::TypeTiny::Compilation::AUTHORITY = 'cpan:TOBYINK';
+	$Error::TypeTiny::Compilation::VERSION   = '0.029_01';
 }
 
-require Type::Exception;
-our @ISA = 'Type::Exception';
+require Error::TypeTiny;
+our @ISA = 'Error::TypeTiny';
 
 sub code        { $_[0]{code} };
 sub environment { $_[0]{environment} ||= {} };
@@ -32,7 +32,7 @@ __END__
 
 =head1 NAME
 
-Type::Exception::Compilation - exception for Eval::TypeTiny
+Error::TypeTiny::Compilation - exception for Eval::TypeTiny
 
 =head1 DESCRIPTION
 
@@ -40,7 +40,7 @@ Thrown when compiling a closure fails. Common causes are problems with
 inlined type constraints, and syntax errors when coercions are given as
 strings of Perl code.
 
-This package inherits from L<Type::Exception>; see that for most
+This package inherits from L<Error::TypeTiny>; see that for most
 documentation. Major differences are listed below:
 
 =head2 Attributes
@@ -68,7 +68,7 @@ L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
 
 =head1 SEE ALSO
 
-L<Type::Exception>.
+L<Error::TypeTiny>.
 
 =head1 AUTHOR
 

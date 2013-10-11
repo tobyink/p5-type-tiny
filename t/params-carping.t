@@ -53,7 +53,7 @@ my $e = exception {
 	testsub2(1.1);
 };
 
-isa_ok($e, 'Type::Exception');
+isa_ok($e, 'Error::TypeTiny');
 
 like(
 	$e,

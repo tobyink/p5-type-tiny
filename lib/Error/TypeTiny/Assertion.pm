@@ -1,4 +1,4 @@
-package Type::Exception::Assertion;
+package Error::TypeTiny::Assertion;
 
 use 5.006001;
 use strict;
@@ -9,12 +9,12 @@ BEGIN {
 }
 
 BEGIN {
-	$Type::Exception::Assertion::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Exception::Assertion::VERSION   = '0.029_01';
+	$Error::TypeTiny::Assertion::AUTHORITY = 'cpan:TOBYINK';
+	$Error::TypeTiny::Assertion::VERSION   = '0.029_01';
 }
 
-require Type::Exception;
-our @ISA = 'Type::Exception';
+require Error::TypeTiny;
+our @ISA = 'Error::TypeTiny';
 
 sub type               { $_[0]{type} };
 sub value              { $_[0]{value} };
@@ -97,13 +97,13 @@ __END__
 
 =head1 NAME
 
-Type::Exception::Assertion - exception when a value fails a type constraint
+Error::TypeTiny::Assertion - exception when a value fails a type constraint
 
 =head1 DESCRIPTION
 
 This exception is thrown when a value fails a type constraint assertion.
 
-This package inherits from L<Type::Exception>; see that for most
+This package inherits from L<Error::TypeTiny>; see that for most
 documentation. Major differences are listed below:
 
 =head2 Attributes
@@ -168,7 +168,7 @@ L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
 
 =head1 SEE ALSO
 
-L<Type::Exception>.
+L<Error::TypeTiny>.
 
 =head1 AUTHOR
 

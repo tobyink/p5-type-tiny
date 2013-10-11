@@ -9,7 +9,7 @@ BEGIN {
 	$Type::Tiny::Enum::VERSION   = '0.029_01';
 }
 
-sub _croak ($;@) { require Type::Exception; goto \&Type::Exception::croak }
+sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
 use overload q[@{}] => 'values';
 

@@ -160,7 +160,7 @@ my $e = exception { eval_closure(source => 'sub { 1 ]') };
 
 isa_ok(
 	$e,
-	'Type::Exception::Compilation',
+	'Error::TypeTiny::Compilation',
 	'$e',
 );
 

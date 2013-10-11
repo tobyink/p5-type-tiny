@@ -4,7 +4,7 @@
 
 =head1 PURPOSE
 
-Tests that L<Type::Exception> is capable of providing stack traces.
+Tests that L<Error::TypeTiny> is capable of providing stack traces.
 
 =head1 DEPENDENCIES
 
@@ -27,7 +27,7 @@ use strict;
 use warnings;
 use lib qw( ./lib ./t/lib ../inc ./inc );
 
-local $Type::Exception::StackTrace;
+local $Error::TypeTiny::StackTrace;
 
 use Test::More;
 use Test::Fatal;
@@ -36,7 +36,7 @@ use Test::Requires { "Devel::StackTrace" => 0 };
 use Types::Standard slurpy => -types;
 
 sub foo {
-	local $Type::Exception::StackTrace = 1;
+	local $Error::TypeTiny::StackTrace = 1;
 	Int->(@_);
 }
 
