@@ -51,6 +51,9 @@ cpan:STEVENL
 cpan:BBYRD
 	:name "Brendan Byrd".
 
+cpan:ILMARI
+	:name "Dagfinn Ilmari Mannsåker".
+
 # We bundle some files made by these dudes...
 
 cpan:RJBS
