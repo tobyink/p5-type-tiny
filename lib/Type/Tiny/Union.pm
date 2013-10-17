@@ -142,7 +142,7 @@ sub validate_explain
 		),
 		map {
 			$_->get_message($value),
-			map("    $_", @{ $_->validate_explain || []}),
+			map("    $_", @{ $_->validate_explain($value) || []}),
 		} @$self
 	];
 }
