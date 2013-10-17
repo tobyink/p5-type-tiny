@@ -37,7 +37,9 @@ sub import
 	my $next = \&Exporter::Tiny::import;
 	*import = $next;
 	my $class = shift;
-	return $class->$next({ into => scalar(caller) }, @_);
+	my $opts  = { ref($_[0]) ? %{+shift} : () };
+	$opts->{into} ||= scalar(caller);
+	return $class->$next($opts, @_);
 }
 
 use warnings;
