@@ -11,7 +11,7 @@ package Test::Fatal;
 use Carp ();
 use Try::Tiny 0.07;
 
-use Exporter 5.57 'import';
+use base 'Exporter';
 
 our @EXPORT    = qw(exception);
 our @EXPORT_OK = qw(exception success dies_ok lives_ok);

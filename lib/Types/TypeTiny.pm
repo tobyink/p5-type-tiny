@@ -20,7 +20,8 @@ sub import
 	require Exporter::Tiny;
 	my $next = \&Exporter::Tiny::import;
 	*import = $next;
-	return $next->(-into => scalar(caller), @_);
+	my $class = shift;
+	return $class->$next({ into => scalar(caller) }, @_);
 }
 
 sub meta
