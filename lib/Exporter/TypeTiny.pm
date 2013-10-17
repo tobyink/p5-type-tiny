@@ -1,7 +1,7 @@
 package Exporter::TypeTiny;
 require Exporter::Tiny;
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.029_03';
+our $VERSION   = '0.029_04';
 our @ISA       = 'Exporter::Tiny';
 our @EXPORT_OK = qw| mkopt mkopt_hash _croak |;
 *import        = \&Exporter::Tiny::import;

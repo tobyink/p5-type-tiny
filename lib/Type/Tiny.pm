@@ -10,7 +10,7 @@ BEGIN {
 
 BEGIN {
 	$Type::Tiny::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::VERSION   = '0.029_03';
+	$Type::Tiny::VERSION   = '0.029_04';
 }
 
 use Eval::TypeTiny ();
