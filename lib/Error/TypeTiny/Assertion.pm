@@ -38,8 +38,14 @@ sub new
 		$self->{attribute_name} = $d{name} if defined $d{name};
 		$self->{attribute_step} = $d{step} if defined $d{step};
 		
-		$self->{varname} = sprintf '$self->{%s}', B::perlstring($d{init_arg})
-			if defined $d{init_arg};
+		if (defined $d{init_arg})
+		{
+			$self->{varname} = sprintf('$args->{%s}', B::perlstring($d{init_arg}));
+		}
+		elsif (defined $d{name})
+		{
+			$self->{varname} = sprintf('$self->{%s}', B::perlstring($d{name}));
+		}
 	}
 	
 	return $self;
