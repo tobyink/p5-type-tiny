@@ -49,7 +49,7 @@ my $e_constructor = exception { Goo->new(number => "too") };
 isa_ok($e_constructor, 'Error::TypeTiny::Assertion', '$e_constructor');
 is($e_constructor->attribute_name, 'number', '$e_constructor->attribute_name');
 is($e_constructor->attribute_step, 'isa check', '$e_constructor->attribute_step');
-is($e_constructor->varname, '$self->{"number"}', '$e_constructor->varname');
+is($e_constructor->varname, '$args->{"number"}', '$e_constructor->varname');
 is($e_constructor->value, "too", '$e_constructor->value');
 is($e_constructor->type, Types::Standard::Int, '$e_constructor->type');
 
