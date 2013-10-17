@@ -20,7 +20,7 @@ sub import
 	require Exporter::Tiny;
 	my $next = \&Exporter::Tiny::import;
 	*import = $next;
-	goto $next;
+	return $next->(-into => scalar(caller), @_);
 }
 
 sub meta
