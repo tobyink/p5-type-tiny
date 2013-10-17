@@ -188,6 +188,7 @@ sub _dd
 	!defined $value ? 'Undef' :
 	!ref $value     ? sprintf('Value %s', B::perlstring($value)) :
 	do {
+		my $N = 0 + (defined($DD) ? $DD : 72);
 		require Data::Dumper;
 		local $Data::Dumper::Indent   = 0;
 		local $Data::Dumper::Useqq    = 1;
@@ -195,8 +196,8 @@ sub _dd
 		local $Data::Dumper::Sortkeys = 1;
 		local $Data::Dumper::Maxdepth = 2;
 		my $str = Data::Dumper::Dumper($value);
-		$str = substr($str, 0, 60).'...'.substr($str, -1, 1)
-			if length($str) >= 72;
+		$str = substr($str, 0, $N - 12).'...'.substr($str, -1, 1)
+			if length($str) >= $N;
 		"Reference $str";
 	}
 }
@@ -1473,8 +1474,11 @@ version of Perl.
 
 This in undef by default but may be set to a coderef that Type::Tiny
 and related modules will use to dump data structures in things like
-error messages. Otherwise Type::Tiny uses it's own routine to dump data
-structures.
+error messages.
+
+Otherwise Type::Tiny uses it's own routine to dump data structures.
+C<< $DD >> may then be set to a number to limit the lengths of the
+dumps. (Default limit is 72.)
 
 This is a package variable (rather than get/set class methods) to allow
 for easy localization.
