@@ -54,6 +54,9 @@ cpan:BBYRD
 cpan:ILMARI
 	:name "Dagfinn Ilmari Mannsåker".
 
+cpan:DAGOLDEN
+	:name "David Golden".
+
 # We bundle some files made by these dudes...
 
 cpan:RJBS

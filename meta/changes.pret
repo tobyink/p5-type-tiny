@@ -1166,20 +1166,43 @@
 	doap:branch "master";
 	changeset [
 		dcs:versus `Type-Tiny 0.029_01 cpan:TOBYINK`;
-		item "Renamed the Type::Exception modules to Error::TypeTiny."^^BackCompat;
-		item "Type::Tiny::Enum type constraints are now subtypes of Types::Standard::Str; not Types::Standard::Defined."^^Change;
-		item "Types::Standard::Item is now a subtype of not Types::Standard::Any."^^Change;
-		item "Fix typos in documentation of Error::TypeTiny package variables."^^Documentation;
-		item "$Type::Tiny::DD package variable can now be used for a pluggable data dumper coderef."^^Change;
+		item [
+			a dcs:BackCompat;
+			label "Renamed the Type::Exception modules to Error::TypeTiny.";
+			dcs:fixes RT#89280;
+			dcs:thanks cpan:BBYRD;
+		];
+		item [
+			label "Type::Tiny::Enum type constraints are now subtypes of Types::Standard::Str; not Types::Standard::Defined.";
+			dcs:thanks cpan:DAGOLDEN;
+		];
+		item [
+			label "Types::Standard::Item is now a subtype of not Types::Standard::Any.";
+			dcs:thanks cpan:DAGOLDEN;
+		];
+		item [
+			a dcs:Documentation;
+			label "Fix typos in documentation of Error::TypeTiny package variables.";
+		];
+		item [
+			label "$Type::Tiny::DD package variable can now be used for a pluggable data dumper coderef.";
+			dcs:thanks cpan:TIMB;
+			dcs:fixes RT#89251;
+		];
 	].
 
 `Type-Tiny 0.029_03 cpan:TOBYINK`
 	issued  2013-10-17;
 	changeset [
 		dcs:versus `Type-Tiny 0.029_02 cpan:TOBYINK`;
-		item "Older versions of Scalar::Util::looks_like_number return true for undef; work around them."^^Bugfix;
 		item [
+			a dcs:Bugfix;
+			label "Older versions of Scalar::Util::looks_like_number return true for undef; work around them.";
+		];
+		item [
+			a dcs:Bugfix;
 			label "Fix segfault on Perl 5.8.1 to 5.8.3. (And possibly some other 5.8.x Perls.) Caused by the combination of eval and goto.";
 			dcs:thanks cpan:RIBASUSHI, cpan:HAARG, cpan:ILMARI;
 		];
 	].
+
