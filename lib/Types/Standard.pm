@@ -101,7 +101,7 @@ my $_laxnum = $meta->add_type({
 	name       => "LaxNum",
 	parent     => $_str,
 	constraint => sub { looks_like_number $_ },
-	inlined    => sub { "!ref($_[1]) && Scalar::Util::looks_like_number($_[1])" },
+	inlined    => sub { "defined($_[1]) && !ref($_[1]) && Scalar::Util::looks_like_number($_[1])" },
 });
 
 my $_strictnum = $meta->add_type({
