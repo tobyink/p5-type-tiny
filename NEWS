@@ -4,17 +4,6 @@
    changes in development releases, see the "Changes" file instead.
 =======================================================================
 
-2013-08-06 Type-Tiny version 0.022 released!
-
- - Strict comparison methods in Type::Tiny.
- - Improved compatibility with Moose attribute native traits.
-
-2013-08-27 Type-Tiny version 0.024 released!
-
- - Improved compatibility between Types::Standard and Moose built-in type
-   constraints.
- - Better MooseX::Types/MouseX::Type integration.
-
 2013-09-05 Type-Tiny version 0.026 released!
 
  - Type::Params now provides a `multisig` function.
