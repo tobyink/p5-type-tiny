@@ -6,9 +6,19 @@
 
 Check for memory leaks.
 
+These tests are not comprehensive; chances are that there are still
+memory leaks lurking somewhere in Type::Tiny. If you have any concrete
+suggestions for things to test, or fixes for identified memory leaks,
+please file a bug report.
+
+L<https://rt.cpan.org/Ticket/Create.html?Queue=Type-Tiny>.
+
 =head1 DEPENDENCIES
 
 L<Test::LeakTrace>.
+
+This test is skipped on Perl < 5.10.1 because I'm not interested in
+jumping through hoops for ancient versions of Perl.
 
 =head1 AUTHOR
 
@@ -29,7 +39,7 @@ use lib qw( ./lib ./t/lib ../inc ./inc );
 
 use Test::More;
 
-BEGIN { plan skip_all => 'Perl 5.10.0' if $] == 5.010 };
+BEGIN { plan skip_all => 'Perl < 5.10.1' if $] < 5.010001 };
 
 use Test::Requires 'Test::LeakTrace';
 use Test::LeakTrace;
