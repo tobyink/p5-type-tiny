@@ -1,3 +1,9 @@
+=======================================================================
+   This file contains a high-level summary of changes between recent
+   stable releases of Type-Tiny. For a more detailed list, including
+   changes in development releases, see the "Changes" file instead.
+=======================================================================
+
 2013-08-06 Type-Tiny version 0.022 released!
 
  - Strict comparison methods in Type::Tiny.
