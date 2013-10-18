@@ -1231,3 +1231,17 @@
 			dcs:fixes RT#89234;
 		];
 	].
+
+`Type-Tiny 0.030 cpan:TOBYINK`
+	issued  2013-10-18;
+	changeset [
+		dcs:versus `Type-Tiny 0.029_04 cpan:TOBYINK`;
+		item [
+			a dcs:Tests;
+			label "Skip leak.t on Perl < 5.10.1. Type-Tiny does have some memory leaks in particular older versions of Perl: 5.8.8 and 5.10.0 are known to be problematic, but 5.8.9 seems fine. Ultimately it would be nice to get these fixed, but in the mean time skipping the test case makes the distribution easier to install.";
+		];
+		item [
+			a dcs:Documentation;
+			label "Updated NEWS file.";
+		];
+	].
