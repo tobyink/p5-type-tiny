@@ -35,6 +35,7 @@ my $type = HashRef[Str];
 
 {
 	package AAA;
+	BEGIN { $INC{'AAA.pm'} = __FILE__ };
 	use Moo::Role;
 	has foo => (
 		is     => 'ro',
