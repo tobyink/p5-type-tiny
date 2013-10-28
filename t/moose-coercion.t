@@ -32,6 +32,7 @@ use lib qw( ./lib ./t/lib ../inc ./inc );
 use Test::More;
 use Test::Requires { Moose => 2.0000 };
 use Test::Fatal;
+use Test::TypeTiny qw( matchfor );
 
 my @warnings;
 
@@ -64,7 +65,7 @@ my @warnings;
 my ($e, $o);
 
 my $suffix = "mutable class";
-for (0..1)
+for my $i (0..1)
 {
 	$e = exception {
 		$o = "Local::Class"->new(
@@ -82,7 +83,16 @@ for (0..1)
 			big   => {},
 		);
 	};
-	like($e, qr{^Attribute \(big\)}, "'big' attribute throws when it cannot coerce in constructor - $suffix");
+	is(
+		$e,
+		matchfor(
+			$i # exception class thrown by constructor is dependent on immutability
+				? 'Moose::Exception::ValidationFailedForInlineTypeConstraint'
+				: 'Moose::Exception::ValidationFailedForTypeConstraint',
+			qr{^Attribute \(big\)}
+		),
+		"'big' attribute throws when it cannot coerce in constructor - $suffix",
+	);
 
 	$e = exception {
 		$o = "Local::Class"->new(
@@ -90,7 +100,16 @@ for (0..1)
 			big   => [],
 		);
 	};
-	like($e, qr{^Attribute \(small\)}, "'small' attribute throws when it cannot coerce in constructor - $suffix");
+	is(
+		$e,
+		matchfor(
+			$i # exception class thrown by constructor is dependent on immutability
+				? 'Moose::Exception::ValidationFailedForInlineTypeConstraint'
+				: 'Moose::Exception::ValidationFailedForTypeConstraint',
+			qr{^Attribute \(small\)}
+		),
+		"'small' attribute throws when it cannot coerce in constructor - $suffix",
+	);
 	
 	$o = "Local::Class"->new;
 	$e = exception {
@@ -101,10 +120,24 @@ for (0..1)
 	is($o && $o->small, 1, "'small' attribute coerces in accessor - $suffix");
 	
 	$e = exception { $o->big({}) };
-	like($e, qr{^Attribute \(big\)}, "'big' attribute throws when it cannot coerce in accessor - $suffix");
+	is(
+		$e,
+		matchfor(
+			'Moose::Exception::ValidationFailedForInlineTypeConstraint',
+			qr{^Attribute \(big\)}
+		),
+		"'big' attribute throws when it cannot coerce in accessor - $suffix",
+	);
 
 	$e = exception { $o->small({}) };
-	like($e, qr{^Attribute \(small\)}, "'small' attribute throws when it cannot coerce in accessor - $suffix");
+	is(
+		$e,
+		matchfor(
+			'Moose::Exception::ValidationFailedForInlineTypeConstraint',
+			qr{^Attribute \(small\)}
+		),
+		"'small' attribute throws when it cannot coerce in accessor - $suffix",
+	);
 	
 	"Local::Class"->meta->make_immutable;
 	$suffix = "im$suffix";

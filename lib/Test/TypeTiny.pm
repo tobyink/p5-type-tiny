@@ -17,7 +17,34 @@ BEGIN {
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.030';
 our @EXPORT    = qw( should_pass should_fail ok_subtype );
-our @EXPORT_OK = qw( EXTENDED_TESTING );
+our @EXPORT_OK = qw( EXTENDED_TESTING matchfor );
+
+sub matchfor
+{
+	my @matchers = @_;
+	bless \@matchers, do {
+		package #
+		Test::TypeTiny::Internal::MATCHFOR;
+		use overload
+			q[==] => 'match',
+			q[eq] => 'match',
+			q[""] => 'to_string',
+			fallback => 1;
+		sub to_string {
+			$_[0][0]
+		}
+		sub match {
+			my ($self, $e) = @_;
+			my $does = Scalar::Util::blessed($e) ? ($e->can('DOES') || $e->can('isa')) : undef;
+			for my $s (@$self) {
+				return 1 if  ref($s) && $e =~ $s;
+				return 1 if !ref($s) && $does && $e->$does($s);
+			}
+			return;
+		}
+		__PACKAGE__;
+	};
+}
 
 sub _mk_message
 {
@@ -159,6 +186,11 @@ Test that passes iff all C<< @subtypes >> are subtypes of C<< $type >>.
 =item C<< EXTENDED_TESTING >>
 
 Exportable boolean constant.
+
+=item C<< matchfor(@things) >>
+
+Assistant for matching exceptions. Not exported by default.
+See also L<Test::Fatal::matchfor>.
 
 =back
 

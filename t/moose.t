@@ -52,27 +52,41 @@ is(
 	"some values that should pass their type constraint",
 );
 
-like(
+use Test::TypeTiny qw( matchfor );
+
+is(
 	exception { "Local::Class"->new(small => 100) },
-	qr{^Attribute \(small\) does not pass the type constraint},
+	matchfor(
+		'Moose::Exception::ValidationFailedForTypeConstraint',
+		qr{^Attribute \(small\) does not pass the type constraint}
+	),
 	"direct violation of type constraint",
 );
 
-like(
+is(
 	exception { "Local::Class"->new(small => 5.5) },
-	qr{^Attribute \(small\) does not pass the type constraint},
+	matchfor(
+		'Moose::Exception::ValidationFailedForTypeConstraint',
+		qr{^Attribute \(small\) does not pass the type constraint}
+	),
 	"violation of parent type constraint",
 );
 
-like(
+is(
 	exception { "Local::Class"->new(small => "five point five") },
-	qr{^Attribute \(small\) does not pass the type constraint},
+	matchfor(
+		'Moose::Exception::ValidationFailedForTypeConstraint',
+		qr{^Attribute \(small\) does not pass the type constraint}
+	),
 	"violation of grandparent type constraint",
 );
 
-like(
+is(
 	exception { "Local::Class"->new(small => []) },
-	qr{^Attribute \(small\) does not pass the type constraint},
+	matchfor(
+		'Moose::Exception::ValidationFailedForTypeConstraint',
+		qr{^Attribute \(small\) does not pass the type constraint}
+	),
 	"violation of great-grandparent type constraint",
 );
 
@@ -228,9 +242,12 @@ ok(
 	'pushing ok value',
 );
 
-like(
+is(
 	exception { $coll->add({})},
-	qr{^A new member value for things does not pass its type constraint because:},
+	matchfor(
+		'Moose::Exception::ValidationFailedForInlineTypeConstraint',
+		qr{^A new member value for things does not pass its type constraint because:},
+	),
 	'pushing not ok value',
 );
 
