@@ -285,6 +285,8 @@ __END__
 
 =encoding utf-8
 
+=for stopwords arrayfication hashification
+
 =head1 NAME
 
 Types::TypeTiny - type constraints used internally by Type::Tiny
