@@ -1553,6 +1553,8 @@ Any string.
 (The only difference between C<Value> and C<Str> is that the former accepts
 typeglobs and vstrings.)
 
+Other customers also bought: C<< StringLike >> from L<Types::TypeTiny>.
+
 =item C<< Num >>
 
 See C<LaxNum> and C<StrictNum> below.
@@ -1600,6 +1602,8 @@ If parameterized, the elements of the array must pass the additional
 constraint. For example, C<< ArrayRef[Num] >> must be a reference to an
 array of numbers.
 
+Other customers also bought: C<< ArrayLike >> from L<Types::TypeTiny>.
+
 =item C<< HashRef[`a] >>
 
 A value where C<< ref($value) eq "HASH" >>.
@@ -1610,9 +1614,13 @@ hash where the values are numbers. The hash keys are not constrained,
 but Perl limits them to strings; see C<Map> below if you need to further
 constrain the hash values.
 
+Other customers also bought: C<< HashLike >> from L<Types::TypeTiny>.
+
 =item C<< CodeRef >>
 
 A value where C<< ref($value) eq "CODE" >>.
+
+Other customers also bought: C<< CodeLike >> from L<Types::TypeTiny>.
 
 =item C<< RegexpRef >>
 

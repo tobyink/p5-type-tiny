@@ -293,8 +293,9 @@ Types::TypeTiny - type constraints used internally by Type::Tiny
 
 Dogfooding.
 
-This isn't a real Type::Library-based type library; that would involve too
-much circularity. But it exports some type constraint "constants":
+This isn't a real Type::Library-based type library; that would involve
+too much circularity. But it exports some type constraints which, while
+designed for use within Type::Tiny, may be more generally useful.
 
 =head2 Types
 
@@ -302,13 +303,23 @@ much circularity. But it exports some type constraint "constants":
 
 =item C<< StringLike >>
 
+Accepts strings and objects overloading stringification.
+
 =item C<< HashLike >>
+
+Accepts hashrefs and objects overloading hashification.
 
 =item C<< ArrayLike >>
 
+Accepts arrayrefs and objects overloading arrayfication.
+
 =item C<< CodeLike >>
 
+Accepts coderefs and objects overloading codification.
+
 =item C<< TypeTiny >>
+
+Accepts blessed L<Type::Tiny> objects.
 
 =back
 
