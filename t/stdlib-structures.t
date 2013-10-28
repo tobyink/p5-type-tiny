@@ -118,4 +118,16 @@ should_fail([undef], $anyany);
 should_fail([1,1,1], $anyany);
 should_fail([1,1,undef], $anyany);
 
+note "Tuple[] vs Tuple";
+should_pass([ ], Tuple[]);
+should_fail([1], Tuple[]);
+should_pass([ ], Tuple);
+should_pass([1], Tuple);
+
+note "Dict[] vs Dict";
+should_pass(+{      }, Dict[]);
+should_fail(+{foo=>1}, Dict[]);
+should_pass(+{      }, Dict);
+should_pass(+{foo=>1}, Dict);
+
 done_testing;

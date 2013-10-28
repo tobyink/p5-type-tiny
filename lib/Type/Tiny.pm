@@ -679,12 +679,12 @@ my %param_cache;
 sub parameterize
 {
 	my $self = shift;
-	return $self unless @_;
+	
 	$self->is_parameterizable
-		or _croak "Type '%s' does not accept parameters", "$self";
+		or @_ ? _croak("Type '%s' does not accept parameters", "$self") : return($self);
 	
 	@_ = map Types::TypeTiny::to_TypeTiny($_), @_;
-	
+
 	# Generate a key for caching parameterized type constraints,
 	# but only if all the parameters are strings or type constraints.
 	my $key;

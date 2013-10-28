@@ -167,6 +167,8 @@ my $_ref = $meta->add_type({
 	inlined    => sub { "!!ref($_[1])" },
 	constraint_generator => sub
 	{
+		return $meta->get_type('Ref') unless @_;
+		
 		my $reftype = shift;
 		Types::TypeTiny::StringLike->check($reftype)
 			or _croak("Parameter to Ref[`a] expected to be string; got $reftype");
@@ -243,6 +245,8 @@ my $_arr = $meta->add_type({
 	inlined    => sub { "ref($_[1]) eq 'ARRAY'" },
 	constraint_generator => sub
 	{
+		return $meta->get_type('ArrayRef') unless @_;
+		
 		my $param = Types::TypeTiny::to_TypeTiny(shift);
 		Types::TypeTiny::TypeTiny->check($param)
 			or _croak("Parameter to ArrayRef[`a] expected to be a type constraint; got $param");
@@ -295,6 +299,8 @@ my $_hash = $meta->add_type({
 	inlined    => sub { "ref($_[1]) eq 'HASH'" },
 	constraint_generator => sub
 	{
+		return $meta->get_type('HashRef') unless @_;
+		
 		my $param = Types::TypeTiny::to_TypeTiny(shift);
 		Types::TypeTiny::TypeTiny->check($param)
 			or _croak("Parameter to HashRef[`a] expected to be a type constraint; got $param");
@@ -348,6 +354,8 @@ $meta->add_type({
 	inlined    => sub { "ref($_[1]) eq 'SCALAR' or ref($_[1]) eq 'REF'" },
 	constraint_generator => sub
 	{
+		return $meta->get_type('ScalarRef') unless @_;
+		
 		my $param = Types::TypeTiny::to_TypeTiny(shift);
 		Types::TypeTiny::TypeTiny->check($param)
 			or _croak("Parameter to ScalarRef[`a] expected to be a type constraint; got $param");
@@ -399,6 +407,8 @@ $meta->add_type({
 	parent     => $_item,
 	constraint_generator => sub
 	{
+		return $meta->get_type('Maybe') unless @_;
+		
 		my $param = Types::TypeTiny::to_TypeTiny(shift);
 		Types::TypeTiny::TypeTiny->check($param)
 			or _croak("Parameter to Maybe[`a] expected to be a type constraint; got $param");
@@ -436,6 +446,8 @@ $meta->add_type({
 	parent     => $_hash,
 	constraint_generator => sub
 	{
+		return $meta->get_type('Map') unless @_;
+		
 		my ($keys, $values) = map Types::TypeTiny::to_TypeTiny($_), @_;
 		Types::TypeTiny::TypeTiny->check($keys)
 			or _croak("First parameter to Map[`k,`v] expected to be a type constraint; got $keys");
@@ -502,6 +514,8 @@ my $_Optional = $meta->add_type({
 	parent     => $_item,
 	constraint_generator => sub
 	{
+		return $meta->get_type('Optional') unless @_;
+		
 		my $param = Types::TypeTiny::to_TypeTiny(shift);
 		Types::TypeTiny::TypeTiny->check($param)
 			or _croak("Parameter to Optional[`a] expected to be a type constraint; got $param");
@@ -756,6 +770,8 @@ $meta->add_type({
 	inlined    => sub { "Scalar::Util::blessed($_[1]) and overload::Overloaded($_[1])" },
 	constraint_generator => sub
 	{
+		return $meta->get_type('Overload') unless @_;
+		
 		my @operations = map {
 			Types::TypeTiny::StringLike->check($_)
 				? "$_"
@@ -787,6 +803,8 @@ $meta->add_type({
 	parent     => $_str,
 	constraint_generator => sub
 	{
+		return $meta->get_type('StrMatch') unless @_;
+		
 		my ($regexp, $checker) = @_;
 		
 		ref($regexp) eq 'Regexp'
@@ -898,6 +916,8 @@ $meta->add_type({
 	},
 	constraint_generator => sub
 	{
+		return $meta->get_type('Tied') unless @_;
+		
 		my $param = Types::TypeTiny::to_TypeTiny(shift);
 		unless (Types::TypeTiny::TypeTiny->check($param))
 		{
@@ -939,6 +959,7 @@ $meta->add_type({
 	name       => "InstanceOf",
 	parent     => $_obj,
 	constraint_generator => sub {
+		return $meta->get_type('InstanceOf') unless @_;
 		require Type::Tiny::Class;
 		my @classes = map {
 			Types::TypeTiny::TypeTiny->check($_)
@@ -960,6 +981,7 @@ $meta->add_type({
 	name       => "ConsumerOf",
 	parent     => $_obj,
 	constraint_generator => sub {
+		return $meta->get_type('ConsumerOf') unless @_;
 		require B;
 		require Type::Tiny::Role;
 		my @roles = map {
@@ -981,6 +1003,7 @@ $meta->add_type({
 	name       => "HasMethods",
 	parent     => $_obj,
 	constraint_generator => sub {
+		return $meta->get_type('HasMethods') unless @_;
 		require B;
 		require Type::Tiny::Duck;
 		return "Type::Tiny::Duck"->new(
@@ -994,6 +1017,7 @@ $meta->add_type({
 	name       => "Enum",
 	parent     => $_str,
 	constraint_generator => sub {
+		return $meta->get_type('Enum') unless @_;
 		require B;
 		require Type::Tiny::Enum;
 		return "Type::Tiny::Enum"->new(
