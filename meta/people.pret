@@ -57,6 +57,10 @@ cpan:ILMARI
 cpan:DAGOLDEN
 	:name "David Golden".
 
+<urn:uuid:580d3dfe-fe45-42ef-9f58-1310ffee7004>
+	:name "Benct Philip Jonsson";
+	:mbox <mailto:bpj@melroch.se>.
+
 # We bundle some files made by these dudes...
 
 cpan:RJBS

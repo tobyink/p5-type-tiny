@@ -1245,3 +1245,19 @@
 			label "Updated NEWS file.";
 		];
 	].
+
+`Type-Tiny 0.031_01 cpan:TOBYINK`
+	issued  2013-10-28;
+	changeset [
+		dcs:versus `Type-Tiny 0.030 cpan:TOBYINK`;
+		item "Adjustments to cope with newer Moose is-class-loaded heuristics."^^Tests;
+		item "Check Moose exception objects with isa rather than regexp matching."^^Tests;
+		item "Improved documentation for Types::TypeTiny."^^Documentation;
+		item [
+			a dcs:Bugfix;
+			label "Differentiate Tuple[] vs Tuple, and Dict[] vs Dict.";
+			dcs:thanks <urn:uuid:580d3dfe-fe45-42ef-9f58-1310ffee7004>;
+			dcs:fixes RT#89696;
+		];
+	].
+
