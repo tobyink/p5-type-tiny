@@ -295,12 +295,12 @@ Evaluate: {
 		my $tokens = $self->{tokens};
 		
 		my ($lhs, $min_p) = @_;
-		while (!$tokens->empty and exists $precedence{$tokens->peek(0)->type} and $precedence{$tokens->peek(0)->type} >= $min_p)
+		while (!$tokens->empty and defined($precedence{$tokens->peek(0)->type}) and $precedence{$tokens->peek(0)->type} >= $min_p)
 		{
 			my $op  = $tokens->eat;
 			my $rhs = $self->_parse_primary;
 			
-			while (!$tokens->empty and exists $precedence{$tokens->peek(0)->type} and $precedence{$tokens->peek(0)->type} > $precedence{$op->type})
+			while (!$tokens->empty and defined($precedence{$tokens->peek(0)->type}) and $precedence{$tokens->peek(0)->type} > $precedence{$op->type})
 			{
 				my $lookahead = $tokens->peek(0);
 				$rhs = $self->_parse_expression_1($rhs, $precedence{$lookahead->type});
