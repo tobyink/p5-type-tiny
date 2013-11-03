@@ -205,8 +205,8 @@ Evaluate: {
 		bless { @_ }, $class;
 	}
 	
-	my %precedence = (
-		Type::Parser::COMMA()     , 1 ,
+	our %precedence = (
+#		Type::Parser::COMMA()     , 1 ,
 		Type::Parser::UNION()     , 2 ,
 		Type::Parser::INTERSECT() , 3 ,
 		Type::Parser::NOT()       , 4 ,
@@ -254,6 +254,8 @@ Evaluate: {
 			my $base = { type  => "primary", token => $tokens->eat(Type::Parser::TYPE) };
 			$tokens->eat(Type::Parser::L_BRACKET);
 			$tokens->assert_not_empty;
+			
+			local $precedence{ Type::Parser::COMMA() } = 1;
 			
 			my $params = undef;
 			if ($tokens->peek(0)->type eq Type::Parser::R_BRACKET)

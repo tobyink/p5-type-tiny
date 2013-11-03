@@ -132,6 +132,9 @@ note "Tail retention";
 my ($ast, $remaining) = parse("ArrayRef   [DateTime::]  |HashRef[ Int|\tDateTime::]|CodeRef monkey nuts ");
 is($remaining, " monkey nuts ", "remainder is ok");
 
+($ast, $remaining) = parse("Int, Str");
+is($remaining, ", Str", "comma can indicate beginning of remainder");
+
 note "Parsing edge cases";
 is_deeply(
 	scalar parse('Xyzzy[Foo]'),
