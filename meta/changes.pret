@@ -1261,3 +1261,11 @@
 		];
 	].
 
+`Type-Tiny 0.031_02 cpan:TOBYINK`
+	issued  2013-11-03;
+	changeset [
+		dcs:versus `Type-Tiny 0.031_01 cpan:TOBYINK`;
+		item "Type::Parser now differentiates between Tuple[] and Tuple too."^^Change;
+		item "Type::Parser only treats a comma as an operator within a parameterization now, and is thus now able to parse types from the head of a string which is a comma-separated list of types."^^Change;
+	].
+
