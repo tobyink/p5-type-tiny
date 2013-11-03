@@ -1281,3 +1281,10 @@
 		];
 	].
 
+`Type-Tiny 0.031_04 cpan:TOBYINK`
+	issued  2013-11-03;
+	changeset [
+		dcs:versus `Type-Tiny 0.031_03 cpan:TOBYINK`;
+		item "Type::Parser 0.031_02 introduced a bug under Perl 5.6.x where we relied on the existence (or not) of a hash item being affected by `local`; this was implemented in Perl 5.8.0. Work around this problem by checking definedness instead."^^Bugfix;
+	].
+
