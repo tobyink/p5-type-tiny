@@ -219,6 +219,10 @@ C<Dict>
 
 C<Optional>
 
+=item *
+
+C<Maybe>
+
 =back
 
 =head2 Chained Coercions

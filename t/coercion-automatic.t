@@ -106,6 +106,34 @@ NONINLINED: {
 		$ref2,
 		'$RefOfFoo does not coerce value that cannot be coerced',
 	);
+	
+	# This added coercion should be ignored, because undef shouldn't
+	# need coercion!
+	my $MaybeFoo = Maybe[$Foo->plus_coercions(Undef, 999)];
+	
+	is(
+		$MaybeFoo->coerce(undef),
+		undef,
+		'$MaybeFoo does not coerce undef',
+	);
+	
+	is(
+		$MaybeFoo->coerce(42),
+		42,
+		'$MaybeFoo does not coerce integer',
+	);
+	
+	is(
+		$MaybeFoo->coerce(4.2),
+		4,
+		'$MaybeFoo does coerce non-integer number',
+	);
+	
+	is(
+		$MaybeFoo->coerce("xyz"),
+		"xyz",
+		'$MaybeFoo cannot coerce non-number',
+	);
 };
 
 INLINED: {
@@ -187,6 +215,34 @@ INLINED: {
 		$RefOfBar->coerce($ref2),
 		$ref2,
 		'$RefOfBar does not coerce value that cannot be coerced',
+	);
+	
+	# This added coercion should be ignored, because undef shouldn't
+	# need coercion!
+	my $MaybeBar = Maybe[$Bar->plus_coercions(Undef, 999)];
+	
+	is(
+		$MaybeBar->coerce(undef),
+		undef,
+		'$MaybeBar does not coerce undef',
+	);
+	
+	is(
+		$MaybeBar->coerce(42),
+		42,
+		'$MaybeBar does not coerce integer',
+	);
+	
+	is(
+		$MaybeBar->coerce(4.2),
+		4,
+		'$MaybeBar does coerce non-integer number',
+	);
+	
+	is(
+		$MaybeBar->coerce("xyz"),
+		"xyz",
+		'$MaybeBar cannot coerce non-number',
 	);
 };
 

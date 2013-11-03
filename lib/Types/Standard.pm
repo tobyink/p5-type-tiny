@@ -1257,6 +1257,13 @@ $lib->get_type("Optional")->{coercion_generator} = sub
 	return $param->coercion;
 };
 
+$lib->get_type("Maybe")->{coercion_generator} = sub
+{
+	my ($parent, $child, $param) = @_;
+	return unless $param->has_coercion;
+	return $param->coercion;
+};
+
 my $label_counter = 0;
 our ($keycheck_counter, @KEYCHECK) = -1;
 $lib->get_type("Dict")->{coercion_generator} = sub
