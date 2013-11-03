@@ -106,8 +106,10 @@ Evaluate: {
 		
 		if ($node->{type} eq "parameterized")
 		{
-			return _eval_type($node->{base}, $reg) unless $node->{params};
-			return _eval_type($node->{base}, $reg)->parameterize(_eval_type($node->{params}, $reg));
+			my $base = _eval_type($node->{base}, $reg);
+			
+			return $base unless $base->is_parameterizable || $node->{params};
+			return $base->parameterize($node->{params} ? _eval_type($node->{params}, $reg) : ());
 		}
 		
 		if ($node->{type} eq "primary" and $node->{token}->type eq CLASS)
