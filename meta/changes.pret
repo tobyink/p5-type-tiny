@@ -1269,3 +1269,15 @@
 		item "Type::Parser only treats a comma as an operator within a parameterization now, and is thus now able to parse types from the head of a string which is a comma-separated list of types."^^Change;
 	].
 
+`Type-Tiny 0.031_03 cpan:TOBYINK`
+	issued  2013-11-03;
+	changeset [
+		dcs:versus `Type-Tiny 0.031_02 cpan:TOBYINK`;
+		item [
+			a dcs:Addition;
+			label "Deep coercions for Maybe[`a].";
+			dcs:fixes RT#89936;
+			dcs:thanks cpan:BBYRD;
+		];
+	].
+
