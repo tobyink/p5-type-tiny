@@ -1347,6 +1347,7 @@ $lib->get_type("Dict")->{coercion_generator} = sub
 		last if!$all_inlinable;
 	}
 	$all_inlinable = 0 if $slurpy && !$slurpy->can_be_inlined;
+	$all_inlinable = 0 if $slurpy && $slurpy->has_coercion && !$slurpy->coercion->can_be_inlined;
 	
 	if ($all_inlinable)
 	{
@@ -1360,7 +1361,23 @@ $lib->get_type("Dict")->{coercion_generator} = sub
 			my @code;
 			push @code, 'do { my ($orig, $return_orig, %tmp, %new) = ($_, 0);';
 			push @code,       "$label: {";
-			push @code,       sprintf('($_ =~ $%s::KEYCHECK[%d])||(($return_orig = 1), last %s) for sort keys %%$orig;', __PACKAGE__, $keycheck_counter, $label);
+			if ($slurpy)
+			{
+				push @code, sprintf('my $slurped = +{ map +($_=~$%s::KEYCHECK[%d])?():($_=>$orig->{$_}), keys %%$orig };', __PACKAGE__, $keycheck_counter);
+				if ($slurpy->has_coercion)
+				{
+					push @code, sprintf('my $coerced = %s;', $slurpy->coercion->inline_coercion('$slurped'));
+					push @code, sprintf('((%s)&&(%s))?(%%new=%%$coerced):(($return_orig = 1), last %s);', $_hash->inline_check('$coerced'), $slurpy->inline_check('$coerced'), $label);
+				}
+				else
+				{
+					push @code, sprintf('(%s)?(%%new=%%$slurped):(($return_orig = 1), last %s);', $slurpy->inline_check('$slurped'), $label);
+				}
+			}
+			else
+			{
+				push @code, sprintf('($_ =~ $%s::KEYCHECK[%d])||(($return_orig = 1), last %s) for sort keys %%$orig;', __PACKAGE__, $keycheck_counter, $label);
+			}
 			for my $k (keys %dict)
 			{
 				my $ct = $dict{$k};
@@ -1411,10 +1428,33 @@ $lib->get_type("Dict")->{coercion_generator} = sub
 			$parent => sub {
 				my $value = @_ ? $_[0] : $_;
 				my %new;
-				for my $k (keys %$value)
+				
+				if ($slurpy)
 				{
-					return $value unless exists $dict{$k};
+					my %slurped = map exists($dict{$_}) ? () : ($_ => $value->{$_}), keys %$value;
+					
+					if ($slurpy->check(\%slurped))
+					{
+						%new = %slurped;
+					}
+					elsif ($slurpy->has_coercion)
+					{
+						my $coerced = $slurpy->coerce(\%slurped);
+						$slurpy->check($coerced) ? (%new = %$coerced) : (return $value);
+					}
+					else
+					{
+						return $value;
+					}
 				}
+				else
+				{
+					for my $k (keys %$value)
+					{
+						return $value unless exists $dict{$k};
+					}
+				}
+
 				for my $k (keys %dict)
 				{
 					my $ct = $dict{$k};

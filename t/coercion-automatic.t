@@ -335,6 +335,26 @@ DICT: {
 	);
 };
 
+DICT_PLUS_SLURPY: {
+	my $Rounded1 = Int->plus_coercions(Num, q[int($_)]);
+	my $Dict1    = Dict[ a => $Rounded1, slurpy Map[$Rounded1, $Rounded1] ];
+	
+	is_deeply(
+		$Dict1->coerce({ a => 1.1, 2.2 => 3.3, 4.4 => 5 }),
+		{ a => 1, 2 => 3, 4 => 5 },
+		"Coercion to $Dict1 (inlined)",
+	);
+	
+	my $Rounded2 = Int->plus_coercions(Num, sub { int($_) });
+	my $Dict2    = Dict[ a => $Rounded2, slurpy Map[$Rounded2, $Rounded2] ];
+	
+	is_deeply(
+		$Dict2->coerce({ a => 1.1, 2.2 => 3.3, 4.4 => 5 }),
+		{ a => 1, 2 => 3, 4 => 5 },
+		"Coercion to $Dict2 (non-inlined)",
+	);
+};
+
 TUPLE: {
 	my $IntFromStr = declare IntFromStr => as Int;
 	coerce $IntFromStr, from Str, q{ length($_) };
