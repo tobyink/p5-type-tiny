@@ -679,11 +679,14 @@ $meta->add_type({
 	parent     => $_hash,
 	name_generator => sub
 	{
-		my ($s, %a) = @_;
-		sprintf('%s[%s]', $s, join q[,], map sprintf("%s=>%s", $_, $a{$_}), sort keys %a);
+		my ($s, @p) = @_;
+		my $l = ref($p[-1]) eq q(HASH) ? pop(@p)->{slurpy} : undef;
+		my %a = @p;
+		sprintf('%s[%s%s]', $s, join(q[,], map sprintf("%s=>%s", $_, $a{$_}), sort keys %a), $l ? ",slurpy $l" : '');
 	},
 	constraint_generator => sub
 	{
+		my $slurpy = ref($_[-1]) eq q(HASH) ? pop(@_)->{slurpy} : undef;
 		my %constraints = @_;
 		
 		while (my ($k, $v) = each %constraints)
@@ -696,7 +699,17 @@ $meta->add_type({
 		return sub
 		{
 			my $value = $_[0];
-			exists($constraints{$_}) || return for sort keys %$value;
+			if ($slurpy)
+			{
+				my %tmp = map {
+					exists($constraints{$_}) ? () : ($_ => $value->{$_})
+				} keys %$value;
+				return unless $slurpy->check(\%tmp);
+			}
+			else
+			{
+				exists($constraints{$_}) || return for sort keys %$value;
+			}
 			for (sort keys %constraints) {
 				my $c = $constraints{$_};
 				return unless exists($value->{$_}) || $c->is_strictly_a_type_of(Optional());
@@ -709,12 +722,17 @@ $meta->add_type({
 	{
 		# We can only inline a parameterized Dict if all the
 		# constraints inside can be inlined.
+		
+		my $slurpy = ref($_[-1]) eq q(HASH) ? pop(@_)->{slurpy} : undef;
+		return if $slurpy && !$slurpy->can_be_inlined;
+		
 		my %constraints = @_;
 		for my $c (values %constraints)
 		{
 			next if $c->can_be_inlined;
 			return;
 		}
+		
 		my $regexp = join "|", map quotemeta, sort keys %constraints;
 		return sub
 		{
@@ -722,7 +740,12 @@ $meta->add_type({
 			my $h = $_[1];
 			join " and ",
 				"ref($h) eq 'HASH'",
-				"not(grep !/^($regexp)\$/, keys \%{$h})",
+				( $slurpy ? do {
+					'do {'
+					. "my \$slurpy_tmp = +{ map /\\A(?:$regexp)\\z/ ? () : (\$_ => ($h)->{\$_}), keys \%{$h} };"
+					. $slurpy->inline_check('$slurpy_tmp')
+					. '}'
+				} : "not(grep !/\\A(?:$regexp)\\z/, keys \%{$h})" ),
 				( map {
 					my $k = B::perlstring($_);
 					$constraints{$_}->is_strictly_a_type_of( Optional() )
@@ -734,7 +757,10 @@ $meta->add_type({
 	deep_explanation => sub {
 		require B;
 		my ($type, $value, $varname) = @_;
-		my %constraints = @{ $type->parameters };
+		my @params = @{ $type->parameters };
+		
+		my $slurpy = ref($params[-1]) eq q(HASH) ? pop(@params)->{slurpy} : undef;
+		my %constraints = @params;
 		
 		for my $k (sort keys %$value)
 		{
@@ -1268,6 +1294,7 @@ my $label_counter = 0;
 our ($keycheck_counter, @KEYCHECK) = -1;
 $lib->get_type("Dict")->{coercion_generator} = sub
 {
+	my $slurpy = ref($_[-1]) eq q(HASH) ? pop(@_)->{slurpy} : undef;
 	my ($parent, $child, %dict) = @_;
 	my $C = "Type::Coercion"->new(type_constraint => $child);
 	

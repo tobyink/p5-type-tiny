@@ -130,4 +130,36 @@ should_fail(+{foo=>1}, Dict[]);
 should_pass(+{      }, Dict);
 should_pass(+{foo=>1}, Dict);
 
+my $gazetteer = Dict[ foo => Int, bar => Optional[Int], slurpy HashRef[Num] ];
+note "Dict[ ..., slurpy ... ]";
+should_pass({ foo => 42 }, $gazetteer);
+should_pass({ foo => 42, bar => 666 }, $gazetteer);
+should_fail({ foo => 4.2 }, $gazetteer);
+should_fail({ foo => 42, bar => 6.66 }, $gazetteer);
+should_fail({ foo => 4.2, bar => 6.66 }, $gazetteer);
+should_fail({ foo => undef }, $gazetteer);
+should_fail({ }, $gazetteer);
+should_pass({ foo => 42, baz => 999 }, $gazetteer);
+should_pass({ foo => 42, bar => 666, baz => 999 }, $gazetteer);
+should_fail({ foo => 4.2, baz => 999 }, $gazetteer);
+should_fail({ foo => 42, bar => 6.66, baz => 999 }, $gazetteer);
+should_fail({ foo => 4.2, bar => 6.66, baz => 999 }, $gazetteer);
+should_fail({ foo => undef, baz => 999 }, $gazetteer);
+should_fail({ baz => 999 }, $gazetteer);
+should_pass({ foo => 42, baz => 9.99 }, $gazetteer);
+should_pass({ foo => 42, bar => 666, baz => 9.99 }, $gazetteer);
+should_fail({ foo => 4.2, baz => 9.99 }, $gazetteer);
+should_fail({ foo => 42, bar => 6.66, baz => 9.99 }, $gazetteer);
+should_fail({ foo => 4.2, bar => 6.66, baz => 9.99 }, $gazetteer);
+should_fail({ foo => undef, baz => 9.99 }, $gazetteer);
+should_fail({ baz => 9.99 }, $gazetteer);
+should_fail({ foo => 42, baz => "x" }, $gazetteer);
+should_fail({ foo => 42, bar => 666, baz => "x" }, $gazetteer);
+should_fail({ foo => 4.2, baz => "x" }, $gazetteer);
+should_fail({ foo => 42, bar => 6.66, baz => "x" }, $gazetteer);
+should_fail({ foo => 4.2, bar => 6.66, baz => "x" }, $gazetteer);
+should_fail({ foo => undef, baz => "x" }, $gazetteer);
+should_fail({ baz => "x" }, $gazetteer);
+
+
 done_testing;
