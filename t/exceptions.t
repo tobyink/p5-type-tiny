@@ -129,12 +129,12 @@ is_deeply(
 my $dict = Dict[a => Int, b => Optional[ArrayRef[Str]]];
 
 is_deeply(
-	(exception { $dict->({c => 1}) })->explain,
+	(exception { $dict->({a => 1, c => 1}) })->explain,
 	[
-		'Reference {"c" => 1} did not pass type constraint "Dict[a=>Int,b=>Optional[ArrayRef[Str]]]"',
+		'Reference {"a" => 1,"c" => 1} did not pass type constraint "Dict[a=>Int,b=>Optional[ArrayRef[Str]]]"',
 		'"Dict[a=>Int,b=>Optional[ArrayRef[Str]]]" does not allow key "c" to appear in hash',
 	],
-	'$dict deep explanation, given {c => 1}',
+	'$dict deep explanation, given {a => 1, c => 1}',
 );
 
 is_deeply(
