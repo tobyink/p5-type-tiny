@@ -16,7 +16,7 @@ constraint:
 
    class_type PathTiny, { class => "Path::Tiny" };
 
-We may wish to define a coercion (i.e. a convertion routine) to handle
+We may wish to define a coercion (i.e. a conversion routine) to handle
 strings, and convert them into Path::Tiny objects:
 
    coerce PathTiny,
