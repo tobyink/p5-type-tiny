@@ -61,6 +61,10 @@ cpan:DAGOLDEN
 	:name "Benct Philip Jonsson";
 	:mbox <mailto:bpj@melroch.se>.
 
+<urn:uuid:26bd4917-ff58-4e17-b2ee-4e81abe27f19>
+	:name "David Steinbrunner";
+	:mbox <mailto:dsteinbrunner@pobox.com>.
+
 # We bundle some files made by these dudes...
 
 cpan:RJBS
