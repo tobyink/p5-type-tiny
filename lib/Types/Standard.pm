@@ -441,7 +441,7 @@ $meta->add_type({
 	},
 });
 
-$meta->add_type({
+my $_map = $meta->add_type({
 	name       => "Map",
 	parent     => $_hash,
 	constraint_generator => sub
@@ -730,6 +730,17 @@ $meta->add_type({
 		# i.e. Any, Item, Defined, Ref, or HashRef
 		my $slurpy_is_any = $slurpy && $_hash->is_a_type_of( $slurpy );
 		
+		# Is slurpy a parameterized Map, or expressable as a parameterized Map?
+		my $slurpy_is_map = $slurpy
+			&& $slurpy->is_parameterized
+			&& ((
+				$slurpy->parent->strictly_equals($_map)
+				&& $slurpy->parameters
+			)||(
+				$slurpy->parent->strictly_equals($_hash)
+				&& [ $_any, $slurpy->parameters->[0] ]
+			));
+		
 		my %constraints = @_;
 		for my $c (values %constraints)
 		{
@@ -745,6 +756,15 @@ $meta->add_type({
 			join " and ",
 				"ref($h) eq 'HASH'",
 				( $slurpy_is_any ? '1'
+				: $slurpy_is_map ? do {
+					'(not grep {'
+					."my \$v = ($h)->{\$_};"
+					.sprintf(
+						'not((%s) and (%s))',
+						$slurpy_is_map->[0]->inline_check('$_'),
+						$slurpy_is_map->[1]->inline_check('$v'),
+					) ."} keys \%{$h})"
+				}
 				: $slurpy ? do {
 					'do {'
 					. "my \$slurpy_tmp = +{ map /\\A(?:$regexp)\\z/ ? () : (\$_ => ($h)->{\$_}), keys \%{$h} };"
