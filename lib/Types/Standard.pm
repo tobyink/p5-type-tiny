@@ -1346,6 +1346,7 @@ $lib->get_type("Dict")->{coercion_generator} = sub
 		$all_inlinable = 0 if $tc->has_coercion && !$tc->coercion->can_be_inlined;
 		last if!$all_inlinable;
 	}
+	$all_inlinable = 0 if $slurpy && !$slurpy->can_be_inlined;
 	
 	if ($all_inlinable)
 	{
