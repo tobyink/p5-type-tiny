@@ -761,14 +761,7 @@ $meta->add_type({
 		
 		my $slurpy = ref($params[-1]) eq q(HASH) ? pop(@params)->{slurpy} : undef;
 		my %constraints = @params;
-		
-		for my $k (sort keys %$value)
-		{
-			return [
-				sprintf('"%s" does not allow key %s to appear in hash', $type, B::perlstring($k))
-			] unless exists $constraints{$k};
-		}
-		
+				
 		for my $k (sort keys %constraints)
 		{
 			next if $constraints{$k}->parent == Optional() && !exists $value->{$k};
@@ -782,6 +775,28 @@ $meta->add_type({
 				sprintf('"%s" constrains value at key %s of hash with "%s"', $type, B::perlstring($k), $constraints{$k}),
 				@{ $constraints{$k}->validate_explain($value->{$k}, sprintf('%s->{%s}', $varname, B::perlstring($k))) },
 			];
+		}
+		
+		if ($slurpy)
+		{
+			my %tmp = map {
+				exists($constraints{$_}) ? () : ($_ => $value->{$_})
+			} keys %$value;
+			
+			my $explain = $slurpy->validate_explain(\%tmp, '$slurpy');
+			return [
+				sprintf('"%s" requires the hashref of additional key/value pairs to conform to "%s"', $type, $slurpy),
+				@$explain,
+			] if $explain;
+		}
+		else
+		{
+			for my $k (sort keys %$value)
+			{
+				return [
+					sprintf('"%s" does not allow key %s to appear in hash', $type, B::perlstring($k))
+				] unless exists $constraints{$k};
+			}
 		}
 		
 		return;
