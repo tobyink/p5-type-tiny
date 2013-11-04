@@ -46,6 +46,14 @@
 		deps:on "Reply"^^deps:CpanId;
 		comment "Type::Tiny bundles a plugin for Reply."@en;
 	];
+	deps:runtime-conflict [
+		deps:on "Kavorka <= 0.013"^^deps:CpanId;
+		comment "Theoretically broken by changes to parameterization of Dict to allow it to accept a slurpy."@en;
+	];
+	deps:runtime-conflict [
+		deps:on "Types::ReadOnly <= 0.001"^^deps:CpanId;
+		comment "Theoretically broken by changes to parameterization of Dict to allow it to accept a slurpy."@en;
+	];
 	deps:develop-suggestion [
 		deps:on "Dist::Inkt 0.007"^^deps:CpanId;
 		comment "This is used for building the release tarball."@en;
