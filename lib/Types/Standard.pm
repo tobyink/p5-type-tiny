@@ -726,6 +726,10 @@ $meta->add_type({
 		my $slurpy = ref($_[-1]) eq q(HASH) ? pop(@_)->{slurpy} : undef;
 		return if $slurpy && !$slurpy->can_be_inlined;
 		
+		# Is slurpy a very loose type constraint?
+		# i.e. Any, Item, Defined, Ref, or HashRef
+		my $slurpy_is_any = $slurpy && $_hash->is_a_type_of( $slurpy );
+		
 		my %constraints = @_;
 		for my $c (values %constraints)
 		{
@@ -740,12 +744,14 @@ $meta->add_type({
 			my $h = $_[1];
 			join " and ",
 				"ref($h) eq 'HASH'",
-				( $slurpy ? do {
+				( $slurpy_is_any ? '1'
+				: $slurpy ? do {
 					'do {'
 					. "my \$slurpy_tmp = +{ map /\\A(?:$regexp)\\z/ ? () : (\$_ => ($h)->{\$_}), keys \%{$h} };"
 					. $slurpy->inline_check('$slurpy_tmp')
 					. '}'
-				} : "not(grep !/\\A(?:$regexp)\\z/, keys \%{$h})" ),
+				}
+				: "not(grep !/\\A(?:$regexp)\\z/, keys \%{$h})" ),
 				( map {
 					my $k = B::perlstring($_);
 					$constraints{$_}->is_strictly_a_type_of( Optional() )
