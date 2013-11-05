@@ -1307,7 +1307,7 @@
 
 `Type-Tiny 0.032 cpan:TOBYINK`
 	issued  2013-11-05;
-	label   "Remember, remember the fifth of November"
+	label   "Remember, remember the fifth of November";
 	changeset [
 		dcs:versus `Type-Tiny 0.031_05 cpan:TOBYINK`;
 		item "Updated NEWS file."^^Documentation;
