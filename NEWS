@@ -28,3 +28,12 @@
  - Improved Perl 5.8.x support.
  - Exporter::TypeTiny deprecated; use Exporter::Tiny instead!
  - Renamed the Type::Exception modules to Error::TypeTiny.
+
+2013-11-05 Type-Tiny version 0.032 released!
+
+ - Dict[`a] is now allowed to take a slurpy parameter for validating any
+   remaining key/value pairs.
+ - Maybe[`a] now has a deep coercion.
+ - Tuple[] (with empty parameter list) now explicitly tests for an empty
+   arrayref. (Ditto Dict[] for an empty hashref.)
+ - Moose 2.11xx fixes.
