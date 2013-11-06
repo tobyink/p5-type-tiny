@@ -2056,6 +2056,9 @@ ranges (e.g. C<< PositiveInteger[maxInclusive=>10] >> and so on.
 L<Types::Encodings> provides C<Bytes> and C<Chars> type constraints that
 were formerly found in Types::Standard.
 
+L<Types::Common::Numeric> and L<Types::Common::String> provide replacements
+for L<MooseX::Types::Common>.
+
 =head1 AUTHOR
 
 Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
