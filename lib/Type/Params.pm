@@ -40,6 +40,8 @@ BEGIN {
 sub _mkslurpy
 {
 	my ($name, $type, $tc, $i) = @_;
+	$name = 'local $_' if $name eq '$_';
+	
 	$type eq '@'
 		? sprintf(
 			'%s = [ @_[%d..$#_] ];',
