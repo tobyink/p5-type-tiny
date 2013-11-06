@@ -10,8 +10,8 @@ BEGIN {
 }
 
 BEGIN {
-	$Type::Params::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Params::VERSION   = '0.032';
+	$Types::Common::String::AUTHORITY = 'cpan:TOBYINK';
+	$Types::Common::String::VERSION   = '0.032';
 }
 
 use Type::Library -base, -declare => qw(
