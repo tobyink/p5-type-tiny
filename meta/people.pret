@@ -65,6 +65,9 @@ cpan:DAGOLDEN
 	:name "David Steinbrunner";
 	:mbox <mailto:dsteinbrunner@pobox.com>.
 
+cpan:SKAUFMAN
+	:name "Samuel Kaufman".
+
 # We bundle some files made by these dudes...
 
 cpan:RJBS

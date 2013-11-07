@@ -546,6 +546,11 @@
 			dcs:fixes RT#86172;
 			dcs:thanks cpan:PJFL;
 		];
+		item [
+			a dcs:Tests;
+			label "Bundle test for interaction between constraints, coercions, and Moose classes that inherit from Moo classes.";
+			dcs:blame cpan:PJFL;
+		];
 	].
 
 `Type-Tiny 0.007_09 cpan:TOBYINK`
@@ -563,6 +568,11 @@
 			label "Fix unintuitive Dict deep coercions.";
 			dcs:fixes RT#86239;
 			dcs:thanks cpan:MMCLERIC;
+		];
+		item [
+			a dcs:Tests;
+			label "Bundle various tests for deep Dict coercions.";
+			dcs:blame cpan:MMCLERIC;
 		];
 	].
 
@@ -655,7 +665,11 @@
 		item "More test cases for interacting with MooseX::Types type constraints."^^Tests;
 		item "Type::Params no longer uses Type::Utils."^^Change;
 		item "Subclasses of Type::Tiny reject 'inlined' coderef, just like they already reject 'constraint' coderef."^^Change;
-		item "Make rt86172.t an 'xt' test case because it's causing random CPAN testers failures unrelated to the feature it's supposed to be testing."^^Tests;
+		item [
+			a dcs:Tests;
+			label "Make rt86172.t an 'xt' test case because it's causing random CPAN testers failures unrelated to the feature it's supposed to be testing.";
+			seealso RT#86172;
+		];
 		item "If a Type::Tiny object is instantiated with a Sub::Quote quoted constraint coderef, and no inlined coderef, then Type::Tiny will use Sub::Quote to make an inlined coderef."^^Change;
 	].
 
@@ -1312,4 +1326,22 @@
 		dcs:versus `Type-Tiny 0.031_05 cpan:TOBYINK`;
 		item "Updated NEWS file."^^Documentation;
 		item "Eliminate a warning under Perl 5.6.x."^^Bugfix;
+	].
+
+`Type-Tiny 0.033_01 cpan:TOBYINK`
+	issued  2013-11-07;
+	changeset [
+		dcs:versus `Type-Tiny 0.032 cpan:TOBYINK`;
+		item [
+			a dcs:Tests;
+			label "Test case using a Type::Params compiled check within the scope of a read-only $_ variable.";
+			dcs:blame cpan:SKAUFMAN;
+		];
+		item [
+			a dcs:Bugfix;
+			label "Type::Params now localizes $_ before trying to assign anything to it.";
+			dcs:fixes RT#90096;
+		];
+		item "Types::Common::Numeric"^^Addition;
+		item "Types::Common::String"^^Addition;
 	].
