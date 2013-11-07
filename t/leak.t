@@ -20,6 +20,12 @@ L<Test::LeakTrace>.
 This test is skipped on Perl < 5.10.1 because I'm not interested in
 jumping through hoops for ancient versions of Perl.
 
+=head1 MISC ATTRIBUTE DECORATION
+
+If Perl has been compiled with Misc Attribute Decoration (MAD) enabled,
+then this test may fail. If you don't know what MAD is, then don't
+worry: you probably don't have it enabled.
+
 =head1 AUTHOR
 
 Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
