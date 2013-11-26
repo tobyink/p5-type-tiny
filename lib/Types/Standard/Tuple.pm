@@ -9,13 +9,14 @@ BEGIN {
 	$Types::Standard::Tuple::VERSION   = '0.033_01';
 }
 
-use Scalar::Util qw( blessed looks_like_number );
 use Types::Standard ();
 use Types::TypeTiny ();
 
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
 my $_Optional = Types::Standard->meta->get_type('Optional');
+
+no warnings;
 
 sub __constraint_generator
 {

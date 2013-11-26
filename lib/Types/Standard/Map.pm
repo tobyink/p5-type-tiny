@@ -9,13 +9,14 @@ BEGIN {
 	$Types::Standard::Map::VERSION   = '0.033_01';
 }
 
-use Scalar::Util qw( blessed looks_like_number );
 use Types::Standard ();
 use Types::TypeTiny ();
 
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
 my $meta = Types::Standard->meta;
+
+no warnings;
 
 sub __constraint_generator
 {
