@@ -1141,6 +1141,8 @@ alias for C<LaxNum>.)
 
 =item Stringable
 
+=item LazyLoad
+
 =end private
 
 =head1 BUGS
