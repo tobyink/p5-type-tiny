@@ -107,4 +107,10 @@ is exception  {
 	$check->( b => 3 );
 }, undef;
 
+is exception  {
+	my $check = multisig( compile(slurpy $a), compile(slurpy $b) );
+	$check->( a => 3 );
+	$check->( b => 3 );
+}, undef;
+
 done_testing;
