@@ -89,7 +89,7 @@ sub _build_message
 sub explain
 {
 	my $e = shift;
-	return [] unless $e->has_type;
+	return undef unless $e->has_type;
 	$e->type->validate_explain($e->value, $e->varname);
 }
 
