@@ -10,6 +10,8 @@ Test L<Type::Params> C<multisig> function.
 
 Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
+Portions by Diab Jerius E<lt>djerius@cpan.orgE<gt>.
+
 =head1 COPYRIGHT AND LICENCE
 
 This software is copyright (c) 2013 by Toby Inkster.
@@ -26,8 +28,8 @@ use warnings;
 use Test::More;
 use Test::Fatal;
 
-use Type::Params 'multisig';
-use Types::Standard -types;
+use Type::Params qw( multisig compile validate );
+use Types::Standard qw( -types slurpy );
 
 my $Rounded = Int->plus_coercions(Num, 'int($_)');
 
@@ -84,5 +86,25 @@ like(
 	qr{^Parameter validation failed},
 	'third choice in multi, should fail',
 );
+
+my $a = Dict [ a => Num ];
+my $b = Dict [ b => Num ];
+
+is exception {
+	validate( [ { a => 3 } ], $a );
+	validate( [   a => 3   ], slurpy $a );
+}, undef;
+
+is exception {
+	my $check = multisig( [ $a ], [ $b ] );
+	$check->( { a => 3 } );
+	$check->( { b => 3 } );
+}, undef;
+
+is exception  {
+	my $check = multisig( [ slurpy $a ], [ slurpy $b ] );
+	$check->( a => 3 );
+	$check->( b => 3 );
+}, undef;
 
 done_testing;

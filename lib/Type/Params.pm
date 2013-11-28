@@ -210,7 +210,7 @@ sub compile
 	
 	return {
 		min_args   => $min_args,
-		max_args   => $saw_slurpy ? $max_args : undef,
+		max_args   => $saw_slurpy ? undef : $max_args,
 		closure    => $closure,
 	} if $options{want_details};
 	
@@ -243,7 +243,7 @@ sub multisig
 		my @cond;
 		push @cond, sprintf('@_ >= %s', $sig->{min_args}) if defined $sig->{min_args};
 		push @cond, sprintf('@_ <= %s', $sig->{max_args}) if defined $sig->{max_args};
-		push @code, sprintf('if (%s){', join('and', @cond)) if @cond;
+		push @code, sprintf('if (%s){', join(' and ', @cond)) if @cond;
 		push @code, sprintf('eval { $r = [ $multi[%d]{closure}->(@_) ] };', $i);
 		push @code, 'return(@$r) if $r;';
 		push @code, '}' if @cond;
