@@ -14,6 +14,10 @@
 		deps:on "Exporter::Tiny 0.026"^^deps:CpanId;
 		comment "This module was spun off from the Type-Tiny distribution."@en;
 	];
+	deps:runtime-recommendation [
+		deps:on "Sub::Name"^^deps:CpanId;
+		comment "This allows Type::Library to name subs nicely."@en;
+	];
 	deps:test-requirement [
 		deps:on "Test::More 0.96"^^deps:CpanId;
 		comment "I don't have the patience to maintain a test suite that runs on ancient versions of Test::More."@en;

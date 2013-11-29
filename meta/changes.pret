@@ -1359,6 +1359,10 @@
 	changeset [
 		dcs:versus `Type-Tiny 0.033_02 cpan:TOBYINK`;
 		item [
+			a dcs:Packaging;
+			label "Recommend Sub::Name in META.json.";
+		];
+		item [
 			a dcs:Bugfix;
 			label "Fix bug in Type::Params::multisig with regard to slurpy parameters.";
 			dcs:fixes RT#90865;
