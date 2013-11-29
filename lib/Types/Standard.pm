@@ -12,7 +12,7 @@ BEGIN {
 
 BEGIN {
 	$Types::Standard::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::VERSION   = '0.033_01';
+	$Types::Standard::VERSION   = '0.033_02';
 }
 
 use Type::Library -base;
@@ -36,11 +36,40 @@ sub _is_class_loaded {
 
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
+my $meta = __PACKAGE__->meta;
+
+sub Stringable (&)
+{
+	package #private
+	Types::Standard::_Stringable;
+	use overload q[""] => sub { $_[0]{text} ||= $_[0]{code}->() }, fallback => 1;
+	bless +{ code => $_[0] };
+}
+
+sub LazyLoad ($$)
+{
+	package #private
+	Types::Standard::LazyLoad;
+	use overload fallback => 1, q[&{}] => sub {
+		my ($typename, $function) = @{$_[0]};
+		my $type  = $meta->get_type($typename);
+		my $class = "Types::Standard::$typename";
+		eval "require $class; 1" or die($@);
+		# Majorly break encapsulation for Type::Tiny :-O
+		for my $key (keys %$type)
+		{
+			next unless ref($type->{$key}) eq __PACKAGE__;
+			my $f = $type->{$key}[1];
+			$type->{$key} = $class->can("__$f");
+		}
+		return $class->can("__$function");
+	};
+	bless \@_;
+}
+
 no warnings;
 
 BEGIN { *STRICTNUM = $ENV{PERL_TYPES_STANDARD_STRICTNUM} ? sub(){!!1} : sub(){!!0} };
-
-my $meta = __PACKAGE__->meta;
 
 my $_any = $meta->add_type({
 	name       => "Any",
@@ -243,52 +272,10 @@ my $_arr = $meta->add_type({
 	parent     => $_ref,
 	constraint => sub { ref $_ eq "ARRAY" },
 	inlined    => sub { "ref($_[1]) eq 'ARRAY'" },
-	constraint_generator => sub
-	{
-		return $meta->get_type('ArrayRef') unless @_;
-		
-		my $param = Types::TypeTiny::to_TypeTiny(shift);
-		Types::TypeTiny::TypeTiny->check($param)
-			or _croak("Parameter to ArrayRef[`a] expected to be a type constraint; got $param");
-		
-		return sub
-		{
-			my $array = shift;
-			$param->check($_) || return for @$array;
-			return !!1;
-		};
-	},
-	inline_generator => sub {
-		my $param = shift;
-		return unless $param->can_be_inlined;
-		my $param_check = $param->inline_check('$i');
-		return sub {
-			my $v = $_[1];
-			"ref($v) eq 'ARRAY' and do { "
-			.  "my \$ok = 1; "
-			.  "for my \$i (\@{$v}) { "
-			.    "\$ok = 0 && last unless $param_check "
-			.  "}; "
-			.  "\$ok "
-			."}"
-		};
-	},
-	deep_explanation => sub {
-		my ($type, $value, $varname) = @_;
-		my $param = $type->parameters->[0];
-		
-		for my $i (0 .. $#$value)
-		{
-			my $item = $value->[$i];
-			next if $param->check($item);
-			return [
-				sprintf('"%s" constrains each value in the array with "%s"', $type, $param),
-				@{ $param->validate_explain($item, sprintf('%s->[%d]', $varname, $i)) },
-			]
-		}
-		
-		return;
-	},
+	constraint_generator => LazyLoad(ArrayRef => 'constraint_generator'),
+	inline_generator     => LazyLoad(ArrayRef => 'inline_generator'),
+	deep_explanation     => LazyLoad(ArrayRef => 'deep_explanation'),
+	coercion_generator   => LazyLoad(ArrayRef => 'coercion_generator'),
 });
 
 my $_hash = $meta->add_type({
@@ -297,53 +284,10 @@ my $_hash = $meta->add_type({
 	parent     => $_ref,
 	constraint => sub { ref $_ eq "HASH" },
 	inlined    => sub { "ref($_[1]) eq 'HASH'" },
-	constraint_generator => sub
-	{
-		return $meta->get_type('HashRef') unless @_;
-		
-		my $param = Types::TypeTiny::to_TypeTiny(shift);
-		Types::TypeTiny::TypeTiny->check($param)
-			or _croak("Parameter to HashRef[`a] expected to be a type constraint; got $param");
-		
-		return sub
-		{
-			my $hash = shift;
-			$param->check($_) || return for values %$hash;
-			return !!1;
-		};
-	},
-	inline_generator => sub {
-		my $param = shift;
-		return unless $param->can_be_inlined;
-		my $param_check = $param->inline_check('$i');
-		return sub {
-			my $v = $_[1];
-			"ref($v) eq 'HASH' and do { "
-			.  "my \$ok = 1; "
-			.  "for my \$i (values \%{$v}) { "
-			.    "\$ok = 0 && last unless $param_check "
-			.  "}; "
-			.  "\$ok "
-			."}"
-		};
-	},
-	deep_explanation => sub {
-		require B;
-		my ($type, $value, $varname) = @_;
-		my $param = $type->parameters->[0];
-		
-		for my $k (sort keys %$value)
-		{
-			my $item = $value->{$k};
-			next if $param->check($item);
-			return [
-				sprintf('"%s" constrains each value in the hash with "%s"', $type, $param),
-				@{ $param->validate_explain($item, sprintf('%s->{%s}', $varname, B::perlstring($k))) },
-			];
-		}
-		
-		return;
-	},
+	constraint_generator => LazyLoad(HashRef => 'constraint_generator'),
+	inline_generator     => LazyLoad(HashRef => 'inline_generator'),
+	deep_explanation     => LazyLoad(HashRef => 'deep_explanation'),
+	coercion_generator   => LazyLoad(HashRef => 'coercion_generator'),
 });
 
 $meta->add_type({
@@ -352,45 +296,10 @@ $meta->add_type({
 	parent     => $_ref,
 	constraint => sub { ref $_ eq "SCALAR" or ref $_ eq "REF" },
 	inlined    => sub { "ref($_[1]) eq 'SCALAR' or ref($_[1]) eq 'REF'" },
-	constraint_generator => sub
-	{
-		return $meta->get_type('ScalarRef') unless @_;
-		
-		my $param = Types::TypeTiny::to_TypeTiny(shift);
-		Types::TypeTiny::TypeTiny->check($param)
-			or _croak("Parameter to ScalarRef[`a] expected to be a type constraint; got $param");
-		
-		return sub
-		{
-			my $ref = shift;
-			$param->check($$ref) || return;
-			return !!1;
-		};
-	},
-	inline_generator => sub {
-		my $param = shift;
-		return unless $param->can_be_inlined;
-		return sub {
-			my $v = $_[1];
-			my $param_check = $param->inline_check("\${$v}");
-			"(ref($v) eq 'SCALAR' or ref($v) eq 'REF') and $param_check";
-		};
-	},
-	deep_explanation => sub {
-		my ($type, $value, $varname) = @_;
-		my $param = $type->parameters->[0];
-		
-		for my $item ($$value)
-		{
-			next if $param->check($item);
-			return [
-				sprintf('"%s" constrains the referenced scalar value with "%s"', $type, $param),
-				@{ $param->validate_explain($item, sprintf('${%s}', $varname)) },
-			];
-		}
-		
-		return;
-	},
+	constraint_generator => LazyLoad(ScalarRef => 'constraint_generator'),
+	inline_generator     => LazyLoad(ScalarRef => 'inline_generator'),
+	deep_explanation     => LazyLoad(ScalarRef => 'deep_explanation'),
+	coercion_generator   => LazyLoad(ScalarRef => 'coercion_generator'),
 });
 
 my $_obj = $meta->add_type({
@@ -439,74 +348,21 @@ $meta->add_type({
 			@{ $param->validate_explain($value, $varname) },
 		];
 	},
+	coercion_generator => sub
+	{
+		my ($parent, $child, $param) = @_;
+		return unless $param->has_coercion;
+		return $param->coercion;
+	},
 });
 
 my $_map = $meta->add_type({
 	name       => "Map",
 	parent     => $_hash,
-	constraint_generator => sub
-	{
-		return $meta->get_type('Map') unless @_;
-		
-		my ($keys, $values) = map Types::TypeTiny::to_TypeTiny($_), @_;
-		Types::TypeTiny::TypeTiny->check($keys)
-			or _croak("First parameter to Map[`k,`v] expected to be a type constraint; got $keys");
-		Types::TypeTiny::TypeTiny->check($values)
-			or _croak("Second parameter to Map[`k,`v] expected to be a type constraint; got $values");
-		
-		return sub
-		{
-			my $hash = shift;
-			$keys->check($_)   || return for keys %$hash;
-			$values->check($_) || return for values %$hash;
-			return !!1;
-		};
-	},
-	inline_generator => sub {
-		my ($k, $v) = @_;
-		return unless $k->can_be_inlined && $v->can_be_inlined;
-		my $k_check = $k->inline_check('$k');
-		my $v_check = $v->inline_check('$v');
-		return sub {
-			my $h = $_[1];
-			"ref($h) eq 'HASH' and do { "
-			.  "my \$ok = 1; "
-			.  "for my \$v (values \%{$h}) { "
-			.    "\$ok = 0 && last unless $v_check "
-			.  "}; "
-			.  "for my \$k (keys \%{$h}) { "
-			.    "\$ok = 0 && last unless $k_check "
-			.  "}; "
-			.  "\$ok "
-			."}"
-		};
-	},
-	deep_explanation => sub {
-		require B;
-		my ($type, $value, $varname) = @_;
-		my ($kparam, $vparam) = @{ $type->parameters };
-		
-		for my $k (sort keys %$value)
-		{
-			unless ($kparam->check($k))
-			{
-				return [
-					sprintf('"%s" constrains each key in the hash with "%s"', $type, $kparam),
-					@{ $kparam->validate_explain($k, sprintf('key %s->{%s}', $varname, B::perlstring($k))) },
-				];
-			}
-			
-			unless ($vparam->check($value->{$k}))
-			{
-				return [
-					sprintf('"%s" constrains each value in the hash with "%s"', $type, $vparam),
-					@{ $vparam->validate_explain($value->{$k}, sprintf('%s->{%s}', $varname, B::perlstring($k))) },
-				];
-			}
-		}
-		
-		return;
-	},
+	constraint_generator => LazyLoad(Map => 'constraint_generator'),
+	inline_generator     => LazyLoad(Map => 'inline_generator'),
+	deep_explanation     => LazyLoad(Map => 'deep_explanation'),
+	coercion_generator   => LazyLoad(Map => 'coercion_generator'),
 });
 
 my $_Optional = $meta->add_type({
@@ -541,6 +397,12 @@ my $_Optional = $meta->add_type({
 			@{ $param->validate_explain($value, $varname) },
 		];
 	},
+	coercion_generator => sub
+	{
+		my ($parent, $child, $param) = @_;
+		return unless $param->has_coercion;
+		return $param->coercion;
+	},
 });
 
 sub slurpy {
@@ -556,122 +418,10 @@ $meta->add_type({
 		my ($s, @a) = @_;
 		sprintf('%s[%s]', $s, join q[,], map { ref($_) eq "HASH" ? sprintf("slurpy %s", $_->{slurpy}) : $_ } @a);
 	},
-	constraint_generator => sub
-	{
-		my @constraints = @_;
-		my $slurpy;
-		if (exists $constraints[-1] and ref $constraints[-1] eq "HASH")
-		{
-			$slurpy = Types::TypeTiny::to_TypeTiny(pop(@constraints)->{slurpy});
-			Types::TypeTiny::TypeTiny->check($slurpy)
-				or _croak("Slurpy parameter to Tuple[...] expected to be a type constraint; got $slurpy");
-		}
-		
-		@constraints = map Types::TypeTiny::to_TypeTiny($_), @constraints;
-		for (@constraints)
-		{
-			Types::TypeTiny::TypeTiny->check($_)
-				or _croak("Parameters to Tuple[...] expected to be type constraints; got $_");
-		}
-			
-		return sub
-		{
-			my $value = $_[0];
-			if ($#constraints < $#$value)
-			{
-				defined($slurpy) && $slurpy->check(
-					$slurpy->is_a_type_of(HashRef())
-						? +{@$value[$#constraints+1 .. $#$value]}
-						: +[@$value[$#constraints+1 .. $#$value]]
-				) or return;
-			}
-			for my $i (0 .. $#constraints)
-			{
-				$i <= $#$value or $constraints[$i]->is_strictly_a_type_of($_Optional) or return;
-				$constraints[$i]->check(exists $value->[$i] ? $value->[$i] : ()) or return;
-			}
-			return !!1;
-		};
-	},
-	inline_generator => sub
-	{
-		my @constraints = @_;
-		my $slurpy;
-		if (exists $constraints[-1] and ref $constraints[-1] eq "HASH")
-		{
-			$slurpy = pop(@constraints)->{slurpy};
-		}
-		
-		return if grep { not $_->can_be_inlined } @constraints;
-		return if defined $slurpy && !$slurpy->can_be_inlined;
-		
-		my $tmpl = defined($slurpy) && $slurpy->is_a_type_of(HashRef())
-			? "do { my \$tmp = +{\@{%s}[%d..\$#{%s}]}; %s }"
-			: "do { my \$tmp = +[\@{%s}[%d..\$#{%s}]]; %s }";
-		
-		my $min = 0 + grep !$_->is_strictly_a_type_of($_Optional), @constraints;
-		
-		return sub
-		{
-			my $v = $_[1];
-			join " and ",
-				"ref($v) eq 'ARRAY'",
-				"scalar(\@{$v}) >= $min",
-				($slurpy
-					? sprintf($tmpl, $v, $#constraints+1, $v, $slurpy->inline_check('$tmp'))
-					: sprintf("\@{$v} <= %d", scalar @constraints)
-				),
-				map { $constraints[$_]->inline_check("$v\->[$_]") } 0 .. $#constraints;
-		};
-	},
-	deep_explanation => sub {
-		my ($type, $value, $varname) = @_;
-		
-		my @constraints = @{ $type->parameters };
-		my $slurpy;
-		if (exists $constraints[-1] and ref $constraints[-1] eq "HASH")
-		{
-			$slurpy = Types::TypeTiny::to_TypeTiny(pop(@constraints)->{slurpy});
-		}
-		@constraints = map Types::TypeTiny::to_TypeTiny($_), @constraints;
-		
-		if ($#constraints < $#$value and not $slurpy)
-		{
-			return [
-				sprintf('"%s" expects at most %d values in the array', $type, $#constraints),
-				sprintf('%d values found; too many', $#$value),
-			];
-		}
-		
-		for my $i (0 .. $#constraints)
-		{
-			next if $constraints[$i]->is_strictly_a_type_of( Optional() ) && $i > $#$value;
-			next if $constraints[$i]->check($value->[$i]);
-			
-			return [
-				sprintf('"%s" constrains value at index %d of array with "%s"', $type, $i, $constraints[$i]),
-				@{ $constraints[$i]->validate_explain($value->[$i], sprintf('%s->[%s]', $varname, $i)) },
-			];
-		}
-		
-		if (defined($slurpy))
-		{
-			my $tmp = $slurpy->is_a_type_of(HashRef())
-				? +{@$value[$#constraints+1 .. $#$value]}
-				: +[@$value[$#constraints+1 .. $#$value]];
-			$slurpy->check($tmp) or return [
-				sprintf(
-					'Array elements from index %d are slurped into a %s which is constrained with "%s"',
-					$#constraints+1,
-					$slurpy->is_a_type_of(HashRef()) ? 'hashref' : 'arrayref',
-					$slurpy,
-				),
-				@{ $slurpy->validate_explain($tmp, '$SLURPY') },
-			];
-		}
-		
-		return;
-	},
+	constraint_generator => LazyLoad(Tuple => 'constraint_generator'),
+	inline_generator     => LazyLoad(Tuple => 'inline_generator'),
+	deep_explanation     => LazyLoad(Tuple => 'deep_explanation'),
+	coercion_generator   => LazyLoad(Tuple => 'coercion_generator'),
 });
 
 $meta->add_type({
@@ -684,149 +434,10 @@ $meta->add_type({
 		my %a = @p;
 		sprintf('%s[%s%s]', $s, join(q[,], map sprintf("%s=>%s", $_, $a{$_}), sort keys %a), $l ? ",slurpy $l" : '');
 	},
-	constraint_generator => sub
-	{
-		my $slurpy = ref($_[-1]) eq q(HASH) ? pop(@_)->{slurpy} : undef;
-		my %constraints = @_;
-		
-		while (my ($k, $v) = each %constraints)
-		{
-			$constraints{$k} = Types::TypeTiny::to_TypeTiny($v);
-			Types::TypeTiny::TypeTiny->check($v)
-				or _croak("Parameter to Dict[`a] for key '$k' expected to be a type constraint; got $v");
-		}
-		
-		return sub
-		{
-			my $value = $_[0];
-			if ($slurpy)
-			{
-				my %tmp = map {
-					exists($constraints{$_}) ? () : ($_ => $value->{$_})
-				} keys %$value;
-				return unless $slurpy->check(\%tmp);
-			}
-			else
-			{
-				exists($constraints{$_}) || return for sort keys %$value;
-			}
-			for (sort keys %constraints) {
-				my $c = $constraints{$_};
-				return unless exists($value->{$_}) || $c->is_strictly_a_type_of(Optional());
-				return unless $c->check( exists $value->{$_} ? $value->{$_} : () );
-			}
-			return !!1;
-		};
-	},
-	inline_generator => sub
-	{
-		# We can only inline a parameterized Dict if all the
-		# constraints inside can be inlined.
-		
-		my $slurpy = ref($_[-1]) eq q(HASH) ? pop(@_)->{slurpy} : undef;
-		return if $slurpy && !$slurpy->can_be_inlined;
-		
-		# Is slurpy a very loose type constraint?
-		# i.e. Any, Item, Defined, Ref, or HashRef
-		my $slurpy_is_any = $slurpy && $_hash->is_a_type_of( $slurpy );
-		
-		# Is slurpy a parameterized Map, or expressable as a parameterized Map?
-		my $slurpy_is_map = $slurpy
-			&& $slurpy->is_parameterized
-			&& ((
-				$slurpy->parent->strictly_equals($_map)
-				&& $slurpy->parameters
-			)||(
-				$slurpy->parent->strictly_equals($_hash)
-				&& [ $_any, $slurpy->parameters->[0] ]
-			));
-		
-		my %constraints = @_;
-		for my $c (values %constraints)
-		{
-			next if $c->can_be_inlined;
-			return;
-		}
-		
-		my $regexp = join "|", map quotemeta, sort keys %constraints;
-		return sub
-		{
-			require B;
-			my $h = $_[1];
-			join " and ",
-				"ref($h) eq 'HASH'",
-				( $slurpy_is_any ? '1'
-				: $slurpy_is_map ? do {
-					'(not grep {'
-					."my \$v = ($h)->{\$_};"
-					.sprintf(
-						'not((%s) and (%s))',
-						$slurpy_is_map->[0]->inline_check('$_'),
-						$slurpy_is_map->[1]->inline_check('$v'),
-					) ."} keys \%{$h})"
-				}
-				: $slurpy ? do {
-					'do {'
-					. "my \$slurpy_tmp = +{ map /\\A(?:$regexp)\\z/ ? () : (\$_ => ($h)->{\$_}), keys \%{$h} };"
-					. $slurpy->inline_check('$slurpy_tmp')
-					. '}'
-				}
-				: "not(grep !/\\A(?:$regexp)\\z/, keys \%{$h})" ),
-				( map {
-					my $k = B::perlstring($_);
-					$constraints{$_}->is_strictly_a_type_of( Optional() )
-						? $constraints{$_}->inline_check("$h\->{$k}")
-						: ( "exists($h\->{$k})", $constraints{$_}->inline_check("$h\->{$k}") )
-				} sort keys %constraints ),
-		}
-	},
-	deep_explanation => sub {
-		require B;
-		my ($type, $value, $varname) = @_;
-		my @params = @{ $type->parameters };
-		
-		my $slurpy = ref($params[-1]) eq q(HASH) ? pop(@params)->{slurpy} : undef;
-		my %constraints = @params;
-				
-		for my $k (sort keys %constraints)
-		{
-			next if $constraints{$k}->parent == Optional() && !exists $value->{$k};
-			next if $constraints{$k}->check($value->{$k});
-			
-			return [
-				sprintf('"%s" requires key %s to appear in hash', $type, B::perlstring($k))
-			] unless exists $value->{$k};
-			
-			return [
-				sprintf('"%s" constrains value at key %s of hash with "%s"', $type, B::perlstring($k), $constraints{$k}),
-				@{ $constraints{$k}->validate_explain($value->{$k}, sprintf('%s->{%s}', $varname, B::perlstring($k))) },
-			];
-		}
-		
-		if ($slurpy)
-		{
-			my %tmp = map {
-				exists($constraints{$_}) ? () : ($_ => $value->{$_})
-			} keys %$value;
-			
-			my $explain = $slurpy->validate_explain(\%tmp, '$slurpy');
-			return [
-				sprintf('"%s" requires the hashref of additional key/value pairs to conform to "%s"', $type, $slurpy),
-				@$explain,
-			] if $explain;
-		}
-		else
-		{
-			for my $k (sort keys %$value)
-			{
-				return [
-					sprintf('"%s" does not allow key %s to appear in hash', $type, B::perlstring($k))
-				] unless exists $constraints{$k};
-			}
-		}
-		
-		return;
-	},
+	constraint_generator => LazyLoad(Dict => 'constraint_generator'),
+	inline_generator     => LazyLoad(Dict => 'inline_generator'),
+	deep_explanation     => LazyLoad(Dict => 'deep_explanation'),
+	coercion_generator   => LazyLoad(Dict => 'coercion_generator'),
 });
 
 use overload ();
@@ -932,9 +543,10 @@ $meta->add_type({
 
 $meta->add_type({
 	name       => "OptList",
-	parent     => $_arr->parameterize($_arr),
+	parent     => $_arr,
 	constraint => sub {
 		for my $inner (@$_) {
+			return unless ref($inner) eq q(ARRAY);
 			return unless @$inner == 2;
 			return unless is_Str($inner->[0]);
 		}
@@ -942,18 +554,13 @@ $meta->add_type({
 	},
 	inlined     => sub {
 		my ($self, $var) = @_;
-		my $Str_check = __PACKAGE__->meta->get_type("Str")->inline_check('$inner->[0]');
+		my $Str_check = Str()->inline_check('$inner->[0]');
 		my @code = 'do { my $ok = 1; ';
 		push @code,   sprintf('for my $inner (@{%s}) { no warnings; ', $var);
-		push @code,     '($ok=0) && last unless @$inner == 2; ';
-		push @code,     sprintf('($ok=0) && last unless (%s); ', $Str_check);
+		push @code,   sprintf('($ok=0) && last unless ref($inner) eq q(ARRAY) && @$inner == 2 && (%s); ', $Str_check);
 		push @code,   '} ';
 		push @code, '$ok }';
-		my $r = sprintf(
-			'%s and %s',
-			$self->parent->inline_check($var),
-			join(q( ), @code),
-		);
+		return (undef, join(q( ), @code));
 	},
 });
 
@@ -1129,504 +736,6 @@ $meta->add_coercion({
 		return (Str(), qq{ [split /$regexp_string/, \$_] });
 	},
 });
-
-#### Deep coercion stuff...
-
-sub Stringable (&)
-{
-	package #private
-	Types::Standard::_Stringable;
-	use overload q[""] => sub { $_[0]{text} ||= $_[0]{code}->() }, fallback => 1;
-	bless +{ code => $_[0] };
-}
-
-my $lib = "Types::Standard"->meta;
-
-$lib->get_type("ArrayRef")->{coercion_generator} = sub
-{
-	my ($parent, $child, $param) = @_;
-	return unless $param->has_coercion;
-	
-	my $coercable_item = $param->coercion->_source_type_union;
-	my $C = "Type::Coercion"->new(type_constraint => $child);
-	
-	if ($param->coercion->can_be_inlined and $coercable_item->can_be_inlined)
-	{
-		$C->add_type_coercions($parent => Stringable {
-			my @code;
-			push @code, 'do { my ($orig, $return_orig, @new) = ($_, 0);';
-			push @code,    'for (@$orig) {';
-			push @code, sprintf('$return_orig++ && last unless (%s);', $coercable_item->inline_check('$_'));
-			push @code, sprintf('push @new, (%s);', $param->coercion->inline_coercion('$_'));
-			push @code,    '}';
-			push @code,    '$return_orig ? $orig : \\@new';
-			push @code, '}';
-			"@code";
-		});
-	}
-	else
-	{
-		$C->add_type_coercions(
-			$parent => sub {
-				my $value = @_ ? $_[0] : $_;
-				my @new;
-				for my $item (@$value)
-				{
-					return $value unless $coercable_item->check($item);
-					push @new, $param->coerce($item);
-				}
-				return \@new;
-			},
-		);
-	}
-	
-	return $C;
-};
-
-$lib->get_type("HashRef")->{coercion_generator} = sub
-{
-	my ($parent, $child, $param) = @_;
-	return unless $param->has_coercion;
-	
-	my $coercable_item = $param->coercion->_source_type_union;
-	my $C = "Type::Coercion"->new(type_constraint => $child);
-	
-	if ($param->coercion->can_be_inlined and $coercable_item->can_be_inlined)
-	{
-		$C->add_type_coercions($parent => Stringable {
-			my @code;
-			push @code, 'do { my ($orig, $return_orig, %new) = ($_, 0);';
-			push @code,    'for (keys %$orig) {';
-			push @code, sprintf('$return_orig++ && last unless (%s);', $coercable_item->inline_check('$orig->{$_}'));
-			push @code, sprintf('$new{$_} = (%s);', $param->coercion->inline_coercion('$orig->{$_}'));
-			push @code,    '}';
-			push @code,    '$return_orig ? $orig : \\%new';
-			push @code, '}';
-			"@code";
-		});
-	}
-	else
-	{
-		$C->add_type_coercions(
-			$parent => sub {
-				my $value = @_ ? $_[0] : $_;
-				my %new;
-				for my $k (keys %$value)
-				{
-					return $value unless $coercable_item->check($value->{$k});
-					$new{$k} = $param->coerce($value->{$k});
-				}
-				return \%new;
-			},
-		);
-	}
-	
-	return $C;
-};
-
-$lib->get_type("ScalarRef")->{coercion_generator} = sub
-{
-	my ($parent, $child, $param) = @_;
-	return unless $param->has_coercion;
-	
-	my $coercable_item = $param->coercion->_source_type_union;
-	my $C = "Type::Coercion"->new(type_constraint => $child);
-	
-	if ($param->coercion->can_be_inlined and $coercable_item->can_be_inlined)
-	{
-		$C->add_type_coercions($parent => Stringable {
-			my @code;
-			push @code, 'do { my ($orig, $return_orig, $new) = ($_, 0);';
-			push @code,    'for ($$orig) {';
-			push @code, sprintf('$return_orig++ && last unless (%s);', $coercable_item->inline_check('$_'));
-			push @code, sprintf('$new = (%s);', $param->coercion->inline_coercion('$_'));
-			push @code,    '}';
-			push @code,    '$return_orig ? $orig : \\$new';
-			push @code, '}';
-			"@code";
-		});
-	}
-	else
-	{
-		$C->add_type_coercions(
-			$parent => sub {
-				my $value = @_ ? $_[0] : $_;
-				my $new;
-				for my $item ($$value)
-				{
-					return $value unless $coercable_item->check($item);
-					$new = $param->coerce($item);
-				}
-				return \$new;
-			},
-		);
-	}
-	
-	return $C;
-};
-
-$lib->get_type("Map")->{coercion_generator} = sub
-{
-	my ($parent, $child, $kparam, $vparam) = @_;
-	return unless $kparam->has_coercion || $vparam->has_coercion;
-	
-	my $kcoercable_item = $kparam->has_coercion ? $kparam->coercion->_source_type_union : $kparam;
-	my $vcoercable_item = $vparam->has_coercion ? $vparam->coercion->_source_type_union : $vparam;
-	my $C = "Type::Coercion"->new(type_constraint => $child);
-	
-	if ((!$kparam->has_coercion or $kparam->coercion->can_be_inlined)
-	and (!$vparam->has_coercion or $vparam->coercion->can_be_inlined)
-	and $kcoercable_item->can_be_inlined
-	and $vcoercable_item->can_be_inlined)
-	{
-		$C->add_type_coercions($parent => Stringable {
-			my @code;
-			push @code, 'do { my ($orig, $return_orig, %new) = ($_, 0);';
-			push @code,    'for (keys %$orig) {';
-			push @code, sprintf('$return_orig++ && last unless (%s);', $kcoercable_item->inline_check('$_'));
-			push @code, sprintf('$return_orig++ && last unless (%s);', $vcoercable_item->inline_check('$orig->{$_}'));
-			push @code, sprintf('$new{(%s)} = (%s);',
-				$kparam->has_coercion ? $kparam->coercion->inline_coercion('$_') : '$_',
-				$vparam->has_coercion ? $vparam->coercion->inline_coercion('$orig->{$_}') : '$orig->{$_}',
-			);
-			push @code,    '}';
-			push @code,    '$return_orig ? $orig : \\%new';
-			push @code, '}';
-			"@code";
-		});
-	}
-	else
-	{
-		$C->add_type_coercions(
-			$parent => sub {
-				my $value = @_ ? $_[0] : $_;
-				my %new;
-				for my $k (keys %$value)
-				{
-					return $value unless $kcoercable_item->check($k) && $vcoercable_item->check($value->{$k});
-					$new{$kparam->has_coercion ? $kparam->coerce($k) : $k} =
-						$vparam->has_coercion ? $vparam->coerce($value->{$k}) : $value->{$k};
-				}
-				return \%new;
-			},
-		);
-	}
-	
-	return $C;
-};
-
-# XXX - also Maybe[`a]?
-# XXX - does not seem quite right
-$lib->get_type("Optional")->{coercion_generator} = sub
-{
-	my ($parent, $child, $param) = @_;
-	return unless $param->has_coercion;
-	return $param->coercion;
-};
-
-$lib->get_type("Maybe")->{coercion_generator} = sub
-{
-	my ($parent, $child, $param) = @_;
-	return unless $param->has_coercion;
-	return $param->coercion;
-};
-
-my $label_counter = 0;
-our ($keycheck_counter, @KEYCHECK) = -1;
-$lib->get_type("Dict")->{coercion_generator} = sub
-{
-	my $slurpy = ref($_[-1]) eq q(HASH) ? pop(@_)->{slurpy} : undef;
-	my ($parent, $child, %dict) = @_;
-	my $C = "Type::Coercion"->new(type_constraint => $child);
-	
-	my $all_inlinable = 1;
-	for my $tc (values %dict)
-	{
-		$all_inlinable = 0 if !$tc->can_be_inlined;
-		$all_inlinable = 0 if $tc->has_coercion && !$tc->coercion->can_be_inlined;
-		last if!$all_inlinable;
-	}
-	$all_inlinable = 0 if $slurpy && !$slurpy->can_be_inlined;
-	$all_inlinable = 0 if $slurpy && $slurpy->has_coercion && !$slurpy->coercion->can_be_inlined;
-	
-	if ($all_inlinable)
-	{
-		$C->add_type_coercions($parent => Stringable {
-			require B;
-			
-			my $keycheck = join "|", map quotemeta, sort { length($b) <=> length($a) or $a cmp $b } keys %dict;
-			$keycheck = $KEYCHECK[++$keycheck_counter] = qr{^($keycheck)$}ms; # regexp for legal keys
-			
-			my $label = sprintf("LABEL%d", ++$label_counter);
-			my @code;
-			push @code, 'do { my ($orig, $return_orig, %tmp, %new) = ($_, 0);';
-			push @code,       "$label: {";
-			if ($slurpy)
-			{
-				push @code, sprintf('my $slurped = +{ map +($_=~$%s::KEYCHECK[%d])?():($_=>$orig->{$_}), keys %%$orig };', __PACKAGE__, $keycheck_counter);
-				if ($slurpy->has_coercion)
-				{
-					push @code, sprintf('my $coerced = %s;', $slurpy->coercion->inline_coercion('$slurped'));
-					push @code, sprintf('((%s)&&(%s))?(%%new=%%$coerced):(($return_orig = 1), last %s);', $_hash->inline_check('$coerced'), $slurpy->inline_check('$coerced'), $label);
-				}
-				else
-				{
-					push @code, sprintf('(%s)?(%%new=%%$slurped):(($return_orig = 1), last %s);', $slurpy->inline_check('$slurped'), $label);
-				}
-			}
-			else
-			{
-				push @code, sprintf('($_ =~ $%s::KEYCHECK[%d])||(($return_orig = 1), last %s) for sort keys %%$orig;', __PACKAGE__, $keycheck_counter, $label);
-			}
-			for my $k (keys %dict)
-			{
-				my $ct = $dict{$k};
-				my $ct_coerce   = $ct->has_coercion;
-				my $ct_optional = $ct->is_a_type_of(Types::Standard::Optional());
-				my $K = B::perlstring($k);
-				
-				push @code, "if (exists \$orig->{$K}) {" if $ct_optional;
-				if ($ct_coerce)
-				{
-					push @code, sprintf('%%tmp = (); $tmp{x} = %s;', $ct->coercion->inline_coercion("\$orig->{$K}"));
-					push @code, sprintf(
-#						$ct_optional
-#							? 'if (%s) { $new{%s}=$tmp{x} }'
-#							:
-						'if (%s) { $new{%s}=$tmp{x} } else { $return_orig = 1; last %s }',
-						$ct->inline_check('$tmp{x}'),
-						$K,
-						$label,
-					);
-				}
-				else
-				{
-					push @code, sprintf(
-#						$ct_optional
-#							? 'if (%s) { $new{%s}=$orig->{%s} }'
-#							:
-						'if (%s) { $new{%s}=$orig->{%s} } else { $return_orig = 1; last %s }',
-						$ct->inline_check("\$orig->{$K}"),
-						$K,
-						$K,
-						$label,
-					);
-				}
-				push @code, '}' if $ct_optional;
-			}
-			push @code,       '}';
-			push @code,    '$return_orig ? $orig : \\%new';
-			push @code, '}';
-			#warn "CODE:: @code";
-			"@code";
-		});
-	}
-	
-	else
-	{
-		$C->add_type_coercions(
-			$parent => sub {
-				my $value = @_ ? $_[0] : $_;
-				my %new;
-				
-				if ($slurpy)
-				{
-					my %slurped = map exists($dict{$_}) ? () : ($_ => $value->{$_}), keys %$value;
-					
-					if ($slurpy->check(\%slurped))
-					{
-						%new = %slurped;
-					}
-					elsif ($slurpy->has_coercion)
-					{
-						my $coerced = $slurpy->coerce(\%slurped);
-						$slurpy->check($coerced) ? (%new = %$coerced) : (return $value);
-					}
-					else
-					{
-						return $value;
-					}
-				}
-				else
-				{
-					for my $k (keys %$value)
-					{
-						return $value unless exists $dict{$k};
-					}
-				}
-
-				for my $k (keys %dict)
-				{
-					my $ct = $dict{$k};
-					my @accept;
-					
-					if (exists $value->{$k} and $ct->check($value->{$k}))
-					{
-						@accept = $value->{$k};
-					}
-					elsif (exists $value->{$k} and $ct->has_coercion)
-					{
-						my $x = $ct->coerce($value->{$k});
-						@accept = $x if $ct->check($x);
-					}
-					elsif (exists $value->{$k})
-					{
-						return $value;
-					}
-					
-					if (@accept)
-					{
-						$new{$k} = $accept[0];
-					}
-					elsif (not $ct->is_a_type_of(Types::Standard::Optional()))
-					{
-						return $value;
-					}
-				}
-				
-				return \%new;
-			},
-		);
-	}
-	
-	return $C;
-};
-
-$lib->get_type("Tuple")->{coercion_generator} = sub
-{
-	my ($parent, $child, @tuple) = @_;
-	my $C = "Type::Coercion"->new(type_constraint => $child);
-	
-	my $slurpy;
-	if (exists $tuple[-1] and ref $tuple[-1] eq "HASH")
-	{
-		$slurpy = pop(@tuple)->{slurpy};
-	}
-	
-	my $all_inlinable = 1;
-	for my $tc (@tuple, ($slurpy ? $slurpy : ()))
-	{
-		$all_inlinable = 0 if !$tc->can_be_inlined;
-		$all_inlinable = 0 if $tc->has_coercion && !$tc->coercion->can_be_inlined;
-		last if!$all_inlinable;
-	}
-	
-	if ($all_inlinable)
-	{
-		$C->add_type_coercions($parent => Stringable {
-			my $label = sprintf("LABEL%d", ++$label_counter);
-			my @code;
-			push @code, 'do { my ($orig, $return_orig, @tmp, @new) = ($_, 0);';
-			push @code,       "$label: {";
-			push @code,       sprintf('(($return_orig = 1), last %s) if @$orig > %d;', $label, scalar @tuple) unless $slurpy;
-			for my $i (0 .. $#tuple)
-			{
-				my $ct = $tuple[$i];
-				my $ct_coerce   = $ct->has_coercion;
-				my $ct_optional = $ct->is_a_type_of(Types::Standard::Optional());
-				
-				if ($ct_coerce)
-				{
-					push @code, sprintf('@tmp = (); $tmp[0] = %s;', $ct->coercion->inline_coercion("\$orig->[$i]"));
-					push @code, sprintf(
-						$ct_optional
-							? 'if (%s) { $new[%d]=$tmp[0] }'
-							: 'if (%s) { $new[%d]=$tmp[0] } else { $return_orig = 1; last %s }',
-						$ct->inline_check('$tmp[0]'),
-						$i,
-						$label,
-					);
-				}
-				else
-				{
-					push @code, sprintf(
-						$ct_optional
-							? 'if (%s) { $new[%d]=$orig->[%s] }'
-							: 'if (%s) { $new[%d]=$orig->[%s] } else { $return_orig = 1; last %s }',
-						$ct->inline_check("\$orig->[$i]"),
-						$i,
-						$i,
-						$label,
-					);
-				}
-			}
-			if ($slurpy)
-			{
-				my $size = @tuple;
-				push @code, sprintf('if (@$orig > %d) {', $size);
-				push @code, sprintf('my $tail = [ @{$orig}[%d .. $#$orig] ];', $size);
-				push @code, $slurpy->has_coercion
-					? sprintf('$tail = %s;', $slurpy->coercion->inline_coercion('$tail'))
-					: q();
-				push @code, sprintf(
-					'(%s) ? push(@new, @$tail) : ($return_orig++);',
-					$slurpy->inline_check('$tail'),
-				);
-				push @code, '}';
-			}
-			push @code,       '}';
-			push @code,    '$return_orig ? $orig : \\@new';
-			push @code, '}';
-			"@code";
-		});
-	}
-	
-	else
-	{
-		$C->add_type_coercions(
-			$parent => sub {
-				my $value = @_ ? $_[0] : $_;
-				
-				if (!$slurpy and @$value > @tuple)
-				{
-					return $value;
-				}
-				
-				my @new;
-				for my $i (0 .. $#tuple)
-				{
-					my $ct = $tuple[$i];
-					my @accept;
-					
-					if (exists $value->[$i] and $ct->check($value->[$i]))
-					{
-						@accept = $value->[$i];
-					}
-					elsif (exists $value->[$i] and $ct->has_coercion)
-					{
-						my $x = $ct->coerce($value->[$i]);
-						@accept = $x if $ct->check($x);
-					}
-					else
-					{
-						return $value;
-					}
-					
-					if (@accept)
-					{
-						$new[$i] = $accept[0];
-					}
-					elsif (not $ct->is_a_type_of(Types::Standard::Optional()))
-					{
-						return $value;
-					}
-				}
-				
-				if ($slurpy and @$value > @tuple)
-				{
-					my $tmp = $slurpy->has_coercion
-						? $slurpy->coerce([ @{$value}[@tuple .. $#$value] ])
-						: [ @{$value}[@tuple .. $#$value] ];
-					$slurpy->check($tmp) ? push(@new, @$tmp) : return($value);
-				}
-				
-				return \@new;
-			},
-		);
-	};
-	
-	return $C;
-};
 
 1;
 
@@ -2031,6 +1140,8 @@ alias for C<LaxNum>.)
 =begin private
 
 =item Stringable
+
+=item LazyLoad
 
 =end private
 

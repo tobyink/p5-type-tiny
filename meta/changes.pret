@@ -1345,3 +1345,12 @@
 		item "Types::Common::Numeric"^^Addition;
 		item "Types::Common::String"^^Addition;
 	].
+
+`Type-Tiny 0.033_02 cpan:TOBYINK`
+	doap:branch "ts-optimization";
+	issued  2013-11-26;
+	changeset [
+		dcs:versus `Type-Tiny 0.033_01 cpan:TOBYINK`;
+		item "Split out some of the longer parts of Types::Standard into other modules that will be loaded on demand; this shaves about 20% off the load time of Types::Standard."^^Change;
+	].
+
