@@ -1354,3 +1354,20 @@
 		item "Split out some of the longer parts of Types::Standard into other modules that will be loaded on demand; this shaves about 20% off the load time of Types::Standard."^^Change;
 	].
 
+`Type-Tiny 0.033_03 cpan:TOBYINK`
+	issued  2013-11-26;
+	changeset [
+		dcs:versus `Type-Tiny 0.033_02 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix;
+			label "Fix bug in Type::Params::multisig with regard to slurpy parameters.";
+			dcs:fixes RT#90865;
+			dcs:thanks cpan:DJERIUS;
+		];
+		item [
+			a dcs:Documentation;
+			label "Make Error::TypeTiny::Assertion's explain method act more according to documentation.";
+			dcs:fixes RT#90867;
+			dcs:thanks cpan:DJERIUS;
+		];
+	].
