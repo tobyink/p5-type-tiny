@@ -47,6 +47,8 @@ sub extends
 		{
 			$caller->add_type( $lib->get_type($_) )
 				for sort $lib->meta->type_names;
+			$caller->add_coercion( $lib->get_coercion($_) )
+				for sort $lib->meta->coercion_names;
 		}
 		elsif ($lib->isa('MooseX::Types::Base'))
 		{
