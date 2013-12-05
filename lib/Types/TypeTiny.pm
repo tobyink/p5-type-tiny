@@ -31,6 +31,11 @@ sub meta
 	return $_[0];
 }
 
+sub has_type
+{
+	defined(shift->get_coercion(@_))
+}
+
 sub get_type
 {
 	my $self = shift;
@@ -43,6 +48,21 @@ sub get_type
 sub type_names
 {
 	qw( CodeLike StringLike TypeTiny HashLike ArrayLike );
+}
+
+sub has_coercion
+{
+	defined(shift->get_coercion(@_))
+}
+
+sub get_coercion
+{
+	();
+}
+
+sub coercion_names
+{
+	();
 }
 
 sub StringLike ()
@@ -360,9 +380,17 @@ works, for rough compatibility with a real L<Type::Library> type library.
 
 =item C<< meta >>
 
+=item C<< type_names >>
+
 =item C<< get_type($name) >>
 
-=item C<< type_names >>
+=item C<< has_type($name) >>
+
+=item C<< coercion_names >>
+
+=item C<< get_coercion($name) >>
+
+=item C<< has_coercion($name) >>
 
 =back
 
