@@ -1341,6 +1341,7 @@
 			a dcs:Bugfix;
 			label "Type::Params now localizes $_ before trying to assign anything to it.";
 			dcs:fixes RT#90096;
+			dcs:thanks cpan:SKAUFMAN;
 		];
 		item "Types::Common::Numeric"^^Addition;
 		item "Types::Common::String"^^Addition;
@@ -1374,4 +1375,21 @@
 			dcs:fixes RT#90867;
 			dcs:thanks cpan:DJERIUS;
 		];
+	].
+
+`Type-Tiny 0.033_04 cpan:TOBYINK`
+	issued  2013-12-06;
+	changeset [
+		item [
+			label "The `extends` function from Type::Utils now allows inheritance of coercions, not just types.";
+			dcs:fixes RT#91153;
+			dcs:thanks cpan:JRMASH;
+		];
+		item [
+			a dcs:Tests;
+			label "Further tests related to RT#90096.";
+			seealso RT#90096;
+			dcs:thanks cpan:DJERIUS;
+		];
+		item "Implement coercion_names, get_coercion, has_coercion, and has_type methods for Types::TypeTiny, to make it more like a real Type::Library type library."^^Change;
 	].
