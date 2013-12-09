@@ -37,3 +37,9 @@
  - Tuple[] (with empty parameter list) now explicitly tests for an empty
    arrayref. (Ditto Dict[] for an empty hashref.)
  - Moose 2.11xx fixes.
+
+2013-12-09 Type-Tiny version 0.034 released!
+
+ - Added: Types::Common::Numeric
+ - Added: Types::Common::String
+ - Improvements to initial load speed of Types::Standard.

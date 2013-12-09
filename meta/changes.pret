@@ -1393,3 +1393,10 @@
 		];
 		item "Implement coercion_names, get_coercion, has_coercion, and has_type methods for Types::TypeTiny, to make it more like a real Type::Library type library."^^Change;
 	].
+
+`Type-Tiny 0.034 cpan:TOBYINK`
+	issued  2013-12-09;
+	changeset [
+		dcs:versus `Type-Tiny 0.033_04 cpan:TOBYINK`;
+		item "Updated NEWS file."^^Documentation;
+	].
