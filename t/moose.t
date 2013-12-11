@@ -251,4 +251,64 @@ is(
 	'pushing not ok value',
 );
 
+use Types::Standard -types;
+my %attributes = (
+	hashref      => HashRef,
+	hashref_int  => HashRef[Int],
+	map          => Map,
+	map_strint   => Map[Str, Int],
+);
+
+{
+	package MyHashes;
+	use Moose;
+	while (my ($attr, $type) = each %attributes)
+	{
+		has $attr => (
+			traits  => ['Hash'],
+			is      => 'ro',
+			isa     => $type,
+			handles => {
+				"$attr\_get" => 'get',
+				"$attr\_set" => 'set',
+				"$attr\_has" => 'exists',
+			},
+			default => sub { +{} },
+		);
+	}
+}
+
+for my $attr (sort keys %attributes)
+{
+	my $type      = $attributes{$attr};
+	my $getter    = "$attr\_get";
+	my $setter    = "$attr\_set";
+	my $predicate = "$attr\_has";
+	
+	subtest "Hash trait with type $type" => sub
+	{
+		my $obj = MyHashes->new;
+		is_deeply($obj->$attr, {}, 'default empty hash');
+		
+		$obj->$setter(foo => 666);
+		$obj->$setter(bar => 999);
+		is($obj->$getter('foo'), 666, 'getter');
+		is($obj->$getter('bar'), 999, 'getter');
+		$obj->$setter(bar => 42);
+		is($obj->$getter('bar'), 42, 'setter');
+		ok($obj->$predicate('foo'), 'predicate');
+		ok($obj->$predicate('bar'), 'predicate');
+		ok(!$obj->$predicate('baz'), 'predicate - negatory');
+		is_deeply($obj->$attr, { foo => 666, bar => 42 }, 'correct hash');
+		
+		like(
+			exception { $obj->$setter(baz => 3.141592) },
+			qr/type constraint/,
+			'cannot add non-Int value',
+		) if $attr =~ /int$/;
+		
+		done_testing;
+	};
+}
+
 done_testing;
