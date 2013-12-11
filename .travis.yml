@@ -2,6 +2,7 @@ language: perl
 script: HARNESS_IS_VERBOSE=1 prove -Ilib t
 install:
   - cpanm Test::Requires Test::Fatal Moo Exporter::Tiny
+  - cpanm -n Moose Mouse MooseX::Types::Common Class::InsideOut Test::LeakTrace MouseX::Types Function::Parameters
 perl:
   - "5.19"
   - "5.18"
