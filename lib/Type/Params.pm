@@ -10,7 +10,7 @@ BEGIN {
 
 BEGIN {
 	$Type::Params::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Params::VERSION   = '0.034';
+	$Type::Params::VERSION   = '0.035_01';
 }
 
 use B qw(perlstring);

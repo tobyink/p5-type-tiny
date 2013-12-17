@@ -1400,3 +1400,18 @@
 		dcs:versus `Type-Tiny 0.033_04 cpan:TOBYINK`;
 		item "Updated NEWS file."^^Documentation;
 	].
+
+`Type-Tiny 0.035_01 cpan:TOBYINK`
+	issued  2013-12-09;
+	changeset [
+		dcs:versus `Type-Tiny 0.034 cpan:TOBYINK`;
+		item [
+			label "Make parameterized Dict and Map type constraints work with Moose native hash attribute trait.";
+			dcs:thanks cpan:JRMASH;
+		];
+		item [
+			label "Make Type::Parser work with newer versions of MooseX::Types::Common which uses namespace::autoclean.";
+			dcs:fixes RT#91468;
+			dcs:thanks <urn:uuid:26bd4917-ff58-4e17-b2ee-4e81abe27f19>;
+		];
+	].
