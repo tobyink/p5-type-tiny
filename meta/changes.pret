@@ -1402,7 +1402,7 @@
 	].
 
 `Type-Tiny 0.035_01 cpan:TOBYINK`
-	issued  2013-12-09;
+	issued  2013-12-17;
 	changeset [
 		dcs:versus `Type-Tiny 0.034 cpan:TOBYINK`;
 		item [
