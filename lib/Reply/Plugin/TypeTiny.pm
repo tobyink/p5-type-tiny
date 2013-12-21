@@ -5,7 +5,7 @@ use warnings;
 
 BEGIN {
 	$Reply::Plugin::TypeTiny::AUTHORITY = 'cpan:TOBYINK';
-	$Reply::Plugin::TypeTiny::VERSION   = '0.035_01';
+	$Reply::Plugin::TypeTiny::VERSION   = '0.036';
 };
 
 require Reply::Plugin;
