@@ -13,7 +13,7 @@ BEGIN {
 	$Type::Params::VERSION   = '0.036';
 }
 
-use B qw(perlstring);
+use B qw();
 use Eval::TypeTiny;
 use Scalar::Util qw(refaddr);
 use Error::TypeTiny;
@@ -52,7 +52,7 @@ sub _mkslurpy
 			'%s = (($#_-%d)%%2)==0 ? "Error::TypeTiny::WrongNumberOfParameters"->throw(message => sprintf("Odd number of elements in %%s", %s)) : +{ @_[%d..$#_] };',
 			$name,
 			$i,
-			perlstring("$tc"),
+			B::perlstring("$tc"),
 			$i,
 			$i,
 		);
@@ -147,7 +147,7 @@ sub compile
 				'(%s) or Type::Tiny::_failed_check(%d, %s, %s, varname => %s);',
 				$constraint->inline_check($varname),
 				$constraint->{uniq},
-				perlstring($constraint),
+				B::perlstring($constraint),
 				$varname,
 				$is_slurpy ? 'q{$SLURPY}' : sprintf('q{$_[%d]}', $arg),
 			);
@@ -159,7 +159,7 @@ sub compile
 				'%s or Type::Tiny::_failed_check(%d, %s, %s, varname => %s);',
 				sprintf(sprintf '$check[%d]->(%s)', $arg, $varname),
 				$constraint->{uniq},
-				perlstring($constraint),
+				B::perlstring($constraint),
 				$varname,
 				$is_slurpy ? 'q{$SLURPY}' : sprintf('q{$_[%d]}', $arg),
 			);
