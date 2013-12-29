@@ -7,15 +7,27 @@ perl:
   - "5.14"
   - "5.12"
   - "5.10"
+env:
+  - EXTENDED_TESTING=1
 matrix:
   include:
-    - perl: 5.8.1
-      env: AUTHOR_TESTING=0
+    - perl: "5.8.1"
+      install:
+        - "cpanm -n Test::Requires Test::Fatal Test::LeakTrace"
+        - "cpanm Exporter::Tiny"
+        - "cpanm -n indirect multidimensional bareword::filehandles"
+        - "cpanm -n Moo"
 before_install:
-  - source devel.travis/travis-perlbrew
-  - perlbrew install-cpanm -f
-  - perl -V
+  - "source devel.travis/travis-perlbrew"
+  - "perlbrew install-cpanm -f"
+  - "perl -V"
 install:
-  - cpanm Test::Requires Test::Fatal Exporter::Tiny
-  - cpanm -n Moose Mouse MooseX::Types::Common Class::InsideOut Test::LeakTrace MouseX::Types indirect multidimensional bareword::filehandles Moo
-script: HARNESS_IS_VERBOSE=1 prove -Ilib t
+  - "cpanm -n Test::Requires Test::Fatal Test::LeakTrace"
+  - "cpanm Exporter::Tiny"
+  - "cpanm -n indirect multidimensional bareword::filehandles"
+  - "cpanm -n Moose MooseX::Types::Common"
+  - "cpanm -n Mouse MouseX::Types"
+  - "cpanm -n Moo"
+  - "cpanm -n Class::InsideOut"
+script:
+  - "HARNESS_IS_VERBOSE=1 prove -Ilib t"
