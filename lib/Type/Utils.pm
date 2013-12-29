@@ -565,6 +565,11 @@ Type::Utils - utility functions to make defining and using type constraints a li
    coerce "AllCaps",
       from "Str", via { uc($_) };
 
+=head1 STATUS
+
+This module is covered by the
+L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
+
 =head1 DESCRIPTION
 
 This module provides utility functions to make defining and using type

@@ -34,6 +34,11 @@ __END__
 
 Error::TypeTiny::Compilation - exception for Eval::TypeTiny
 
+=head1 STATUS
+
+This module is covered by the
+L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
+
 =head1 DESCRIPTION
 
 Thrown when compiling a closure fails. Common causes are problems with

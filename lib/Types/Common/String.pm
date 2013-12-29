@@ -146,6 +146,11 @@ __END__
 
 Types::Common::String - drop-in replacement for MooseX::Types::Common::String
 
+=head1 STATUS
+
+This module is covered by the
+L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
+
 =head1 DESCRIPTION
 
 A drop-in replacement for L<MooseX::Types::Common::String>.

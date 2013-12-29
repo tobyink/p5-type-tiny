@@ -138,6 +138,11 @@ Error::TypeTiny - exceptions for Type::Tiny and friends
          if $exception->isa("Error::TypeTiny::Assertion");
    };
 
+=head1 STATUS
+
+This module is covered by the
+L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
+
 =head1 DESCRIPTION
 
 When Type::Tiny and its related modules encounter an error, they throw an

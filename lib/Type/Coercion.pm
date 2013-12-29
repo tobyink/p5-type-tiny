@@ -504,6 +504,11 @@ __END__
 
 Type::Coercion - a set of coercions to a particular target type constraint
 
+=head1 STATUS
+
+This module is covered by the
+L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
+
 =head1 DESCRIPTION
 
 =head2 Constructors

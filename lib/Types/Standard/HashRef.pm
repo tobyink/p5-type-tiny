@@ -121,6 +121,12 @@ __END__
 
 Types::Standard::HashRef - internals for the Types::Standard HashRef type constraint
 
+=head1 STATUS
+
+This module is considered part of Type-Tiny's internals. It is not
+covered by the
+L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
+
 =head1 DESCRIPTION
 
 This file contains some of the guts for L<Types::Standard>.

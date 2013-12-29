@@ -293,6 +293,11 @@ Type::Params - Params::Validate-like parameter validation using Type::Tiny type 
  
  deposit_monies("12-34-56", "11223344", 1.2, 3, 99.99);
 
+=head1 STATUS
+
+This module is covered by the
+L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
+
 =head1 DESCRIPTION
 
 Type::Params uses L<Type::Tiny> constraints to validate the parameters to a

@@ -533,6 +533,11 @@ Type::Parser - parse type constraint strings
  $type->check([1..4]);    # true
  $type->check({foo=>1});  # false
 
+=head1 STATUS
+
+This module is covered by the
+L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
+
 =head1 DESCRIPTION
 
 Generally speaking, you probably don't want to be using this module directly.

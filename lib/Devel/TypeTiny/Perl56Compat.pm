@@ -41,6 +41,12 @@ __END__
 
 Devel::TypeTiny::Perl56Compat - shims to allow Type::Tiny to run on Perl 5.6.x
 
+=head1 STATUS
+
+This module is considered part of Type-Tiny's internals. It is not
+covered by the
+L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
+
 =head1 DESCRIPTION
 
 This is not considered part of Type::Tiny's public API.

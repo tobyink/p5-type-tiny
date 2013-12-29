@@ -110,6 +110,11 @@ __END__
 
 Type::Tiny::Duck - type constraints based on the "can" method
 
+=head1 STATUS
+
+This module is covered by the
+L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
+
 =head1 DESCRIPTION
 
 Type constraints of the general form C<< { $_->can("method") } >>.

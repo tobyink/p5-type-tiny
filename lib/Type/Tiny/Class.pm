@@ -183,6 +183,11 @@ __END__
 
 Type::Tiny::Class - type constraints based on the "isa" method
 
+=head1 STATUS
+
+This module is covered by the
+L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
+
 =head1 DESCRIPTION
 
 Type constraints of the general form C<< { $_->isa("Some::Class") } >>.

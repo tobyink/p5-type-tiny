@@ -53,6 +53,12 @@ __END__
 
 Type::Coercion::FromMoose - a set of coercions borrowed from Moose
 
+=head1 STATUS
+
+This module is considered part of Type-Tiny's internals. It is not
+covered by the
+L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
+
 =head1 DESCRIPTION
 
 This package inherits from L<Type::Coercion>; see that for most documentation.

@@ -66,6 +66,11 @@ __END__
 
 Reply::Plugin::TypeTiny - improved type constraint exceptions in Reply
 
+=head1 STATUS
+
+This module is not covered by the
+L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
+
 =head1 DESCRIPTION
 
 This is a small plugin to improve error messages in L<Reply>.

@@ -117,6 +117,11 @@ __END__
 
 Type::Tiny::Intersection - intersection type constraints
 
+=head1 STATUS
+
+This module is covered by the
+L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
+
 =head1 DESCRIPTION
 
 Intersection type constraints.

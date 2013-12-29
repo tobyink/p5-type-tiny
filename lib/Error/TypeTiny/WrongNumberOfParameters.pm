@@ -68,6 +68,11 @@ __END__
 
 Error::TypeTiny::WrongNumberOfParameters - exception for Type::Params
 
+=head1 STATUS
+
+This module is covered by the
+L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
+
 =head1 DESCRIPTION
 
 Thrown when a Type::Params compiled check is called with the wrong number

@@ -159,6 +159,11 @@ Test::TypeTiny - useful functions for testing the efficacy of type constraints
    
    done_testing;
 
+=head1 STATUS
+
+This module is covered by the
+L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
+
 =head1 DESCRIPTION
 
 L<Test::TypeTiny> provides a few handy functions for testing type constraints.

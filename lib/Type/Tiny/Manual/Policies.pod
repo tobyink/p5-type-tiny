@@ -1,0 +1,63 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Type::Tiny::Manual::Policies - Type::Tiny policies
+
+=head1 STABILITY
+
+B<< The following stability policy is planned for Type::Tiny 1.000000
+and above. This milestone has not yet been reached. >>
+
+Type::Tiny 1.000000 is considered stable. Any changes to the API that
+are big enough to I<require> changes to the test suite will be preceded
+by a I<< six month >> notice period, with the following exceptions:
+
+=over
+
+=item *
+
+Where a change is necessary to maintain compatibility with new releases
+of L<Moose>, L<Moo>, or Perl itself.
+
+=item *
+
+Where a change fixes a contradiction between the implementation and
+documentation of Type::Tiny.
+
+=item *
+
+Where a feature is explicitly documented as being "experimental" or
+"unstable".
+
+=item *
+
+Improvements to the text of error messages.
+
+=back
+
+=head1 BUGS
+
+Please report any bugs to
+L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+=cut

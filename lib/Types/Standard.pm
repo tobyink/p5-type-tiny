@@ -753,6 +753,11 @@ __END__
 
 Types::Standard - bundled set of built-in types for Type::Tiny
 
+=head1 STATUS
+
+This module is covered by the
+L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
+
 =head1 DESCRIPTION
 
 L<Type::Tiny> bundles a few types which seem to be useful.

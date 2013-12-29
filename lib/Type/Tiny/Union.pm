@@ -159,6 +159,11 @@ __END__
 
 Type::Tiny::Union - union type constraints
 
+=head1 STATUS
+
+This module is covered by the
+L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
+
 =head1 DESCRIPTION
 
 Union type constraints.

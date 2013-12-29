@@ -109,6 +109,11 @@ __END__
 
 Types::Common::Numeric - drop-in replacement for MooseX::Types::Common::Numeric
 
+=head1 STATUS
+
+This module is covered by the
+L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
+
 =head1 DESCRIPTION
 
 A drop-in replacement for L<MooseX::Types::Common::Numeric>.

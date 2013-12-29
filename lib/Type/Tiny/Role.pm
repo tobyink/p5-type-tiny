@@ -102,6 +102,11 @@ __END__
 
 Type::Tiny::Role - type constraints based on the "DOES" method
 
+=head1 STATUS
+
+This module is covered by the
+L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
+
 =head1 DESCRIPTION
 
 Type constraints of the general form C<< { $_->DOES("Some::Role") } >>.

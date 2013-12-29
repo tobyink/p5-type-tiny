@@ -54,6 +54,11 @@ __END__
 
 Type::Coercion::Union - a set of coercions to a union type constraint
 
+=head1 STATUS
+
+This module is covered by the
+L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
+
 =head1 DESCRIPTION
 
 This package inherits from L<Type::Coercion>; see that for most documentation.

@@ -352,6 +352,11 @@ Type::Library - tiny, yet Moo(se)-compatible type libraries
       has favourite_number => (is => "ro", isa => Number);
    }
 
+=head1 STATUS
+
+This module is covered by the
+L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
+
 =head1 DESCRIPTION
 
 L<Type::Library> is a tiny class for creating MooseX::Types-like type

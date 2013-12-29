@@ -105,6 +105,11 @@ __END__
 
 Error::TypeTiny::Assertion - exception when a value fails a type constraint
 
+=head1 STATUS
+
+This module is covered by the
+L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
+
 =head1 DESCRIPTION
 
 This exception is thrown when a value fails a type constraint assertion.

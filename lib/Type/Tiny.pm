@@ -1029,6 +1029,11 @@ Type::Tiny - tiny, yet Moo(se)-compatible type constraint
       has favourite_number => (is => "ro", isa => $NUM);
    }
 
+=head1 STATUS
+
+This module is covered by the
+L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
+
 =head1 DESCRIPTION
 
 L<Type::Tiny> is a tiny class for creating Moose-like type constraint
