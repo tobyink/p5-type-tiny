@@ -63,6 +63,10 @@ L<Processing arguments to subs|Type::Tiny::Manual::Params> - coerce and validate
 
 Other modules using Type::Tiny in interesting ways: L<Type::Tie>, L<Scalar::Does>, L<Set::Equivalence>...
 
+=item *
+
+L<Type::Tiny maintenance policies|Type::Tiny::Manual::Policies> - the stability policy.
+
 =back
 
 =head1 DEPENDENCIES
