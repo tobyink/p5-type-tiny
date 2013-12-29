@@ -1429,3 +1429,10 @@
 		dcs:versus `Type-Tiny 0.036 cpan:TOBYINK`;
 		item "Fix a Type::Params/B problem on Perl 5.6.x."^^Bugfix;
 	].
+
+`Type-Tiny 0.037_02 cpan:TOBYINK`
+	issued  2013-12-29;
+	changeset [
+		dcs:versus `Type-Tiny 0.037_01 cpan:TOBYINK`;
+		item "Link to the Type::Tiny stability policy from the pod of each module it covers."^^Documentation;
+	].
