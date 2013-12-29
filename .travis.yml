@@ -12,7 +12,7 @@ matrix:
     - perl: 5.8.1
       env: AUTHOR_TESTING=0
 before_install:
-  - source maint/travis-perlbrew
+  - source devel.travis/travis-perlbrew
   - perlbrew install-cpanm -f
   - perl -V
 install:
