@@ -1,13 +1,21 @@
 language: perl
-script: HARNESS_IS_VERBOSE=1 prove -Ilib t
-install:
-  - cpanm Test::Requires Test::Fatal Moo Exporter::Tiny
-  - cpanm -n Moose Mouse MooseX::Types::Common Class::InsideOut Test::LeakTrace MouseX::Types indirect multidimensional bareword::filehandles
 perl:
   - "5.19"
+  - "5.18.1_thr"
   - "5.18"
   - "5.16"
   - "5.14"
   - "5.12"
   - "5.10"
-  - "5.8"
+matrix:
+  include:
+    - perl: 5.8.1
+      env: AUTHOR_TESTING=0
+before_install:
+  - source maint/travis-perlbrew
+  - perlbrew install-cpanm -f
+  - perl -V
+install:
+  - cpanm Test::Requires Test::Fatal Exporter::Tiny
+  - cpanm -n Moose Mouse MooseX::Types::Common Class::InsideOut Test::LeakTrace MouseX::Types indirect multidimensional bareword::filehandles Moo
+script: HARNESS_IS_VERBOSE=1 prove -Ilib t
