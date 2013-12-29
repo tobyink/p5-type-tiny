@@ -242,7 +242,7 @@ __END__
 
 =encoding utf-8
 
-=for stopwords pragmas
+=for stopwords pragmas coderefs
 
 =head1 NAME
 
@@ -250,7 +250,8 @@ Eval::TypeTiny - utility to evaluate a string of Perl code in a clean environmen
 
 =head1 DESCRIPTION
 
-This is not considered part of Type::Tiny's public API.
+This module is used by Type::Tiny to compile coderefs from strings of
+Perl code, and hashrefs of variables to close over.
 
 =head2 Functions
 
