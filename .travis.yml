@@ -17,6 +17,18 @@ matrix:
         - "cpanm Exporter::Tiny"
         - "cpanm -n indirect multidimensional bareword::filehandles"
         - "cpanm -n Moo"
+    - perl: "5.6.2"
+      install:
+        - "perl -Idevel.travis -MCPAN -e'install q(Scalar::Util)'"
+        - "perl -Idevel.travis -MCPAN -e'install q(Text::Balanced)'"
+        - "perl -Idevel.travis -MCPAN -e'install q(MSCHWERN/ExtUtils-MakeMaker-6.56.tar.gz)'"
+        - "perl -Idevel.travis -MCPAN -e'install q(FERREIRA/Exporter-5.63.tar.gz)'"
+        - "perl -Idevel.travis -MCPAN -e'install q(Class::ISA)'"
+        - "perl -Idevel.travis -MCPAN -e'install q(Test::More)'"
+        - "perl -Idevel.travis -MCPAN -e'install q(Test::Harness)'"
+        - "perl -Idevel.travis -MCPAN -e'install q(Exporter::Tiny)'"
+      script:
+        - "HARNESS_IS_VERBOSE=1 perl /home/travis/perl5/perlbrew/perls/5.6.2/bin/prove -Ilib -Iinc t"
 before_install:
   - "source devel.travis/travis-perlbrew"
   - "perlbrew install-cpanm -f"
