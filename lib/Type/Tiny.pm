@@ -137,7 +137,9 @@ sub new
 		$ALL_TYPES{$uniq} = $self;
 		weaken( $ALL_TYPES{$uniq} );
 		
-		$Moo::HandleMoose::TYPE_MAP{overload::StrVal($self)} = sub { $ALL_TYPES{$uniq} };
+		package # no index
+			Moo::HandleMoose;
+		$Moo::HandleMoose::TYPE_MAP{$self} = sub { $ALL_TYPES{$uniq} };
 	}
 	
 	if (ref($params{coercion}) eq q(CODE))
