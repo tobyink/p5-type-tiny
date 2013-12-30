@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Types::Standard::HashRef::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::HashRef::VERSION   = '0.037_02';
+	$Types::Standard::HashRef::VERSION   = '0.037_03';
 }
 
 use Types::Standard ();

@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Error::TypeTiny::AUTHORITY = 'cpan:TOBYINK';
-	$Error::TypeTiny::VERSION   = '0.037_02';
+	$Error::TypeTiny::VERSION   = '0.037_03';
 }
 
 use overload
