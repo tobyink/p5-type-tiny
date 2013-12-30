@@ -165,7 +165,9 @@ sub DESTROY
 {
 	my $self = shift;
 	delete( $ALL_TYPES{$self->{uniq}} );
-	delete( $Moo::HandleMoose::TYPE_MAP{overload::StrVal($self)} );
+	package # no index
+		Moo::HandleMoose;
+	delete( $Moo::HandleMoose::TYPE_MAP{$self} );
 	return;
 }
 

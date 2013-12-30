@@ -44,8 +44,10 @@ use warnings;
 use lib qw( ./lib ./t/lib ../inc ./inc );
 
 use Test::More;
+use Config;
 
 BEGIN { plan skip_all => 'Perl < 5.10.1' if $] < 5.010001 };
+BEGIN { plan skip_all => 'useithreads'   if $Config{'useithreads'} };
 
 use Test::Requires 'Test::LeakTrace';
 use Test::LeakTrace;
