@@ -1448,3 +1448,11 @@
 		];
 		item "Skip leak.t on threaded Perls (for now)."^^Tests;
 	].
+
+`Type-Tiny 0.038 cpan:TOBYINK`
+	issued  2014-01-01;
+	changeset [
+		dcs:versus `Type-Tiny 0.037_03 cpan:TOBYINK`;
+		item "Updated NEWS file."^^Documentation;
+		item "Copyright 2014."^^Documentation;
+	].
