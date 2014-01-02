@@ -43,3 +43,8 @@ install:
   - "cpanm -n Class::InsideOut"
 script:
   - "HARNESS_IS_VERBOSE=1 prove -Ilib t"
+notifications:
+  irc:
+    channels:
+      - "irc.perl.org#moops"
+    on_success: change
