@@ -24,7 +24,10 @@ sub _swap { $_[2] ? @_[1,0] : @_[0,1] }
 BEGIN {
 	($] > 5.010001)
 		? eval q{ sub SUPPORT_SMARTMATCH () { !!0 } }
-		: eval q{ sub SUPPORT_SMARTMATCH () { !!1 } }
+		: eval q{ sub SUPPORT_SMARTMATCH () { !!1 } };
+	($] >= 5.014)
+		? eval q{ sub FIXED_PRECEDENCE () { !!1 } }
+		: eval q{ sub FIXED_PRECEDENCE () { !!0 } };
 }
 
 use overload
@@ -32,8 +35,24 @@ use overload
 	q(bool)    => sub { 1 },
 	q(&{})     => "_overload_coderef",
 	q(+)       => sub { $_[2] ? $_[1]->plus_coercions($_[0]) : $_[0]->plus_fallback_coercions($_[1]) },
-	q(|)       => sub { my @tc = _swap @_; require Type::Tiny::Union; "Type::Tiny::Union"->new(type_constraints => \@tc) },
-	q(&)       => sub { my @tc = _swap @_; require Type::Tiny::Intersection; "Type::Tiny::Intersection"->new(type_constraints => \@tc) },
+	q(|)       => sub {
+		my @tc = _swap @_;
+		if (!FIXED_PRECEDENCE && !blessed $tc[0] && ref $tc[0] eq 'ARRAY') {
+			require Type::Tiny::HalfOp;
+			return "Type::Tiny::HalfOp"->new('|', @tc);
+		}
+		require Type::Tiny::Union;
+		"Type::Tiny::Union"->new(type_constraints => \@tc)
+	},
+	q(&)       => sub {
+		my @tc = _swap @_;
+		if (!FIXED_PRECEDENCE && !blessed $tc[0] && ref $tc[0] eq 'ARRAY') {
+			require Type::Tiny::HalfOp;
+			return "Type::Tiny::HalfOp"->new('&', @tc);
+		}
+		require Type::Tiny::Intersection;
+		"Type::Tiny::Intersection"->new(type_constraints => \@tc)
+	},
 	q(~)       => sub { shift->complementary_type },
 	q(==)      => sub { $_[0]->equals($_[1]) },
 	q(<)       => sub { my $m = $_[0]->can('is_subtype_of'); $m->(_swap @_) },
