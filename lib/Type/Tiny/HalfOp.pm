@@ -16,7 +16,7 @@ sub new {
 sub complete {
 	my ($self, $type) = @_;
 	my $complete_type = $type->parameterize(@{$self->{param}});
-	my $method = overload::Method($type, $self->{op});
+	my $method = overload::Method($complete_type, $self->{op});
 	$complete_type->$method($self->{type});
 }
 
