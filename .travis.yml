@@ -28,7 +28,7 @@ matrix:
         - "perl -Idevel.travis -MCPAN -e'install q(Test::Harness)'"
         - "perl -Idevel.travis -MCPAN -e'install q(Exporter::Tiny)'"
       script:
-        - "HARNESS_IS_VERBOSE=1 perl /home/travis/perl5/perlbrew/perls/5.6.2/bin/prove -Ilib -Iinc t"
+        - "HARNESS_IS_VERBOSE=1 perl /home/travis/perl5/perlbrew/perls/5.6.2/bin/prove -r -Ilib -Iinc t"
 before_install:
   - "source devel.travis/travis-perlbrew"
   - "perlbrew install-cpanm -f"
@@ -42,7 +42,7 @@ install:
   - "cpanm -n Moo"
   - "cpanm -n Class::InsideOut"
 script:
-  - "HARNESS_IS_VERBOSE=1 prove -Ilib t"
+  - "HARNESS_IS_VERBOSE=1 prove -r -Ilib t"
 notifications:
   irc:
     channels:
