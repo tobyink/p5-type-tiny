@@ -1456,3 +1456,13 @@
 		item "Updated NEWS file."^^Documentation;
 		item "Copyright 2014."^^Documentation;
 	].
+
+`Type-Tiny 0.039_01 cpan:TOBYINK`
+	issued  2014-01-21;
+	changeset [
+		dcs:versus `Type-Tiny 0.038 cpan:TOBYINK`;
+		item "The preferred IRC channel for support is now #moops."^^Documentation;
+		item "Exporter::TypeTiny."^^Removal;
+		item "Restructure the 't' directory."^^Tests;
+	].
+
