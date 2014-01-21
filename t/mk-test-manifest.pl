@@ -69,7 +69,7 @@ UNIT_TESTS:
 		say "m`$mod ${\ PROJ_NAME }`";
 		for my $test (sort @{ $mods{$mod} })
 		{
-			say "\t:unit_test [ a :UnitTest; :test_script f`${\ $test->relative(PROJ_DIR) } ${\ PROJ_NAME }`; :purpose \"${\ podpurpose($test,1) }\" ]";
+			say "\t:unit_test [ a :UnitTest; :test_script f`${\ $test->relative(PROJ_DIR) } ${\ PROJ_NAME }`; :purpose \"${\ podpurpose($test,1) }\" ];";
 		}
 		say "\t.";
 	}
