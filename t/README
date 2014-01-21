@@ -1,0 +1,34 @@
+Running the test suite
+======================
+
+In the main directory for the distribution (i.e. the directory containing
+dist.ini), run the following command:
+
+	prove -lr "t"
+
+
+
+Test suite structure
+====================
+
+t/modules/
+	- unit tests for each module in the distribution
+
+t/integration/
+	- integration tests for using Type-Tiny with other software
+	- these should be skipped if the other software is not available
+
+t/dependencies/
+	- integration tests ensuring that our dependencies don't make us break
+
+t/regression/
+	- tests related to specific bug reports
+
+t/lib/
+	- support files for test cases.
+
+t/*.t
+	- miscellaneous other tests
+
+t/*.pl
+	- support files for managing test cases
