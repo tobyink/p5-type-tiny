@@ -11,6 +11,8 @@ dist.ini), run the following command:
 Test suite structure
 ====================
 
+Each test should contain its own documentation in pod format.
+
 t/modules/
 	- unit tests for each module in the distribution
 
