@@ -13,17 +13,14 @@ Test suite structure
 
 Each test should contain its own documentation in pod format.
 
-t/modules/
+t/20-unit/
 	- unit tests for each module in the distribution
 
-t/integration/
+t/30-integration/
 	- integration tests for using Type-Tiny with other software
 	- these should be skipped if the other software is not available
 
-t/dependencies/
-	- integration tests ensuring that our dependencies don't make us break
-
-t/regression/
+t/40-regression/
 	- tests related to specific bug reports
 
 t/lib/
