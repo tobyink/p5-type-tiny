@@ -22,6 +22,10 @@
 		deps:on "Test::More 0.96"^^deps:CpanId;
 		comment "I don't have the patience to maintain a test suite that runs on ancient versions of Test::More."@en;
 	];
+	deps:test-recommendation [
+		deps:on "Test::Tester 0.109"^^deps:CpanId;
+		comment "For testing Test::TypeTiny."@en;
+	];
 	deps:runtime-recommendation [
 		deps:on "Type::Tie"^^deps:CpanId;
 		comment "Type::Tie is needed if you want to constrain the type of a scalar, array or hash variable."@en;
