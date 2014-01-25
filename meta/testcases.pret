@@ -14,6 +14,10 @@ m`Eval::TypeTiny Type-Tiny`
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Eval-TypeTiny/basic.t Type-Tiny`; :purpose "Tests Eval::TypeTiny." ];
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Eval-TypeTiny/lexical-subs.t Type-Tiny`; :purpose "Tests Eval::TypeTiny with experimental lexical subs." ];
 	.
+m`Test::TypeTiny Type-Tiny`
+	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Test-TypeTiny/basic.t Type-Tiny`; :purpose "Tests Test::TypeTiny (which is somewhat important because Test::TypeTiny is itself used for the majority of the type constraint tests). In particular, this tests that everything works when the '$EXTENDED_TESTING' environment variable is false." ];
+	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Test-TypeTiny/extended.t Type-Tiny`; :purpose "Tests Test::TypeTiny works when the '$EXTENDED_TESTING' environment variable is true. Note that Test::Tester appears to have issues with subtests, so currently 'should_pass' and 'should_fail' are not tested." ];
+	.
 m`Type::Coercion Type-Tiny`
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Coercion/basic.t Type-Tiny`; :purpose "Checks Type::Coercion works." ];
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Coercion/frozen.t Type-Tiny`; :purpose "Type::Coercion objects are mutable, unlike Type::Tiny objects. However, they can be frozen, making them immutable. (And Type::Tiny will freeze them occasionally, if it feels it has to.)" ];
