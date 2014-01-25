@@ -1466,3 +1466,10 @@
 		item "Restructure the 't' directory."^^Tests;
 	].
 
+`Type-Tiny 0.039_02 cpan:TOBYINK`
+	issued  2014-01-25;
+	changeset [
+		dcs:versus `Type-Tiny 0.039_01 cpan:TOBYINK`;
+		item "Add tests for Test::TypeTiny."^^Tests;
+	].
+
