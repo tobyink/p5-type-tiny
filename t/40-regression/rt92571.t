@@ -4,7 +4,8 @@
 
 =head1 PURPOSE
 
-Make sure that L<Type::Params> localizes C<< $_ >>.
+Make sure that the weakening of the reference from a Type::Coercion
+object back to its "owner" type constraint does not break functionality.
 
 =head1 SEE ALSO
 
