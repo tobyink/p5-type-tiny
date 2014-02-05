@@ -38,8 +38,8 @@ use overload
 	q(|)       => sub {
 		my @tc = _swap @_;
 		if (!FIXED_PRECEDENCE && !blessed $tc[0] && ref $tc[0] eq 'ARRAY') {
-			require Type::Tiny::HalfOp;
-			return "Type::Tiny::HalfOp"->new('|', @tc);
+			require Type::Tiny::_HalfOp;
+			return "Type::Tiny::_HalfOp"->new('|', @tc);
 		}
 		require Type::Tiny::Union;
 		"Type::Tiny::Union"->new(type_constraints => \@tc)
@@ -47,8 +47,8 @@ use overload
 	q(&)       => sub {
 		my @tc = _swap @_;
 		if (!FIXED_PRECEDENCE && !blessed $tc[0] && ref $tc[0] eq 'ARRAY') {
-			require Type::Tiny::HalfOp;
-			return "Type::Tiny::HalfOp"->new('&', @tc);
+			require Type::Tiny::_HalfOp;
+			return "Type::Tiny::_HalfOp"->new('&', @tc);
 		}
 		require Type::Tiny::Intersection;
 		"Type::Tiny::Intersection"->new(type_constraints => \@tc)

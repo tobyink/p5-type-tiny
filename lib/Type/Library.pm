@@ -83,7 +83,7 @@ sub _mksub
 		? sprintf(
 			q{
 				sub (%s) {
-					if (ref $_[0] eq 'Type::Tiny::HalfOp') { return $_[0]->complete($type); }
+					return $_[0]->complete($type) if ref($_[0]) eq 'Type::Tiny::_HalfOp';
 					my $params; $params = shift if ref($_[0]) eq q(ARRAY);
 					my $t = $params ? $type->parameterize(@$params) : $type;
 					@_ && wantarray ? return($t%s, @_) : return $t%s;

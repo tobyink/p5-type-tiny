@@ -1,4 +1,6 @@
 package Type::Tiny::HalfOp;
+
+use 5.006001;
 use strict;
 use warnings;
 
@@ -7,9 +9,9 @@ use overload ();
 sub new {
 	my ($class, $op, $param, $type) = @_;
 	bless {
-		op => $op,
+		op    => $op,
 		param => $param,
-		type => $type,
+		type  => $type,
 	}, $class;
 }
 
