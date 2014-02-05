@@ -468,8 +468,7 @@ This allows constructs like:
 
    ArrayRef[Int] | HashRef[Int]
 
-... to "just work". Sadly, this constant is false on Perl < 5.14, and
-expressions like the above need lots of parentheses to do what you mean.
+... to "just work".
 
 =back
 
