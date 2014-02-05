@@ -143,3 +143,10 @@ RT#90096
 	:regression_test [ a :RegressionTest; :test_script f`t/40-regression/rt90096-2.t Type-Tiny`; :purpose "Additional tests related to RT#90096. Make sure that Type::Params localizes '$_'."];
 	:regression_test [ a :RegressionTest; :test_script f`t/40-regression/rt90096.t Type-Tiny`; :purpose "Make sure that Type::Params localizes '$_'."];
 	.
+RT#92571
+	:regression_test [ a :RegressionTest; :test_script f`t/40-regression/rt92571-2.t Type-Tiny`; :purpose "Make sure that the weakening of the reference from a Type::Coercion::Union object back to its \"owner\" type constraint does not break functionality."];
+	:regression_test [ a :RegressionTest; :test_script f`t/40-regression/rt92571.t Type-Tiny`; :purpose "Make sure that the weakening of the reference from a Type::Coercion object back to its \"owner\" type constraint does not break functionality."];
+	.
+RT#92591
+	:regression_test [ a :RegressionTest; :test_script f`t/40-regression/rt92591.t Type-Tiny`; :purpose "Make sure that 'declare_coercion' works outside type libraries."];
+	.
