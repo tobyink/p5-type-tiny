@@ -10,9 +10,9 @@ following three type constraints are expected to be equivalent to each other:
    use Types::Standard qw( ArrayRef Int Num Str );
    use Type::Utils qw( union intersection );
    
-   my $type1 = (ArrayRef[Int])
-      | (ArrayRef[Num & ~Int])
-      | (ArrayRef[Str & ~Num]);
+   my $type1 = ArrayRef[Int]
+      | ArrayRef[Num & ~Int]
+      | ArrayRef[Str & ~Num];
    
    my $type2 = union [
       ArrayRef[Int],
@@ -59,7 +59,7 @@ use Test::More;
 use Types::Standard qw( ArrayRef Int Num Str );
 use Type::Utils qw( union intersection );
 
-my $type1 = (ArrayRef[Int]) | (ArrayRef[Num & ~Int]) | (ArrayRef[Str & ~Num]);
+my $type1 = ArrayRef[Int] | ArrayRef[Num & ~Int] | ArrayRef[Str & ~Num];
 
 my $type2 = union [
 	ArrayRef[Int],
