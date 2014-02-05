@@ -26,8 +26,8 @@ BEGIN {
 		? eval q{ sub SUPPORT_SMARTMATCH () { !!0 } }
 		: eval q{ sub SUPPORT_SMARTMATCH () { !!1 } };
 	($] >= 5.014)
-		? eval q{ sub FIXED_PRECEDENCE () { !!1 } }
-		: eval q{ sub FIXED_PRECEDENCE () { !!0 } };
+		? eval q{ sub _FIXED_PRECEDENCE () { !!1 } }
+		: eval q{ sub _FIXED_PRECEDENCE () { !!0 } };
 }
 
 use overload
@@ -37,7 +37,7 @@ use overload
 	q(+)       => sub { $_[2] ? $_[1]->plus_coercions($_[0]) : $_[0]->plus_fallback_coercions($_[1]) },
 	q(|)       => sub {
 		my @tc = _swap @_;
-		if (!FIXED_PRECEDENCE && !blessed $tc[0] && ref $tc[0] eq 'ARRAY') {
+		if (!_FIXED_PRECEDENCE && !blessed $tc[0] && ref $tc[0] eq 'ARRAY') {
 			require Type::Tiny::_HalfOp;
 			return "Type::Tiny::_HalfOp"->new('|', @tc);
 		}
@@ -46,7 +46,7 @@ use overload
 	},
 	q(&)       => sub {
 		my @tc = _swap @_;
-		if (!FIXED_PRECEDENCE && !blessed $tc[0] && ref $tc[0] eq 'ARRAY') {
+		if (!_FIXED_PRECEDENCE && !blessed $tc[0] && ref $tc[0] eq 'ARRAY') {
 			require Type::Tiny::_HalfOp;
 			return "Type::Tiny::_HalfOp"->new('&', @tc);
 		}
