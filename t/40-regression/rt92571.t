@@ -47,7 +47,7 @@ is_deeply(
 is_deeply(
 	( ( ( ArrayRef ) + ArrayRefFromAny )->coerce( ['a'] ) ),
 	['a'],
-);	
+);
 
 # types go away after generation of coercion sub, breaking it
 my $coerce = ( ( ArrayRef ) + ArrayRefFromAny )->coercion;
