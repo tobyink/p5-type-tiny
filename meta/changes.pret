@@ -1491,3 +1491,14 @@
 		];
 	].
 
+`Type-Tiny 0.039_04 cpan:TOBYINK`
+	issued  2014-02-05;
+	changeset [
+		dcs:versus `Type-Tiny 0.039_03 cpan:TOBYINK`;
+		item [
+			label "Make overloaded ops on parameterized type constraints work more consistently between Perl above and below 5.14, reducing the need for parenthesizing complex type constraint expresssions.";
+			dcs:blame cpan:HAARG;
+			seealso <https://github.com/tobyink/p5-type-tiny/pull/8>
+		];
+	].
+
