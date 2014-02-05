@@ -279,6 +279,10 @@ sub declare_coercion
 			push @C, shift;
 		}
 	}
+	else
+	{
+		@C = @_;
+	}
 	
 	$c->add_type_coercions(@C);
 	
