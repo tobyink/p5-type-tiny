@@ -57,8 +57,7 @@ sub new
 	
 	my $self = bless \%params, $class;
 	$self->add_type_coercions(@$C) if @$C;
-	$self->{_compiled_type_constraint_check} = $self->{type_constraint}->compiled_check
-		if $self->{type_constraint};
+	$self->_preserve_type_constraint;
 	Scalar::Util::weaken($self->{type_constraint}); # break ref cycle
 	$self->{frozen} = $F if $F;
 	
@@ -88,6 +87,13 @@ sub has_library            { exists $_[0]{library} }
 sub has_type_constraint    { defined $_[0]->type_constraint } # sic
 sub has_coercion_generator { exists $_[0]{coercion_generator} }
 sub has_parameters         { exists $_[0]{parameters} }
+
+sub _preserve_type_constraint
+{
+	my $self = shift;
+	$self->{_compiled_type_constraint_check} = $self->{type_constraint}->compiled_check
+		if $self->{type_constraint};
+}
 
 sub _maybe_restore_type_constraint
 {

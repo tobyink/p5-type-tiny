@@ -17,6 +17,23 @@ sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 require Type::Coercion;
 our @ISA = 'Type::Coercion';
 
+sub _preserve_type_constraint
+{
+	my $self = shift;
+	$self->{_union_of} = $self->{type_constraint}->type_constraints
+		if $self->{type_constraint};
+}
+
+sub _maybe_restore_type_constraint
+{
+	my $self = shift;
+	if ( my $union = $self->{_union_of} )
+	{
+		return Type::Tiny::Union->new(type_constraints => $union);
+	}
+	return;
+}
+
 sub type_coercion_map
 {
 	my $self = shift;
