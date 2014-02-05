@@ -1473,3 +1473,21 @@
 		item "Add tests for Test::TypeTiny."^^Tests;
 	].
 
+`Type-Tiny 0.039_03 cpan:TOBYINK`
+	issued  2014-02-05;
+	changeset [
+		dcs:versus `Type-Tiny 0.039_02 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix;
+			dcs:fixes RT#92591;
+			label "Make Type::Utils::declare_coercion work outside type libraries.";
+			dcs:thanks cpan:DJERIUS;
+		];
+		item [
+			a dcs:Bugfix;
+			dcs:fixes RT#92571;
+			label "Weak reference from Type::Coercion objects to target type constraint caused bad behaviour in some cases. This has been fixed by retaining enough information within the Type::Coercion to be able to reconstruct its type constraint if it disappears due to the reference count falling to zero.";
+			dcs:thanks cpan:DJERIUS;
+		];
+	].
+
