@@ -71,11 +71,11 @@ L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
 
 =head1 AUTHOR
 
-Graham Knopp E<lt>haarg@cpan.orgE<gt>.
+Graham Knop E<lt>haarg@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2014 by Graham Knopp.
+This software is copyright (c) 2014 by Graham Knop.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
