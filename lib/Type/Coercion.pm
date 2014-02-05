@@ -57,6 +57,8 @@ sub new
 	
 	my $self = bless \%params, $class;
 	$self->add_type_coercions(@$C) if @$C;
+	$self->{_compiled_type_constraint_check} = $self->{type_constraint}->compiled_check
+		if $self->{type_constraint};
 	Scalar::Util::weaken($self->{type_constraint}); # break ref cycle
 	$self->{frozen} = $F if $F;
 	
@@ -74,7 +76,7 @@ sub new
 sub name                   { $_[0]{name} }
 sub display_name           { $_[0]{display_name}      ||= $_[0]->_build_display_name }
 sub library                { $_[0]{library} }
-sub type_constraint        { $_[0]{type_constraint} }
+sub type_constraint        { $_[0]{type_constraint}   ||= $_[0]->_maybe_restore_type_constraint }
 sub type_coercion_map      { $_[0]{type_coercion_map} ||= [] }
 sub moose_coercion         { $_[0]{moose_coercion}    ||= $_[0]->_build_moose_coercion }
 sub compiled_coercion      { $_[0]{compiled_coercion} ||= $_[0]->_build_compiled_coercion }
@@ -83,9 +85,19 @@ sub coercion_generator     { $_[0]{coercion_generator} }
 sub parameters             { $_[0]{parameters} }
 
 sub has_library            { exists $_[0]{library} }
-sub has_type_constraint    { defined $_[0]{type_constraint} } # sic
+sub has_type_constraint    { defined $_[0]->type_constraint } # sic
 sub has_coercion_generator { exists $_[0]{coercion_generator} }
 sub has_parameters         { exists $_[0]{parameters} }
+
+sub _maybe_restore_type_constraint
+{
+	my $self = shift;
+	if ( my $check = $self->{_compiled_type_constraint_check} )
+	{
+		return Type::Tiny->new(constraint => $check);
+	}
+	return;
+}
 
 sub add
 {
