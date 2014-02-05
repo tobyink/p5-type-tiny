@@ -4,6 +4,11 @@ use 5.006001;
 use strict;
 use warnings;
 
+BEGIN {
+	$Type::Tiny::_HalfOp::AUTHORITY = 'cpan:TOBYINK';
+	$Type::Tiny::_HalfOp::VERSION   = '0.039_04';
+}
+
 use overload ();
 
 sub new {
