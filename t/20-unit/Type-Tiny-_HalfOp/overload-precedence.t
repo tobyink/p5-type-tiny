@@ -1,8 +1,8 @@
-use strictures;
-use Type::Tiny;
-use Types::Standard -all;
-
+use strict;
+use warnings FATAL => 'all';
 use Test::More;
+
+use Types::Standard -all;
 
 my $union = eval { ArrayRef[Int] | HashRef[Int] };
 
