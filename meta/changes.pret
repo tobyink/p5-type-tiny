@@ -1502,3 +1502,9 @@
 		];
 	].
 
+`Type-Tiny 0.039_05 cpan:TOBYINK`
+	issued  2014-02-15;
+	changeset [
+		dcs:versus `Type-Tiny 0.039_04 cpan:TOBYINK`;
+		item "Apply the Type::Tiny::_HalfOp trick to overloaded addition too."^^Change;
+	].
