@@ -110,14 +110,19 @@ sub add
 	my $class = shift;
 	my ($x, $y, $swap) = @_;
 	
+	if (!blessed $y and ref $y eq 'ARRAY') {
+		require Type::Tiny::_HalfOp;
+		return "Type::Tiny::_HalfOp"->new('+', $y, $x);
+	}
+	
 	Types::TypeTiny::TypeTiny->check($x) and return $x->plus_fallback_coercions($y);
 	Types::TypeTiny::TypeTiny->check($y) and return $y->plus_coercions($x);
 	
 	_croak "Attempt to add $class to something that is not a $class"
 		unless blessed($x) && blessed($y) && $x->isa($class) && $y->isa($class);
-
+	
 	($y, $x) = ($x, $y) if $swap;
-
+	
 	my %opts;
 	if ($x->has_type_constraint and $y->has_type_constraint and $x->type_constraint == $y->type_constraint)
 	{

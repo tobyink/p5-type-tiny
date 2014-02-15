@@ -41,8 +41,8 @@ is(length($chars),         17, 'length $chars == 17');
 is(length($bytes_utf8),    19, 'length $bytes_utf8 == 19');
 is(length($bytes_western), 17, 'length $bytes_western == 17');
 
-my $SplitSpace = (ArrayRef[Str]) + (Split[qr/\s/]);
-my $SplitPipe  = (ArrayRef[Str]) + (Split[qr/\|/]);
+my $SplitSpace = ArrayRef[Str] + Split[qr/\s/];
+my $SplitPipe  = ArrayRef[Str] + Split[qr/\|/];
 
 ok($SplitSpace->can_be_inlined, '$SplitSpace can be inlined');
 ok($SplitPipe->can_be_inlined, '$SplitPipe can be inlined');
