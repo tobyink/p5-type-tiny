@@ -89,7 +89,7 @@ BEGIN {
 };
 
 sub bar :ReturnType(scalar => $Even, list => HashRef[Int]) {
-	@_;
+	wantarray ? @_ : scalar(@_);
 }
 
 subtest "more complex return type constraint" => sub
