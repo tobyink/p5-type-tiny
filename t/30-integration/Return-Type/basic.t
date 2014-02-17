@@ -55,7 +55,10 @@ subtest "simple return type constraint" => sub
 {
 	subtest "scalar context" => sub
 	{
-		is( scalar(foo(42)), 42 );
+		is(
+			scalar(foo(42)),
+			42,
+		);
 		
 		like(
 			exception { scalar(foo(4.2)) },
@@ -67,7 +70,10 @@ subtest "simple return type constraint" => sub
 	
 	subtest "list context" => sub
 	{
-		is_deeply( [ foo(4, 2) ], [4, 2] );
+		is_deeply(
+			[ foo(4, 2) ],
+			[     4, 2  ],
+		);
 		
 		like(
 			exception { [ foo(4, 2, 4.2) ] },
@@ -117,7 +123,7 @@ subtest "more complex return type constraint" => sub
 	{
 		is_deeply(
 			{ bar(xxx => 1, yyy => 2) },
-			{ xxx => 1, yyy => 2 },
+			{     xxx => 1, yyy => 2  },
 		);
 		
 		like(
