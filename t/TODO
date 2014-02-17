@@ -1,2 +1,2 @@
-- integration tests with Moops, Kavorka, match::simple and Switcheroo
+- integration tests with Moops, Kavorka, and Switcheroo
 - full module coverage (according to not-covered.pl)
