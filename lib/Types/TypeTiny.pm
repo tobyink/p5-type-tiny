@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.039_05';
+our $VERSION   = '0.039_06';
 
 use Scalar::Util qw< blessed refaddr weaken >;
 

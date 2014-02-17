@@ -1508,3 +1508,33 @@
 		dcs:versus `Type-Tiny 0.039_04 cpan:TOBYINK`;
 		item "Apply the Type::Tiny::_HalfOp trick to overloaded addition too."^^Change;
 	].
+
+`Type-Tiny 0.039_06 cpan:TOBYINK`
+	issued  2014-02-17;
+	changeset [
+		dcs:versus `Type-Tiny 0.039_05 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix;
+			label "Type::Tiny's TIEARRAY and TIEHASH methods were broken; fixed now.";
+		];
+		item [
+			a dcs:Bugfix;
+			label "Type::Tiny's SUPPORT_SMARTMATCH constant was broken; fixed now.";
+		];
+		item [
+			a dcs:Tests;
+			label "Test integration with match::simple.";
+		];
+		item [
+			a dcs:Tests;
+			label "Test integration with Type::Tie.";
+		];
+		item [
+			a dcs:Tests;
+			label "Test integration with Return::Type.";
+		];
+		item [
+			a dcs:Tests;
+			label "Enable some old tests that had been disabled as not-yet-implemented for parameterized type constraints; the feature they test was implemented ages ago.";
+		];
+	].
