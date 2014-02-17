@@ -39,12 +39,9 @@ my $p3 = ArrayRef[Int->create_child_type()];
 is($p1->{uniq}, $p2->{uniq}, "Avoid duplicating parameterized types");
 isnt($p1->{uniq}, $p3->{uniq}, "... except when necessary!");
 
-=pod
-
-=begin not_yet_implemented
-
 my $p4 = ArrayRef[sub { $_ eq "Bob" }];
 my $p5 = ArrayRef[sub { $_ eq "Bob" or die "not Bob" }];
+my $p6 = ArrayRef[Str & +sub { $_ eq "Bob" or die "not Bob" }];
 
 should_pass(["Bob"], $p4);
 should_pass(["Bob", "Bob"], $p4);
@@ -53,6 +50,10 @@ should_fail(["Bob", "Bob", "Suzie"], $p4);
 should_pass(["Bob"], $p5);
 should_pass(["Bob", "Bob"], $p5);
 should_fail(["Bob", "Bob", "Suzie"], $p5);
+
+should_pass(["Bob"], $p6);
+should_pass(["Bob", "Bob"], $p6);
+should_fail(["Bob", "Bob", "Suzie"], $p6);
 
 is(
 	$p4->parameters->[0]->validate("Suzie"),
@@ -65,9 +66,5 @@ like(
 	qr{^not Bob},
 	'error message when a coderef dies',
 );
-
-=end not_yet_implemented
-
-=cut
 
 done_testing;
