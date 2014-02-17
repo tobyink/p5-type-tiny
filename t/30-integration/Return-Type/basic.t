@@ -116,8 +116,8 @@ subtest "more complex return type constraint" => sub
 	subtest "list context" => sub
 	{
 		is_deeply(
-			[ bar(xxx => 1, yyy => 2) ],
-			[ xxx => 1, yyy => 2 ],
+			{ bar(xxx => 1, yyy => 2) },
+			{ xxx => 1, yyy => 2 },
 		);
 		
 		like(
