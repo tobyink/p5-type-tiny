@@ -1538,3 +1538,13 @@
 			label "Enable some old tests that had been disabled as not-yet-implemented for parameterized type constraints; the feature they test was implemented ages ago.";
 		];
 	].
+
+`Type-Tiny 0.039_07 cpan:TOBYINK`
+	issued  2014-02-17;
+	changeset [
+		dcs:versus `Type-Tiny 0.039_06 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix, dcs:Tests;
+			label "Fix hash ordering bug in Return::Type integration tests.";
+		];
+	].
