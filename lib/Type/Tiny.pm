@@ -1009,8 +1009,8 @@ sub _unite                     { require Type::Tiny::Union; "Type::Tiny::Union"-
 
 # Hooks for Type::Tie
 sub TIESCALAR  { require Type::Tie; unshift @_, 'Type::Tie::SCALAR'; goto \&Type::Tie::SCALAR::TIESCALAR };
-sub TIEARRAY   { require Type::Tie; unshift @_, 'Type::Tie::ARRAY';  goto \&Type::Tie::SCALAR::TIEARRAY };
-sub TIEHASH    { require Type::Tie; unshift @_, 'Type::Tie::HASH';   goto \&Type::Tie::SCALAR::TIEHASH };
+sub TIEARRAY   { require Type::Tie; unshift @_, 'Type::Tie::ARRAY';  goto \&Type::Tie::ARRAY::TIEARRAY };
+sub TIEHASH    { require Type::Tie; unshift @_, 'Type::Tie::HASH';   goto \&Type::Tie::HASH::TIEHASH };
 
 1;
 

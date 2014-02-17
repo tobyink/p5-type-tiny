@@ -1,4 +1,3 @@
 - integration tests with Moops, Kavorka, match::simple and Switcheroo
 - full module coverage (according to not-covered.pl)
-- integration tests with Type::Tie
 - integration tests with Return::Type
