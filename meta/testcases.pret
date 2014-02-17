@@ -60,6 +60,7 @@ m`Type::Tiny Type-Tiny`
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Tiny/basic.t Type-Tiny`; :purpose "Checks Type::Tiny works." ];
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Tiny/coercion-modifiers.t Type-Tiny`; :purpose "Checks 'plus_coercions', 'minus_coercions' and 'no_coercions' methods work." ];
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Tiny/parameterization.t Type-Tiny`; :purpose "There are loads of tests for parameterization in 'stdlib.t', 'stdlib-overload.t', 'stdlib-strmatch.t', 'stdlib-structures.t', 'syntax.t', 'stdlib-automatic.t', etc. This file includes a handful of other parameterization-related tests that didn't fit anywhere else." ];
+	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Tiny/smartmatch.t Type-Tiny`; :purpose "Checks Type::Tiny works with the smartmatch operator." ];
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Tiny/syntax.t Type-Tiny`; :purpose "Checks that all this Type[Param] syntactic sugar works. In particular, the following three type constraints are expected to be equivalent to each other: use Types::Standard qw( ArrayRef Int Num Str ); use Type::Utils qw( union intersection ); my $type1 = ArrayRef[Int] | ArrayRef[Num & ~Int] | ArrayRef[Str & ~Num]; my $type2 = union [ ArrayRef[Int], ArrayRef[Num & ~Int], ArrayRef[Str & ~Num], ]; my $type3 = union([ ArrayRef->parameterize(Int), ArrayRef->parameterize( intersection([ Num, Int->complementary_type, ]), ), ArrayRef->parameterize( intersection([ Str, Num->complementary_type, ]), ), ]);" ];
 	.
 m`Type::Tiny::Class Type-Tiny`
@@ -127,8 +128,11 @@ m`Types::Standard Type-Tiny`
 [] a :IntegrationTest; :test_script f`t/30-integration/Mouse/coercion.t Type-Tiny`; :purpose "Check coercions work with Mouse; both mutable and immutable classes.".
 [] a :IntegrationTest; :test_script f`t/30-integration/MouseX-Types/basic.t Type-Tiny`; :purpose "Complex checks between Type::Tiny and MouseX::Types.".
 [] a :IntegrationTest; :test_script f`t/30-integration/Object-Accessor/basic.t Type-Tiny`; :purpose "Check type constraints work with Object::Accessor.".
+[] a :IntegrationTest; :test_script f`t/30-integration/Return-Type/basic.t Type-Tiny`; :purpose "Test that this sort of thing works: sub foo :ReturnType(Int) { ...; }".
 [] a :IntegrationTest; :test_script f`t/30-integration/Sub-Quote/basic.t Type-Tiny`; :purpose "Check type constraints can be made inlinable using Sub::Quote.".
+[] a :IntegrationTest; :test_script f`t/30-integration/Type-Tie/basic.t Type-Tiny`; :purpose "Test that this sort of thing works: tie my $var, Int;".
 [] a :IntegrationTest; :test_script f`t/30-integration/Validation-Class-Simple/basic.t Type-Tiny`; :purpose "Check type constraints Validation::Class::Simple objects can be used as type constraints.".
+[] a :IntegrationTest; :test_script f`t/30-integration/match-simple/basic.t Type-Tiny`; :purpose "Checks Type::Tiny works with match::simple.".
 [] a :RegressionTest; :test_script f`t/40-regression/gh1.t Type-Tiny`; :purpose "Test that subtypes of Type::Tiny::Class work.".
 RT#85911
 	:regression_test [ a :RegressionTest; :test_script f`t/40-regression/rt85911.t Type-Tiny`; :purpose "Test Type::Params with deep Dict coercion."];
