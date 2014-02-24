@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.039_07';
+our $VERSION   = '0.039_08';
 
 #### re doesn't provide is_regexp in Perl < 5.10
 

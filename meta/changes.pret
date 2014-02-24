@@ -1548,3 +1548,13 @@
 			label "Fix hash ordering bug in Return::Type integration tests.";
 		];
 	].
+
+`Type-Tiny 0.039_08 cpan:TOBYINK`
+	issued  2014-02-24;
+	changeset [
+		dcs:versus `Type-Tiny 0.039_07 cpan:TOBYINK`;
+		item [
+			a dcs:Tests;
+			label "Test integration with Kavorka.";
+		];
+	].
