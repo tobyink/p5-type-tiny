@@ -94,7 +94,65 @@ Don't you wish your subs could look like this?
 Well; here are a few solutions for sub signatures that work with
 L<Type::Tiny>...
 
+=head3 Kavorka
+
+L<Kavorka> is a sub signatures implementation written to natively use
+L<Type::Utils>' C<dwim_type> for type constraints, and take advantage
+of Type::Tiny's features such as inlining, and coercions.
+
+   method set_name (Str $name)
+   {
+      $self->{name} = $name;
+   }
+
+Kavorka's signatures provide a lot more flexibility, and slightly more
+speed than Type::Params. (The speed comes from inlining almost all type
+checks into the body of the sub being declared.)
+
+Kavorka also includes support for type checking of the returned value.
+
+Kavorka can also be used as part of L<Moops>, a larger framework for
+object oriented programming in Perl.
+
+=head3 Function::Parameters
+
+The following should work with L<Function::Parameters> 1.0201 or above:
+
+   use Type::Utils;
+   use Function::Parameters {
+      method => {
+         strict     => 1,
+         reify_type => sub { Type::Utils::dwim_type($_[0]) },
+      },
+   };
+   
+   method set_name (Str $name)
+   {
+      $self->{name} = $name;
+   }
+
+Note that by default, Function::Parameters uses Moose's type
+constraints. The C<reify_type> option above (introduced in
+Function::Parameters 1.0201) allows you to "divert" type constraint
+lookups. Using Type::Tiny constraints will gain you about a 7%
+speed-up in function signature checks.
+
+An alternative way to use Function::Parameter with Type::Tiny is to
+provide type constraint expressions in parentheses:
+
+   use Types::Standard;
+   use Function::Parameters ':strict';
+   
+   method set_name ((Str) $name)
+   {
+      $self->{name} = $name;
+   }
+
 =head3 Attribute::Contract
+
+Both Kavorka and Function::Parameters require a relatively recent
+version of Perl. L<Attribute::Contract> supports older versions by
+using a lot less magic.
 
 You want Attribute::Contract 0.03 or above.
 
@@ -106,38 +164,8 @@ You want Attribute::Contract 0.03 or above.
       $self->{name} = $name;
    }
 
-Attribute::Contract also includes support for type checking of the returned
-value.
-
-=head3 Function::Parameters
-
-The following should work from L<Function::Parameters> 1.0101:
-
-   use Function::Parameters qw(:strict);
-   use Types::Standard;
-   
-   fun set_name ((Object) $self, (Str) $name)
-   {
-      $self->{name} = $name;
-   }
-   
-   # or...
-   method set_name ((Str) $name)
-   {
-      $self->{name} = $name;
-   }
-
-In Function::Parameters 1.0101 and 1.0102, L<Moose> was required to be
-loaded for this to work (even though it's not actually being used for type
-checks). Since Function::Parameters 1.0103, Moose is no longer required.
-
-Note the parentheses around the type names are required, because without
-parentheses, Function::Parameters will use Moose type constraints:
-
-   method set_name (Str $name)  # Moose type constraint
-   {
-      $self->{name} = $name;
-   }
+Attribute::Contract also includes support for type checking of the
+returned value.
 
 =head1 AUTHOR
 
