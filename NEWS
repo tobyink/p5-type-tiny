@@ -36,3 +36,10 @@
    I think). I'm now testing Perl 5.6.2 on Travis-CI, so hopefully this
    won't happen again.
  - Fix problems with Moo 1.4.x on threaded Perls.
+
+2014-03-?? Type-Tiny version 0.040 released!
+
+ - Deprecated module Exporter::TypeTiny is now gone.
+ - Restructure and expand test suite.
+ - Coercion bugfixes.
+ - Improvements to overloaded operations on parameterized types.
