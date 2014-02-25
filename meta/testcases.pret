@@ -4,6 +4,12 @@
 [] a :Test; :test_script f`t/02-api.t Type-Tiny`; :purpose "Test that Type::Tiny and Type::Coercion provide a Moose/Mouse-compatible API.".
 [] a :Test; :test_script f`t/03-leak.t Type-Tiny`; :purpose "Check for memory leaks. These tests are not comprehensive; chances are that there are still memory leaks lurking somewhere in Type::Tiny. If you have any concrete suggestions for things to test, or fixes for identified memory leaks, please file a bug report. https://rt.cpan.org/Ticket/Create.html?Queue=Type-Tiny.".
 [] a :Test; :test_script f`t/99-moose-std-types-test.t Type-Tiny`; :purpose "Type constraint tests pilfered from the Moose test suite.".
+m`Devel::TypeTiny::Perl56Compat Type-Tiny`
+	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Devel-TypeTiny-Perl56Compat/basic.t Type-Tiny`; :purpose "Checks 'B::perlstring()' works." ];
+	.
+m`Devel::TypeTiny::Perl58Compat Type-Tiny`
+	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Devel-TypeTiny-Perl58Compat/basic.t Type-Tiny`; :purpose "Checks 're::is_regexp()' works." ];
+	.
 m`Error::TypeTiny Type-Tiny`
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Error-TypeTiny/stacktrace.t Type-Tiny`; :purpose "Tests that Error::TypeTiny is capable of providing stack traces." ];
 	.
