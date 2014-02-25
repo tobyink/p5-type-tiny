@@ -863,6 +863,7 @@ sub plus_coercions
 		@more,
 		@{$self->coercion->type_coercion_map},
 	);
+	$new->coercion->freeze;
 	return $new;
 }
 
@@ -879,6 +880,7 @@ sub plus_fallback_coercions
 		@{$self->coercion->type_coercion_map},
 		@more,
 	);
+	$new->coercion->freeze;
 	return $new;
 }
 
@@ -909,12 +911,15 @@ sub minus_coercions
 
 	my $new = $self->_clone;
 	$new->coercion->add_type_coercions(@keep);
+	$new->coercion->freeze;
 	return $new;
 }
 
 sub no_coercions
 {
-	shift->_clone;
+	my $new = shift->_clone;
+	$new->coercion->freeze;
+	$new;
 }
 
 sub coercibles

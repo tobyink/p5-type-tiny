@@ -300,6 +300,51 @@ So we can define the coercions for C<Point3D> as:
 
 ... and now coercing from C<< [1, 1] >> will work.
 
+=head2 The (Lack of) Zen of Coercions
+
+Coercions can lead to ugliness.
+
+Let's say we define a type constraint C<Path> which has a coercion from
+C<Str>. Now we define a class which uses that type constraint.
+
+Now in another class, we define a coercion from C<ArrayRef> to C<Path>.
+This kind of action at a distance is not really desirable. And in fact,
+things will probably subtly break - the first class may have already
+built a constructor inlining a bunch of code from the coercion.
+
+However, you too can achieve coercion zen by following these
+L<three weird tricks|http://www.slate.com/articles/business/moneybox/2013/07/how_one_weird_trick_conquered_the_internet_what_happens_when_you_click_on.html>:
+
+=over
+
+=item 1.
+
+If you want to define coercions for a type, do it I<< within your type
+constraint library >>, so the coercions are all defined before the
+type constraint is ever used.
+
+=item 2.
+
+At the end of your type constraint library, consider calling
+C<< $type->coercion->freeze >> on each type constraint that has a
+coercion. This makes the type's coercions immutable. If anybody wants
+to define any additional coercions, they'll have to create a child type
+to do it with.
+
+=item 3.
+
+Use C<plus_coercions> and similar methods to easily create a child
+type constraint of any existing type, and add more coercions to it.
+Don't fiddle directly with the existing type constraint which may be
+being used elsewhere.
+
+Note that these methods all return type constraint objects with
+frozen (immutable) coercions.
+
+=back
+
+That's it.
+
 =head1 SEE ALSO
 
 L<Moose::Manual::BestPractices>,
