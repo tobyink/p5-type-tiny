@@ -1553,8 +1553,17 @@
 	issued  2014-02-24;
 	changeset [
 		dcs:versus `Type-Tiny 0.039_07 cpan:TOBYINK`;
-		item [
-			a dcs:Tests;
-			label "Test integration with Kavorka.";
-		];
+		item "Test integration with Kavorka."^^Tests;
+	].
+
+`Type-Tiny 0.039_09 cpan:TOBYINK`
+	issued  2014-02-25;
+	changeset [
+		dcs:versus `Type-Tiny 0.039_08 cpan:TOBYINK`;
+		item "Update Type::Tiny::Manual::Params to mention Kavorka, and newer features of Function::Parameters."^^Documentation;
+		item "Test integration with Moops."^^Tests;
+		item "Test integration with Switcheroo."^^Tests;
+		item "Test that coercions attached to Moose type constraints get inherited by Type::Tiny when they are inhaled."^^Tests;
+		item "Unit tests for Devel::TypeTiny::Perl56Compat."^^Tests;
+		item "Unit tests for Devel::TypeTiny::Perl58Compat."^^Tests;
 	].
