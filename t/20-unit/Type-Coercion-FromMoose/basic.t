@@ -63,4 +63,17 @@ is_deeply(
 	'coercion works',
 );
 
+# Making this work might prevent coercions from being inlined
+# unless the coercion has been frozen.
+#
+TODO: {
+	local $TODO = "\$Array_of_Rounded's coercion has already been compiled";
+	coerce 'RoundedInt', from 'Undef', via { 0 };
+	is_deeply(
+		$Array_of_Rounded->coerce([ 9.1, 1.1, undef, 3.3 ]),
+		[ 9, 1, 0, 3 ],
+		'coercion can be altered later',
+	);
+};
+
 done_testing;
