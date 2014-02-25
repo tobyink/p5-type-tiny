@@ -24,6 +24,9 @@ m`Type::Coercion Type-Tiny`
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Coercion/inlining.t Type-Tiny`; :purpose "Checks Type::Coercion can be inlined." ];
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Coercion/parameterized.t Type-Tiny`; :purpose "Checks the 'Split' and 'Join' parameterized coercions from Types::Standard." ];
 	.
+m`Type::Coercion::FromMoose Type-Tiny`
+	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Coercion-FromMoose/basic.t Type-Tiny`; :purpose "Checks the types adopted from Moose still have a coercion which works." ];
+	.
 m`Type::Coercion::Union Type-Tiny`
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Coercion-Union/basic.t Type-Tiny`; :purpose "Checks Type::Coercion::Union works." ];
 	.
@@ -113,11 +116,14 @@ m`Types::Standard Type-Tiny`
 [] a :IntegrationTest; :test_script f`t/30-integration/Exporter-Tiny/installer.t Type-Tiny`; :purpose "Tests Type::Library libraries work with Sub::Exporter plugins.".
 [] a :IntegrationTest; :test_script f`t/30-integration/Exporter-Tiny/role-conflict.t Type-Tiny`; :purpose "Tests exporting to two roles; tries to avoid reporting conflicts.".
 [] a :IntegrationTest; :test_script f`t/30-integration/Function-Parameters/basic.t Type-Tiny`; :purpose "Check type constraints work with Function::Parameters.".
+[] a :IntegrationTest; :test_script f`t/30-integration/Kavorka/basic.t Type-Tiny`; :purpose "Checks Type::Tiny works with Kavorka.".
 [] a :IntegrationTest; :test_script f`t/30-integration/Moo/basic.t Type-Tiny`; :purpose "Check type constraints work with Moo. Checks values that should pass and should fail; checks error messages.".
 [] a :IntegrationTest; :test_script f`t/30-integration/Moo/coercion.t Type-Tiny`; :purpose "Check coercions work with Moo.".
 [] a :IntegrationTest; :test_script f`t/30-integration/Moo/exceptions.t Type-Tiny`; :purpose "Tests Error::TypeTiny interaction with Moo.".
 [] a :IntegrationTest; :test_script f`t/30-integration/Moo/inflation.t Type-Tiny`; :purpose "Checks that type constraints continue to work when a Moo class is inflated to a Moose class. Checks that Moo::HandleMoose correctly calls back to Type::Tiny to build Moose type constraints.".
 [] a :IntegrationTest; :test_script f`t/30-integration/Moo/inflation2.t Type-Tiny`; :purpose "A test for type constraint inflation from Moo to Moose.".
+[] a :IntegrationTest; :test_script f`t/30-integration/Moops/basic.t Type-Tiny`; :purpose "Check that type constraints work in Moops. This file is borrowed from the Moops test suite, where it is called '31types.t'.".
+[] a :IntegrationTest; :test_script f`t/30-integration/Moops/library-keyword.t Type-Tiny`; :purpose "Check that type libraries can be declared with Moops. This file is borrowed from the Moops test suite, where it is called '71library.t'.".
 [] a :IntegrationTest; :test_script f`t/30-integration/Moose/accept-moose-types.t Type-Tiny`; :purpose "Check that Moose type constraints can be passed into the Type::Tiny API where a Type::Tiny constraint might usually be expected.".
 [] a :IntegrationTest; :test_script f`t/30-integration/Moose/basic.t Type-Tiny`; :purpose "Check type constraints work with Moose. Checks values that should pass and should fail; checks error messages.".
 [] a :IntegrationTest; :test_script f`t/30-integration/Moose/coercion.t Type-Tiny`; :purpose "Check coercions work with Moose; both mutable and immutable classes.".
@@ -130,6 +136,7 @@ m`Types::Standard Type-Tiny`
 [] a :IntegrationTest; :test_script f`t/30-integration/Object-Accessor/basic.t Type-Tiny`; :purpose "Check type constraints work with Object::Accessor.".
 [] a :IntegrationTest; :test_script f`t/30-integration/Return-Type/basic.t Type-Tiny`; :purpose "Test that this sort of thing works: sub foo :ReturnType(Int) { ...; }".
 [] a :IntegrationTest; :test_script f`t/30-integration/Sub-Quote/basic.t Type-Tiny`; :purpose "Check type constraints can be made inlinable using Sub::Quote.".
+[] a :IntegrationTest; :test_script f`t/30-integration/Switcheroo/basic.t Type-Tiny`; :purpose "Checks Type::Tiny works with Switcheroo.".
 [] a :IntegrationTest; :test_script f`t/30-integration/Type-Tie/basic.t Type-Tiny`; :purpose "Test that this sort of thing works: tie my $var, Int;".
 [] a :IntegrationTest; :test_script f`t/30-integration/Validation-Class-Simple/basic.t Type-Tiny`; :purpose "Check type constraints Validation::Class::Simple objects can be used as type constraints.".
 [] a :IntegrationTest; :test_script f`t/30-integration/match-simple/basic.t Type-Tiny`; :purpose "Checks Type::Tiny works with match::simple.".

@@ -15,7 +15,8 @@ while (my $file = $iter->())
 	my $module = path($file)->relative(LIB_DIR);
 	$module =~ s{.pm$}{};
 	$module =~ s{/}{::}g;
-	
+
 	TEST_DIR->child($module =~ s/::/-/gr)->exists
+		or ($module =~ /^Types::Standard::/)   # helper module
 		or say $module;
 }
