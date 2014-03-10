@@ -1567,3 +1567,11 @@
 		item "Unit tests for Devel::TypeTiny::Perl56Compat."^^Tests;
 		item "Unit tests for Devel::TypeTiny::Perl58Compat."^^Tests;
 	].
+
+`Type-Tiny 0.039_10 cpan:TOBYINK`
+	issued  2014-03-10;
+	changeset [
+		dcs:versus `Type-Tiny 0.039_09 cpan:TOBYINK`;
+		item "Document the benefits of freezing coercions, and of defining coercions either within the type library, or via $type->plus_coercions."^^Documentation;
+		item "$type->plus_coercions and friends now return objects with frozen coercions."^^Change;
+	].
