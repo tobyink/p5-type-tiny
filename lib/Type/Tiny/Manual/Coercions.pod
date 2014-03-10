@@ -2,6 +2,8 @@
 
 =encoding utf-8
 
+=for stopwords zen
+
 =head1 NAME
 
 Type::Tiny::Manual::Coercions - adding coercions to type constraints
