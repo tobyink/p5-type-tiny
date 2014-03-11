@@ -25,7 +25,7 @@ the same terms as the Perl 5 programming language system itself.
 use strict;
 use warnings;
 use Test::More;
-use Test::Requires 'Moops';
+use Test::Requires { 'Moops' => '0.018' };
 use Test::Fatal;
 use Test::TypeTiny;
 
