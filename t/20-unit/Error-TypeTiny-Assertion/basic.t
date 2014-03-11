@@ -163,7 +163,10 @@ is_deeply(
 );
 
 TODO: {
-	local $TODO = ($] >= 5.019) ? "Data::Dumper output changed in Perl 5.19??" : undef;
+	require Data::Dumper;
+	local $TODO = (Data::Dumper->VERSION > 2.145)
+		? "Data::Dumper output changed after 2.145"
+		: undef;
 	
 	is_deeply(
 		(exception { (Map[Int,Num])->({1=>1.1,2.2=>2.3,3.3=>3.4}) })->explain,
@@ -203,7 +206,9 @@ is_deeply(
 );
 
 TODO: {
-	local $TODO = ($] >= 5.019) ? "Data::Dumper output changed in Perl 5.19??" : undef;
+	local $TODO = (Data::Dumper->VERSION > 2.145)
+		? "Data::Dumper output changed after 2.145"
+		: undef;
 	
 	is_deeply(
 		(exception { $SlurpyThing->([1.1, 2 => "Hello"]) })->explain,
