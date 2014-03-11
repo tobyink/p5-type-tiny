@@ -1575,3 +1575,10 @@
 		item "Document the benefits of freezing coercions, and of defining coercions either within the type library, or via $type->plus_coercions."^^Documentation;
 		item "$type->plus_coercions and friends now return objects with frozen coercions."^^Change;
 	].
+
+`Type-Tiny 0.039_11 cpan:TOBYINK`
+	issued  2014-03-11;
+	changeset [
+		dcs:versus `Type-Tiny 0.039_10 cpan:TOBYINK`;
+		item "Because of changes to Data::Dumper in Perl 5.19.x, the test suite was previously skipping some Dumper-based test cases depending on Perl version. However, Dumper is dual-lifed, so older versions of Perl may have shiny, new Dumpers. Skip test cases based on Data::Dumper version instead."^^Tests;
+	].
