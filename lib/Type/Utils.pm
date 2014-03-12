@@ -159,7 +159,7 @@ sub inline_as (&;@)
 sub class_type
 {
 	my $name = ref($_[0]) ? undef : shift;
-	my %opts = %{ +shift };
+	my %opts = %{ shift or {} };
 	
 	if (defined $name)
 	{
@@ -176,7 +176,7 @@ sub class_type
 sub role_type
 {
 	my $name = ref($_[0]) ? undef : shift;
-	my %opts = %{ +shift };
+	my %opts = %{ shift or {} };
 	
 	if (defined $name)
 	{
@@ -193,7 +193,7 @@ sub role_type
 sub duck_type
 {
 	my $name    = ref($_[0]) ? undef : shift;
-	my @methods = @{ +shift };
+	my @methods = @{ shift or [] };
 	
 	my %opts;
 	$opts{name} = $name if defined $name;
@@ -208,7 +208,7 @@ sub duck_type
 sub enum
 {
 	my $name   = ref($_[0]) ? undef : shift;
-	my @values = @{ +shift };
+	my @values = @{ shift or [] };
 	
 	my %opts;
 	$opts{name} = $name if defined $name;
@@ -223,7 +223,7 @@ sub enum
 sub union
 {
 	my $name = ref($_[0]) ? undef : shift;
-	my @tcs  = @{ +shift };
+	my @tcs  = @{ shift or [] };
 	
 	my %opts;
 	$opts{name} = $name if defined $name;
@@ -238,7 +238,7 @@ sub union
 sub intersection
 {
 	my $name = ref($_[0]) ? undef : shift;
-	my @tcs  = @{ +shift };
+	my @tcs  = @{ shift or [] };
 	
 	my %opts;
 	$opts{name} = $name if defined $name;
