@@ -74,7 +74,7 @@ class_type "FooBar", { class => "Foo::Bar" };
 	sub baz { 4 }
 }
 
-class_type "FooBaz", { class => "Foo::Baz" };
+class_type "Foo::Baz";
 duck_type "CanFooBar", [qw/ foo bar /];
 duck_type "CanFooBaz", [qw/ foo baz /];
 
