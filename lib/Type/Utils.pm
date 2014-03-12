@@ -703,13 +703,29 @@ Moose/Mouse/Moo.
 
 =item C<< class_type { class => $package, %options } >>
 
+=item C<< class_type $name >>
+
 Shortcut for declaring a L<Type::Tiny::Class> type constraint.
+
+If C<< $package >> is omitted, is assumed to be the same as C<< $name >>.
+If C<< $name >> contains "::" (which would be an invalid name as far as
+L<Type::Tiny> is concerned), this will be removed.
+
+So for example, C<< class_type("Foo::Bar") >> declares a L<Type::Tiny::Class>
+type constraint named "FooBar" which constrains values to objects blessed
+into the "Foo::Bar" package.
 
 =item C<< role_type $name, { role => $package, %options } >>
 
 =item C<< role_type { role => $package, %options } >>
 
+=item C<< role_type $name >>
+
 Shortcut for declaring a L<Type::Tiny::Role> type constraint.
+
+If C<< $package >> is omitted, is assumed to be the same as C<< $name >>.
+If C<< $name >> contains "::" (which would be an invalid name as far as
+L<Type::Tiny> is concerned), this will be removed.
 
 =item C<< duck_type $name, \@methods >>
 
