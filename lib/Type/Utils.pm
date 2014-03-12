@@ -165,6 +165,8 @@ sub class_type
 	{
 		$opts{name}  = $name unless exists $opts{name};
 		$opts{class} = $name unless exists $opts{class};
+		
+		$opts{name} =~ s/:://g;
 	}
 	
 	$opts{bless} = "Type::Tiny::Class";
@@ -180,8 +182,10 @@ sub role_type
 	
 	if (defined $name)
 	{
-		$opts{name}  = $name unless exists $opts{name};
-		$opts{role}  = $name unless exists $opts{role};
+		$opts{name} = $name unless exists $opts{name};
+		$opts{role} = $name unless exists $opts{role};
+		
+		$opts{name} =~ s/:://g;
 	}
 	
 	$opts{bless} = "Type::Tiny::Role";

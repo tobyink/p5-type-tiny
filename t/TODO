@@ -1,1 +1,2 @@
 - full module coverage (according to not-covered.pl)
+- test the s/:://g bit in Type::Utils::{class_type,role_type}
