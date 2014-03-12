@@ -1582,3 +1582,19 @@
 		dcs:versus `Type-Tiny 0.039_10 cpan:TOBYINK`;
 		item "Because of changes to Data::Dumper in Perl 5.19.x, the test suite was previously skipping some Dumper-based test cases depending on Perl version. However, Dumper is dual-lifed, so older versions of Perl may have shiny, new Dumpers. Skip test cases based on Data::Dumper version instead."^^Tests;
 	].
+
+`Type-Tiny 0.039_12 cpan:TOBYINK`
+	issued  2014-03-12;
+	changeset [
+		dcs:versus `Type-Tiny 0.039_11 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix;
+			dcs:thanks cpan:MATTP;
+			label "Various Type::Utils functions were trying to dereference undef as a hash or array in certain circumstances.";
+		];
+		item [
+			a dcs:Change;
+			dcs:thanks cpan:MATTP;
+			label "Type::Utils' class_type and role_type functions will $name =~ s/:://g.";
+		];
+	].
