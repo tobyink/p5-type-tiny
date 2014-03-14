@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.039_12';
+our $VERSION   = '0.039_13';
 
 #### B doesn't provide perlstring() in 5.6. Monkey patch it.
 

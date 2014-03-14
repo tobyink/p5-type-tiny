@@ -1598,3 +1598,14 @@
 			label "Type::Utils' class_type and role_type functions will $name =~ s/:://g.";
 		];
 	].
+
+`Type-Tiny 0.039_13 cpan:TOBYINK`
+	issued  2014-03-14;
+	changeset [
+		dcs:versus `Type-Tiny 0.039_12 cpan:TOBYINK`;
+		item [
+			a dcs:Tests;
+			dcs:blame cpan:HAARG;
+			label "Test for occasional segfaults on threaded Perl 5.18.x.";
+		];
+	].
