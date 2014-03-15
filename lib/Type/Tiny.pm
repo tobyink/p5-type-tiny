@@ -158,7 +158,9 @@ sub new
 		
 		package # no index
 			Moo::HandleMoose;
-		$Moo::HandleMoose::TYPE_MAP{$self} = sub { $ALL_TYPES{$uniq} };
+		my $tmp = $self;
+		weaken($tmp);
+		$Moo::HandleMoose::TYPE_MAP{$self} = sub { $tmp };
 	}
 	
 	if (ref($params{coercion}) eq q(CODE))
