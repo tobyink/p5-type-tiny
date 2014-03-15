@@ -1600,12 +1600,17 @@
 	].
 
 `Type-Tiny 0.039_13 cpan:TOBYINK`
-	issued  2014-03-14;
+	issued  2014-03-15;
 	changeset [
 		dcs:versus `Type-Tiny 0.039_12 cpan:TOBYINK`;
 		item [
 			a dcs:Tests;
 			dcs:blame cpan:HAARG;
 			label "Test for occasional segfaults on threaded Perl 5.18.x.";
+		];
+		item [
+			a dcs:Bugfix;
+			dcs:blame cpan:HAARG;
+			label "Fix occasional segfaults on threaded Perl 5.18.x.";
 		];
 	].
