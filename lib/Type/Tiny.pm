@@ -159,7 +159,7 @@ sub new
 		package # no index
 			Moo::HandleMoose;
 		my $tmp = $self;
-		weaken($tmp);
+		Scalar::Util::weaken($tmp);
 		$Moo::HandleMoose::TYPE_MAP{$self} = sub { $tmp };
 	}
 	
