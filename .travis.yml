@@ -41,6 +41,7 @@ install:
   - "cpanm -n Mouse MouseX::Types"
   - "cpanm -n Moo"
   - "cpanm -n Class::InsideOut"
+  - "cpanm -n match::simple"
 script:
   - "HARNESS_IS_VERBOSE=1 prove -r -Ilib t"
 notifications:
