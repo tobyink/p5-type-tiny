@@ -1614,3 +1614,12 @@
 			label "Fix occasional segfaults on threaded Perl 5.18.x.";
 		];
 	].
+
+`Type-Tiny 0.040 cpan:TOBYINK`
+	issued  2014-03-17;
+	changeset [
+		dcs:versus `Type-Tiny 0.039_11 cpan:TOBYINK`;
+		item "Updated NEWS file."^^Documentation;
+		item "Refreshed SEE ALSO section of Type::Tiny::Manual::Libraries."^^Documentation;
+	].
+

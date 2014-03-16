@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Library::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Library::VERSION   = '0.039_13';
+	$Type::Library::VERSION   = '0.040';
 }
 
 use Eval::TypeTiny qw< eval_closure >;
