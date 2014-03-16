@@ -302,19 +302,7 @@ L<Types::Standard>
 
 =item *
 
-L<Types::Encodings>
-
-=item *
-
 L<Types::Path::Tiny>
-
-=item *
-
-L<Unexpected::Types>
-
-=item *
-
-L<Geo::JSON::Types>
 
 =item *
 
@@ -323,6 +311,10 @@ L<Types::XSD> / L<Types::XSD::Lite>
 =item *
 
 L<Types::Set>
+
+=item *
+
+L<more|https://github.com/tobyink/p5-type-tiny/wiki/Type-libraries>!
 
 =back
 
