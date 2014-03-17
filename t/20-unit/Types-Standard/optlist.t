@@ -31,7 +31,7 @@ use Test::TypeTiny;
 use Types::Standard qw( OptList MkOpt );
 
 my $O  = OptList;
-my $OM = OptList + MkOpt;
+my $OM = OptList->plus_coercions(MkOpt);
 
 should_pass([], $O);
 should_pass([[foo=>undef]], $O);

@@ -110,24 +110,6 @@ look a little cleaner:
       coerce => 1,
    );
 
-=head2 Overloading
-
-L<Type::Tiny> and L<Type::Coercion> overload the C<< + >> operator to add
-coercions. So you may use:
-
-      isa    => PathTiny + PathTinyFromStr,
-
-However, beware precedence. The following is parsed as a function call with
-an argument preceded by a unary plus:
-
-      isa    => ArrayRef + LinesFromStr,
-      #         ArrayRef( +LinesFromStr )
-
-When things can be parameterized, it's generally a good idea to wrap them in
-parentheses to disambiguate:
-
-      isa    => (ArrayRef) + LinesFromStr,
-
 =head2 Parameterized Coercions
 
 Parameterized type constraints are familiar from Moose. For example, an
@@ -141,13 +123,10 @@ into lines:
 
    use Types::Standard qw( ArrayRef Split );
    
-   my $ArrayOfLines = (ArrayRef) + Split[ qr{\n} ];
+   my $ArrayOfLines = ArrayRef->plus_coercions( Split[ qr{\n} ] );
 
-The implementation of this feature is considered experimental, and the
-API for building parameterized coercions is likely to change. However, the
-feature itself, and its surface syntax (the square brackets) is likely
-to stay. So beware building your own parameterizable coercions, but don't
-be shy about using the ones in Types::Standard.
+Viewing the source code for L<Types::Standard> should give you hints as
+to how they are implemented.
 
 =head2 plus_fallback_coercions, minus_coercions and no_coercions
 

@@ -132,35 +132,35 @@ is_deeply(
 	'ArrayRefFromAny coercion works',
 );
 
-my $sum1 = ArrayRefFromAny + ArrayRefFromPiped;
+my $sum1 = 'Type::Coercion'->add(ArrayRefFromAny, ArrayRefFromPiped);
 is_deeply(
 	$sum1->coerce("foo|bar"),
 	["foo|bar"],
 	"Coercion $sum1 prioritizes ArrayRefFromAny",
 );
 
-my $sum2 = ArrayRefFromPiped + ArrayRefFromAny;
+my $sum2 = 'Type::Coercion'->add(ArrayRefFromPiped, ArrayRefFromAny);
 is_deeply(
 	$sum2->coerce("foo|bar"),
 	["foo","bar"],
 	"Coercion $sum2 prioritizes ArrayRefFromPiped",
 );
 
-my $arr = (ArrayRef) + (ArrayRefFromAny);
+my $arr = ArrayRef->plus_fallback_coercions(ArrayRefFromAny);
 is_deeply(
 	$arr->coerce("foo|bar"),
 	["foo|bar"],
 	"Type \$arr coercion works",
 );
 
-my $sum3 = ($arr) + (ArrayRefFromPiped);
+my $sum3 = $arr->plus_fallback_coercions(ArrayRefFromPiped);
 is_deeply(
 	$sum3->coerce("foo|bar"),
 	["foo|bar"],
 	"Type \$sum3 coercion works",
 );
 
-my $sum4 = (ArrayRefFromPiped) + ($arr);
+my $sum4 = $arr->plus_coercions(ArrayRefFromPiped);
 is_deeply(
 	$sum4->coerce("foo|bar"),
 	["foo","bar"],
@@ -169,7 +169,7 @@ is_deeply(
 
 use Test::TypeTiny;
 
-my $arrayref_from_piped = (ArrayRef) + (ArrayRefFromPiped);
+my $arrayref_from_piped = ArrayRef->plus_coercions(ArrayRefFromPiped);
 my $coercibles          = $arrayref_from_piped->coercibles;
 should_pass([],      $coercibles);
 should_pass('1|2|3', $coercibles);

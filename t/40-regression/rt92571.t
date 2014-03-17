@@ -37,7 +37,7 @@ declare_coercion ArrayRefFromAny,
 	from Any, via { [$_] }
 ;
 
-my $x = ( ArrayRef ) + ArrayRefFromAny;
+my $x = ArrayRef->plus_coercions(ArrayRefFromAny);
 is_deeply(
 	$x->coerce( ['a'] ),
 	['a'],
@@ -45,12 +45,12 @@ is_deeply(
 
 # types hang around until after the coerce method is run
 is_deeply(
-	( ( ( ArrayRef ) + ArrayRefFromAny )->coerce( ['a'] ) ),
+	ArrayRef->plus_coercions(ArrayRefFromAny)->coerce( ['a'] ),
 	['a'],
 );
 
 # types go away after generation of coercion sub, breaking it
-my $coerce = ( ( ArrayRef ) + ArrayRefFromAny )->coercion;
+my $coerce = ArrayRef->plus_coercions(ArrayRefFromAny)->coercion;
 is_deeply(
 	$coerce->( ['a'] ),
 	['a'],

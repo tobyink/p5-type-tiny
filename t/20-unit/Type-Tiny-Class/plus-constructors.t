@@ -74,7 +74,7 @@ BEGIN {
 		required => 1,
 		coerce   => 1,
 		is       => "ro",
-		isa      => Str + Join[" "],
+		isa      => Str->plus_coercions(Join[" "]),
 	);
 	
 	has addr => (

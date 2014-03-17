@@ -48,8 +48,8 @@ is(length($chars),         17, 'length $chars == 17');
 is(length($bytes_utf8),    19, 'length $bytes_utf8 == 19');
 is(length($bytes_western), 17, 'length $bytes_western == 17');
 
-my $SplitSpace = (ArrayRef[Str]) + (Split[qr/\s/]);
-my $SplitPipe  = (ArrayRef[Foo]) + (Split[qr/\|/]);
+my $SplitSpace = (ArrayRef[Str])->plus_coercions(Split[qr/\s/]);
+my $SplitPipe  = (ArrayRef[Foo])->plus_coercions(Split[qr/\|/]);
 
 ok($SplitSpace->can_be_inlined, '$SplitSpace can be inlined');
 ok($SplitPipe->can_be_inlined, '$SplitPipe can be inlined');
@@ -94,7 +94,7 @@ is_deeply(
 	'$SplitPipe->coerce($bytes_western)',
 );
 
-my $JoinPipe = Foo + Join["|"];
+my $JoinPipe = Foo->plus_coercions(Join["|"]);
 
 is(
 	$_ = $JoinPipe->coerce($arr_chars),

@@ -34,7 +34,6 @@ use overload
 	q("")      => sub { caller =~ m{^(Moo::HandleMoose|Sub::Quote)} ? overload::StrVal($_[0]) : $_[0]->display_name },
 	q(bool)    => sub { 1 },
 	q(&{})     => "_overload_coderef",
-	q(+)       => sub { $_[2] ? $_[1]->plus_coercions($_[0]) : $_[0]->plus_fallback_coercions($_[1]) },
 	q(|)       => sub {
 		my @tc = _swap @_;
 		if (!_FIXED_PRECEDENCE && !blessed $tc[0] && ref $tc[0] eq 'ARRAY') {
@@ -1483,12 +1482,11 @@ See L<Type::Tiny::Union>.
 The C<< & >> operator is overloaded to build the intersection of two type
 constraints. See L<Type::Tiny::Intersection>.
 
-=item *
-
-The C<< + >> operator is overloaded to call C<plus_coercions> or
-C<plus_fallback_coercions> as appropriate.
-
 =back
+
+Previous versions of Type::Tiny would overload the C<< + >> operator to
+call C<plus_coercions> or C<plus_fallback_coercions> as appropriate.
+Support for this was dropped after 0.040.
 
 =head2 Constants
 

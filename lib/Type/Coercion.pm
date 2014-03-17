@@ -19,7 +19,6 @@ use overload
 	q("")      => sub { caller =~ m{^(Moo::HandleMoose|Sub::Quote)} ? overload::StrVal($_[0]) : $_[0]->display_name },
 	q(bool)    => sub { 1 },
 	q(&{})     => "_overload_coderef",
-	q(+)       => sub { __PACKAGE__->add(@_) },
 	fallback   => 1,
 ;
 
@@ -109,11 +108,6 @@ sub add
 {
 	my $class = shift;
 	my ($x, $y, $swap) = @_;
-	
-	if (!blessed $y and ref $y eq 'ARRAY') {
-		require Type::Tiny::_HalfOp;
-		return "Type::Tiny::_HalfOp"->new('+', $y, $x);
-	}
 	
 	Types::TypeTiny::TypeTiny->check($x) and return $x->plus_fallback_coercions($y);
 	Types::TypeTiny::TypeTiny->check($y) and return $y->plus_coercions($x);
@@ -728,11 +722,10 @@ Coderefification is overloaded to call C<coerce>.
 
 On Perl 5.10.1 and above, smart match is overloaded to call C<has_coercion_for_value>.
 
-=item *
-
-Addition is overloaded to call C<add>.
-
 =back
+
+Previous versions of Type::Coercion would overload the C<< + >> operator
+to call C<add>. Support for this was dropped after 0.040.
 
 =head1 DIAGNOSTICS
 
