@@ -1623,3 +1623,11 @@
 		item "Refreshed SEE ALSO section of Type::Tiny::Manual::Libraries."^^Documentation;
 	].
 
+`Type-Tiny 0.041_01 cpan:TOBYINK`
+	issued  2014-03-17;
+	changeset [
+		dcs:versus `Type-Tiny 0.040 cpan:TOBYINK`;
+		item "Type::Tiny and Type::Coercion no longer overload addition. This feature never really worked very well with regard to precendence, requiring lot of parentheses to use. The overload also made solving the parameterizable type coercion problem very difficult."^^BackCompat;
+		item "Parameterizable coercions are now passed a reference to the type constraint they should target."^^Change;
+	].
+
