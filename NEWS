@@ -4,6 +4,14 @@
    changes in development releases, see the "Changes" file instead.
 =======================================================================
 
+
+                         **** WARNING ****
+Parameterized coercions and named coercions are likely to change
+a lot in version 0.42!!!
+                         **** WARNING ****
+
+
+
 2013-10-18 Type-Tiny version 0.030 released!
 
  - Improved Perl 5.8.x support.
