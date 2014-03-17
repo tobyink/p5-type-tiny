@@ -81,6 +81,7 @@ sub compiled_coercion      { $_[0]{compiled_coercion} ||= $_[0]->_build_compiled
 sub frozen                 { $_[0]{frozen}            ||= 0 }
 sub coercion_generator     { $_[0]{coercion_generator} }
 sub parameters             { $_[0]{parameters} }
+sub parameterized_from     { $_[0]{parameterized_from} }
 
 sub has_library            { exists $_[0]{library} }
 sub has_type_constraint    { defined $_[0]->type_constraint } # sic
@@ -437,6 +438,24 @@ sub parameterize
 		type_coercion_map  => [ $self->coercion_generator->($self, $self->type_constraint, @_) ],
 		parameters         => \@_,
 		frozen             => 1,
+		parameterized_from => $self,
+	);
+}
+
+sub _reparameterize
+{
+	my $self = shift;
+	my ($target_type) = @_;
+	
+	$self->is_parameterized or return $self;
+	my $parent = $self->parameterized_from;
+	
+	return ref($self)->new(
+		type_constraint    => $target_type,
+		type_coercion_map  => [ $parent->coercion_generator->($parent, $target_type, @{$self->parameters}) ],
+		parameters         => \@_,
+		frozen             => 1,
+		parameterized_from => $parent,
 	);
 }
 
@@ -692,6 +711,8 @@ fully documented because they may change in the near future:
 =item C<< parameterize(@params) >>
 
 =item C<< parameters >>
+
+=item C<< parameterized_from >>
 
 =back
 
