@@ -12,32 +12,6 @@
 
 
 
-2013-10-18 Type-Tiny version 0.030 released!
-
- - Improved Perl 5.8.x support.
- - Exporter::TypeTiny deprecated; use Exporter::Tiny instead!
- - Renamed the Type::Exception modules to Error::TypeTiny.
-
-2013-11-05 Type-Tiny version 0.032 released!
-
- - Dict[`a] is now allowed to take a slurpy parameter for validating any
-   remaining key/value pairs.
- - Maybe[`a] now has a deep coercion.
- - Tuple[] (with empty parameter list) now explicitly tests for an empty
-   arrayref. (Ditto Dict[] for an empty hashref.)
- - Moose 2.11xx fixes.
-
-2013-12-09 Type-Tiny version 0.034 released!
-
- - Added: Types::Common::Numeric
- - Added: Types::Common::String
- - Improvements to initial load speed of Types::Standard.
-
-2013-12-21 Type-Tiny version 0.036 released!
-
- - Parameterized Dict and Map type constraints now work with Moose
-   native "Hash" attribute trait.
-
 2014-01-01 Type-Tiny version 0.038 released!
 
  - Fix for Type::Tiny on Perl 5.6.x (which has been broken since 0.032
