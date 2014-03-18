@@ -83,12 +83,25 @@ a boost with Moose as it does with Moo, because Moose doesn't inline coercion
 code. However, it should still improve performance somewhat because it allows
 L<Type::Coercion> to do some internal inlining.
 
+=head2 Interactions with MooseX-Types
+
+Type::Tiny and MooseX::Types type constraints should "play nice". If, for
+example, C<ArrayRef> is taken from L<Types::Standard> (i.e. a Type::Tiny-based
+type library), and C<PositiveInt> is taken from L<MooseX::Types::Common::Numeric>,
+then the following should "just work":
+
+   isa => ArrayRef[ PositiveInt ]
+
+   isa => PositiveInt | ArrayRef
+
 =head1 SEE ALSO
 
 For examples using Type::Tiny with L<Moose> see the SYNOPSIS sections of
-L<Type::Tiny> and L<Type::Library>, and the files C<< moose.t >>,
-C<< moose-coercion.t >> and C<< moo-inflation.t >> in the Type-Tiny
-L<test suite|https://bitbucket.org/tobyink/p5-type-tiny/src/tip/t>.
+L<Type::Tiny> and L<Type::Library>, and the
+L<Moose integration tests|https://github.com/tobyink/p5-type-tiny/tree/master/t/30-integration/Moose>,
+and
+L<MooseX-Types integration tests|https://github.com/tobyink/p5-type-tiny/tree/master/t/30-integration/MooseX-Types>
+in the test suite.
 
 =head1 AUTHOR
 
