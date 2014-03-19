@@ -6,6 +6,10 @@
 
 Checks Type::Registry works with MooseX::Types.
 
+=head1 DEPENDENCIES
+
+Requires L<MooseX::Types::Common> 0.001004; skipped otherwise.
+
 =head1 AUTHOR
 
 Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
@@ -24,7 +28,7 @@ use warnings;
 use lib qw( ./lib ./t/lib ../inc ./inc );
 
 use Test::More;
-use Test::Requires { 'MooseX::Types::Common' => '0.001000' };
+use Test::Requires { 'MooseX::Types::Common' => '0.001004' };
 use Test::TypeTiny;
 use Test::Fatal;
 
