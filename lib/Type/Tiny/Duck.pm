@@ -49,7 +49,12 @@ sub _build_inlined
 	sub {
 		my $var = $_[1];
 		local $" = q{ };
-		qq{ Scalar::Util::blessed($var) and not grep(!$var->can(\$_), qw/@methods/) };
+		# If $var is $_ or $_->{foo} or $foo{$_} or somesuch, then we
+		# can't use it within the grep expression, so we need to save
+		# it into a temporary variable ($tmp).
+		($var =~ /\$_/)
+			? qq{ Scalar::Util::blessed($var) and not do { my \$tmp = $var; grep(!\$tmp->can(\$_), qw/@methods/) } }
+			: qq{ Scalar::Util::blessed($var) and not grep(!$var->can(\$_), qw/@methods/) };
 	};
 }
 
