@@ -11,7 +11,7 @@ BEGIN {
 
 BEGIN {
 	$Types::Common::String::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Common::String::VERSION   = '0.041_01';
+	$Types::Common::String::VERSION   = '0.041_02';
 }
 
 use Type::Library -base, -declare => qw(

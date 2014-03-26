@@ -1631,3 +1631,17 @@
 		item "Parameterizable coercions are now passed a reference to the type constraint they should target."^^Change;
 	].
 
+`Type-Tiny 0.041_02 cpan:TOBYINK`
+	issued  2014-03-26;
+	changeset [
+		dcs:versus `Type-Tiny 0.041_01 cpan:TOBYINK`;
+		item "Type::Tiny::Manual links to various parts of the test suite to document concepts. These links had grown stale and have now been updated."^^Documentation;
+		item "Prevent 20-unit/Type-Registry/moosextypes.t from failing due to too old MooseX::Types::Common - just skip the test script if MXTC is older than 0.001004."^^Tests;
+		item [
+			a dcs:Bugfix;
+			dcs:fixes RT#94196;
+			label "Fix Type::Tiny::Duck's inlining of code when given the variable name `$_`.";
+			dcs:thanks cpan:DJERIUS;
+		];
+		item "Updated NEWS file."^^Documentation;
+	].
