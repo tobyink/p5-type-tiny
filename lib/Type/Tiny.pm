@@ -1112,7 +1112,42 @@ Moose-style constructor function.
 
 =head2 Attributes
 
+Attributes are named values that may be passed to the constructor. For
+each attribute, there is a corresponding reader method. For example:
+
+   my $type = Type::Tiny->new( name => "Foo" );
+   print $type->name, "\n";   # says "Foo"
+
+=head3 Important attributes
+
+These are the attributes you are likely to be most interested in
+proviing when creating your own type constraints, and most interested
+in reading when dealing with type constraint objects.
+
 =over
+
+=item C<< constraint >>
+
+Coderef to validate a value (C<< $_ >>) against the type constraint. The
+coderef will not be called unless the value is known to pass any parent
+type constraint (see C<parent> below).
+
+Defaults to C<< sub { 1 } >> - i.e. a coderef that passes all values.
+
+=item C<< parent >>
+
+Optional attribute; parent type constraint. For example, an "Integer"
+type constraint might have a parent "Number".
+
+If provided, must be a Type::Tiny object.
+
+=item C<< inlined >>
+
+A coderef which returns a string of Perl code suitable for inlining this
+type. Optional.
+
+If C<constraint> (above) is a coderef generated via L<Sub::Quote>, then
+Type::Tiny I<may> be able to automatically generate C<inlined> for you.
 
 =item C<< name >>
 
@@ -1128,49 +1163,16 @@ A name to display for the type constraint when stringified. These don't
 have to conform to any naming rules. Optional; a default name will be
 calculated from the C<name>.
 
-=item C<< parent >>
-
-Optional attribute; parent type constraint. For example, an "Integer"
-type constraint might have a parent "Number".
-
-If provided, must be a Type::Tiny object.
-
-=item C<< constraint >>
-
-Coderef to validate a value (C<< $_ >>) against the type constraint. The
-coderef will not be called unless the value is known to pass any parent
-type constraint.
-
-Defaults to C<< sub { 1 } >> - i.e. a coderef that passes all values.
-
-=item C<< compiled_check >>
-
-Coderef to validate a value (C<< $_[0] >>) against the type constraint.
-This coderef is expected to also handle all validation for the parent
-type constraints.
-
-The general point of this attribute is that you should not set it, and
-rely on the lazily-built default. Type::Tiny will usually generate a
-pretty fast coderef.
-
-=item C<< message >>
-
-Coderef that returns an error message when C<< $_ >> does not validate
-against the type constraint. Optional (there's a vaguely sensible default.)
-
-=item C<< inlined >>
-
-A coderef which returns a string of Perl code suitable for inlining this
-type. Optional.
-
-If C<constraint> (above) is a coderef generated via L<Sub::Quote>, then
-Type::Tiny I<may> be able to automatically generate C<inlined> for you.
-
 =item C<< library >>
 
 The package name of the type library this type is associated with.
 Optional. Informational only: setting this attribute does not install
 the type into the package.
+
+=item C<< message >>
+
+Coderef that returns an error message when C<< $_ >> does not validate
+against the type constraint. Optional (there's a vaguely sensible default.)
 
 =item C<< coercion >>
 
@@ -1183,29 +1185,9 @@ You may pass C<< coercion => 1 >> to the constructor to inherit coercions
 from the constraint's parent. (This requires the parent constraint to have
 a coercion.)
 
-=item C<< complementary_type >>
-
-A complementary type for this type. For example, the complementary type
-for an integer type would be all things that are not integers, including
-floating point numbers, but also alphabetic strings, arrayrefs, filehandles,
-etc.
-
-Generally speaking this attribute should not be passed to the constructor;
-you should rely on the default lazily-built complementary type.
-
-=item C<< moose_type >>, C<< mouse_type >>
-
-Objects equivalent to this type constraint, but as a
-L<Moose::Meta::TypeConstraint> or L<Mouse::Meta::TypeConstraint>.
-
-Generally speaking this attribute should not be passed to the constructor;
-you should rely on the default lazily-built objects.
-
-It should rarely be necessary to obtain a L<Moose::Meta::TypeConstraint>
-object from L<Type::Tiny> because the L<Type::Tiny> object itself should
-be usable pretty much anywhere a L<Moose::Meta::TypeConstraint> is expected.
-
 =back
+
+=head3 Attributes related to parameterizable and parameterized types
 
 The following additional attributes are used for parameterizable (e.g.
 C<ArrayRef>) and parameterized (e.g. C<< ArrayRef[Int] >>) type
@@ -1213,20 +1195,20 @@ constraints. Unlike Moose, these aren't handled by separate subclasses.
 
 =over
 
-=item C<< parameters >>
+=item C<< constraint_generator >>
 
-In parameterized types, returns an arrayref of the parameters.
+Coderef that generates a new constraint coderef based on parameters.
+Alternatively, the constraint generator can return a fully-formed
+Type::Tiny object, in which case the C<name_generator>, C<inline_generator>,
+and C<coercion_generator> attributes documented below are ignored.
+
+Optional; providing a generator makes this type into a parameterizable
+type constraint.
 
 =item C<< name_generator >>
 
 A coderef which generates a new display_name based on parameters.
 Optional; the default is reasonable.
-
-=item C<< constraint_generator >>
-
-Coderef that generates a new constraint coderef based on parameters.
-Optional; providing a generator makes this type into a parameterizable
-type constraint.
 
 =item C<< inline_generator >>
 
@@ -1242,15 +1224,58 @@ This API is not finalized. Coderef used by L<Error::TypeTiny::Assertion> to
 peek inside parameterized types and figure out why a value doesn't pass the
 constraint.
 
+=item C<< parameters >>
+
+In parameterized types, returns an arrayref of the parameters.
+
+=back
+
+=head3 Lazy generated attributes
+
+The following attributes should not be usuallly passed to the constructor;
+unless you're doing something especially unusual, you should rely on the
+default lazily-built return values.
+
+=over
+
+=item C<< compiled_check >>
+
+Coderef to validate a value (C<< $_[0] >>) against the type constraint.
+This coderef is expected to also handle all validation for the parent
+type constraints.
+
+=item C<< complementary_type >>
+
+A complementary type for this type. For example, the complementary type
+for an integer type would be all things that are not integers, including
+floating point numbers, but also alphabetic strings, arrayrefs, filehandles,
+etc.
+
+=item C<< moose_type >>, C<< mouse_type >>
+
+Objects equivalent to this type constraint, but as a
+L<Moose::Meta::TypeConstraint> or L<Mouse::Meta::TypeConstraint>.
+
+It should rarely be necessary to obtain a L<Moose::Meta::TypeConstraint>
+object from L<Type::Tiny> because the L<Type::Tiny> object itself should
+be usable pretty much anywhere a L<Moose::Meta::TypeConstraint> is expected.
+
 =back
 
 =head2 Methods
+
+=head3 Predicate methods
+
+These methods return booleans indicating information about the type
+constraint. They are each tightly associated with a particular attribute.
+(See L</"Attributes">.)
 
 =over
 
 =item C<has_parent>, C<has_library>, C<has_inlined>, C<has_constraint_generator>, C<has_inline_generator>, C<has_coercion_generator>, C<has_parameters>, C<has_message>, C<has_deep_explanation>
 
-Predicate methods.
+Simple Moose-style predicate methods indicating the presence or
+absence of an attibute.
 
 =item C<has_coercion>
 
@@ -1266,47 +1291,14 @@ Returns true iff the type constraint does not have a C<name>.
 Indicates whether a type has been parameterized (e.g. C<< ArrayRef[Int] >>)
 or could potentially be (e.g. C<< ArrayRef >>).
 
-=item C<< qualified_name >>
+=back
 
-For non-anonymous type constraints that have a library, returns a qualified
-C<< "Library::Type" >> sort of name. Otherwise, returns the same as C<name>.
+=head3 Validation and coercion
 
-=item C<< parents >>
+The following methods are used for coercing and validating values
+against a type constraint:
 
-Returns a list of all this type constraint's ancestor constraints. For
-example, if called on the C<Str> type constraint would return the list
-C<< (Value, Defined, Item, Any) >>.
-
-B<< Due to a historical misunderstanding, this differs from the Moose
-implementation of the C<parents> method. In Moose, C<parents> only returns the
-immediate parent type constraints, and because type constraints only have
-one immediate parent, this is effectively an alias for C<parent>. The
-extension module L<MooseX::Meta::TypeConstraint::Intersection> is the only
-place where multiple type constraints are returned; and they are returned
-as an arrayref in violation of the base class' documentation. I'm keeping
-my behaviour as it seems more useful. >>
-
-=item C<< equals($other) >>, C<< is_subtype_of($other) >>, C<< is_supertype_of($other) >>, C<< is_a_type_of($other) >>
-
-Compare two types. See L<Moose::Meta::TypeConstraint> for what these all mean.
-(OK, Moose doesn't define C<is_supertype_of>, but you get the idea, right?)
-
-Note that these have a slightly DWIM side to them. If you create two
-L<Type::Tiny::Class> objects which test the same class, they're considered
-equal. And:
-
-   my $subtype_of_Num = Types::Standard::Num->create_child_type;
-   my $subtype_of_Int = Types::Standard::Int->create_child_type;
-   $subtype_of_Int->is_subtype_of( $subtype_of_Num );  # true
-
-=item C<< strictly_equals($other) >>, C<< is_strictly_subtype_of($other) >>, C<< is_strictly_supertype_of($other) >>, C<< is_strictly_a_type_of($other) >>
-
-Stricter versions of the type comparison functions. These only care about
-explicit inheritance via C<parent>.
-
-   my $subtype_of_Num = Types::Standard::Num->create_child_type;
-   my $subtype_of_Int = Types::Standard::Int->create_child_type;
-   $subtype_of_Int->is_strictly_subtype_of( $subtype_of_Num );  # false
+=over
 
 =item C<< check($value) >>
 
@@ -1316,15 +1308,6 @@ Returns true iff the value passes the type constraint.
 
 Returns the error message for the value; returns an explicit undef if the
 value passes the type constraint.
-
-=item C<< validate_explain($value, $varname) >>
-
-Like C<validate> but instead of a string error message, returns an arrayref
-of strings explaining the reasoning why the value does not meet the type
-constraint, examining parent types, etc.
-
-The C<< $varname >> is an optional string like C<< '$foo' >> indicating the
-name of the variable being checked.
 
 =item C<< assert_valid($value) >>
 
@@ -1348,6 +1331,15 @@ are edge cases where it could break Moose compatibility.
 Returns the error message for the value; even if the value passes the type
 constraint.
 
+=item C<< validate_explain($value, $varname) >>
+
+Like C<validate> but instead of a string error message, returns an arrayref
+of strings explaining the reasoning why the value does not meet the type
+constraint, examining parent types, etc.
+
+The C<< $varname >> is an optional string like C<< '$foo' >> indicating the
+name of the variable being checked.
+
 =item C<< coerce($value) >>
 
 Attempt to coerce C<< $value >> to this type.
@@ -1357,11 +1349,121 @@ Attempt to coerce C<< $value >> to this type.
 Attempt to coerce C<< $value >> to this type. Throws an exception if this is
 not possible.
 
+=back
+
+=head3 Child type constraint creation
+
+These methods generate new type constraint objects that inherit from the
+constraint they are called upon:
+
+=over
+
+=item C<< create_child_type(%attributes) >>
+
+Construct a new Type::Tiny object with this object as its parent.
+
+=item C<< child_type_class >>
+
+The class that create_child_type will construct by default.
+
+=item C<< parameterize(@parameters) >>
+
+Creates a new parameterized type; throws an exception if called on a
+non-parameterizable type.
+
+=item C<< plus_coercions($type1, $code1, ...) >>
+
+Shorthand for creating a new child type constraint with the same coercions
+as this one, but then adding some extra coercions (at a higher priority than
+the existing ones).
+
+=item C<< plus_fallback_coercions($type1, $code1, ...) >>
+
+Like C<plus_coercions>, but added at a lower priority.
+
+=item C<< minus_coercions($type1, ...) >>
+
+Shorthand for creating a new child type constraint with fewer type coercions.
+
+=item C<< no_coercions >>
+
+Shorthand for creating a new child type constraint with no coercions at all.
+
+=back
+
+=head3 Type relationship introspection methods
+
+These methods allow you to determine a type constraint's relationship to
+other type constraints in an organised hierarchy:
+
+=over
+
+=item C<< equals($other) >>, C<< is_subtype_of($other) >>, C<< is_supertype_of($other) >>, C<< is_a_type_of($other) >>
+
+Compare two types. See L<Moose::Meta::TypeConstraint> for what these all mean.
+(OK, Moose doesn't define C<is_supertype_of>, but you get the idea, right?)
+
+Note that these have a slightly DWIM side to them. If you create two
+L<Type::Tiny::Class> objects which test the same class, they're considered
+equal. And:
+
+   my $subtype_of_Num = Types::Standard::Num->create_child_type;
+   my $subtype_of_Int = Types::Standard::Int->create_child_type;
+   $subtype_of_Int->is_subtype_of( $subtype_of_Num );  # true
+
+=item C<< strictly_equals($other) >>, C<< is_strictly_subtype_of($other) >>, C<< is_strictly_supertype_of($other) >>, C<< is_strictly_a_type_of($other) >>
+
+Stricter versions of the type comparison functions. These only care about
+explicit inheritance via C<parent>.
+
+   my $subtype_of_Num = Types::Standard::Num->create_child_type;
+   my $subtype_of_Int = Types::Standard::Int->create_child_type;
+   $subtype_of_Int->is_strictly_subtype_of( $subtype_of_Num );  # false
+
+=item C<< parents >>
+
+Returns a list of all this type constraint's ancestor constraints. For
+example, if called on the C<Str> type constraint would return the list
+C<< (Value, Defined, Item, Any) >>.
+
+B<< Due to a historical misunderstanding, this differs from the Moose
+implementation of the C<parents> method. In Moose, C<parents> only returns the
+immediate parent type constraints, and because type constraints only have
+one immediate parent, this is effectively an alias for C<parent>. The
+extension module L<MooseX::Meta::TypeConstraint::Intersection> is the only
+place where multiple type constraints are returned; and they are returned
+as an arrayref in violation of the base class' documentation. I'm keeping
+my behaviour as it seems more useful. >>
+
 =item C<< coercibles >>
 
 Return a type constraint which is the union of type constraints that can be
 coerced to this one (including this one). If this type constraint has no
 coercions, returns itself.
+
+=item C<< type_parameter >>
+
+In parameterized type constraints, returns the first item on the list of
+parameters; otherwise returns undef. For example:
+
+   ( ArrayRef[Int] )->type_parameter;    # returns Int
+   ( ArrayRef[Int] )->parent;            # returns ArrayRef
+
+Note that parameterizable type constraints can perfectly legitimately take
+multiple parameters (several off the parameterizable type constraints in
+L<Types::Standard> do). This method only returns the first such parameter.
+L</"Attributes related to parameterizable and parameterized types">
+documents the C<parameters> attribute, which returns an arrayref of all
+the parameters.
+
+=back
+
+=head3 Inlining methods
+
+The following methods are used to generate strings of Perl code which
+may be pasted into stringy C<eval>uated subs to perform type checks:
+
+=over
 
 =item C<< can_be_inlined >>
 
@@ -1389,36 +1491,16 @@ Much like C<inline_check> but outputs a statement of the form:
 Note that if this type has a custom error message, the inlined code will
 I<ignore> this custom message!!
 
-=item C<< parameterize(@parameters) >>
+=back
 
-Creates a new parameterized type; throws an exception if called on a
-non-parameterizable type.
+=head3 Other methods
 
-=item C<< create_child_type(%attributes) >>
+=over
 
-Construct a new Type::Tiny object with this object as its parent.
+=item C<< qualified_name >>
 
-=item C<< child_type_class >>
-
-The class that create_child_type will construct.
-
-=item C<< plus_coercions($type1, $code1, ...) >>
-
-Shorthand for creating a new child type constraint with the same coercions
-as this one, but then adding some extra coercions (at a higher priority than
-the existing ones).
-
-=item C<< plus_fallback_coercions($type1, $code1, ...) >>
-
-Like C<plus_coercions>, but added at a lower priority.
-
-=item C<< minus_coercions($type1, ...) >>
-
-Shorthand for creating a new child type constraint with fewer type coercions.
-
-=item C<< no_coercions >>
-
-Shorthand for creating a new child type constraint with no coercions at all.
+For non-anonymous type constraints that have a library, returns a qualified
+C<< "MyLib::MyType" >> sort of name. Otherwise, returns the same as C<name>.
 
 =item C<< isa($class) >>, C<< can($method) >>, C<< AUTOLOAD(@args) >>
 
@@ -1460,8 +1542,6 @@ anything useful.
 =item C<< inline_environment >>
 
 =item C<< meta >>
-
-=item C<< type_parameter >>
 
 =back
 
@@ -1531,7 +1611,7 @@ version of Perl.
 
 =item C<< $Type::Tiny::DD >>
 
-This in undef by default but may be set to a coderef that Type::Tiny
+This undef by default but may be set to a coderef that Type::Tiny
 and related modules will use to dump data structures in things like
 error messages.
 
