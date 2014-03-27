@@ -1121,7 +1121,7 @@ each attribute, there is a corresponding reader method. For example:
 =head3 Important attributes
 
 These are the attributes you are likely to be most interested in
-proviing when creating your own type constraints, and most interested
+providing when creating your own type constraints, and most interested
 in reading when dealing with type constraint objects.
 
 =over
@@ -1351,7 +1351,7 @@ not possible.
 
 =back
 
-=head3 Child type constraint creation
+=head3 Child type constraint creation and parameterization
 
 These methods generate new type constraint objects that inherit from the
 constraint they are called upon:

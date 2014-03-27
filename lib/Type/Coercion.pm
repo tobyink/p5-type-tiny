@@ -563,7 +563,34 @@ Create a Type::Coercion from two existing Type::Coercion objects.
 
 =head2 Attributes
 
+Attributes are named values that may be passed to the constructor. For
+each attribute, there is a corresponding reader method. For example:
+
+   my $c = Type::Coercion->new( type_constraint => Int );
+   my $t = $c->type_constraint;  # Int
+
+=head3 Important attributes
+
+These are the attributes you are likely to be most interested in
+providing when creating your own type coercions, and most interested
+in reading when dealing with coercion objects.
+
 =over
+
+=item C<type_constraint>
+
+Weak reference to the target type constraint (i.e. the type constraint which
+the output of coercion coderefs is expected to conform to).
+
+=item C<type_coercion_map>
+
+Arrayref of source-type/code pairs. Don't set this in the constructor; use
+the C<add_type_coercions> method instead.
+
+=item C<frozen>
+
+Boolean; default false. A frozen coercion cannot have C<add_type_coercions>
+called upon it.
 
 =item C<name>
 
@@ -585,15 +612,30 @@ The package name of the type library this coercion is associated with.
 Optional. Informational only: setting this attribute does not install
 the coercion into the package.
 
-=item C<type_constraint>
+=back
 
-Weak reference to the target type constraint (i.e. the type constraint which
-the output of coercion coderefs is expected to conform to).
+=head3 Attributes related to parameterizable and parameterized types
 
-=item C<type_coercion_map>
+The following attributes are used for parameterized coercions, but are not
+fully documented because they may change in the near future:
 
-Arrayref of source-type/code pairs. Don't set this in the constructor; use
-the C<add_type_coercions> method instead.
+=over
+
+=item C<< coercion_generator >>
+
+=item C<< parameters >>
+
+=item C<< parameterized_from >>
+
+=back
+
+=head3 Lazy generated attributes
+
+The following attributes should not be usuallly passed to the constructor;
+unless you're doing something especially unusual, you should rely on the
+default lazily-built return values.
+
+=over
 
 =item C<< compiled_coercion >>
 
@@ -608,14 +650,15 @@ pretty fast coderef, inlining all type constraint checks, etc.
 A L<Moose::Meta::TypeCoercion> object equivalent to this one. Don't set this
 manually; rely on the default built one.
 
-=item C<frozen>
-
-Boolean; default false. A frozen coercion cannot have C<add_type_coercions>
-called upon it.
-
 =back
 
 =head2 Methods
+
+=head3 Predicate methods
+
+These methods return booleans indicating information about the coercion.
+They are each tightly associated with a particular attribute.
+(See L</"Attributes">.)
 
 =over
 
@@ -627,20 +670,28 @@ Predicate methods.
 
 Returns true iff the coercion does not have a C<name>.
 
-=item C<< qualified_name >>
+=back
 
-For non-anonymous coercions that have a library, returns a qualified
-C<< "Library::Type" >> sort of name. Otherwise, returns the same as C<name>.
+The following predicates are used for parameterized coercions, but are not
+fully documented because they may change in the near future:
 
-=item C<< add_type_coercions($type1, $code1, ...) >>
+=over
 
-Takes one or more pairs of L<Type::Tiny> constraints and coercion code,
-creating an ordered list of source types and coercion codes.
+=item C<< has_coercion_generator >>
 
-Coercion codes can be expressed as either a string of Perl code (this
-includes objects which overload stringification), or a coderef (or object
-that overloads coderefification). In either case, the value to be coerced
-is C<< $_ >>.
+=item C<< has_parameters >>
+
+=item C<< is_parameterizable >>
+
+=item C<< is_parameterized >>
+
+=back
+
+=head3 Coercion
+
+The following methods are used for coercing values to a type constraint:
+
+=over
 
 =item C<< coerce($value) >>
 
@@ -655,6 +706,47 @@ Coerce the value to the target type, and throw an exception if the result
 does not validate against the target type constraint.
 
 Returns the coerced value.
+
+=back
+
+=head3 Coercion code definition methods
+
+=over
+
+=item C<< add_type_coercions($type1, $code1, ...) >>
+
+Takes one or more pairs of L<Type::Tiny> constraints and coercion code,
+creating an ordered list of source types and coercion codes.
+
+Coercion codes can be expressed as either a string of Perl code (this
+includes objects which overload stringification), or a coderef (or object
+that overloads coderefification). In either case, the value to be coerced
+is C<< $_ >>.
+
+=item C<< freeze >>
+
+Sets the C<frozen> attribute to true. There is no C<unfreeze>. Called
+automatically by L<Type::Tiny> sometimes.
+
+=back
+
+=head3 Parameterization
+
+The following method is used for parameterized coercions, but is not
+fully documented because it may change in the near future:
+
+=over
+
+=item C<< parameterize(@params) >>
+
+=back
+
+=head3 Type coercion introspection methods
+
+These methods allow you to determine a coercion's relationship to type
+constraints:
+
+=over
 
 =item C<< has_coercion_for_type($source_type) >>
 
@@ -673,6 +765,18 @@ Returns the special string C<< "0 but true" >> if no coercion would be
 actually be necessary for this value (due to it already meeting the target
 type constraint).
 
+=back
+
+The C<type_constraint> attribute provides a type constraint object for the
+target type constraint of the coercion. See L</"Attributes">.
+
+=head3 Inlining methods
+
+The following methods are used to generate strings of Perl code which
+may be pasted into stringy C<eval>uated subs to perform type coercions:
+
+=over
+
 =item C<< can_be_inlined >>
 
 Returns true iff the coercion can be inlined.
@@ -681,38 +785,22 @@ Returns true iff the coercion can be inlined.
 
 Much like C<inline_coerce> from L<Type::Tiny>.
 
-=item C<< freeze >>
+=back
 
-Set C<frozen> to true. There is no C<unfreeze>. Called automatically by
-L<Type::Tiny> sometimes.
+=head3 Other methods
+
+=over
+
+=item C<< qualified_name >>
+
+For non-anonymous coercions that have a library, returns a qualified
+C<< "MyLib::MyCoercion" >> sort of name. Otherwise, returns the same
+as C<name>.
 
 =item C<< isa($class) >>, C<< can($method) >>, C<< AUTOLOAD(@args) >>
 
 If Moose is loaded, then the combination of these methods is used to mock
 a Moose::Meta::TypeCoercion.
-
-=back
-
-The following methods are used for parameterized coercions, but are not
-fully documented because they may change in the near future:
-
-=over
-
-=item C<< coercion_generator >>
-
-=item C<< has_coercion_generator >>
-
-=item C<< has_parameters >>
-
-=item C<< is_parameterizable >>
-
-=item C<< is_parameterized >>
-
-=item C<< parameterize(@params) >>
-
-=item C<< parameters >>
-
-=item C<< parameterized_from >>
 
 =back
 
