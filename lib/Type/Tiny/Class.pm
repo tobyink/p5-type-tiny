@@ -123,6 +123,13 @@ sub _build_parent
 	my $self  = shift;
 	my $class = $self->class;
 	
+	# Some classes (I'm looking at you, Math::BigFloat) include a class in
+	# their @ISA to inherit methods, but then override isa() to return false,
+	# so that they don't appear to be a subclass.
+	#
+	# In these cases, we don't want to list the parent class as a parent
+	# type constraint.
+	#
 	my @isa = grep $class->isa($_), do { no strict "refs"; no warnings; @{"$class\::ISA"} };
 	
 	if (@isa == 0)

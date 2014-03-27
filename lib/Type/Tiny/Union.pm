@@ -199,7 +199,10 @@ A parent will instead be automatically calculated.
 
 =item C<coercion>
 
-Will typically be a L<Type::Coercion::Union>.
+You probably do not pass this to the constructor. (It's not currently
+disallowed, as there may be a use for it that I haven't thought of.)
+
+The auto-generated default will be a L<Type::Coercion::Union> object.
 
 =back
 
