@@ -631,7 +631,7 @@ fully documented because they may change in the near future:
 
 =head3 Lazy generated attributes
 
-The following attributes should not be usuallly passed to the constructor;
+The following attributes should not be usually passed to the constructor;
 unless you're doing something especially unusual, you should rely on the
 default lazily-built return values.
 
@@ -664,7 +664,8 @@ They are each tightly associated with a particular attribute.
 
 =item C<has_type_constraint>, C<has_library>
 
-Predicate methods.
+Simple Moose-style predicate methods indicating the presence or
+absence of an attribute.
 
 =item C<is_anon>
 
@@ -771,6 +772,8 @@ The C<type_constraint> attribute provides a type constraint object for the
 target type constraint of the coercion. See L</"Attributes">.
 
 =head3 Inlining methods
+
+=for stopwords uated
 
 The following methods are used to generate strings of Perl code which
 may be pasted into stringy C<eval>uated subs to perform type coercions:

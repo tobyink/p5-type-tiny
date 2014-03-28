@@ -1232,7 +1232,7 @@ In parameterized types, returns an arrayref of the parameters.
 
 =head3 Lazy generated attributes
 
-The following attributes should not be usuallly passed to the constructor;
+The following attributes should not be usually passed to the constructor;
 unless you're doing something especially unusual, you should rely on the
 default lazily-built return values.
 
@@ -1275,7 +1275,7 @@ constraint. They are each tightly associated with a particular attribute.
 =item C<has_parent>, C<has_library>, C<has_inlined>, C<has_constraint_generator>, C<has_inline_generator>, C<has_coercion_generator>, C<has_parameters>, C<has_message>, C<has_deep_explanation>
 
 Simple Moose-style predicate methods indicating the presence or
-absence of an attibute.
+absence of an attribute.
 
 =item C<has_coercion>
 
@@ -1459,6 +1459,8 @@ the parameters.
 =back
 
 =head3 Inlining methods
+
+=for stopwords uated
 
 The following methods are used to generate strings of Perl code which
 may be pasted into stringy C<eval>uated subs to perform type checks:
