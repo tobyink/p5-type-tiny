@@ -41,4 +41,14 @@ ok not( 42 ~~ ArrayRef );
 ok( 42 ~~ \&is_Int );
 ok not( 42 ~~ \&is_ArrayRef );
 
+TODO: {
+	use feature qw(switch);
+	local $TODO = 'this would be nice, but probably requires changes to perl';
+	given (4) {
+		when ( RegexpRef ) { fail('regexpref') }
+		when ( Int )       { pass('int') }
+		default            { fail('default') }
+	}
+};
+
 done_testing;
