@@ -1653,3 +1653,10 @@
 		item "Improve documentation for the Type::Tiny class; especially its constructor, attributes and methods."^^Documentation;
 		item "Improve documentation for the Type::Coercion class; especially its constructors, attributes and methods."^^Documentation;
 	].
+
+`Type-Tiny 0.041_04 cpan:TOBYINK`
+	issued  2014-03-31;
+	changeset [
+		dcs:versus `Type-Tiny 0.041_03 cpan:TOBYINK`;
+		item "Add tests for given/when matching against type constraints."^^Tests;
+	].
