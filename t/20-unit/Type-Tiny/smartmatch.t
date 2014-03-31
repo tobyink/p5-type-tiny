@@ -43,6 +43,12 @@ ok not( 42 ~~ \&is_ArrayRef );
 
 TODO: {
 	use feature qw(switch);
+	given (4) {
+		when ( \&is_RegexpRef ) { fail('regexpref') }
+		when ( \&is_Int )       { pass('int') }
+		default                 { fail('default') }
+	}
+	
 	local $TODO = 'this would be nice, but probably requires changes to perl';
 	given (4) {
 		when ( RegexpRef ) { fail('regexpref') }
