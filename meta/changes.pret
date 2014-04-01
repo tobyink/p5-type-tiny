@@ -1666,4 +1666,5 @@
 	changeset [
 		dcs:versus `Type-Tiny 0.041_04 cpan:TOBYINK`;
 		item "List currently unstable/experimental parts of the distribution in Type::Tiny::Manual::Policies."^^Documentation;
+		item "Include more recent results in benchmarking example scripts."^^Documentation;
 	].

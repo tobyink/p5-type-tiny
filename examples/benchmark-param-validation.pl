@@ -110,15 +110,15 @@ cmpthese(-3, {
 });
 
 __END__
-           Rate   [D:V]   [P:V]   [P:C] [T:P v] [T:P c]
-[D:V]    9983/s      --    -16%    -39%    -41%    -71%
-[P:V]   11898/s     19%      --    -27%    -29%    -65%
-[P:C]   16259/s     63%     37%      --     -3%    -52%
-[T:P v] 16797/s     68%     41%      3%      --    -51%
-[T:P c] 34032/s    241%    186%    109%    103%      --
+           Rate   [D:V]   [P:V] [T:P v]   [P:C] [T:P c]
+[D:V]   10006/s      --    -26%    -38%    -39%    -68%
+[P:V]   13567/s     36%      --    -15%    -17%    -57%
+[T:P v] 16012/s     60%     18%      --     -2%    -49%
+[P:C]   16384/s     64%     21%      2%      --    -48%
+[T:P c] 31220/s    212%    130%     95%     91%      --
 
 ----
 
                          Rate ParamsValidateSimple     TypeParamsSimple
-ParamsValidateSimple  74972/s                   --                 -63%
-TypeParamsSimple     204193/s                 172%                   --
+ParamsValidateSimple  91317/s                   --                 -60%
+TypeParamsSimple     229049/s                 151%                   --

@@ -36,14 +36,14 @@ immutable.
 For both Moose and Moo, L<Type::Tiny> type constraints are clearly faster
 than the conventional approach:
 
-               Rate Moo_MXTML    Moo_TT     Moose  Moose_TT
-   Moo_MXTML 3412/s        --      -33%      -49%      -60%
-   Moo_TT    5119/s       50%        --      -23%      -39%
-   Moose     6636/s       94%       30%        --      -21%
-   Moose_TT  8452/s      148%       65%       27%        --
+             Rate Moo_MXTML    Moo_TT     Moose  Moose_TT
+ Moo_MXTML 3381/s        --      -39%      -45%      -63%
+ Moo_TT    5582/s       65%        --      -10%      -39%
+ Moose     6194/s       83%       11%        --      -33%
+ Moose_TT  9225/s      173%       65%       49%        --
 
-(Tested versions: Type::Tiny 0.003_16, Moose 2.0604, Moo 1.002000, and
-MooX::Types::MooseLike 0.16.)
+(Tested versions: Type::Tiny 0.042, Moose 2.1107, Moo 1.004001, and
+MooX::Types::MooseLike 0.23.)
 
 =head1 DEPENDENCIES
 
@@ -55,7 +55,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013 by Toby Inkster.
+This software is copyright (c) 2013-2014 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

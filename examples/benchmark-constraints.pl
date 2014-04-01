@@ -42,16 +42,16 @@ B<< XS is switched off using C<MOUSE_PUREPERL> environment variable. >>
 In all cases, L<Type::Tiny> type constraints are clearly faster
 than the conventional approach:
 
-             Rate Moo_MXTML     Mouse     Moose    Moo_TT  Mouse_TT  Moose_TT
- Moo_MXTML 2999/s        --      -32%      -52%      -56%      -68%      -69%
- Mouse     4436/s       48%        --      -29%      -34%      -52%      -54%
- Moose     6279/s      109%       42%        --       -7%      -33%      -35%
- Moo_TT    6762/s      125%       52%        8%        --      -27%      -30%
- Mouse_TT  9309/s      210%      110%       48%       38%        --       -4%
- Moose_TT  9686/s      223%      118%       54%       43%        4%        --
+             Rate Moo_MXTML     Mouse     Moose    Moo_TT  Moose_TT  Mouse_TT
+ Moo_MXTML 2947/s        --      -29%      -50%      -51%      -67%      -68%
+ Mouse     4177/s       42%        --      -29%      -31%      -54%      -55%
+ Moose     5910/s      101%       41%        --       -3%      -35%      -36%
+ Moo_TT    6074/s      106%       45%        3%        --      -33%      -34%
+ Moose_TT  9050/s      207%      117%       53%       49%        --       -2%
+ Mouse_TT  9221/s      213%      121%       56%       52%        2%        --
 
-(Tested versions: Type::Tiny 0.005_06, Moose 2.0604, Moo 1.002000,
-MooX::Types::MooseLike 0.16, and Mouse 1.11)
+(Tested versions: Type::Tiny 0.042, Moose 2.1107, Moo 1.004001,
+MooX::Types::MooseLike 0.23, and Mouse 2.1.0)
 
 =head1 DEPENDENCIES
 
@@ -63,7 +63,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013 by Toby Inkster.
+This software is copyright (c) 2013-2014 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
