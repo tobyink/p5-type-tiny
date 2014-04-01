@@ -1660,3 +1660,9 @@
 		dcs:versus `Type-Tiny 0.041_03 cpan:TOBYINK`;
 		item "Add tests for given/when matching against type constraints."^^Tests;
 	].
+
+`Type-Tiny 0.042 cpan:TOBYINK`
+	issued  2014-04-02;
+	changeset [
+		dcs:versus `Type-Tiny 0.041_04 cpan:TOBYINK`;
+	].
