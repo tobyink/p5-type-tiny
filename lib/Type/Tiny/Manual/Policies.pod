@@ -11,6 +11,8 @@ Type::Tiny::Manual::Policies - Type::Tiny policies
 B<< The following stability policy is planned for Type::Tiny 1.000000
 and above. This milestone has not yet been reached. >>
 
+=head2 Type::Tiny Stability Policy
+
 Type::Tiny 1.000000 is considered stable. Any changes to the API that
 are big enough to I<require> changes to the test suite will be preceded
 by a I<< six month >> notice period, with the following exceptions:
@@ -35,6 +37,53 @@ Where a feature is explicitly documented as being "experimental" or
 =item *
 
 Improvements to the text of error messages.
+
+=back
+
+=head2 Experimental and Unstable Type::Tiny Features
+
+The following list is currently non-exhaustive.
+
+=over
+
+=item *
+
+L<Type::Tiny> inlining subs (i.e. C<inline_as>) may return a list of
+strings (with C<undef> being allowed as the first item on the list).
+This is experimental. See L<Type::Utils>.
+
+=item *
+
+The L<parameterizable coercion API|Type::Coercion> is subject to change.
+
+=item *
+
+L<Type::Registry> has L<changes under consideration|Type::Registry/"STATUS">.
+
+=item *
+
+L<Type::Registry>'s ability to import L<MooseX::Types> and L<MouseX::Types>
+type libraries is experimental.
+
+=item *
+
+These modules are considered part of Type::Tiny's internals, and not
+covered by the stability policy:
+L<Devel::TypeTiny::Perl56Compat>,
+L<Devel::TypeTiny::Perl58Compat>,
+L<Eval::TypeTiny>,
+L<Type::Coercion::FromMoose>,
+L<Type::Tiny::_HalfOp>,
+L<Types::Standard::ArrayRef>,
+L<Types::Standard::Dict>,
+L<Types::Standard::HashRef>,
+L<Types::Standard::Map>,
+L<Types::Standard::ScalarRef>, and
+L<Types::Standard::Tuple>.
+
+=item *
+
+L<Reply::Plugin::TypeTiny> is not covered by the stability policy.
 
 =back
 
