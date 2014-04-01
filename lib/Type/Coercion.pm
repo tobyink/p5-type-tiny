@@ -614,7 +614,7 @@ the coercion into the package.
 
 =back
 
-=head3 Attributes related to parameterizable and parameterized types
+=head3 Attributes related to parameterizable and parameterized coercions
 
 The following attributes are used for parameterized coercions, but are not
 fully documented because they may change in the near future:
