@@ -275,6 +275,7 @@ sub _TypeTinyFromGeneric
 	return $new;
 }
 
+my $QFS;
 sub _TypeTinyFromCodeRef
 {
 	my $t = $_[0];
@@ -289,6 +290,22 @@ sub _TypeTinyFromCodeRef
 			return sprintf('%s did not pass type constraint', Type::Tiny::_dd($_));
 		},
 	);
+	
+	if ($QFS ||= "Sub::Quote"->can("quoted_from_sub"))
+	{
+		my (undef, $perlstring, $captures) = @{ $QFS->($t) || [] };
+		$perlstring = "!!eval{ $perlstring }";
+		$opts{inlined} = sub
+		{
+			my $var = $_[1];
+			Sub::Quote::inlinify(
+				$perlstring,
+				$var,
+				$var eq q($_) ? '' : "local \$_ = $var;",
+				1,
+			);
+		} if $perlstring && !$captures;
+	}
 
 	require Type::Tiny;
 	my $new = "Type::Tiny"->new(%opts);

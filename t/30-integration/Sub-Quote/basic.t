@@ -33,7 +33,7 @@ use Test::TypeTiny;
 
 use Sub::Quote;
 use Type::Tiny;
-use Types::Standard qw(Int);
+use Types::Standard qw( ArrayRef Int );
 
 my $Type1 = "Type::Tiny"->new(
 	name       => "Type1",
@@ -104,5 +104,15 @@ should_pass(42, $Type6);
 should_pass(43, $Type6);
 should_fail(44.4, $Type6);
 ok(!$Type6->can_be_inlined, 'constraint built using quote_sub and non-inlinable parent cannot be inlined');
+
+my $Type7 = ArrayRef([Int]) & quote_sub q{ @$_ > 1 and @$_ < 4 };
+
+should_pass([1,2,3], $Type7);
+should_fail([1,2.1,3], $Type7);
+should_fail([1], $Type7);
+should_fail([1,2,3,4], $Type7);
+ok($Type7->can_be_inlined, 'constraint built as an intersection of an inlinable type constraint and a quoted sub can be inlined');
+
+note($Type7->inline_check('$VAR'));
 
 done_testing;
