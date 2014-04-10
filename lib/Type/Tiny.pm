@@ -254,6 +254,7 @@ sub parameters               { $_[0]{parameters} }
 sub moose_type               { $_[0]{moose_type}     ||= $_[0]->_build_moose_type }
 sub mouse_type               { $_[0]{mouse_type}     ||= $_[0]->_build_mouse_type }
 sub deep_explanation         { $_[0]{deep_explanation} }
+sub my_methods               { $_[0]{my_methods}     ||= $_[0]->_build_my_methods }
 
 sub has_parent               { exists $_[0]{parent} }
 sub has_library              { exists $_[0]{library} }
@@ -977,8 +978,31 @@ sub isa
 	{
 		return !!1;
 	}
-
+	
 	$self->SUPER::isa(@_);
+}
+
+sub _build_my_methods
+{
+	return {};
+}
+
+sub _lookup_my_method
+{
+	my $self = shift;
+	my ($name) = @_;
+	
+	if ($self->my_methods->{$name})
+	{
+		return $self->my_methods->{$name};
+	}
+	
+	if ($self->has_parent)
+	{
+		return $self->parent->_lookup_my_method(@_);
+	}
+	
+	return;
 }
 
 sub can
@@ -990,9 +1014,18 @@ sub can
 	my $can = $self->SUPER::can(@_);
 	return $can if $can;
 	
-	if ($INC{"Moose.pm"} and ref($self) and my $method = $self->moose_type->can(@_))
+	if (ref($self))
 	{
-		return sub { $method->(shift->moose_type, @_) };
+		if ($INC{"Moose.pm"})
+		{
+			my $method = $self->moose_type->can(@_);
+			return sub { shift->moose_type->$method(@_) };
+		}
+		if ($_[0] =~ /\Amy_(.+)\z/)
+		{
+			my $method = $self->_lookup_my_method($1);
+			return $method if $method;
+		}
 	}
 	
 	return;
@@ -1004,9 +1037,18 @@ sub AUTOLOAD
 	my ($m) = (our $AUTOLOAD =~ /::(\w+)$/);
 	return if $m eq 'DESTROY';
 	
-	if ($INC{"Moose.pm"} and ref($self) and my $method = $self->moose_type->can($m))
+	if (ref($self))
 	{
-		return $method->($self->moose_type, @_);
+		if ($INC{"Moose.pm"})
+		{
+			my $method = $self->moose_type->can($m);
+			return $self->moose_type->$method(@_) if $method;
+		}
+		if ($m =~ /\Amy_(.+)\z/)
+		{
+			my $method = $self->_lookup_my_method($1);
+			return $self->$method(@_) if $method;
+		}
 	}
 	
 	_croak q[Can't locate object method "%s" via package "%s"], $m, ref($self)||$self;
@@ -1186,6 +1228,11 @@ you should rely on the default lazily-built coercion object.
 You may pass C<< coercion => 1 >> to the constructor to inherit coercions
 from the constraint's parent. (This requires the parent constraint to have
 a coercion.)
+
+=item C<< my_methods >>
+
+Experimenal hashref of additional methods that can be called on the type
+constraint object.
 
 =back
 

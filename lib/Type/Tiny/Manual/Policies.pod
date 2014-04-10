@@ -54,6 +54,11 @@ This is experimental. See L<Type::Utils>.
 
 =item *
 
+L<Type::Tiny>'s C<my_methods> attribute and the functionality it
+provides is experimental.
+
+=item *
+
 The L<parameterizable coercion API|Type::Coercion> is subject to change.
 
 =item *
