@@ -1119,7 +1119,7 @@ __END__
 
 =encoding utf-8
 
-=for stopwords Moo(se)-compatible MooseX MouseX MooX Moose-compat
+=for stopwords Moo(se)-compatible MooseX MouseX MooX Moose-compat invocant
 
 =head1 NAME
 
