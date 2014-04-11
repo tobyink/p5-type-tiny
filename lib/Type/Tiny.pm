@@ -490,6 +490,30 @@ sub parents
 	return ($self->parent, $self->parent->parents);
 }
 
+sub find_parent
+{
+	my $self = shift;
+	my ($test) = @_;
+	
+	local ($_, $.);
+	my $type  = $self;
+	my $count = 0;
+	while ($type)
+	{
+		if ($test->($_=$type, $.=$count))
+		{
+			return wantarray ? ($type, $count) : $type;
+		}
+		else
+		{
+			$type = $type->parent;
+			$count++;
+		}
+	}
+	
+	return;
+}
+
 sub check
 {
 	my $self = shift;
@@ -1483,6 +1507,16 @@ extension module L<MooseX::Meta::TypeConstraint::Intersection> is the only
 place where multiple type constraints are returned; and they are returned
 as an arrayref in violation of the base class' documentation. I'm keeping
 my behaviour as it seems more useful. >>
+
+=item C<< find_parent($coderef) >>
+
+Loops through the parent type constraints I<< including the invocant
+itself >> and returns the nearest ancestor type constraint where the
+coderef evaluates to true. Within the coderef the ancestor currently
+being checked is C<< $_ >>. Returns undef if there is no match.
+
+In list context also returns the number of type constraints which had
+been looped through before the matching constraint was found.
 
 =item C<< coercibles >>
 

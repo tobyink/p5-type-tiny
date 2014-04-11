@@ -136,4 +136,24 @@ use Types::Standard ();
 	);
 }
 
+my $t1 = Types::Standard::Int;
+my $t2 = $t1->create_child_type(name => 'T2');
+my $t3 = $t2->create_child_type(name => 'T3');
+my $t4 = $t3->create_child_type(name => 'T4');
+my $t5 = $t4->create_child_type(name => 'T5');
+my $t6 = $t5->create_child_type(name => 'T6');
+
+my $found = $t6->find_parent(sub {
+	$_->has_parent and $_->parent->name eq 'Int'
+});
+
+is($found->name, 'T2', 'find_parent (scalar context)');
+
+my ($found2, $n) = $t6->find_parent(sub {
+	$_->has_parent and $_->parent->name eq 'Int'
+});
+
+is($found2->name, 'T2', 'find_parent (list context)');
+is($n, 4, '... includes a count');
+
 done_testing;
