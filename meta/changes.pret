@@ -1676,3 +1676,11 @@
 		item "Sub::Quote quoted coderefs passed to to_TypeTiny() now result in inlinable type constraints."^^Change;
 	].
 
+`Type-Tiny 0.043_02 cpan:TOBYINK`
+	issued  2014-04-11;
+	changeset [
+		dcs:versus `Type-Tiny 0.043_01 cpan:TOBYINK`;
+		item "Experimental my_methods attribute so that type constraints can offer additional methods."^^Addition;
+		item "Type::Tiny now has a find_parent method."^^Addition;
+	].
+
