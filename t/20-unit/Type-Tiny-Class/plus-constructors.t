@@ -92,7 +92,7 @@ BEGIN {
 		my ($name) = @_;
 		$class->new(name => $name);
 	}
-
+	
 	$Person = class_type { class => __PACKAGE__ };
 };
 

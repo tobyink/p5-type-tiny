@@ -917,7 +917,6 @@ sub _process_coercion_list
 sub plus_coercions
 {
 	my $self = shift;
-	
 	my $new = $self->_clone;
 	$new->coercion->add_type_coercions(
 		$self->_process_coercion_list(@_),
@@ -1043,7 +1042,7 @@ sub can
 		if ($INC{"Moose.pm"})
 		{
 			my $method = $self->moose_type->can(@_);
-			return sub { shift->moose_type->$method(@_) };
+			return sub { shift->moose_type->$method(@_) } if $method;
 		}
 		if ($_[0] =~ /\Amy_(.+)\z/)
 		{
