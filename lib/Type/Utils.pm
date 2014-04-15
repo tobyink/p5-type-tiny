@@ -28,6 +28,7 @@ our @EXPORT_OK = (
 		extends type subtype
 		match_on_type compile_match_on_type
 		dwim_type english_list
+		classifier
 	>,
 );
 
@@ -441,6 +442,23 @@ sub compile_match_on_type
 			'@actions' => \@actions,
 			'@checks'  => \@checks,
 		},
+	);
+}
+
+sub classifier
+{
+	my $i;
+	compile_match_on_type(
+		+(
+			map {
+				my $type = $_->[0];
+				$type => sub { $type };
+			}
+			sort { $b->[1] <=> $a->[1] or $a->[2] <=> $b->[2] }
+			map [$_, scalar(my @parents = $_->parents), ++$i],
+			@_
+		),
+		q[ undef ],
 	);
 }
 
@@ -902,6 +920,27 @@ don't compile it over and over. C<state> variables (in Perl >= 5.10)
 are good for this. (Same sort of idea as L<Type::Params>.)
 
 This function is not exported by default.
+
+=item C<< my $coderef = classifier(@types) >>
+
+Returns a coderef that can be used to classify values according to their
+type constraint. The coderef, when passed a value, returns a type
+constraint which the value satisfies.
+
+   use feature qw( say );
+   use Type::Utils qw( classifier );
+   use Types::Standard qw( Int Num Str Any );
+   
+   my $classifier = classifier(Str, Int, Num, Any);
+   
+   say $classifier->( "42"  )->name;   # Int
+   say $classifier->( "4.2" )->name;   # Num
+   say $classifier->( []    )->name;   # Any
+
+Note that, for example, "42" satisfies Int, but it would satisfy the
+type constraints Num, Str, and Any as well. In this case, the
+classifier has picked the most specific type constraint that "42"
+satisfies.
 
 =item C<< dwim_type($string, %options) >>
 
