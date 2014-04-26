@@ -4,7 +4,7 @@
 
 =head1 PURPOSE
 
-This example expands upon the Types::Datetime library defined in
+This example expands upon the Example::Types library defined in
 L<Type::Tiny::Manual::Libraries>. It defines class types for L<DateTime>
 and L<DateTime::Duration> and some structured types for hashes that
 can be used to instantiate DateTime objects. It defines some coercions
@@ -37,7 +37,7 @@ use warnings;
 use lib "lib", "../lib";
 
 BEGIN {
-	package Types::Datetime;
+	package Example::Types;
 	
 	use Type::Library
 		-base,
@@ -76,7 +76,7 @@ BEGIN {
 		from DatetimeHash, via { "DateTime"->new(%$_) },
 		from EpochHash,    via { "DateTime"->from_epoch(%$_) };
 	
-	$INC{"Types/Datetime.pm"} = __FILE__;
+	$INC{"Example/Types.pm"} = __FILE__;
 };
 
 BEGIN {
@@ -84,7 +84,7 @@ BEGIN {
 	
 	use Moose;
 	use Types::Standard qw( Str Int Num );
-	use Types::Datetime qw( Datetime Duration );
+	use Example::Types qw( Datetime Duration );
 	
 	has name => (
 		is       => "ro",
