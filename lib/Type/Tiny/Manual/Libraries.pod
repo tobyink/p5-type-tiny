@@ -153,6 +153,8 @@ Use a custom types library just like you would L<Types::Standard>:
      coerce  => 1,
    );
 
+See L<Type::Tiny::Manual> for other ways to make use of type libraries.
+
 =head1 ADVANCED TOPICS
 
 =head2 Messages
