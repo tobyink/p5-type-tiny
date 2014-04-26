@@ -297,6 +297,24 @@ my $_hash = $meta->add_type({
 	inline_generator     => LazyLoad(HashRef => 'inline_generator'),
 	deep_explanation     => LazyLoad(HashRef => 'deep_explanation'),
 	coercion_generator   => LazyLoad(HashRef => 'coercion_generator'),
+	my_methods => {
+		hashref_allows_key => sub {
+			my $self = shift;
+			Str()->check($_[0]);
+		},
+		hashref_allows_value => sub {
+			my $self = shift;
+			my ($key, $value) = @_;
+			
+			return !!0 unless $self->my_hashref_allows_key($key);
+			return !!1 if $self==HashRef();
+			
+			my $href  = $self->find_parent(sub { $_->has_parent && $_->parent==HashRef() });
+			my $param = $href->type_parameter;
+			
+			Str()->check($key) and $param->check($value);
+		},
+	},
 });
 
 $meta->add_type({
@@ -372,6 +390,32 @@ my $_map = $meta->add_type({
 	inline_generator     => LazyLoad(Map => 'inline_generator'),
 	deep_explanation     => LazyLoad(Map => 'deep_explanation'),
 	coercion_generator   => LazyLoad(Map => 'coercion_generator'),
+	my_methods => {
+		hashref_allows_key => sub {
+			my $self = shift;
+			my ($key) = @_;
+			
+			return Str()->check($key) if $self==Map();
+			
+			my $map = $self->find_parent(sub { $_->has_parent && $_->parent==Map() });
+			my ($kcheck, $vcheck) = @{ $map->parameters };
+			
+			($kcheck or Any())->check($key);
+		},
+		hashref_allows_value => sub {
+			my $self = shift;
+			my ($key, $value) = @_;
+			
+			return !!0 unless $self->my_hashref_allows_key($key);
+			return !!1 if $self==Map();
+			
+			my $map = $self->find_parent(sub { $_->has_parent && $_->parent==Map() });
+			my ($kcheck, $vcheck) = @{ $map->parameters };
+			
+			($kcheck or Any())->check($key)
+				and ($vcheck or Any())->check($value);
+		},
+	},
 });
 
 my $_Optional = $meta->add_type({
@@ -447,6 +491,82 @@ $meta->add_type({
 	inline_generator     => LazyLoad(Dict => 'inline_generator'),
 	deep_explanation     => LazyLoad(Dict => 'deep_explanation'),
 	coercion_generator   => LazyLoad(Dict => 'coercion_generator'),
+	my_methods => {
+		dict_is_slurpy => sub
+		{
+			my $self = shift;
+			
+			return !!0 if $self==Dict();
+			
+			my $dict = $self->find_parent(sub { $_->has_parent && $_->parent==Dict() });
+			ref($dict->parameters->[-1]) eq q(HASH)
+				? $dict->parameters->[-1]{slurpy}
+				: !!0
+		},
+		hashref_allows_key => sub
+		{
+			my $self = shift;
+			my ($key) = @_;
+			
+			return Str()->check($key) if $self==Dict();
+			
+			my $dict = $self->find_parent(sub { $_->has_parent && $_->parent==Dict() });
+			my %params;
+			my $slurpy = $dict->my_dict_is_slurpy;
+			if ($slurpy)
+			{
+				my @args = @{$dict->parameters};
+				pop @args;
+				%params = @args;
+			}
+			else
+			{
+				%params = @{ $dict->parameters }
+			}
+			
+			return !!1
+				if exists($params{$key});
+			return !!0
+				if !$slurpy;
+			return Str()->check($key)
+				if $slurpy==Any() || $slurpy==Item() || $slurpy==Defined() || $slurpy==Ref();
+			return $slurpy->my_hashref_allows_key($key)
+				if $slurpy->is_a_type_of(HashRef());
+			return !!0;
+		},
+		hashref_allows_value => sub
+		{
+			my $self = shift;
+			my ($key, $value) = @_;
+			
+			return !!0 unless $self->my_hashref_allows_key($key);
+			return !!1 if $self==Dict();
+			
+			my $dict = $self->find_parent(sub { $_->has_parent && $_->parent==Dict() });
+			my %params;
+			my $slurpy = $dict->my_dict_is_slurpy;
+			if ($slurpy)
+			{
+				my @args = @{$dict->parameters};
+				pop @args;
+				%params = @args;
+			}
+			else
+			{
+				%params = @{ $dict->parameters }
+			}
+			
+			return !!1
+				if exists($params{$key}) && $params{$key}->check($value);
+			return !!0
+				if !$slurpy;
+			return !!1
+				if $slurpy==Any() || $slurpy==Item() || $slurpy==Defined() || $slurpy==Ref();
+			return $slurpy->my_hashref_allows_value($key, $value)
+				if $slurpy->is_a_type_of(HashRef());
+			return !!0;
+		},
+	},
 });
 
 use overload ();

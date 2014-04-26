@@ -162,5 +162,100 @@ should_fail({ foo => 4.2, bar => 6.66, baz => "x" }, $gazetteer);
 should_fail({ foo => undef, baz => "x" }, $gazetteer);
 should_fail({ baz => "x" }, $gazetteer);
 
+subtest my_dict_is_slurpy => sub
+{
+	ok(!$struct5->my_dict_is_slurpy, 'On a non-slurpy Dict');
+	ok($gazetteer->my_dict_is_slurpy, 'On a slurpy Dict');
+	ok(!$struct5->create_child_type->my_dict_is_slurpy, 'On a child of a non-slurpy Dict');
+	ok($gazetteer->create_child_type->my_dict_is_slurpy, 'On a child of a slurpy Dict');
+};
+
+subtest my_hashref_allows_key => sub
+{
+	ok(HashRef->my_hashref_allows_key('foo'), 'HashRef allows key "foo"');
+	ok(!HashRef->my_hashref_allows_key(undef), 'HashRef disallows key undef');
+	ok(!HashRef->my_hashref_allows_key([]), 'HashRef disallows key []');
+	ok((HashRef[Int])->my_hashref_allows_key('foo'), 'HashRef[Int] allows key "foo"');
+	ok(!(HashRef[Int])->my_hashref_allows_key(undef), 'HashRef[Int] disallows key undef');
+	ok(!(HashRef[Int])->my_hashref_allows_key([]), 'HashRef[Int] disallows key []');
+	ok(Map->my_hashref_allows_key('foo'), 'Map allows key "foo"');
+	ok(!Map->my_hashref_allows_key(undef), 'Map disallows key undef');
+	ok(!Map->my_hashref_allows_key([]), 'Map disallows key []');
+	ok(!(Map[Int,Int])->my_hashref_allows_key('foo'), 'Map[Int,Int] disallows key "foo"');
+	ok(!(Map[Int,Int])->my_hashref_allows_key(undef), 'Map[Int,Int] disallows key undef');
+	ok(!(Map[Int,Int])->my_hashref_allows_key([]), 'Map[Int,Int] disallows key []');
+	ok((Map[Int,Int])->my_hashref_allows_key('42'), 'Map[Int,Int] allows key "42"');
+	ok(Dict->my_hashref_allows_key('foo'), 'Dict allows key "foo"');
+	ok(!Dict->my_hashref_allows_key(undef), 'Dict disallows key undef');
+	ok(!Dict->my_hashref_allows_key([]), 'Dict disallows key []');
+	ok(!(Dict[])->my_hashref_allows_key('foo'), 'Dict[] disallows key "foo"');
+	ok(!(Dict[])->my_hashref_allows_key(undef), 'Dict[] disallows key undef');
+	ok(!(Dict[])->my_hashref_allows_key([]), 'Dict[] disallows key []');
+	ok(!(Dict[bar=>Int])->my_hashref_allows_key('foo'), 'Dict[bar=>Int] disallows key "foo"');
+	ok((Dict[bar=>Int])->my_hashref_allows_key('bar'), 'Dict[bar=>Int] allows key "bar"');
+	ok(!(Dict[bar=>Int])->my_hashref_allows_key(undef), 'Dict[bar=>Int] disallows key undef');
+	ok(!(Dict[bar=>Int])->my_hashref_allows_key([]), 'Dict[bar=>Int] disallows key []');
+	ok((Dict[bar=>Int, slurpy Any])->my_hashref_allows_key('foo'), 'Dict[bar=>Int,slurpy Any] allows key "foo"');
+	ok((Dict[bar=>Int, slurpy Any])->my_hashref_allows_key('bar'), 'Dict[bar=>Int,slurpy Any] allows key "bar"');
+	ok(!(Dict[bar=>Int, slurpy Any])->my_hashref_allows_key(undef), 'Dict[bar=>Int,slurpy Any] disallows key undef');
+	ok(!(Dict[bar=>Int, slurpy Any])->my_hashref_allows_key([]), 'Dict[bar=>Int,slurpy Any] disallows key []');
+	ok((Dict[bar=>Int, slurpy Ref])->my_hashref_allows_key('foo'), 'Dict[bar=>Int,slurpy Ref] allows key "foo"');
+	ok((Dict[bar=>Int, slurpy Ref])->my_hashref_allows_key('bar'), 'Dict[bar=>Int,slurpy Ref] allows key "bar"');
+	ok(!(Dict[bar=>Int, slurpy Ref])->my_hashref_allows_key(undef), 'Dict[bar=>Int,slurpy Ref] disallows key undef');
+	ok(!(Dict[bar=>Int, slurpy Ref])->my_hashref_allows_key([]), 'Dict[bar=>Int,slurpy Ref] disallows key []');
+	ok(!(Dict[bar=>Int, slurpy Map[Int,Int]])->my_hashref_allows_key('foo'), 'Dict[bar=>Int,slurpy Map[Int,Int]] disallows key "foo"');
+	ok((Dict[bar=>Int, slurpy Map[Int,Int]])->my_hashref_allows_key('bar'), 'Dict[bar=>Int,slurpy Map[Int,Int]] allows key "bar"');
+	ok(!(Dict[bar=>Int, slurpy Map[Int,Int]])->my_hashref_allows_key(undef), 'Dict[bar=>Int,slurpy Map[Int,Int]] disallows key undef');
+	ok(!(Dict[bar=>Int, slurpy Map[Int,Int]])->my_hashref_allows_key([]), 'Dict[bar=>Int,slurpy Map[Int,Int]] disallows key []');
+	ok((Dict[bar=>Int, slurpy Map[Int,Int]])->my_hashref_allows_key('42'), 'Dict[bar=>Int,slurpy Map[Int,Int]] allows key "42"');
+	ok(HashRef->create_child_type->my_hashref_allows_key('foo'), 'A child of HashRef allows key "foo"');
+	ok(!HashRef->create_child_type->my_hashref_allows_key(undef), 'A child of HashRef disallows key undef');
+	ok(!HashRef->create_child_type->my_hashref_allows_key([]), 'A child of HashRef disallows key []');
+	ok((HashRef[Int])->create_child_type->my_hashref_allows_key('foo'), 'A child of HashRef[Int] allows key "foo"');
+	ok(!(HashRef[Int])->create_child_type->my_hashref_allows_key(undef), 'A child of HashRef[Int] disallows key undef');
+	ok(!(HashRef[Int])->create_child_type->my_hashref_allows_key([]), 'A child of HashRef[Int] disallows key []');
+	ok(Map->create_child_type->my_hashref_allows_key('foo'), 'A child of Map allows key "foo"');
+	ok(!Map->create_child_type->my_hashref_allows_key(undef), 'A child of Map disallows key undef');
+	ok(!Map->create_child_type->my_hashref_allows_key([]), 'A child of Map disallows key []');
+	ok(!(Map[Int,Int])->create_child_type->my_hashref_allows_key('foo'), 'A child of Map[Int,Int] disallows key "foo"');
+	ok(!(Map[Int,Int])->create_child_type->my_hashref_allows_key(undef), 'A child of Map[Int,Int] disallows key undef');
+	ok(!(Map[Int,Int])->create_child_type->my_hashref_allows_key([]), 'A child of Map[Int,Int] disallows key []');
+	ok((Map[Int,Int])->create_child_type->my_hashref_allows_key('42'), 'A child of Map[Int,Int] allows key "42"');
+	ok(Dict->create_child_type->my_hashref_allows_key('foo'), 'A child of Dict allows key "foo"');
+	ok(!Dict->create_child_type->my_hashref_allows_key(undef), 'A child of Dict disallows key undef');
+	ok(!Dict->create_child_type->my_hashref_allows_key([]), 'A child of Dict disallows key []');
+	ok(!(Dict[])->create_child_type->my_hashref_allows_key('foo'), 'A child of Dict[] disallows key "foo"');
+	ok(!(Dict[])->create_child_type->my_hashref_allows_key(undef), 'A child of Dict[] disallows key undef');
+	ok(!(Dict[])->create_child_type->my_hashref_allows_key([]), 'A child of Dict[] disallows key []');
+	ok(!(Dict[bar=>Int])->create_child_type->my_hashref_allows_key('foo'), 'A child of Dict[bar=>Int] disallows key "foo"');
+	ok((Dict[bar=>Int])->create_child_type->my_hashref_allows_key('bar'), 'A child of Dict[bar=>Int] allows key "bar"');
+	ok(!(Dict[bar=>Int])->create_child_type->my_hashref_allows_key(undef), 'A child of Dict[bar=>Int] disallows key undef');
+	ok(!(Dict[bar=>Int])->create_child_type->my_hashref_allows_key([]), 'A child of Dict[bar=>Int] disallows key []');
+	ok((Dict[bar=>Int, slurpy Any])->create_child_type->my_hashref_allows_key('foo'), 'A child of Dict[bar=>Int,slurpy Any] allows key "foo"');
+	ok((Dict[bar=>Int, slurpy Any])->create_child_type->my_hashref_allows_key('bar'), 'A child of Dict[bar=>Int,slurpy Any] allows key "bar"');
+	ok(!(Dict[bar=>Int, slurpy Any])->create_child_type->my_hashref_allows_key(undef), 'A child of Dict[bar=>Int,slurpy Any] disallows key undef');
+	ok(!(Dict[bar=>Int, slurpy Any])->create_child_type->my_hashref_allows_key([]), 'A child of Dict[bar=>Int,slurpy Any] disallows key []');
+	ok((Dict[bar=>Int, slurpy Ref])->create_child_type->my_hashref_allows_key('foo'), 'A child of Dict[bar=>Int,slurpy Ref] allows key "foo"');
+	ok((Dict[bar=>Int, slurpy Ref])->create_child_type->my_hashref_allows_key('bar'), 'A child of Dict[bar=>Int,slurpy Ref] allows key "bar"');
+	ok(!(Dict[bar=>Int, slurpy Ref])->create_child_type->my_hashref_allows_key(undef), 'A child of Dict[bar=>Int,slurpy Ref] disallows key undef');
+	ok(!(Dict[bar=>Int, slurpy Ref])->create_child_type->my_hashref_allows_key([]), 'A child of Dict[bar=>Int,slurpy Ref] disallows key []');
+	ok(!(Dict[bar=>Int, slurpy Map[Int,Int]])->create_child_type->my_hashref_allows_key('foo'), 'A child of Dict[bar=>Int,slurpy Map[Int,Int]] disallows key "foo"');
+	ok((Dict[bar=>Int, slurpy Map[Int,Int]])->create_child_type->my_hashref_allows_key('bar'), 'A child of Dict[bar=>Int,slurpy Map[Int,Int]] allows key "bar"');
+	ok(!(Dict[bar=>Int, slurpy Map[Int,Int]])->create_child_type->my_hashref_allows_key(undef), 'A child of Dict[bar=>Int,slurpy Map[Int,Int]] disallows key undef');
+	ok(!(Dict[bar=>Int, slurpy Map[Int,Int]])->create_child_type->my_hashref_allows_key([]), 'A child of Dict[bar=>Int,slurpy Map[Int,Int]] disallows key []');
+	ok((Dict[bar=>Int, slurpy Map[Int,Int]])->create_child_type->my_hashref_allows_key('42'), 'A child of Dict[bar=>Int,slurpy Map[Int,Int]] allows key "42"');
+};
+
+# This could probably be expanded...
+subtest my_hashref_allows_value => sub
+{
+	ok(HashRef->my_hashref_allows_value(foo => "bar"), 'HashRef allows key "foo" with value "bar"');
+	ok(HashRef->my_hashref_allows_value(foo => undef), 'HashRef allows key "foo" with value undef');
+	ok(!HashRef->my_hashref_allows_value(undef, "bar"), 'HashRef disallows key undef with value "bar"');
+	ok(!(HashRef[Int])->my_hashref_allows_value(foo => "bar"), 'HashRef[Int] disallows key "foo" with value "bar"');
+	ok((Dict[bar=>Int, slurpy Map[Int,Int]])->create_child_type->my_hashref_allows_value(bar => 42), 'A child of Dict[bar=>Int,slurpy Map[Int,Int]] allows key "bar" with value 42');
+	ok((Dict[bar=>Int, slurpy Map[Int,Int]])->create_child_type->my_hashref_allows_value(21, 42), 'A child of Dict[bar=>Int,slurpy Map[Int,Int]] allows key "21" with value 42');
+	ok(!(Dict[bar=>Int, slurpy Map[Int,Int]])->create_child_type->my_hashref_allows_value(baz => 42), 'A child of Dict[bar=>Int,slurpy Map[Int,Int]] disallows key "baz" with value 42');
+};
 
 done_testing;

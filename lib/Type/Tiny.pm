@@ -180,6 +180,17 @@ sub new
 	
 	$self->{type_constraints} ||= undef;
 	
+	if ($params{my_methods} and eval { require Sub::Name })
+	{
+		for my $key (keys %{$params{my_methods}})
+		{
+			Sub::Name::subname(
+				sprintf("%s::my_%s", $self->qualified_name, $key),
+				$params{my_methods}{$key},
+			);
+		}
+	}
+	
 	return $self;
 }
 
