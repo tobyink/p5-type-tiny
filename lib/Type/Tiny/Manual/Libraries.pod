@@ -138,6 +138,24 @@ These are simply coderefs that will be fired when you want a Datetime,
 but are given something else. For more information on coercions, see
 L<Type::Tiny::Manual::Coercions>.
 
+=head1 USING YOUR LIBRARY
+
+Use a custom types library just like you would L<Types::Standard>:
+
+   packge MyClass;
+   use Moose;
+   use DateTime;
+   use Types::Datetime qw( Datetime ); # must import the custom type
+                                       # NOTE type spelling Datetime
+                                       # is different than
+                                       # class spelling DateTime
+   has 'sometime' => (
+     is => 'rw',
+     isa => Datetime,
+     coerce => 1,
+   );
+
+
 =head1 ADVANCED TOPICS
 
 =head2 Messages
