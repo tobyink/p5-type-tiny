@@ -111,7 +111,7 @@ is($external, 42, 'closing over variables really really really works!');
 			push @store, $_[0];
 			$self->SUPER::STORE(@_);
 		}
-		sub my_method { 42 }
+		sub method_of_mine { 42 }
 	}
 	
 	tie(my($var), 'MyTie');
@@ -119,7 +119,7 @@ is($external, 42, 'closing over variables really really really works!');
 	$var = 1;
 	
 	my $closure = eval_closure(
-		source       => 'sub { $xxx = $_[0]; tied($xxx)->my_method }',
+		source       => 'sub { $xxx = $_[0]; tied($xxx)->method_of_mine }',
 		environment  => { '$xxx' => \$var },
 		alias        => 1,
 	);
@@ -133,7 +133,7 @@ is($external, 42, 'closing over variables really really really works!');
 		alias        => 1,
 	);
 	
-	ok( $nother_closure->('my_method'), '... can');
+	ok( $nother_closure->('method_of_mine'), '... can');
 	ok(!$nother_closure->('your_method'), '... !can');
 
 	is_deeply(
@@ -145,7 +145,7 @@ is($external, 42, 'closing over variables really really really works!');
 	{
 		package OtherTie;
 		our @ISA = 'MyTie';
-		sub my_method { 666 }
+		sub method_of_mine { 666 }
 	}
 	
 	tie($var, 'OtherTie');
@@ -153,7 +153,7 @@ is($external, 42, 'closing over variables really really really works!');
 
 	untie($var);
 	my $e = exception { $closure->(5) };
-	like($e, qr{^Can't call method "my_method" on an undefined value}, '... can be untied');
+	like($e, qr{^Can't call method "method_of_mine" on an undefined value}, '... can be untied');
 }
 
 my $e = exception { eval_closure(source => 'sub { 1 ]') };

@@ -9,8 +9,11 @@ BEGIN {
 {
 	my $hlv;
 	sub HAS_LEXICAL_VARS () {
-		$hlv = !! eval { require Devel::LexAlias } unless defined $hlv;
-		return $hlv;
+		$hlv = !! eval {
+			require Devel::LexAlias;
+			exists(&Devel::LexAlias::lexalias);
+		} unless defined $hlv;
+		$hlv;
 	}
 }
 
