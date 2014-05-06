@@ -71,6 +71,9 @@ cpan:SKAUFMAN
 cpan:JRMASH
 	:name "Jason R Mash".
 
+cpan:KARMAN
+	:name "Peter Karman".
+
 # We bundle some files made by these dudes...
 
 cpan:RJBS

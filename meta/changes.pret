@@ -1684,3 +1684,21 @@
 		item "Type::Tiny now has a find_parent method."^^Addition;
 	].
 
+`Type-Tiny 0.043_03 cpan:TOBYINK`
+	issued  2014-05-06;
+	changeset [
+		dcs:versus `Type-Tiny 0.043_02 cpan:TOBYINK`;
+		item "Type::Utils::classifier"^^Addition;
+		item [
+			a dcs:Documentation;
+			label "Type::Tiny::Manual::Libraries add example of using the custom types library.";
+			dcs:blame cpan:KARMAN;
+		];
+		item "Rename Types::Datetime to Example::Types because there is now really a Types::DateTime on CPAN."^^Documentation;
+		item "Extremely experimental and mostly undocumented my_method stuff."^^Addition;
+		item "Improve Eval::TypeTiny test cases."^^Tests;
+		item "Updated bundled version of Try::Tiny."^^Packaging;
+		item "Tests for Type::Library error messages."^^Tests;
+		item "Add some test cases for the Error::TypeTiny class."^^Tests;
+	].
+
