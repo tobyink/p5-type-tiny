@@ -431,7 +431,7 @@ sub compile_match_on_type
 		}
 	}
 	
-	push @code, 'else', '  { Type::Util::_croak("No cases matched for %s", Type::Tiny::_dd($_[0])) }';
+	push @code, 'else', '  { Type::Utils::_croak("No cases matched for %s", Type::Tiny::_dd($_[0])) }';
 	
 	push @code, '}';  # /sub
 	
@@ -941,6 +941,9 @@ Note that, for example, "42" satisfies Int, but it would satisfy the
 type constraints Num, Str, and Any as well. In this case, the
 classifier has picked the most specific type constraint that "42"
 satisfies.
+
+If no type constraint is satisfied by the value, then the classifier
+will return undef.
 
 =item C<< dwim_type($string, %options) >>
 

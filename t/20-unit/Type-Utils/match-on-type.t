@@ -86,6 +86,20 @@ is(
 	'to_json_2 using match_on_type works',
 );
 
+my $compiled1 = compile_match_on_type(
+	HashRef()  => sub { 'HASH' },
+	ArrayRef() => sub { 'ARRAY' },
+);
+
+is(ref($compiled1), 'CODE', 'compile_match_on_type returns a coderef');
+is($compiled1->({}), 'HASH', '... correct result');
+is($compiled1->([]), 'ARRAY', '... correct result');
+like(
+	exception { $compiled1->(42) },
+	qr/^No cases matched for Value "?42"?/,
+	'... correct exception',
+);
+
 if ($ENV{EXTENDED_TESTING})
 {
 	require Benchmark;
