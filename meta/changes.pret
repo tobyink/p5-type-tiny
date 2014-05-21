@@ -1702,3 +1702,10 @@
 		item "Add some test cases for the Error::TypeTiny class."^^Tests;
 	].
 
+`Type-Tiny 0.043_04 cpan:TOBYINK`
+	issued  2014-05-21;
+	changeset [
+		dcs:versus `Type-Tiny 0.043_03 cpan:TOBYINK`;
+		item "Improve test cases for integration with Moose native attribute traits."^^Tests;
+	].
+
