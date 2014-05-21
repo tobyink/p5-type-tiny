@@ -1709,3 +1709,44 @@
 		item "Improve test cases for integration with Moose native attribute traits."^^Tests;
 	].
 
+`Type-Tiny 0.043_05 cpan:TOBYINK`
+	issued  2014-05-21;
+	changeset [
+		dcs:versus `Type-Tiny 0.043_04 cpan:TOBYINK`;
+		item [
+			a dcs:Tests;
+			label "Integration tests for MooseX::Getopt.";
+			dcs:blame cpan:ABRAXXA;
+		];
+		item [
+			a dcs:Bugfix;
+			label "Fix inflation of Type::Coercion objects to Moose::Meta::TypeCoercion when some of the coercion routines are given as strings.";
+			dcs:fixes [
+				a dbug:Issue;
+				label "Inflation of Type::Coercion objects to Moose::Meta::TypeCoercion is sometimes broken.";
+				dbug:reporter cpan:ABRAXXA;
+			];
+		];
+		item [
+			a dcs:Change;
+			label "No longer need to inflate a Type::Tiny object to Moose::Meta::TypeConstraint in order to give an answer to $type->isa('Moose::Meta::TypeConstraint::Union').";
+			comment "Inflation to Moose::Meta::TypeConstraint is a last resort.";
+		];
+		item [
+			a dcs:Change;
+			label "Detect missing comma in declaration of type constraints using Type::Utils a la `declare Foo as Bar`, and print a warning.";
+			dcs:thanks cpan:TIMB;
+		];
+		item [
+			a dcs:Documentation;
+			label "Document the is_*, to_*, and assert_* functions in Type::Tiny::Manual::Libraries.";
+			comment "They were already mentioned in Type::Library.";
+			dcs:thanks cpan:ABRAXXA;
+		];
+		item [
+			a dcs:Documentation;
+			label "Mention coercion=>1 and why it is useful in Type::Tiny::Manual::Coercions.";
+			comment "It was already mentioned in Type::Tiny.";
+			dcs:thanks cpan:ABRAXXA;
+		];
+	].
