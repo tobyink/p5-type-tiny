@@ -998,9 +998,10 @@ sub isa
 	
 	if ($INC{"Moose.pm"} and ref($self))
 	{
-		return !!1                       if $_[0] eq 'Moose::Meta::TypeConstraint';
-		return $self->is_parameterized   if $_[0] eq 'Moose::Meta::TypeConstraint::Parameterized';
-		return $self->is_parameterizable if $_[0] eq 'Moose::Meta::TypeConstraint::Parameterizable';
+		return !!1                             if $_[0] eq 'Moose::Meta::TypeConstraint';
+		return $self->is_parameterized         if $_[0] eq 'Moose::Meta::TypeConstraint::Parameterized';
+		return $self->is_parameterizable       if $_[0] eq 'Moose::Meta::TypeConstraint::Parameterizable';
+		return $self->isa('Type::Tiny::Union') if $_[0] eq 'Moose::Meta::TypeConstraint::Union';
 	}
 	
 	if ($INC{"Moose.pm"} and ref($self) and $_[0] =~ /^Moose/ and my $r = $self->moose_type->isa(@_))
