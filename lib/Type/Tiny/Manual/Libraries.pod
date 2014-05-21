@@ -138,7 +138,7 @@ These are simply coderefs that will be fired when you want a Datetime,
 but are given something else. For more information on coercions, see
 L<Type::Tiny::Manual::Coercions>.
 
-=head1 USING YOUR LIBRARY
+=head2 Using Your Library
 
 Use a custom types library just like you would L<Types::Standard>:
 
@@ -152,6 +152,42 @@ Use a custom types library just like you would L<Types::Standard>:
      isa     => Datetime,
      coerce  => 1,
    );
+
+Type libraries defined with L<Type::Library> are also able to export
+some convenience functions:
+
+   use Example::Types qw( is_Datetime to_Datetime assert_Datetime );
+   
+   my $dt = Foo::get_datetime;
+   
+   unless ( is_Datetime $dt )
+   {
+      $dt = to_Datetime $dt;
+   }
+   
+   assert_Datetime $dt;
+
+These functions act as shortcuts for:
+
+   use Example::Types qw( Datetime );
+   
+   my $dt = Foo::get_datetime;
+   
+   unless ( Datetime->check($dt) )
+   {
+      $dt = Datetime->coerce($dt);
+   }
+   
+   Datetime->assert_return($dt);
+
+Pick whichever style you think is clearer!
+
+Type::Library-based libraries provide a shortcut for importing a type
+constraint along with all its associated convenience functions:
+
+   # Shortcut for qw( DateTime is_Datetime to_Datetime assert_Datetime )
+   #
+   use Example::Types qw( +Datetime );
 
 See L<Type::Tiny::Manual> for other ways to make use of type libraries.
 
