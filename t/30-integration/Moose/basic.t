@@ -33,6 +33,7 @@ use lib qw( ./lib ./t/lib ../inc ./inc );
 use Test::More;
 use Test::Requires { Moose => 2.0000 };
 use Test::Fatal;
+use Test::TypeTiny qw( matchfor );
 
 note "The basics";
 
@@ -51,8 +52,6 @@ is(
 	undef,
 	"some values that should pass their type constraint",
 );
-
-use Test::TypeTiny qw( matchfor );
 
 is(
 	exception { "Local::Class"->new(small => 100) },
@@ -220,95 +219,5 @@ is(
 	Scalar::Util::refaddr( $intersect->Types::TypeTiny::to_TypeTiny->moose_type->Types::TypeTiny::to_TypeTiny->moose_type->Types::TypeTiny::to_TypeTiny ),
 	'round-tripping between ->moose_type and ->Types::TypeTiny::to_TypeTiny preserves reference address'
 );
-
-note "Native attribute traits";
-
-{
-	package MyCollection;
-	use Moose;
-	use Types::Standard qw( ArrayRef Object );
-	has things => (
-		is      => 'ro',
-		isa     => ArrayRef[ Object ],
-		traits  => [ 'Array' ],
-		handles => { add => 'push' },
-	);
-}
-
-my $coll = MyCollection->new(things => []);
-
-ok(
-	!exception { $coll->add(bless {}, "Monkey") },
-	'pushing ok value',
-);
-
-is(
-	exception { $coll->add({})},
-	matchfor(
-		'Moose::Exception::ValidationFailedForInlineTypeConstraint',
-		qr{^A new member value for things does not pass its type constraint because:},
-	),
-	'pushing not ok value',
-);
-
-use Types::Standard -types;
-my %attributes = (
-	hashref      => HashRef,
-	hashref_int  => HashRef[Int],
-	map          => Map,
-	map_strint   => Map[Str, Int],
-);
-
-{
-	package MyHashes;
-	use Moose;
-	while (my ($attr, $type) = each %attributes)
-	{
-		has $attr => (
-			traits  => ['Hash'],
-			is      => 'ro',
-			isa     => $type,
-			handles => {
-				"$attr\_get" => 'get',
-				"$attr\_set" => 'set',
-				"$attr\_has" => 'exists',
-			},
-			default => sub { +{} },
-		);
-	}
-}
-
-for my $attr (sort keys %attributes)
-{
-	my $type      = $attributes{$attr};
-	my $getter    = "$attr\_get";
-	my $setter    = "$attr\_set";
-	my $predicate = "$attr\_has";
-	
-	subtest "Hash trait with type $type" => sub
-	{
-		my $obj = MyHashes->new;
-		is_deeply($obj->$attr, {}, 'default empty hash');
-		
-		$obj->$setter(foo => 666);
-		$obj->$setter(bar => 999);
-		is($obj->$getter('foo'), 666, 'getter');
-		is($obj->$getter('bar'), 999, 'getter');
-		$obj->$setter(bar => 42);
-		is($obj->$getter('bar'), 42, 'setter');
-		ok($obj->$predicate('foo'), 'predicate');
-		ok($obj->$predicate('bar'), 'predicate');
-		ok(!$obj->$predicate('baz'), 'predicate - negatory');
-		is_deeply($obj->$attr, { foo => 666, bar => 42 }, 'correct hash');
-		
-		like(
-			exception { $obj->$setter(baz => 3.141592) },
-			qr/type constraint/,
-			'cannot add non-Int value',
-		) if $attr =~ /int$/;
-		
-		done_testing;
-	};
-}
 
 done_testing;
