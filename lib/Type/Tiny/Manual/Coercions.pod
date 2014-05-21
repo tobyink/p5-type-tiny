@@ -206,6 +206,26 @@ C<Maybe>
 
 =back
 
+Imagine we're declaring a type library:
+
+   declare Paths, as ArrayRef[PathTiny];
+
+The C<PathTiny> type (declared earlier in the tutorial) has a coercion
+from C<Str>, so C<Paths> should be able to coerce from an arrayref of
+strings, right?
+
+B<< Wrong! >> C<< ArrayRef[PathTiny] >> can coerce from an arrayref of
+strings, but C<Paths> is a separate type constraint which, although it
+inherits from C<< ArrayRef[PathTiny] >> has its own (currently empty)
+set of coercions.
+
+Because that is often not what you want, Type::Tiny provides a shortcut
+when declaring a subtype to copy the parent type constraint's coercions:
+
+   declare Paths, as ArrayRef[PathTiny], coercion => 1;
+
+Now C<Paths> can coerce from an arrayref of strings.
+
 =head2 Chained Coercions
 
 Consider the following type library:
