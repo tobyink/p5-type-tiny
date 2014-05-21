@@ -404,7 +404,7 @@ sub _codelike_type_coercion_map
 		}
 		else
 		{
-			Eval::TypeTiny::eval_closure(
+			push @new, Eval::TypeTiny::eval_closure(
 				source      => sprintf('sub { local $_ = $_[0]; %s }', $converter),
 				description => sprintf("temporary compiled converter from '%s'", $type),
 			);
