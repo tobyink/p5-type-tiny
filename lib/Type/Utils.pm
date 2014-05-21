@@ -90,6 +90,11 @@ sub declare
 	if (@_ % 2 == 0)
 	{
 		%opts = @_;
+		if (@_==2 and $_[0]=~ /^_*[A-Z]/ and $_[1] =~ /^[0-9]+$/)
+		{
+			require Carp;
+			Carp::carp("Possible missing comma after 'declare $_[0]'");
+		}
 	}
 	else
 	{
