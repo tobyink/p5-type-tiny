@@ -1750,3 +1750,11 @@
 			dcs:thanks cpan:ABRAXXA;
 		];
 	].
+
+`Type-Tiny 0.044 cpan:TOBYINK`
+	issued  2014-06-03;
+	changeset [
+		dcs:versus `Type-Tiny 0.043_05 cpan:TOBYINK`;
+		item "Updated NEWS file."^^Documentation;
+	].
+
