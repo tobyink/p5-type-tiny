@@ -852,12 +852,17 @@ sub _build_moose_type
 	}
 	else
 	{
+		my $wrapped_inlined = sub {
+			shift;
+			$self->inline_check(@_);
+		};
+		
 		my %opts;
 		$opts{name}       = $self->qualified_name     if $self->has_library && !$self->is_anon;
 		$opts{parent}     = $self->parent->moose_type if $self->has_parent;
 		$opts{constraint} = $self->constraint         unless $self->_is_null_constraint;
 		$opts{message}    = $self->message            if $self->has_message;
-		$opts{inlined}    = $self->inlined            if $self->has_inlined;
+		$opts{inlined}    = $wrapped_inlined          if $self->has_inlined;
 		
 		$r = $self->_instantiate_moose_type(%opts);
 		$r->{"Types::TypeTiny::to_TypeTiny"} = $self;
