@@ -63,7 +63,7 @@
 		comment "Theoretically broken by changes to parameterization of Dict to allow it to accept a slurpy."@en;
 	];
 	deps:develop-suggestion [
-		deps:on "Dist::Inkt 0.007"^^deps:CpanId;
+		deps:on "Dist::Inkt::Profile::TOBYINK"^^deps:CpanId;
 		comment "This is used for building the release tarball."@en;
 	];
 .
