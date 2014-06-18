@@ -12,26 +12,31 @@ perl:
   - "blead"
 matrix:
   include:
-    - perl: 5.18.2
-      env: COVERAGE=1         # enables coverage+coveralls reporting
+    - perl: "5.18"
+      env:
+        - COVERAGE=1
+        - EXTENDED_TESTING=1
     - perl: "5.8.1"
+      env:
+        - EXTENDED_TESTING=1
       install:
-        - "cpanm -n Test::Requires Test::Fatal Test::LeakTrace"
-        - "cpanm Exporter::Tiny"
-        - "cpanm -n indirect multidimensional bareword::filehandles"
-        - "cpanm -n Moo"
+        - cpanm -n Test::Requires Test::Fatal Test::LeakTrace
+        - cpanm Exporter::Tiny
+        - cpanm -n indirect multidimensional bareword::filehandles
+        - cpanm -n Moo
     - perl: "5.6.2"
       install:
-        - "perl -Idevel.travis -MCPAN -e'install q(PEVANS/Scalar-List-Utils-1.35.tar.gz)'"
-        - "perl -Idevel.travis -MCPAN -e'install q(Text::Balanced)'"
-        - "perl -Idevel.travis -MCPAN -e'install q(MSCHWERN/ExtUtils-MakeMaker-6.56.tar.gz)'"
-        - "perl -Idevel.travis -MCPAN -e'install q(FERREIRA/Exporter-5.63.tar.gz)'"
-        - "perl -Idevel.travis -MCPAN -e'install q(Class::ISA)'"
-        - "perl -Idevel.travis -MCPAN -e'install q(Test::More)'"
-        - "perl -Idevel.travis -MCPAN -e'install q(Test::Harness)'"
-        - "perl -Idevel.travis -MCPAN -e'install q(Exporter::Tiny)'"
+        - export CPANCONFIG="$TRAVIS_BUILD_DIR/devel.travis"
+        - perl -I$CPANCONFIG -MCPAN -e'install q(PEVANS/Scalar-List-Utils-1.35.tar.gz)'
+        - perl -I$CPANCONFIG -MCPAN -e'install q(Text::Balanced)'
+        - perl -I$CPANCONFIG -MCPAN -e'install q(MSCHWERN/ExtUtils-MakeMaker-6.56.tar.gz)'
+        - perl -I$CPANCONFIG -MCPAN -e'install q(FERREIRA/Exporter-5.63.tar.gz)'
+        - perl -I$CPANCONFIG -MCPAN -e'install q(Class::ISA)'
+        - perl -I$CPANCONFIG -MCPAN -e'install q(Test::More)'
+        - perl -I$CPANCONFIG -MCPAN -e'install q(Test::Harness)'
+        - perl -I$CPANCONFIG -MCPAN -e'install q(Exporter::Tiny)'
       script:
-        - "HARNESS_IS_VERBOSE=1 perl /home/travis/perl5/perlbrew/perls/5.6.2/bin/prove -r -Ilib -Iinc t"
+        - perl /home/travis/perl5/perlbrew/perls/5.6.2/bin/prove -r -Ilib -Iinc t
 before_install:
   - export DIST_INKT_PROFILE="Dist::Inkt::Profile::TOBYINK"
   - git clone git://github.com/tobyink/perl-travis-helper
