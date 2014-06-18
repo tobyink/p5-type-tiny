@@ -1,16 +1,19 @@
 language: perl
 perl:
-  - "5.19"
-  - "5.18.1_thr"
-  - "5.18"
-  - "5.16"
-  - "5.14"
-  - "5.12"
+  - "5.8.9"
+  - "5.8.9_thr"
   - "5.10"
-env:
-  - EXTENDED_TESTING=1
+  - "5.12"
+  - "5.14"
+  - "5.16"
+  - "5.18"
+  - "5.20.0"
+  - "5.20.0_thr"
+  - "blead"
 matrix:
   include:
+    - perl: 5.18.2
+      env: COVERAGE=1         # enables coverage+coveralls reporting
     - perl: "5.8.1"
       install:
         - "cpanm -n Test::Requires Test::Fatal Test::LeakTrace"
@@ -30,22 +33,19 @@ matrix:
       script:
         - "HARNESS_IS_VERBOSE=1 perl /home/travis/perl5/perlbrew/perls/5.6.2/bin/prove -r -Ilib -Iinc t"
 before_install:
-  - "source devel.travis/travis-perlbrew"
-  - "perlbrew install-cpanm -f"
-  - "perl -V"
+  - export DIST_INKT_PROFILE="Dist::Inkt::Profile::TOBYINK"
+  - git clone git://github.com/tobyink/perl-travis-helper
+  - source perl-travis-helper/init
+  - build-perl
+  - perl -V
+  - build-dist
+  - cd $BUILD_DIR             # $BUILD_DIR is set by the build-dist command
 install:
-  - "cpanm -n Test::Requires Test::Fatal Test::LeakTrace"
-  - "cpanm Exporter::Tiny"
-  - "cpanm -n indirect multidimensional bareword::filehandles"
-  - "cpanm -n Moose MooseX::Types::Common"
-  - "cpanm -n Mouse MouseX::Types"
-  - "cpanm -n Moo"
-  - "cpanm -n Class::InsideOut"
-  - "cpanm -n match::simple"
+  - cpan-install --deps       # installs prereqs, including recommends
+  - cpan-install --coverage   # installs converage prereqs, if enabled
+before_script:
+  - coverage-setup
 script:
-  - "HARNESS_IS_VERBOSE=1 prove -r -Ilib t"
-notifications:
-  irc:
-    channels:
-      - "irc.perl.org#moops"
-    on_success: change
+  - prove -l -j$((SYSTEM_CORES + 1)) $(test-dirs)   # parallel testing
+after_success:
+  - coverage-report
