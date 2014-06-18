@@ -145,7 +145,9 @@ sub compile
 		{
 			push @code, sprintf(
 				'(%s) or Type::Tiny::_failed_check(%d, %s, %s, varname => %s);',
-				$constraint->inline_check($varname),
+				$is_optional && $constraint->type_parameter
+					? $constraint->type_parameter->inline_check($varname)
+					: $constraint->inline_check($varname),
 				$constraint->{uniq},
 				B::perlstring($constraint),
 				$varname,
@@ -154,7 +156,9 @@ sub compile
 		}
 		else
 		{
-			$env{'@check'}[$arg] = $constraint->compiled_check;
+			$env{'@check'}[$arg] = $is_optional && $constraint->type_parameter
+				? $constraint->type_parameter->compiled_check
+				: $constraint->compiled_check;
 			push @code, sprintf(
 				'%s or Type::Tiny::_failed_check(%d, %s, %s, varname => %s);',
 				sprintf(sprintf '$check[%d]->(%s)', $arg, $varname),

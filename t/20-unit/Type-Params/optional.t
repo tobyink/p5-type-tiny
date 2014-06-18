@@ -72,5 +72,10 @@ like(
 	qr{^Wrong number of parameters; got 0; expected 1 to 3},
 );
 
+like(
+	exception { $chk->(1, 2, undef) },
+	qr{^Undef did not pass type constraint},
+);
+
 done_testing;
 
