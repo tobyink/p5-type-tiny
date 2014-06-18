@@ -13,12 +13,9 @@ perl:
 matrix:
   include:
     - perl: "5.18"
-      env:
-        - COVERAGE=1
-        - EXTENDED_TESTING=1
+      env: EXTENDED_TESTING=1 COVERAGE=1
     - perl: "5.8.1"
-      env:
-        - EXTENDED_TESTING=1
+      env: EXTENDED_TESTING=1
       install:
         - cpanm -n Test::Requires Test::Fatal Test::LeakTrace
         - cpanm Exporter::Tiny
@@ -54,3 +51,8 @@ script:
   - prove -r -Ilib -Iinc -$(test-dirs)
 after_success:
   - coverage-report
+notifications:
+  irc:
+    channels:
+      - "irc.perl.org#moops"
+    on_success: change
