@@ -6,7 +6,7 @@
 
 Check type constraint inlining works with L<Moose> in strange edge
 cases where we need to inflate Type::Tiny constraints into full
-L<MooseX::Meta::TypeConstraint> objects.
+L<Moose::Meta::TypeConstraint> objects.
 
 =head1 DEPENDENCIES
 

@@ -138,6 +138,7 @@ m`Types::Standard Type-Tiny`
 [] a :IntegrationTest; :test_script f`t/30-integration/Moose/accept-moose-types.t Type-Tiny`; :purpose "Check that Moose type constraints can be passed into the Type::Tiny API where a Type::Tiny constraint might usually be expected.".
 [] a :IntegrationTest; :test_script f`t/30-integration/Moose/basic.t Type-Tiny`; :purpose "Check type constraints work with Moose. Checks values that should pass and should fail; checks error messages.".
 [] a :IntegrationTest; :test_script f`t/30-integration/Moose/coercion.t Type-Tiny`; :purpose "Check coercions work with Moose; both mutable and immutable classes.".
+[] a :IntegrationTest; :test_script f`t/30-integration/Moose/inflate-then-inline.t Type-Tiny`; :purpose "Check type constraint inlining works with Moose in strange edge cases where we need to inflate Type::Tiny constraints into full Moose::Meta::TypeConstraint objects.".
 [] a :IntegrationTest; :test_script f`t/30-integration/Moose/native-attribute-traits.t Type-Tiny`; :purpose "Check type constraints and coercions work with Moose native attibute traits.".
 [] a :IntegrationTest; :test_script f`t/30-integration/MooseX-Getopt/coercion.t Type-Tiny`; :purpose "Check coercions work with MooseX::Getopt; both mutable and immutable classes.".
 [] a :IntegrationTest; :test_script f`t/30-integration/MooseX-Types/basic.t Type-Tiny`; :purpose "Complex checks between Type::Tiny and MooseX::Types.".
