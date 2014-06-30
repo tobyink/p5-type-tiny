@@ -1758,3 +1758,20 @@
 		item "Updated NEWS file."^^Documentation;
 	].
 
+`Type-Tiny 0.045_01 cpan:TOBYINK`
+	issued  2014-06-30;
+	changeset [
+		dcs:versus `Type-Tiny 0.044 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix;
+			label "Ensure that when a Type::Tiny object is inflated into a Moose::Meta::TypeConstraint, inlining still happens via Type::Tiny.";
+			comment "This was causing some obscure problems with MooseX::Getopt.";
+			dcs:thanks [ a foaf:Person; foaf:nick "omega" ];
+		];
+		item [
+			a dcs:Bugfix;
+			label "Workaround strange behaviour of exists() function when applied to @_ on Perl older than 5.20 which caused some uses of Optional[Foo] to accept an explicit undef.";
+			dcs:thanks cpan:XENO;
+		];
+	].
+

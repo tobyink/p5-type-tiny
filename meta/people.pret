@@ -77,6 +77,9 @@ cpan:KARMAN
 cpan:ABRAXXA
 	:name "Alexander Hartmaier".
 
+cpan:XENO
+	:name "Caleb Cushing".
+
 # We bundle some files made by these dudes...
 
 cpan:RJBS
