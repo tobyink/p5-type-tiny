@@ -164,9 +164,10 @@ is_deeply(
 
 TODO: {
 	require Data::Dumper;
-	local $TODO = (Data::Dumper->VERSION > 2.145)
-		? "Data::Dumper output changed after 2.145"
-		: undef;
+	local $TODO =
+		(Data::Dumper->VERSION > 2.145) ? "Data::Dumper output changed after 2.145" :
+		(Data::Dumper->VERSION < 2.121) ? "Data::Dumper too old" :
+		undef;
 	
 	is_deeply(
 		(exception { (Map[Int,Num])->({1=>1.1,2.2=>2.3,3.3=>3.4}) })->explain,
@@ -206,9 +207,10 @@ is_deeply(
 );
 
 TODO: {
-	local $TODO = (Data::Dumper->VERSION > 2.145)
-		? "Data::Dumper output changed after 2.145"
-		: undef;
+	local $TODO =
+		(Data::Dumper->VERSION > 2.145) ? "Data::Dumper output changed after 2.145" :
+		(Data::Dumper->VERSION < 2.121) ? "Data::Dumper too old" :
+		undef;
 	
 	is_deeply(
 		(exception { $SlurpyThing->([1.1, 2 => "Hello"]) })->explain,
