@@ -1,12 +1,13 @@
 language: perl
 perl:
+  - "5.6.1"
+  - "5.6.2"
   - "5.8.9"
   - "5.8.9_thr"
   - "5.10"
   - "5.12"
   - "5.14"
   - "5.16"
-  - "5.18"
   - "5.20.0"
   - "5.20.0_thr"
   - "blead"
@@ -21,30 +22,21 @@ matrix:
         - cpanm Exporter::Tiny
         - cpanm -n indirect multidimensional bareword::filehandles
         - cpanm -n Moo
-    - perl: "5.6.2"
-      install:
-        - export CPANCONFIG="$TRAVIS_BUILD_DIR/devel.travis"
-        - perl -I$CPANCONFIG -MCPAN -e'install q(PEVANS/Scalar-List-Utils-1.35.tar.gz)'
-        - perl -I$CPANCONFIG -MCPAN -e'install q(Text::Balanced)'
-        - perl -I$CPANCONFIG -MCPAN -e'install q(MSCHWERN/ExtUtils-MakeMaker-6.56.tar.gz)'
-        - perl -I$CPANCONFIG -MCPAN -e'install q(FERREIRA/Exporter-5.63.tar.gz)'
-        - perl -I$CPANCONFIG -MCPAN -e'install q(Class::ISA)'
-        - perl -I$CPANCONFIG -MCPAN -e'install q(Test::More)'
-        - perl -I$CPANCONFIG -MCPAN -e'install q(Test::Harness)'
-        - perl -I$CPANCONFIG -MCPAN -e'install q(Exporter::Tiny)'
-      script:
-        - perl /home/travis/perl5/perlbrew/perls/5.6.2/bin/prove -r -Ilib -Iinc t
+        - cpan-install --toolchain
+        - cpan-install --deps
+        - cpan-install --coverage
 before_install:
   - export DIST_INKT_PROFILE="Dist::Inkt::Profile::TOBYINK"
-  - git clone git://github.com/tobyink/perl-travis-helper
+  - git clone git://github.com/haarg/perl-travis-helper
   - source perl-travis-helper/init
   - build-perl
   - perl -V
   - build-dist
-  - cd $BUILD_DIR             # $BUILD_DIR is set by the build-dist command
+  - cd $BUILD_DIR
 install:
-  - cpan-install --deps       # installs prereqs, including recommends
-  - cpan-install --coverage   # installs converage prereqs, if enabled
+  - cpan-install --toolchain
+  - cpan-install --deps
+  - cpan-install --coverage
 before_script:
   - coverage-setup
 script:
