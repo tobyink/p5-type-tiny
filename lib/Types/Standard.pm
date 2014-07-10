@@ -1215,7 +1215,7 @@ things like "Inf".
 
 None of the types in this type library have any coercions by default.
 However some standalone coercions may be exported. These can be combined
-with type constraints using the C<< + >> operator.
+with type constraints using the C<< plus_coercions >> method.
 
 =over
 
@@ -1228,7 +1228,7 @@ usage in a Moose attribute:
    
    has options => (
       is     => "ro",
-      isa    => OptList + MkOpt,
+      isa    => OptList->plus_coercions( MkOpt ),
       coerce => 1,
    );
 
@@ -1240,7 +1240,7 @@ Split a string on a regexp.
    
    has name => (
       is     => "ro",
-      isa    => (ArrayRef[Str]) + (Split[qr/\s/]),
+      isa    => (ArrayRef[Str])->plus_coercions(Split[qr/\s/]),
       coerce => 1,
    );
 
@@ -1250,7 +1250,7 @@ Join an array of strings with a delimiter.
 
    use Types::Standard qw( Str Join );
    
-   my $FileLines = Str + Join["\n"];
+   my $FileLines = Str->plus_coercions(Join["\n"]);
    
    has file_contents => (
       is     => "ro",
