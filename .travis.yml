@@ -40,7 +40,7 @@ install:
 before_script:
   - coverage-setup
 script:
-  - prove -r -Ilib -Iinc -$(test-dirs)
+  - prove -r -Ilib -Iinc $(test-dirs)
 after_success:
   - coverage-report
 notifications:
