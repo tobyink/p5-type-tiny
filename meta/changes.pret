@@ -1775,3 +1775,16 @@
 		];
 	].
 
+`Type-Tiny 0.045_02 cpan:TOBYINK`
+	issued  2014-07-10;
+	changeset [
+		dcs:versus `Type-Tiny 0.045_01 cpan:TOBYINK`;
+		item "Include benchmark/example of Type::Params versus Scalar::Validation."^^Documentation;
+		item [
+			a dcs:Bugfix, dcs:Documentation;
+			label "Include benchmark/example of Type::Params versus Scalar::Validation.";
+			dcs:fixes RT#96379;
+			dcs:thanks cpan:DJERIUS;
+		];
+	].
+
