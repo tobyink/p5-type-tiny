@@ -107,8 +107,8 @@ note "Introspection, comparisons, conversions...";
 
 require Types::Standard;
 ok(
-	Types::Standard::Num->moose_type->equals(
-		Moose::Util::TypeConstraints::find_type_constraint("Num")
+	Types::Standard::ArrayRef->moose_type->equals(
+		Moose::Util::TypeConstraints::find_type_constraint("ArrayRef")
 	),
 	"equivalence between Types::Standard types and core Moose types",
 );
