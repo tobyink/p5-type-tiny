@@ -31,11 +31,11 @@ my $add_core_type;
 		
 		my $name = $typedef->{name};
 		
-		# Mouse's implementation of these three types differs enough from
+		# Mouse's implementation of these types differs enough from
 		# Type::Tiny and Moose to make their implementations not worthwhile.
 		# Type::Tiny::XS's implementation currently matches Mouse's, but
 		# will be brought closer to Type::Tiny's soon.
-		unless ($name eq 'RegexpRef' or $name eq 'Object' or $name eq 'Int')
+		unless ($name eq 'RegexpRef' or $name eq 'Int')
 		{
 			if ($INC{'Type/Tiny/XS.pm'})
 			{
