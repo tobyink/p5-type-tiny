@@ -22,6 +22,37 @@ our @EXPORT_OK = qw( slurpy );
 use Scalar::Util qw( blessed looks_like_number );
 use Types::TypeTiny ();
 
+my $add_core_type;
+{
+	$add_core_type = sub {
+		my $meta = shift;
+		my ($typedef) = @_;
+		$typedef->{_is_core} = 1;
+		
+		my $name = $typedef->{name};
+		
+		# Mouse's implementation of these three types differs enough from
+		# Type::Tiny and Moose to make their implementations not worthwhile.
+		# Type::Tiny::XS's implementation currently matches Mouse's, but
+		# will be brought closer to Type::Tiny's soon.
+		unless ($name eq 'RegexpRef' or $name eq 'Object' or $name eq 'Int')
+		{
+			if ($INC{'Type/Tiny/XS.pm'})
+			{
+				my $xsub = Type::Tiny::XS::get_coderef_for($name);
+				$typedef->{compiled_type_constraint} = $xsub if $xsub;
+			}
+			elsif ($INC{'Mouse/Util.pm'} and Mouse::Util::MOUSE_XS()) {
+				require Mouse::Util::TypeConstraints;
+				my $xsub = "Mouse::Util::TypeConstraints"->can($name);
+				$typedef->{compiled_type_constraint} = $xsub if $xsub;
+			}
+		}
+		
+		$meta->add_type($typedef);
+	};
+}
+
 sub _is_class_loaded {
 	return !!0 if ref $_[0];
 	return !!0 if not $_[0];
@@ -80,54 +111,47 @@ no warnings;
 
 BEGIN { *STRICTNUM = $ENV{PERL_TYPES_STANDARD_STRICTNUM} ? sub(){!!1} : sub(){!!0} };
 
-my $_any = $meta->add_type({
+my $_any = $meta->$add_core_type({
 	name       => "Any",
-	_is_core   => 1,
 	inlined    => sub { "!!1" },
 });
 
-my $_item = $meta->add_type({
+my $_item = $meta->$add_core_type({
 	name       => "Item",
-	_is_core   => 1,
 	inlined    => sub { "!!1" },
 	parent     => $_any,
 });
 
-$meta->add_type({
+$meta->$add_core_type({
 	name       => "Bool",
-	_is_core   => 1,
 	parent     => $_item,
 	constraint => sub { !defined $_ or $_ eq q() or $_ eq '0' or $_ eq '1' },
 	inlined    => sub { "!defined $_[1] or $_[1] eq q() or $_[1] eq '0' or $_[1] eq '1'" },
 });
 
-my $_undef = $meta->add_type({
+my $_undef = $meta->$add_core_type({
 	name       => "Undef",
-	_is_core   => 1,
 	parent     => $_item,
 	constraint => sub { !defined $_ },
 	inlined    => sub { "!defined($_[1])" },
 });
 
-my $_def = $meta->add_type({
+my $_def = $meta->$add_core_type({
 	name       => "Defined",
-	_is_core   => 1,
 	parent     => $_item,
 	constraint => sub { defined $_ },
 	inlined    => sub { "defined($_[1])" },
 });
 
-my $_val = $meta->add_type({
+my $_val = $meta->$add_core_type({
 	name       => "Value",
-	_is_core   => 1,
 	parent     => $_def,
 	constraint => sub { not ref $_ },
 	inlined    => sub { "defined($_[1]) and not ref($_[1])" },
 });
 
-my $_str = $meta->add_type({
+my $_str = $meta->$add_core_type({
 	name       => "Str",
-	_is_core   => 1,
 	parent     => $_val,
 	constraint => sub { ref(\$_) eq 'SCALAR' or ref(\(my $val = $_)) eq 'SCALAR' },
 	inlined    => sub {
@@ -170,21 +194,18 @@ my $_strictnum = $meta->add_type({
 
 my $_num = $meta->add_type({
 	name       => "Num",
-	_is_core   => 1,
 	parent     => (STRICTNUM ? $_strictnum : $_laxnum),
 });
 
-$meta->add_type({
+$meta->$add_core_type({
 	name       => "Int",
-	_is_core   => 1,
 	parent     => $_num,
 	constraint => sub { /\A-?[0-9]+\z/ },
 	inlined    => sub { "defined $_[1] and $_[1] =~ /\\A-?[0-9]+\\z/" },
 });
 
-my $_classn = $meta->add_type({
+my $_classn = $meta->$add_core_type({
 	name       => "ClassName",
-	_is_core   => 1,
 	parent     => $_str,
 	constraint => sub { goto \&_is_class_loaded },
 	inlined    => sub { "Types::Standard::_is_class_loaded($_[1])" },
@@ -197,9 +218,8 @@ $meta->add_type({
 	inlined    => sub { "Types::Standard::_is_class_loaded($_[1]) and not $_[1]\->can('new')" },
 });
 
-my $_ref = $meta->add_type({
+my $_ref = $meta->$add_core_type({
 	name       => "Ref",
-	_is_core   => 1,
 	parent     => $_def,
 	constraint => sub { ref $_ },
 	inlined    => sub { "!!ref($_[1])" },
@@ -237,33 +257,29 @@ my $_ref = $meta->add_type({
 	},
 });
 
-$meta->add_type({
+$meta->$add_core_type({
 	name       => "CodeRef",
-	_is_core   => 1,
 	parent     => $_ref,
 	constraint => sub { ref $_ eq "CODE" },
 	inlined    => sub { "ref($_[1]) eq 'CODE'" },
 });
 
-$meta->add_type({
+$meta->$add_core_type({
 	name       => "RegexpRef",
-	_is_core   => 1,
 	parent     => $_ref,
 	constraint => sub { ref($_) && !!re::is_regexp($_) },
 	inlined    => sub { "ref($_[1]) && !!re::is_regexp($_[1])" },
 });
 
-$meta->add_type({
+$meta->$add_core_type({
 	name       => "GlobRef",
-	_is_core   => 1,
 	parent     => $_ref,
 	constraint => sub { ref $_ eq "GLOB" },
 	inlined    => sub { "ref($_[1]) eq 'GLOB'" },
 });
 
-$meta->add_type({
+$meta->$add_core_type({
 	name       => "FileHandle",
-	_is_core   => 1,
 	parent     => $_ref,
 	constraint => sub {
 		(ref($_) eq "GLOB" && Scalar::Util::openhandle($_))
@@ -275,9 +291,8 @@ $meta->add_type({
 	},
 });
 
-my $_arr = $meta->add_type({
+my $_arr = $meta->$add_core_type({
 	name       => "ArrayRef",
-	_is_core   => 1,
 	parent     => $_ref,
 	constraint => sub { ref $_ eq "ARRAY" },
 	inlined    => sub { "ref($_[1]) eq 'ARRAY'" },
@@ -287,9 +302,8 @@ my $_arr = $meta->add_type({
 	coercion_generator   => LazyLoad(ArrayRef => 'coercion_generator'),
 });
 
-my $_hash = $meta->add_type({
+my $_hash = $meta->$add_core_type({
 	name       => "HashRef",
-	_is_core   => 1,
 	parent     => $_ref,
 	constraint => sub { ref $_ eq "HASH" },
 	inlined    => sub { "ref($_[1]) eq 'HASH'" },
@@ -317,9 +331,8 @@ my $_hash = $meta->add_type({
 	},
 });
 
-$meta->add_type({
+$meta->$add_core_type({
 	name       => "ScalarRef",
-	_is_core   => 1,
 	parent     => $_ref,
 	constraint => sub { ref $_ eq "SCALAR" or ref $_ eq "REF" },
 	inlined    => sub { "ref($_[1]) eq 'SCALAR' or ref($_[1]) eq 'REF'" },
@@ -329,17 +342,15 @@ $meta->add_type({
 	coercion_generator   => LazyLoad(ScalarRef => 'coercion_generator'),
 });
 
-my $_obj = $meta->add_type({
+my $_obj = $meta->$add_core_type({
 	name       => "Object",
-	_is_core   => 1,
 	parent     => $_ref,
 	constraint => sub { blessed $_ },
 	inlined    => sub { "Scalar::Util::blessed($_[1])" },
 });
 
-$meta->add_type({
+$meta->$add_core_type({
 	name       => "Maybe",
-	_is_core   => 1,
 	parent     => $_item,
 	constraint_generator => sub
 	{

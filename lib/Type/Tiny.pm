@@ -340,23 +340,6 @@ sub _build_compiled_check
 		return $self->parent->compiled_check;
 	}
 	
-	if ($INC{'Mouse/Util.pm'} and Mouse::Util::MOUSE_XS())
-	{
-		require Mouse::Util::TypeConstraints;
-		
-		if ($self->{_is_core})
-		{
-			my $xs = "Mouse::Util::TypeConstraints"->can($self->name);
-			return $xs if $xs;
-		}
-		elsif ($self->is_parameterized and $self->has_parent
-		and $self->parent->{_is_core} and $self->parent->name =~ /^(ArrayRef|HashRef|Maybe)$/)
-		{
-			my $xs = "Mouse::Util::TypeConstraints"->can("_parameterize_".$self->parent->name."_for");
-			return $xs->($self->parameters->[0]) if $xs;
-		}
-	}
-	
 	return Eval::TypeTiny::eval_closure(
 		source      => sprintf('sub ($) { %s }', $self->inline_check('$_[0]')),
 		description => sprintf("compiled check '%s'", $self),
