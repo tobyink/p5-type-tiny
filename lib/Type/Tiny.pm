@@ -745,7 +745,7 @@ sub parameterize
 	local $_ = $_[0];
 	my $P;
 	
-	my $constraint = $self->constraint_generator->(@_);
+	my ($constraint, $compiled) = $self->constraint_generator->(@_);
 	
 	if (Types::TypeTiny::TypeTiny->check($constraint))
 	{
@@ -758,6 +758,8 @@ sub parameterize
 			display_name => $self->name_generator->($self, @_),
 			parameters   => [@_],
 		);
+		$options{compiled_type_constraint} = $compiled
+			if $compiled;
 		$options{inlined} = $self->inline_generator->(@_)
 			if $self->has_inline_generator;
 		exists $options{$_} && !defined $options{$_} && delete $options{$_}
