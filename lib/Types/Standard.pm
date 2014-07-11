@@ -22,48 +22,76 @@ our @EXPORT_OK = qw( slurpy );
 use Scalar::Util qw( blessed looks_like_number );
 use Types::TypeTiny ();
 
-my $add_core_type;
-{
-	$add_core_type = sub {
-		my $meta = shift;
-		my ($typedef) = @_;
-		$typedef->{_is_core} = 1;
-		
-		my $name = $typedef->{name};
-		
-		# Mouse's implementation of these types differs enough from
-		# Type::Tiny and Moose to make their implementations not worthwhile.
-		# Type::Tiny::XS's implementation currently matches Mouse's, but
-		# will be brought closer to Type::Tiny's soon.
-		unless ($name eq 'RegexpRef' or $name eq 'Int')
-		{
-			if ($INC{'Type/Tiny/XS.pm'})
-			{
-				my $xsub = Type::Tiny::XS::get_coderef_for($name);
-				$typedef->{compiled_type_constraint} = $xsub if $xsub;
-			}
-			elsif ($INC{'Mouse/Util.pm'} and Mouse::Util::MOUSE_XS()) {
-				require Mouse::Util::TypeConstraints;
-				my $xsub = "Mouse::Util::TypeConstraints"->can($name);
-				$typedef->{compiled_type_constraint} = $xsub if $xsub;
-			}
-		}
-		
-		$meta->add_type($typedef);
-	};
-}
+BEGIN {
+	my $try_xs =
+		exists($ENV{PERL_TYPES_STANDARD_XS}) ? !!$ENV{PERL_TYPES_STANDARD_XS} :
+		exists($ENV{PERL_ONLY})              ?  !$ENV{PERL_ONLY} :
+		0;
+	
+	my $use_xs = 0;
+	$try_xs and eval { require Type::Tiny::XS; $use_xs++ };
+	
+	*_USE_XS = $use_xs
+		? sub () { !!1 }
+		: sub () { !!0 };
+	
+	*_USE_MOUSE = $try_xs
+		? sub () { $INC{'Mouse/Util.pm'} and Mouse::Util::MOUSE_XS() }
+		: sub () { !!0 };
+};
 
-sub _is_class_loaded {
-	return !!0 if ref $_[0];
-	return !!0 if not $_[0];
-	my $stash = do { no strict 'refs'; \%{"$_[0]\::"} };
-	return !!1 if exists $stash->{'ISA'};
-	return !!1 if exists $stash->{'VERSION'};
-	foreach my $globref (values %$stash) {
-		return !!1 if *{$globref}{CODE};
+BEGIN {
+	*_is_class_loaded = _USE_XS
+		? \&Type::Tiny::XS::Util::is_class_loaded
+		: sub {
+			return !!0 if ref $_[0];
+			return !!0 if not $_[0];
+			my $stash = do { no strict 'refs'; \%{"$_[0]\::"} };
+			return !!1 if exists $stash->{'ISA'};
+			return !!1 if exists $stash->{'VERSION'};
+			foreach my $globref (values %$stash) {
+				return !!1 if *{$globref}{CODE};
+			}
+			return !!0;
+		};
+};
+
+my $add_core_type = sub {
+	my $meta = shift;
+	my ($typedef) = @_;
+	$typedef->{_is_core} = 1;
+	
+	my $name = $typedef->{name};
+	my ($xsub, $xsubname);
+	
+	if ( _USE_XS
+	and not ($name eq 'RegexpRef' or $name eq 'Int') ) {
+		$xsub     = Type::Tiny::XS::get_coderef_for($name);
+		$xsubname = Type::Tiny::XS::get_subname_for($name);
 	}
-	return !!0;
-}
+		
+	elsif ( _USE_MOUSE
+	and not ($name eq 'RegexpRef' or $name eq 'Int' or $name eq 'Object') ) {
+		require Mouse::Util::TypeConstraints;
+		$xsub     = "Mouse::Util::TypeConstraints"->can($name);
+		$xsubname = "Mouse::Util::TypeConstraints::$name";
+	}
+	
+	$typedef->{compiled_type_constraint} = $xsub if $xsub;
+	
+	$typedef->{inlined} = sub { "$xsubname\($_[1])" }
+		if defined($xsubname) and (
+			# These should be faster than their normal inlined
+			# equivalents
+			$name eq 'Str' or
+			$name eq 'Bool' or
+			$name eq 'ClassName' or
+			$name eq 'RegexpRef' or
+			$name eq 'FileHandle'
+		);
+	
+	$meta->add_type($typedef);
+};
 
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
@@ -204,18 +232,18 @@ $meta->$add_core_type({
 	inlined    => sub { "defined $_[1] and $_[1] =~ /\\A-?[0-9]+\\z/" },
 });
 
-my $_classn = $meta->$add_core_type({
+my $_classn = $meta->add_type({
 	name       => "ClassName",
 	parent     => $_str,
-	constraint => sub { goto \&_is_class_loaded },
-	inlined    => sub { "Types::Standard::_is_class_loaded($_[1])" },
+	constraint => \&_is_class_loaded,
+	inlined    => sub { "Types::Standard::_is_class_loaded(do { my \$tmp = $_[1] })" },
 });
 
 $meta->add_type({
 	name       => "RoleName",
 	parent     => $_classn,
 	constraint => sub { not $_->can("new") },
-	inlined    => sub { "Types::Standard::_is_class_loaded($_[1]) and not $_[1]\->can('new')" },
+	inlined    => sub { "Types::Standard::_is_class_loaded(do { my \$tmp = $_[1] }) and not $_[1]\->can('new')" },
 });
 
 my $_ref = $meta->$add_core_type({
