@@ -1794,6 +1794,6 @@
 		dcs:versus `Type-Tiny 0.045_02 cpan:TOBYINK`;
 		item "Type::Tiny::XS is now used (if available) to speed up some of the Types::Standard type constraints, plus Type::Tiny::Class and Type::Tiny::Duck."^^Change;
 		item "The Mouse XS stuff introduced in Type-Tiny 0.003_09 has been partially removed. (I do plan on restoring it, and improving it.)"^^Regression;
-		item "When testing equivalence between Types::Standard types and core Moose types, don't test `Num` because Type::Tiny provides two different implementations for it."^^Tests;
+		item "When testing equivalence between Types::Standard types and core Moose types, don't test `Num` because Types::Standard provides two different implementations for it."^^Tests;
 		item "Update benchmark scripts, showing results with/without Type::Tiny::XS."^^Documentation;
 	].
