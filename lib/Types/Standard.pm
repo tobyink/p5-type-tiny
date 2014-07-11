@@ -29,7 +29,11 @@ BEGIN {
 		0;
 	
 	my $use_xs = 0;
-	$try_xs and eval { require Type::Tiny::XS; $use_xs++ };
+	$try_xs and eval {
+		require Type::Tiny::XS;
+		'Type::Tiny::XS'->VERSION('0.002');
+		$use_xs++;
+	};
 	
 	*_USE_XS = $use_xs
 		? sub () { !!1 }
