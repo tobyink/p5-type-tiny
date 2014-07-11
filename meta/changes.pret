@@ -1782,7 +1782,7 @@
 		item "Include benchmark/example of Type::Params versus Scalar::Validation."^^Documentation;
 		item [
 			a dcs:Bugfix, dcs:Documentation;
-			label "Include benchmark/example of Type::Params versus Scalar::Validation.";
+			label "Remove outdated references to the overloaded + operator from Types::Standard documentation.";
 			dcs:fixes RT#96379;
 			dcs:thanks cpan:DJERIUS;
 		];
