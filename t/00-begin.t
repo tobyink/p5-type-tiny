@@ -72,28 +72,14 @@ ok 1;
 done_testing;
 
 __END__
-# Required:
-
 perl
 Exporter::Tiny
-Scalar::Util
-Test::More
-Text::Balanced
+Type::Tie
+Type::Tiny::XS
 
-# Optional:
-
-Class::ISA
-Devel::LexAlias
-Devel::StackTrace
-Function::Parameters
 Moo
 Moose
-MooseX::Types
 Mouse
-MouseX::Types
-Role::Tiny
-
-# Environment:
 
 $AUTOMATED_TESTING
 $NONINTERACTIVE_TESTING
@@ -102,9 +88,5 @@ $AUTHOR_TESTING
 $RELEASE_TESTING
 
 $PERL_TYPES_STANDARD_STRICTNUM
-$MOO_XS_DISABLE
-$MOOSE_ERROR_STYLE
-$MOUSE_XS
-$MOUSE_PUREPERL
+$PERL_TYPE_TINY_XS
 $PERL_ONLY
-
