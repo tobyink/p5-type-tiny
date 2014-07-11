@@ -26,7 +26,7 @@ BEGIN {
 	my $try_xs =
 		exists($ENV{PERL_TYPE_TINY_XS}) ? !!$ENV{PERL_TYPE_TINY_XS} :
 		exists($ENV{PERL_ONLY})         ?  !$ENV{PERL_ONLY} :
-		0;
+		1;
 	
 	my $use_xs = 0;
 	$try_xs and eval {
