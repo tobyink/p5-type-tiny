@@ -491,7 +491,7 @@
 	rdfs:label           "documentation error in Types::Standard vis-à-vis coercions";
 	dbug:id              "96379";
 	dbug:page            <https://rt.cpan.org/Public/Bug/Display.html?id=96379>;
-	dbug:status          <http://purl.org/NET/cpan-uri/rt/status/open>;
+	dbug:status          <http://purl.org/NET/cpan-uri/rt/status/patched>;
 	dc:created           "2014-06-11T17:20:17+01:00"^^xsd:dateTime;
 	dc:reporter          <http://purl.org/NET/cpan-uri/person/djerius>.
 
