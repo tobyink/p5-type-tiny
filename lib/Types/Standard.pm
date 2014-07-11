@@ -31,7 +31,7 @@ BEGIN {
 	my $use_xs = 0;
 	$try_xs and eval {
 		require Type::Tiny::XS;
-		'Type::Tiny::XS'->VERSION('0.002');
+		'Type::Tiny::XS'->VERSION('0.003');
 		$use_xs++;
 	};
 	
@@ -69,7 +69,7 @@ my $add_core_type = sub {
 	my ($xsub, $xsubname);
 	
 	if ( _USE_XS
-	and not ($name eq 'RegexpRef' or $name eq 'Int') ) {
+	and not ($name eq 'RegexpRef') ) {
 		$xsub     = Type::Tiny::XS::get_coderef_for($name);
 		$xsubname = Type::Tiny::XS::get_subname_for($name);
 	}
