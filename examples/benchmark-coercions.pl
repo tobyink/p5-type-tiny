@@ -30,23 +30,35 @@ immutable.
 
 =back
 
-
 =head1 RESULTS
 
 For both Moose and Moo, L<Type::Tiny> type constraints are clearly faster
-than the conventional approach:
+than the conventional approach.
+
+B<< With Type::Tiny::XS: >>
+
+              Rate Moo_MXTML     Moose    Moo_TT  Moose_TT
+ Moo_MXTML  3040/s        --      -44%      -64%      -83%
+ Moose      5463/s       80%        --      -35%      -69%
+ Moo_TT     8373/s      175%       53%        --      -52%
+ Moose_TT  17612/s      479%      222%      110%        --
+
+B<< Without Type::Tiny::XS: >>
 
              Rate Moo_MXTML    Moo_TT     Moose  Moose_TT
- Moo_MXTML 3381/s        --      -39%      -45%      -63%
- Moo_TT    5582/s       65%        --      -10%      -39%
- Moose     6194/s       83%       11%        --      -33%
- Moose_TT  9225/s      173%       65%       49%        --
+ Moo_MXTML 3140/s        --      -41%      -50%      -63%
+ Moo_TT    5288/s       68%        --      -16%      -38%
+ Moose     6305/s      101%       19%        --      -26%
+ Moose_TT  8574/s      173%       62%       36%        --
 
-(Tested versions: Type::Tiny 0.042, Moose 2.1107, Moo 1.004001, and
-MooX::Types::MooseLike 0.23.)
+(Tested versions: Type::Tiny 0.045_03, Type::Tiny::XS 0.004, Moose 2.1207,
+Moo 1.005000, and MooX::Types::MooseLike 0.25.)
 
 =head1 DEPENDENCIES
 
+To run this script, you will need:
+
+L<Type::Tiny::XS>,
 L<Moo>, L<MooX::Types::MooseLike::Base>, L<Moose>.
 
 =head1 AUTHOR

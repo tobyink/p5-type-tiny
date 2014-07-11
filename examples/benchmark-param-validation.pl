@@ -1,3 +1,121 @@
+=pod
+
+=encoding utf-8
+
+=head1 TEST 1: COMPLEX PARAMETER CHECKING
+
+Compares the run-time speed of five parameter validators for validating
+a fairly complex function signature. The function accepts an arrayref,
+followed by an object providing C<print> and C<say> methods, followed
+by an integer less than 90.
+
+The validators tested were:
+
+=over
+
+=item B<Data::Validator> (shown as B<D:V> in results table)
+
+Using the C<StrictSequenced> trait.
+
+=item B<Params::Validate> (shown as B<P:V> in results table)
+
+C<validate_pos> given the following spec:
+
+   state $spec = [
+      {  type      => ARRAYREF,
+      },
+      {  can       => ["print", "say"],
+      },
+      {  type      => SCALAR,
+         regex     => qr{^\d+$},
+         callbacks => {
+            'less than 90' => sub { shift() < 90 },
+         },
+      },
+   ];
+
+=item B<Params::Check> (shown as B<P:C> in results table)
+
+Given three coderefs to validate parameters.
+
+=item B<< Type::Params::validate() >> (shown as B<< T:P v >> in results table)
+
+Called as:
+
+   validate(\@_, ArrayRef, $PrintAndSay, $SmallInt);
+
+Where C<< $PrintAndSay >> is a duck type, and C<< $SmallInt >> is a
+subtype of C<< Int >>, with inlining defined.
+
+=item B<< Type::Params::compile() >> (shown as B<< T:P c >> in results table)
+
+Using the same type constraints as C<< validate() >>
+
+=back
+
+=head2 Results
+
+B<< With Type::Tiny::XS: >>
+
+            Rate   [D:V]   [P:V]   [P:C] [T:P v] [T:P c]
+ [D:V]   10324/s      --     -8%    -35%    -48%    -81%
+ [P:V]   11247/s      9%      --    -29%    -43%    -80%
+ [P:C]   15941/s     54%     42%      --    -19%    -71%
+ [T:P v] 19685/s     91%     75%     23%      --    -64%
+ [T:P c] 55304/s    436%    392%    247%    181%      --
+
+B<< Without Type::Tiny::XS: >>
+
+            Rate   [P:V]   [D:V]   [P:C] [T:P v] [T:P c]
+ [P:V]    9800/s      --     -7%     -8%    -41%    -72%
+ [D:V]   10500/s      7%      --     -1%    -37%    -71%
+ [P:C]   10609/s      8%      1%      --    -36%    -70%
+ [T:P v] 16638/s     70%     58%     57%      --    -53%
+ [T:P c] 35628/s    264%    239%    236%    114%      --
+
+(Tested versions: Data::Validator 1.04 with Mouse 2.3.0,
+Params::Validate 1.10, Params::Check 0.38, and Type::Params 0.045_03
+with Type::Tiny::XS 0.004.)
+
+=head1 TEST B: SIMPLE PARAMETER CHECKING
+
+Based on the idea that I was playing to Type::Params' strengths,
+I decided to test a much simpler function signature. Here we check
+a function which takes two required and one optional parameters.
+This is purely a test of parameter count; no type checking is involved!
+
+This is a face off between Type::Params and Params::Validate.
+
+=head2 Results
+
+Because no type checks are involved, it doesn't matter whether
+Type::Tiny::XS is available or not. (The results are similar either
+way.)
+
+             Rate   [P:V] [T:P c]
+ [P:V]    73643/s      --    -70%
+ [T:P c] 241917/s    228%      --
+
+=head1 DEPENDENCIES
+
+To run this script, you will need:
+
+L<Type::Tiny::XS>,
+L<Data::Validator>, L<Params::Check>, L<Params::Validate>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013-2014 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
 use strict;
 use warnings;
 use feature qw(state);
@@ -105,20 +223,7 @@ print "\n----\n\n";
 our $CHK  = compile(1, 1, 0);
 our @ARGS = 1..2;
 cmpthese(-3, {
-	TypeParamsSimple     => q { $::CHK->(@::ARGS) },
-	ParamsValidateSimple => q { validate_pos(@::ARGS, 1, 1, 0) },
+	'[T:P c]'  => q { $::CHK->(@::ARGS) },
+	'[P:V]'    => q { validate_pos(@::ARGS, 1, 1, 0) },
 });
 
-__END__
-           Rate   [D:V]   [P:V] [T:P v]   [P:C] [T:P c]
-[D:V]   10006/s      --    -26%    -38%    -39%    -68%
-[P:V]   13567/s     36%      --    -15%    -17%    -57%
-[T:P v] 16012/s     60%     18%      --     -2%    -49%
-[P:C]   16384/s     64%     21%      2%      --    -48%
-[T:P c] 31220/s    212%    130%     95%     91%      --
-
-----
-
-                         Rate ParamsValidateSimple     TypeParamsSimple
-ParamsValidateSimple  91317/s                   --                 -60%
-TypeParamsSimple     229049/s                 151%                   --

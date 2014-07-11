@@ -37,24 +37,60 @@ B<< XS is switched off using C<MOUSE_PUREPERL> environment variable. >>
 
 =back
 
+Each tool is used to define a class like the following:
+
+   {
+      package Local::Class;
+      use Whatever::Tool;
+      use Types::Standard qw(HashRef ArrayRef Int);
+      has attr1 => (is  => "ro", isa => ArrayRef[Int]);
+      has attr2 => (is  => "ro", isa => HashRef[ArrayRef[Int]]);
+   }
+
+Then we benchmark the following object instantiation:
+
+   Local::Class->new(
+      attr1  => [1..10],
+      attr2  => {
+         one   => [0 .. 1],
+         two   => [0 .. 2],
+         three => [0 .. 3],
+      },
+   );
+
 =head1 RESULTS
 
 In all cases, L<Type::Tiny> type constraints are clearly faster
-than the conventional approach:
+than the conventional approach.
 
-             Rate Moo_MXTML     Mouse     Moose    Moo_TT  Moose_TT  Mouse_TT
- Moo_MXTML 2947/s        --      -29%      -50%      -51%      -67%      -68%
- Mouse     4177/s       42%        --      -29%      -31%      -54%      -55%
- Moose     5910/s      101%       41%        --       -3%      -35%      -36%
- Moo_TT    6074/s      106%       45%        3%        --      -33%      -34%
- Moose_TT  9050/s      207%      117%       53%       49%        --       -2%
- Mouse_TT  9221/s      213%      121%       56%       52%        2%        --
+B<< With Type::Tiny::XS: >>
 
-(Tested versions: Type::Tiny 0.042, Moose 2.1107, Moo 1.004001,
-MooX::Types::MooseLike 0.23, and Mouse 2.1.0)
+              Rate Moo_MXTML     Mouse     Moose    Moo_TT  Moose_TT  Mouse_TT
+ Moo_MXTML  2428/s        --      -35%      -57%      -82%      -90%      -91%
+ Mouse      3759/s       55%        --      -33%      -72%      -85%      -86%
+ Moose      5607/s      131%       49%        --      -58%      -78%      -79%
+ Moo_TT    13274/s      447%      253%      137%        --      -48%      -51%
+ Moose_TT  25358/s      945%      575%      352%       91%        --       -7%
+ Mouse_TT  27306/s     1025%      626%      387%      106%        8%        --
+
+B<< Without Type::Tiny::XS: >>
+
+             Rate Moo_MXTML     Mouse    Moo_TT     Moose  Moose_TT  Mouse_TT
+ Moo_MXTML 2610/s        --      -31%      -56%      -56%      -67%      -67%
+ Mouse     3759/s       44%        --      -36%      -37%      -52%      -52%
+ Moo_TT    5894/s      126%       57%        --       -1%      -24%      -25%
+ Moose     5925/s      127%       58%        1%        --      -24%      -25%
+ Moose_TT  7802/s      199%      108%       32%       32%        --       -1%
+ Mouse_TT  7876/s      202%      110%       34%       33%        1%        --
+
+(Tested versions: Type::Tiny 0.045_03, Type::Tiny::XS 0.004, Moose 2.1207,
+Moo 1.005000, MooX::Types::MooseLike 0.25, and Mouse 2.3.0)
 
 =head1 DEPENDENCIES
 
+To run this script, you will need:
+
+L<Type::Tiny::XS>,
 L<Moo>, L<MooX::Types::MooseLike::Base>, L<Moose>, L<Mouse>.
 
 =head1 AUTHOR
@@ -141,5 +177,5 @@ cmpthese(-1, {
 	Mouse     => q{ Local::Mouse->new(%::data) },
 	Moo_TT    => q{ Local::Moo_TT->new(%::data) },
 	Moose_TT  => q{ Local::Moose_TT->new(%::data) },
-	Mouse_TT  => q{ Local::Moose_TT->new(%::data) },
+	Mouse_TT  => q{ Local::Mouse_TT->new(%::data) },
 });
