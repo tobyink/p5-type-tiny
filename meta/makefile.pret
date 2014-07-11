@@ -10,6 +10,10 @@
 		deps:on "perl 5.010001"^^deps:CpanId;
 		comment "For smartmatch operator overloading; and to avoid some pre-5.10 hacks."@en;
 	];
+	deps:runtime-recommendation [
+		deps:on "Type::Tiny::XS 0.003"^^deps:CpanId;
+		comment "Make stuff faster (I think)."@en;
+	];
 	deps:runtime-requirement [
 		deps:on "Exporter::Tiny 0.026"^^deps:CpanId;
 		comment "This module was spun off from the Type-Tiny distribution."@en;

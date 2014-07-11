@@ -95,6 +95,11 @@ L<Reply::Plugin::TypeTiny> plugin for L<Reply> requires L<Reply>
 (obviously). L<Devel::LexAlias> may I<slightly> increase the speed
 of some of Type::Tiny's compiled coderefs.
 
+L<Type::Tiny::XS> is not required, but if available provides a speed
+boost for some type checks. (Setting the environment variable
+C<PERL_TYPE_TINY_XS> to false, or setting C<PERL_ONLY> to true will
+suppress the use of Type::Tiny::XS, even if it is available.)
+
 The test suite additionally requires L<Test::More>, L<Test::Fatal>
 and L<Test::Requires>. Test::More comes bundled with Perl, but if
 you are using a version of Perl older than 5.14, you will need to

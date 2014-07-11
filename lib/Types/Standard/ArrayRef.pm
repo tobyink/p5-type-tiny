@@ -24,17 +24,37 @@ sub __constraint_generator
 	Types::TypeTiny::TypeTiny->check($param)
 		or _croak("Parameter to ArrayRef[`a] expected to be a type constraint; got $param");
 	
-	return sub
+	my $param_compiled_check = $param->compiled_check;
+	my $xsub;
+	if (Types::Standard::_USE_XS)
 	{
-		my $array = shift;
-		$param->check($_) || return for @$array;
-		return !!1;
-	};
+		my $paramname = Type::Tiny::XS::is_known($param_compiled_check);
+		$xsub = Type::Tiny::XS::get_coderef_for("ArrayRef[$paramname]");
+	}
+	
+	return (
+		sub
+		{
+			my $array = shift;
+			$param->check($_) || return for @$array;
+			return !!1;
+		},
+		$xsub,
+	);
 }
 
 sub __inline_generator
 {
 	my $param = shift;
+	
+	my $param_compiled_check = $param->compiled_check;
+	if (Types::Standard::_USE_XS)
+	{
+		my $paramname = Type::Tiny::XS::is_known($param_compiled_check);
+		my $xsubname  = Type::Tiny::XS::get_subname_for("ArrayRef[$paramname]");
+		return sub { "$xsubname\($_[1]\)" } if $xsubname;
+	}
+	
 	return unless $param->can_be_inlined;
 	my $param_check = $param->inline_check('$i');
 	return sub {

@@ -20,6 +20,24 @@ sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 require Type::Tiny;
 our @ISA = 'Type::Tiny';
 
+BEGIN {
+	my $try_xs =
+		exists($ENV{PERL_TYPE_TINY_XS}) ? !!$ENV{PERL_TYPE_TINY_XS} :
+		exists($ENV{PERL_ONLY})         ?  !$ENV{PERL_ONLY} :
+		1;
+	
+	my $use_xs = 0;
+	$try_xs and eval {
+		require Type::Tiny::XS;
+		'Type::Tiny::XS'->VERSION('0.002');
+		$use_xs++;
+	};
+	
+	*_USE_XS = $use_xs
+		? sub () { !!1 }
+		: sub () { !!0 };
+};
+
 sub new {
 	my $proto = shift;
 	return $proto->class->new(@_) if blessed $proto; # DWIM
@@ -29,6 +47,11 @@ sub new {
 	_croak "Class type constraints cannot have a constraint coderef passed to the constructor" if exists $opts{constraint};
 	_croak "Class type constraints cannot have a inlining coderef passed to the constructor" if exists $opts{inlined};
 	_croak "Need to supply class name" unless exists $opts{class};
+	
+	if (_USE_XS) {
+		my $xsub = Type::Tiny::XS::get_coderef_for("InstanceOf[".$opts{class}."]");
+		$opts{compiled_type_constraint} = $xsub if $xsub;
+	}
 	
 	return $proto->SUPER::new(%opts);
 }
@@ -49,6 +72,12 @@ sub _build_inlined
 {
 	my $self  = shift;
 	my $class = $self->class;
+	
+	if (_USE_XS) {
+		my $xsub = Type::Tiny::XS::get_subname_for("InstanceOf[$class]");
+		return sub { my $var = $_[1]; "$xsub\($var\)" } if $xsub;
+	}
+	
 	sub {
 		my $var = $_[1];
 		qq{Scalar::Util::blessed($var) and $var->isa(q[$class])};

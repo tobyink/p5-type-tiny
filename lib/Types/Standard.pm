@@ -22,17 +22,80 @@ our @EXPORT_OK = qw( slurpy );
 use Scalar::Util qw( blessed looks_like_number );
 use Types::TypeTiny ();
 
-sub _is_class_loaded {
-	return !!0 if ref $_[0];
-	return !!0 if not $_[0];
-	my $stash = do { no strict 'refs'; \%{"$_[0]\::"} };
-	return !!1 if exists $stash->{'ISA'};
-	return !!1 if exists $stash->{'VERSION'};
-	foreach my $globref (values %$stash) {
-		return !!1 if *{$globref}{CODE};
+BEGIN {
+	my $try_xs =
+		exists($ENV{PERL_TYPE_TINY_XS}) ? !!$ENV{PERL_TYPE_TINY_XS} :
+		exists($ENV{PERL_ONLY})         ?  !$ENV{PERL_ONLY} :
+		1;
+	
+	my $use_xs = 0;
+	$try_xs and eval {
+		require Type::Tiny::XS;
+		'Type::Tiny::XS'->VERSION('0.003');
+		$use_xs++;
+	};
+	
+	*_USE_XS = $use_xs
+		? sub () { !!1 }
+		: sub () { !!0 };
+	
+	*_USE_MOUSE = $try_xs
+		? sub () { $INC{'Mouse/Util.pm'} and Mouse::Util::MOUSE_XS() }
+		: sub () { !!0 };
+};
+
+BEGIN {
+	*_is_class_loaded = _USE_XS
+		? \&Type::Tiny::XS::Util::is_class_loaded
+		: sub {
+			return !!0 if ref $_[0];
+			return !!0 if not $_[0];
+			my $stash = do { no strict 'refs'; \%{"$_[0]\::"} };
+			return !!1 if exists $stash->{'ISA'};
+			return !!1 if exists $stash->{'VERSION'};
+			foreach my $globref (values %$stash) {
+				return !!1 if *{$globref}{CODE};
+			}
+			return !!0;
+		};
+};
+
+my $add_core_type = sub {
+	my $meta = shift;
+	my ($typedef) = @_;
+	$typedef->{_is_core} = 1;
+	
+	my $name = $typedef->{name};
+	my ($xsub, $xsubname);
+	
+	if ( _USE_XS
+	and not ($name eq 'RegexpRef') ) {
+		$xsub     = Type::Tiny::XS::get_coderef_for($name);
+		$xsubname = Type::Tiny::XS::get_subname_for($name);
 	}
-	return !!0;
-}
+		
+	elsif ( _USE_MOUSE
+	and not ($name eq 'RegexpRef' or $name eq 'Int' or $name eq 'Object') ) {
+		require Mouse::Util::TypeConstraints;
+		$xsub     = "Mouse::Util::TypeConstraints"->can($name);
+		$xsubname = "Mouse::Util::TypeConstraints::$name";
+	}
+	
+	$typedef->{compiled_type_constraint} = $xsub if $xsub;
+	
+	$typedef->{inlined} = sub { "$xsubname\($_[1])" }
+		if defined($xsubname) and (
+			# These should be faster than their normal inlined
+			# equivalents
+			$name eq 'Str' or
+			$name eq 'Bool' or
+			$name eq 'ClassName' or
+			$name eq 'RegexpRef' or
+			$name eq 'FileHandle'
+		);
+	
+	$meta->add_type($typedef);
+};
 
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
@@ -80,54 +143,47 @@ no warnings;
 
 BEGIN { *STRICTNUM = $ENV{PERL_TYPES_STANDARD_STRICTNUM} ? sub(){!!1} : sub(){!!0} };
 
-my $_any = $meta->add_type({
+my $_any = $meta->$add_core_type({
 	name       => "Any",
-	_is_core   => 1,
 	inlined    => sub { "!!1" },
 });
 
-my $_item = $meta->add_type({
+my $_item = $meta->$add_core_type({
 	name       => "Item",
-	_is_core   => 1,
 	inlined    => sub { "!!1" },
 	parent     => $_any,
 });
 
-$meta->add_type({
+$meta->$add_core_type({
 	name       => "Bool",
-	_is_core   => 1,
 	parent     => $_item,
 	constraint => sub { !defined $_ or $_ eq q() or $_ eq '0' or $_ eq '1' },
 	inlined    => sub { "!defined $_[1] or $_[1] eq q() or $_[1] eq '0' or $_[1] eq '1'" },
 });
 
-my $_undef = $meta->add_type({
+my $_undef = $meta->$add_core_type({
 	name       => "Undef",
-	_is_core   => 1,
 	parent     => $_item,
 	constraint => sub { !defined $_ },
 	inlined    => sub { "!defined($_[1])" },
 });
 
-my $_def = $meta->add_type({
+my $_def = $meta->$add_core_type({
 	name       => "Defined",
-	_is_core   => 1,
 	parent     => $_item,
 	constraint => sub { defined $_ },
 	inlined    => sub { "defined($_[1])" },
 });
 
-my $_val = $meta->add_type({
+my $_val = $meta->$add_core_type({
 	name       => "Value",
-	_is_core   => 1,
 	parent     => $_def,
 	constraint => sub { not ref $_ },
 	inlined    => sub { "defined($_[1]) and not ref($_[1])" },
 });
 
-my $_str = $meta->add_type({
+my $_str = $meta->$add_core_type({
 	name       => "Str",
-	_is_core   => 1,
 	parent     => $_val,
 	constraint => sub { ref(\$_) eq 'SCALAR' or ref(\(my $val = $_)) eq 'SCALAR' },
 	inlined    => sub {
@@ -170,13 +226,11 @@ my $_strictnum = $meta->add_type({
 
 my $_num = $meta->add_type({
 	name       => "Num",
-	_is_core   => 1,
 	parent     => (STRICTNUM ? $_strictnum : $_laxnum),
 });
 
-$meta->add_type({
+$meta->$add_core_type({
 	name       => "Int",
-	_is_core   => 1,
 	parent     => $_num,
 	constraint => sub { /\A-?[0-9]+\z/ },
 	inlined    => sub { "defined $_[1] and $_[1] =~ /\\A-?[0-9]+\\z/" },
@@ -184,22 +238,20 @@ $meta->add_type({
 
 my $_classn = $meta->add_type({
 	name       => "ClassName",
-	_is_core   => 1,
 	parent     => $_str,
-	constraint => sub { goto \&_is_class_loaded },
-	inlined    => sub { "Types::Standard::_is_class_loaded($_[1])" },
+	constraint => \&_is_class_loaded,
+	inlined    => sub { "Types::Standard::_is_class_loaded(do { my \$tmp = $_[1] })" },
 });
 
 $meta->add_type({
 	name       => "RoleName",
 	parent     => $_classn,
 	constraint => sub { not $_->can("new") },
-	inlined    => sub { "Types::Standard::_is_class_loaded($_[1]) and not $_[1]\->can('new')" },
+	inlined    => sub { "Types::Standard::_is_class_loaded(do { my \$tmp = $_[1] }) and not $_[1]\->can('new')" },
 });
 
-my $_ref = $meta->add_type({
+my $_ref = $meta->$add_core_type({
 	name       => "Ref",
-	_is_core   => 1,
 	parent     => $_def,
 	constraint => sub { ref $_ },
 	inlined    => sub { "!!ref($_[1])" },
@@ -237,33 +289,29 @@ my $_ref = $meta->add_type({
 	},
 });
 
-$meta->add_type({
+$meta->$add_core_type({
 	name       => "CodeRef",
-	_is_core   => 1,
 	parent     => $_ref,
 	constraint => sub { ref $_ eq "CODE" },
 	inlined    => sub { "ref($_[1]) eq 'CODE'" },
 });
 
-$meta->add_type({
+$meta->$add_core_type({
 	name       => "RegexpRef",
-	_is_core   => 1,
 	parent     => $_ref,
 	constraint => sub { ref($_) && !!re::is_regexp($_) },
 	inlined    => sub { "ref($_[1]) && !!re::is_regexp($_[1])" },
 });
 
-$meta->add_type({
+$meta->$add_core_type({
 	name       => "GlobRef",
-	_is_core   => 1,
 	parent     => $_ref,
 	constraint => sub { ref $_ eq "GLOB" },
 	inlined    => sub { "ref($_[1]) eq 'GLOB'" },
 });
 
-$meta->add_type({
+$meta->$add_core_type({
 	name       => "FileHandle",
-	_is_core   => 1,
 	parent     => $_ref,
 	constraint => sub {
 		(ref($_) eq "GLOB" && Scalar::Util::openhandle($_))
@@ -275,9 +323,8 @@ $meta->add_type({
 	},
 });
 
-my $_arr = $meta->add_type({
+my $_arr = $meta->$add_core_type({
 	name       => "ArrayRef",
-	_is_core   => 1,
 	parent     => $_ref,
 	constraint => sub { ref $_ eq "ARRAY" },
 	inlined    => sub { "ref($_[1]) eq 'ARRAY'" },
@@ -287,9 +334,8 @@ my $_arr = $meta->add_type({
 	coercion_generator   => LazyLoad(ArrayRef => 'coercion_generator'),
 });
 
-my $_hash = $meta->add_type({
+my $_hash = $meta->$add_core_type({
 	name       => "HashRef",
-	_is_core   => 1,
 	parent     => $_ref,
 	constraint => sub { ref $_ eq "HASH" },
 	inlined    => sub { "ref($_[1]) eq 'HASH'" },
@@ -317,9 +363,8 @@ my $_hash = $meta->add_type({
 	},
 });
 
-$meta->add_type({
+$meta->$add_core_type({
 	name       => "ScalarRef",
-	_is_core   => 1,
 	parent     => $_ref,
 	constraint => sub { ref $_ eq "SCALAR" or ref $_ eq "REF" },
 	inlined    => sub { "ref($_[1]) eq 'SCALAR' or ref($_[1]) eq 'REF'" },
@@ -329,17 +374,15 @@ $meta->add_type({
 	coercion_generator   => LazyLoad(ScalarRef => 'coercion_generator'),
 });
 
-my $_obj = $meta->add_type({
+my $_obj = $meta->$add_core_type({
 	name       => "Object",
-	_is_core   => 1,
 	parent     => $_ref,
 	constraint => sub { blessed $_ },
 	inlined    => sub { "Scalar::Util::blessed($_[1])" },
 });
 
-$meta->add_type({
+$meta->$add_core_type({
 	name       => "Maybe",
-	_is_core   => 1,
 	parent     => $_item,
 	constraint_generator => sub
 	{
