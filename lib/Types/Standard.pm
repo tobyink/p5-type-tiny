@@ -24,8 +24,8 @@ use Types::TypeTiny ();
 
 BEGIN {
 	my $try_xs =
-		exists($ENV{PERL_TYPES_STANDARD_XS}) ? !!$ENV{PERL_TYPES_STANDARD_XS} :
-		exists($ENV{PERL_ONLY})              ?  !$ENV{PERL_ONLY} :
+		exists($ENV{PERL_TYPE_TINY_XS}) ? !!$ENV{PERL_TYPE_TINY_XS} :
+		exists($ENV{PERL_ONLY})         ?  !$ENV{PERL_ONLY} :
 		0;
 	
 	my $use_xs = 0;

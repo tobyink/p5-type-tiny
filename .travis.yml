@@ -1,7 +1,7 @@
 language: perl
 env:
-  - PERL_TYPES_STANDARD_XS=0
-  - PERL_TYPES_STANDARD_XS=1
+  - PERL_TYPE_TINY_XS=0
+  - PERL_TYPE_TINY_XS=1
 perl:
   - "5.10"
   - "5.12"
@@ -14,17 +14,17 @@ perl:
 matrix:
   include:
     - perl: "5.6.1"
-      env: PERL_TYPES_STANDARD_XS=0 
+      env: PERL_TYPE_TINY_XS=0 
     - perl: "5.6.2"
-      env: PERL_TYPES_STANDARD_XS=0 
+      env: PERL_TYPE_TINY_XS=0 
     - perl: "5.8.9"
-      env: PERL_TYPES_STANDARD_XS=0 
+      env: PERL_TYPE_TINY_XS=0 
     - perl: "5.8.9_thr"
-      env: PERL_TYPES_STANDARD_XS=0 
+      env: PERL_TYPE_TINY_XS=0 
     - perl: "5.18"
-      env: PERL_TYPES_STANDARD_XS=0 EXTENDED_TESTING=1 COVERAGE=1
+      env: PERL_TYPE_TINY_XS=0 EXTENDED_TESTING=1 COVERAGE=1
     - perl: "5.8.1"
-      env: PERL_TYPES_STANDARD_XS=0 EXTENDED_TESTING=1
+      env: PERL_TYPE_TINY_XS=0 EXTENDED_TESTING=1
       install:
         - cpanm -n Test::Requires Test::Fatal Test::LeakTrace
         - cpanm Exporter::Tiny
