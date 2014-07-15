@@ -1797,3 +1797,18 @@
 		item "When testing equivalence between Types::Standard types and core Moose types, don't test `Num` because Types::Standard provides two different implementations for it."^^Tests;
 		item "Update benchmark scripts, showing results with/without Type::Tiny::XS."^^Documentation;
 	].
+
+`Type-Tiny 0.045_04 cpan:TOBYINK`
+	issued  2014-07-15;
+	changeset [
+		dcs:versus `Type-Tiny 0.045_03 cpan:TOBYINK`;
+		item "Cope with changes to Type::Tie error messages introduced in Type::Tie 0.008."^^Tests;
+		item "Generally stop testing the contents of error messages produced by external modules!"^^Tests;
+		item [
+			a dcs:Tests;
+			label "Fix warnings in 30-integration/Moose/native-attribute-traits.t when run under perl -w.";
+			dcs:blame cpan:KARMAN;
+		];
+		item "Type::Params was warning about additional arguments passed to sprintf under Perl blead. The additional argument has been removed."^^Bugfix;
+		item "Updated NEWS file."^^Documentation;
+	].

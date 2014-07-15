@@ -21,6 +21,7 @@
 
  - Lots of bugfixes, tests, and documentation improvements.
 
-2014-08-XX Type-Tiny version 0.046 released!
+2014-07-18 Type-Tiny version 0.046 released!
 
  - Support for Type::Tiny::XS.
+ - Test case improvements.
