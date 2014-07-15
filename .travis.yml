@@ -9,7 +9,7 @@ perl:
   - "5.16"
   - "5.18"
   - "5.20.0"
-  - "5.20.0_thr"
+  - "5.20.0-thr"
   - "blead"
 matrix:
   include:
@@ -19,7 +19,7 @@ matrix:
       env: PERL_TYPE_TINY_XS=0 
     - perl: "5.8.9"
       env: PERL_TYPE_TINY_XS=0 
-    - perl: "5.8.9_thr"
+    - perl: "5.8.9-thr"
       env: PERL_TYPE_TINY_XS=0 
     - perl: "5.18"
       env: PERL_TYPE_TINY_XS=0 EXTENDED_TESTING=1 COVERAGE=1
