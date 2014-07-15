@@ -52,9 +52,9 @@ is(
 	'foo(4) works',
 );
 
-like(
+isnt(
 	exception { foo(4.1) },
-	qr{^In fun foo: parameter 1 \(\$x\): Value "4\.1" did not pass type constraint "Int"},
+	undef,
 	'foo(4.1) throws',
 );
 
