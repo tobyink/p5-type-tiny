@@ -80,8 +80,8 @@ with Type::Tiny::XS 0.004.)
 =head1 TEST B: SIMPLE PARAMETER CHECKING
 
 Based on the idea that I was playing to Type::Params' strengths,
-I decided to test a much simpler function signature. Here we check
-a function which takes two required and one optional parameters.
+I decided on something I thought would be more of a challenge: a simpler
+function signature which takes two required and one optional parameters.
 This is purely a test of parameter count; no type checking is involved!
 
 This is a face off between Type::Params and Params::Validate.
