@@ -10,7 +10,7 @@ BEGIN {
 }
 
 use Eval::TypeTiny qw< eval_closure >;
-use Scalar::Util qw< blessed >;
+use Scalar::Util qw< blessed refaddr >;
 use Type::Tiny;
 use Types::TypeTiny qw< TypeTiny to_TypeTiny >;
 
@@ -23,10 +23,13 @@ sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
 {
 	my $got_subname;
+	my %already; # prevent renaming established functions
 	sub _subname ($$)
 	{
-		$got_subname = 1 && goto \&Sub::Name::subname
-			if $got_subname || eval "require Sub::Name";
+		($got_subname or eval "require Sub::Name")
+			and ($got_subname = 1)
+			and !$already{refaddr($_[1])}++
+			and return(Sub::Name::subname(@_));
 		return $_[1];
 	}
 }
@@ -240,9 +243,9 @@ sub add_type
 	# XXX: maybe we can use it if the coercion is frozen???
 	#
 	*{"$class\::$name"}        = $class->_mksub($type);
-	*{"$class\::is_$name"}     = _subname "is_"    .$type->qualified_name, $type->compiled_check;
-	*{"$class\::to_$name"}     = _subname "to_"    .$type->qualified_name, sub ($) { $type->coerce($_[0]) };
-	*{"$class\::assert_$name"} = _subname "assert_".$type->qualified_name, $type->_overload_coderef;
+	*{"$class\::is_$name"}     = _subname "$class\::is_$name", $type->compiled_check;
+	*{"$class\::to_$name"}     = _subname "$class\::to_$name", sub ($) { $type->coerce($_[0]) };
+	*{"$class\::assert_$name"} = _subname "$class\::assert_$name", $type->_overload_coderef;
 	
 	return $type;
 }
