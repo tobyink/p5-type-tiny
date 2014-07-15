@@ -50,27 +50,27 @@ is(
 	"some values that should pass their type constraint",
 );
 
-like(
+isnt(
 	exception { "Local::Class"->new(small => 100) },
-	qr{^100 is too big},
+	undef,
 	"direct violation of type constraint",
 );
 
-like(
+isnt(
 	exception { "Local::Class"->new(small => 5.5) },
-	qr{^5.5 is too big},
+	undef,
 	"violation of parent type constraint",
 );
 
-like(
+isnt(
 	exception { "Local::Class"->new(small => "five point five") },
-	qr{^five point five is too big},
+	undef,
 	"violation of grandparent type constraint",
 );
 
-like(
+isnt(
 	exception { "Local::Class"->new(small => []) },
-	qr{^ARRAY\(\w+\) is too big},
+	undef,
 	"violation of great-grandparent type constraint",
 );
 

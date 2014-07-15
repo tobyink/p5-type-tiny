@@ -50,27 +50,27 @@ is(
 	"some values that should pass their type constraint",
 );
 
-like(
+isnt(
 	exception { "Local::Class"->new(small => 100) },
-	qr{^Attribute \(small\) does not pass the type constraint},
+	undef,
 	"direct violation of type constraint",
 );
 
-like(
+isnt(
 	exception { "Local::Class"->new(small => 5.5) },
-	qr{^Attribute \(small\) does not pass the type constraint},
+	undef,
 	"violation of parent type constraint",
 );
 
-like(
+isnt(
 	exception { "Local::Class"->new(small => "five point five") },
-	qr{^Attribute \(small\) does not pass the type constraint},
+	undef,
 	"violation of grandparent type constraint",
 );
 
-like(
+isnt(
 	exception { "Local::Class"->new(small => []) },
-	qr{^Attribute \(small\) does not pass the type constraint},
+	undef,
 	"violation of great-grandparent type constraint",
 );
 

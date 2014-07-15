@@ -36,15 +36,15 @@ is(
 
 can_ok(main => "Any");
 
-like(
+isnt(
 	exception { "Types::Standard"->import("kghffubbtfui") },
-	qr{^Could not find sub 'kghffubbtfui' to export in package 'Types::Standard'},
+	undef,
 	q {Attempt to export a function which does not exist},
 );
 
-like(
+isnt(
 	exception { "Types::Standard"->import("declare") },
-	qr{^Could not find sub 'declare' to export in package 'Types::Standard'},
+	undef,
 	q {Attempt to export a function which exists but not in @EXPORT_OK},
 );
 

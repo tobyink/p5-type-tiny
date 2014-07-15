@@ -55,9 +55,9 @@ is(
 	'... neither raise an exception',
 );
 
-like(
+isnt(
 	exception { xyz(2.1,3,4) },
-	qr/^Value "2.1" did not pass type constraint "Int"/,
+	undef,
 	'failed type constraint with no coercion raises an exception',
 );
 

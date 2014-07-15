@@ -44,19 +44,19 @@ is($foo->num, 40);
 is($foo->add(2), 42);
 is($foo->num, 42);
 
-like(
+isnt(
 	exception { $foo->num("Hello") },
-	qr{Value "Hello" did not pass type constraint "Num"},
+	undef,
 );
 
-like(
+isnt(
 	exception { $foo->add("Hello") },
-	qr{Value "Hello" did not pass type constraint "Num"},
+	undef,
 );
 
-like(
+isnt(
 	exception { 'Foo'->new(num => "Hello") },
-	qr{Value "Hello" did not pass type constraint "Num"},
+	undef,
 );
 
 done_testing;
