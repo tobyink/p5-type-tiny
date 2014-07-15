@@ -29,7 +29,7 @@ use strict;
 use warnings;
 use Test::More;
 
-use Test::Requires { 'Type::Tie' => '0.008' };
+use Test::Requires 'Type::Tie';
 use Types::Standard qw( ArrayRef Int );
 use Test::Fatal;
 
@@ -42,9 +42,9 @@ subtest "tied scalar" => sub
 		undef,
 	);
 	
-	like(
+	isnt(
 		exception { $int = 4.2 },
-		qr/^Value "4.2" did not pass type constraint/,
+		undef,
 	);
 	
 	is($int, 42);
@@ -65,9 +65,9 @@ subtest "tied array" => sub
 		undef,
 	);
 	
-	like(
+	isnt(
 		exception { $ints[3] = 3.5 },
-		qr/^Value "3.5" did not pass type constraint/,
+		undef,
 	);
 	
 	is_deeply(
@@ -90,9 +90,9 @@ subtest "tied hash" => sub
 		undef,
 	);
 	
-	like(
+	isnt(
 		exception { $ints{three} = 3.5 },
-		qr/^Value "3.5" did not pass type constraint/,
+		undef,
 	);
 	
 	is_deeply(
