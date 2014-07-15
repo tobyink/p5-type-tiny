@@ -252,7 +252,7 @@ with_immutable
 		};
 	}
 	
-	my %subtests = (
+	%subtests = (
 		MyHashes2  => "Hash trait with types HashRef[InstanceOf] and Map[Int,InstanceOf]; and coercion",
 		MyHashes3  => "Hash trait with types HashRef[InstanceOf] and Map[Int,InstanceOf]; and coercion and subtyping",
 	);
