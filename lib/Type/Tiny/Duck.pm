@@ -32,6 +32,10 @@ BEGIN {
 	*_USE_XS = $use_xs
 		? sub () { !!1 }
 		: sub () { !!0 };
+	
+	*_USE_MOUSE = $try_xs
+		? sub () { $INC{'Mouse/Util.pm'} and Mouse::Util::MOUSE_XS() }
+		: sub () { !!0 };
 };
 
 sub new {
@@ -45,10 +49,17 @@ sub new {
 	
 	$opts{methods} = [$opts{methods}] unless ref $opts{methods};
 	
-	if (_USE_XS) {
+	if (_USE_XS)
+	{
 		my $methods = join ",", sort(@{$opts{methods}});
 		my $xsub    = Type::Tiny::XS::get_coderef_for("HasMethods[$methods]");
 		$opts{compiled_type_constraint} = $xsub if $xsub;
+	}
+	elsif (_USE_MOUSE)
+	{
+		require Mouse::Util::TypeConstraints;
+		my $maker = "Mouse::Util::TypeConstraints"->can("generate_can_predicate_for");
+		$opts{compiled_type_constraint} = $maker->($opts{methods}) if $maker;
 	}
 	
 	return $proto->SUPER::new(%opts);
@@ -71,7 +82,8 @@ sub _build_inlined
 	my $self = shift;
 	my @methods = @{$self->methods};
 	
-	if (_USE_XS) {
+	if (_USE_XS)
+	{
 		my $methods = join ",", sort(@{$self->methods});
 		my $xsub    = Type::Tiny::XS::get_subname_for("HasMethods[$methods]");
 		return sub { my $var = $_[1]; "$xsub\($var\)" } if $xsub;

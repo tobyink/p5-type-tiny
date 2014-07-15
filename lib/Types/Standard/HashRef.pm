@@ -29,7 +29,14 @@ sub __constraint_generator
 	if (Types::Standard::_USE_XS)
 	{
 		my $paramname = Type::Tiny::XS::is_known($param_compiled_check);
-		$xsub = Type::Tiny::XS::get_coderef_for("HashRef[$paramname]");
+		$xsub = Type::Tiny::XS::get_coderef_for("HashRef[$paramname]")
+			if $paramname;
+	}
+	elsif (Types::Standard::_USE_MOUSE and $param->_has_xsub)
+	{
+		require Mouse::Util::TypeConstraints;
+		my $maker = "Mouse::Util::TypeConstraints"->can("_parameterize_HashRef_for");
+		$xsub = $maker->($param) if $maker;
 	}
 	
 	return (

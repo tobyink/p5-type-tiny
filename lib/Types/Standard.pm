@@ -392,6 +392,8 @@ $meta->$add_core_type({
 		Types::TypeTiny::TypeTiny->check($param)
 			or _croak("Parameter to Maybe[`a] expected to be a type constraint; got $param");
 		
+		# TODO: xsubs
+		
 		return sub
 		{
 			my $value = shift;
