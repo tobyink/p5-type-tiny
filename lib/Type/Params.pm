@@ -54,7 +54,6 @@ sub _mkslurpy
 			$i,
 			B::perlstring("$tc"),
 			$i,
-			$i,
 		);
 }
 
