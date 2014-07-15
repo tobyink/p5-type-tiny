@@ -83,6 +83,8 @@ a boost with Moose as it does with Moo, because Moose doesn't inline coercion
 code. However, it should still improve performance somewhat because it allows
 L<Type::Coercion> to do some internal inlining.
 
+See also L<Type::Tiny::Manual::Optimization>.
+
 =head2 Interactions with MooseX-Types
 
 Type::Tiny and MooseX::Types type constraints should "play nice". If, for

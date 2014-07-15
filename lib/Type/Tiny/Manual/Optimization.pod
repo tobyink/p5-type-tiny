@@ -1,0 +1,156 @@
+=pod
+
+=for stopwords smush smushed
+
+=encoding utf-8
+
+=head1 NAME
+
+Type::Tiny::Manual::Optimization - squeeze the most out of your CPU
+
+=head1 DESCRIPTION
+
+Various tips to help you squeeze the most out of your CPU.
+
+=head2 XS
+
+The simplest thing you can do to increase performance of many of
+L<Types::Standard>'s built-in type constraints (as well as
+L<Type::Tiny::Class> and L<Type::Tiny::Duck>) is to install
+L<Type::Tiny::XS>, a set of ultra-fast type constraint checks
+implemented in C.
+
+L<Types::Standard>, L<Type::Tiny::Class>, and L<Type::Tiny::Duck>
+will attempt to load L<Type::Tiny::XS> and use its type checks.
+If L<Type::Tiny::XS> is not available, they'll then try to use
+L<Mouse> B<< if it is already loaded >>. (They won't attempt to
+load Mouse.)
+
+=head2 Common Sense
+
+The C<< HashRef[ArrayRef] >> type constraint can probably be checked
+faster than C<< HashRef[ArrayRef[Num]] >>. If you find yourself using
+very complex and slow type constraints, you should consider switching
+to simpler and faster ones. (Though this means you have to place a
+little more trust in your caller to not supply you with bad data.)
+
+(A counter-intuitive exception to this: even though C<Int> is more
+restrictive than C<Num>, in most circumstances C<Int> checks will run
+faster.)
+
+=head2 Inlining Type Constraints
+
+If your type constraint can be inlined, this can not only speed up
+Type::Tiny's own checks and coercions, it may also allow your type constraint
+to be inlined into generated methods such as Moose attribute accessors.
+
+All of the constraints from C<Types::Standard> can be inlined, as can enum,
+class_type, role_type and duck_type constraints. Union and intersection
+constraints can be inlined if their sub-constraints can be. So if you can
+define your own types purely in terms of these types, you automatically
+get inlining:
+
+   declare HashLike, as union [
+      Ref["HASH"],
+      Overload["&{}"],
+   ];
+
+However, sometimes these base types are not powerful enough and you'll need
+to write a constraint coderef:
+
+   declare NonEmptyHash, as HashLike,
+      where     { scalar values %$_ };
+
+... and you've suddenly sacrificed a lot of speed.
+
+Inlining to the rescue! You can define an inlining coderef which will be
+passed two parameters: the constraint itself and a variable name as a string.
+For example, the variable name might be C<< '$_' >> or C<< '$_[0]' >>.
+Your coderef should return a Perl expression string, interpolating that
+variable name.
+
+   declare NonEmptyHash, as HashLike,
+      where     { scalar values %$_ },
+      inline_as {
+         my ($constraint, $varname) = @_;
+         return sprintf(
+            '%s and scalar values %%{%s}',
+            $constraint->parent->inline_check($varname),
+            $varname,
+         );
+      };
+
+The Perl expression could be inlined within a function or a C<if> clause or
+potentially anywhere, so it really must be an expression, not a statement.
+It should not C<return> or C<exit> and probably shouldn't C<die>. (If you
+need loops and so on, you can output a C<do> block.)
+
+Note that if you're subtyping an existing type constraint, your C<inline_as>
+block is also responsible for checking the parent type's constraint. This
+can be done quite easily, as shown in the example above.
+
+Note that defining a type constraint in terms of a constraint coderef and an
+inlining coderef can be a little repetitive. L<Sub::Quote> provides an
+alternative that reduces repetition (though the inlined code might not be as
+compact/good/fast).
+
+   declare NonEmptyHash, as HashLike,
+      constraint => quote_sub q{ scalar values %$_ };
+
+Aside: it's been pointed out that "might not be as fast" above is a bit
+hand-wavy. When Type::Tiny does inlining from Sub::Quote coderefs, it needs
+to inline all the ancestor type constraints, and smush them together with
+C<< && >>. This may result in duplicate checks. For example, if 'MyArray'
+inherits from 'MyRef' which inherits from 'MyDef', the inlined code might
+end up as:
+
+   defined($_)              # check MyDef
+   && ref($_)               # check MyRef
+   && ref($_) eq 'ARRAY'    # check MyArray
+
+When just the last check would have been sufficient. A custom C<inline_as>
+allows you finer control over how the type constraint is inlined.
+
+=head2 Optimizing Coercions
+
+Coercions are often defined using coderefs:
+
+   PathTiny->plus_coercions(
+      Str,   sub { "Path::Tiny"->new($_) },
+      Undef, sub { "Path::Tiny"->new("/etc/myapp/default.conf") },
+   );
+
+But you can instead define them as strings of Perl code operating on
+C<< $_ >>:
+
+   PathTiny->plus_coercions(
+      Str,   q{ "Path::Tiny"->new($_) },
+      Undef, q{ "Path::Tiny"->new("/etc/myapp/default.conf") },
+   );
+
+The latter will run faster, so is preferable at least for simple
+coercions.
+
+This makes the most difference when used with L<Moo>, which supports
+inlining of coercions. L<Moose> does not inline coercions, but
+providing coercions as strings still allows Type::Tiny to optimize the
+coercion coderef it provides to Moose.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013-2014 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+=cut

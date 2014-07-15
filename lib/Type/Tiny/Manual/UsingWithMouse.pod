@@ -79,9 +79,10 @@ C<no_coercions> in L<Type::Tiny>.
 =head2 Optimization
 
 Mouse's built-in type constraints are implemented using XS and are stupidly
-fast. Using Type::Tiny type constraints I<will> be significantly slower.
-However, Type::Tiny constraints should not be significantly slower (and may
-even be faster) than non-built-in Mouse type constraints.
+fast. For many type constraints, if Type::Tiny notices Mouse is loaded early
+enough, Type::Tiny will borrow Mouse's XS subs.
+
+See also L<Type::Tiny::Manual::Optimization>.
 
 =head2 Interactions with MouseX-Types
 

@@ -65,6 +65,10 @@ Other modules using Type::Tiny in interesting ways: L<Type::Tie>, L<Test::Mocha>
 
 =item *
 
+L<Optimization|Type::Tiny::Manual::Optimization> - squeeze the most out of your CPU.
+
+=item *
+
 L<Type::Tiny maintenance policies|Type::Tiny::Manual::Policies> - the stability policy.
 
 =back

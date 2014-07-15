@@ -76,19 +76,6 @@ Where the C<PathTiny> constraint is used in another part of the code, it
 will not see these coercions, because they were added to the new anonymous
 type constraint, not to the C<PathTiny> constraint itself!
 
-=head2 Aside: Optimizing Coercions
-
-Stepping away from the flow of this article, I'll point out that the
-following also works, using strings of Perl code instead of coderefs.
-It allows Type::Coercion to do a little optimization and run faster:
-
-   my $ConfigFileType = PathTiny->plus_coercions(
-      Str,   q{ "Path::Tiny"->new($_) },
-      Undef, q{ "Path::Tiny"->new("/etc/myapp/default.conf") },
-   );
-
-Now, where were we...?
-
 =head2 Named Coercions
 
 A type library may define a named set of coercions to a particular

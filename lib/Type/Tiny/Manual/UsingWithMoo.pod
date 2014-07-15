@@ -71,6 +71,8 @@ If creating your own type constraints using C<< Type::Tiny->new >>, then
 consider using L<Sub::Quote> to quote the coderef; this allows you to take
 advantage of inlining without having to write your own inlining routines.
 
+See also L<Type::Tiny::Manual::Optimization>.
+
 =head1 SEE ALSO
 
 For examples using Type::Tiny with L<Moo> see the SYNOPSIS sections of
