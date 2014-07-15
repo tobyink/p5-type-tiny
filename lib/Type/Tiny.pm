@@ -1089,6 +1089,12 @@ sub DOES
 	"UNIVERSAL"->can("DOES") ? $self->SUPER::DOES(@_) : $self->isa(@_);
 }
 
+sub _has_xsub
+{
+	require B;
+	!!B::svref_2object( shift->compiled_check )->XSUB;
+}
+
 # fill out Moose-compatible API
 sub inline_environment         { +{} }
 sub _inline_check              { shift->inline_check(@_) }
