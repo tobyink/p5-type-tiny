@@ -21,8 +21,13 @@ by a I<< six month >> notice period, with the following exceptions:
 
 =item *
 
-Where a change is necessary to maintain compatibility with new releases
-of L<Moose>, L<Moo>, or Perl itself.
+Any changes which are necessary to maintain compatibility with new
+releases of L<Moose>, L<Moo>, and other software that Type::Tiny needs
+to integrate with.
+
+=item *
+
+Changes to maintain compatibility with future versions of Perl itself.
 
 =item *
 
@@ -69,6 +74,10 @@ L<Type::Registry> has L<changes under consideration|Type::Registry/"STATUS">.
 
 L<Type::Registry>'s ability to import L<MooseX::Types> and L<MouseX::Types>
 type libraries is experimental.
+
+=item *
+
+Integration with L<Type::Tiny::XS>.
 
 =item *
 
