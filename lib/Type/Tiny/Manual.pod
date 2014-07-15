@@ -61,7 +61,7 @@ L<Processing arguments to subs|Type::Tiny::Manual::Params> - coerce and validate
 
 =item *
 
-Other modules using Type::Tiny in interesting ways: L<Type::Tie>, L<Scalar::Does>, L<Set::Equivalence>...
+Other modules using Type::Tiny in interesting ways: L<Type::Tie>, L<Test::Mocha>, L<Scalar::Does>, L<Set::Equivalence>...
 
 =item *
 
