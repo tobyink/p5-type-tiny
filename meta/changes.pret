@@ -1812,3 +1812,14 @@
 		item "Type::Params was warning about additional arguments passed to sprintf under Perl blead. The additional argument has been removed."^^Bugfix;
 		item "Updated NEWS file."^^Documentation;
 	].
+
+`Type-Tiny 0.045_05 cpan:TOBYINK`
+	issued  2014-07-18;
+	changeset [
+		dcs:versus `Type-Tiny 0.045_04 cpan:TOBYINK`;
+		item "Type::Tiny now has an `of` method which is a shortcut for `parameterize` which I can never spell properly."^^Addition;
+		item "Type::Tiny now has a `where` method which is a shortcut for creating a child type with a constraint coderef."^^Addition;
+		item "Added a Type::Tiny::Manual::Optimization perldoc page."^^Documentation;
+		item "More sensible use of Sub::Name in Type::Library."^^Bugfix;
+		item "Restore and improve Mouse XS stuff dropped in Type-Tiny 0.045_03."^^Change;
+	].
