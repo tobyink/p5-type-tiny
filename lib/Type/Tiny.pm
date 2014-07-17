@@ -1095,6 +1095,9 @@ sub _has_xsub
 	!!B::svref_2object( shift->compiled_check )->XSUB;
 }
 
+sub of                         { shift->parameterize(@_) }
+sub where                      { shift->create_child_type(constraint => @_) }
+
 # fill out Moose-compatible API
 sub inline_environment         { +{} }
 sub _inline_check              { shift->inline_check(@_) }
@@ -1442,6 +1445,14 @@ constraint they are called upon:
 
 Construct a new Type::Tiny object with this object as its parent.
 
+=item C<< where($coderef) >>
+
+Shortcut for creating an anonymous child type constraint. Use it like
+C<< HashRef->where(sub { exists($_->{name}) }) >>. That said, you can
+get a similar result using overloaded C<< & >>:
+
+   HashRef & sub { exists($_->{name}) }
+
 =item C<< child_type_class >>
 
 The class that create_child_type will construct by default.
@@ -1450,6 +1461,10 @@ The class that create_child_type will construct by default.
 
 Creates a new parameterized type; throws an exception if called on a
 non-parameterizable type.
+
+=item C<< of(@parameters) >>
+
+A cute alias for C<parameterize>. Use it like C<< ArrayRef->of(Int) >>.
 
 =item C<< plus_coercions($type1, $code1, ...) >>
 
