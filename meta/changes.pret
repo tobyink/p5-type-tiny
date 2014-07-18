@@ -1823,3 +1823,13 @@
 		item "More sensible use of Sub::Name in Type::Library."^^Bugfix;
 		item "Restore and improve Mouse XS stuff dropped in Type-Tiny 0.045_03."^^Change;
 	].
+
+`Type-Tiny 0.046 cpan:TOBYINK`
+	issued  2014-07-18;
+	changeset [
+		dcs:versus `Type-Tiny 0.045_05 cpan:TOBYINK`;
+		item "Add test cases for Types::TypeTiny (the library of type constraints used internally by Type::Tiny)."^^Tests;
+		item "Fix for Types::TypeTiny::to_TypeTiny($coderef) when Sub::Quote is loaded but not used."^^Bugfix;
+		item "Undef no longer passes the Types::TypeTiny::StringLike type constraint."^^Bugfix;
+		item "Minor optimizations to Types::TypeTiny::to_TypeTiny."^^Change;
+	].

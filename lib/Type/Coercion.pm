@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Coercion::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Coercion::VERSION   = '0.045_05';
+	$Type::Coercion::VERSION   = '0.046';
 }
 
 use Eval::TypeTiny qw<>;
