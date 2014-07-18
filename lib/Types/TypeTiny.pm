@@ -70,8 +70,8 @@ sub StringLike ()
 	require Type::Tiny;
 	$cache{StringLike} ||= "Type::Tiny"->new(
 		name       => "StringLike",
-		constraint => sub {    !ref($_   ) or Scalar::Util::blessed($_   ) && overload::Method($_   , q[""])  },
-		inlined    => sub { qq/!ref($_[1]) or Scalar::Util::blessed($_[1]) && overload::Method($_[1], q[""])/ },
+		constraint => sub {    defined($_   ) && !ref($_   ) or Scalar::Util::blessed($_   ) && overload::Method($_   , q[""])  },
+		inlined    => sub { qq/defined($_[1]) && !ref($_[1]) or Scalar::Util::blessed($_[1]) && overload::Method($_[1], q[""])/ },
 		library    => __PACKAGE__,
 	);
 }
@@ -126,22 +126,22 @@ sub to_TypeTiny
 {
 	my $t = $_[0];
 	
-	return $t unless ref $t;
-	return $t if ref($t) =~ /^Type::Tiny\b/;
+	return $t unless (my $ref = ref $t);
+	return $t if $ref =~ /^Type::Tiny\b/;
 	
 	return $ttt_cache{ refaddr($t) } if $ttt_cache{ refaddr($t) };
 	
 	if (my $class = blessed $t)
 	{
-		return $t                           if $class->isa("Type::Tiny");
-		goto \&_TypeTinyFromMoose           if $class->isa("Moose::Meta::TypeConstraint");
-		goto \&_TypeTinyFromMoose           if $class->isa("MooseX::Types::TypeDecorator");
-		goto \&_TypeTinyFromValidationClass if $class->isa("Validation::Class::Simple");
-		goto \&_TypeTinyFromValidationClass if $class->isa("Validation::Class");
-		goto \&_TypeTinyFromGeneric         if $t->can("check") && $t->can("get_message"); # i.e. Type::API::Constraint
+		return $t                               if $class->isa("Type::Tiny");
+		return _TypeTinyFromMoose($t)           if $class->isa("Moose::Meta::TypeConstraint");
+		return _TypeTinyFromMoose($t)           if $class->isa("MooseX::Types::TypeDecorator");
+		return _TypeTinyFromValidationClass($t) if $class->isa("Validation::Class::Simple");
+		return _TypeTinyFromValidationClass($t) if $class->isa("Validation::Class");
+		return _TypeTinyFromGeneric($t)         if $t->can("check") && $t->can("get_message"); # i.e. Type::API::Constraint
 	}
 	
-	goto \&_TypeTinyFromCodeRef if ref($t) eq q(CODE);
+	return _TypeTinyFromCodeRef($t) if $ref eq q(CODE);
 	
 	$t;
 }
