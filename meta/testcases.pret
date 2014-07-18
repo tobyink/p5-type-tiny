@@ -123,6 +123,10 @@ m`Types::Standard Type-Tiny`
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Types-Standard/structured.t Type-Tiny`; :purpose "Checks various values against structured types from Types::Standard." ];
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Types-Standard/tied.t Type-Tiny`; :purpose "Checks various values against 'Tied' from Types::Standard." ];
 	.
+m`Types::TypeTiny Type-Tiny`
+	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Types-TypeTiny/basic.t Type-Tiny`; :purpose "Test the Types::TypeTiny bootstrap library. (That is, type constraints used by Type::Tiny internally.)" ];
+	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Types-TypeTiny/coercion.t Type-Tiny`; :purpose "Test Types::TypeTiny::to_TypeTiny pseudo-coercion." ];
+	.
 [] a :IntegrationTest; :test_script f`t/30-integration/Class-InsideOut/basic.t Type-Tiny`; :purpose "Check type constraints work with Class::InsideOut.".
 [] a :IntegrationTest; :test_script f`t/30-integration/Exporter-Tiny/basic.t Type-Tiny`; :purpose "Tests Exporter::Tiny has the features Type::Tiny needs.".
 [] a :IntegrationTest; :test_script f`t/30-integration/Exporter-Tiny/installer.t Type-Tiny`; :purpose "Tests Type::Library libraries work with Sub::Exporter plugins.".
