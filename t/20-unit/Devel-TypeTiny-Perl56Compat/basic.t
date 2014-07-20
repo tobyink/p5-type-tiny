@@ -23,6 +23,7 @@ use strict;
 use warnings;
 use lib qw( ./lib ./t/lib ../inc ./inc );
 
+use B;
 use Test::More;
 use Types::Standard;
 
