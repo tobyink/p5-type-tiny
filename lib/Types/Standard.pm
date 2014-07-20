@@ -63,11 +63,15 @@ BEGIN {
 my $add_core_type = sub {
 	my $meta = shift;
 	my ($typedef) = @_;
-	$typedef->{_is_core} = 1;
 	
 	my $name = $typedef->{name};
 	my ($xsub, $xsubname);
 	
+	# We want Map and Tuple to be XSified, even if they're not
+	# really core.
+	$typedef->{_is_core} = 1
+		unless $name eq 'Map' || $name eq 'Tuple';
+
 	if ( _USE_XS
 	and not ($name eq 'RegexpRef') ) {
 		$xsub     = Type::Tiny::XS::get_coderef_for($name);
@@ -428,7 +432,7 @@ $meta->$add_core_type({
 	},
 });
 
-my $_map = $meta->add_type({
+my $_map = $meta->$add_core_type({
 	name       => "Map",
 	parent     => $_hash,
 	constraint_generator => LazyLoad(Map => 'constraint_generator'),
@@ -508,7 +512,7 @@ sub slurpy {
 	wantarray ? (+{ slurpy => $t }, @_) : +{ slurpy => $t };
 }
 
-$meta->add_type({
+$meta->$add_core_type({
 	name       => "Tuple",
 	parent     => $_arr,
 	name_generator => sub

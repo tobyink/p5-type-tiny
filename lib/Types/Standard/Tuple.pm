@@ -35,8 +35,28 @@ sub __constraint_generator
 		Types::TypeTiny::TypeTiny->check($_)
 			or _croak("Parameters to Tuple[...] expected to be type constraints; got $_");
 	}
+	
+	# By god, the Type::Tiny::XS API is currently horrible
+	my @xsub;
+	if (Types::Standard::_USE_XS and !$slurpy)
+	{
+		my @known = map {
+			my $known;
+			$known = Type::Tiny::XS::is_known($_->compiled_check)
+				unless $_->is_strictly_a_type_of($_Optional);
+			defined($known) ? $known : ();
+		} @constraints;
 		
-	return sub
+		if (@known == @constraints)
+		{
+			my $xsub = Type::Tiny::XS::get_coderef_for(
+				sprintf "Tuple[%s]", join(',', @known)
+			);
+			push @xsub, $xsub if $xsub;
+		}
+	}
+	
+	sub
 	{
 		my $value = $_[0];
 		if ($#constraints < $#$value)
@@ -53,7 +73,7 @@ sub __constraint_generator
 			$constraints[$i]->check(exists $value->[$i] ? $value->[$i] : ()) or return;
 		}
 		return !!1;
-	};
+	}, @xsub;
 }
 
 sub __inline_generator
@@ -67,6 +87,24 @@ sub __inline_generator
 	
 	return if grep { not $_->can_be_inlined } @constraints;
 	return if defined $slurpy && !$slurpy->can_be_inlined;
+	
+	if (Types::Standard::_USE_XS and !$slurpy)
+	{
+		my @known = map {
+			my $known;
+			$known = Type::Tiny::XS::is_known($_->compiled_check)
+				unless $_->is_strictly_a_type_of($_Optional);
+			defined($known) ? $known : ();
+		} @constraints;
+		
+		if (@known == @constraints)
+		{
+			my $xsub = Type::Tiny::XS::get_subname_for(
+				sprintf "Tuple[%s]", join(',', @known)
+			);
+			return sub { my $var = $_[1]; "$xsub\($var\)" } if $xsub;
+		}
+	}
 	
 	my $tmpl = defined($slurpy) && $slurpy->is_a_type_of(Types::Standard::HashRef)
 		? "do { my \$tmp = +{\@{%s}[%d..\$#{%s}]}; %s }"
