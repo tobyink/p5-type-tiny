@@ -9,6 +9,7 @@ BEGIN {
 	$Types::Standard::Tuple::VERSION   = '0.046';
 }
 
+use Type::Tiny ();
 use Types::Standard ();
 use Types::TypeTiny ();
 
@@ -38,7 +39,7 @@ sub __constraint_generator
 	
 	# By god, the Type::Tiny::XS API is currently horrible
 	my @xsub;
-	if (Types::Standard::_USE_XS and !$slurpy)
+	if (Type::Tiny::_USE_XS and !$slurpy)
 	{
 		my @known = map {
 			my $known;
@@ -88,7 +89,7 @@ sub __inline_generator
 	return if grep { not $_->can_be_inlined } @constraints;
 	return if defined $slurpy && !$slurpy->can_be_inlined;
 	
-	if (Types::Standard::_USE_XS and !$slurpy)
+	if (Type::Tiny::_USE_XS and !$slurpy)
 	{
 		my @known = map {
 			my $known;

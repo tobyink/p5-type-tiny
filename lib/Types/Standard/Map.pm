@@ -9,6 +9,7 @@ BEGIN {
 	$Types::Standard::Map::VERSION   = '0.046';
 }
 
+use Type::Tiny ();
 use Types::Standard ();
 use Types::TypeTiny ();
 
@@ -29,7 +30,7 @@ sub __constraint_generator
 		or _croak("Second parameter to Map[`k,`v] expected to be a type constraint; got $values");
 	
 	my @xsub;
-	if (Types::Standard::_USE_XS)
+	if (Type::Tiny::_USE_XS)
 	{
 		my @known = map {
 			my $known = Type::Tiny::XS::is_known($_->compiled_check);
@@ -59,7 +60,7 @@ sub __inline_generator
 	my ($k, $v) = @_;
 	return unless $k->can_be_inlined && $v->can_be_inlined;
 	
-	if (Types::Standard::_USE_XS)
+	if (Type::Tiny::_USE_XS)
 	{
 		my @known = map {
 			my $known = Type::Tiny::XS::is_known($_->compiled_check);

@@ -27,25 +27,8 @@ use Type::Library -base, -declare => qw(
 	UpperCaseStr
 );
 
+use Type::Tiny ();
 use Types::Standard qw( Str );
-
-BEGIN {
-	my $try_xs =
-		exists($ENV{PERL_TYPE_TINY_XS}) ? !!$ENV{PERL_TYPE_TINY_XS} :
-		exists($ENV{PERL_ONLY})         ?  !$ENV{PERL_ONLY} :
-		1;
-	
-	my $use_xs = 0;
-	$try_xs and eval {
-		require Type::Tiny::XS;
-		'Type::Tiny::XS'->VERSION('0.002');
-		$use_xs++;
-	};
-	
-	*_USE_XS = $use_xs
-		? sub () { !!1 }
-		: sub () { !!0 };
-};
 
 my $meta = __PACKAGE__->meta;
 
@@ -97,7 +80,7 @@ $meta->add_type(
 );
 
 my ($nestr);
-if (_USE_XS) {
+if (Type::Tiny::_USE_XS) {
 	$nestr = Type::Tiny::XS::get_coderef_for('NonEmptyStr');
 }
 

@@ -28,7 +28,29 @@ BEGIN {
 	($] >= 5.014)
 		? eval q{ sub _FIXED_PRECEDENCE () { !!1 } }
 		: eval q{ sub _FIXED_PRECEDENCE () { !!0 } };
-}
+};
+
+BEGIN {
+	my $try_xs =
+		exists($ENV{PERL_TYPE_TINY_XS}) ? !!$ENV{PERL_TYPE_TINY_XS} :
+		exists($ENV{PERL_ONLY})         ?  !$ENV{PERL_ONLY} :
+		1;
+	
+	my $use_xs = 0;
+	$try_xs and eval {
+		require Type::Tiny::XS;
+		'Type::Tiny::XS'->VERSION('0.003');
+		$use_xs++;
+	};
+	
+	*_USE_XS = $use_xs
+		? sub () { !!1 }
+		: sub () { !!0 };
+	
+	*_USE_MOUSE = $try_xs
+		? sub () { $INC{'Mouse/Util.pm'} and Mouse::Util::MOUSE_XS() }
+		: sub () { !!0 };
+};
 
 use overload
 	q("")      => sub { caller =~ m{^(Moo::HandleMoose|Sub::Quote)} ? overload::StrVal($_[0]) : $_[0]->display_name },

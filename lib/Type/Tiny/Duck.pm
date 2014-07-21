@@ -13,30 +13,8 @@ use Scalar::Util qw< blessed >;
 
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
-require Type::Tiny;
+use Type::Tiny ();
 our @ISA = 'Type::Tiny';
-
-BEGIN {
-	my $try_xs =
-		exists($ENV{PERL_TYPE_TINY_XS}) ? !!$ENV{PERL_TYPE_TINY_XS} :
-		exists($ENV{PERL_ONLY})         ?  !$ENV{PERL_ONLY} :
-		1;
-	
-	my $use_xs = 0;
-	$try_xs and eval {
-		require Type::Tiny::XS;
-		'Type::Tiny::XS'->VERSION('0.002');
-		$use_xs++;
-	};
-	
-	*_USE_XS = $use_xs
-		? sub () { !!1 }
-		: sub () { !!0 };
-	
-	*_USE_MOUSE = $try_xs
-		? sub () { $INC{'Mouse/Util.pm'} and Mouse::Util::MOUSE_XS() }
-		: sub () { !!0 };
-};
 
 sub new {
 	my $proto = shift;
@@ -49,13 +27,13 @@ sub new {
 	
 	$opts{methods} = [$opts{methods}] unless ref $opts{methods};
 	
-	if (_USE_XS)
+	if (Type::Tiny::_USE_XS)
 	{
 		my $methods = join ",", sort(@{$opts{methods}});
 		my $xsub    = Type::Tiny::XS::get_coderef_for("HasMethods[$methods]");
 		$opts{compiled_type_constraint} = $xsub if $xsub;
 	}
-	elsif (_USE_MOUSE)
+	elsif (Type::Tiny::_USE_MOUSE)
 	{
 		require Mouse::Util::TypeConstraints;
 		my $maker = "Mouse::Util::TypeConstraints"->can("generate_can_predicate_for");
@@ -82,7 +60,7 @@ sub _build_inlined
 	my $self = shift;
 	my @methods = @{$self->methods};
 	
-	if (_USE_XS)
+	if (Type::Tiny::_USE_XS)
 	{
 		my $methods = join ",", sort(@{$self->methods});
 		my $xsub    = Type::Tiny::XS::get_subname_for("HasMethods[$methods]");

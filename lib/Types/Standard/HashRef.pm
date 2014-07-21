@@ -9,6 +9,7 @@ BEGIN {
 	$Types::Standard::HashRef::VERSION   = '0.046';
 }
 
+use Type::Tiny ();
 use Types::Standard ();
 use Types::TypeTiny ();
 
@@ -26,13 +27,13 @@ sub __constraint_generator
 	
 	my $param_compiled_check = $param->compiled_check;
 	my $xsub;
-	if (Types::Standard::_USE_XS)
+	if (Type::Tiny::_USE_XS)
 	{
 		my $paramname = Type::Tiny::XS::is_known($param_compiled_check);
 		$xsub = Type::Tiny::XS::get_coderef_for("HashRef[$paramname]")
 			if $paramname;
 	}
-	elsif (Types::Standard::_USE_MOUSE and $param->_has_xsub)
+	elsif (Type::Tiny::_USE_MOUSE and $param->_has_xsub)
 	{
 		require Mouse::Util::TypeConstraints;
 		my $maker = "Mouse::Util::TypeConstraints"->can("_parameterize_HashRef_for");
@@ -55,7 +56,7 @@ sub __inline_generator
 	my $param = shift;
 	
 	my $compiled = $param->compiled_check;
-	if (Types::Standard::_USE_XS)
+	if (Type::Tiny::_USE_XS)
 	{
 		my $paramname = Type::Tiny::XS::is_known($compiled);
 		my $xsubname  = Type::Tiny::XS::get_subname_for("HashRef[$paramname]");
