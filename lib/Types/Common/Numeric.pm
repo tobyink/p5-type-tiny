@@ -23,6 +23,24 @@ use Type::Library -base, -declare => qw(
 
 use Types::Standard qw( Num Int );
 
+BEGIN {
+	my $try_xs =
+		exists($ENV{PERL_TYPE_TINY_XS}) ? !!$ENV{PERL_TYPE_TINY_XS} :
+		exists($ENV{PERL_ONLY})         ?  !$ENV{PERL_ONLY} :
+		1;
+	
+	my $use_xs = 0;
+	$try_xs and eval {
+		require Type::Tiny::XS;
+		'Type::Tiny::XS'->VERSION('0.002');
+		$use_xs++;
+	};
+	
+	*_USE_XS = $use_xs
+		? sub () { !!1 }
+		: sub () { !!0 };
+};
+
 my $meta = __PACKAGE__->meta;
 
 $meta->add_type(
@@ -41,20 +59,40 @@ $meta->add_type(
 	message    => sub { "Must be a number greater than or equal to zero" },
 );
 
+my ($pos_int, $posz_int);
+if (_USE_XS) {
+	$pos_int  = Type::Tiny::XS::get_coderef_for('PositiveInt');
+	$posz_int = Type::Tiny::XS::get_coderef_for('PositiveOrZeroInt');
+}
+
 $meta->add_type(
 	name       => 'PositiveInt',
 	parent     => Int,
 	constraint => sub { $_ > 0 },
-	inlined    => sub { undef, qq($_ > 0) },
+	inlined    => sub {
+		if ($pos_int) {
+			my $xsub = Type::Tiny::XS::get_subname_for($_[0]->name);
+			return "$xsub($_[1])" if $xsub;
+		}
+		undef, qq($_ > 0);
+	},
 	message    => sub { "Must be a positive integer" },
+	$pos_int ? ( compiled_type_constraint => $pos_int ) : (),
 );
 
 $meta->add_type(
 	name       => 'PositiveOrZeroInt',
 	parent     => Int,
 	constraint => sub { $_ >= 0 },
-	inlined    => sub { undef, qq($_ >= 0) },
+	inlined    => sub {
+		if ($posz_int) {
+			my $xsub = Type::Tiny::XS::get_subname_for($_[0]->name);
+			return "$xsub($_[1])" if $xsub;
+		}
+		undef, qq($_ >= 0);
+	},
 	message    => sub { "Must be an integer greater than or equal to zero" },
+	$posz_int ? ( compiled_type_constraint => $posz_int ) : (),
 );
 
 $meta->add_type(

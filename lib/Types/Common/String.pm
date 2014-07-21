@@ -29,6 +29,24 @@ use Type::Library -base, -declare => qw(
 
 use Types::Standard qw( Str );
 
+BEGIN {
+	my $try_xs =
+		exists($ENV{PERL_TYPE_TINY_XS}) ? !!$ENV{PERL_TYPE_TINY_XS} :
+		exists($ENV{PERL_ONLY})         ?  !$ENV{PERL_ONLY} :
+		1;
+	
+	my $use_xs = 0;
+	$try_xs and eval {
+		require Type::Tiny::XS;
+		'Type::Tiny::XS'->VERSION('0.002');
+		$use_xs++;
+	};
+	
+	*_USE_XS = $use_xs
+		? sub () { !!1 }
+		: sub () { !!0 };
+};
+
 my $meta = __PACKAGE__->meta;
 
 $meta->add_type(
@@ -78,12 +96,24 @@ $meta->add_type(
 	message    => sub { "Must be between 8 and 255 chars, and contain a non-alpha char" },
 );
 
+my ($nestr);
+if (_USE_XS) {
+	$nestr = Type::Tiny::XS::get_coderef_for('NonEmptyStr');
+}
+
 $meta->add_type(
 	name       => NonEmptyStr,
 	parent     => Str,
 	constraint => sub { length($_) > 0 },
-	inlined    => sub { undef, qq(length($_) > 0) },
+	inlined    => sub {
+		if ($nestr) {
+			my $xsub = Type::Tiny::XS::get_subname_for($_[0]->name);
+			return "$xsub($_[1])" if $xsub;
+		}
+		undef, qq(length($_) > 0);
+	},
 	message    => sub { "Must not be empty" },
+	$nestr ? ( compiled_type_constraint => $nestr ) : (),
 );
 
 $meta->add_type(
