@@ -1,6 +1,6 @@
 =pod
 
-=for stopwords smush smushed
+=for stopwords smush smushed enums
 
 =encoding utf-8
 
@@ -48,7 +48,7 @@ type check will be conducted by Type::Tiny::XS.
 The parameterized C<InstanceOf>, C<HasMethods>, and C<Enum> type
 constraints will be accelerated. So will L<Type::Tiny::Class>,
 L<Type::Tiny::Duck>, and L<Type::Tiny::Enum> objects. (But enums will
-only be accellerated if the list of allowed string values consists
+only be accelerated if the list of allowed string values consists
 entirely of "words" - i.e. C<< not grep /\W/, @values >>.)
 
 The C<PositiveInt> and C<PositiveOrZeroInt> type constraints from
