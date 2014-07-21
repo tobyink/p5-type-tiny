@@ -1833,3 +1833,44 @@
 		item "Undef no longer passes the Types::TypeTiny::StringLike type constraint."^^Bugfix;
 		item "Minor optimizations to Types::TypeTiny::to_TypeTiny."^^Change;
 	].
+
+`Type-Tiny 0.047_01 cpan:TOBYINK`
+	issued  2014-07-21;
+	changeset [
+		dcs:versus `Type-Tiny 0.046 cpan:TOBYINK`;
+		item [
+			label "Types::Standard::Map is now XS-accelerated.";
+			seealso <https://gist.github.com/tobyink/e733f839cecc0dd193a6>;
+		];
+		item [
+			label "Types::Standard::Tuple is now XS-accelerated.";
+			seealso <https://gist.github.com/tobyink/e733f839cecc0dd193a6>;
+		];
+		item [
+			label "Type::Tiny::Enum is now XS-accelerated.";
+			seealso <https://gist.github.com/tobyink/dfdf9bb826a530781e3d>;
+		];
+		item [
+			label "Types::Common::Numeric::PositiveInt is now XS-accelerated.";
+			seealso <https://gist.github.com/tobyink/dcc15cf283c90c749501>;
+		];
+		item [
+			label "Types::Common::Numeric::PositiveOrZeroInt is now XS-accelerated.";
+			seealso <https://gist.github.com/tobyink/dcc15cf283c90c749501>;
+		];
+		item [
+			label "Types::Common::String::NonEmptyStr is now XS-accelerated.";
+			seealso <https://gist.github.com/tobyink/dcc15cf283c90c749501>;
+		];
+		item [
+			label "Unify _USE_XS/_USE_MOUSE logic in Type::Tiny. (It was previously scattered across Types::Standard and various other modules.)";
+		];
+		item [
+			a dcs:Documentation;
+			label "Better document which type constraints will be accelerated by Type::Tiny::XS and Mouse.";
+		];
+		item [
+			a dcs:Tests, dcs:Bugfix;
+			label "Fix a silly test case that was relying on Exporter::Tiny to always load B.pm. (Current versions of Exporter::Tiny do load B.pm, but future versions might not.)";
+		];
+	].

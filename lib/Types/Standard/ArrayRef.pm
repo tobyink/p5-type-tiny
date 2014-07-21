@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Types::Standard::ArrayRef::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::ArrayRef::VERSION   = '0.046';
+	$Types::Standard::ArrayRef::VERSION   = '0.047_01';
 }
 
 use Type::Tiny ();
