@@ -16,7 +16,7 @@ sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
 use overload q[@{}] => sub { $_[0]{type_constraints} ||= [] };
 
-require Type::Tiny;
+use Type::Tiny ();
 our @ISA = 'Type::Tiny';
 
 sub new {
@@ -33,6 +33,23 @@ sub new {
 		map Types::TypeTiny::to_TypeTiny($_),
 		@{ ref $opts{type_constraints} eq "ARRAY" ? $opts{type_constraints} : [$opts{type_constraints}] }
 	];
+	
+	if (Type::Tiny::_USE_XS)
+	{
+		my @constraints = @{$opts{type_constraints}};
+		my @known = map {
+			my $known = Type::Tiny::XS::is_known($_->compiled_check);
+			defined($known) ? $known : ();
+		} @constraints;
+		
+		if (@known == @constraints)
+		{
+			my $xsub = Type::Tiny::XS::get_coderef_for(
+				sprintf "AllOf[%s]", join(',', @known)
+			);
+			$opts{compiled_type_constraint} = $xsub if $xsub;
+		}
+	}
 	
 	return $proto->SUPER::new(%opts);
 }
@@ -66,6 +83,29 @@ sub can_be_inlined
 sub inline_check
 {
 	my $self = shift;
+	
+	if (Type::Tiny::_USE_XS and !exists $self->{xs_sub})
+	{
+		$self->{xs_sub} = undef;
+		
+		my @constraints = @{$self->type_constraints};
+		my @known = map {
+			my $known = Type::Tiny::XS::is_known($_->compiled_check);
+			defined($known) ? $known : ();
+		} @constraints;
+		
+		if (@known == @constraints)
+		{
+			$self->{xs_sub} = Type::Tiny::XS::get_subname_for(
+				sprintf "AllOf[%s]", join(',', @known)
+			);
+		}
+	}
+	
+	if (Type::Tiny::_USE_XS and $self->{xs_sub}) {
+		return "$self->{xs_sub}\($_[0]\)";
+	}
+	
 	sprintf '(%s)', join " and ", map $_->inline_check($_[0]), @$self;
 }
 
