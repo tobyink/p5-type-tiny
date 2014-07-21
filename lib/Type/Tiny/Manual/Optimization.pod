@@ -15,16 +15,67 @@ Various tips to help you squeeze the most out of your CPU.
 =head2 XS
 
 The simplest thing you can do to increase performance of many of
-L<Types::Standard>'s built-in type constraints (as well as
-L<Type::Tiny::Class> and L<Type::Tiny::Duck>) is to install
-L<Type::Tiny::XS>, a set of ultra-fast type constraint checks
-implemented in C.
+the built-in type constraints is to install L<Type::Tiny::XS>, a
+set of ultra-fast type constraint checks implemented in C.
 
-L<Types::Standard>, L<Type::Tiny::Class>, and L<Type::Tiny::Duck>
-will attempt to load L<Type::Tiny::XS> and use its type checks.
-If L<Type::Tiny::XS> is not available, they'll then try to use
-L<Mouse> B<< if it is already loaded >>. (They won't attempt to
-load Mouse.)
+L<Type::Tiny> will attempt to load L<Type::Tiny::XS> and use its
+type checks. If L<Type::Tiny::XS> is not available, it will then
+try to use L<Mouse> B<< if it is already loaded >>, but Type::Tiny
+won't attempt to load Mouse for you.
+
+=head3 Types that can be accelerated by Type::Tiny::XS
+
+The following simple type constraints from L<Types::Standard> will
+be accelerated by Type::Tiny::XS: C<Any>, C<ArrayRef>, C<Bool>,
+C<ClassName>, C<CodeRef>, C<Defined>, C<FileHandle>, C<GlobRef>,
+C<HashRef>, C<Int>, C<Item>, C<Object>, C<Map>, C<Ref>, C<ScalarRef>,
+C<Str>, C<Tuple>, C<Undef>, and C<Value>. (Note that C<Num> and
+C<RegexpRef> are B<not> on that list.)
+
+The parameterized form of C<Ref> cannot be accelerated.
+
+The parameterized forms of C<ArrayRef>, C<HashRef>, and C<Map> can be
+accelerated only if their parameters are.
+
+The parameterized form of C<Tuple> can be accelerated if its
+parameters are, it has no C<Optional> components, and it does not use
+C<slurpy>.
+
+Certain type constraints may benefit partially from Type::Tiny::XS.
+For example, C<RoleName> inherits from C<ClassName>, so part of the
+type check will be conducted by Type::Tiny::XS.
+
+The parameterized C<InstanceOf>, C<HasMethods>, and C<Enum> type
+constraints will be accelerated. So will L<Type::Tiny::Class>,
+L<Type::Tiny::Duck>, and L<Type::Tiny::Enum> objects. (But enums will
+only be accellerated if the list of allowed string values consists
+entirely of "words" - i.e. C<< not grep /\W/, @values >>.)
+
+The C<PositiveInt> and C<PositiveOrZeroInt> type constraints from
+L<Types::Common::Numeric> will be accelerated, as will the
+C<NonEmptyStr> type constraint from L<Types::Common::String>.
+
+=head3 Types that can be accelerated by Mouse
+
+The following simple type constraints from L<Types::Standard> will
+be accelerated by Type::Tiny::XS: C<Any>, C<ArrayRef>, C<Bool>,
+C<ClassName>, C<CodeRef>, C<Defined>, C<FileHandle>, C<GlobRef>,
+C<HashRef>, C<Ref>, C<ScalarRef>, C<Str>, C<Undef>, and C<Value>.
+(Note that C<Item>, C<Num>, C<Int>, C<Object>, and C<RegexpRef>
+are B<not> on that list.)
+
+The parameterized form of C<Ref> cannot be accelerated.
+
+The parameterized forms of C<ArrayRef> and C<HashRef> can be
+accelerated only if their parameters are.
+
+Certain type constraints may benefit partially from Mouse. For
+example, C<RoleName> inherits from C<ClassName>, so part of the
+type check will be conducted by Mouse.
+
+The parameterized C<InstanceOf> and C<HasMethods> type constraints
+will be accelerated. So will L<Type::Tiny::Class> and
+L<Type::Tiny::Duck> objects.
 
 =head2 Common Sense
 
