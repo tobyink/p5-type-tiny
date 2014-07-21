@@ -16,6 +16,24 @@ use overload q[@{}] => 'values';
 require Type::Tiny;
 our @ISA = 'Type::Tiny';
 
+BEGIN {
+	my $try_xs =
+		exists($ENV{PERL_TYPE_TINY_XS}) ? !!$ENV{PERL_TYPE_TINY_XS} :
+		exists($ENV{PERL_ONLY})         ?  !$ENV{PERL_ONLY} :
+		1;
+	
+	my $use_xs = 0;
+	$try_xs and eval {
+		require Type::Tiny::XS;
+		'Type::Tiny::XS'->VERSION('0.002');
+		$use_xs++;
+	};
+	
+	*_USE_XS = $use_xs
+		? sub () { !!1 }
+		: sub () { !!0 };
+};
+
 sub new
 {
 	my $proto = shift;
@@ -30,6 +48,13 @@ sub new
 		map { $_ => 1 }
 		@{ ref $opts{values} eq "ARRAY" ? $opts{values} : [$opts{values}] };
 	$opts{values} = [sort keys %tmp];
+	
+	if (_USE_XS and not grep /\W/, @{$opts{values}})
+	{
+		my $enum = join ",", @{$opts{values}};
+		my $xsub = Type::Tiny::XS::get_coderef_for("Enum[$enum]");
+		$opts{compiled_type_constraint} = $xsub if $xsub;
+	}
 	
 	return $proto->SUPER::new(%opts);
 }
@@ -46,6 +71,7 @@ sub _build_display_name
 sub _build_constraint
 {
 	my $self = shift;
+	
 	my $regexp = join "|", map quotemeta, @$self;
 	return sub { defined and m{\A(?:$regexp)\z} };
 }
@@ -58,6 +84,14 @@ sub can_be_inlined
 sub inline_check
 {
 	my $self = shift;
+	
+	if (_USE_XS)
+	{
+		my $enum = join ",", @{$self->values};
+		my $xsub = Type::Tiny::XS::get_subname_for("Enum[$enum]");
+		return "$xsub\($_[0]\)" if $xsub;
+	}
+	
 	my $regexp = join "|", map quotemeta, @$self;
 	$_[0] eq '$_'
 		? "(defined and !ref and m{\\A(?:$regexp)\\z})"
