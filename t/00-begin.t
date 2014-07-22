@@ -68,10 +68,22 @@ while (<DATA>)
 	diag_version($_) if /\S/;
 }
 
+require Types::Standard;
+diag("");
+diag(
+	!Types::Standard::Str()->_has_xsub
+		? ">>>> Type::Tiny is not using XS"
+		: $INC{'Type/Tiny/XS.pm'}
+			? ">>>> Type::Tiny is using Type::Tiny::XS"
+			: ">>>> Type::Tiny is using Mouse::XS"
+);
+diag("");
+
 ok 1;
 done_testing;
 
 __END__
+
 perl
 Exporter::Tiny
 Type::Tie
