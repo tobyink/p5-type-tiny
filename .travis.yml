@@ -38,6 +38,7 @@ matrix:
         - cpanm -n Test::Requires Test::Fatal Test::LeakTrace
         - cpanm -n indirect multidimensional bareword::filehandles strictures
         - cpanm -n Moo Moose Mouse MooseX::Types::Common MouseX::Types::Common
+        - cpanm -n match::simple MooseX::Getopt Class::InsideOut Object::Accessor
         - cpanm -n Type::Tie
         - cpan-install --toolchain
         - cpan-install --deps
@@ -49,6 +50,7 @@ matrix:
         - cpanm -n Test::Requires Test::Fatal Test::LeakTrace
         - cpanm -n indirect multidimensional bareword::filehandles strictures
         - cpanm -n Moo Moose Mouse MooseX::Types::Common MouseX::Types::Common
+        - cpanm -n match::simple MooseX::Getopt Class::InsideOut Object::Accessor
         - cpanm -n Type::Tie Validation::Class::Simple 
         - cpan-install --toolchain
         - cpan-install --deps
@@ -56,20 +58,21 @@ matrix:
     # Coverage report
     - perl: "5.20"
       env: COVERAGE=1 EXTENDED_TESTING=1
-      script:
-        - export PERL_TYPE_TINY_XS=0
-        - prove -r -Ilib -Iinc $(test-dirs)
-        - export PERL_TYPE_TINY_XS=1
-        - prove -r -Ilib -Iinc $(test-dirs)
       install:
         - cpanm Exporter::Tiny
         - cpanm -n Test::Requires Test::Fatal Test::LeakTrace
         - cpanm -n indirect multidimensional bareword::filehandles strictures
         - cpanm -n Moo Moose Mouse MooseX::Types::Common MouseX::Types::Common
+        - cpanm -n match::simple MooseX::Getopt Class::InsideOut Object::Accessor
         - cpanm -n Type::Tie Validation::Class::Simple 
         - cpan-install --toolchain
         - cpan-install --deps
         - cpan-install --coverage
+      script:
+        - export PERL_TYPE_TINY_XS=0
+        - prove -r -Ilib -Iinc $(test-dirs)
+        - export PERL_TYPE_TINY_XS=1
+        - prove -r -Ilib -Iinc $(test-dirs)
 before_install:
   - export DIST_INKT_PROFILE="Dist::Inkt::Profile::TOBYINK"
   - git clone git://github.com/haarg/perl-travis-helper
