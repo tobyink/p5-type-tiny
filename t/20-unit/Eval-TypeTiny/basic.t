@@ -156,32 +156,6 @@ is($external, 42, 'closing over variables really really really works!');
 	like($e, qr{^Can't call method "method_of_mine" on an undefined value}, '... can be untied');
 }
 
-my $e = exception { eval_closure(source => 'sub { 1 ]') };
-
-isa_ok(
-	$e,
-	'Error::TypeTiny::Compilation',
-	'$e',
-);
-
-like(
-	$e,
-	qr{^Failed to compile source because: syntax error},
-	'throw exception when code does not compile',
-);
-
-like(
-	$e->errstr,
-	qr{^syntax error},
-	'$e->errstr',
-);
-
-like(
-	$e->code,
-	qr{sub \{ 1 \]},
-	'$e->code',
-);
-
 my $c1 = eval_closure(source => 'sub { die("BANG") }', description => 'test1');
 my $e1 = exception { $c1->() };
 
