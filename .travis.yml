@@ -8,28 +8,65 @@ perl:
   - "5.14"
   - "5.16"
   - "5.18"
-  - "5.20.0"
-  - "5.20.0-thr"
+  - "5.20"
   - "blead"
 matrix:
+  allow_failures:
+    - perl: "5.6.1"
+    - perl: "5.6.2"
+    - perl: "5.8.1"
   include:
+    # Archaic Perls
     - perl: "5.6.1"
       env: PERL_TYPE_TINY_XS=0 
     - perl: "5.6.2"
       env: PERL_TYPE_TINY_XS=0 
-    - perl: "5.8.9"
-      env: PERL_TYPE_TINY_XS=0 
-    - perl: "5.8.9-thr"
-      env: PERL_TYPE_TINY_XS=0 
-    - perl: "5.18"
-      env: PERL_TYPE_TINY_XS=0 EXTENDED_TESTING=1 COVERAGE=1
     - perl: "5.8.1"
+      env: PERL_TYPE_TINY_XS=0
+    # Threaded Perls
+    - perl: "5.8.9-thr"
+      env: PERL_TYPE_TINY_XS=0
+    - perl: "5.20.0-thr"
+      env: PERL_TYPE_TINY_XS=0
+    - perl: "5.20.0-thr"
+      env: PERL_TYPE_TINY_XS=1
+    # Extended testing on both a Modern and older Perl
+    - perl: "5.8.9"
       env: PERL_TYPE_TINY_XS=0 EXTENDED_TESTING=1
       install:
-        - cpanm -n Test::Requires Test::Fatal Test::LeakTrace
         - cpanm Exporter::Tiny
-        - cpanm -n indirect multidimensional bareword::filehandles
-        - cpanm -n Moo
+        - cpanm -n Test::Requires Test::Fatal Test::LeakTrace
+        - cpanm -n indirect multidimensional bareword::filehandles strictures
+        - cpanm -n Moo Moose Mouse MooseX::Types::Common MouseX::Types::Common
+        - cpanm -n Type::Tie
+        - cpan-install --toolchain
+        - cpan-install --deps
+        - cpan-install --coverage
+    - perl: "5.20"
+      env: PERL_TYPE_TINY_XS=0 EXTENDED_TESTING=1
+      install:
+        - cpanm Exporter::Tiny
+        - cpanm -n Test::Requires Test::Fatal Test::LeakTrace
+        - cpanm -n indirect multidimensional bareword::filehandles strictures
+        - cpanm -n Moo Moose Mouse MooseX::Types::Common MouseX::Types::Common
+        - cpanm -n Type::Tie Validation::Class::Simple 
+        - cpan-install --toolchain
+        - cpan-install --deps
+        - cpan-install --coverage
+    # Coverage report
+    - perl: "5.20"
+      env: COVERAGE=1 EXTENDED_TESTING=1
+      script:
+        - export PERL_TYPE_TINY_XS=0
+        - prove -r -Ilib -Iinc $(test-dirs)
+        - export PERL_TYPE_TINY_XS=1
+        - prove -r -Ilib -Iinc $(test-dirs)
+      install:
+        - cpanm Exporter::Tiny
+        - cpanm -n Test::Requires Test::Fatal Test::LeakTrace
+        - cpanm -n indirect multidimensional bareword::filehandles strictures
+        - cpanm -n Moo Moose Mouse MooseX::Types::Common MouseX::Types::Common
+        - cpanm -n Type::Tie Validation::Class::Simple 
         - cpan-install --toolchain
         - cpan-install --deps
         - cpan-install --coverage
