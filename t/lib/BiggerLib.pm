@@ -33,7 +33,7 @@ use warnings;
 
 use Type::Utils qw(:all);
 
-use base "Type::Library";
+use Type::Library -base;
 
 extends "DemoLib";
 extends "Types::Standard";
@@ -65,7 +65,7 @@ class_type "FooBar", { class => "Foo::Bar" };
 
 {
 	package Foo::Baz;
-	use base "Foo::Bar";
+	our @ISA = "Foo::Bar";
 	sub DOES {
 		return 1 if $_[1] eq 'Quux';
 		$_[0]->isa($_[0]);

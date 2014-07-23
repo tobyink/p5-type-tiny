@@ -85,10 +85,10 @@ distribution. Don't worry - it's quick and easy to install.
 
 At run-time, Type::Tiny also requires the following modules: L<B>,
 L<B::Deparse>, L<Data::Dumper>, L<Scalar::Util>, L<Text::Balanced>,
-L<base>, L<overload>, L<strict> and L<warnings>. All of these
-come bundled with Perl itself. Prior to Perl 5.8, L<Scalar::Util> and
-L<Text::Balanced> do not come bundled with Perl and will need installing
-separately from the CPAN.
+L<overload>, L<strict> and L<warnings>. All of these come bundled with
+Perl itself. Prior to Perl 5.8, L<Scalar::Util> and L<Text::Balanced>
+do not come bundled with Perl and will need installing separately from
+the CPAN.
 
 Certain features require additional modules. Tying a variable to a
 type constraint (e.g. C<< tie my $count, Int >>) requires L<Type::Tie>;

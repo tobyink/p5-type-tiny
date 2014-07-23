@@ -29,7 +29,7 @@ use warnings;
 use Scalar::Util "looks_like_number";
 use Type::Utils;
 
-use base "Type::Library";
+use Type::Library -base;
 
 declare "String",
 	where { not ref $_ }
