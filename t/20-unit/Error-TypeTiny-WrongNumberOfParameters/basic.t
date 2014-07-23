@@ -29,11 +29,11 @@ use Test::Fatal;
 use Type::Params qw(compile);
 use Types::Standard qw(Num Optional slurpy ArrayRef);
 
-my $check;
+my $check1;
 sub nth_root
 {
-	$check ||= compile( Num, Num );
-	[ $check->(@_) ];
+	$check1 ||= compile( Num, Num );
+	[ $check1->(@_) ];
 }
 
 subtest "nth_root()" => sub {
@@ -66,11 +66,11 @@ subtest "nth_root(1, 2, 3)" => sub {
 	like($e, qr{^Wrong number of parameters; got 3; expected 2});
 };
 
-my $check;
+my $check2;
 sub nth_root_opt
 {
-	$check ||= compile( Num, Optional[Num] );
-	[ $check->(@_) ];
+	$check2 ||= compile( Num, Optional[Num] );
+	[ $check2->(@_) ];
 }
 
 subtest "nth_root_opt()" => sub {
@@ -83,11 +83,11 @@ subtest "nth_root_opt()" => sub {
 	like($e, qr{^Wrong number of parameters; got 0; expected 1 to 2});
 };
 
-my $check;
+my $check3;
 sub nth_root_slurp
 {
-	$check ||= compile( Num, slurpy ArrayRef[Num] );
-	[ $check->(@_) ];
+	$check3 ||= compile( Num, slurpy ArrayRef[Num] );
+	[ $check3->(@_) ];
 }
 
 subtest "nth_root_slurp()" => sub {
