@@ -1879,7 +1879,7 @@
 	issued  2014-07-23;
 	changeset [
 		dcs:versus `Type-Tiny 0.047_01 cpan:TOBYINK`;
-		item "Allow Enums containing hyphens to be accellerated by Type::Tiny::XS."^^Change;
+		item "Allow Enums containing hyphens to be accelerated by Type::Tiny::XS."^^Change;
 		item [
 			label "Type::Tiny::Union is now XS-accelerated.";
 			seealso <https://gist.github.com/tobyink/71eab715ac16178cbcfb>;

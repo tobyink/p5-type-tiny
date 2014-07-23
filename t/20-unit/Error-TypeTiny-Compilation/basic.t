@@ -68,7 +68,7 @@ subtest '$e->context' => sub {
 	is($ctx->{package}, 'main',    '$ctx->{package}');
 	is($ctx->{file},    'basic.t', '$ctx->{file}');
 	ok($ctx->{line} >= 37, '$ctx->{line} >= 37') or diag('line is '.$ctx->{line});
-	ok($ctx->{line} <= 42, '$ctx->{line} <= 42') or diag('line is '.$ctx->{line});	
+	ok($ctx->{line} <= 42, '$ctx->{line} <= 42') or diag('line is '.$ctx->{line});
 };
 
 like(
