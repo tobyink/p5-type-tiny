@@ -17,6 +17,12 @@ m`Error::TypeTiny Type-Tiny`
 m`Error::TypeTiny::Assertion Type-Tiny`
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Error-TypeTiny-Assertion/basic.t Type-Tiny`; :purpose "Tests Error::TypeTiny." ];
 	.
+m`Error::TypeTiny::Compilation Type-Tiny`
+	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Error-TypeTiny-Compilation/basic.t Type-Tiny`; :purpose "Tests for Error::TypeTiny::Compilation, mostly by triggering compilation errors using Eval::TypeTiny." ];
+	.
+m`Error::TypeTiny::WrongNumberOfParameters Type-Tiny`
+	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Error-TypeTiny-WrongNumberOfParameters/basic.t Type-Tiny`; :purpose "Test Error::TypeTiny::WrongNumberOfParameters." ];
+	.
 m`Eval::TypeTiny Type-Tiny`
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Eval-TypeTiny/basic.t Type-Tiny`; :purpose "Tests Eval::TypeTiny." ];
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Eval-TypeTiny/fallback-aliases.t Type-Tiny`; :purpose "Tests Eval::TypeTiny supports alias=>1 even when Devel::LexAlias is unavailable." ];
@@ -76,9 +82,12 @@ m`Type::Tiny Type-Tiny`
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Tiny/shortcuts.t Type-Tiny`; :purpose "Test the '->of' and '->where' shortcut methods." ];
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Tiny/smartmatch.t Type-Tiny`; :purpose "Checks Type::Tiny works with the smartmatch operator." ];
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Tiny/syntax.t Type-Tiny`; :purpose "Checks that all this Type[Param] syntactic sugar works. In particular, the following three type constraints are expected to be equivalent to each other: use Types::Standard qw( ArrayRef Int Num Str ); use Type::Utils qw( union intersection ); my $type1 = ArrayRef[Int] | ArrayRef[Num & ~Int] | ArrayRef[Str & ~Num]; my $type2 = union [ ArrayRef[Int], ArrayRef[Num & ~Int], ArrayRef[Str & ~Num], ]; my $type3 = union([ ArrayRef->parameterize(Int), ArrayRef->parameterize( intersection([ Num, Int->complementary_type, ]), ), ArrayRef->parameterize( intersection([ Str, Num->complementary_type, ]), ), ]);" ];
+	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Tiny/to-moose.t Type-Tiny`; :purpose "Checks Type::Tiny objects can be converted to Moose type constraint objects." ];
+	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Tiny/to-mouse.t Type-Tiny`; :purpose "Checks Type::Tiny objects can be converted to Mouse type constraint objects." ];
 	.
 m`Type::Tiny::Class Type-Tiny`
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Tiny-Class/basic.t Type-Tiny`; :purpose "Checks class type constraints work." ];
+	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Tiny-Class/errors.t Type-Tiny`; :purpose "Checks class type constraints throw sane error messages." ];
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Tiny-Class/plus-constructors.t Type-Tiny`; :purpose "Checks the 'Type::Tiny::Class''s 'plus_constructors' method." ];
 	.
 m`Type::Tiny::Duck Type-Tiny`
@@ -86,12 +95,14 @@ m`Type::Tiny::Duck Type-Tiny`
 	.
 m`Type::Tiny::Enum Type-Tiny`
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Tiny-Enum/basic.t Type-Tiny`; :purpose "Checks enum type constraints work." ];
+	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Tiny-Enum/errors.t Type-Tiny`; :purpose "Checks enum type constraints throw sane error messages." ];
 	.
 m`Type::Tiny::Intersection Type-Tiny`
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Tiny-Intersection/basic.t Type-Tiny`; :purpose "Checks intersection type constraints work." ];
 	.
 m`Type::Tiny::Role Type-Tiny`
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Tiny-Role/basic.t Type-Tiny`; :purpose "Checks role type constraints work." ];
+	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Tiny-Role/errors.t Type-Tiny`; :purpose "Checks role type constraints throw sane error messages." ];
 	.
 m`Type::Tiny::Union Type-Tiny`
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Tiny-Union/basic.t Type-Tiny`; :purpose "Checks union type constraints work." ];
@@ -161,6 +172,7 @@ m`Types::TypeTiny Type-Tiny`
 [] a :IntegrationTest; :test_script f`t/30-integration/match-simple/basic.t Type-Tiny`; :purpose "Checks Type::Tiny works with match::simple.".
 [] a :RegressionTest; :test_script f`t/40-regression/73f51e2d.t Type-Tiny`; :purpose "Possible issue causing segfaults on threaded Perl 5.18.x.".
 [] a :RegressionTest; :test_script f`t/40-regression/gh1.t Type-Tiny`; :purpose "Test that subtypes of Type::Tiny::Class work.".
+[] a :RegressionTest; :test_script f`t/40-regression/ttxs-gh1.t Type-Tiny`; :purpose "Test that was failing with Type::Tiny::XS prior to 0.009.".
 RT#85911
 	:regression_test [ a :RegressionTest; :test_script f`t/40-regression/rt85911.t Type-Tiny`; :purpose "Test Type::Params with deep Dict coercion."];
 	.

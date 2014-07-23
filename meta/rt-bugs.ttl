@@ -482,7 +482,7 @@
 	rdfs:label           "Type::Tiny and when()";
 	dbug:id              "94286";
 	dbug:page            <https://rt.cpan.org/Public/Bug/Display.html?id=94286>;
-	dbug:status          <http://purl.org/NET/cpan-uri/rt/status/open>;
+	dbug:status          <http://purl.org/NET/cpan-uri/rt/status/rejected>;
 	dc:created           "2014-03-28T15:35:36Z"^^xsd:dateTime;
 	dc:reporter          <http://purl.org/NET/cpan-uri/person/SJM>.
 
@@ -491,7 +491,7 @@
 	rdfs:label           "documentation error in Types::Standard vis-à-vis coercions";
 	dbug:id              "96379";
 	dbug:page            <https://rt.cpan.org/Public/Bug/Display.html?id=96379>;
-	dbug:status          <http://purl.org/NET/cpan-uri/rt/status/patched>;
+	dbug:status          <http://purl.org/NET/cpan-uri/rt/status/resolved>;
 	dc:created           "2014-06-11T17:20:17+01:00"^^xsd:dateTime;
 	dc:reporter          <http://purl.org/NET/cpan-uri/person/djerius>.
 
@@ -500,7 +500,7 @@
 	rdfs:label           "5.20+ fails compile( Optional ) if passing explicit undef";
 	dbug:id              "96545";
 	dbug:page            <https://rt.cpan.org/Public/Bug/Display.html?id=96545>;
-	dbug:status          <http://purl.org/NET/cpan-uri/rt/status/patched>;
+	dbug:status          <http://purl.org/NET/cpan-uri/rt/status/resolved>;
 	dc:created           "2014-06-19T04:42:06+01:00"^^xsd:dateTime;
 	dc:reporter          _:B1.
 

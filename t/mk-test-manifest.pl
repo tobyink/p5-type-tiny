@@ -28,7 +28,7 @@ sub podpurpose
 {
 	my $pod = Pod::POM->new->parse_file($_[0]->openr_raw);
 	my ($purpose) = grep $_->title eq 'PURPOSE', $pod->head1;
-	my $content = $purpose->content->present('Local::View');
+	my $content = eval { $purpose->content->present('Local::View') } || "(Unknown.)";
 	my $trimmed = ($content =~ s/(\A\s+)|(\s+\z)//rms);
 	$trimmed =~ s/\s+/ /g;
 	
