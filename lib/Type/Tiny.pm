@@ -378,7 +378,7 @@ sub _build_compiled_check
 		local $_ = $_[0];
 		for my $c (@constraints)
 		{
-			return unless $c->($_);
+			return unless $c->(@_);
 		}
 		return !!1;
 	};
