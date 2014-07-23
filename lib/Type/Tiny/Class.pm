@@ -168,6 +168,28 @@ sub _build_parent
 	);
 }
 
+*__get_linear_isa_dfs = eval { require mro }
+	? \&mro::get_linear_isa
+	: sub {
+		no strict 'refs';
+		
+		my $classname = shift;
+		my @lin = ($classname);
+		my %stored;
+		
+		foreach my $parent (@{"$classname\::ISA"})
+		{
+			my $plin = __get_linear_isa_dfs($parent);
+			foreach (@$plin) {
+				next if exists $stored{$_};
+				push(@lin, $_);
+				$stored{$_} = 1;
+			}
+		}
+		
+		return \@lin;
+	};
+
 sub validate_explain
 {
 	my $self = shift;
@@ -177,16 +199,7 @@ sub validate_explain
 	return undef if $self->check($value);
 	return ["Not a blessed reference"] unless blessed($value);
 	
-	my @isa;
-	if (eval { require mro })
-	{
-		@isa = @{ mro::get_linear_isa(ref $value) };
-	}
-	else
-	{
-		require Class::ISA;
-		@isa = Class::ISA::super_path(ref $value);
-	}
+	my @isa = @{ __get_linear_isa_dfs(ref $value) };
 	
 	my $display_var = $varname eq q{$_} ? '' : sprintf(' (in %s)', $varname);
 	
