@@ -56,7 +56,7 @@ matrix:
         - cpan-install --deps
         - cpan-install --coverage
     # Coverage report
-    - perl: "5.20"
+    - perl: "5.18"
       env: COVERAGE=1 EXTENDED_TESTING=1
       install:
         - cpanm Exporter::Tiny
