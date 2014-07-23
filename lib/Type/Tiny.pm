@@ -9,8 +9,9 @@ BEGIN {
 }
 
 BEGIN {
-	$Type::Tiny::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::VERSION   = '0.047_01';
+	$Type::Tiny::AUTHORITY   = 'cpan:TOBYINK';
+	$Type::Tiny::VERSION     = '0.047_01';
+	$Type::Tiny::XS_VERSION  = '0.010';
 }
 
 use Eval::TypeTiny ();
@@ -39,7 +40,7 @@ BEGIN {
 	my $use_xs = 0;
 	$try_xs and eval {
 		require Type::Tiny::XS;
-		'Type::Tiny::XS'->VERSION('0.003');
+		'Type::Tiny::XS'->VERSION($Type::Tiny::XS_VERSION);
 		$use_xs++;
 	};
 	
@@ -377,7 +378,7 @@ sub _build_compiled_check
 		local $_ = $_[0];
 		for my $c (@constraints)
 		{
-			return unless $c->(@_);
+			return unless $c->($_);
 		}
 		return !!1;
 	};
