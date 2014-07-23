@@ -1874,3 +1874,32 @@
 			label "Fix a silly test case that was relying on Exporter::Tiny to always load B.pm. (Current versions of Exporter::Tiny do load B.pm, but future versions might not.)";
 		];
 	].
+
+`Type-Tiny 0.047_02 cpan:TOBYINK`
+	issued  2014-07-23;
+	changeset [
+		dcs:versus `Type-Tiny 0.047_01 cpan:TOBYINK`;
+		item "Allow Enums containing hyphens to be accellerated by Type::Tiny::XS."^^Change;
+		item [
+			label "Type::Tiny::Union is now XS-accelerated.";
+			seealso <https://gist.github.com/tobyink/71eab715ac16178cbcfb>;
+		];
+		item [
+			label "Type::Tiny::Intersection is now XS-accelerated.";
+			seealso <https://gist.github.com/tobyink/71eab715ac16178cbcfb>;
+		];
+		item "Test the Error::TypeTiny::Compilation exception class."^^Tests;
+		item "Test exceptions thrown by Type::Tiny::Enum."^^Tests;
+		item "Test the Error::TypeTiny::WrongNumberOfParameters exception class."^^Tests;
+		item [
+			a dcs:Tests;
+			label "Include test case relating to Type::Tiny::XS GitHub issue #1.";
+			seealso <https://github.com/tobyink/p5-type-tiny-xs/issues/1>;
+		];
+		item "Test exceptions thrown by Type::Tiny::Class."^^Tests;
+		item "Test exceptions thrown by Type::Tiny::Role."^^Tests;
+		item "Add tests explicitly testing Type::Tiny objects conversion to Moose::Meta::TypeConstraint and Mouse::Meta::TypeConstraint objects."^^Tests;
+		item "Test::Tiny::Class should stop using Class::ISA. Instead, if mro.pm is not available, use a private sub stolen from MRO::Compat."^^Change;
+		item "Stop using base.pm."^^Tests;
+		item "Type::Tiny::Manual no longer says that Perl 5.6.x support is at risk."^^Documentation;
+	].
