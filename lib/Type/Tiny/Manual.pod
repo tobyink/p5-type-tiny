@@ -110,9 +110,6 @@ Test::Fatal (plus Try::Tiny which Test::Fatal depends on) are bundled
 with Type::Tiny in the C<inc> directory, so you do not need to
 install them separately.
 
-Perl 5.6.x support is not well tested; if it proves too burdensome
-to maintain, it may be dropped in a future release. 
-
 =head1 TYPE::TINY VERSUS X
 
 =head2 Specio 
