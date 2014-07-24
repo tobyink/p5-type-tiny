@@ -121,18 +121,39 @@ use Types::Standard ();
 {
 	my $subtype_of_Num = Types::Standard::Num->create_child_type;
 	my $subtype_of_Int = Types::Standard::Int->create_child_type;
+	
 	ok(
 		$subtype_of_Int->is_subtype_of( $subtype_of_Num ),
-		'loose type comparison',
+		'loose subtype comparison 1',
 	);
-}
-
-{
-	my $subtype_of_Num = Types::Standard::Num->create_child_type;
-	my $subtype_of_Int = Types::Standard::Int->create_child_type;
 	ok(
 		! $subtype_of_Int->is_strictly_subtype_of( $subtype_of_Num ),
-		'strict type comparison',
+		'strict subtype comparison 1',
+	);
+	ok(
+		$subtype_of_Num->is_supertype_of( $subtype_of_Int ),
+		'loose supertype comparison 1',
+	);
+	ok(
+		! $subtype_of_Num->is_strictly_supertype_of( $subtype_of_Int ),
+		'strict supertype comparison 1',
+	);
+	
+	ok(
+		Types::Standard::Int->is_subtype_of( Types::Standard::Num ),
+		'loose subtype comparison 2',
+	);
+	ok(
+		Types::Standard::Int->is_strictly_subtype_of( Types::Standard::Num ),
+		'strict subtype comparison 2',
+	);
+	ok(
+		Types::Standard::Num->is_supertype_of( Types::Standard::Int ),
+		'loose supertype comparison 2',
+	);
+	ok(
+		Types::Standard::Num->is_strictly_supertype_of( Types::Standard::Int ),
+		'strict supertype comparison 2',
 	);
 }
 
@@ -149,11 +170,16 @@ my $found = $t6->find_parent(sub {
 
 is($found->name, 'T2', 'find_parent (scalar context)');
 
-my ($found2, $n) = $t6->find_parent(sub {
+my ($found2, $n2) = $t6->find_parent(sub {
 	$_->has_parent and $_->parent->name eq 'Int'
 });
 
 is($found2->name, 'T2', 'find_parent (list context)');
-is($n, 4, '... includes a count');
+is($n2, 4, '... includes a count');
+
+my ($found3, $n3) = $t6->find_parent(sub { $_->name eq 'Kristoff' });
+
+is($found3, undef, 'find_parent (null result)');
+is($3, undef, '... includes an undef count');
 
 done_testing;
