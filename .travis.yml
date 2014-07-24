@@ -76,7 +76,7 @@ matrix:
         - prove -r -Ilib -Iinc $(test-dirs)
 before_install:
   - export DIST_INKT_PROFILE="Dist::Inkt::Profile::TOBYINK"
-  - git clone git://github.com/tobyink/perl-travis-helper
+  - git clone git://github.com/haarg/perl-travis-helper
   - source perl-travis-helper/init
   - build-perl
   - perl -V
