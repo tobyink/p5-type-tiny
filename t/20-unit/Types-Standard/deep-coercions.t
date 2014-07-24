@@ -393,6 +393,24 @@ TUPLE: {
 		[ 1.1, 2.2 ],
 		"Coercion (B) to $Tuple2 - changed in 0.003_11; the presence of an additional value cancels coercion",
 	);
+	
+	my $EvenInt = Int->create_child_type(
+		name       => 'EvenInt',
+		constraint => sub { not $_ % 2 },
+	);
+	my $Tuple3  = Tuple[ $EvenInt->plus_coercions(Int, sub { 2 * $_ }) ];
+	
+	is_deeply(
+		$Tuple3->coerce([4]),
+		[4],
+		"No coercion necessary to $Tuple3",
+	);
+	
+	is_deeply(
+		$Tuple3->coerce([3]),
+		[6],
+		"Coercion to $Tuple3",
+	);
 };
 
 done_testing;
