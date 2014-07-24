@@ -33,7 +33,7 @@ sub meta
 
 sub has_type
 {
-	defined(shift->get_coercion(@_))
+	defined(shift->get_type(@_))
 }
 
 sub get_type
