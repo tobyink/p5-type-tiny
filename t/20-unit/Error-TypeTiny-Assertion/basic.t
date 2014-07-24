@@ -192,6 +192,18 @@ is_deeply(
 	'$AlwaysFail explanation, given 1',
 );
 
+my $TupleOf1 = Tuple[ Int ];
+
+is_deeply(
+	(exception { $TupleOf1->([1,2]) })->explain,
+	[
+		'Reference [1,2] did not pass type constraint "Tuple[Int]"',
+		'"Tuple[Int]" expects at most 1 values in the array',
+		'2 values found; too many',
+	],
+	'$TupleOf1 explanation, given [1,2]',
+);
+
 my $SlurpyThing = Tuple[ Num, slurpy Map[Int, ArrayRef] ];
 
 is_deeply(
