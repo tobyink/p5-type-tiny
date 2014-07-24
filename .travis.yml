@@ -91,8 +91,7 @@ before_script:
 script:
   - prove -r -Ilib -Iinc $(test-dirs)
 after_success:
-  - export COVERALLS_OPTS=" -select_re '^lib/' "
-  - coverage-report
+  - coverage-report -select_re '^lib/'
 notifications:
   irc:
     channels:
