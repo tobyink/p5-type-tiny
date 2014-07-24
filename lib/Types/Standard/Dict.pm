@@ -97,7 +97,8 @@ sub __inline_generator
 				'(not grep {'
 				."my \$v = ($h)->{\$_};"
 				.sprintf(
-					'not((%s) and (%s))',
+					'not((/\\A(?:%s)\\z/) or ((%s) and (%s)))',
+					$regexp,
 					$slurpy_is_map->[0]->inline_check('$_'),
 					$slurpy_is_map->[1]->inline_check('$v'),
 				) ."} keys \%{$h})"
