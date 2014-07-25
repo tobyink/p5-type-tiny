@@ -106,6 +106,48 @@ note "Coercion...";
 note "Introspection, comparisons, conversions...";
 
 require Types::Standard;
+isa_ok(
+	Types::Standard::Int(),
+	'Class::MOP::Object',
+	'Int',
+);
+
+isa_ok(
+	Types::Standard::ArrayRef(),
+	'Moose::Meta::TypeConstraint',
+	'ArrayRef',
+);
+
+isa_ok(
+	Types::Standard::ArrayRef(),
+	'Moose::Meta::TypeConstraint::Parameterizable',
+	'ArrayRef',
+);
+
+isa_ok(
+	Types::Standard::ArrayRef()->of(Types::Standard::Int()),
+	'Moose::Meta::TypeConstraint',
+	'ArrayRef[Int]',
+);
+
+isa_ok(
+	Types::Standard::ArrayRef()->of(Types::Standard::Int()),
+	'Moose::Meta::TypeConstraint::Parameterized',
+	'ArrayRef[Int]',
+);
+
+isa_ok(
+	Types::Standard::ArrayRef() | Types::Standard::Int(),
+	'Moose::Meta::TypeConstraint',
+	'ArrayRef|Int',
+);
+
+isa_ok(
+	Types::Standard::ArrayRef() | Types::Standard::Int(),
+	'Moose::Meta::TypeConstraint::Union',
+	'ArrayRef|Int',
+);
+
 ok(
 	Types::Standard::ArrayRef->moose_type->equals(
 		Moose::Util::TypeConstraints::find_type_constraint("ArrayRef")
