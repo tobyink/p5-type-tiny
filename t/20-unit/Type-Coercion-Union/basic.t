@@ -24,6 +24,7 @@ use warnings;
 use lib qw( ./lib ./t/lib ../inc ./inc );
 
 use Test::More;
+use Test::Fatal;
 use Test::TypeTiny;
 
 use Types::Standard -types;
@@ -121,6 +122,12 @@ is(
 	$Union1->coerce($arr),
 	$arr,
 	"Union1 cannot coerce an arrayref",
+);
+
+like(
+	exception { $Union1->coercion->add_type_coercions(ArrayRef, q[ scalar(@$_) ]) },
+	qr/^Adding coercions to Type::Coercion::Union not currently supported/,
+	"Cannot add to Type::Tiny::Union's coercion",
 );
 
 done_testing;
