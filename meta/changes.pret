@@ -1835,6 +1835,7 @@
 	].
 
 `Type-Tiny 0.047_01 cpan:TOBYINK`
+	label   "The 87% Coverage Release";
 	issued  2014-07-21;
 	changeset [
 		dcs:versus `Type-Tiny 0.046 cpan:TOBYINK`;
@@ -1876,6 +1877,7 @@
 	].
 
 `Type-Tiny 0.047_02 cpan:TOBYINK`
+	label   "The 92% Coverage Release";
 	issued  2014-07-23;
 	changeset [
 		dcs:versus `Type-Tiny 0.047_01 cpan:TOBYINK`;
@@ -1902,4 +1904,26 @@
 		item "Test::Tiny::Class should stop using Class::ISA. Instead, if mro.pm is not available, use a private sub stolen from MRO::Compat."^^Change;
 		item "Stop using base.pm."^^Tests;
 		item "Type::Tiny::Manual no longer says that Perl 5.6.x support is at risk."^^Documentation;
+	].
+
+`Type-Tiny 0.047_03 cpan:TOBYINK`
+	label   "The 96% Coverage Release";
+	issued  2014-07-26;
+	changeset [
+		dcs:versus `Type-Tiny 0.047_02 cpan:TOBYINK`;
+		item "Improved type introspection method tests (find_parent/is_supertype_of/is_subtype_of/is_strictly_supertype_of/is_strictly_subtype_of)."^^Tests;
+		item "Improved type constraint constructor tests (exceptions thrown for bad parameters, coercion=>ARRAY|CODE parameter)."^^Tests;
+		item "Checks for more Error::TypeTiny::Assertion explanations (Tuple, Duck, Intersection, Union, Dicts containing slurpy things)."^^Tests;
+		item "Checks non-inlineable deep coercions for Tuple."^^Tests;
+		item "Fix for slurpy Map within a Tuple."^^Bugfix;
+		item "Types::TypeTiny->has_type was incorrectly returning whether Types::TypeTiny contained the named *coercion* instead of a named *type*."^^Bugfix;
+		item "Test the immutability of Type::Coercion::Union."^^Tests;
+		item "Fake a very old Validation::Class::Simple for a certain test by overriding $Validation::Class::Simple::VERSION."^^Tests;
+		item "Check that Type::Registry works in conjunction with MouseX::Types. (There's some TODO stuff there.)"^^Tests;
+		item "Bundle my TODO file."^^Packaging;
+		item "Better `isa` faking - returns true to Class::MOP::Object."^^Change;
+		item "Tests for `isa`."^^Tests;
+		item "Tests for various little methods which were added for Moose/Mouse-compatibility."^^Tests;
+		item "Tests for non-inlineable type constraints in `match_on_type` and `compile_match_on_type`."^^Tests;
+		item "Check Type::Library-based type libraries can extend MouseX::Types-based type libraries."^^Tests;
 	].
