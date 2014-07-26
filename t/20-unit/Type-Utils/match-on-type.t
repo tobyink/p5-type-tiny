@@ -48,12 +48,13 @@ sub to_json;
 	Num()   => q {$_},
 	Str()   => q { '"' . $_ . '"' },
 	Undef() => q {'null'},
+	ScalarRef() &+ sub { Bool->check($$_) } => q { $$_ ? 'true' : 'false' },
 	=> sub { die "$_ is not acceptable json type" },
 );
 
 is(
-	to_json({foo => 1, bar => 2, baz => [3 .. 5], quux => undef}),
-	'{ "bar" : 2, "baz" : [ 3, 4, 5 ], "foo" : 1, "quux" : null }',
+	to_json({foo => 1, bar => 2, baz => [3 .. 5], quux => undef, xyzzy => \1 }),
+	'{ "bar" : 2, "baz" : [ 3, 4, 5 ], "foo" : 1, "quux" : null, "xyzzy" : true }',
 	'to_json using compile_match_on_type works',
 );
 
@@ -76,13 +77,14 @@ sub to_json_2
 		Num()   => q {$_},
 		Str()   => q { '"' . $_ . '"' },
 		Undef() => q {'null'},
+		ScalarRef() &+ sub { Bool->check($$_) } => q { $$_ ? 'true' : 'false' },
 		=> sub { die "$_ is not acceptable json type" },
 	);
 }
 
 is(
-	to_json_2({foo => 1, bar => 2, baz => [3 .. 5], quux => undef}),
-	'{ "bar" : 2, "baz" : [ 3, 4, 5 ], "foo" : 1, "quux" : null }',
+	to_json_2({foo => 1, bar => 2, baz => [3 .. 5], quux => undef, xyzzy => \1 }),
+	'{ "bar" : 2, "baz" : [ 3, 4, 5 ], "foo" : 1, "quux" : null, "xyzzy" : true }',
 	'to_json_2 using match_on_type works',
 );
 
