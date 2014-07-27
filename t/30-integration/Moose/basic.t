@@ -262,4 +262,19 @@ is(
 	'round-tripping between ->moose_type and ->Types::TypeTiny::to_TypeTiny preserves reference address'
 );
 
+note "Method pass-through";
+
+{
+	local *Moose::Meta::TypeConstraint::dummy_1 = sub {
+		42;
+	};
+	
+	is(Types::Standard::Int()->dummy_1, 42, 'method pass-through');
+	like(
+		exception { Types::Standard::Int()->dummy_2 },
+		qr/^Can't locate object method "dummy_2"/,
+		'... but not non-existant method',
+	);
+}
+
 done_testing;

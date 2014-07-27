@@ -36,4 +36,6 @@ my $type2 = $type->create_child_type(name => 'Number2');
 can_ok($_, 'my_round_off') for $type, $type2;
 is($_->my_round_off(42.3), 42, "$_ my_round_off works") for $type, $type2;
 
+ok(!$_->can('my_smirnoff'), "$_ cannot my_smirnoff") for $type, $type2;
+
 done_testing;
