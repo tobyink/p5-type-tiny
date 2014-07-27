@@ -57,7 +57,8 @@ sub __deep_explanation
 		];
 	}
 	
-	return;
+	# This should never happen...
+	return;  # uncoverable statement
 }
 
 sub __coercion_generator

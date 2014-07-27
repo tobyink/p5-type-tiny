@@ -174,7 +174,8 @@ sub __deep_explanation
 		];
 	}
 	
-	return;
+	# This should never happen...
+	return;  # uncoverable statement
 }
 
 my $label_counter = 0;

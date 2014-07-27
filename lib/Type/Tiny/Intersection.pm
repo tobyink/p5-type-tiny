@@ -141,7 +141,8 @@ sub validate_explain
 		] if $deep;
 	}
 	
-	return ["Mysterious!"];
+	# This should never happen...
+	return;  # uncoverable statement
 }
 
 
