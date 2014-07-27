@@ -61,7 +61,7 @@ matrix:
       env: COVERAGE=1 EXTENDED_TESTING=1
       install:
         - cpanm Exporter::Tiny
-        - cpanm -n Test::Requires Test::Fatal Test::LeakTrace
+        - cpanm -n Test::Requires Test::Fatal Test::LeakTrace Test::Tester
         - cpanm -n indirect multidimensional bareword::filehandles strictures
         - cpanm -n Moo Moose Mouse MooseX::Types::Common MouseX::Types::Common
         - cpanm -n match::simple MooseX::Getopt Class::InsideOut Object::Accessor
