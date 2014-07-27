@@ -30,8 +30,25 @@ use Test::Fatal;
 {
 	package Local::Pkg1;
 	use Type::Registry "t";
+	
+	::is(t(), Type::Registry->for_me, 'Type::Registry->for_me works');
+	::is(t(), Type::Registry->for_class(__PACKAGE__), 'Type::Registry->for_class works');
+	
 	t->add_types(-Standard);
+	
+	::like(
+		::exception { t->add_types(-MonkeyNutsAndChimpanzeeRaisins) },
+		qr{^Types::MonkeyNutsAndChimpanzeeRaisins is not a type library},
+		'cannot add non-existant type library to registry',
+	);
+	
 	t->alias_type(Int => "Integer");
+	
+	::like(
+		::exception { t->alias_type(ChimpanzeeRaisins => "ChimpSultanas") },
+		qr{^Expected existing type constraint name},
+		'cannot alias non-existant type in registry',
+	);
 	
 	::ok(t->Integer == Types::Standard::Int(), 'alias works');
 	::ok(t("Integer") == Types::Standard::Int(), 'alias works via simple_lookup');
@@ -66,6 +83,12 @@ like(
 	exception { $r->lookup('MonkeyNuts') },
 	qr{^MonkeyNuts is not a known type constraint },
 	'type constraint unknown type',
+);
+
+like(
+	exception { $r->MonkeyNuts },
+	qr{^Can't locate object method "MonkeyNuts" via package},
+	'type constraint unknown type (as method call)',
 );
 
 is(

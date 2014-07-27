@@ -152,7 +152,9 @@ sub alias_type
 {
 	my $self = shift;
 	my ($old, @new) = @_;
-	$self->{$_} = $self->{$old} for @new;
+	my $lookup = eval { $self->lookup($old) }
+		or _croak("Expected existing type constraint name; got '$old'");
+	$self->{$_} = $lookup for @new;
 	$self;
 }
 
