@@ -41,7 +41,8 @@ use Moose::Util::TypeConstraints qw(find_type_constraint);
 
 subtest "Coercion from Moose type constraint object" => sub
 {
-	my $type = to_TypeTiny find_type_constraint("Int");
+	my $orig = find_type_constraint("Int");
+	my $type = to_TypeTiny $orig;
 	
 	should_pass($type, TypeTiny, 'to_TypeTiny converted a Moose type constraint to a Type::Tiny one');
 	is($type->name, 'Int', '... which has the correct name');
@@ -52,11 +53,20 @@ subtest "Coercion from Moose type constraint object" => sub
 		should_pass(123, $type);
 		should_fail(3.3, $type);
 	};
+
+## We don't do this for Moose for some reason.
+#
+#	is(
+#		$type->get_message(3.3),
+#		$orig->get_message(3.3),
+#		'... and provides proper message',
+#	);
 };
 
 subtest "Coercion from Mouse type constraint object" => sub
 {
-	my $type = to_TypeTiny Mouse::Util::TypeConstraints::find_type_constraint("Int");
+	my $orig = Mouse::Util::TypeConstraints::find_type_constraint("Int");
+	my $type = to_TypeTiny $orig;
 	
 	should_pass($type, TypeTiny, 'to_TypeTiny converted a Mouse type constraint to a Type::Tiny one');
 	subtest "... and it works" => sub
@@ -64,6 +74,11 @@ subtest "Coercion from Mouse type constraint object" => sub
 		should_pass(123, $type);
 		should_fail(3.3, $type);
 	};
+	is(
+		$type->get_message(3.3),
+		$orig->get_message(3.3),
+		'... and provides proper message',
+	);
 };
 
 subtest "Coercion from predicate-like coderef" => sub
@@ -88,7 +103,11 @@ subtest "Coercion from assertion-like coderef" => sub
 		should_pass(123, $type);
 		should_fail(3.3, $type);
 	};
-	like($type->validate(3.3), qr/\Anot an integer/, '... and can provide useful messages');
+	like(
+		$type->validate(3.3),
+		qr/\Anot an integer/,
+		'... and provides proper message',
+	);
 };
 
 subtest "Coercion from Sub::Quote coderef" => sub
