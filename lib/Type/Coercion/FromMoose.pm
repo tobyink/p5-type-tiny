@@ -22,9 +22,10 @@ sub type_coercion_map
 	my $self = shift;
 	
 	my @from;
-	if (my $moose = $self->type_constraint->{moose_type})
+	if ($self->type_constraint)
 	{
-		@from = @{ $moose->coercion->type_coercion_map };
+		my $moose = $self->type_constraint->{moose_type};
+		@from = @{ $moose->coercion->type_coercion_map } if $moose && $moose->has_coercion;
 	}
 	else
 	{
@@ -53,9 +54,10 @@ sub _build_moose_coercion
 {
 	my $self = shift;
 	
-	if (my $moose = $self->type_constraint->{moose_type})
+	if ($self->type_constraint)
 	{
-		return $moose->coercion if $moose->has_coercion;
+		my $moose = $self->type_constraint->{moose_type};
+		return $moose->coercion if $moose && $moose->has_coercion;
 	}
 	
 	$self->SUPER::_build_moose_coercion(@_);
