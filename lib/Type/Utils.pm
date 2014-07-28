@@ -348,19 +348,16 @@ sub match_on_type
 	
 	while (@_)
 	{
-		my ($type, $code);
+		my $code;
 		if (@_ == 1)
 		{
-			require Types::Standard;
-			($type, $code) = (Types::Standard::Any(), shift);
+			$code = shift;
 		}
 		else
 		{
-			($type, $code) = splice(@_, 0, 2);
-			TypeTiny->($type);
+			(my($type), $code) = splice(@_, 0, 2);
+			TypeTiny->($type)->check($value) or next;
 		}
-		
-		$type->check($value) or next;
 		
 		if (StringLike->check($code))
 		{
