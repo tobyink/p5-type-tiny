@@ -74,6 +74,11 @@ matrix:
         - prove -r -Ilib -Iinc $(test-dirs)
         - export PERL_TYPE_TINY_XS=1
         - prove -r -Ilib -Iinc $(test-dirs)
+    # Strict Num
+    - perl: "5.18"
+      env: PERL_TYPES_STANDARD_STRICTNUM=1 PERL_TYPE_TINY_XS=0 EXTENDED_TESTING=1
+    - perl: "5.18"
+      env: PERL_TYPES_STANDARD_STRICTNUM=1 PERL_TYPE_TINY_XS=1 EXTENDED_TESTING=1
 before_install:
   - export DIST_INKT_PROFILE="Dist::Inkt::Profile::TOBYINK"
   - git clone git://github.com/tobyink/perl-travis-helper ~/perl-travis-helper
