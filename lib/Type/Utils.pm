@@ -1003,7 +1003,8 @@ This function is not exported by default.
 
 By default, all of the functions documented above are exported, except
 C<subtype> and C<type> (prefer C<declare> instead), C<extends>, C<dwim_type>,
-and C<match_on_type>/C<compile_match_on_type>.
+C<match_on_type>/C<compile_match_on_type>, C<classifier>, and
+C<english_list>.
 
 This module uses L<Exporter::Tiny>; see the documentation of that module
 for tips and tricks importing from Type::Utils.
