@@ -57,7 +57,18 @@ sub add_type_coercions
 	_croak "Adding coercions to Type::Coercion::Union not currently supported" if @_;
 }
 
-# sub _build_moose_coercion ???
+sub _build_moose_coercion
+{
+	my $self = shift;
+	
+	my %options = ();
+	$options{type_constraint} = $self->type_constraint if $self->has_type_constraint;
+	
+	require Moose::Meta::TypeCoercion::Union;
+	my $r = "Moose::Meta::TypeCoercion::Union"->new(%options);
+	
+	return $r;
+}
 
 1;
 
