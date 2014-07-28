@@ -305,11 +305,22 @@ note "Method pass-through";
 	local *Moose::Meta::TypeConstraint::dummy_1 = sub {
 		42;
 	};
+	local *Moose::Meta::TypeCoercion::dummy_3 = sub {
+		666;
+	};
 	
 	is(Types::Standard::Int()->dummy_1, 42, 'method pass-through');
 	like(
 		exception { Types::Standard::Int()->dummy_2 },
 		qr/^Can't locate object method "dummy_2"/,
+		'... but not non-existant method',
+	);
+	
+	my $int = Types::Standard::Int()->plus_coercions(Types::Standard::Any(),q[999]);
+	is($int->coercion->dummy_3, 666, 'method pass-through for coercions');
+	like(
+		exception { $int->coercion->dummy_4 },
+		qr/^Can't locate object method "dummy_4"/,
 		'... but not non-existant method',
 	);
 }
