@@ -124,4 +124,47 @@ if ($ENV{EXTENDED_TESTING})
 	diag "compile_match_on_type: " . Benchmark::timestr($compiled);
 }
 
+like(
+	exception {
+		match_on_type([], Int, sub { 44 });
+	},
+	qr/^No cases matched/,
+	'match_on_type with no match',
+);
+
+like(
+	exception {
+		compile_match_on_type(Int, sub { 44 })->([]);
+	},
+	qr/^No cases matched/,
+	'coderef compiled by compile_match_on_type with no match',
+);
+
+my $context;
+MATCH_VOID: {
+	match_on_type([], ArrayRef, sub { $context = wantarray });
+	ok(!defined($context), 'match_on_type void context');
+};
+MATCH_SCALAR: {
+	my $x = match_on_type([], ArrayRef, sub { $context = wantarray });
+	ok(defined($context) && !$context, 'match_on_type scalar context');
+};
+MATCH_LIST: {
+	my @x = match_on_type([], ArrayRef, sub { $context = wantarray });
+	ok(defined($context) && $context, 'match_on_type list context');
+};
+my $compiled = compile_match_on_type(ArrayRef, sub { $context = wantarray });
+COMPILE_VOID: {
+	$compiled->([]);
+	ok(!defined($context), 'compile_match_on_type void context');
+};
+COMPILE_SCALAR: {
+	my $x = $compiled->([]);
+	ok(defined($context) && !$context, 'compile_match_on_type scalar context');
+};
+COMPILE_LIST: {
+	my @x = $compiled->([]);
+	ok(defined($context) && $context, 'compile_match_on_type list context');
+};
+
 done_testing;
