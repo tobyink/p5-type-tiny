@@ -301,7 +301,6 @@ is_deeply(
 is_deeply(
 	(exception { $UndefRef->([]) })->explain,
 	[
-		'Reference \\"bar" did not pass type constraint "ScalarRef[Undef]"',
 		'"ScalarRef[Undef]" is a subtype of "ScalarRef"',
 		'Reference [] did not pass type constraint "ScalarRef"',
 		'"ScalarRef" is defined as: (ref($_) eq \'SCALAR\' or ref($_) eq \'REF\')',
