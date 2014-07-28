@@ -15,7 +15,7 @@ m`Error::TypeTiny Type-Tiny`
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Error-TypeTiny/stacktrace.t Type-Tiny`; :purpose "Tests that Error::TypeTiny is capable of providing stack traces." ];
 	.
 m`Error::TypeTiny::Assertion Type-Tiny`
-	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Error-TypeTiny-Assertion/basic.t Type-Tiny`; :purpose "Tests Error::TypeTiny." ];
+	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Error-TypeTiny-Assertion/basic.t Type-Tiny`; :purpose "Tests Error::TypeTiny::Assertion." ];
 	.
 m`Error::TypeTiny::Compilation Type-Tiny`
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Error-TypeTiny-Compilation/basic.t Type-Tiny`; :purpose "Tests for Error::TypeTiny::Compilation, mostly by triggering compilation errors using Eval::TypeTiny." ];
@@ -31,12 +31,16 @@ m`Eval::TypeTiny Type-Tiny`
 m`Test::TypeTiny Type-Tiny`
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Test-TypeTiny/basic.t Type-Tiny`; :purpose "Tests Test::TypeTiny (which is somewhat important because Test::TypeTiny is itself used for the majority of the type constraint tests). In particular, this tests that everything works when the '$EXTENDED_TESTING' environment variable is false." ];
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Test-TypeTiny/extended.t Type-Tiny`; :purpose "Tests Test::TypeTiny works when the '$EXTENDED_TESTING' environment variable is true. Note that Test::Tester appears to have issues with subtests, so currently 'should_pass' and 'should_fail' are not tested." ];
+	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Test-TypeTiny/matchfor.t Type-Tiny`; :purpose "Tests Test::TypeTiny (which is somewhat important because Test::TypeTiny is itself used for the majority of the type constraint tests). In particular, this tests that everything works when the '$EXTENDED_TESTING' environment variable is false." ];
 	.
 m`Type::Coercion Type-Tiny`
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Coercion/basic.t Type-Tiny`; :purpose "Checks Type::Coercion works." ];
+	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Coercion/esoteric.t Type-Tiny`; :purpose "Checks various undocumented Type::Coercion methods. The fact that these are tested here should not be construed to mean tht they are any any way a stable, supported part of the Type::Coercion API." ];
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Coercion/frozen.t Type-Tiny`; :purpose "Type::Coercion objects are mutable, unlike Type::Tiny objects. However, they can be frozen, making them immutable. (And Type::Tiny will freeze them occasionally, if it feels it has to.)" ];
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Coercion/inlining.t Type-Tiny`; :purpose "Checks Type::Coercion can be inlined." ];
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Coercion/parameterized.t Type-Tiny`; :purpose "Checks the 'Split' and 'Join' parameterized coercions from Types::Standard." ];
+	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Coercion/smartmatch.t Type-Tiny`; :purpose "Checks Type::Coercion overload of '~~'." ];
+	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Coercion/typetiny-constructor.t Type-Tiny`; :purpose "Checks proper Type::Coercion objects are automatically created by the Type::Tiny constructor." ];
 	.
 m`Type::Coercion::FromMoose Type-Tiny`
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Coercion-FromMoose/basic.t Type-Tiny`; :purpose "Checks the types adopted from Moose still have a coercion which works." ];
@@ -72,11 +76,13 @@ m`Type::Parser Type-Tiny`
 m`Type::Registry Type-Tiny`
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Registry/basic.t Type-Tiny`; :purpose "Checks Type::Registry works." ];
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Registry/moosextypes.t Type-Tiny`; :purpose "Checks Type::Registry works with MooseX::Types." ];
+	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Registry/mousextypes.t Type-Tiny`; :purpose "Checks Type::Registry works with MouseX::Types." ];
 	.
 m`Type::Tiny Type-Tiny`
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Tiny/arithmetic.t Type-Tiny`; :purpose "Tests overloading of bitwise operators and numeric comparison operators for Type::Tiny." ];
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Tiny/basic.t Type-Tiny`; :purpose "Checks Type::Tiny works." ];
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Tiny/coercion-modifiers.t Type-Tiny`; :purpose "Checks 'plus_coercions', 'minus_coercions' and 'no_coercions' methods work." ];
+	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Tiny/esoteric.t Type-Tiny`; :purpose "Checks various undocumented Type::Tiny methods. The fact that these are tested here should not be construed to mean tht they are any any way a stable, supported part of the Type::Tiny API." ];
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Tiny/my-methods.t Type-Tiny`; :purpose "Checks Type::Tiny's 'my_methods' attribute." ];
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Tiny/parameterization.t Type-Tiny`; :purpose "There are loads of tests for parameterization in 'stdlib.t', 'stdlib-overload.t', 'stdlib-strmatch.t', 'stdlib-structures.t', 'syntax.t', 'stdlib-automatic.t', etc. This file includes a handful of other parameterization-related tests that didn't fit anywhere else." ];
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Tiny/shortcuts.t Type-Tiny`; :purpose "Test the '->of' and '->where' shortcut methods." ];
@@ -92,6 +98,7 @@ m`Type::Tiny::Class Type-Tiny`
 	.
 m`Type::Tiny::Duck Type-Tiny`
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Tiny-Duck/basic.t Type-Tiny`; :purpose "Checks duck type constraints work." ];
+	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Tiny-Duck/errors.t Type-Tiny`; :purpose "Checks duck type constraints throw sane error messages." ];
 	.
 m`Type::Tiny::Enum Type-Tiny`
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Tiny-Enum/basic.t Type-Tiny`; :purpose "Checks enum type constraints work." ];
@@ -99,6 +106,7 @@ m`Type::Tiny::Enum Type-Tiny`
 	.
 m`Type::Tiny::Intersection Type-Tiny`
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Tiny-Intersection/basic.t Type-Tiny`; :purpose "Checks intersection type constraints work." ];
+	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Tiny-Intersection/errors.t Type-Tiny`; :purpose "Checks intersection type constraints throw sane error messages." ];
 	.
 m`Type::Tiny::Role Type-Tiny`
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Tiny-Role/basic.t Type-Tiny`; :purpose "Checks role type constraints work." ];
@@ -106,6 +114,7 @@ m`Type::Tiny::Role Type-Tiny`
 	.
 m`Type::Tiny::Union Type-Tiny`
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Tiny-Union/basic.t Type-Tiny`; :purpose "Checks union type constraints work." ];
+	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Tiny-Union/errors.t Type-Tiny`; :purpose "Checks union type constraints throw sane error messages." ];
 	.
 m`Type::Tiny::_HalfOp Type-Tiny`
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Tiny-_HalfOp/overload-precedence.t Type-Tiny`; :purpose "Ensure that the following works consistently on all supported Perls: ArrayRef[Int] | HashRef[Int]" ];
@@ -137,6 +146,7 @@ m`Types::Standard Type-Tiny`
 m`Types::TypeTiny Type-Tiny`
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Types-TypeTiny/basic.t Type-Tiny`; :purpose "Test the Types::TypeTiny bootstrap library. (That is, type constraints used by Type::Tiny internally.)" ];
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Types-TypeTiny/coercion.t Type-Tiny`; :purpose "Test Types::TypeTiny::to_TypeTiny pseudo-coercion." ];
+	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Types-TypeTiny/meta.t Type-Tiny`; :purpose "Test the Types::TypeTiny introspection methods. Types::TypeTiny doesn't inherit from Type::Library (because bootstrapping), so provides independent re-implementations of the most important introspection stuff." ];
 	.
 [] a :IntegrationTest; :test_script f`t/30-integration/Class-InsideOut/basic.t Type-Tiny`; :purpose "Check type constraints work with Class::InsideOut.".
 [] a :IntegrationTest; :test_script f`t/30-integration/Exporter-Tiny/basic.t Type-Tiny`; :purpose "Tests Exporter::Tiny has the features Type::Tiny needs.".
@@ -163,11 +173,15 @@ m`Types::TypeTiny Type-Tiny`
 [] a :IntegrationTest; :test_script f`t/30-integration/Mouse/basic.t Type-Tiny`; :purpose "Check type constraints work with Mouse. Checks values that should pass and should fail; checks error messages.".
 [] a :IntegrationTest; :test_script f`t/30-integration/Mouse/coercion.t Type-Tiny`; :purpose "Check coercions work with Mouse; both mutable and immutable classes.".
 [] a :IntegrationTest; :test_script f`t/30-integration/MouseX-Types/basic.t Type-Tiny`; :purpose "Complex checks between Type::Tiny and MouseX::Types.".
+[] a :IntegrationTest; :test_script f`t/30-integration/MouseX-Types/extending.t Type-Tiny`; :purpose "Check that Type::Library can extend an existing MooseX::Types type constraint library.".
 [] a :IntegrationTest; :test_script f`t/30-integration/Object-Accessor/basic.t Type-Tiny`; :purpose "Check type constraints work with Object::Accessor.".
 [] a :IntegrationTest; :test_script f`t/30-integration/Return-Type/basic.t Type-Tiny`; :purpose "Test that this sort of thing works: sub foo :ReturnType(Int) { ...; }".
 [] a :IntegrationTest; :test_script f`t/30-integration/Sub-Quote/basic.t Type-Tiny`; :purpose "Check type constraints can be made inlinable using Sub::Quote.".
+[] a :IntegrationTest; :test_script f`t/30-integration/Sub-Quote/unquote-coercions.t Type-Tiny`; :purpose "Check type coercions can be unquoted Sub::Quote.".
+[] a :IntegrationTest; :test_script f`t/30-integration/Sub-Quote/unquote-constraints.t Type-Tiny`; :purpose "Check type constraints can be unquoted Sub::Quote.".
 [] a :IntegrationTest; :test_script f`t/30-integration/Switcheroo/basic.t Type-Tiny`; :purpose "Checks Type::Tiny works with Switcheroo.".
 [] a :IntegrationTest; :test_script f`t/30-integration/Type-Tie/basic.t Type-Tiny`; :purpose "Test that this sort of thing works: tie my $var, Int;".
+[] a :IntegrationTest; :test_script f`t/30-integration/Validation-Class-Simple/archaic.t Type-Tiny`; :purpose "Fake Validation::Class::Simple 7.900017 by overriding '$VERSION' variable. (There is a reason for this... 'Types::TypeTiny::to_TypeTiny' follows two different code paths depending on the version of the Validation::Class::Simple object passed to it.)".
 [] a :IntegrationTest; :test_script f`t/30-integration/Validation-Class-Simple/basic.t Type-Tiny`; :purpose "Check type constraints Validation::Class::Simple objects can be used as type constraints.".
 [] a :IntegrationTest; :test_script f`t/30-integration/match-simple/basic.t Type-Tiny`; :purpose "Checks Type::Tiny works with match::simple.".
 [] a :RegressionTest; :test_script f`t/40-regression/73f51e2d.t Type-Tiny`; :purpose "Possible issue causing segfaults on threaded Perl 5.18.x.".
