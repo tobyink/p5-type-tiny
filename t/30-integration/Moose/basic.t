@@ -315,6 +315,11 @@ note "Method pass-through";
 		qr/^Can't locate object method "dummy_2"/,
 		'... but not non-existant method',
 	);
+
+	ok(
+		Types::Standard::Int()->can('dummy_1') && !Types::Standard::Int()->can('dummy_2'),
+		'... and `can` works ok',
+	);
 	
 	my $int = Types::Standard::Int()->plus_coercions(Types::Standard::Any(),q[999]);
 	is($int->coercion->dummy_3, 666, 'method pass-through for coercions');
@@ -322,6 +327,11 @@ note "Method pass-through";
 		exception { $int->coercion->dummy_4 },
 		qr/^Can't locate object method "dummy_4"/,
 		'... but not non-existant method',
+	);
+	
+	ok(
+		$int->coercion->can('dummy_3') && !$int->coercion->can('dummy_4'),
+		'... and `can` works ok',
 	);
 }
 
