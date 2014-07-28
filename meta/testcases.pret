@@ -44,6 +44,7 @@ m`Type::Coercion Type-Tiny`
 	.
 m`Type::Coercion::FromMoose Type-Tiny`
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Coercion-FromMoose/basic.t Type-Tiny`; :purpose "Checks the types adopted from Moose still have a coercion which works." ];
+	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Coercion-FromMoose/errors.t Type-Tiny`; :purpose "Checks crazy Type::Coercion::FromMoose errors." ];
 	.
 m`Type::Coercion::Union Type-Tiny`
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Coercion-Union/basic.t Type-Tiny`; :purpose "Checks Type::Coercion::Union works." ];
@@ -124,6 +125,7 @@ m`Type::Utils Type-Tiny`
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Utils/dwim-moose.t Type-Tiny`; :purpose "Checks Moose type constraints, and MooseX::Types type constraints are picked up by 'dwim_type' from Type::Utils." ];
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Utils/dwim-mouse.t Type-Tiny`; :purpose "Checks Mouse type constraints, and MouseX::Types type constraints are picked up by 'dwim_type' from Type::Utils." ];
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Utils/match-on-type.t Type-Tiny`; :purpose "Test Type::Utils 'match_on_type' and 'compile_match_on_type' functions." ];
+	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Utils/warnings.t Type-Tiny`; :purpose "Tests warnings raised by Type::Utils." ];
 	.
 m`Types::Common::Numeric Type-Tiny`
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Types-Common-Numeric/basic.t Type-Tiny`; :purpose "Tests constraints for Types::Common::Numeric. These tests are based on tests from MooseX::Types::Common." ];
