@@ -324,6 +324,9 @@ Type::Library - tiny, yet Moo(se)-compatible type libraries
 
 =head1 SYNOPSIS
 
+=for test_synopsis
+BEGIN { die "SKIP: crams multiple modules into single example" };
+
    package Types::Mine {
       use Scalar::Util qw(looks_like_number);
       use Type::Library -base;

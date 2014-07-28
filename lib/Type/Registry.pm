@@ -211,6 +211,8 @@ Type::Registry - a glorified hashref for looking up type constraints
 
 =head1 SYNOPSIS
 
+=for test_synopsis no warnings qw(misc);
+
    package Foo::Bar;
    
    use Type::Registry;
