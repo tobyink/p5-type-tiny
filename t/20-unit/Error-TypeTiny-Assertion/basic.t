@@ -285,6 +285,30 @@ TODO: {
 	);
 }
 
+my $UndefRef = ScalarRef[Undef];
+
+is_deeply(
+	(exception { $UndefRef->(do { my $x = "bar"; \$x }) })->explain,
+	[
+		'Reference \\"bar" did not pass type constraint "ScalarRef[Undef]"',
+		'"ScalarRef[Undef]" constrains the referenced scalar value with "Undef"',
+		'Value "bar" did not pass type constraint "Undef" (in ${$_})',
+		'"Undef" is defined as: (!defined($_))',
+	],
+	'$UndefRef explanantion, given \"bar"',
+);
+
+is_deeply(
+	(exception { $UndefRef->([]) })->explain,
+	[
+		'Reference \\"bar" did not pass type constraint "ScalarRef[Undef]"',
+		'"ScalarRef[Undef]" is a subtype of "ScalarRef"',
+		'Reference [] did not pass type constraint "ScalarRef"',
+		'"ScalarRef" is defined as: (ref($_) eq \'SCALAR\' or ref($_) eq \'REF\')',
+	],
+	'$UndefRef explanantion, given []',
+);
+
 my $e_where = exception {
 #line 1 "thisfile.plx"
 package Monkey::Nuts;
