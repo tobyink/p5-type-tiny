@@ -91,16 +91,24 @@ is(
 
 note "Coercion...";
 
+my $coercion;
 {
 	package TmpNS1;
 	use Moose::Util::TypeConstraints;
+	use Scalar::Util qw(refaddr);
 	subtype 'MyInt', as 'Int';
 	coerce 'MyInt', from 'ArrayRef', via { scalar(@$_) };
 	
-	my $type = Types::TypeTiny::to_TypeTiny(find_type_constraint('MyInt'));
+	my $orig = find_type_constraint('MyInt');
+	my $type = Types::TypeTiny::to_TypeTiny($orig);
 	
 	::ok($type->has_coercion, 'types converted from Moose retain coercions');
 	::is($type->coerce([qw/a b c/]), 3, '... which work');
+	
+	::is(refaddr($type->moose_type), refaddr($orig), '... refaddr matches');
+	::is(refaddr($type->coercion->moose_coercion), refaddr($orig->coercion), '... coercion refaddr matches');
+	
+	$coercion = $type->coercion;
 }
 
 note "Introspection, comparisons, conversions...";
@@ -146,6 +154,35 @@ isa_ok(
 	Types::Standard::ArrayRef() | Types::Standard::Int(),
 	'Moose::Meta::TypeConstraint::Union',
 	'ArrayRef|Int',
+);
+
+isa_ok(
+	$coercion,
+	'Moose::Meta::TypeCoercion',
+	'MyInt->coercion',
+);
+
+$coercion = do {
+	my $arrayref = Types::Standard::ArrayRef()->plus_coercions(
+		Types::Standard::ScalarRef(), sub { [$$_] },
+	);
+	my $int = Types::Standard::Int()->plus_coercions(
+		Types::Standard::Num(), sub { int($_) },
+	);
+	my $array_or_int = $arrayref | $int;
+	$array_or_int->coercion;
+};
+
+isa_ok(
+	$coercion,
+	'Moose::Meta::TypeCoercion',
+	'(ArrayRef|Int)->coercion',
+);
+
+isa_ok(
+	$coercion,
+	'Moose::Meta::TypeCoercion::Union',
+	'(ArrayRef|Int)->coercion',
 );
 
 ok(
