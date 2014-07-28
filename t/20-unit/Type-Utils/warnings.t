@@ -8,7 +8,7 @@ Tests warnings raised by L<Type::Utils>.
 
 =head1 DEPENDENCIES
 
-Requires L<Test::Warnings>; skipped otherwise.
+Requires Perl 5.14 and L<Test::Warnings>; skipped otherwise.
 
 =head1 AUTHOR
 
@@ -28,17 +28,20 @@ use warnings;
 use lib qw( ./lib ./t/lib ../inc ./inc );
 
 use Test::More;
+use Test::Requires '5.014';
 use Test::Requires 'Test::Warnings';
-use Test::Warnings qw( :no_end_test warning );
+use Test::Warnings qw( :no_end_test warnings );
 
 use Type::Library -base, -declare => qw/WholeNumber/;
 use Type::Utils -all;
 use Types::Standard qw/Int/;
 
+my @warnings = warnings {
+	declare WholeNumber as Int;
+};
+
 like(
-	warning {
-		declare WholeNumber as Int;
-	},
+	$warnings[0],
 	qr/^Possible missing comma after 'declare WholeNumber'/,
 	'warning for missing comma',
 );
