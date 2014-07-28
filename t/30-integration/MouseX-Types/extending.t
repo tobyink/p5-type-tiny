@@ -30,6 +30,7 @@ use warnings;
 use Test::More;
 use Test::Requires { "MouseX::Types" => "0.06" };
 use Test::TypeTiny;
+use Test::Fatal;
 
 BEGIN {
 	package MyTypes;
@@ -50,5 +51,20 @@ should_pass("foo", NonEmptyStr);
 should_fail("", NonEmptyStr);
 should_pass({}, HashLike);
 should_fail([], HashLike);
+
+{
+	package MyDummy;
+	use Mouse;
+	$INC{'MyDummy.pm'} = __FILE__;
+	
+	package MoreTypes;
+	use Type::Library -base;
+	
+	::like(
+		::exception { Type::Utils::extends 'MyDummy' },
+		qr/not a type constraint library/,
+		'cannot extend non-type-library',
+	);
+}
 
 done_testing;
