@@ -6,6 +6,10 @@
 
 Checks the types adopted from Moose still have a coercion which works.
 
+=head1 DEPENDENCIES
+
+Moose 2.0600; otherwise skipped.
+
 =head1 AUTHOR
 
 Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
