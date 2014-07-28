@@ -177,7 +177,10 @@ sub _TypeTinyFromMoose
 	
 	$new->{coercion} = do {
 		require Type::Coercion::FromMoose;
-		'Type::Coercion::FromMoose'->new(type_constraint => $new);
+		'Type::Coercion::FromMoose'->new(
+			type_constraint => $new,
+			moose_coercion  => $t->coercion,
+		);
 	} if $t->has_coercion;
 	
 	return $new;

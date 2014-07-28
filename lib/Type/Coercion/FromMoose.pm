@@ -21,8 +21,16 @@ sub type_coercion_map
 {
 	my $self = shift;
 	
-	my @from = @{ $self->type_constraint->moose_type->coercion->type_coercion_map };
-
+	my @from;
+	if (my $moose = $self->type_constraint->{moose_type})
+	{
+		@from = @{ $moose->coercion->type_coercion_map };
+	}
+	else
+	{
+		_croak "The type constraint attached to this coercion has been garbage collected... PANIC";
+	}
+	
 	my @return;
 	while (@from)
 	{
@@ -39,6 +47,18 @@ sub add_type_coercions
 {
 	my $self = shift;
 	_croak "Adding coercions to Type::Coercion::FromMoose not currently supported" if @_;
+}
+
+sub _build_moose_coercion
+{
+	my $self = shift;
+	
+	if (my $moose = $self->type_constraint->{moose_type})
+	{
+		return $moose->coercion if $moose->has_coercion;
+	}
+	
+	$self->SUPER::_build_moose_coercion(@_);
 }
 
 1;
