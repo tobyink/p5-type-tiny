@@ -132,21 +132,9 @@ Evaluate: {
 		if ($node->{type} eq "primary" and $node->{token}->type eq TYPE)
 		{
 			my $t = $node->{token}->spelling;
-			my $r;
-			if ($t =~ /^(.+)::(\w+)$/)
-			{
-				require Types::TypeTiny;
-				my $library = $1; $t = $2;
-				eval "require $library;";
-				$r =
-					$library->isa('MooseX::Types::Base')  ? Types::TypeTiny::to_TypeTiny(Moose::Util::TypeConstraints::find_type_constraint($library->get_type($t))) :
-					$library->can("get_type")             ? $library->get_type($t) :
-					$reg->simple_lookup("$library\::$t", 1);
-				}
-			else
-			{
-				$r = $reg->simple_lookup($t, 1);
-			}
+			my $r = ($t =~ /^(.+)::(\w+)$/)
+				? $reg->foreign_lookup($t, 1)
+				: $reg->simple_lookup($t, 1);
 			$r or _croak("%s is not a known type constraint", $node->{token}->spelling);
 			return $r;
 		}

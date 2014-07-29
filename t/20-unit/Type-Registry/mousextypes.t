@@ -36,13 +36,10 @@ use Type::Registry 't';
 
 t->add_types(-Standard);
 
-SKIP: {
-	skip "not implemented yet", 3;
-	my $ucstrs = t->lookup('ArrayRef[MouseX::Types::Common::String::NonEmptyStr]');
-	should_pass([], $ucstrs);
-	should_pass(['FOO', 'BAR'], $ucstrs);
-	should_fail(['FOO', ''], $ucstrs);
-}
+my $nestr = t->lookup('ArrayRef[MouseX::Types::Common::String::NonEmptyStr]');
+should_pass([], $nestr);
+should_pass(['FOO', 'BAR'], $nestr);
+should_fail(['FOO', ''], $nestr);
 
 t->add_types('MouseX::Types::Common::Numeric');
 

@@ -173,6 +173,44 @@ sub simple_lookup
 	return;
 }
 
+sub foreign_lookup
+{
+	my $self = shift;
+	
+	return $self->simple_lookup($_[0], 1)
+		unless $_[0] =~ /^(.+)::(\w+)$/;
+	
+	my $library  = $1;
+	my $typename = $2;
+	
+	eval "require $library;";
+	
+	if ( $library->isa('MooseX::Types::Base') )
+	{
+		require Moose::Util::TypeConstraints;
+		my $type = Moose::Util::TypeConstraints::find_type_constraint(
+			$library->get_type($typename)
+		) or return;
+		return to_TypeTiny($type);
+	}
+	
+	if ( $library->isa('MouseX::Types::Base') )
+	{
+		require Mouse::Util::TypeConstraints;
+		my $sub  = $library->can($typename) or return;
+		my $type = Mouse::Util::TypeConstraints::find_type_constraint($sub->()) or return;
+		return to_TypeTiny($type);
+	}
+	
+	if ( $library->can("get_type") )
+	{
+		my $type = $library->get_type($typename);
+		return to_TypeTiny($type);
+	}
+	
+	return;
+}
+
 sub lookup
 {
 	my $self = shift;
@@ -355,6 +393,11 @@ Create an alias for an existing type.
 Look up a type in the registry by name. 
 
 Returns undef if not found.
+
+=item C<< foreign_lookup($name) >>
+
+Like C<simple_lookup>, but if the type name contains "::", will attempt
+to load it from a type library. (And will attempt to load that module.)
 
 =item C<< lookup($name) >>
 
