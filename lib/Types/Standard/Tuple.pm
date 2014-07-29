@@ -147,7 +147,7 @@ sub __inline_generator
 				$slurpy_any
 					? ()
 					: (
-						$slurpy 
+						$slurpy
 							? sprintf($tmpl, $v, $#constraints+1, $v, $slurpy->inline_check('$tmp'))
 							: sprintf("\@{$v} <= %d", scalar @constraints)
 					)
