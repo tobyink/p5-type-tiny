@@ -58,24 +58,25 @@ sub __constraint_generator
 	}
 	
 	my @is_optional = map !!$_->is_strictly_a_type_of($_Optional), @constraints;
-	
+	my $slurp_hash  = $slurpy && $slurpy->is_a_type_of(Types::Standard::HashRef);
 	sub
 	{
 		my $value = $_[0];
 		if ($#constraints < $#$value)
 		{
-			defined($slurpy) && $slurpy->check(
-				$slurpy->is_a_type_of(Types::Standard::HashRef)
-					? +{@$value[$#constraints+1 .. $#$value]}
-					: +[@$value[$#constraints+1 .. $#$value]]
-			) or return;
+			return !!0 unless $slurpy;
+			my $tmp = $slurp_hash
+				? +{@$value[$#constraints+1 .. $#$value]}
+				: +[@$value[$#constraints+1 .. $#$value]];
+			$slurpy->check($tmp) or return;
 		}
 		for my $i (0 .. $#constraints)
 		{
-			return !!1 if $is_optional[$i] && $#$value < $i;
+			($i > $#$value)
+				and return !!$is_optional[$i];
 			
 			$constraints[$i]->check($value->[$i])
-				or return;
+				or return !!0;
 		}
 		return !!1;
 	}, @xsub;
