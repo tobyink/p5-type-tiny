@@ -79,13 +79,7 @@ should_fail({ name => "Bob", age => 40, height => undef }, $struct4);
 should_fail({ name => "Bob", age => undef, height => 1.76 }, $struct4);
 
 my $opt1 = Optional[Int];
-ok( $opt1->check(), "$opt1 check ()");
 ok( $opt1->check(1), "$opt1 check (1)");
-SKIP: {
-	skip "`exists(\$_[0])` doesn't work properly in your version of Perl", 1
-		if $] < 5.019004;
-	ok(!$opt1->check(undef), "$opt1 check (undef)");
-};
 ok(!$opt1->check('xxx'), "$opt1 check ('xxx')");
 
 my $slurper = Tuple[ArrayRef, slurpy Map[Num, Int]];

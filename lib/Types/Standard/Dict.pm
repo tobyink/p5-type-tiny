@@ -14,9 +14,10 @@ use Types::TypeTiny ();
 
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
-my $_hash = Types::Standard::HashRef;
-my $_map  = Types::Standard::Map;
-my $_any  = Types::Standard::Any;
+my $_optional = Types::Standard::Optional;
+my $_hash     = Types::Standard::HashRef;
+my $_map      = Types::Standard::Map;
+my $_any      = Types::Standard::Any;
 
 no warnings;
 
@@ -24,10 +25,12 @@ sub __constraint_generator
 {
 	my $slurpy = ref($_[-1]) eq q(HASH) ? pop(@_)->{slurpy} : undef;
 	my %constraints = @_;
+	my %is_optional;
 	
 	while (my ($k, $v) = each %constraints)
 	{
 		$constraints{$k} = Types::TypeTiny::to_TypeTiny($v);
+		$is_optional{$k} = !!$constraints{$k}->is_strictly_a_type_of($_optional);
 		Types::TypeTiny::TypeTiny->check($v)
 			or _croak("Parameter to Dict[`a] for key '$k' expected to be a type constraint; got $v");
 	}
@@ -46,10 +49,9 @@ sub __constraint_generator
 		{
 			exists($constraints{$_}) || return for sort keys %$value;
 		}
-		for (sort keys %constraints) {
-			my $c = $constraints{$_};
-			return unless exists($value->{$_}) || $c->is_strictly_a_type_of(Types::Standard::Optional);
-			return unless $c->check( exists $value->{$_} ? $value->{$_} : () );
+		for my $k (sort keys %constraints) {
+			exists($value->{$k}) or ($is_optional{$k} ? next : return);
+			$constraints{$k}->check($value->{$k}) or return;
 		}
 		return !!1;
 	};
@@ -112,8 +114,8 @@ sub __inline_generator
 			: "not(grep !/\\A(?:$regexp)\\z/, keys \%{$h})" ),
 			( map {
 				my $k = B::perlstring($_);
-				$constraints{$_}->is_strictly_a_type_of( Types::Standard::Optional )
-					? $constraints{$_}->inline_check("$h\->{$k}")
+				$constraints{$_}->is_strictly_a_type_of( $_optional )
+					? sprintf('(!exists %s->{%s} or %s)', $h, $k, $constraints{$_}->inline_check("$h\->{$k}"))
 					: ( "exists($h\->{$k})", $constraints{$_}->inline_check("$h\->{$k}") )
 			} sort keys %constraints ),
 	}
@@ -197,7 +199,7 @@ sub __coercion_generator
 			
 			my $label = sprintf("DICTLABEL%d", ++$label_counter);
 			my @code;
-			push @code, 'do { my ($orig, $return_orig, %tmp, %new) = ($_, 0);';
+			push @code, 'do { my ($orig, $return_orig, $tmp, %new) = ($_, 0);';
 			push @code,       "$label: {";
 			if ($slurpy)
 			{
@@ -220,37 +222,19 @@ sub __coercion_generator
 			{
 				my $ct = $dict{$k};
 				my $ct_coerce   = $ct->has_coercion;
-				my $ct_optional = $ct->is_a_type_of(Types::Standard::Optional);
+				my $ct_optional = $ct->is_a_type_of($_optional);
 				my $K = B::perlstring($k);
 				
-				push @code, "if (exists \$orig->{$K}) {" if $ct_optional;
-				if ($ct_coerce)
-				{
-					push @code, sprintf('%%tmp = (); $tmp{x} = %s;', $ct->coercion->inline_coercion("\$orig->{$K}"));
-					push @code, sprintf(
-#						$ct_optional
-#							? 'if (%s) { $new{%s}=$tmp{x} }'
-#							:
-						'if (%s) { $new{%s}=$tmp{x} } else { $return_orig = 1; last %s }',
-						$ct->inline_check('$tmp{x}'),
-						$K,
-						$label,
-					);
-				}
-				else
-				{
-					push @code, sprintf(
-#						$ct_optional
-#							? 'if (%s) { $new{%s}=$orig->{%s} }'
-#							:
-						'if (%s) { $new{%s}=$orig->{%s} } else { $return_orig = 1; last %s }',
-						$ct->inline_check("\$orig->{$K}"),
-						$K,
-						$K,
-						$label,
-					);
-				}
-				push @code, '}' if $ct_optional;
+				push @code, sprintf(
+					'if (exists $orig->{%s}) { $tmp = %s; (%s) ? ($new{%s}=$tmp) : ($return_orig=1 and last %s) }',
+					$K,
+					$ct_coerce
+						? $ct->coercion->inline_coercion("\$orig->{$K}")
+						: "\$orig->{$K}",
+					$ct->inline_check('$tmp'),
+					$K,
+					$label,
+				);
 			}
 			push @code,       '}';
 			push @code,    '$return_orig ? $orig : \\%new';
@@ -262,6 +246,9 @@ sub __coercion_generator
 	
 	else
 	{
+		my %is_optional = map {
+			; $_ => $dict{$_}->is_strictly_a_type_of($_optional)
+		} keys %dict;
 		$C->add_type_coercions(
 			$parent => sub {
 				my $value = @_ ? $_[0] : $_;
@@ -295,31 +282,14 @@ sub __coercion_generator
 
 				for my $k (keys %dict)
 				{
+					next if $is_optional{$k} and not exists $value->{$k};
+					
 					my $ct = $dict{$k};
-					my @accept;
+					my $x  = $ct->has_coercion ? $ct->coerce($value->{$k}) : $value->{$k};
 					
-					if (exists $value->{$k} and $ct->check($value->{$k}))
-					{
-						@accept = $value->{$k};
-					}
-					elsif (exists $value->{$k} and $ct->has_coercion)
-					{
-						my $x = $ct->coerce($value->{$k});
-						@accept = $x if $ct->check($x);
-					}
-					elsif (exists $value->{$k})
-					{
-						return $value;
-					}
+					return $value unless $ct->check($x);
 					
-					if (@accept)
-					{
-						$new{$k} = $accept[0];
-					}
-					elsif (not $ct->is_a_type_of(Types::Standard::Optional))
-					{
-						return $value;
-					}
+					$new{$k} = $x;
 				}
 				
 				return \%new;

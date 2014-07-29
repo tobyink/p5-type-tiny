@@ -457,15 +457,14 @@ my $_Optional = $meta->add_type({
 		Types::TypeTiny::TypeTiny->check($param)
 			or _croak("Parameter to Optional[`a] expected to be a type constraint; got $param");
 		
-		sub { exists($_[0]) ? $param->check($_[0]) : !!1 }
+		sub { $param->check($_[0]) }
 	},
 	inline_generator => sub {
 		my $param = shift;
 		return unless $param->can_be_inlined;
 		return sub {
 			my $v = $_[1];
-			my $param_check = $param->inline_check($v);
-			"!exists($v) or $param_check";
+			$param->inline_check($v);
 		};
 	},
 	deep_explanation => sub {

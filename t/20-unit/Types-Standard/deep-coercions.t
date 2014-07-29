@@ -400,6 +400,9 @@ TUPLE: {
 	);
 	my $Tuple3  = Tuple[ $EvenInt->plus_coercions(Int, sub { 2 * $_ }) ];
 	
+	ok(     $Tuple3->check([4]) );
+	ok( not $Tuple3->check([3]) );
+		
 	is_deeply(
 		$Tuple3->coerce([4]),
 		[4],
@@ -410,6 +413,28 @@ TUPLE: {
 		$Tuple3->coerce([3]),
 		[6],
 		"Coercion to $Tuple3",
+	);
+	
+	my $EvenInt2 = Int->create_child_type(
+		name       => 'EvenInt2',
+		constraint => sub { not $_ % 2 },
+		inlined    => sub { undef, "not($_ % 2)" },
+	);
+	my $Tuple4   = Tuple[ $EvenInt2->plus_coercions(Int, q{ 2 * $_ }) ];
+	
+	ok(     $Tuple4->check([4]) );
+	ok( not $Tuple4->check([3]) );
+	
+	is_deeply(
+		$Tuple4->coerce([4]),
+		[4],
+		"No coercion necessary to $Tuple4",
+	);
+	
+	is_deeply(
+		$Tuple4->coerce([3]),
+		[6],
+		"Coercion to $Tuple4",
 	);
 };
 

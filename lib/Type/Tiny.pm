@@ -201,8 +201,6 @@ sub new
 		$self->coercion->add_type_coercions(@$arr);
 	}
 	
-	$self->{type_constraints} ||= undef;
-	
 	if ($params{my_methods} and eval { require Sub::Name })
 	{
 		for my $key (keys %{$params{my_methods}})

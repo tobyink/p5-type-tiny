@@ -57,6 +57,8 @@ sub __constraint_generator
 		}
 	}
 	
+	my @is_optional = map !!$_->is_strictly_a_type_of($_Optional), @constraints;
+	
 	sub
 	{
 		my $value = $_[0];
@@ -70,8 +72,10 @@ sub __constraint_generator
 		}
 		for my $i (0 .. $#constraints)
 		{
-			$i <= $#$value or $constraints[$i]->is_strictly_a_type_of($_Optional) or return;
-			$constraints[$i]->check(exists $value->[$i] ? $value->[$i] : ()) or return;
+			return !!1 if $is_optional[$i] && $#$value < $i;
+			
+			$constraints[$i]->check($value->[$i])
+				or return;
 		}
 		return !!1;
 	}, @xsub;
@@ -111,7 +115,8 @@ sub __inline_generator
 		? "do { my \$tmp = +{\@{%s}[%d..\$#{%s}]}; %s }"
 		: "do { my \$tmp = +[\@{%s}[%d..\$#{%s}]]; %s }";
 	
-	my $min = 0 + grep !$_->is_strictly_a_type_of($_Optional), @constraints;
+	my @is_optional = map !!$_->is_strictly_a_type_of($_Optional), @constraints;
+	my $min         = 0 + grep !$_, @is_optional;
 	
 	return sub
 	{
@@ -123,7 +128,12 @@ sub __inline_generator
 				? sprintf($tmpl, $v, $#constraints+1, $v, $slurpy->inline_check('$tmp'))
 				: sprintf("\@{$v} <= %d", scalar @constraints)
 			),
-			map { $constraints[$_]->inline_check("$v\->[$_]") } 0 .. $#constraints;
+			map {
+				my $inline = $constraints[$_]->inline_check("$v\->[$_]");
+				$is_optional[$_]
+					? sprintf('(@{%s} <= %d or %s)', $v, $_, $inline)
+					: $inline;
+			} 0 .. $#constraints;
 	};
 }
 
@@ -203,7 +213,7 @@ sub __coercion_generator
 		$C->add_type_coercions($parent => Types::Standard::Stringable {
 			my $label = sprintf("TUPLELABEL%d", ++$label_counter);
 			my @code;
-			push @code, 'do { my ($orig, $return_orig, @tmp, @new) = ($_, 0);';
+			push @code, 'do { my ($orig, $return_orig, $tmp, @new) = ($_, 0);';
 			push @code,       "$label: {";
 			push @code,       sprintf('(($return_orig = 1), last %s) if @$orig > %d;', $label, scalar @tuple) unless $slurpy;
 			for my $i (0 .. $#tuple)
@@ -212,30 +222,16 @@ sub __coercion_generator
 				my $ct_coerce   = $ct->has_coercion;
 				my $ct_optional = $ct->is_a_type_of(Types::Standard::Optional);
 				
-				if ($ct_coerce)
-				{
-					push @code, sprintf('@tmp = (); $tmp[0] = %s;', $ct->coercion->inline_coercion("\$orig->[$i]"));
-					push @code, sprintf(
-						$ct_optional
-							? 'if (%s) { $new[%d]=$tmp[0] }'
-							: 'if (%s) { $new[%d]=$tmp[0] } else { $return_orig = 1; last %s }',
-						$ct->inline_check('$tmp[0]'),
-						$i,
-						$label,
-					);
-				}
-				else
-				{
-					push @code, sprintf(
-						$ct_optional
-							? 'if (%s) { $new[%d]=$orig->[%s] }'
-							: 'if (%s) { $new[%d]=$orig->[%s] } else { $return_orig = 1; last %s }',
-						$ct->inline_check("\$orig->[$i]"),
-						$i,
-						$i,
-						$label,
-					);
-				}
+				push @code, sprintf(
+					'if (@$orig > %d) { $tmp = %s; (%s) ? ($new[%d]=$tmp) : ($return_orig=1 and last %s) }',
+					$i,
+					$ct_coerce
+						? $ct->coercion->inline_coercion("\$orig->[$i]")
+						: "\$orig->[$i]",
+					$ct->inline_check('$tmp'),
+					$i,
+					$label,
+				);
 			}
 			if ($slurpy)
 			{
@@ -260,6 +256,8 @@ sub __coercion_generator
 	
 	else
 	{
+		my @is_optional = map !!$_->is_strictly_a_type_of($_Optional), @tuple;
+		
 		$C->add_type_coercions(
 			$parent => sub {
 				my $value = @_ ? $_[0] : $_;
@@ -272,31 +270,14 @@ sub __coercion_generator
 				my @new;
 				for my $i (0 .. $#tuple)
 				{
+					return \@new if $i > $#$value and $is_optional[$i];
+					
 					my $ct = $tuple[$i];
-					my @accept;
+					my $x  = $ct->has_coercion ? $ct->coerce($value->[$i]) : $value->[$i];
 					
-					if (exists $value->[$i] and $ct->check($value->[$i]))
-					{
-						@accept = $value->[$i];
-					}
-					elsif (exists $value->[$i] and $ct->has_coercion)
-					{
-						my $x = $ct->coerce($value->[$i]);
-						@accept = $x if $ct->check($x);
-					}
-					else
-					{
-						return $value;
-					}
+					return $value unless $ct->check($x);
 					
-					if (@accept)
-					{
-						$new[$i] = $accept[0];
-					}
-					elsif (not $ct->is_a_type_of(Types::Standard::Optional))
-					{
-						return $value;
-					}
+					$new[$i] = $x;
 				}
 				
 				if ($slurpy and @$value > @tuple)
