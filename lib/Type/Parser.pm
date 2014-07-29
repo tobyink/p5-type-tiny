@@ -80,17 +80,15 @@ Evaluate: {
 		
 		if ($node->{type} eq "union")
 		{
-			require Type::Tiny::Union;
-			return "Type::Tiny::Union"->new(
-				type_constraints => [ map _eval_type($_, $reg), @{$node->{union}} ],
+			return $reg->make_union(
+				map _eval_type($_, $reg), @{$node->{union}}
 			);
 		}
 		
 		if ($node->{type} eq "intersect")
 		{
-			require Type::Tiny::Intersection;
-			return "Type::Tiny::Intersection"->new(
-				type_constraints => [ map _eval_type($_, $reg), @{$node->{intersect}} ],
+			return $reg->make_intersection(
+				map _eval_type($_, $reg), @{$node->{intersect}}
 			);
 		}
 		
@@ -115,8 +113,7 @@ Evaluate: {
 		if ($node->{type} eq "primary" and $node->{token}->type eq CLASS)
 		{
 			my $class = substr($node->{token}->spelling, 0, length($node->{token}->spelling) - 2);
-			require Type::Tiny::Class;
-			return "Type::Tiny::Class"->new(class => $class);
+			$reg->make_class_type($class);
 		}
 		
 		if ($node->{type} eq "primary" and $node->{token}->type eq QUOTELIKE)

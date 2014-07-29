@@ -218,6 +218,42 @@ sub lookup
 	$self->simple_lookup(@_) or eval_type($_[0], $self);
 }
 
+sub make_union
+{
+	my $self = shift;
+	my (@types) = @_;
+	
+	require Type::Tiny::Union;
+	return "Type::Tiny::Union"->new(type_constraints => \@types);
+}
+
+sub make_intersection
+{
+	my $self = shift;
+	my (@types) = @_;
+	
+	require Type::Tiny::Intersection;
+	return "Type::Tiny::Intersection"->new(type_constraints => \@types);
+}
+
+sub make_class_type
+{
+	my $self = shift;
+	my ($class) = @_;
+	
+	require Type::Tiny::Class;
+	return "Type::Tiny::Class"->new(class => $class);
+}
+
+sub make_role_type
+{
+	my $self = shift;
+	my ($role) = @_;
+	
+	require Type::Tiny::Role;
+	return "Type::Tiny::Role"->new(role => $role);
+}
+
 sub AUTOLOAD
 {
 	my $self = shift;
@@ -417,6 +453,13 @@ The DSL can be summed up as:
    Foo::Bar::      class type
 
 Croaks if not found.
+
+=item C<< make_union(@constraints) >>,
+C<< make_intersection(@constraints) >>,
+C<< make_class_type($class) >>,
+C<< make_role_type($role) >>
+
+Convenience methods for creating certain common type constraints.
 
 =item C<< AUTOLOAD >>
 
