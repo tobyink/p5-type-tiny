@@ -94,7 +94,7 @@ sub __inline_generator
 		my $h = $_[1];
 		join " and ",
 			"ref($h) eq 'HASH'",
-			( $slurpy_is_any ? '1'
+			( $slurpy_is_any ? ()
 			: $slurpy_is_map ? do {
 				'(not grep {'
 				."my \$v = ($h)->{\$_};"

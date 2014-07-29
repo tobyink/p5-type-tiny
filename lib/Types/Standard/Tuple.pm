@@ -59,16 +59,26 @@ sub __constraint_generator
 	
 	my @is_optional = map !!$_->is_strictly_a_type_of($_Optional), @constraints;
 	my $slurp_hash  = $slurpy && $slurpy->is_a_type_of(Types::Standard::HashRef);
+	my $slurp_any   = $slurpy && $slurpy->equals(Types::Standard::Any);
+	
 	sub
 	{
 		my $value = $_[0];
 		if ($#constraints < $#$value)
 		{
 			return !!0 unless $slurpy;
-			my $tmp = $slurp_hash
-				? +{@$value[$#constraints+1 .. $#$value]}
-				: +[@$value[$#constraints+1 .. $#$value]];
-			$slurpy->check($tmp) or return;
+			my $tmp;
+			if ($slurp_hash)
+			{
+				($#$value - $#constraints+1) % 2 or return;
+				$tmp = +{@$value[$#constraints+1 .. $#$value]};
+				$slurpy->check($tmp) or return;
+			}
+			elsif (not $slurp_any)
+			{
+				$tmp = +[@$value[$#constraints+1 .. $#$value]];
+				$slurpy->check($tmp) or return;
+			}
 		}
 		for my $i (0 .. $#constraints)
 		{
@@ -112,9 +122,17 @@ sub __inline_generator
 		}
 	}
 	
-	my $tmpl = defined($slurpy) && $slurpy->is_a_type_of(Types::Standard::HashRef)
-		? "do { my \$tmp = +{\@{%s}[%d..\$#{%s}]}; %s }"
-		: "do { my \$tmp = +[\@{%s}[%d..\$#{%s}]]; %s }";
+	my $tmpl = "do { my \$tmp = +[\@{%s}[%d..\$#{%s}]]; %s }";
+	my $slurpy_any;
+	if (defined $slurpy)
+	{
+		$tmpl = 'do { my ($orig, $from, $to) = (%s, %d, $#{%s});'
+			.    '($to-$from % 2) and do { my $tmp = +{@{$orig}[$from..$to]}; %s }'
+			.    '}'
+			if $slurpy->is_a_type_of(Types::Standard::HashRef);
+		$slurpy_any = 1
+			if $slurpy->equals(Types::Standard::Any);
+	}
 	
 	my @is_optional = map !!$_->is_strictly_a_type_of($_Optional), @constraints;
 	my $min         = 0 + grep !$_, @is_optional;
@@ -125,9 +143,14 @@ sub __inline_generator
 		join " and ",
 			"ref($v) eq 'ARRAY'",
 			"scalar(\@{$v}) >= $min",
-			($slurpy
-				? sprintf($tmpl, $v, $#constraints+1, $v, $slurpy->inline_check('$tmp'))
-				: sprintf("\@{$v} <= %d", scalar @constraints)
+			(
+				$slurpy_any
+					? ()
+					: (
+						$slurpy 
+							? sprintf($tmpl, $v, $#constraints+1, $v, $slurpy->inline_check('$tmp'))
+							: sprintf("\@{$v} <= %d", scalar @constraints)
+					)
 			),
 			map {
 				my $inline = $constraints[$_]->inline_check("$v\->[$_]");
