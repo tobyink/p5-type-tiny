@@ -1949,3 +1949,15 @@
 		item "Test warnings raised by Type::Utils::declare()."^^Tests;
 		item "Test code from SYNOPSIS sections (only in xt)."^^Tests;
 	].
+
+`Type-Tiny 0.047_05 cpan:TOBYINK`
+	label   "Sanity++";
+	issued  2014-07-29;
+	changeset [
+		dcs:versus `Type-Tiny 0.047_04 cpan:TOBYINK`;
+		item "A far saner implementation of Optional[]."^^Change;
+		item "Improve the documentation of Optional[] and slurpy."^^Documentation;
+		item "Optimizations for slurpy Any."^^Change;
+		item "When slurping the tail of a Tuple into a hashref, check it's an even number of elements."^^Change;
+		item "A slightly saner implementation of Types::TypeTiny's meta methods."^^Change;
+	].
