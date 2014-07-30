@@ -48,11 +48,11 @@ use Test::Fatal;
 	coerce JsonHash,
 		from Str, 'JSON::PP::decode_json($_)';
 	
-	coerce ArrayRef,
+	coerce JsonArray,
 		from Str, 'JSON::PP::decode_json($_)';
 }
 
-my $code = T::ArrayRef->coercion->inline_coercion('$::foo');
+my $code = T::JsonArray->coercion->inline_coercion('$::foo');
 
 our $foo = "[3,2,1]";
 
