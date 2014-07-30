@@ -802,7 +802,6 @@ sub parameterize
 	}
 	
 	$P->coercion->freeze;
-	die "nah nah nah nah" unless $P->coercion->frozen;
 	
 	return $P;
 }
