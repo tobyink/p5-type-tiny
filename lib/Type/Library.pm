@@ -308,6 +308,15 @@ sub coercion_names
 	keys %{ $meta->{coercions} };
 }
 
+sub make_immutable
+{
+	my $meta = shift->meta;
+	for my $type (values %{$meta->{types}}) {
+		$type->coercion->freeze;
+	}
+	1;
+}
+
 1;
 
 __END__

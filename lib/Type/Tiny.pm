@@ -801,6 +801,9 @@ sub parameterize
 		weaken($param_cache{$key});
 	}
 	
+	$P->coercion->freeze;
+	die "nah nah nah nah" unless $P->coercion->frozen;
+	
 	return $P;
 }
 

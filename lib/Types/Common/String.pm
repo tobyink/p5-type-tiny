@@ -147,6 +147,8 @@ UpperCaseSimpleStr->coercion->add_type_coercions(
 	NonEmptySimpleStr, q[ uc($_) ],
 );
 
+__PACKAGE__->meta->make_immutable;
+
 1;
 
 __END__

@@ -117,7 +117,9 @@ $meta->add_type(
 	inlined    => sub { undef, qq($_ >= -9), qq($_ <= 9) },
 	message    => sub { "Must be a single digit" },
 );
- 
+
+__PACKAGE__->meta->make_immutable;
+
 1;
 
 __END__
