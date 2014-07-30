@@ -1088,7 +1088,7 @@ C<< Dict[name => Str, id => Optional[Int]] >> allows C<< { name => "Bob" } >>
 but not C<< { name => "Bob", id => "BOB" } >>.
 
 Note that any use of C<< Optional[`a] >> outside the context of
-parameterized C<Dict> and C<Slurpy> type constraints makes little sense,
+parameterized C<Dict> and C<Tuple> type constraints makes little sense,
 and its behaviour is undefined. (An exception: it is used by
 L<Type::Params> for a similar purpose to how it's used in C<Tuple>.)
 
