@@ -148,7 +148,7 @@ sub new
 		$params{parent}->has_coercion
 			or _croak "coercion => 1 requires type to have a direct parent with a coercion";
 		
-		$params{coercion} = $params{parent}->coercion;
+		$params{coercion} = $params{parent}->coercion->type_coercion_map;
 	}
 	
 	if (!exists $params{inlined}
