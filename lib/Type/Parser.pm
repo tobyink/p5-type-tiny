@@ -112,8 +112,12 @@ Evaluate: {
 		
 		if ($node->{type} eq "primary" and $node->{token}->type eq CLASS)
 		{
-			my $class = substr($node->{token}->spelling, 0, length($node->{token}->spelling) - 2);
-			$reg->make_class_type($class);
+			my $class = substr(
+				$node->{token}->spelling,
+				0,
+				length($node->{token}->spelling) - 2
+			);
+			return $reg->make_class_type($class);
 		}
 		
 		if ($node->{type} eq "primary" and $node->{token}->type eq QUOTELIKE)
