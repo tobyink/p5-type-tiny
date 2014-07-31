@@ -84,7 +84,7 @@ bundled in this distribution, but has since been spun off as a separate
 distribution. Don't worry - it's quick and easy to install.
 
 At run-time, Type::Tiny also requires the following modules: L<B>,
-L<B::Deparse>, L<Data::Dumper>, L<Scalar::Util>, L<Text::Balanced>,
+L<B::Deparse>, L<Carp>, L<Data::Dumper>, L<Scalar::Util>, L<Text::Balanced>,
 L<overload>, L<strict> and L<warnings>. All of these come bundled with
 Perl itself. Prior to Perl 5.8, L<Scalar::Util> and L<Text::Balanced>
 do not come bundled with Perl and will need installing separately from
