@@ -742,6 +742,10 @@ If you really want to unfreeze a coercion, call this method.
 
 Don't call this method. It will potentially lead to subtle bugs.
 
+This method is considered unstable; future versions of Type::Tiny may
+alter its behaviour (e.g. to throw an exception if it has been detected
+that unfreezing this particular coercion will cause bugs).
+
 =back
 
 =head3 Parameterization
