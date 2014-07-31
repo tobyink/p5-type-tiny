@@ -319,6 +319,10 @@ coercion. This makes the type's coercions immutable. If anybody wants
 to define any additional coercions, they'll have to create a child type
 to do it with.
 
+A shortcut exists for this:
+
+   __PACKAGE__->meta->make_immutable;
+
 =item 3.
 
 Use C<plus_coercions> and similar methods to easily create a child

@@ -348,6 +348,8 @@ BEGIN { die "SKIP: crams multiple modules into single example" };
       );
       
       __PACKAGE__->meta->add_type($NUM);
+      
+      __PACKAGE__->meta->make_immutable;
    }
       
    package Ermintrude {
@@ -468,6 +470,11 @@ List all standalone coercions defined by the library.
 =item C<< import(@args) >>
 
 Type::Library-based libraries are exporters.
+
+=item C<< make_immutable >>
+
+A shortcut for calling C<< $type->coercion->freeze >> on every
+type constraint in the library.
 
 =back
 
