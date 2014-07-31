@@ -25,7 +25,7 @@ sub L_PAREN   () { "L_PAREN" };
 sub R_PAREN   () { "R_PAREN" };
 sub MYSTERY   () { "MYSTERY" };
 
-our @EXPORT_OK = qw( eval_type _std_eval parse );
+our @EXPORT_OK = qw( eval_type _std_eval parse extract_type );
 
 require Exporter::Tiny;
 our @ISA = 'Exporter::Tiny';
