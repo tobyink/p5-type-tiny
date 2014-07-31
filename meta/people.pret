@@ -80,6 +80,9 @@ cpan:ABRAXXA
 cpan:XENO
 	:name "Caleb Cushing".
 
+cpan:MSCHWERN
+	:name "Michael G Schwern".
+
 # We bundle some files made by these dudes...
 
 cpan:RJBS

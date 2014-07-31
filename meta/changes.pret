@@ -1961,3 +1961,24 @@
 		item "When slurping the tail of a Tuple into a hashref, check it's an even number of elements."^^Change;
 		item "A slightly saner implementation of Types::TypeTiny's meta methods."^^Change;
 	].
+
+`Type-Tiny 0.047_06 cpan:TOBYINK`
+	label   "What made the Queen go all ice crazy?";
+	issued  2014-07-31;
+	changeset [
+		dcs:versus `Type-Tiny 0.047_05 cpan:TOBYINK`;
+		item "Type::Registry/Type::Parser will now auto-load MouseX::Types libraries."^^Change;
+		item "Type::Registry now has methods for creating union/intersection/class/role type constraints. Type::Parser delegates to these, making it potentially reusable outside Type::Tiny by simply passing it an alternative type registry object."^^Change;
+		item "More Type::Registry test cases."^^Tests;
+		item [
+			label "Parameterized types now have their coercions frozen automatically, so you can no longer add coercions to, say, ArrayRef[Int]. However, you can create a subtype of ArrayRef[Int] and add coercions to that.";
+			seealso RT#97516;
+			dcs:thanks cpan:MSCHWERN;
+		];
+		item "Bugfix in coercion inheritance where the child's type_coercion_map arrayref would end up as a reference to the parent's type_coercion_map. (Which was not good.)"^^Bugfix;
+		item "Coercions for the types defined in Types::Standard are now frozen."^^Change;
+		item "Coercions for the types defined in Types::Common::Numeric are now frozen."^^Change;
+		item "Coercions for the types defined in Types::Common::String are now frozen."^^Change;
+		item "Type::Coercion now has a i_really_want_to_unfreeze method."^^Addition;
+		item "Type::Library now has a make_immutable method"^^Addition;
+	].
