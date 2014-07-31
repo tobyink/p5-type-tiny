@@ -12,7 +12,7 @@ Test that this sort of thing works:
 
 =head1 DEPENDENCIES
 
-Requires L<Return::Type>; skipped otherwise.
+Requires L<Return::Type> 0.004; skipped otherwise.
 
 =head1 AUTHOR
 
@@ -36,7 +36,7 @@ BEGIN {
 		if exists $INC{"App/ForkProve.pm"};
 };
 
-use Test::Requires 'Return::Type';
+use Test::Requires { 'Return::Type' => '0.004' };
 use Types::Standard qw( HashRef Int );
 use Test::Fatal;
 
