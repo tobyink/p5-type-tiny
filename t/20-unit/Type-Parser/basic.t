@@ -27,8 +27,8 @@ use Test::More;
 use Test::TypeTiny;
 use Test::Fatal;
 
-use Type::Parser qw(_std_eval parse);
-use Types::Standard qw(-types slurpy);
+use Type::Parser qw( _std_eval parse extract_type );
+use Types::Standard qw( -types slurpy );
 use Type::Utils;
 
 sub types_equal
@@ -135,6 +135,14 @@ is($remaining, " monkey nuts ", "remainder is ok");
 
 ($ast, $remaining) = parse("Int, Str");
 is($remaining, ", Str", "comma can indicate beginning of remainder");
+
+require Type::Registry;
+my $type;
+my $reg = Type::Registry->new;
+$reg->add_types( -Standard );
+($type, $remaining) = extract_type('ArrayRef [ Int ] yah', $reg);
+types_equal($type, ArrayRef[Int], 'extract_type works');
+like($remaining, qr/\A\s?yah\z/, '... and provides proper remainder too');
 
 note "Parsing edge cases";
 is_deeply(
