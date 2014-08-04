@@ -375,17 +375,42 @@ $meta->$add_core_type({
 		Types::TypeTiny::TypeTiny->check($param)
 			or _croak("Parameter to Maybe[`a] expected to be a type constraint; got $param");
 		
-		# TODO: xsubs
-		
-		return sub
+		my $param_compiled_check = $param->compiled_check;
+		my @xsub;
+		if (Type::Tiny::_USE_XS)
 		{
-			my $value = shift;
-			return !!1 unless defined $value;
-			return $param->check($value);
-		};
+			my $paramname = Type::Tiny::XS::is_known($param_compiled_check);
+			push @xsub, Type::Tiny::XS::get_coderef_for("Maybe[$paramname]")
+				if $paramname;
+		}
+		elsif (Type::Tiny::_USE_MOUSE and $param->_has_xsub)
+		{
+			require Mouse::Util::TypeConstraints;
+			my $maker = "Mouse::Util::TypeConstraints"->can("_parameterize_Maybe_for");
+			push @xsub, $maker->($param) if $maker;
+		}
+		
+		return(
+			sub
+			{
+				my $value = shift;
+				return !!1 unless defined $value;
+				return $param->check($value);
+			},
+			@xsub,
+		);
 	},
 	inline_generator => sub {
 		my $param = shift;
+		
+		my $param_compiled_check = $param->compiled_check;
+		if (Type::Tiny::_USE_XS)
+		{
+			my $paramname = Type::Tiny::XS::is_known($param_compiled_check);
+			my $xsubname  = Type::Tiny::XS::get_subname_for("Maybe[$paramname]");
+			return sub { "$xsubname\($_[1]\)" } if $xsubname;
+		}
+		
 		return unless $param->can_be_inlined;
 		return sub {
 			my $v = $_[1];
