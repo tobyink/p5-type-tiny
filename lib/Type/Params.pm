@@ -10,7 +10,7 @@ BEGIN {
 
 BEGIN {
 	$Type::Params::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Params::VERSION   = '0.047_06';
+	$Type::Params::VERSION   = '0.047_07';
 }
 
 use B qw();

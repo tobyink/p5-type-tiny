@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Tiny::_HalfOp::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::_HalfOp::VERSION   = '0.047_06';
+	$Type::Tiny::_HalfOp::VERSION   = '0.047_07';
 }
 
 use overload ();

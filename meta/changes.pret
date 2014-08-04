@@ -1980,5 +1980,14 @@
 		item "Coercions for the types defined in Types::Common::Numeric are now frozen."^^Change;
 		item "Coercions for the types defined in Types::Common::String are now frozen."^^Change;
 		item "Type::Coercion now has a i_really_want_to_unfreeze method."^^Addition;
-		item "Type::Library now has a make_immutable method"^^Addition;
+		item "Type::Library now has a make_immutable method."^^Addition;
+	].
+
+`Type-Tiny 0.047_07 cpan:TOBYINK`
+	issued  2014-08-04;
+	changeset [
+		dcs:versus `Type-Tiny 0.047_06 cpan:TOBYINK`;
+		item "The extract_type function was missing from Type::Parser's @EXPORT_OK list."^^Bugfix;
+		item "Test cases for Type::Parser::extract_type."^^Tests;
+		item "Parameterized Maybe constraints are now XS-accelerated."^^Change;
 	].
