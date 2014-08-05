@@ -26,6 +26,8 @@ Guillermo Roditi <groditi@gmail.com>
  
 =back
 
+Test cases ported to L<Test::TypeTiny> by Toby Inkster.
+
 =head1 COPYRIGHT AND LICENCE
 
 This software is copyright (c) 2013-2014 by Matt S Trout - mst (at) shadowcatsystems.co.uk (L<http://www.shadowcatsystems.co.uk/>).
@@ -39,22 +41,23 @@ use strict;
 use warnings FATAL => 'all';
 use utf8;
 use Test::More;
+use Test::TypeTiny;
 
 use Types::Common::String -all;
 
-ok(  is_UpperCaseStr('CAFÉ'), q[CAFÉ is uppercase] );
-ok( !is_UpperCaseStr('CAFé'), q[CAFé is not (entirely) uppercase] );
+should_pass('CAFÉ', UpperCaseStr, "CAFÉ is uppercase");
+should_fail('CAFé', UpperCaseStr, "CAFé is not (entirely) uppercase");
 
-ok( !is_UpperCaseStr('ŐħĤăĩ'), q[----- not entirely uppercase] );
-ok( !is_LowerCaseStr('ŐħĤăĩ'), q[----- not entirely lowercase] );
+should_fail('ŐħĤăĩ', UpperCaseStr, "----- not entirely uppercase");
+should_fail('ŐħĤăĩ', LowerCaseStr, "----- not entirely lowercase");
 
-ok(  is_LowerCaseStr('café'), q[café is lowercase] );
-ok( !is_LowerCaseStr('cafÉ'), q[cafÉ is not (entirely) lowercase] );
+should_pass('café', LowerCaseStr, "café is lowercase");
+should_fail('cafÉ', LowerCaseStr, "cafÉ is not (entirely) lowercase");
 
-ok(  is_UpperCaseSimpleStr('CAFÉ'), q[CAFÉ is uppercase] );
-ok( !is_UpperCaseSimpleStr('CAFé'), q[CAFé is not (entirely) uppercase] );
+should_pass('CAFÉ', UpperCaseSimpleStr, "CAFÉ is uppercase");
+should_fail('CAFé', UpperCaseSimpleStr, "CAFé is not (entirely) uppercase");
 
-ok(  is_LowerCaseSimpleStr('café'), q[café is lowercase] );
-ok( !is_LowerCaseSimpleStr('cafÉ'), q[cafÉ is not (entirely) lowercase] );
+should_pass('café', LowerCaseSimpleStr, "café is lowercase");
+should_fail('cafÉ', LowerCaseSimpleStr, "cafÉ is not (entirely) lowercase");
 
 done_testing;

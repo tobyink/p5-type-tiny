@@ -26,6 +26,8 @@ Guillermo Roditi <groditi@gmail.com>
  
 =back
 
+Test cases ported to L<Test::TypeTiny> by Toby Inkster.
+
 =head1 COPYRIGHT AND LICENCE
 
 This software is copyright (c) 2013-2014 by Matt S Trout - mst (at) shadowcatsystems.co.uk (L<http://www.shadowcatsystems.co.uk/>).
@@ -38,63 +40,51 @@ the same terms as the Perl 5 programming language system itself.
 use strict;
 use warnings FATAL => 'all';
 use Test::More;
+use Test::TypeTiny;
 
-use Types::Common::String qw(
-	+SimpleStr
-	+NonEmptySimpleStr
-	+LowerCaseSimpleStr
-	+UpperCaseSimpleStr
-	+Password
-	+StrongPassword
-	+NonEmptyStr
-	+LowerCaseStr
-	+UpperCaseStr
-	+NumericCode
-);
+use Types::Common::String -all;
 
-# TODO: need to check both the inlined and non-inlined versions!
+should_pass('', SimpleStr, "SimpleStr");
+should_pass('a string', SimpleStr, "SimpleStr 2");
+should_fail("another\nstring", SimpleStr, "SimpleStr 3");
+should_fail(join('', ("long string" x 25)), SimpleStr, "SimpleStr 4");
 
-ok(is_SimpleStr(''), 'SimpleStr');
-ok(is_SimpleStr('a string'), 'SimpleStr 2');
-ok(!is_SimpleStr("another\nstring"), 'SimpleStr 3');
-ok(!is_SimpleStr(join('', ("long string" x 25))), 'SimpleStr 4');
+should_fail('', NonEmptyStr, "NonEmptyStr");
+should_pass('a string', NonEmptyStr, "NonEmptyStr 2");
+should_pass("another string", NonEmptyStr, "NonEmptyStr 3");
+should_pass(join('', ("long string" x 25)), NonEmptyStr, "NonEmptyStr 4");
 
-ok(!is_NonEmptyStr(''), 'NonEmptyStr');
-ok(is_NonEmptyStr('a string'), 'NonEmptyStr 2');
-ok(is_NonEmptyStr("another string"), 'NonEmptyStr 3');
-ok(is_NonEmptyStr(join('', ("long string" x 25))), 'NonEmptyStr 4');
+should_pass('good str', NonEmptySimpleStr, "NonEmptySimplrStr");
+should_fail('', NonEmptySimpleStr, "NonEmptyStr 2");
 
-ok(is_NonEmptySimpleStr('good str'), 'NonEmptySimplrStr');
-ok(!is_NonEmptySimpleStr(''), 'NonEmptyStr 2');
+should_fail('no', Password, "Password");
+should_pass('okay', Password, "Password 2");
 
-ok(!is_Password('no'), 'Password');
-ok(is_Password('okay'), 'Password 2');
+should_fail('notokay', StrongPassword, "StrongPassword");
+should_pass('83773r_ch01c3', StrongPassword, "StrongPassword 2");
 
-ok(!is_StrongPassword('notokay'), 'StrongPassword');
-ok(is_StrongPassword('83773r_ch01c3'), 'StrongPassword 2');
+should_fail('NOTOK', LowerCaseSimpleStr, "LowerCaseSimpleStr");
+should_pass('ok', LowerCaseSimpleStr, "LowerCaseSimpleStr 2");
+should_fail('NOTOK_123`"', LowerCaseSimpleStr, "LowerCaseSimpleStr 3");
+should_pass('ok_123`"', LowerCaseSimpleStr, "LowerCaseSimpleStr 4");
 
-ok(!is_LowerCaseSimpleStr('NOTOK'), 'LowerCaseSimpleStr');
-ok(is_LowerCaseSimpleStr('ok'), 'LowerCaseSimpleStr 2');
-ok(!is_LowerCaseSimpleStr('NOTOK_123`"'), 'LowerCaseSimpleStr 3');
-ok(is_LowerCaseSimpleStr('ok_123`"'), 'LowerCaseSimpleStr 4');
+should_fail('notok', UpperCaseSimpleStr, "UpperCaseSimpleStr");
+should_pass('OK', UpperCaseSimpleStr, "UpperCaseSimpleStr 2");
+should_fail('notok_123`"', UpperCaseSimpleStr, "UpperCaseSimpleStr 3");
+should_pass('OK_123`"', UpperCaseSimpleStr, "UpperCaseSimpleStr 4");
 
-ok(!is_UpperCaseSimpleStr('notok'), 'UpperCaseSimpleStr');
-ok(is_UpperCaseSimpleStr('OK'), 'UpperCaseSimpleStr 2');
-ok(!is_UpperCaseSimpleStr('notok_123`"'), 'UpperCaseSimpleStr 3');
-ok(is_UpperCaseSimpleStr('OK_123`"'), 'UpperCaseSimpleStr 4');
+should_fail('NOTOK', LowerCaseStr, "LowerCaseStr");
+should_pass("ok\nok", LowerCaseStr, "LowerCaseStr 2");
+should_fail('NOTOK_123`"', LowerCaseStr, "LowerCaseStr 3");
+should_pass("ok\n_123`'", LowerCaseStr, "LowerCaseStr 4");
 
-ok(!is_LowerCaseStr('NOTOK'), 'LowerCaseStr');
-ok(is_LowerCaseStr("ok\nok"), 'LowerCaseStr 2');
-ok(!is_LowerCaseStr('NOTOK_123`"'), 'LowerCaseStr 3');
-ok(is_LowerCaseStr("ok\n_123`'"), 'LowerCaseStr 4');
+should_fail('notok', UpperCaseStr, "UpperCaseStr");
+should_pass("OK\nOK", UpperCaseStr, "UpperCaseStr 2");
+should_fail('notok_123`"', UpperCaseStr, "UpperCaseStr 3");
+should_pass("OK\n_123`'", UpperCaseStr, "UpperCaseStr 4");
 
-ok(!is_UpperCaseStr('notok'), 'UpperCaseStr');
-ok(is_UpperCaseStr("OK\nOK"), 'UpperCaseStr 2');
-ok(!is_UpperCaseStr('notok_123`"'), 'UpperCaseStr 3');
-ok(is_UpperCaseStr("OK\n_123`'"), 'UpperCaseStr 4');
-
-ok(is_NumericCode('032'),  'NumericCode lives');
-ok(!is_NumericCode('abc'),  'NumericCode dies' );
-ok(!is_NumericCode('x18'),  'mixed NumericCode dies');
+should_pass('032', NumericCode, "NumericCode lives");
+should_fail('abc', NumericCode, "NumericCode dies");
+should_fail('x18', NumericCode, "mixed NumericCode dies");
 
 done_testing;

@@ -26,6 +26,8 @@ Guillermo Roditi <groditi@gmail.com>
  
 =back
 
+Test cases ported to L<Test::TypeTiny> by Toby Inkster.
+
 =head1 COPYRIGHT AND LICENCE
 
 This software is copyright (c) 2013-2014 by Matt S Trout - mst (at) shadowcatsystems.co.uk (L<http://www.shadowcatsystems.co.uk/>).
@@ -38,59 +40,54 @@ the same terms as the Perl 5 programming language system itself.
 use strict;
 use warnings FATAL => 'all';
 use Test::More;
+use Test::TypeTiny;
 
-use Types::Common::Numeric qw(
-	+PositiveNum +PositiveOrZeroNum
-	+PositiveInt +PositiveOrZeroInt
-	+NegativeNum +NegativeOrZeroNum
-	+NegativeInt +NegativeOrZeroInt
-	+SingleDigit
-);
+use Types::Common::Numeric -all;
 
-ok(!is_SingleDigit(100), 'SingleDigit 100');
-ok(!is_SingleDigit(10), 'SingleDigit 10');
-ok(is_SingleDigit(9), 'SingleDigit 9');
-ok(is_SingleDigit(1), 'SingleDigit 1');
-ok(is_SingleDigit(0), 'SingleDigit 0');
-ok(is_SingleDigit(-1), 'SingleDigit -1');
-ok(is_SingleDigit(-9), 'SingleDigit -9');
-ok(!is_SingleDigit(-10), 'SingleDigit -10');
+should_fail(100, SingleDigit, "SingleDigit 100");
+should_fail(10, SingleDigit, "SingleDigit 10");
+should_pass(9, SingleDigit, "SingleDigit 9");
+should_pass(1, SingleDigit, "SingleDigit 1");
+should_pass(0, SingleDigit, "SingleDigit 0");
+should_pass(-1, SingleDigit, "SingleDigit -1");
+should_pass(-9, SingleDigit, "SingleDigit -9");
+should_fail(-10, SingleDigit, "SingleDigit -10");
 
 
-ok(!is_PositiveInt(-100), 'PositiveInt (-100)');
-ok(!is_PositiveInt(0), 'PositiveInt (0)');
-ok(!is_PositiveInt(100.885), 'PositiveInt (100.885)');
-ok(is_PositiveInt(100), 'PositiveInt (100)');
-ok(!is_PositiveNum(0), 'PositiveNum (0)');
-ok(is_PositiveNum(100.885), 'PositiveNum (100.885)');
-ok(!is_PositiveNum(-100.885), 'PositiveNum (-100.885)');
-ok(is_PositiveNum(0.0000000001), 'PositiveNum (0.0000000001)');
+should_fail(-100, PositiveInt, "PositiveInt (-100)");
+should_fail(0, PositiveInt, "PositiveInt (0)");
+should_fail(100.885, PositiveInt, "PositiveInt (100.885)");
+should_pass(100, PositiveInt, "PositiveInt (100)");
+should_fail(0, PositiveNum, "PositiveNum (0)");
+should_pass(100.885, PositiveNum, "PositiveNum (100.885)");
+should_fail(-100.885, PositiveNum, "PositiveNum (-100.885)");
+should_pass(0.0000000001, PositiveNum, "PositiveNum (0.0000000001)");
 
-ok(!is_PositiveOrZeroInt(-100), 'PositiveOrZeroInt (-100)');
-ok(is_PositiveOrZeroInt(0), 'PositiveOrZeroInt (0)');
-ok(!is_PositiveOrZeroInt(100.885), 'PositiveOrZeroInt (100.885)');
-ok(is_PositiveOrZeroInt(100), 'PositiveOrZeroInt (100)');
-ok(is_PositiveOrZeroNum(0), 'PositiveOrZeroNum (0)');
-ok(is_PositiveOrZeroNum(100.885), 'PositiveOrZeroNum (100.885)');
-ok(!is_PositiveOrZeroNum(-100.885), 'PositiveOrZeroNum (-100.885)');
-ok(is_PositiveOrZeroNum(0.0000000001), 'PositiveOrZeroNum (0.0000000001)');
+should_fail(-100, PositiveOrZeroInt, "PositiveOrZeroInt (-100)");
+should_pass(0, PositiveOrZeroInt, "PositiveOrZeroInt (0)");
+should_fail(100.885, PositiveOrZeroInt, "PositiveOrZeroInt (100.885)");
+should_pass(100, PositiveOrZeroInt, "PositiveOrZeroInt (100)");
+should_pass(0, PositiveOrZeroNum, "PositiveOrZeroNum (0)");
+should_pass(100.885, PositiveOrZeroNum, "PositiveOrZeroNum (100.885)");
+should_fail(-100.885, PositiveOrZeroNum, "PositiveOrZeroNum (-100.885)");
+should_pass(0.0000000001, PositiveOrZeroNum, "PositiveOrZeroNum (0.0000000001)");
 
-ok(!is_NegativeInt(100), 'NegativeInt (100)');
-ok(!is_NegativeInt(-100.885), 'NegativeInt (-100.885)');
-ok(is_NegativeInt(-100), 'NegativeInt (-100)');
-ok(!is_NegativeInt(0), 'NegativeInt (0)');
-ok(is_NegativeNum(-100.885), 'NegativeNum (-100.885)');
-ok(!is_NegativeNum(100.885), 'NegativeNum (100.885)');
-ok(!is_NegativeNum(0), 'NegativeNum (0)');
-ok(is_NegativeNum(-0.0000000001), 'NegativeNum (-0.0000000001)');
+should_fail(100, NegativeInt, "NegativeInt (100)");
+should_fail(-100.885, NegativeInt, "NegativeInt (-100.885)");
+should_pass(-100, NegativeInt, "NegativeInt (-100)");
+should_fail(0, NegativeInt, "NegativeInt (0)");
+should_pass(-100.885, NegativeNum, "NegativeNum (-100.885)");
+should_fail(100.885, NegativeNum, "NegativeNum (100.885)");
+should_fail(0, NegativeNum, "NegativeNum (0)");
+should_pass(-0.0000000001, NegativeNum, "NegativeNum (-0.0000000001)");
 
-ok(!is_NegativeOrZeroInt(100), 'NegativeOrZeroInt (100)');
-ok(!is_NegativeOrZeroInt(-100.885), 'NegativeOrZeroInt (-100.885)');
-ok(is_NegativeOrZeroInt(-100), 'NegativeOrZeroInt (-100)');
-ok(is_NegativeOrZeroInt(0), 'NegativeOrZeroInt (0)');
-ok(is_NegativeOrZeroNum(-100.885), 'NegativeOrZeroNum (-100.885)');
-ok(!is_NegativeOrZeroNum(100.885), 'NegativeOrZeroNum (100.885)');
-ok(is_NegativeOrZeroNum(0), 'NegativeOrZeroNum (0)');
-ok(is_NegativeOrZeroNum(-0.0000000001), 'NegativeOrZeroNum (-0.0000000001)');
+should_fail(100, NegativeOrZeroInt, "NegativeOrZeroInt (100)");
+should_fail(-100.885, NegativeOrZeroInt, "NegativeOrZeroInt (-100.885)");
+should_pass(-100, NegativeOrZeroInt, "NegativeOrZeroInt (-100)");
+should_pass(0, NegativeOrZeroInt, "NegativeOrZeroInt (0)");
+should_pass(-100.885, NegativeOrZeroNum, "NegativeOrZeroNum (-100.885)");
+should_fail(100.885, NegativeOrZeroNum, "NegativeOrZeroNum (100.885)");
+should_pass(0, NegativeOrZeroNum, "NegativeOrZeroNum (0)");
+should_pass(-0.0000000001, NegativeOrZeroNum, "NegativeOrZeroNum (-0.0000000001)");
 
 done_testing;
