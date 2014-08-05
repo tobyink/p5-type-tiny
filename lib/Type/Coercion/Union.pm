@@ -70,6 +70,21 @@ sub _build_moose_coercion
 	return $r;
 }
 
+sub can_be_inlined
+{
+	my $self = shift;
+	
+	Types::TypeTiny::TypeTiny->assert_valid(my $type = $self->type_constraint);
+	
+	for my $tc (@$type)
+	{
+		next unless $tc->has_coercion;
+		return !!0 unless $tc->coercion->can_be_inlined;
+	}
+	
+	!!1;
+}
+
 1;
 
 __END__

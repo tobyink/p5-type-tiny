@@ -139,8 +139,10 @@ NONINLINED: {
 INLINED: {
 	my $Bar = declare Bar => as Int;
 	coerce $Bar, from Num, q { int($_) };
+	$Bar->coercion->freeze;
 	
 	my $ArrayOfBar = ArrayRef[$Bar];
+	$ArrayOfBar->coercion->freeze;
 	
 	ok($ArrayOfBar->has_coercion, '$ArrayOfBar has coercion');
 	ok($ArrayOfBar->coercion->can_be_inlined, '$ArrayOfBar coercion can be inlined');
@@ -167,6 +169,7 @@ INLINED: {
 	);
 	
 	my $HashOfBar = HashRef[$Bar];
+	$HashOfBar->coercion->freeze;
 	
 	ok($HashOfBar->has_coercion, '$HashOfBar has coercion');
 	ok($HashOfBar->coercion->can_be_inlined, '$HashOfBar coercion can be inlined');
@@ -193,6 +196,8 @@ INLINED: {
 	);
 	
 	my $RefOfBar = ScalarRef[$Bar];
+	$RefOfBar->coercion->freeze;
+	
 	ok($RefOfBar->has_coercion, '$RefOfBar has coercion');
 	ok($RefOfBar->coercion->can_be_inlined, '$RefOfBar coercion can be inlined');
 	
@@ -220,6 +225,7 @@ INLINED: {
 	# This added coercion should be ignored, because undef shouldn't
 	# need coercion!
 	my $MaybeBar = Maybe[$Bar->plus_coercions(Undef, 999)];
+	$MaybeBar->coercion->freeze;
 	
 	is(
 		$MaybeBar->coerce(undef),
@@ -255,6 +261,8 @@ MAP: {
 	
 	my $IntFromArray = declare IntFromArray => as Int;
 	coerce $IntFromArray, from ArrayRef, via { scalar(@$_) };
+	
+	$_->coercion->freeze for $IntFromStr, $IntFromNum, $IntFromArray;
 	
 	my $Map1 = Map[$IntFromNum, $IntFromStr];
 	ok(
@@ -307,9 +315,11 @@ DICT: {
 	
 	my $IntFromNum = declare IntFromNum => as Int;
 	coerce $IntFromNum, from Num, q{ int($_) };
-
+	
 	my $IntFromArray = declare IntFromArray => as Int;
 	coerce $IntFromArray, from ArrayRef, via { scalar(@$_) };
+	
+	$_->coercion->freeze for $IntFromStr, $IntFromNum, $IntFromArray;
 	
 	my @a = (a => $IntFromStr, b => $IntFromNum, c => Optional[$IntFromNum]);
 	
@@ -364,6 +374,8 @@ TUPLE: {
 	
 	my $IntFromArray = declare IntFromArray => as Int;
 	coerce $IntFromArray, from ArrayRef, via { scalar(@$_) };
+	
+	$_->coercion->freeze for $IntFromStr, $IntFromNum, $IntFromArray;
 	
 	my $Tuple1 = Tuple[ $IntFromNum, Optional[$IntFromStr], slurpy ArrayRef[$IntFromNum]];
 	ok(

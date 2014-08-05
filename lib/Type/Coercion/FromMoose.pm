@@ -63,6 +63,11 @@ sub _build_moose_coercion
 	$self->SUPER::_build_moose_coercion(@_);
 }
 
+sub can_be_inlined
+{
+	0;
+}
+
 1;
 
 __END__

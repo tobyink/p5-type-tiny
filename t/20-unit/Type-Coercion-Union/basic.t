@@ -31,14 +31,14 @@ use Types::Standard -types;
 use Type::Utils;
 
 my $RoundedInteger = declare RoundedInteger => as Int;
-$RoundedInteger->coercion->add_type_coercions(Num, 'int($_)');
+$RoundedInteger->coercion->add_type_coercions(Num, 'int($_)')->freeze;
 
 should_pass("4", $RoundedInteger);
 should_fail("1.1", $RoundedInteger);
 should_fail("xyz", $RoundedInteger);
 
 my $String3 = declare String3 => as StrMatch[qr/^.{3}$/];
-$String3->coercion->add_type_coercions(Str, 'substr("$_   ", 0, 3)');
+$String3->coercion->add_type_coercions(Str, 'substr("$_   ", 0, 3)')->freeze;
 
 should_pass("xyz", $String3);
 should_fail("x", $String3);

@@ -50,6 +50,8 @@ use Test::Fatal;
 	
 	coerce JsonArray,
 		from Str, 'JSON::PP::decode_json($_)';
+	
+	__PACKAGE__->meta->make_immutable;
 }
 
 my $code = T::JsonArray->coercion->inline_coercion('$::foo');
