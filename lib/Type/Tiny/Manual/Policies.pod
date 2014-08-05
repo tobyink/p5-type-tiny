@@ -68,6 +68,12 @@ The L<parameterizable coercion API|Type::Coercion> is subject to change.
 
 =item *
 
+The interaction of deep coercions and mutable coercions currently results
+in ill-defined behaviour. This could change at any time.
+(See L<Type::Tiny::Manual::Coercions/"Deep Caveat">.)
+
+=item *
+
 L<Type::Registry> has L<changes under consideration|Type::Registry/"STATUS">.
 
 =item *

@@ -213,6 +213,31 @@ when declaring a subtype to copy the parent type constraint's coercions:
 
 Now C<Paths> can coerce from an arrayref of strings.
 
+=head3 Deep Caveat
+
+Currently there exists ill-defined behaviour resulting from mixing deep
+coercions and mutable (non-frozen) coercions. Consider the following:
+
+   class_type PathTiny, { class => "Path::Tiny" };
+   coerce PathTiny,
+      from Str, via { "Path::Tiny"->new($_) };
+   
+   declare Paths, as ArrayRef[PathTiny], coercion => 1;
+   
+   coerce PathTiny,
+      from InstanceOf["My::File"], via { $_->get_path };
+
+An arrayref of strings can now be coerced to an arrayref of Path::Tiny
+objects, but is it also now possible to coerce an arrayref of My::File
+objects to an arrayref of Path::Tiny objects?
+
+Currently the answer is "no", but this is mostly down to implementation
+details. It's not clear what the best way to behave in this situation
+is, and it could start working at some point in the future.
+
+You should avoid falling into this trap by following the advice found
+under L</"The (Lack of) Zen of Coercions">.
+
 =head2 Chained Coercions
 
 Consider the following type library:
