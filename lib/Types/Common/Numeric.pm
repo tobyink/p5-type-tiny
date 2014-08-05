@@ -105,7 +105,7 @@ $meta->add_type(
 $meta->add_type(
 	name       => 'NegativeOrZeroInt',
 	parent     => Int,
-	constraint => sub { $_ >= 0 },
+	constraint => sub { $_ <= 0 },
 	inlined    => sub { undef, qq($_ <= 0) },
 	message    => sub { "Must be an integer less than or equal to zero" },
 );
