@@ -10,7 +10,7 @@ Check coercions work with L<Moose>; both mutable and immutable classes.
 
 Uses the bundled BiggerLib.pm type library.
 
-Test is skipped if Moose 2.0000 is not available.
+Test is skipped if Moose 2.1200 is not available.
 
 =head1 AUTHOR
 
@@ -30,11 +30,11 @@ use warnings;
 use lib qw( ./lib ./t/lib ../inc ./inc );
 
 use Test::More;
-use Test::Requires { Moose => 2.0000 };
+use Test::Requires { Moose => '2.1200' };
 use Test::Fatal;
 use Test::TypeTiny qw( matchfor );
 
-my @warnings;
+my $e;
 
 {
 	package Local::Class;
@@ -46,23 +46,20 @@ my @warnings;
 	
 	has small  => (is => "rw", isa => SmallInteger, coerce => 1);
 	has big    => (is => "rw", isa => BigInteger, coerce => 1);
-
-# TODO!!!
-# In Moose 2.1100 this changed from a warning to an exception! Once
-# a new stable Moose is out, upgrade the Test::Requires above, then
-# rewrite the test below to use Test::Fatal instead of $SIG{__WARN__}.
-#	
-#	local $SIG{__WARN__} = sub { push @warnings, \@_ };
-#	has big_nc => (is => "rw", isa => BigInteger->no_coercions, coerce => 1);
+	
+	$e = ::exception {
+		has big_nc => (is => "rw", isa => BigInteger->no_coercions, coerce => 1);
+	};
 }
 
-#like(
-#	$warnings[0][0],
-#	qr{^You cannot coerce an attribute .?big_nc.? unless its type .?\w+.? has a coercion},
-#	"no_coercions and friends available on Moose type constraint objects",
-#);
+like(
+	$e,
+	qr{^You cannot coerce an attribute .?big_nc.? unless its type .?\w+.? has a coercion},
+	"no_coercions and friends available on Moose type constraint objects",
+);
 
-my ($e, $o);
+undef $e;
+my $o;
 
 my $suffix = "mutable class";
 for my $i (0..1)
