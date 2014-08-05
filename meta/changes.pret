@@ -1991,3 +1991,37 @@
 		item "Test cases for Type::Parser::extract_type."^^Tests;
 		item "Parameterized Maybe constraints are now XS-accelerated."^^Change;
 	].
+
+`Type-Tiny 0.047_08 cpan:TOBYINK`
+	label   "Sanity++";
+	issued  2014-08-05;
+	changeset [
+		dcs:versus `Type-Tiny 0.047_07 cpan:TOBYINK`;
+		item [
+			a dcs:Tests;
+			label "Test to avoid the \"too few arguments for type constraint check functions\" error.";
+			dcs:thanks cpan:DJERIUS;
+			seealso RT#97684;
+		];
+		item [
+			label "Prevent inlining of coercions if they've not been frozen.";
+			seealso RT#93345;
+		];
+		item [
+			a dcs:Documentation;
+			label "Document the remaining RT#93345-related issues - see \"Deep Caveat\" in Type::Tiny::Manual::Coercions.";
+			seealso RT#93345;
+		];
+		item [
+			a dcs:Tests;
+			label "Update t/30-integration/Moose/coercion.t to Moose 2.1200 which throws an exception rather than printing a warning when coerce=>1 is used on a type constraint with no coercions.";
+		];
+		item [
+			a dcs:Tests;
+			label "Alter the Types::Common::* test cases to use Test::TypeTiny.";
+		];
+		item [
+			a dcs:Bugfix;
+			label "Fix non-inlined version of NegativeOrZeroInt.";
+		];
+	].

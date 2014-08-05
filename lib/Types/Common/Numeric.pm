@@ -10,7 +10,7 @@ BEGIN {
 
 BEGIN {
 	$Types::Common::Numeric::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Common::Numeric::VERSION   = '0.047_07';
+	$Types::Common::Numeric::VERSION   = '0.047_08';
 }
 
 use Type::Library -base, -declare => qw(
