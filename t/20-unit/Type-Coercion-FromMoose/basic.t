@@ -31,8 +31,9 @@ use Test::More;
 use Test::Requires { Moose => '2.0600' };
 use Test::TypeTiny;
 
+use Moose::Util::TypeConstraints;
+
 my $Rounded = do {
-	use Moose::Util::TypeConstraints;
 	subtype 'RoundedInt', as 'Int';
 	coerce 'RoundedInt', from 'Num', via { int($_) };
 	find_type_constraint 'RoundedInt';
@@ -69,6 +70,8 @@ is_deeply(
 
 # Making this work might prevent coercions from being inlined
 # unless the coercion has been frozen.
+#
+# See https://rt.cpan.org/Ticket/Display.html?id=93345#txn-1395097
 #
 TODO: {
 	local $TODO = "\$Array_of_Rounded's coercion has already been compiled";
