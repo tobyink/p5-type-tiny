@@ -594,8 +594,7 @@ the output of coercion coderefs is expected to conform to).
 
 =item C<type_coercion_map>
 
-Arrayref of source-type/code pairs. Don't set this in the constructor; use
-the C<add_type_coercions> method instead.
+Arrayref of source-type/code pairs.
 
 =item C<frozen>
 
