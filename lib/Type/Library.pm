@@ -235,16 +235,13 @@ sub add_type
 	no strict "refs";
 	no warnings "redefine", "prototype";
 	
+	my $to_type = $type->has_coercion && $type->coercion->frozen
+		? $type->coercion->compiled_coercion
+		: sub ($) { $type->coerce($_[0]) };
 	
-	# There is an inlined coercion available, but don't use that because
-	# additional coercions can be added *after* the type has been installed
-	# into the library.
-	#
-	# XXX: maybe we can use it if the coercion is frozen???
-	#
 	*{"$class\::$name"}        = $class->_mksub($type);
 	*{"$class\::is_$name"}     = _subname "$class\::is_$name", $type->compiled_check;
-	*{"$class\::to_$name"}     = _subname "$class\::to_$name", sub ($) { $type->coerce($_[0]) };
+	*{"$class\::to_$name"}     = _subname "$class\::to_$name", $to_type;
 	*{"$class\::assert_$name"} = _subname "$class\::assert_$name", $type->_overload_coderef;
 	
 	return $type;
@@ -310,10 +307,24 @@ sub coercion_names
 
 sub make_immutable
 {
-	my $meta = shift->meta;
-	for my $type (values %{$meta->{types}}) {
+	my $meta  = shift->meta;
+	my $class = ref($meta);
+	
+	for my $type (values %{$meta->{types}})
+	{
 		$type->coercion->freeze;
+		
+		no strict "refs";
+		no warnings "redefine", "prototype";
+		
+		my $to_type = $type->has_coercion && $type->coercion->frozen
+			? $type->coercion->compiled_coercion
+			: sub ($) { $type->coerce($_[0]) };
+		my $name = $type->name;
+		
+		*{"$class\::to_$name"} = _subname "$class\::to_$name", $to_type;
 	}
+	
 	1;
 }
 
