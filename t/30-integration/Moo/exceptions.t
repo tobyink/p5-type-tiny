@@ -47,7 +47,9 @@ BEGIN {
 my $e_constructor = exception { Goo->new(number => "too") };
 
 isa_ok($e_constructor, 'Error::TypeTiny::Assertion', '$e_constructor');
+ok($e_constructor->has_attribute_name, '$e_constructor->has_attribute_name');
 is($e_constructor->attribute_name, 'number', '$e_constructor->attribute_name');
+ok($e_constructor->has_attribute_step, '$e_constructor->has_attribute_step');
 is($e_constructor->attribute_step, 'isa check', '$e_constructor->attribute_step');
 is($e_constructor->varname, '$args->{"number"}', '$e_constructor->varname');
 is($e_constructor->value, "too", '$e_constructor->value');
@@ -56,7 +58,9 @@ is($e_constructor->type, Types::Standard::Int, '$e_constructor->type');
 my $e_accessor    = exception { Goo->new->number("too") };
 
 isa_ok($e_accessor, 'Error::TypeTiny::Assertion', '$e_accessor');
+ok($e_accessor->has_attribute_name, '$e_accessor->has_attribute_name');
 is($e_accessor->attribute_name, 'number', '$e_accessor->attribute_name');
+ok($e_accessor->has_attribute_step, '$e_accessor->has_attribute_step');
 is($e_accessor->attribute_step, 'isa check', '$e_accessor->attribute_step');
 is($e_accessor->value, "too", '$e_accessor->value');
 is($e_accessor->type, Types::Standard::Int, '$e_accessor->type');
