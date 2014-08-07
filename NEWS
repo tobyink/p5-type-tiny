@@ -25,3 +25,13 @@
 
  - Support for Type::Tiny::XS.
  - Test case improvements.
+
+2014-08-16 Type-Tiny version 1.000000 released!
+
+ - Enhanced support for Type::Tiny::XS.
+ - More test case improvements.
+ - Saner implementations of slurpy and Optional within Tuples and Dicts.
+ - More aggressive at freezing coercions.
+ - Better behaviour of non-frozen coercions.
+   (For example, they are no longer considered to be inlineable.)
+ - Better integration between Type::Library and Type::Registry.
