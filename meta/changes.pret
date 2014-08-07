@@ -1901,7 +1901,7 @@
 		item "Test exceptions thrown by Type::Tiny::Class."^^Tests;
 		item "Test exceptions thrown by Type::Tiny::Role."^^Tests;
 		item "Add tests explicitly testing Type::Tiny objects conversion to Moose::Meta::TypeConstraint and Mouse::Meta::TypeConstraint objects."^^Tests;
-		item "Test::Tiny::Class should stop using Class::ISA. Instead, if mro.pm is not available, use a private sub stolen from MRO::Compat."^^Change;
+		item "Type::Tiny::Class should stop using Class::ISA. Instead, if mro.pm is not available, use a private sub stolen from MRO::Compat."^^Change;
 		item "Stop using base.pm."^^Tests;
 		item "Type::Tiny::Manual no longer says that Perl 5.6.x support is at risk."^^Documentation;
 	].
