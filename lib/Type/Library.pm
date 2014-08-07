@@ -155,20 +155,26 @@ sub _exporter_expand_sub
 	return $class->SUPER::_exporter_expand_sub(@_);
 }
 
-#sub _exporter_install_sub
-#{
-#	my $class = shift;
-#	my ($name, $value, $globals, $sym) = @_;
-#	
-#	warn sprintf(
-#		'Exporter %s exporting %s with prototype %s',
-#		$class,
-#		$name,
-#		prototype($sym),
-#	);
-#	
-#	$class->SUPER::_exporter_install_sub(@_);
-#}
+sub _exporter_install_sub
+{
+	my $class = shift;
+	my ($name, $value, $globals, $sym) = @_;
+	
+	my $package = $globals->{into};
+	
+	if (!ref $package and my $type = $class->get_type($name))
+	{
+		my ($prefix) = grep defined, $value->{-prefix}, $globals->{prefix}, q();
+		my ($suffix) = grep defined, $value->{-suffix}, $globals->{suffix}, q();
+		my $as = $prefix . ($value->{-as} || $name) . $suffix;
+		
+		$INC{'Type/Registry.pm'}
+			? 'Type::Registry'->for_class($package)->add_type($type, $as)
+			: ($Type::Registry::DELAYED{$package}{$as} = $type);
+	}
+	
+	$class->SUPER::_exporter_install_sub(@_);
+}
 
 sub _exporter_fail
 {

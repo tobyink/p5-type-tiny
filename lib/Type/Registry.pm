@@ -123,6 +123,7 @@ sub add_types
 		for my $key (sort keys %hash)
 		{
 			exists($self->{$key})
+				and $self->{$key}{uniq} != $hash{$key}{uniq}
 				and _croak("Duplicate type name: %s", $key);
 			$self->{$key} = $hash{$key};
 		}
@@ -142,6 +143,7 @@ sub add_type
 	};
 	
 	exists($self->{$name})
+		and $self->{$name}{uniq} != $type->{uniq}
 		and _croak("Duplicate type name: %s", $name);
 	
 	$self->{$name} = $type;
@@ -269,6 +271,20 @@ sub DESTROY
 	return;
 }
 
+DELAYED: {
+	our %DELAYED;
+	for my $package (sort keys %DELAYED)
+	{
+		my $reg   = __PACKAGE__->for_class($package);
+		my $types = $DELAYED{$package};
+		
+		for my $name (sort keys %$types)
+		{
+			$reg->add_type($types->{$name}, $name);
+		}
+	}
+}
+
 1;
 
 __END__
@@ -338,24 +354,6 @@ Alternatively:
 This module is covered by the
 L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
 
-=head2 Changes under consideration
-
-An exception to this policy is that the following feature is being
-considered. When type constraint barewords are imported into a package
-that has a registry:
-
-   use Type::Registry qw(t);
-   use Types::Standard -types;
-
-Then the C<Str>, C<Num>, etc keywords imported from L<Types::Standard> will
-work fine, but C<< t->lookup("Str") >> and C<< t->lookup("Num") >> will fail,
-because importing types from a library does not automatically add them to
-your registry.
-
-Some kind of integration may be desirable between Type::Registry and
-L<Type::Library>, but exactly what form that will take is still to be
-decided.
-
 =head1 DESCRIPTION
 
 A type registry is basically just a hashref mapping type names to type
@@ -373,6 +371,9 @@ Create a new glorified hashref.
 
 Create or return the existing glorified hashref associated with the given
 class.
+
+Note that any type constraint you have imported from Type::Library-based
+type libraries will be automatically available in your class' registry.
 
 =item C<< for_me >>
 

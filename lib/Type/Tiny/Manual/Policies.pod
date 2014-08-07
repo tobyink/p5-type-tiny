@@ -74,10 +74,6 @@ in ill-defined behaviour. This could change at any time.
 
 =item *
 
-L<Type::Registry> has L<changes under consideration|Type::Registry/"STATUS">.
-
-=item *
-
 L<Type::Registry>'s ability to import L<MooseX::Types> and L<MouseX::Types>
 type libraries is experimental.
 
