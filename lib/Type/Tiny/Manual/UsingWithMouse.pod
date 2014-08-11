@@ -23,7 +23,7 @@ Type::Tiny::Manual::UsingWithMouse - how to use Type::Tiny and Type::Library wit
       my $PositiveInt = declare
          as        Int,
          where     {  $_ > 0  },
-         inline_as { "$_ =~ /^[0-9]\$/ and $_ > 0" };
+         inline_as { "$_ =~ /^[0-9]+\$/ and $_ > 0" };
       
       coerce $PositiveInt, from Int, q{ abs $_ };
       

@@ -30,7 +30,7 @@ C<get_hook> and C<set_hook> options.
       my $PositiveInt = declare
          as        Int,
          where     {  $_ > 0  },
-         inline_as { "$_ =~ /^[0-9]\$/ and $_ > 0" };
+         inline_as { "$_ =~ /^[0-9]+\$/ and $_ > 0" };
       
       coerce $PositiveInt, from Int, q{ abs $_ };
       
