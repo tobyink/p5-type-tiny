@@ -492,22 +492,51 @@ sub classifier
 		# Only continue any further if we've been called from Type::Parser.
 		return unless $_[1];
 		
-		# If Moose is loaded...
-		if ($INC{'Moose.pm'})
+		my $moose_lookup = sub
 		{
-			require Moose::Util::TypeConstraints;
-			require Types::TypeTiny;
-			$r = Moose::Util::TypeConstraints::find_type_constraint($_[0]);
-			return Types::TypeTiny::to_TypeTiny($r) if defined $r;
+			if ($INC{'Moose.pm'})
+			{
+				require Moose::Util::TypeConstraints;
+				require Types::TypeTiny;
+				$r = Moose::Util::TypeConstraints::find_type_constraint($_[0]);
+				$r = Types::TypeTiny::to_TypeTiny($r) if defined $r;
+				return 1;
+			}
+			return;
+		};
+		
+		my $mouse_lookup = sub
+		{
+			if ($INC{'Mouse.pm'})
+			{
+				require Mouse::Util::TypeConstraints;
+				require Types::TypeTiny;
+				$r = Mouse::Util::TypeConstraints::find_type_constraint($_[0]);
+				$r = Types::TypeTiny::to_TypeTiny($r) if defined $r;
+				return 1;
+			}
+			return;
+		};
+		
+		my $meta;
+		if (defined $self->{"~~chained"})
+		{
+			$meta ||= Moose::Util::find_meta($self->{"~~chained"}) if $INC{'Moose.pm'};
+			$meta ||= Mouse::Util::find_meta($self->{"~~chained"}) if $INC{'Mouse.pm'};
 		}
 		
-		# If Mouse is loaded...
-		if ($INC{'Mouse.pm'})
+		if ($meta and $meta->isa('Class::MOP::Module'))
 		{
-			require Mouse::Util::TypeConstraints;
-			require Types::TypeTiny;
-			$r = Mouse::Util::TypeConstraints::find_type_constraint($_[0]);
-			return Types::TypeTiny::to_TypeTiny($r) if defined $r;
+			$moose_lookup->(@_) and return $r;
+		}
+		elsif ($meta and $meta->isa('Mouse::Meta::Module'))
+		{
+			$mouse_lookup->(@_) and return $r;
+		}
+		else
+		{
+			$moose_lookup->(@_) and return $r;
+			$mouse_lookup->(@_) and return $r;
 		}
 		
 		return unless $_[0] =~ /^\s*(\w+(::\w+)*)\s*$/sm;
