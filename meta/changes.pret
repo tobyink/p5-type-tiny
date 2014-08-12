@@ -2025,3 +2025,21 @@
 			label "Fix non-inlined version of NegativeOrZeroInt.";
 		];
 	].
+
+`Type-Tiny 0.047_09 cpan:TOBYINK`
+	issued  2014-08-12;
+	changeset [
+		dcs:versus `Type-Tiny 0.047_08 cpan:TOBYINK`;
+		item "Improvements and clarifications to Type::Coercion documentation."^^Documentation;
+		item "The to_Foo functions exported by Type::Library-based modules are now significantly faster. (But only if the type's coercion is frozen.)"^^Change;
+		item "Add tests for Error::TypeTiny::Assertion's predicate methods."^^Tests;
+		item "Add tests for Type::Coercion's i_really_want_to_unfreeze method."^^Tests;
+		item "Better integration between Type::Library and Type::Registry. If you import a type constraint from a Type::Library-based module, it will automatically be inserted into your modules' type registry."^^Change;
+		item [
+			a dcs:Bugfix, dcs:Documentation;
+			label "Fix documentation typo.";
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/12>;
+			dcs:thanks <urn:uuid:580d3dfe-fe45-42ef-9f58-1310ffee7004>;
+		];
+		item "Type::Utils::dwim_type now takes into account what OO framework the caller is using (Moose or Mouse) if it needs to fall back to asking the OO framework about a type constraint."^^Change;
+	].
