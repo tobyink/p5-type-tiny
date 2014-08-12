@@ -53,7 +53,7 @@ use Test::Requires { 'Moose' => '2.0600' };
 use Eval::TypeTiny;
 use IO::File;
 use Scalar::Util qw( blessed openhandle );
-use Type::Utils -all;
+use Type::Utils { replace => 1 }, -all;
 use Types::Standard;
 
 my $ZERO    = 0;
