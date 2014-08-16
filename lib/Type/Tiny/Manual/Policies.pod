@@ -8,9 +8,6 @@ Type::Tiny::Manual::Policies - Type::Tiny policies
 
 =head1 STABILITY
 
-B<< The following stability policy is planned for Type::Tiny 1.000000
-and above. This milestone has not yet been reached. >>
-
 =head2 Type::Tiny Stability Policy
 
 Type::Tiny 1.000000 is considered stable. Any changes to the API that
