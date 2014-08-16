@@ -2,6 +2,8 @@
 
 =encoding utf-8
 
+=for stopwords versioning
+
 =head1 NAME
 
 Type::Tiny::Manual::Policies - Type::Tiny policies
