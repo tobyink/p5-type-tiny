@@ -2043,3 +2043,12 @@
 		];
 		item "Type::Utils::dwim_type now takes into account what OO framework the caller is using (Moose or Mouse) if it needs to fall back to asking the OO framework about a type constraint."^^Change;
 	].
+
+`Type-Tiny 1.000000 cpan:TOBYINK`
+	issued  2014-08-16;
+	label   "Happy CPAN Day!";
+	changeset [
+		dcs:versus `Type-Tiny 0.047_09 cpan:TOBYINK`;
+		item "Updated NEWS file."^^Documentation;
+		item "Updated TODO file."^^Documentation;
+	].

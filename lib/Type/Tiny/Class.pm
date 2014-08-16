@@ -10,7 +10,7 @@ BEGIN {
 
 BEGIN {
 	$Type::Tiny::Class::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::Class::VERSION   = '0.047_09';
+	$Type::Tiny::Class::VERSION   = '1.000000';
 }
 
 use Scalar::Util qw< blessed >;
