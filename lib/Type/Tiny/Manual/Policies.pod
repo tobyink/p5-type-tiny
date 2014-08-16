@@ -100,6 +100,19 @@ L<Reply::Plugin::TypeTiny> is not covered by the stability policy.
 
 =back
 
+=head2 Type::Tiny Versioning Policy
+
+As of 1.000000, this distribution follows a versioning scheme similar
+to L<Moo>, which is based on a L<semver|http://semver.org/>-like three
+component version number, but with the last two components each
+represented by three decimal digits in the fractional part of the
+version number. That is, version 1.003002 of the software represents
+"1.3.2".
+
+Additionally, releases where the second component is an odd number will
+be considered unstable/trial releases. (These will also include an
+underscore in the version number as per the usual CPAN convention.)
+
 =head1 BUGS
 
 Please report any bugs to

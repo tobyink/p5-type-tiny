@@ -2051,4 +2051,5 @@
 		dcs:versus `Type-Tiny 0.047_09 cpan:TOBYINK`;
 		item "Updated NEWS file."^^Documentation;
 		item "Updated TODO file."^^Documentation;
+		item "Document the Type::Tiny versioning policy."^^Documentation;
 	].
