@@ -4,6 +4,17 @@ Post-1.000000 Changes
 * Type::Params should provide compile_named/validate_named functions
   tailored for named parameters rather than using the slurpy Dict hack.
 
+* Type::Utils::dwim_type shouldn't fall back to pulling types from the
+  Moose/Mouse type registry unless the caller is a Moose/Mouse-based
+  package *OR* it is explicitly requested like
+  
+     dwim_type("Foo", using => "Mouse")
+  
+* Also, there should be a way to disable Type::Utils::dwim_type falling
+  back to making a class_type. Instead of does=>1, it should be more like
+  fallback=>"make_class_type"|"make_role_type"|undef. Still need to
+  support does=>1 for back-compat.
+
 * Try to make inlining for ClassName, RoleName, StrMatch, etc more
   suitable for things like Mite.
 
@@ -31,3 +42,6 @@ Post-1.000000 Changes
   add_type_coercions to succeed?
 
 * to_TypeTiny's _TypeTinyFromGeneric could support inlining?
+
+* Investigate some more method overrides in Type::Tiny::Union - look at
+  what Moose::Meta::TypeConstraint::Union does.
