@@ -24,8 +24,10 @@ use overload
 
 BEGIN {
 	require Type::Tiny;
-	overload->import(q(~~) => sub { $_[0]->has_coercion_for_value($_[1]) })
-		if Type::Tiny::SUPPORT_SMARTMATCH();
+	overload->import(
+		q(~~)    => sub { $_[0]->has_coercion_for_value($_[1]) },
+		fallback => 1, # 5.10 loses the fallback otherwise
+	) if Type::Tiny::SUPPORT_SMARTMATCH();
 }
 
 sub _overload_coderef

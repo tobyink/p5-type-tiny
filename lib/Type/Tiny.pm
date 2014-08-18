@@ -86,8 +86,10 @@ use overload
 	fallback   => 1,
 ;
 BEGIN {
-	overload->import(q(~~) => sub { $_[0]->check($_[1]) })
-		if Type::Tiny::SUPPORT_SMARTMATCH;
+	overload->import(
+		q(~~)    => sub { $_[0]->check($_[1]) },
+		fallback => 1, # 5.10 loses the fallback otherwise
+	) if Type::Tiny::SUPPORT_SMARTMATCH;
 }
 
 sub _overload_coderef
