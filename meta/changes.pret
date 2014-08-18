@@ -2064,3 +2064,16 @@
 			dcs:thanks cpan:SHLOMIF;
 		];
 	].
+
+`Type-Tiny 1.000002 cpan:TOBYINK`
+	issued  2014-08-18;
+	changeset [
+		dcs:versus `Type-Tiny 1.000001 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix;
+			label "Fix for overloaded operation fallback on Perl 5.10.x.";
+			dcs:blame cpan:ILMARI;
+			dcs:thanks cpan:PJFL;
+			dcs:fixes RT#98113;
+		];
+	].
