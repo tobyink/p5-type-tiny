@@ -179,7 +179,7 @@ sub foreign_lookup
 {
 	my $self = shift;
 	
-	return $self->simple_lookup($_[0], 1)
+	return $_[1] ? () : $self->simple_lookup($_[0], 1)
 		unless $_[0] =~ /^(.+)::(\w+)$/;
 	
 	my $library  = $1;

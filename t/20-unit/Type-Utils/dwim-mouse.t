@@ -57,6 +57,8 @@ should_fail([2, 3, 2], $twos);
 	use MouseX::Types::Moose "Int";
 	
 	subtype Three, as Int, where { $_ eq 3 };
+	
+	$INC{'MyTypes.pm'} = __FILE__;
 }
 
 # Note that MouseX::Types namespace-prefixes its types.
@@ -70,5 +72,29 @@ should_pass(3, $three);
 should_fail(4, $three);
 should_pass([3, 3, 3], $threes);
 should_fail([3, 4, 3], $threes);
+
+{
+	my $testclass = 'Local::Some::Class';
+	my $fallback  = dwim_type($testclass);
+	should_pass(bless({}, $testclass), $fallback);
+	should_fail(bless({}, 'main'), $fallback);
+	
+	my $fallbackp = dwim_type("ArrayRef[$testclass]");
+	should_pass([bless({}, $testclass)], $fallbackp);
+	should_pass([], $fallbackp);
+	should_fail([bless({}, 'main')], $fallbackp);
+}
+
+{
+	my $testclass = 'Local::Some::Class';
+	my $fallback  = dwim_type("$testclass\::");
+	should_pass(bless({}, $testclass), $fallback);
+	should_fail(bless({}, 'main'), $fallback);
+	
+	my $fallbackp = dwim_type("ArrayRef[$testclass\::]");
+	should_pass([bless({}, $testclass)], $fallbackp);
+	should_pass([], $fallbackp);
+	should_fail([bless({}, 'main')], $fallbackp);
+}
 
 done_testing;

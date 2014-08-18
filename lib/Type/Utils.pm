@@ -470,6 +470,22 @@ sub classifier
 	
 	our @ISA = qw(Type::Registry);
 	
+	sub foreign_lookup
+	{
+		my $self = shift;
+		my $r = $self->SUPER::foreign_lookup(@_);
+		return $r if $r;
+		
+		if (defined($self->{"~~assume"})
+		and $_[0] =~ /[A-Z_a-z][0-9A-Z_a-z]*(?:::[0-9A-Z_a-z]+)*/)
+		{
+			my $method = $self->{"~~assume"};
+			return $self->$method(@_);
+		}
+		
+		return;
+	}
+	
 	sub simple_lookup
 	{
 		my $self = shift;
@@ -539,26 +555,7 @@ sub classifier
 			$mouse_lookup->(@_) and return $r;
 		}
 		
-		return unless $_[0] =~ /^\s*(\w+(::\w+)*)\s*$/sm;
-		return unless defined $self->{"~~assume"};
-		
-		# Lastly, if it looks like a class/role name, assume it's
-		# supposed to be a class/role type.
-		#
-		
-		if ($self->{"~~assume"} eq "Type::Tiny::Class")
-		{
-			require Type::Tiny::Class;
-			return "Type::Tiny::Class"->new(class => $_[0]);
-		}
-		
-		if ($self->{"~~assume"} eq "Type::Tiny::Role")
-		{
-			require Type::Tiny::Role;
-			return "Type::Tiny::Role"->new(role => $_[0]);
-		}
-		
-		die;
+		return $self->foreign_lookup(@_);
 	}
 }
 
@@ -574,7 +571,7 @@ sub dwim_type
 	};
 	
 	local $dwimmer->{'~~chained'} = $opts{for};
-	local $dwimmer->{'~~assume'}  = $opts{does} ? 'Type::Tiny::Role' : 'Type::Tiny::Class';
+	local $dwimmer->{'~~assume'}  = $opts{does} ? 'make_role_type' : 'make_class_type';
 	
 	$dwimmer->lookup($string);
 }
