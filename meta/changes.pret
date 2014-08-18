@@ -2053,3 +2053,14 @@
 		item "Updated TODO file."^^Documentation;
 		item "Document the Type::Tiny versioning policy."^^Documentation;
 	].
+
+`Type-Tiny 1.000001 cpan:TOBYINK`
+	issued  2014-08-18;
+	changeset [
+		dcs:versus `Type-Tiny 1.000000 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix;
+			label "Changes to dwim_type() in 0.047_09 broke the fallback to creating class types in some circumstances. This broke the MooX::late test suite, and some usages of MooX::late.";
+			dcs:thanks cpan:SHLOMIF;
+		];
+	].

@@ -83,6 +83,9 @@ cpan:XENO
 cpan:MSCHWERN
 	:name "Michael G Schwern".
 
+cpan:SHLOMIF
+	:name "Shlomi Fish".
+
 # We bundle some files made by these dudes...
 
 cpan:RJBS
