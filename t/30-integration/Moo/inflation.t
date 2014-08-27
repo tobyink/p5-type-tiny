@@ -12,7 +12,7 @@ calls back to Type::Tiny to build Moose type constraints.
 
 Uses the bundled BiggerLib.pm type library.
 
-Test is skipped if Moo 1.001000 is not available. Test is redundant if
+Test is skipped if Moo 1.000000 is not available. Test is redundant if
 Moose 2.0000 is not available.
 
 =head1 AUTHOR
@@ -33,7 +33,7 @@ use warnings;
 use lib qw( ./lib ./t/lib ../inc ./inc );
 
 use Test::More;
-use Test::Requires { Moo => 1.001000 };
+use Test::Requires { Moo => 1.000000 };
 use Test::Fatal;
 
 {

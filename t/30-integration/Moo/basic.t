@@ -11,7 +11,7 @@ and should fail; checks error messages.
 
 Uses the bundled BiggerLib.pm type library.
 
-Test is skipped if Moo 1.001000 is not available.
+Test is skipped if Moo 1.000000 is not available.
 
 =head1 AUTHOR
 
@@ -31,7 +31,7 @@ use warnings;
 use lib qw( ./lib ./t/lib ../inc ./inc );
 
 use Test::More;
-use Test::Requires { Moo => 1.001000 };
+use Test::Requires { Moo => 1.000000 };
 use Test::Fatal;
 
 {
