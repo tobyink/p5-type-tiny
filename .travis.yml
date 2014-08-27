@@ -81,14 +81,14 @@ matrix:
       env: PERL_TYPES_STANDARD_STRICTNUM=1 PERL_TYPE_TINY_XS=1 EXTENDED_TESTING=1
     # Older Moose
     - perl: "5.18"
-      env: MOOSE_RELEASE="DOY/Moose-2.0604.tar.gz"
+      env: MOOSE_RELEASE=DOY/Moose-2.0604.tar.gz
     - perl: "5.18"
-      env: MOOSE_RELEASE="FLORA/Moose-2.0007.tar.gz"
+      env: MOOSE_RELEASE=FLORA/Moose-2.0007.tar.gz
     # Older Moo
     - perl: "5.18"
-      env: MOO_RELEASE="HAARG/Moo-1.004006.tar.gz"
+      env: MOO_RELEASE=HAARG/Moo-1.004006.tar.gz
     - perl: "5.18"
-      env: MOO_RELEASE="MSTROUT/Moo-1.000008.tar.gz"
+      env: MOO_RELEASE=MSTROUT/Moo-1.000008.tar.gz
 before_install:
   - export DIST_INKT_PROFILE="Dist::Inkt::Profile::TOBYINK"
   - git clone git://github.com/tobyink/perl-travis-helper ~/perl-travis-helper
@@ -101,8 +101,8 @@ install:
   - cpan-install --toolchain
   - cpan-install --deps
   - cpan-install --coverage
-  - [ -n "$MOOSE_RELEASE" ] && cpan-install --reinstall "$MOOSE_RELEASE"
-  - [ -n "$MOO_RELEASE" ] && cpan-install --reinstall "$MOO_RELEASE"
+  - '[ -n "$MOOSE_RELEASE" ] && cpan-install --reinstall "$MOOSE_RELEASE"'
+  - '[ -n "$MOO_RELEASE" ] && cpan-install --reinstall "$MOO_RELEASE"'
 before_script:
   - coverage-setup
 script:
