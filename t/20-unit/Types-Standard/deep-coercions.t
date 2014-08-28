@@ -365,6 +365,28 @@ DICT_PLUS_SLURPY: {
 	);
 };
 
+DICT_PLUS_OPTIONAL: {
+	my $IntFromStr = declare IntFromStr => as Int;
+	coerce $IntFromStr, from Str, sub { length($_) };
+	$IntFromStr->coercion->freeze;
+
+	my $Dict1 = Dict[ a => $IntFromStr, b => Optional[Int], c => Optional[Int] ];
+	ok(
+		$Dict1->has_coercion && !$Dict1->coercion->can_be_inlined,
+		"$Dict1 has a non-inlinable coercion",
+	);
+	is_deeply(
+		$Dict1->coerce({ a => "Hello", b => 1, c => 2 }),
+		{ a => 5, b => 1, c => 2 },
+		"Coercion (A) to $Dict1",
+	);
+	is_deeply(
+		$Dict1->coerce({ a => "Hello", b => 1 }),
+		{ a => 5, b => 1 },
+		"Coercion (B) to $Dict1",
+	);
+};
+
 TUPLE: {
 	my $IntFromStr = declare IntFromStr => as Int;
 	coerce $IntFromStr, from Str, q{ length($_) };
