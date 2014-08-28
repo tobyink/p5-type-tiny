@@ -86,6 +86,9 @@ cpan:MSCHWERN
 cpan:SHLOMIF
 	:name "Shlomi Fish".
 
+cpan:DAKKAR
+	:name "Gianni Ceccarelli".
+
 # We bundle some files made by these dudes...
 
 cpan:RJBS
