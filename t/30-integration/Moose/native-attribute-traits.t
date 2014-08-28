@@ -9,7 +9,7 @@ traits.
 
 =head1 DEPENDENCIES
 
-Test is skipped if Moose 2.0600 is not available.
+Test is skipped if Moose 2.0000 is not available.
 
 =head1 AUTHOR
 
@@ -25,7 +25,7 @@ the same terms as the Perl 5 programming language system itself.
 =cut
 
 use Test::More;
-use Test::Requires { Moose => '2.0600' };
+use Test::Requires { Moose => '2.0000' };
 use Test::Fatal;
 use Test::TypeTiny qw( matchfor );
 use Test::Moose qw( with_immutable );

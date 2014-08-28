@@ -170,7 +170,7 @@ sub _TypeTinyFromMoose
 	$opts{display_name} = $t->name;
 	$opts{constraint}   = $t->constraint;
 	$opts{parent}       = to_TypeTiny($t->parent)              if $t->has_parent;
-	$opts{inlined}      = sub { shift; $t->_inline_check(@_) } if $t->can_be_inlined;
+	$opts{inlined}      = sub { shift; $t->_inline_check(@_) } if $t->can("can_be_inlined") && $t->can_be_inlined;
 	$opts{message}      = sub { $t->get_message($_) }          if $t->has_message;
 	$opts{moose_type}   = $t;
 	

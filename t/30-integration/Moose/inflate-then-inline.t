@@ -10,7 +10,7 @@ L<Moose::Meta::TypeConstraint> objects.
 
 =head1 DEPENDENCIES
 
-Test is skipped if Moose 2.0600 is not available.
+Test is skipped if Moose 2.0000 is not available.
 
 =head1 AUTHOR
 
@@ -28,7 +28,7 @@ the same terms as the Perl 5 programming language system itself.
 use strict;
 use warnings;
 use Test::More 0.96;
-use Test::Requires { 'Moose' => '2.0600' };
+use Test::Requires { 'Moose' => '2.0000' };
 
 use Type::Tiny;
 
@@ -51,6 +51,6 @@ like(
 	$type2->moose_type->_inline_check('$XXX'),
 	qr/\(\(?!!1\)? && !!2\)/,
 	'$type2->moose_type->_inline_check'
-);
+) if $type2->moose_type->can("_inline_check");
 
 done_testing;

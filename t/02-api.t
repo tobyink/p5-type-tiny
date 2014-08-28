@@ -34,9 +34,7 @@ my @MOOSE_WANTS = qw(
 	_compiled_type_constraint
 	_default_message
 	_has_compiled_type_constraint
-	_has_inlined_type_constraint
 	_inline_check
-	_inline_environment
 	_new
 	_package_defined_in
 	_set_constraint

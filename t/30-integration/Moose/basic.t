@@ -28,6 +28,7 @@ the same terms as the Perl 5 programming language system itself.
 
 use strict;
 use warnings;
+no warnings qw(once);
 use lib qw( ./lib ./t/lib ../inc ./inc );
 
 use Test::More;
