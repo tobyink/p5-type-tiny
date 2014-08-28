@@ -247,8 +247,8 @@ sub __coercion_generator
 	else
 	{
 		my %is_optional = map {
-			; $_ => $dict{$_}->is_strictly_a_type_of($_optional)
-		} keys %dict;
+			; $_ => !!$dict{$_}->is_strictly_a_type_of($_optional)
+		} sort keys %dict;
 		$C->add_type_coercions(
 			$parent => sub {
 				my $value = @_ ? $_[0] : $_;
