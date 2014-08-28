@@ -1960,6 +1960,11 @@
 		item "Optimizations for slurpy Any."^^Change;
 		item "When slurping the tail of a Tuple into a hashref, check it's an even number of elements."^^Change;
 		item "A slightly saner implementation of Types::TypeTiny's meta methods."^^Change;
+		item [
+			a dcs:Regression;
+			label "Introduced bug concerning coercions to parameterized Dicts with a mixture of inlineable and non-inlineable optional values.";
+			seealso RT#98362;
+		];
 	].
 
 `Type-Tiny 0.047_06 cpan:TOBYINK`
@@ -2075,5 +2080,17 @@
 			dcs:blame cpan:ILMARI;
 			dcs:thanks cpan:PJFL;
 			dcs:fixes RT#98113;
+		];
+	].
+
+`Type-Tiny 1.000003 cpan:TOBYINK`
+	issued  2014-08-28;
+	changeset [
+		dcs:versus `Type-Tiny 1.000002 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix;
+			label "Fix for coercions to parameterized Dict including a mixture of inlineable and non-inlineable optional values.";
+			dcs:blame cpan:DAKKAR;
+			dcs:fixes RT#98362;
 		];
 	].
