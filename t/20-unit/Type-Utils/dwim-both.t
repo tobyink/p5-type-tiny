@@ -9,7 +9,7 @@ Moose and Mouse are loaded.
 
 =head1 DEPENDENCIES
 
-Mouse 1.00 and Moose 2.0600; skipped otherwise.
+Mouse 1.00 and Moose 2.0000; skipped otherwise.
 
 =head1 AUTHOR
 
@@ -29,7 +29,7 @@ use warnings;
 
 use Test::More;
 { package AAA; use Test::Requires { "Mouse" => "1.00" } };
-{ package BBB; use Test::Requires { "Moose" => "2.0600" } };
+{ package BBB; use Test::Requires { "Moose" => "2.0000" } };
 
 {
 	package Minnie;

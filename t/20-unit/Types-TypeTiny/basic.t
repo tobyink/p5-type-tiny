@@ -9,7 +9,7 @@ used by Type::Tiny internally.)
 
 =head1 DEPENDENCIES
 
-This test requires L<Moose> 2.0600 and L<Mouse> 1.00. Otherwise, it is
+This test requires L<Moose> 2.0000 and L<Mouse> 1.00. Otherwise, it is
 skipped.
 
 =head1 AUTHOR
@@ -31,7 +31,7 @@ use lib qw( ./lib ./t/lib ../inc ./inc );
 
 # Test::Requires calls ->import on Moose/Mouse, so be sure
 # to import them into dummy packages.
-{ package XXX; use Test::Requires { Moose => '2.0600' } };
+{ package XXX; use Test::Requires { Moose => '2.0000' } };
 { package YYY; use Test::Requires { Mouse => '1.00' } };
 
 use Test::More;

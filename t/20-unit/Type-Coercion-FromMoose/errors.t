@@ -8,7 +8,7 @@ Checks crazy Type::Coercion::FromMoose errors.
 
 =head1 DEPENDENCIES
 
-Moose 2.0600; otherwise skipped.
+Moose 2.0000; otherwise skipped.
 
 =head1 AUTHOR
 
@@ -28,7 +28,7 @@ use warnings;
 use lib qw( ./lib ./t/lib ../inc ./inc );
 
 use Test::More;
-use Test::Requires { Moose => '2.0600' };
+use Test::Requires { Moose => '2.0000' };
 use Test::Fatal;
 
 use Types::Standard -types;

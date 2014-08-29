@@ -6,6 +6,10 @@
 
 Checks Type::Tiny objects can be converted to Moose type constraint objects.
 
+=head1 DEPENDENCIES
+
+Requires Moose 2.0000; skipped otherwise.
+
 =head1 AUTHOR
 
 Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
@@ -24,7 +28,7 @@ use warnings;
 use lib qw( ./lib ./t/lib ../inc ./inc );
 
 use Test::More;
-use Test::Requires { 'Moose' => '2.0600' };
+use Test::Requires { 'Moose' => '2.0000' };
 use Test::TypeTiny;
 
 use Type::Tiny;

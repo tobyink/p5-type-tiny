@@ -8,7 +8,7 @@ Test L<Types::TypeTiny::to_TypeTiny> pseudo-coercion.
 
 =head1 DEPENDENCIES
 
-This test requires L<Moose> 2.0600, L<Mouse> 1.00, and L<Moo> 1.000000.
+This test requires L<Moose> 2.0000, L<Mouse> 1.00, and L<Moo> 1.000000.
 Otherwise, it is skipped.
 
 =head1 AUTHOR
@@ -30,7 +30,7 @@ use lib qw( ./lib ./t/lib ../inc ./inc );
 
 # Test::Requires calls ->import on Moose/Mouse, so be sure
 # to import them into dummy packages.
-{ package XXX; use Test::Requires { Moose => '2.0600' } };
+{ package XXX; use Test::Requires { Moose => '2.0000' } };
 { package YYY; use Test::Requires { Mouse => '1.00' } };
 { package ZZZ; use Test::Requires { Moo   => '1.000000' } };
 
