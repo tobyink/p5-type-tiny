@@ -111,8 +111,8 @@ with Type::Tiny in the C<inc> directory, so you do not need to
 install them separately.
 
 If using Type::Tiny in conjunction with L<Moo>, then at least Moo
-1.001000 is recommended. If using Type::Tiny with L<Moose>, then at
-least Moose 2.0600 is recommended. If using Type::Tiny with L<Mouse>,
+1.000000 is recommended. If using Type::Tiny with L<Moose>, then at
+least Moose 2.0000 is recommended. If using Type::Tiny with L<Mouse>,
 then at least Mouse 1.00 is recommended. Type::Tiny is mostly
 untested against older versions of these packages.
 
