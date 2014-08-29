@@ -47,7 +47,7 @@
 		comment "Devel::LexAlias is useful for some Eval::TypeTiny features."@en;
 	];
 	deps:runtime-suggestion [
-		deps:on "Moose 2.0400"^^deps:CpanId;
+		deps:on "Moose 2.0000"^^deps:CpanId;
 		comment "Type::Tiny works nicely with Moose."@en;
 	];
 	deps:runtime-suggestion [
