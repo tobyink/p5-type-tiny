@@ -85,7 +85,9 @@ my %attributes = (
 		$class->$next(@_);
 	}
 }
-my $minimilk = (InstanceOf['Mini::Milk'])->plus_constructors(Num, 'new');
+
+my $minimilk = InstanceOf->of('Mini::Milk')->plus_constructors(Num, "new");
+
 {
 	package MyCollection2;
 	use Moose;
@@ -165,6 +167,21 @@ my $minimilk = (InstanceOf['Mini::Milk'])->plus_constructors(Num, 'new');
 	);
 }
 
+WEIRD_ERROR: {
+	my $c = MyCollection3
+		->meta
+		->get_attribute('things')
+		->type_constraint
+		->coercion
+		->compiled_coercion;
+	
+	my $input     = [ Mini::Milk->new(0), 1, 2, 3 ];
+	my $output   = $c->($input);
+	my $expected = [ map Mini::Milk->new($_), 0..3 ];
+	is_deeply($output, $expected)
+		or diag( B::Deparse->new->coderef2text($c) );
+}
+
 my $i = 0;
 with_immutable
 {
@@ -188,7 +205,7 @@ with_immutable
 			'pushing not ok value',
 		);
 	};
-	
+
 	my %subtests = (
 		MyCollection2  => "Array trait with type ArrayRef[InstanceOf] and coercion",
 		MyCollection3  => "Array trait with type ArrayRef[InstanceOf] and coercion and subtyping",
@@ -198,7 +215,7 @@ with_immutable
 		subtest $subtests{$class} => sub
 		{
 			my $coll = $class->new(things => []);
-
+			
 			is(
 				exception {
 					$coll->add( 'Mini::Milk'->new(i => 0) );
@@ -301,6 +318,8 @@ with_immutable
 	}
 } qw(
 	MyCollection
+	MyCollection2
+	MyCollection3
 	MyHashes
 	Mini::Milk
 );

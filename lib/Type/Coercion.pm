@@ -283,8 +283,8 @@ sub _build_compiled_coercion
 			!defined($codes[$i])
 				? sprintf('  { return $_[0] }') :
 			Types::TypeTiny::StringLike->check($codes[$i])
-				? sprintf('  { local $_ = $_[0]; return( %s ) }', $codes[$i]) :
-			sprintf('  { local $_ = $_[0]; return $codes[%d]->(@_) }', $i);
+				? sprintf('  { local $_ = $_[0]; return scalar(%s); }', $codes[$i]) :
+			sprintf('  { local $_ = $_[0]; return scalar($codes[%d]->(@_)) }', $i);
 	}
 	
 	push @sub, 'return $_[0];';
@@ -366,9 +366,9 @@ sub inline_coercion
 		push @sub, sprintf('(%s) ?', $types[$i]->inline_check($varname));
 		push @sub,
 			(defined($codes[$i]) && ($varname eq '$_'))
-				? sprintf('scalar(%s) :', $codes[$i]) :
+				? sprintf('scalar(do { %s }) :', $codes[$i]) :
 			defined($codes[$i])
-				? sprintf('do { local $_ = %s; scalar(%s) } :', $varname, $codes[$i]) :
+				? sprintf('scalar(do { local $_ = %s; %s }) :', $varname, $codes[$i]) :
 			sprintf('%s :', $varname);
 	}
 	
