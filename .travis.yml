@@ -113,4 +113,3 @@ notifications:
     channels:
       - "irc.perl.org#moops"
     on_success: change
-
