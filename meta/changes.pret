@@ -2094,3 +2094,19 @@
 			dcs:fixes RT#98362;
 		];
 	].
+
+`Type-Tiny 1.001_000 cpan:TOBYINK`
+	issued  2014-08-28;
+	changeset [
+		dcs:versus `Type-Tiny 1.000003 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix;
+			label "Fix issues with coercions and native attribute traits with some oldish versions of Moose on oldish versions of Perl.";
+			dcs:thanks cpan:PJFL;
+			dcs:fixes RT#98159;
+		];
+		item [
+			a dcs:Tests;
+			label "Make some of the test case skip_all bits more ambitious; test older versions of Moose and Moo than we were testing before.";
+		];
+	].
