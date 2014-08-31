@@ -516,9 +516,8 @@ sub classifier
 				require Types::TypeTiny;
 				$r = Moose::Util::TypeConstraints::find_type_constraint($_[0]);
 				$r = Types::TypeTiny::to_TypeTiny($r) if defined $r;
-				return 1;
 			}
-			return;
+			defined $r;
 		};
 		
 		my $mouse_lookup = sub
@@ -529,9 +528,8 @@ sub classifier
 				require Types::TypeTiny;
 				$r = Mouse::Util::TypeConstraints::find_type_constraint($_[0]);
 				$r = Types::TypeTiny::to_TypeTiny($r) if defined $r;
-				return 1;
 			}
-			return;
+			defined $r;
 		};
 		
 		my $meta;
