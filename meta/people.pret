@@ -89,6 +89,9 @@ cpan:SHLOMIF
 cpan:DAKKAR
 	:name "Gianni Ceccarelli".
 
+cpan:SPICEMAN
+	:name "Marcel Montes".
+
 # We bundle some files made by these dudes...
 
 cpan:RJBS

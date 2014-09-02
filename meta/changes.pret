@@ -2094,3 +2094,23 @@
 			dcs:fixes RT#98362;
 		];
 	].
+
+`Type-Tiny 1.000004 cpan:TOBYINK`
+	issued  2014-09-02;
+	changeset [
+		dcs:versus `Type-Tiny 1.000003 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix;
+			label "Fix issues with coercions and native attribute traits with some oldish versions of Moose on oldish versions of Perl.";
+			dcs:thanks cpan:PJFL;
+			dcs:fixes RT#98159;
+			comment "Backported fix from 1.001_000.";
+		];
+		item [
+			a dcs:Bugfix;
+			label "Fix for Type::Registry::DWIM.";
+			dcs:thanks cpan:SPICEMAN;
+			dcs:fixes RT#98458;
+			comment "Backported fix from 1.001_000.";
+		];
+	].
