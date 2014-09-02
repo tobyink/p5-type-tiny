@@ -2096,7 +2096,7 @@
 	].
 
 `Type-Tiny 1.001_000 cpan:TOBYINK`
-	issued  2014-08-28;
+	issued  2014-10-01;
 	changeset [
 		dcs:versus `Type-Tiny 1.000003 cpan:TOBYINK`;
 		item [
@@ -2108,5 +2108,15 @@
 		item [
 			a dcs:Tests;
 			label "Make some of the test case skip_all bits more ambitious; test older versions of Moose and Moo than we were testing before.";
+		];
+		item [
+			a dcs:Bugfix;
+			label "Fix for Type::Registry::DWIM.";
+			dcs:thanks cpan:SPICEMAN;
+			dcs:fixes RT#98458;
+		];
+		item [
+			a dcs:Update;
+			label "If Sub::Name is unavailable, but the shiny new core Sub::Util is available, then use it instead.";
 		];
 	].
