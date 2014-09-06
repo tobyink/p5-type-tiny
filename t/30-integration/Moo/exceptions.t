@@ -34,7 +34,8 @@ use Test::Requires { "Moo" => "1.002001" };
 BEGIN {
 	require Method::Generate::Accessor;
 	"Method::Generate::Accessor"->can("_SIGDIE")
-		or plan skip_all => "Method::Generate::Accessor cannot _SIGDIE!!!";
+		or "Moo"->VERSION =~ /^1\.006/
+		or plan skip_all => "Method::Generate::Accessor exception support seems missing!!!";
 };
 
 {
