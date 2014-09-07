@@ -26,8 +26,8 @@ use Types::TypeTiny qw(CodeLike ArrayLike to_TypeTiny);
 require Exporter::Tiny;
 our @ISA = 'Exporter::Tiny';
 
-our @EXPORT = qw( compile );
-our @EXPORT_OK = qw( multisig validate Invocant );
+our @EXPORT    = qw( compile compile_named );
+our @EXPORT_OK = qw( multisig validate validate_named Invocant );
 
 BEGIN {
 	my $Invocant = 'Type::Tiny::Union'->new(
@@ -222,11 +222,162 @@ sub compile
 	return $closure;
 }
 
+sub compile_named
+{
+	my (@code, %env);
+	
+	@code = 'my (%R, %tmp, $tmp);';
+	push @code, '#placeholder';   # $code[1]
+	
+	my %options    = (ref($_[0]) eq "HASH" && !$_[0]{slurpy}) ? %{+shift} : ();
+	my $arg = -1;
+	my $had_slurpy;
+	
+	push @code, 'my %in = ((@_==1) && ref($_[0]) eq "HASH") ? %{$_[0]} : (@_ % 2) ? "Error::TypeTiny::WrongNumberOfParameters"->throw(message => "Odd number of elements in hash") : @_;';
+	
+	while (@_) {
+		++$arg;
+		my ($name, $constraint) = splice(@_, 0, 2);
+		
+		my $is_optional;
+		my $really_optional;
+		my $is_slurpy;
+		my $varname;
+		
+		if (Bool->check($constraint))
+		{
+			$constraint = $constraint ? Any : Optional[Any];
+		}
+		
+		if (HashRef->check($constraint))
+		{
+			$constraint = to_TypeTiny($constraint->{slurpy});
+			++$is_slurpy;
+			++$had_slurpy;
+		}
+		else
+		{
+			$is_optional     = grep $_->{uniq} == Optional->{uniq}, $constraint->parents;
+			$really_optional = $is_optional && $constraint->parent->{uniq} eq Optional->{uniq} && $constraint->type_parameter;
+			
+			$constraint = $constraint->type_parameter if $really_optional;
+		}
+		
+		unless ($is_optional or $is_slurpy) {
+			push @code, sprintf(
+				'exists($in{%s}) or "Error::TypeTiny::WrongNumberOfParameters"->throw(message => sprintf "Missing required parameter: %%s", %s);',
+				B::perlstring($name),
+				B::perlstring($name),
+			);
+		}
+		
+		my $need_to_close_if = 0;
+		
+		if ($is_slurpy) {
+			$varname = '\\%in';
+		}
+		elsif ($is_optional) {
+			push @code, sprintf('if (exists($in{%s})) {', B::perlstring($name));
+			push @code, sprintf('$tmp = delete($in{%s});', B::perlstring($name));
+			$varname = '$tmp';
+			++$need_to_close_if;
+		}
+		else {
+			push @code, sprintf('$tmp = delete($in{%s});', B::perlstring($name));
+			$varname = '$tmp';
+		}
+		
+		if ($constraint->has_coercion) {
+			if ($constraint->coercion->can_be_inlined) {
+				push @code, sprintf(
+					'$tmp = %s;',
+					$constraint->coercion->inline_coercion($varname)
+				);
+			}
+			else {
+				$env{'@coerce'}[$arg] = $constraint->coercion->compiled_coercion;
+				push @code, sprintf(
+					'$tmp = $coerce[%d]->(%s);',
+					$arg,
+					$varname,
+				);
+			}
+			$varname = '$tmp';
+		}
+		
+		if ($constraint->can_be_inlined)
+		{
+			push @code, sprintf(
+				'(%s) or Type::Tiny::_failed_check(%d, %s, %s, varname => %s);',
+				$constraint->inline_check($varname),
+				$constraint->{uniq},
+				B::perlstring($constraint),
+				$varname,
+				$is_slurpy ? 'q{$SLURPY}' : sprintf('q{$_{%s}}', B::perlstring($name)),
+			);
+		}
+		else
+		{
+			$env{'@check'}[$arg] = $constraint->compiled_check;
+			push @code, sprintf(
+				'%s or Type::Tiny::_failed_check(%d, %s, %s, varname => %s);',
+				sprintf(sprintf '$check[%d]->(%s)', $arg, $varname),
+				$constraint->{uniq},
+				B::perlstring($constraint),
+				$varname,
+				$is_slurpy ? 'q{$SLURPY}' : sprintf('q{$_{%s}}', B::perlstring($name)),
+			);
+		}
+		
+		push @code, sprintf('$R{%s} = %s;', B::perlstring($name), $varname);
+		
+		push @code, '}' if $need_to_close_if;
+	}
+	
+	if (!$had_slurpy) {
+		push @code, 'keys(%in) and "Error::TypeTiny"->throw(message => sprintf "Unrecognized parameter%s: %s", keys(%in)>1?"s":"", Type::Utils::english_list(sort keys %in));'
+	}
+	
+	push @code, '\\%R;';
+	
+	my $source  = "sub { no warnings; ".join("\n", @code)." };";
+	return $source if $options{want_source};
+	
+	my $closure = eval_closure(
+		source      => $source,
+		description => sprintf("parameter validation for '%s'", [caller(1+($options{caller_level}||0))]->[3] || '__ANON__'),
+		environment => \%env,
+	);
+	
+	return {
+		min_args   => undef,  # always going to be 1 or 0
+		max_args   => undef,  # should be possible to figure out if no slurpy param
+		closure    => $closure,
+	} if $options{want_details};
+	
+	return $closure;
+}
+
 my %compiled;
 sub validate
 {
 	my $arr = shift;
-	my $sub = $compiled{ join ":", map($_->{uniq}||"\@$_->{slurpy}", @_) } ||= compile({ caller_level => 1 }, @_);
+	my $sub = (
+		$compiled{ join ":", map($_->{uniq}||"\@$_->{slurpy}", @_) }
+			||= compile({ caller_level => 1 }, @_)
+	);
+	@_ = @$arr;
+	goto $sub;
+}
+
+my %compiled_named;
+sub validate_named
+{
+	my $arr = shift;
+	my $sub = (
+		$compiled_named{ join ":", map(ref($_)?($_->{uniq}||"\@$_->{slurpy}"):B::perlstring($_), @_) }
+			||= compile_named({ caller_level => 1 }, @_)
+	);
 	@_ = @$arr;
 	goto $sub;
 }
@@ -343,7 +494,7 @@ Not quite as neat, but not awful either.
 
 There's a shortcut reducing it to one step:
 
- use Type::Params qw( validate );
+ use Type::Params qw( validate validate_named );
  
  sub deposit_monies
  {
@@ -364,6 +515,10 @@ Dude, these functions are documented!
 =item compile
 
 =item validate
+
+=item compile_named
+
+=item validate_named
 
 =item Invocant
 
@@ -420,6 +575,18 @@ a type constraint accepting blessed objects and also class names.
       $self->_run;
    }
 
+Of course, some people like to use C<shift> for the invocant:
+
+   sub dump
+   {
+      state $check = compile( Int );
+      my $self = shift;
+      my ($limit) = $check->(@_);
+      
+      local $Data::Dumper::Maxdepth = $limit;
+      print Data::Dumper::Dumper($self);
+   }
+
 =head2 Optional Parameters
 
    use Types::Standard qw( Object Optional Int );
@@ -460,8 +627,34 @@ parameter.
 
 =head2 Named Parameters
 
-Just use a slurpy C<Dict>:
+You can use C<compile_named> to accept a hash of named parameters
 
+   use Type::Params qw(compile);
+   use Types::Standard qw( slurpy Dict Ref Optional Int );
+   
+   sub dump
+   {
+      state $check = compile_named(
+         var    => Ref,
+         limit  => Optional[Int],
+      );
+      my $arg = $check->(@_);
+      
+      local $Data::Dumper::Maxdepth = $arg->{limit};
+      print Data::Dumper::Dumper($arg->{var});
+   }
+   
+   dump({ var => $foo, limit => 1 });    # ok (hashref)
+   dump(  var => $foo, limit => 1  );    # ok (hash)
+   dump(  var => $foo  );                # ok (no optional parameter)
+   dump(  limit => 1  );                 # dies
+
+Prior to Type::Tiny 1.002000, the recommendation was to use a slurpy
+C<Dict>. This still works, though the error messages you get might not
+be quite so nice, and you don't get the automatic detection of hash
+versus hashref in the input C<< @_ >>.
+
+   use Type::Params qw(compile);
    use Types::Standard qw( slurpy Dict Ref Optional Int );
    
    sub dump
@@ -478,11 +671,13 @@ Just use a slurpy C<Dict>:
       print Data::Dumper::Dumper($arg->{var});
    }
    
-   dump(var => $foo, limit => 1);   # ok
-   dump(var => $foo);               # ok
-   dump(limit => 1);                # dies
+   dump(  var => $foo, limit => 1  );    # ok (hash)
+   dump(  var => $foo  );                # ok (no optional parameter)
+   dump(  limit => 1  );                 # dies
 
 =head2 Mixed Positional and Named Parameters
+
+For this, you can still use the C<< slurpy Dict >> hack...
 
    use Types::Standard qw( slurpy Dict Ref Optional Int );
    
@@ -588,6 +783,7 @@ It's also possible to list coderefs as alternatives in C<multisig>:
       sub { ... },
       [ HashRef, Num ],
       [ CodeRef ],
+      compile_named( needle => Value, haystack => Ref ),
    );
 
 The coderef is expected to die if that alternative should be abandoned (and
@@ -634,11 +830,8 @@ first time your sub is called to make subsequent calls a lot faster.
 
 =item *
 
-Type::Params is mostly geared towards positional parameters, while
-Params::Validate seems to be primarily aimed at named parameters. (Though
-either works for either.) Params::Validate doesn't appear to have a
-particularly natural way of validating a mix of positional and named
-parameters.
+Params::Validate doesn't appear to have a particularly natural way of
+validating a mix of positional and named parameters.
 
 =item *
 
