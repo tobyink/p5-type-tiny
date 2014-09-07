@@ -13,19 +13,15 @@ Type::Tiny::Manual::UsingWithMoose - how to use Type::Tiny and Type::Library wit
       
       use Moose;
       use Types::Standard qw( Str Int );
-      use Type::Utils qw( declare as where inline_as coerce from );
       
       has name => (
          is      => "ro",
          isa     => Str,
       );
       
-      my $PositiveInt = declare
-         as        Int,
-         where     {  $_ > 0  },
-         inline_as { "$_ =~ /^[0-9]+\$/ and $_ > 0" };
-      
-      coerce $PositiveInt, from Int, q{ abs $_ };
+      my $PositiveInt = Int
+         -> where( sub { $_ > 0 } )
+         -> plus_coercions( Int, sub { abs $_ } );
       
       has age => (
          is      => "ro",
@@ -43,6 +39,8 @@ Type::Tiny::Manual::UsingWithMoose - how to use Type::Tiny and Type::Library wit
    }
 
 =head1 DESCRIPTION
+
+Type::Tiny is tested with L<Moose> 2.0007 and above.
 
 L<Type::Tiny> type constraints have an API almost identical to that of
 L<Moose::Meta::TypeConstraint>. It is also able to build a

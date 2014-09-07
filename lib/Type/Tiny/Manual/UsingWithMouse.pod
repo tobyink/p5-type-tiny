@@ -13,19 +13,15 @@ Type::Tiny::Manual::UsingWithMouse - how to use Type::Tiny and Type::Library wit
       
       use Mouse;
       use Types::Standard qw( Str Int );
-      use Type::Utils qw( declare as where inline_as coerce from );
       
       has name => (
          is      => "ro",
          isa     => Str,
       );
       
-      my $PositiveInt = declare
-         as        Int,
-         where     {  $_ > 0  },
-         inline_as { "$_ =~ /^[0-9]+\$/ and $_ > 0" };
-      
-      coerce $PositiveInt, from Int, q{ abs $_ };
+      my $PositiveInt = Int
+         -> where( sub { $_ > 0 } )
+         -> plus_coercions( Int, sub { abs $_ } );
       
       has age => (
          is      => "ro",
@@ -49,6 +45,8 @@ work, but is not anywhere near as well-tested as L<Moo> or L<Moose>
 support.
 
 =head1 DESCRIPTION
+
+Type::Tiny is tested with L<Mouse> 1.00 and above.
 
 L<Type::Tiny> type constraints have an API almost identical to that of
 L<Mouse::Meta::TypeConstraint>. As a result, you can use a Type::Tiny
