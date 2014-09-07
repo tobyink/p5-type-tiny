@@ -494,7 +494,7 @@ Not quite as neat, but not awful either.
 
 There's a shortcut reducing it to one step:
 
- use Type::Params qw( validate );
+ use Type::Params qw( validate validate_named );
  
  sub deposit_monies
  {
@@ -515,6 +515,10 @@ Dude, these functions are documented!
 =item compile
 
 =item validate
+
+=item compile_named
+
+=item validate_named
 
 =item Invocant
 
@@ -571,6 +575,18 @@ a type constraint accepting blessed objects and also class names.
       $self->_run;
    }
 
+Of course, some people like to use C<shift> for the invocant:
+
+   sub dump
+   {
+      state $check = compile( Int );
+      my $self = shift;
+      my ($limit) = $check->(@_);
+      
+      local $Data::Dumper::Maxdepth = $limit;
+      print Data::Dumper::Dumper($self);
+   }
+
 =head2 Optional Parameters
 
    use Types::Standard qw( Object Optional Int );
@@ -611,8 +627,34 @@ parameter.
 
 =head2 Named Parameters
 
-Just use a slurpy C<Dict>:
+You can use C<compile_named> to accept a hash of named parameters
 
+   use Type::Params qw(compile);
+   use Types::Standard qw( slurpy Dict Ref Optional Int );
+   
+   sub dump
+   {
+      state $check = compile_named(
+         var    => Ref,
+         limit  => Optional[Int],
+      );
+      my $arg = $check->(@_);
+      
+      local $Data::Dumper::Maxdepth = $arg->{limit};
+      print Data::Dumper::Dumper($arg->{var});
+   }
+   
+   dump({ var => $foo, limit => 1 });    # ok (hashref)
+   dump(  var => $foo, limit => 1  );    # ok (hash)
+   dump(  var => $foo  );                # ok (no optional parameter)
+   dump(  limit => 1  );                 # dies
+
+Prior to Type::Tiny 1.002000, the recommendation was to use a slurpy
+C<Dict>. This still works, though the error messages you get might not
+be quite so nice, and you don't get the automatic detection of hash
+versus hashref in the input C<< @_ >>.
+
+   use Type::Params qw(compile);
    use Types::Standard qw( slurpy Dict Ref Optional Int );
    
    sub dump
@@ -629,11 +671,13 @@ Just use a slurpy C<Dict>:
       print Data::Dumper::Dumper($arg->{var});
    }
    
-   dump(var => $foo, limit => 1);   # ok
-   dump(var => $foo);               # ok
-   dump(limit => 1);                # dies
+   dump(  var => $foo, limit => 1  );    # ok (hash)
+   dump(  var => $foo  );                # ok (no optional parameter)
+   dump(  limit => 1  );                 # dies
 
 =head2 Mixed Positional and Named Parameters
+
+For this, you can still use the C<< slurpy Dict >> hack...
 
    use Types::Standard qw( slurpy Dict Ref Optional Int );
    
@@ -739,6 +783,7 @@ It's also possible to list coderefs as alternatives in C<multisig>:
       sub { ... },
       [ HashRef, Num ],
       [ CodeRef ],
+      compile_named( needle => Value, haystack => Ref ),
    );
 
 The coderef is expected to die if that alternative should be abandoned (and
@@ -785,11 +830,8 @@ first time your sub is called to make subsequent calls a lot faster.
 
 =item *
 
-Type::Params is mostly geared towards positional parameters, while
-Params::Validate seems to be primarily aimed at named parameters. (Though
-either works for either.) Params::Validate doesn't appear to have a
-particularly natural way of validating a mix of positional and named
-parameters.
+Params::Validate doesn't appear to have a particularly natural way of
+validating a mix of positional and named parameters.
 
 =item *
 
