@@ -2095,8 +2095,28 @@
 		];
 	].
 
+`Type-Tiny 1.000004 cpan:TOBYINK`
+	issued  2014-09-02;
+	changeset [
+		dcs:versus `Type-Tiny 1.000003 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix;
+			label "Fix issues with coercions and native attribute traits with some oldish versions of Moose on oldish versions of Perl.";
+			dcs:thanks cpan:PJFL;
+			dcs:fixes RT#98159;
+			comment "Backported fix from 1.001_000.";
+		];
+		item [
+			a dcs:Bugfix;
+			label "Fix for Type::Registry::DWIM.";
+			dcs:thanks cpan:SPICEMAN;
+			dcs:fixes RT#98458;
+			comment "Backported fix from 1.001_000.";
+		];
+	].
+
 `Type-Tiny 1.001_000 cpan:TOBYINK`
-	issued  2014-10-01;
+	issued  2014-09-07;
 	changeset [
 		dcs:versus `Type-Tiny 1.000003 cpan:TOBYINK`;
 		item [
@@ -2118,5 +2138,18 @@
 		item [
 			a dcs:Update;
 			label "If Sub::Name is unavailable, but the shiny new core Sub::Util is available, then use it instead.";
+		];
+		item [
+			a dcs:Addition;
+			label "Type::Params now provides `compile_named` and `validate_named` functions which do the same thing as `compile` and `validate` but are better for named arguments.";
+			comment "Several people have requested this.";
+		];
+		item [
+			a dcs:Change;
+			label "`Type::Utils::dwim_type` now allows more control over fallback behaviours.";
+		];
+		item [
+			a dcs:Documentation;
+			label "Updated to Type::Tiny::Manual::UsingWithMoose, Type::Tiny::Manual::UsingWithMoo, and Type::Tiny::Manual::UsingWithMouse.";
 		];
 	].
