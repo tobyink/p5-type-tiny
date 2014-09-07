@@ -1,9 +1,6 @@
 Post-1.000000 Changes
 =====================
 
-* Type::Params should provide compile_named/validate_named functions
-  tailored for named parameters rather than using the slurpy Dict hack.
-
 * Type::Utils::dwim_type shouldn't fall back to pulling types from the
   Moose/Mouse type registry unless the caller is a Moose/Mouse-based
   package *OR* it is explicitly requested like
