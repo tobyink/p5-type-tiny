@@ -11,26 +11,23 @@ Type::Tiny::Manual::UsingWithMoo - how to use Type::Tiny and Type::Library with 
    {
       package Person;
       
-      use Moo;
+      use Moo 1.006000;
+      use Sub::Quote qw( quote_sub );
       use Types::Standard qw( Str Int );
-      use Type::Utils qw( declare as where inline_as coerce from );
       
       has name => (
          is      => "ro",
          isa     => Str,
       );
       
-      my $PositiveInt = declare
-         as        Int,
-         where     {  $_ > 0  },
-         inline_as { "$_ =~ /^[0-9]+\$/ and $_ > 0" };
-      
-      coerce $PositiveInt, from Int, q{ abs $_ };
+      my $PositiveInt = Int
+         -> where( quote_sub '$_ > 0' )
+         -> plus_coercions( Int, sub { abs $_ } );
       
       has age => (
          is      => "rwp",
          isa     => $PositiveInt,
-         coerce  => $PositiveInt->coercion,
+         coerce  => 1,
       );
       
       sub get_older {
@@ -49,9 +46,19 @@ Type::Tiny overloads C<< &{} >>. Moo supports using objects that overload
 C<< &{} >> as C<isa> constraints, so Type::Tiny objects can directly be used
 in C<isa>.
 
-Moo doesn't support C<< coerce => 1 >> but requires a coderef as a coercion.
-However, again it supports using objects that overload C<< &{} >>, which
-Type::Coercion does, allowing C<< coerce => $Type->coercion >> to work.
+Moo prior to 1.006000 doesn't support C<< coerce => 1 >>, instead
+requiring a coderef to use as a coercion. However, Type::Tiny can
+provide you with a suitable coderef to use (actually an object that
+overloads C<< &{} >>). Just use:
+
+   has age => (
+      is      => "rwp",
+      isa     => $PositiveInt,
+      coerce  => $PositiveInt->coercion,
+   );
+
+If you can upgrade to the latest Moo, and use C<< coerce => 1 >> you'll
+have a lot more fun though. :-)
 
 Type::Tiny hooks into Moo's HandleMoose interface to ensure that type
 constraints get inflated to Moose type constraints if and when Moo inflates
