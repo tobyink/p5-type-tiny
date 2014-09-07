@@ -2154,4 +2154,5 @@
 		];
 		item "Updated NEWS file."^^Documentation;
 		item "Updated TODO file."^^Documentation;
+		item "Want Type::Tiny::XS 0.011."^^Update;
 	].
