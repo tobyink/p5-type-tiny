@@ -26,8 +26,8 @@ use Types::TypeTiny qw(CodeLike ArrayLike to_TypeTiny);
 require Exporter::Tiny;
 our @ISA = 'Exporter::Tiny';
 
-our @EXPORT = qw( compile );
-our @EXPORT_OK = qw( multisig validate Invocant );
+our @EXPORT    = qw( compile compile_named );
+our @EXPORT_OK = qw( multisig validate validate_named Invocant );
 
 BEGIN {
 	my $Invocant = 'Type::Tiny::Union'->new(
@@ -222,11 +222,162 @@ sub compile
 	return $closure;
 }
 
+sub compile_named
+{
+	my (@code, %env);
+	
+	@code = 'my (%R, %tmp, $tmp);';
+	push @code, '#placeholder';   # $code[1]
+	
+	my %options    = (ref($_[0]) eq "HASH" && !$_[0]{slurpy}) ? %{+shift} : ();
+	my $arg = -1;
+	my $had_slurpy;
+	
+	push @code, 'my %in = ((@_==1) && ref($_[0]) eq "HASH") ? %{$_[0]} : (@_ % 2) ? "Error::TypeTiny::WrongNumberOfParameters"->throw(message => "Odd number of elements in hash") : @_;';
+	
+	while (@_) {
+		++$arg;
+		my ($name, $constraint) = splice(@_, 0, 2);
+		
+		my $is_optional;
+		my $really_optional;
+		my $is_slurpy;
+		my $varname;
+		
+		if (Bool->check($constraint))
+		{
+			$constraint = $constraint ? Any : Optional[Any];
+		}
+		
+		if (HashRef->check($constraint))
+		{
+			$constraint = to_TypeTiny($constraint->{slurpy});
+			++$is_slurpy;
+			++$had_slurpy;
+		}
+		else
+		{
+			$is_optional     = grep $_->{uniq} == Optional->{uniq}, $constraint->parents;
+			$really_optional = $is_optional && $constraint->parent->{uniq} eq Optional->{uniq} && $constraint->type_parameter;
+			
+			$constraint = $constraint->type_parameter if $really_optional;
+		}
+		
+		unless ($is_optional or $is_slurpy) {
+			push @code, sprintf(
+				'exists($in{%s}) or "Error::TypeTiny::WrongNumberOfParameters"->throw(message => sprintf "Missing required parameter: %%s", %s);',
+				B::perlstring($name),
+				B::perlstring($name),
+			);
+		}
+		
+		my $need_to_close_if = 0;
+		
+		if ($is_slurpy) {
+			$varname = '\\%in';
+		}
+		elsif ($is_optional) {
+			push @code, sprintf('if (exists($in{%s})) {', B::perlstring($name));
+			push @code, sprintf('$tmp = delete($in{%s});', B::perlstring($name));
+			$varname = '$tmp';
+			++$need_to_close_if;
+		}
+		else {
+			push @code, sprintf('$tmp = delete($in{%s});', B::perlstring($name));
+			$varname = '$tmp';
+		}
+		
+		if ($constraint->has_coercion) {
+			if ($constraint->coercion->can_be_inlined) {
+				push @code, sprintf(
+					'$tmp = %s;',
+					$constraint->coercion->inline_coercion($varname)
+				);
+			}
+			else {
+				$env{'@coerce'}[$arg] = $constraint->coercion->compiled_coercion;
+				push @code, sprintf(
+					'$tmp = $coerce[%d]->(%s);',
+					$arg,
+					$varname,
+				);
+			}
+			$varname = '$tmp';
+		}
+		
+		if ($constraint->can_be_inlined)
+		{
+			push @code, sprintf(
+				'(%s) or Type::Tiny::_failed_check(%d, %s, %s, varname => %s);',
+				$constraint->inline_check($varname),
+				$constraint->{uniq},
+				B::perlstring($constraint),
+				$varname,
+				$is_slurpy ? 'q{$SLURPY}' : sprintf('q{$_{%s}}', B::perlstring($name)),
+			);
+		}
+		else
+		{
+			$env{'@check'}[$arg] = $constraint->compiled_check;
+			push @code, sprintf(
+				'%s or Type::Tiny::_failed_check(%d, %s, %s, varname => %s);',
+				sprintf(sprintf '$check[%d]->(%s)', $arg, $varname),
+				$constraint->{uniq},
+				B::perlstring($constraint),
+				$varname,
+				$is_slurpy ? 'q{$SLURPY}' : sprintf('q{$_{%s}}', B::perlstring($name)),
+			);
+		}
+		
+		push @code, sprintf('$R{%s} = %s;', B::perlstring($name), $varname);
+		
+		push @code, '}' if $need_to_close_if;
+	}
+	
+	if (!$had_slurpy) {
+		push @code, 'keys(%in) and "Error::TypeTiny"->throw(message => sprintf "Unrecognized parameter%s: %s", keys(%in)>1?"s":"", Type::Utils::english_list(sort keys %in));'
+	}
+	
+	push @code, '\\%R;';
+	
+	my $source  = "sub { no warnings; ".join("\n", @code)." };";
+	return $source if $options{want_source};
+	
+	my $closure = eval_closure(
+		source      => $source,
+		description => sprintf("parameter validation for '%s'", [caller(1+($options{caller_level}||0))]->[3] || '__ANON__'),
+		environment => \%env,
+	);
+	
+	return {
+		min_args   => undef,  # always going to be 1 or 0
+		max_args   => undef,  # should be possible to figure out if no slurpy param
+		closure    => $closure,
+	} if $options{want_details};
+	
+	return $closure;
+}
+
 my %compiled;
 sub validate
 {
 	my $arr = shift;
-	my $sub = $compiled{ join ":", map($_->{uniq}||"\@$_->{slurpy}", @_) } ||= compile({ caller_level => 1 }, @_);
+	my $sub = (
+		$compiled{ join ":", map($_->{uniq}||"\@$_->{slurpy}", @_) }
+			||= compile({ caller_level => 1 }, @_)
+	);
+	@_ = @$arr;
+	goto $sub;
+}
+
+my %compiled_named;
+sub validate_named
+{
+	my $arr = shift;
+	my $sub = (
+		$compiled_named{ join ":", map(ref($_)?($_->{uniq}||"\@$_->{slurpy}"):B::perlstring($_), @_) }
+			||= compile_named({ caller_level => 1 }, @_)
+	);
 	@_ = @$arr;
 	goto $sub;
 }
