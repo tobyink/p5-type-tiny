@@ -8,7 +8,7 @@ Checks Type::Parser can pick up MooseX::Types type constraints.
 
 =head1 DEPENDENCIES
 
-Requires L<Moose> 2.0600 and L<MooseX::Types::Common> 0.001004;
+Requires L<Moose> 2.0201 and L<MooseX::Types::Common> 0.001004;
 skipped otherwise.
 
 =head1 AUTHOR
@@ -29,7 +29,7 @@ use warnings;
 use lib qw( ./lib ./t/lib ../inc ./inc );
 
 use Test::More;
-use Test::Requires { 'Moose' => '2.0600' };
+use Test::Requires { 'Moose' => '2.0201' };
 use Test::Requires { 'MooseX::Types::Common' => '0.001004' };
 use Test::TypeTiny;
 use Test::Fatal;
