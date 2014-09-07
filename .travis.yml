@@ -85,7 +85,7 @@ matrix:
     - perl: "5.16"
       env: MOOSE_RELEASE=DOY/Moose-2.0604.tar.gz MOO_RELEASE=MSTROUT/Moo-1.000008.tar.gz
     - perl: "5.12"
-      env: MOOSE_RELEASE=FLORA/Moose-2.0007.tar.gz EC_RELEASE="https://cpan.metacpan.org/authors/id/D/DO/DOY/Eval-Closure-0.06.tar.gz" NAC_RELEASE=BOBTFISH/namespace-autoclean-0.13.tar.gz
+      env: MOOSE_RELEASE=FLORA/Moose-2.0007.tar.gz EC_RELEASE="https://cpan.metacpan.org/authors/id/D/DO/DOY/Eval-Closure-0.06.tar.gz"
 before_install:
   - export DIST_INKT_PROFILE="Dist::Inkt::Profile::TOBYINK"
   - git clone git://github.com/tobyink/perl-travis-helper ~/perl-travis-helper
@@ -100,7 +100,6 @@ install:
   - cpan-install --coverage
   - '[ -n "$MOOSE_RELEASE" ] && cpan-install "$MOOSE_RELEASE" || echo "MOOSE_RELEASE is not set"'
   - '[ -n "$EC_RELEASE" ]    && cpan-install "$EC_RELEASE"    || echo "EC_RELEASE is not set"'
-  - '[ -n "$NAC_RELEASE" ]   && cpan-install "$NAC_RELEASE"   || echo "NAC_RELEASE is not set"'
   - '[ -n "$MOO_RELEASE" ]   && cpan-install "$MOO_RELEASE"   || echo "MOO_RELEASE is not set"'
 before_script:
   - coverage-setup
