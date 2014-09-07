@@ -423,7 +423,7 @@ __END__
 
 =encoding utf-8
 
-=for stopwords evals
+=for stopwords evals invocant
 
 =head1 NAME
 

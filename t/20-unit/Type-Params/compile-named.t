@@ -266,7 +266,7 @@ simple_test(
 
 $Rounded = Int->plus_coercions(Num, sub { int($_) });
 simple_test(
-	"simple test with inlineable types, but non-inlineable coercion", 
+	"simple test with inlineable types, but non-inlineable coercion",
 	foo => $Rounded,
 	bar => Int,
 	baz => Optional[ArrayRef->of($Rounded)],
@@ -274,7 +274,7 @@ simple_test(
 
 $Rounded = Int->where(sub { !!1 })->plus_coercions(Num, sub { int($_) });
 simple_test(
-	"simple test with everything non-inlineable", 
+	"simple test with everything non-inlineable",
 	foo => $Rounded,
 	bar => Int->where(sub { !!1 }),
 	baz => Optional[ArrayRef->of($Rounded)],
@@ -291,7 +291,7 @@ slurpy_test(
 
 $Rounded = Int->plus_coercions(Num, sub { int($_) });
 slurpy_test(
-	"slurpy test with inlineable types, but non-inlineable coercion", 
+	"slurpy test with inlineable types, but non-inlineable coercion",
 	foo => $Rounded,
 	bar => Int,
 	baz => Optional[ArrayRef->of($Rounded)],
@@ -300,7 +300,7 @@ slurpy_test(
 
 $Rounded = Int->where(sub { !!1 })->plus_coercions(Num, sub { int($_) });
 slurpy_test(
-	"slurpy test with everything non-inlineable", 
+	"slurpy test with everything non-inlineable",
 	foo => $Rounded,
 	bar => Int->where(sub { !!1 }),
 	baz => Optional[ArrayRef->of($Rounded)],

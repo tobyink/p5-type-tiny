@@ -481,7 +481,7 @@ sub classifier
 		{
 			my @methods = ref($assume) ? @$assume : $assume;
 			
-			for my $method (@methods) 
+			for my $method (@methods)
 			{
 				$r = $self->$method(@_);
 				return $r if $r;
