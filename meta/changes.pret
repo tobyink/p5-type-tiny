@@ -2150,7 +2150,7 @@
 		];
 		item [
 			a dcs:Documentation;
-			label "Updated to Type::Tiny::Manual::UsingWithMoose, Type::Tiny::Manual::UsingWithMoo, and Type::Tiny::Manual::UsingWithMouse.";
+			label "Updates to Type::Tiny::Manual::UsingWithMoose, Type::Tiny::Manual::UsingWithMoo, and Type::Tiny::Manual::UsingWithMouse.";
 		];
 		item "Updated NEWS file."^^Documentation;
 		item "Updated TODO file."^^Documentation;
