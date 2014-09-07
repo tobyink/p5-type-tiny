@@ -476,11 +476,46 @@ sub classifier
 		my $r = $self->SUPER::foreign_lookup(@_);
 		return $r if $r;
 		
-		if (defined($self->{"~~assume"})
+		if (my $assume = $self->{"~~assume"}
 		and $_[0] =~ /[A-Z_a-z][0-9A-Z_a-z]*(?:::[0-9A-Z_a-z]+)*/)
 		{
-			my $method = $self->{"~~assume"};
-			return $self->$method(@_);
+			my @methods = ref($assume) ? @$assume : $assume;
+			
+			for my $method (@methods) 
+			{
+				$r = $self->$method(@_);
+				return $r if $r;
+			}
+		}
+		
+		return;
+	}
+	
+	sub lookup_via_moose
+	{
+		my $self = shift;
+		
+		if ($INC{'Moose.pm'})
+		{
+			require Moose::Util::TypeConstraints;
+			require Types::TypeTiny;
+			my $r = Moose::Util::TypeConstraints::find_type_constraint($_[0]);
+			return Types::TypeTiny::to_TypeTiny($r) if defined $r;
+		}
+		
+		return;
+	}
+	
+	sub lookup_via_mouse
+	{
+		my $self = shift;
+		
+		if ($INC{'Mouse.pm'})
+		{
+			require Mouse::Util::TypeConstraints;
+			require Types::TypeTiny;
+			my $r = Mouse::Util::TypeConstraints::find_type_constraint($_[0]);
+			return Types::TypeTiny::to_TypeTiny($r) if defined $r;
 		}
 		
 		return;
@@ -508,30 +543,6 @@ sub classifier
 		# Only continue any further if we've been called from Type::Parser.
 		return unless $_[1];
 		
-		my $moose_lookup = sub
-		{
-			if ($INC{'Moose.pm'})
-			{
-				require Moose::Util::TypeConstraints;
-				require Types::TypeTiny;
-				$r = Moose::Util::TypeConstraints::find_type_constraint($_[0]);
-				$r = Types::TypeTiny::to_TypeTiny($r) if defined $r;
-			}
-			defined $r;
-		};
-		
-		my $mouse_lookup = sub
-		{
-			if ($INC{'Mouse.pm'})
-			{
-				require Mouse::Util::TypeConstraints;
-				require Types::TypeTiny;
-				$r = Mouse::Util::TypeConstraints::find_type_constraint($_[0]);
-				$r = Types::TypeTiny::to_TypeTiny($r) if defined $r;
-			}
-			defined $r;
-		};
-		
 		my $meta;
 		if (defined $self->{"~~chained"})
 		{
@@ -541,16 +552,14 @@ sub classifier
 		
 		if ($meta and $meta->isa('Class::MOP::Module'))
 		{
-			$moose_lookup->(@_) and return $r;
+			$r = $self->lookup_via_moose(@_);
+			return $r if $r;
 		}
+		
 		elsif ($meta and $meta->isa('Mouse::Meta::Module'))
 		{
-			$mouse_lookup->(@_) and return $r;
-		}
-		else
-		{
-			$moose_lookup->(@_) and return $r;
-			$mouse_lookup->(@_) and return $r;
+			$r = $self->lookup_via_mouse(@_);
+			return $r if $r;
 		}
 		
 		return $self->foreign_lookup(@_);
@@ -569,9 +578,20 @@ sub dwim_type
 	};
 	
 	local $dwimmer->{'~~chained'} = $opts{for};
-	local $dwimmer->{'~~assume'}  = $opts{does} ? 'make_role_type' : 'make_class_type';
+	local $dwimmer->{'~~assume'}  = $opts{fallback} || [
+		qw/ lookup_via_moose lookup_via_mouse /,
+		$opts{does} ? 'make_role_type' : 'make_class_type',
+	];
 	
-	$dwimmer->lookup($string);
+	local $@ = undef;
+	my $type;
+	unless (eval { $type = $dwimmer->lookup($string); 1 })
+	{
+		my $e = $@;
+		die($e) unless $e =~ /not a known type constraint/;
+	}
+	
+	$type;
 }
 
 sub english_list
@@ -978,25 +998,54 @@ object, hopefully doing what you mean.
 
 It uses the syntax of L<Type::Parser>. Firstly the L<Type::Registry>
 for the caller package is consulted; if that doesn't have a match,
-L<Types::Standard> is consulted for type constraint names; and if
-there's still no match, then if a type constraint looks like a class
-name, a new L<Type::Tiny::Class> object is created for it.
+L<Types::Standard> is consulted for standard type constraint names.
 
-Somewhere along the way, it also checks Moose/Mouse's type constraint
-registries if they are loaded.
+If none of the above yields a type constraint, and the caller class
+is a Moose-based class, then C<dwim_type> attempts to look the type
+constraint up in the Moose type registry. If it's a Mouse-based class,
+then the Mouse type registry is used instead.
+
+If no type constraint can be found via these normal methods, several
+fallbacks are available:
+
+=over
+
+=item C<lookup_via_moose>
+
+Lookup in Moose registry even if caller is non-Moose class.
+
+=item C<lookup_via_mouse>
+
+Lookup in Mouse registry even if caller is non-Mouse class.
+
+=item C<make_class_type>
+
+Create a new Type::Tiny::Class constraint.
+
+=item C<make_role_type>
+
+Create a new Type::Tiny::Role constraint.
+
+=back
+
+You can alter which should be attempted, and in which order, by passing
+an option to C<dwim_type>:
+
+   my $type = Type::Utils::dwim_type(
+      "ArrayRef[Int]",
+      fallback      => [ "lookup_via_mouse" , "make_role_type" ],
+   );
+
+For historical reasons, by default the fallbacks attempted are:
+
+   lookup_via_moose, lookup_via_mouse, make_class_type
+
+You may set C<fallback> to an empty arrayref to avoid using any of
+these fallbacks.
 
 You can specify an alternative for the caller using the C<for> option.
-If you'd rather create a L<Type::Tiny::Role> object, set the C<does>
-option to true.
 
-   # An arrayref of objects, each of which must do role Foo.
-   my $type = dwim_type("ArrayRef[Foo]", does => 1);
-   
-   Type::Registry->for_me->add_types("-Standard");
-   Type::Registry->for_me->alias_type("Int" => "Foo");
-   
-   # An arrayref of integers.
-   my $type = dwim_type("ArrayRef[Foo]", does => 1);
+   my $type = dwim_type("ArrayRef", for => "Moose::Object");
 
 While it's probably better overall to use the proper L<Type::Registry>
 interface for resolving type constraint strings, this function often does

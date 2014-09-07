@@ -83,6 +83,9 @@ should_fail([3, 4, 3], $threes);
 	should_pass([bless({}, $testclass)], $fallbackp);
 	should_pass([], $fallbackp);
 	should_fail([bless({}, 'main')], $fallbackp);
+	
+	my $fallbacku = dwim_type("ArrayRef[$testclass]", fallback => []);
+	is($fallbacku, undef);
 }
 
 {
@@ -96,5 +99,7 @@ should_fail([3, 4, 3], $threes);
 	should_pass([], $fallbackp);
 	should_fail([bless({}, 'main')], $fallbackp);
 }
+
+
 
 done_testing;
