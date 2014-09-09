@@ -27,8 +27,8 @@ sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 	sub _subname ($$)
 	{
 		$subname =
-			eval { require Sub::Name } ? \&Sub::Name::subname :
 			eval { require Sub::Util } ? \&Sub::Util::set_subname :
+			eval { require Sub::Name } ? \&Sub::Name::subname :
 			0
 			if not defined $subname;
 		!$already{refaddr($_[1])}++ and return($subname->(@_))

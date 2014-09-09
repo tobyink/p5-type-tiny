@@ -207,8 +207,8 @@ sub new
 	if ($params{my_methods})
 	{
 		$subname =
-			eval { require Sub::Name } ? \&Sub::Name::subname :
 			eval { require Sub::Util } ? \&Sub::Util::set_subname :
+			eval { require Sub::Name } ? \&Sub::Name::subname :
 			0
 			if not defined $subname;
 		if ($subname)
