@@ -2115,44 +2115,20 @@
 		];
 	].
 
-`Type-Tiny 1.001_000 cpan:TOBYINK`
-	issued  2014-09-07;
+`Type-Tiny 1.001_001 cpan:TOBYINK`
+	issued  2014-09-19;
 	changeset [
-		dcs:versus `Type-Tiny 1.000003 cpan:TOBYINK`;
-		item [
-			a dcs:Bugfix;
-			label "Fix issues with coercions and native attribute traits with some oldish versions of Moose on oldish versions of Perl.";
-			dcs:thanks cpan:PJFL;
-			dcs:fixes RT#98159;
-		];
-		item [
-			a dcs:Tests;
-			label "Make some of the test case skip_all bits more ambitious; test older versions of Moose and Moo than we were testing before.";
-		];
-		item [
-			a dcs:Bugfix;
-			label "Fix for Type::Registry::DWIM.";
-			dcs:thanks cpan:SPICEMAN;
-			dcs:fixes RT#98458;
-		];
+		dcs:versus `Type-Tiny 1.001_000 cpan:TOBYINK`;
 		item [
 			a dcs:Update;
-			label "If Sub::Name is unavailable, but the shiny new core Sub::Util is available, then use it instead.";
-		];
-		item [
-			a dcs:Addition;
-			label "Type::Params now provides `compile_named` and `validate_named` functions which do the same thing as `compile` and `validate` but are better for named arguments.";
-			comment "Several people have requested this.";
+			label "Prefer Sub::Util over Sub::Name. (The former is smaller.)";
 		];
 		item [
 			a dcs:Change;
-			label "`Type::Utils::dwim_type` now allows more control over fallback behaviours.";
+			label "Lazy-load Text::Balanced in Type::Parser. (Many parses don't even need it.)";
 		];
 		item [
-			a dcs:Documentation;
-			label "Updates to Type::Tiny::Manual::UsingWithMoose, Type::Tiny::Manual::UsingWithMoo, and Type::Tiny::Manual::UsingWithMouse.";
+			a dcs:Change;
+			label "Lazy-load Type::Tiny::Union in Type::Params.";
 		];
-		item "Updated NEWS file."^^Documentation;
-		item "Updated TODO file."^^Documentation;
-		item "Want Type::Tiny::XS 0.011."^^Update;
 	].

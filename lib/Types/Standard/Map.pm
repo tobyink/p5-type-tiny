@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Types::Standard::Map::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::Map::VERSION   = '1.001_000';
+	$Types::Standard::Map::VERSION   = '1.001_001';
 }
 
 use Type::Tiny ();
