@@ -19,7 +19,6 @@ use Scalar::Util qw(refaddr);
 use Error::TypeTiny;
 use Error::TypeTiny::Assertion;
 use Error::TypeTiny::WrongNumberOfParameters;
-use Type::Tiny::Union;
 use Types::Standard -types;
 use Types::TypeTiny qw(CodeLike ArrayLike to_TypeTiny);
 
@@ -29,13 +28,22 @@ our @ISA = 'Exporter::Tiny';
 our @EXPORT    = qw( compile compile_named );
 our @EXPORT_OK = qw( multisig validate validate_named Invocant );
 
-BEGIN {
-	my $Invocant = 'Type::Tiny::Union'->new(
-		name             => 'Invocant',
-		type_constraints => [Object, ClassName],
-	);
-	sub Invocant () { $Invocant };
-};
+{
+	my $Invocant;
+	sub Invocant () {
+		$Invocant ||= do {
+			require Type::Tiny::Union;
+			require Types::Standard;
+			'Type::Tiny::Union'->new(
+				name             => 'Invocant',
+				type_constraints => [
+					Types::Standard::Object(),
+					Types::Standard::ClassName(),
+				],
+			);
+		};
+	}
+}
 
 sub _mkslurpy
 {
