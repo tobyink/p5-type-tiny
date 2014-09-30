@@ -77,6 +77,7 @@ use overload
 	},
 	q(~)       => sub { shift->complementary_type },
 	q(==)      => sub { $_[0]->equals($_[1]) },
+	q(!=)      => sub { not $_[0]->equals($_[1]) },
 	q(<)       => sub { my $m = $_[0]->can('is_subtype_of'); $m->(_swap @_) },
 	q(>)       => sub { my $m = $_[0]->can('is_subtype_of'); $m->(reverse _swap @_) },
 	q(<=)      => sub { my $m = $_[0]->can('is_a_type_of');  $m->(_swap @_) },

@@ -146,4 +146,14 @@ is(
 	'Union find_type_for (none)',
 );
 
+ok(
+	(FooBar|DoesQuux)==(DoesQuux|FooBar),
+	'Union equals',
+);
+
+ok(
+	(FooBar|DoesQuux)!=(DoesQuux|SmallInteger),
+	'Union not equals',
+);
+
 done_testing;

@@ -187,6 +187,32 @@ sub validate_explain
 	];
 }
 
+sub equals
+{
+	my ($self, $other) = Type::Tiny::_loose_to_TypeTiny(@_);
+	return unless blessed($self)  && $self->isa("Type::Tiny");
+	return unless blessed($other) && $other->isa("Type::Tiny");
+	
+	return !!1 if $self->SUPER::equals($other);
+	return !!0 unless $other->isa(__PACKAGE__);
+	
+	my @self_constraints  = @{ $self->type_constraints };
+	my @other_constraints = @{ $other->type_constraints };
+	
+	return !!0 unless @self_constraints == @other_constraints;
+	
+	constraint: foreach my $constraint ( @self_constraints ) {
+		for ( my $i = 0; $i < @other_constraints; $i++ ) {
+			if ( $constraint->equals($other_constraints[$i]) ) {
+				splice @other_constraints, $i, 1;
+				next constraint;
+			}
+		}
+	}
+	
+	@other_constraints == 0;
+}
+
 1;
 
 __END__
