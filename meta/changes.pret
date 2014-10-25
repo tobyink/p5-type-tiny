@@ -2114,3 +2114,19 @@
 			comment "Backported fix from 1.001_000.";
 		];
 	].
+
+`Type-Tiny 1.000005 cpan:TOBYINK`
+	issued  2014-10-25;
+	changeset [
+		dcs:versus `Type-Tiny 1.000004 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix;
+			label "Fix short-circuiting optimizations for parameterized HashRef, ArrayRef, ScalarRef, and Map type constraints.";
+			dcs:thanks cpan:MARTIMM;
+			dcs:fixes RT#99312;
+		];
+		item [
+			a dcs:Tests;
+			label "Fix annoying warning message in test suite with recent versions of Exporter::Tiny.";
+		];
+	].
