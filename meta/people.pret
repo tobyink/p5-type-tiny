@@ -92,6 +92,9 @@ cpan:DAKKAR
 cpan:SPICEMAN
 	:name "Marcel Montes".
 
+cpan:MARTIMM
+	:name "Marcel Timmerman".
+
 # We bundle some files made by these dudes...
 
 cpan:RJBS
