@@ -28,6 +28,3 @@ Post-1.000000 Changes
   add_type_coercions to succeed?
 
 * to_TypeTiny's _TypeTinyFromGeneric could support inlining?
-
-* Investigate some more method overrides in Type::Tiny::Union - look at
-  what Moose::Meta::TypeConstraint::Union does.
