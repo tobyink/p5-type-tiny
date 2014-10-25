@@ -75,7 +75,7 @@ sub __coercion_generator
 			my @code;
 			push @code, 'do { my ($orig, $return_orig, $new) = ($_, 0);';
 			push @code,    'for ($$orig) {';
-			push @code, sprintf('$return_orig++ && last unless (%s);', $coercable_item->inline_check('$_'));
+			push @code, sprintf('++$return_orig && last unless (%s);', $coercable_item->inline_check('$_'));
 			push @code, sprintf('$new = (%s);', $param->coercion->inline_coercion('$_'));
 			push @code,    '}';
 			push @code,    '$return_orig ? $orig : \\$new';
