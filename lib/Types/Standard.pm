@@ -216,7 +216,7 @@ $meta->$add_core_type({
 	name       => "Int",
 	parent     => $_num,
 	constraint => sub { /\A-?[0-9]+\z/ },
-	inlined    => sub { "defined $_[1] and $_[1] =~ /\\A-?[0-9]+\\z/" },
+	inlined    => sub { "defined($_[1]) and !ref($_[1]) and $_[1] =~ /\\A-?[0-9]+\\z/" },
 });
 
 my $_classn = $meta->add_type({
