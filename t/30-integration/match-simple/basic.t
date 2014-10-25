@@ -28,7 +28,7 @@ use Test::Requires 'match::simple';
 use Test::Fatal;
 
 use Types::Standard -all;
-use match::simple;
+use match::simple { replace => 1 };
 
 ok( 42 |M| Int );
 ok( 42 |M| Num );
