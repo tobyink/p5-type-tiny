@@ -2190,3 +2190,28 @@
 			label "Fix annoying warning message in test suite with recent versions of Exporter::Tiny.";
 		];
 	].
+
+`Type-Tiny 1.001_002 cpan:TOBYINK`
+	issued  2014-10-25;
+	changeset [
+		dcs:versus `Type-Tiny 1.001_001 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix;
+			label "Fix short-circuiting optimizations for parameterized HashRef, ArrayRef, ScalarRef, and Map type constraints.";
+			dcs:thanks cpan:MARTIMM;
+			dcs:fixes RT#99312;
+		];
+		item [
+			a dcs:Tests;
+			label "Fix annoying warning message in test suite with recent versions of Exporter::Tiny.";
+		];
+		item [
+			a dcs:Bugfix;
+			label "Inlined version of Types::Standard::Int should check that the value is not a reference.";
+		];
+		item [
+			a dcs:Change;
+			label "Make equals/is_a_type_of/is_subtype_of/is_supertype_of in Type::Tiny::Union work more like Moose::Meta::TypeConstraint::Union.";
+		];
+	].
+
