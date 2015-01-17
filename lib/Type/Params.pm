@@ -158,7 +158,7 @@ sub compile
 					? $constraint->type_parameter->inline_check($varname)
 					: $constraint->inline_check($varname),
 				$constraint->{uniq},
-				B::perlstring($constraint),
+				B::cstring($constraint),
 				$varname,
 				$is_slurpy ? 'q{$SLURPY}' : sprintf('q{$_[%d]}', $arg),
 			);
@@ -172,7 +172,7 @@ sub compile
 				'%s or Type::Tiny::_failed_check(%d, %s, %s, varname => %s);',
 				sprintf(sprintf '$check[%d]->(%s)', $arg, $varname),
 				$constraint->{uniq},
-				B::perlstring($constraint),
+				B::cstring($constraint),
 				$varname,
 				$is_slurpy ? 'q{$SLURPY}' : sprintf('q{$_[%d]}', $arg),
 			);
