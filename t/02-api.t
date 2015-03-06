@@ -25,6 +25,7 @@ use warnings;
 use Test::More;
 
 my $HAVE_MOOSE = eval { require Moose };
+$HAVE_MOOSE = 0 if $Moose::VERSION < '2.000';
 
 my @MOOSE_WANTS = qw(
 	_actually_compile_type_constraint
