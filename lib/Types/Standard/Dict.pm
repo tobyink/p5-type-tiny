@@ -226,7 +226,7 @@ sub __coercion_generator
 				my $K = B::perlstring($k);
 				
 				push @code, sprintf(
-					'if (exists $orig->{%s}) { $tmp = %s; (%s) ? ($new{%s}=$tmp) : ($return_orig=1 and last %s) }',
+					'if (exists $orig->{%s}) { $tmp = %s; (%s) ? ($new{%s}=$tmp) : (($return_orig=1), last %s) }',
 					$K,
 					$ct_coerce
 						? $ct->coercion->inline_coercion("\$orig->{$K}")

@@ -247,7 +247,7 @@ sub __coercion_generator
 				my $ct_optional = $ct->is_a_type_of(Types::Standard::Optional);
 				
 				push @code, sprintf(
-					'if (@$orig > %d) { $tmp = %s; (%s) ? ($new[%d]=$tmp) : ($return_orig=1 and last %s) }',
+					'if (@$orig > %d) { $tmp = %s; (%s) ? ($new[%d]=$tmp) : (($return_orig=1), last %s) }',
 					$i,
 					$ct_coerce
 						? $ct->coercion->inline_coercion("\$orig->[$i]")
