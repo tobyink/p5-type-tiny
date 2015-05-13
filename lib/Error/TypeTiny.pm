@@ -39,6 +39,7 @@ $CarpInternal{$_}++ for qw(
 	Type::Tiny::Union
 	Type::Utils
 	Method::Generate::Constructor
+	Method::Generate::Accessor
 );
 
 sub new
