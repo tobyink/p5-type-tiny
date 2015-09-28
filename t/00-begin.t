@@ -31,8 +31,8 @@ sub diag_version
 	
 	return diag sprintf('  %-30s    undef', $module) unless defined $version;
 	
-	my ($major, $rest) = split /\./, $version;
-	return diag sprintf('  %-30s % 4d.%s', $module, $major, $rest);
+	my ($major, $rest) = split /\./, $version,2;
+	return diag sprintf('  %-30s % 4s.%s', $module, $major, $rest);
 }
 
 sub diag_env
