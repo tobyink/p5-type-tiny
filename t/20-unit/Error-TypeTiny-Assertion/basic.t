@@ -164,11 +164,13 @@ is_deeply(
 
 TODO: {
 	require Data::Dumper;
+        no warnings qw(numeric);
 	local $TODO =
 		(Data::Dumper->VERSION > 2.145) ? "Data::Dumper output changed after 2.145" :
 		(Data::Dumper->VERSION < 2.121) ? "Data::Dumper too old" :
 		undef;
-	
+	use warnings qw(numeric);
+
 	is_deeply(
 		(exception { (Map[Int,Num])->({1=>1.1,2.2=>2.3,3.3=>3.4}) })->explain,
 		[
@@ -183,9 +185,11 @@ TODO: {
 
 TODO: {
 	require Data::Dumper;
+        no warnings qw(numeric);
 	local $TODO =
 		(Data::Dumper->VERSION < 2.121) ? "Data::Dumper too old" :
 		undef;
+	use warnings qw(numeric);
 	
 	my $Ext   = (StrMatch[qr/^x_/])->create_child_type(name => 'Ext');
 	my $dict2 = Dict[foo => ArrayRef, slurpy Map[$Ext, Int]];
@@ -238,9 +242,11 @@ is_deeply(
 
 TODO: {
 	require Data::Dumper;
+	no warnings qw(numeric);
 	local $TODO =
 		(Data::Dumper->VERSION < 2.121) ? "Data::Dumper too old" :
 		undef;
+	use warnings qw(numeric);
 		
 	my $SlurpyThing = Tuple[ Num, slurpy Map[Str, ArrayRef] ];
 	
