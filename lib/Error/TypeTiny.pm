@@ -60,6 +60,11 @@ sub throw
 		my ($pkg, $func) = ($1 =~ m{^(.+)::(\w+)$});
 		$level++ if caller($level) eq ($pkg||"");
 	}
+        $level++
+            if (
+                caller($level) eq "Method::Generate::Constructor" &&
+                (caller($level))[1] =~ /\(eval \d+\)/
+            );
 	@ctxt{qw/ package file line /} = caller($level);
 	
 	my $stack = undef;
