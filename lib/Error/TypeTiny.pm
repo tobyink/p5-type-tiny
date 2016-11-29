@@ -60,10 +60,13 @@ sub throw
 		my ($pkg, $func) = ($1 =~ m{^(.+)::(\w+)$});
 		$level++ if caller($level) eq ($pkg||"");
 	}
+        # Moo's Method::Generate::Constructor puts an eval in the stack trace,
+        # that is useless for debugging, so show the stack frame one above.
         $level++
             if (
-                caller($level) eq "Method::Generate::Constructor" &&
-                (caller($level))[1] =~ /\(eval \d+\)/
+                (caller($level))[1] =~ /^\(eval \d+\)$/ &&
+                # (caller())[3] is $subroutine
+                (caller($level))[3] eq '(eval)'
             );
 	@ctxt{qw/ package file line /} = caller($level);
 	
