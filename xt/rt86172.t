@@ -22,7 +22,7 @@ Peter Flanigan E<lt>pjfl@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013 by Peter Flanigan.
+This software is copyright (c) 2013, 2017 by Peter Flanigan.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
