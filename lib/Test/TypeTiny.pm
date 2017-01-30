@@ -15,7 +15,7 @@ BEGIN {
 };
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '1.000005';
+our $VERSION   = '1.000006';
 our @EXPORT    = qw( should_pass should_fail ok_subtype );
 our @EXPORT_OK = qw( EXTENDED_TESTING matchfor );
 

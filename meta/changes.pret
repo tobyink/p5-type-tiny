@@ -2130,3 +2130,17 @@
 			label "Fix annoying warning message in test suite with recent versions of Exporter::Tiny.";
 		];
 	].
+
+`Type-Tiny 1.000006 cpan:TOBYINK`
+	issued  2017-01-30;
+	changeset [
+		dcs:versus `Type-Tiny 1.000005 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix;
+			a dcs:Update;
+			a dcs:Tests;
+			label "Fix escaping withing q{...} in a test case.";
+			dcs:thanks cpan:ETHER;
+			dcs:fixes RT#114386;
+		];
+	].

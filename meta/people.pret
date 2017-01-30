@@ -95,6 +95,9 @@ cpan:SPICEMAN
 cpan:MARTIMM
 	:name "Marcel Timmerman".
 
+cpan:ETHER
+	:name  "Karen Etheridge".
+
 # We bundle some files made by these dudes...
 
 cpan:RJBS
