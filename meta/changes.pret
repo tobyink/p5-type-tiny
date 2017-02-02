@@ -2215,3 +2215,26 @@
 		];
 	].
 
+`Type-Tiny 1.000006 cpan:TOBYINK`
+	issued  2017-01-30;
+	changeset [
+		dcs:versus `Type-Tiny 1.000005 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix;
+			a dcs:Update;
+			a dcs:Tests;
+			label "Fix escaping within q{...} in a test case.";
+			dcs:thanks cpan:ETHER;
+			dcs:fixes RT#114386;
+		];
+	].
+
+`Type-Tiny 1.001_003 cpan:TOBYINK`
+	issued  2017-02-02;
+	changeset [
+		dcs:versus `Type-Tiny 1.001_002 cpan:TOBYINK`;
+		item [
+			a dcs:Update;
+			label "Merge fixes from stable Type-Tiny 1.000006.";
+		];
+	].
