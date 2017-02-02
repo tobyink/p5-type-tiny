@@ -28,7 +28,7 @@ the same terms as the Perl 5 programming language system itself.
 use strict;
 use warnings;
 use Test::More 0.96;
-use Test::Requires { 'Moose' => '2.0600' };
+use Test::Requires { 'Moose' => '2.1210' };
 
 use Type::Tiny;
 
