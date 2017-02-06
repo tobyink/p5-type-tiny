@@ -32,6 +32,7 @@ sub diag_version
 	return diag sprintf('  %-30s    undef', $module) unless defined $version;
 	
 	my ($major, $rest) = split /\./, $version;
+	$major =~ s/^v//;
 	return diag sprintf('  %-30s % 4d.%s', $module, $major, $rest);
 }
 

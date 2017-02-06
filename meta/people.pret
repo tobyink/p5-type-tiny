@@ -95,6 +95,10 @@ cpan:SPICEMAN
 cpan:MARTIMM
 	:name "Marcel Timmerman".
 
+cpan:TSIBLEY
+	:page <https://github.com/tsibley>;
+	:name "Thomas Sibley".
+
 # We bundle some files made by these dudes...
 
 cpan:RJBS

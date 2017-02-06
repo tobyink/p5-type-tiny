@@ -2224,7 +2224,7 @@
 			a dcs:Update;
 			a dcs:Tests;
 			label "Fix escaping within q{...} in a test case.";
-			dcs:thanks cpan:ETHER;
+			dcs:blame cpan:ETHER;
 			dcs:fixes RT#114386;
 		];
 	].
@@ -2236,5 +2236,17 @@
 		item [
 			a dcs:Update;
 			label "Merge fixes from stable Type-Tiny 1.000006.";
+		];
+	].
+
+`Type-Tiny 1.001_004 cpan:TOBYINK`
+	issued  2017-02-06;
+	changeset [
+		dcs:versus `Type-Tiny 1.001_003 cpan:TOBYINK`;
+		item [
+			a dcs:Change;
+			label "Attempting ArrayRef[Int, Int] or similar now throws an exception.";
+			dcs:blame cpan:TSIBLEY;
+			dcs:fixes RT#105299;
 		];
 	].
