@@ -25,6 +25,9 @@ sub __constraint_generator
 	Types::TypeTiny::TypeTiny->check($param)
 		or _croak("Parameter to ArrayRef[`a] expected to be a type constraint; got $param");
 	
+	_croak("Only one parameter to ArrayRef[`a] expected; got @{[ 1 + @_ ]}. Did you mean to use Tuple[`a]?")
+		if @_;
+	
 	my $param_compiled_check = $param->compiled_check;
 	my $xsub;
 	if (Type::Tiny::_USE_XS)
