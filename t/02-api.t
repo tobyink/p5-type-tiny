@@ -24,7 +24,10 @@ use strict;
 use warnings;
 use Test::More;
 
-my $HAVE_MOOSE = eval { require Moose };
+my $HAVE_MOOSE = eval {
+	require Moose;
+	Moose->VERSION('2.000');
+};
 
 my @MOOSE_WANTS = qw(
 	_actually_compile_type_constraint
