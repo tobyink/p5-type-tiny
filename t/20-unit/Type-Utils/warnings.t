@@ -29,7 +29,7 @@ use lib qw( ./lib ./t/lib ../inc ./inc );
 
 use Test::More;
 use Test::Requires '5.014';
-use Test::Requires 'Test::Warnings';
+use Test::Requires { 'Test::Warnings' => 0.005 }; #warnings added in this version
 use Test::Warnings qw( :no_end_test warnings );
 
 use Type::Library -base, -declare => qw/WholeNumber/;
