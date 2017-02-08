@@ -1093,14 +1093,14 @@ C<Str>.
 
 =item C<< Tuple[...] >>
 
-Subtype of C<ArrayRef>, accepting an list of type constraints for
+Subtype of C<ArrayRef>, accepting a list of type constraints for
 each slot in the array.
 
 C<< Tuple[Int, HashRef] >> would match C<< [1, {}] >> but not C<< [{}, 1] >>.
 
 =item C<< Dict[...] >>
 
-Subtype of C<HashRef>, accepting an list of type constraints for
+Subtype of C<HashRef>, accepting a list of type constraints for
 each slot in the hash.
 
 For example C<< Dict[name => Str, id => Int] >> allows
