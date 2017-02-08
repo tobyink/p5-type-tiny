@@ -27,6 +27,7 @@ use Test::More;
 my $HAVE_MOOSE = eval {
 	require Moose;
 	Moose->VERSION('2.000');
+	1; # return true
 };
 
 my @MOOSE_WANTS = qw(
