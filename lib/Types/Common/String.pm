@@ -60,7 +60,7 @@ $meta->add_type(
 );
 
 NumericCode->coercion->add_type_coercions(
-	NonEmptySimpleStr, q[ do { (my $code = $_) =~ s/[[:punct:]]//g; $code } ],
+	NonEmptySimpleStr, q[ do { (my $code = $_) =~ s/[[:punct:][:space:]]//g; $code } ],
 );
 
 $meta->add_type(
