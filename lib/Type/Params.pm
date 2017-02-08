@@ -493,7 +493,7 @@ example from the SYNOPSIS could be rewritten as:
  sub deposit_monies
  {
     $deposit_monies_check ||= compile( Str, Str, slurpy ArrayRef[Num] );
-    my ($sort_code, $account_number, $monies) = $check->(@_);
+    my ($sort_code, $account_number, $monies) = $deposit_monies_check->(@_);
     
     ...;
  }
