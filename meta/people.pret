@@ -100,20 +100,25 @@ cpan:TSIBLEY
 	:name "Thomas Sibley".
 
 <urn:uuid:6c7beadd-14b0-489a-940c-57ccd2ec90df>
+	:mbox <mailto:peter@morch.com>;
 	:name "Peter Valdemar Mørch".
 
 <urn:uuid:b57923e3-29ce-4c55-b480-660e3cd2c429>
+	:mbox <mailto:cpan@zoffix.com>;
 	:name "Zoffix Znet".
 
 <urn:uuid:b678e2c5-cd5a-4509-b2ea-aadc8937d16c>
+	:mbox <mailto:dionys@gmail.com>;
 	:page <https://github.com/dionys>;
 	:name "Denis Ibaev".
 
 <urn:uuid:ed3a6a47-b3b7-4dd1-af20-6c1ab58e9228>
+	:mbox <mailto:lucasbuchala@gmail.com>;
 	:page <https://github.com/lucasbuchala>;
 	:name "Lucas Buchala".
 
 <urn:uuid:aae4d20c-4388-4267-9336-f71176b27c75>
+	:mbox <mailto:alexchorny@gmail.com>;
 	:page <https://github.com/chorny>;
 	:name "Alexandr Ciornii".
 
