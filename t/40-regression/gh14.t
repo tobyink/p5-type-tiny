@@ -41,13 +41,13 @@ use Test::Requires { Moo => '1.006' };
 	
 	declare 'BankAccountNo',
 		as Str,
-		where { 
-			/^\d{26}$/                 
-			or /^[A-Z]{2}\d{18,26}$/   
+		where {
+			/^\d{26}$/
+			or /^[A-Z]{2}\d{18,26}$/
 			or /^\d{8}-\d+(-\d+)+$/
 		},
 		message { "Bad account: $_"};
-
+		
 		coerce 'BankAccountNo',
 			from Str, via {
 				$_ =~ s{\s+}{}g;
