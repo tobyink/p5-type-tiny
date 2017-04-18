@@ -36,6 +36,6 @@
    (For example, they are no longer considered to be inlineable.)
  - Better integration between Type::Library and Type::Registry.
 
-2014-XX-XX Type-Tiny version 1.002000 released!
+2017-06-01 Type-Tiny version 1.002000 released!
 
  - Type::Params now has `compile_named` and `validate_named`.

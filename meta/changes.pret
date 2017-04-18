@@ -2295,4 +2295,9 @@
 			seealso <https://github.com/tobyink/p5-type-tiny/pull/21>;
 			dcs:blame <urn:uuid:aae4d20c-4388-4267-9336-f71176b27c75>;
 		];
+		item [
+			a dcs:Documentation;
+			label "Include projected release date for Type::Tiny 1.002000 in NEWS.";
+			comment "It's my birthday!";
+		];
 	].
