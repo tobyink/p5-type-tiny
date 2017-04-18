@@ -2291,7 +2291,7 @@
 		];
 		item [
 			a dcs:Tests, dcs:Bugfix;
-			label "/20-unit/Type-Utils/warnings.t should check version of Test::Warnings.";
+			label "20-unit/Type-Utils/warnings.t should check version of Test::Warnings.";
 			seealso <https://github.com/tobyink/p5-type-tiny/pull/21>;
 			dcs:blame <urn:uuid:aae4d20c-4388-4267-9336-f71176b27c75>;
 		];
