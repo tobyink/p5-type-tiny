@@ -2250,3 +2250,49 @@
 			dcs:fixes RT#105299;
 		];
 	].
+
+`Type-Tiny 1.001_005 cpan:TOBYINK`
+	issued  2017-04-19;
+	changeset [
+		dcs:versus `Type-Tiny 1.001_004 cpan:TOBYINK`;
+		item [
+			a dcs:Tests;
+			label "Bundle a test case for GH issue 14.";
+			seealso <https://github.com/tobyink/p5-type-tiny/issues/14>;
+		];
+		item [
+			a dcs:Change;
+			label "Improved error location reporting for Moo";
+			seealso <https://github.com/tobyink/p5-type-tiny/pull/35>;
+			dcs:blame <urn:uuid:6c7beadd-14b0-489a-940c-57ccd2ec90df>;
+		];
+		item [
+			a dcs:Tests, dcs:Bugfix;
+			label "02-api.t should check version of Moose available.";
+			seealso <https://github.com/tobyink/p5-type-tiny/pull/20>;
+		];
+		item [
+			a dcs:Documentation, dcs:Bugfix;
+			label "Fix minor typos in documentation for Types::Standard.";
+			seealso <https://github.com/tobyink/p5-type-tiny/pull/30>;
+			dcs:blame <urn:uuid:b57923e3-29ce-4c55-b480-660e3cd2c429>;
+		];
+		item [
+			a dcs:Update;
+			label "NumericCode now coerces from strings with whitespace in them, like MooseX::Types::Common::Numeric.";
+			seealso <https://github.com/tobyink/p5-type-tiny/pull/22>;
+			dcs:blame <urn:uuid:b678e2c5-cd5a-4509-b2ea-aadc8937d16c>;
+		];
+		item [
+			a dcs:Documentation, dcs:Bugfix;
+			label "Fix variable name typo in documentation for Type::Params.";
+			seealso <https://github.com/tobyink/p5-type-tiny/pull/37>;
+			dcs:blame <urn:uuid:ed3a6a47-b3b7-4dd1-af20-6c1ab58e9228>;
+		];
+		item [
+			a dcs:Tests, dcs:Bugfix;
+			label "/20-unit/Type-Utils/warnings.t should check version of Test::Warnings.";
+			seealso <https://github.com/tobyink/p5-type-tiny/pull/21>;
+			dcs:blame <urn:uuid:aae4d20c-4388-4267-9336-f71176b27c75>;
+		];
+	].
