@@ -67,30 +67,30 @@ sub add_types
 	my $opts = mkopt(\@_);
 	for my $opt (@$opts)
 	{
-		my ($lib, $types) = @_;
+		my ($library, $types) = @_;
 		
-		$lib =~ s/^-/Types::/;
-		eval "require $lib";
+		$library =~ s/^-/Types::/;
+		eval "require $library";
 		
 		my %hash;
 		
-		if ($lib->isa("Type::Library") or $lib eq 'Types::TypeTiny')
+		if ($library->isa("Type::Library") or $library eq 'Types::TypeTiny')
 		{
 			$types ||= [qw/-types/];
 			ArrayLike->check($types)
-				or _croak("Expected arrayref following '%s'; got %s", $lib, $types);
+				or _croak("Expected arrayref following '%s'; got %s", $library, $types);
 			
-			$lib->import({into => \%hash}, @$types);
+			$library->import({into => \%hash}, @$types);
 			$hash{$_} = &{$hash{$_}}() for keys %hash;
 		}
-		elsif ($lib->isa("MooseX::Types::Base"))
+		elsif ($library->isa("MooseX::Types::Base"))
 		{
 			$types ||= [];
 			ArrayLike->check($types) && (@$types == 0)
-				or _croak("Library '%s' is a MooseX::Types type constraint library. No import options currently supported", $lib);
+				or _croak("Library '%s' is a MooseX::Types type constraint library. No import options currently supported", $library);
 			
 			require Moose::Util::TypeConstraints;
-			my $moosextypes = $lib->type_storage;
+			my $moosextypes = $library->type_storage;
 			for my $name (sort keys %$moosextypes)
 			{
 				my $tt = to_TypeTiny(
@@ -99,14 +99,14 @@ sub add_types
 				$hash{$name} = $tt;
 			}
 		}
-		elsif ($lib->isa("MouseX::Types::Base"))
+		elsif ($library->isa("MouseX::Types::Base"))
 		{
 			$types ||= [];
 			ArrayLike->check($types) && (@$types == 0)
-				or _croak("Library '%s' is a MouseX::Types type constraint library. No import options currently supported", $lib);
+				or _croak("Library '%s' is a MouseX::Types type constraint library. No import options currently supported", $library);
 			
 			require Mouse::Util::TypeConstraints;
-			my $moosextypes = $lib->type_storage;
+			my $moosextypes = $library->type_storage;
 			for my $name (sort keys %$moosextypes)
 			{
 				my $tt = to_TypeTiny(
@@ -117,7 +117,7 @@ sub add_types
 		}
 		else
 		{
-			_croak("%s is not a type library", $lib);
+			_croak("%s is not a type library", $library);
 		}
 		
 		for my $key (sort keys %hash)
