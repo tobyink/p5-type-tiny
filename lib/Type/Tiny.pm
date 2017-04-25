@@ -126,6 +126,23 @@ sub new
 	my $class  = shift;
 	my %params = (@_==1) ? %{$_[0]} : @_;
 	
+	if (exists $params{constraint}
+	and not ref $params{constraint}
+	and not exists $params{constraint_generator}
+	and not exists $params{inline_generator})
+	{
+		my $code = $params{constraint};
+		$params{constraint} = Eval::TypeTiny::eval_closure(
+			source      => sprintf('sub ($) { %s }', $code),
+			description => "anonymous check",
+		);
+		$params{inlined} ||= sub {
+			my ($type) = @_;
+			my $inlined = $_ eq '$_' ? "do { $code }" : "do { local \$_ = $_; $code }";
+			$type->has_parent ? (undef, $inlined) : $inlined;
+		};
+	}
+	
 	if (exists $params{parent})
 	{
 		$params{parent} = ref($params{parent}) =~ /^Type::Tiny\b/
