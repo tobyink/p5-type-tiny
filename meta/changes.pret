@@ -2301,3 +2301,19 @@
 			comment "It's my birthday!";
 		];
 	].
+
+`Type-Tiny 1.001_006 cpan:TOBYINK`
+	issued  2017-04-30;
+	changeset [
+		dcs:versus `Type-Tiny 1.001_005 cpan:TOBYINK`;
+		item [
+			a dcs:Change;
+			label "Localize $SIG{__DIE__} in Type::Registry.";
+			dcs:fixes RT#100780;
+		];
+		item [
+			a dcs:Change;
+			label "Allow Type::Tiny's `constraint` parameter to be a string of Perl code.";
+		];
+	].
+
