@@ -39,3 +39,4 @@
 2017-06-01 Type-Tiny version 1.002000 released!
 
  - Type::Params now has `compile_named` and `validate_named`.
+ - Type::Tiny's `constraint` parameter may be a string of code.
