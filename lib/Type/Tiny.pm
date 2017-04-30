@@ -10,7 +10,7 @@ BEGIN {
 
 BEGIN {
 	$Type::Tiny::AUTHORITY   = 'cpan:TOBYINK';
-	$Type::Tiny::VERSION     = '1.001_006';
+	$Type::Tiny::VERSION     = '1.001_005';
 	$Type::Tiny::XS_VERSION  = '0.011';
 }
 
@@ -1255,9 +1255,12 @@ in reading when dealing with type constraint objects.
 
 =item C<< constraint >>
 
-Coderef to validate a value (C<< $_ >>) against the type constraint. The
-coderef will not be called unless the value is known to pass any parent
-type constraint (see C<parent> below).
+Coderef to validate a value (C<< $_ >>) against the type constraint.
+The coderef will not be called unless the value is known to pass any
+parent type constraint (see C<parent> below).
+
+Alternatively, a string of Perl code checking C<< $_ >> can be passed
+as a parameter to the constructor, and will be converted to a coderef.
 
 Defaults to C<< sub { 1 } >> - i.e. a coderef that passes all values.
 
@@ -1275,6 +1278,7 @@ type. Optional.
 
 If C<constraint> (above) is a coderef generated via L<Sub::Quote>, then
 Type::Tiny I<may> be able to automatically generate C<inlined> for you.
+If C<constraint> (above) is a string, it will be able to.
 
 =item C<< name >>
 
@@ -1501,6 +1505,11 @@ C<< HashRef->where(sub { exists($_->{name}) }) >>. That said, you can
 get a similar result using overloaded C<< & >>:
 
    HashRef & sub { exists($_->{name}) }
+
+Like the C<< constraint >> attribute, this will accept a string of Perl
+code:
+
+   HashRef->where('exists($_->{name})')
 
 =item C<< child_type_class >>
 
