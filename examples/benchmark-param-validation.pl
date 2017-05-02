@@ -4,7 +4,7 @@
 
 =head1 TEST 1: COMPLEX PARAMETER CHECKING
 
-Compares the run-time speed of five parameter validators for validating
+Compares the run-time speed of several parameter validators for validating
 a fairly complex function signature. The function accepts an arrayref,
 followed by an object providing C<print> and C<say> methods, followed
 by an integer less than 90.
@@ -12,6 +12,11 @@ by an integer less than 90.
 The validators tested were:
 
 =over
+
+=item B<Params::ValidationCompiler> (shown as B<< PVC m|s|t >> in the results table)
+
+L<Params::ValidationCompiler> with Moose, Specio, and Type::Tiny type
+constraints.
 
 =item B<Data::Validator> (shown as B<D:V> in results table)
 
@@ -57,25 +62,32 @@ Using the same type constraints as C<< validate() >>
 
 B<< With Type::Tiny::XS: >>
 
-            Rate   [D:V]   [P:V]   [P:C] [T:P v] [T:P c]
- [D:V]   10324/s      --     -8%    -35%    -48%    -81%
- [P:V]   11247/s      9%      --    -29%    -43%    -80%
- [P:C]   15941/s     54%     42%      --    -19%    -71%
- [T:P v] 19685/s     91%     75%     23%      --    -64%
- [T:P c] 55304/s    436%    392%    247%    181%      --
+             Rate  [P:V] [D:V] [P:C] [T:P v] [PVC s] [PVC m] [PVC t] [T:P c]
+ [P:V]    65659/s     --  -14%  -49%    -49%    -57%    -57%    -82%    -83%
+ [D:V]    76554/s    17%    --  -40%    -41%    -50%    -50%    -78%    -80%
+ [P:C]   128061/s    95%   67%    --     -1%    -16%    -16%    -64%    -67%
+ [T:P v] 129505/s    97%   69%    1%      --    -15%    -15%    -64%    -66%
+ [PVC s] 152800/s   133%  100%   19%     18%      --     -0%    -57%    -60%
+ [PVC m] 153111/s   133%  100%   20%     18%      0%      --    -57%    -60%
+ [PVC t] 355400/s   441%  364%  178%    174%    133%    132%      --     -7%
+ [T:P c] 382293/s   482%  399%  199%    195%    150%    150%      8%      --
 
 B<< Without Type::Tiny::XS: >>
 
-            Rate   [P:V]   [D:V]   [P:C] [T:P v] [T:P c]
- [P:V]    9800/s      --     -7%     -8%    -41%    -72%
- [D:V]   10500/s      7%      --     -1%    -37%    -71%
- [P:C]   10609/s      8%      1%      --    -36%    -70%
- [T:P v] 16638/s     70%     58%     57%      --    -53%
- [T:P c] 35628/s    264%    239%    236%    114%      --
+             Rate  [D:V] [P:V] [T:P v] [P:C] [PVC s] [PVC m] [PVC t] [T:P c]
+ [D:V]    40714/s     --  -52%    -59%  -66%    -73%    -79%    -80%    -81%
+ [P:V]    85423/s   110%    --    -15%  -28%    -43%    -56%    -59%    -61%
+ [T:P v] 100161/s   146%   17%      --  -16%    -33%    -49%    -52%    -54%
+ [P:C]   118634/s   191%   39%     18%    --    -21%    -39%    -43%    -46%
+ [PVC s] 150390/s   269%   76%     50%   27%      --    -23%    -28%    -31%
+ [PVC m] 194626/s   378%  128%     94%   64%     29%      --     -7%    -11%
+ [PVC t] 208762/s   413%  144%    108%   76%     39%      7%      --     -4%
+ [T:P c] 217803/s   435%  155%    117%   84%     45%     12%      4%      --
 
-(Tested versions: Data::Validator 1.04 with Mouse 2.3.0,
-Params::Validate 1.10, Params::Check 0.38, and Type::Params 0.045_03
-with Type::Tiny::XS 0.004.)
+(Tested versions: Data::Validator 1.07 with Mouse 2.4.7,
+Params::ValidationCompiler 0.23 with Moose 2.2002 and Specio 0.34
+Params::Validate 1.26, Params::Check 0.38, and Type::Params 1.001_007
+with Type::Tiny::XS 0.012.)
 
 =head1 TEST B: SIMPLE PARAMETER CHECKING
 
@@ -92,16 +104,30 @@ Because no type checks are involved, it doesn't matter whether
 Type::Tiny::XS is available or not. (The results are similar either
 way.)
 
-             Rate   [P:V] [T:P c]
- [P:V]    73643/s      --    -70%
- [T:P c] 241917/s    228%      --
+              Rate   [P:V] [T:P c]
+ [P:V]    300784/s      --    -74%
+ [T:P c] 1155745/s    284%      --
+
+=head1 ANALYSIS
+
+Type::Params (using Type::Tiny type constraints) provides the fastest way of
+checking positional parameters for a function, whether or not Type::Tiny::XS
+is available.
+
+Params::ValidationCompiler (also using Type::Tiny type constraints) is very
+nearly as fast.
+
+Params::ValidationCompiler using other type constraints is also quite fast,
+and when Type::Tiny::XS is not available, Moose and Specio constraints run
+almost as fast as Type::Tiny constraints.
 
 =head1 DEPENDENCIES
 
 To run this script, you will need:
 
 L<Type::Tiny::XS>,
-L<Data::Validator>, L<Params::Check>, L<Params::Validate>.
+L<Data::Validator>, L<Mouse>, L<Params::Check>, L<Params::Validate>,
+L<Params::ValidationCompiler>, L<Specio>, L<Moose>.
 
 =head1 AUTHOR
 
@@ -139,6 +165,18 @@ use Mouse::Util::TypeConstraints ();
 # ... and Params::Check...
 use Params::Check ();
 
+# ... and Params::ValidationCompiler
+use Moose::Util::TypeConstraints ();
+use Specio::Declare ();
+BEGIN {
+	Specio::Helpers::install_t_sub(
+		__PACKAGE__,
+		Specio::Registry::internal_types_for_package(__PACKAGE__)
+	);
+}
+use Specio::Library::Builtins;
+use Params::ValidationCompiler ();
+
 # Define custom type constraints...
 my $PrintAndSay = duck_type PrintAndSay => ["print", "say"];
 my $SmallInt    = declare SmallInt => as Int,
@@ -151,6 +189,14 @@ my $SmallInt2 = Mouse::Util::TypeConstraints::subtype(
 	"SmallInt",
 	Mouse::Util::TypeConstraints::as("Int"),
 	Mouse::Util::TypeConstraints::where(sub { $_ < 90 }),
+);
+
+# ... and Moose...
+my $SmallIntMoose = Moose::Util::TypeConstraints::subtype(
+	"SmallIntMoose",
+	Moose::Util::TypeConstraints::as("Int"),
+	Moose::Util::TypeConstraints::where(sub { $_ < 90 }),
+	Moose::Util::TypeConstraints::inline_as(sub { $_[0]->parent->_inline_check($_[1])." and ${\ $_[1]} < 90" }),
 );
 
 sub TypeParams_validate
@@ -172,6 +218,49 @@ sub ParamsValidate
 		{ type => SCALAR, regex => qr{^\d+$}, callbacks => { 'less than 90' => sub { shift() < 90 } } },
 	];
 	my @in = validate_pos(@_, @$spec);
+}
+
+sub ParamsValidationCompiler_moose
+{
+	state $check = Params::ValidationCompiler::validation_for(
+		params => [
+			{ type => Moose::Util::TypeConstraints::find_type_constraint('ArrayRef') },
+			{ type => Moose::Util::TypeConstraints::duck_type([qw/print say/]) },
+			{ type => $SmallIntMoose },
+		],
+	);
+	my @in = $check->(@_);
+}
+
+sub ParamsValidationCompiler_tt
+{
+	state $check = Params::ValidationCompiler::validation_for(
+		params => [
+			{ type => ArrayRef },
+			{ type => $PrintAndSay },
+			{ type => $SmallInt },
+		],
+	);
+	my @in = $check->(@_);
+}
+
+{
+	my $duck  = Specio::Declare::object_can_type('PrintAndSay', methods => [qw/print say/]);
+	my $smint = Specio::Declare::declare('SmallInt', parent => t('Int'), inline => sub {
+		my ($type, $var) = @_;
+		$type->parent->inline_check($var)." and $var < 90";
+	});	
+	sub ParamsValidationCompiler_specio
+	{
+		state $check = Params::ValidationCompiler::validation_for(
+			params => [
+				{ type => t('ArrayRef') },
+				{ type => $duck },
+				{ type => $smint },
+			],
+		);
+		my @in = $check->(@_);
+	}
 }
 
 sub ParamsCheck
@@ -216,6 +305,9 @@ cmpthese(-3, {
 	'[P:C]'    => q{ ParamsCheck(@::data) },
 	'[T:P v]'  => q{ TypeParams_validate(@::data) },
 	'[T:P c]'  => q{ TypeParams_compile(@::data) },
+	'[PVC m]'  => q{ ParamsValidationCompiler_moose(@::data) },
+	'[PVC t]'  => q{ ParamsValidationCompiler_tt(@::data) },
+	'[PVC s]'  => q{ ParamsValidationCompiler_specio(@::data) },
 });
 
 # Now we'll just do a simple check of argument count; not checking any types!
