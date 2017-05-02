@@ -68,8 +68,7 @@ sub _mkslurpy
 sub compile
 {
 	my (@code, %env);
-	@code = 'my (@R, %tmp, $tmp);';
-	push @code, '#placeholder';   # $code[1]
+	push @code, '#placeholder', '#placeholder';  # @code[0,1]
 	
 	my %options    = (ref($_[0]) eq "HASH" && !$_[0]{slurpy}) ? %{+shift} : ();
 	my $arg        = -1;
@@ -78,6 +77,23 @@ sub compile
 	my $max_args   = 0;
 	my $saw_opt    = 0;
 	
+	my $return_default_list = !!1;
+	$code[0] = 'my (%tmp, $tmp);';
+	PARAM: for my $param (@_) {
+		if (HashRef->check($param)) {
+			$code[0] = 'my (@R, %tmp, $tmp);';
+			$return_default_list = !!0;
+			last PARAM;
+		}
+		elsif (not Bool->check($param)) {
+			if ($param->has_coercion) {
+				$code[0] = 'my (@R, %tmp, $tmp);';
+				$return_default_list = !!0;
+				last PARAM;
+			}
+		}
+	}
+		
 	while (@_)
 	{
 		++$arg;
@@ -94,7 +110,10 @@ sub compile
 		
 		if (HashRef->check($constraint))
 		{
-			$constraint = to_TypeTiny($constraint->{slurpy});
+			$constraint = to_TypeTiny(
+				$constraint->{slurpy}
+					or Error::TypeTiny::croak("Slurpy parameter malformed")
+			);
 			push @code,
 				$constraint->is_a_type_of(Dict)     ? _mkslurpy('$_', '%', $constraint => $arg) :
 				$constraint->is_a_type_of(Map)      ? _mkslurpy('$_', '%', $constraint => $arg) :
@@ -115,7 +134,11 @@ sub compile
 			
 			if ($is_optional)
 			{
-				push @code, sprintf 'return @R if $#_ < %d;', $arg;
+				push @code, sprintf(
+					'return %s if $#_ < %d;',
+					$return_default_list ? '@_' : '@R',
+					$arg,
+				);
 				$saw_opt++;
 				$max_args++;
 			}
@@ -178,7 +201,9 @@ sub compile
 			);
 		}
 		
-		push @code, sprintf 'push @R, %s;', $varname;
+		unless ($return_default_list) {
+			push @code, sprintf 'push @R, %s;', $varname;
+		}
 	}
 	
 	if ($min_args == $max_args and not $saw_slurpy)
@@ -209,7 +234,12 @@ sub compile
 		);
 	}
 	
-	push @code, '@R;';
+	if ($return_default_list) {
+		push @code, '@_;';
+	}
+	else {
+		push @code, '@R;';
+	}
 	
 	my $source  = "sub { no warnings; ".join("\n", @code)." };";
 	
