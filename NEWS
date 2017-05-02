@@ -23,3 +23,6 @@
 
  - Type::Params now has `compile_named` and `validate_named`.
  - Type::Tiny's `constraint` parameter may be a string of code.
+ - Fixed bug where Types::Standard::Int would *sometimes* accept
+   an overloaded object. (It never should.)
+ - Various performance enhancements and bug fixes.
