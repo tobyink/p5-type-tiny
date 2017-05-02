@@ -694,10 +694,11 @@ $meta->add_type({
 		require B;
 		my ($regexp, $checker) = @_;
 		my $regexp_string = "$regexp";
-		$_StrMatch{$regexp_string} = $regexp;
 		if ($checker)
 		{
 			return unless $checker->can_be_inlined;
+			
+			$_StrMatch{$regexp_string} = $regexp;
 			return sub
 			{
 				my $v = $_[1];
@@ -710,6 +711,17 @@ $meta->add_type({
 		}
 		else
 		{
+			if ($regexp_string =~ /\A\(\?\^u?:(\.+)\)\z/) {
+				my $length = length $1;
+				return sub { "!ref($_) and length($_)>=$length" };
+			}
+			
+			if ($regexp_string =~ /\A\(\?\^u?:\\A(\.+)\\z\)\z/) {
+				my $length = length $1;
+				return sub { "!ref($_) and length($_)==$length" };
+			}
+			
+			$_StrMatch{$regexp_string} = $regexp;
 			return sub
 			{
 				my $v = $_[1];
@@ -1262,6 +1274,10 @@ You can optionally provide a type constraint for the array of subexpressions:
             enum(DistanceUnit => [qw/ mm cm m km /]),
          ],
       ];
+
+On certain versions of Perl, type constraints of the forms
+C<< StrMatch[qr/../ >> and C<< StrMatch[qr/\A..\z/ >> with any number
+of intervening dots can be optimized to simple length checks.
 
 =item C<< Enum[`a] >>
 
