@@ -698,7 +698,7 @@ You can use C<compile_named> to accept a hash of named parameters
 Prior to Type::Tiny 1.002000, the recommendation was to use a slurpy
 C<Dict>. This still works, though the error messages you get might not
 be quite so nice, and you don't get the automatic detection of hash
-versus hashref in the input C<< @_ >>.
+versus hashref in the input C<< @_ >>. Oh, and it's usually slower.
 
    use Type::Params qw(compile);
    use Types::Standard qw( slurpy Dict Ref Optional Int );
