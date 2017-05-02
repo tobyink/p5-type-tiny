@@ -1163,7 +1163,13 @@ hashref and validated:
 
 In either C<Tuple> or C<Dict>, C<< slurpy Any >> can be used to indicate
 that additional values are acceptable, but should not be constrained in
-any way. (C<< slurpy Any >> is an optimized code path.)
+any way. 
+
+C<< slurpy Any >> is an optimized code path. Although the following are
+essentially equivalent checks, the former should run a lot faster:
+
+   Tuple[Int, slurpy Any]
+   Tuple[Int, slurpy ArrayRef]
 
 =begin trustme
 

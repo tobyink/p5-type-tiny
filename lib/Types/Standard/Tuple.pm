@@ -142,21 +142,31 @@ sub __inline_generator
 		my $v = $_[1];
 		join " and ",
 			"ref($v) eq 'ARRAY'",
-			"scalar(\@{$v}) >= $min",
 			(
-				$slurpy_any
-					? ()
+				(scalar @constraints == $min and not $slurpy)
+					? "\@{$v} == $min"
 					: (
-						$slurpy
-							? sprintf($tmpl, $v, $#constraints+1, $v, $slurpy->inline_check('$tmp'))
-							: sprintf("\@{$v} <= %d", scalar @constraints)
+							"\@{$v} >= $min",
+							(
+								$slurpy_any
+									? ()
+									: (
+										$slurpy
+											? sprintf($tmpl, $v, $#constraints+1, $v, $slurpy->inline_check('$tmp'))
+											: sprintf("\@{$v} <= %d", scalar @constraints)
+									)
+							),
 					)
 			),
 			map {
 				my $inline = $constraints[$_]->inline_check("$v\->[$_]");
-				$is_optional[$_]
-					? sprintf('(@{%s} <= %d or %s)', $v, $_, $inline)
-					: $inline;
+				$inline eq '(!!1)'
+					? ()
+					: (
+						$is_optional[$_]
+							? sprintf('(@{%s} <= %d or %s)', $v, $_, $inline)
+							: $inline
+					);
 			} 0 .. $#constraints;
 	};
 }
