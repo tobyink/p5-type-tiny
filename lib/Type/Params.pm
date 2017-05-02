@@ -617,8 +617,9 @@ Of course, some people like to use C<shift> for the invocant:
 
    sub dump
    {
-      state $check = compile( Int );
       my $self = shift;
+      
+      state $check = compile( Int );
       my ($limit) = $check->(@_);
       
       local $Data::Dumper::Maxdepth = $limit;
@@ -663,11 +664,13 @@ will die if an odd number of elements are slurped in.
 A check may only have one slurpy parameter, and it must be the last
 parameter.
 
+Having a slurpy parameter will slightly slow down your checks.
+
 =head2 Named Parameters
 
 You can use C<compile_named> to accept a hash of named parameters
 
-   use Type::Params qw(compile);
+   use Type::Params qw(compile_named);
    use Types::Standard qw( slurpy Dict Ref Optional Int );
    
    sub dump
@@ -729,6 +732,8 @@ For this, you can still use the C<< slurpy Dict >> hack...
          ],
       );
       my ($string, $arg) = $check->(@_);
+      
+      ...;
    }
    
    my_print("Hello World", colour => "blue");
@@ -785,6 +790,8 @@ Or maybe add an extra coercion:
 Note that the coercion is specified as a string of Perl code. This is usually
 the fastest way to do it, but a coderef is also accepted. Either way, the
 value to be coerced is C<< $_ >>.
+
+Having any coercions will slightly slow down your checks.
 
 =head2 Alternatives
 
