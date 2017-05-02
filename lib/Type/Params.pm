@@ -865,6 +865,32 @@ a full example:
    get_from('foo', \%hash);   # returns $hash{foo}
    get_from('foo', $obj);     # returns $obj->foo
 
+=head2 Defaults
+
+Type::Params does not currently offer a built-in way to set defaults
+for a parameter. Setting defaults manually is not especially difficult.
+
+   sub print_coloured {
+      state $check = compile( Str, Optional[Str] );
+      
+      my ($text, $colour) = $check->(@_);
+      $colour //= "black";
+      
+      ...;
+   }
+
+I occasionally get requests for this to work:
+
+   sub print_coloured {
+      state $check = compile( Str, Default[Str, "black"] );
+      
+      my ($text, $colour) = $check->(@_);
+      
+      ...;
+   }
+
+But honestly, I don't find that any clearer.
+
 =head1 COMPARISON WITH PARAMS::VALIDATE
 
 L<Type::Params> is not really a drop-in replacement for L<Params::Validate>;
@@ -913,6 +939,47 @@ integers.
 
 Whatsmore, Type::Params doesn't just work with Types::Standard, but also
 any other Type::Tiny type constraints.
+
+=back
+
+=head1 COMPARISON WITH PARAMS::VALIDATIONCOMPILER
+
+L<Params::ValidationCompiler> does basically the same thing as
+L<Type::Params>.
+
+=over
+
+=item *
+
+Params::ValidationCompiler and Type::Params are likely to perform fairly
+similarly. In most cases, recent versions of Type::Params seem to be
+I<slightly> faster, but except in very trivial cases, you're unlikely to
+notice the speed difference. Speed probably shouldn't be a factor when
+choosing between them.
+
+=item *
+
+Type::Params's syntax is more compact:
+
+   state $check = compile(Object, Optional[Int], slurpy ArrayRef);
+
+Versus:
+
+   state $check = validation_for(
+      params => [
+         { type => Object },
+         { type => Int,      optional => 1 },
+         { type => ArrayRef, slurpy => 1 },
+      ],
+   );
+
+=item *
+
+L<Params::ValidationCompiler> offers defaults.
+
+=item *
+
+L<Params::ValidationCompiler> probably has slightly better exceptions.
 
 =back
 
