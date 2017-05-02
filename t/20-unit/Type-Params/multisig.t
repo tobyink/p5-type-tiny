@@ -45,10 +45,22 @@ is_deeply(
 	'first choice in multi, no coercion, should pass',
 );
 
+is(
+	${^TYPE_PARAMS_MULTISIG},
+	0,
+	'...${^TYPE_PARAMS_MULTISIG}',
+);
+
 is_deeply(
 	[ $sig->( 1, [2.2,3.3,4.4] ) ],
 	[ 1, [2,3,4] ],
 	'first choice in multi, coercion, should pass',
+);
+
+is(
+	${^TYPE_PARAMS_MULTISIG},
+	0,
+	'...${^TYPE_PARAMS_MULTISIG}',
 );
 
 like(
@@ -63,10 +75,22 @@ is_deeply(
 	'second choice in multi, no coercion, should pass',
 );
 
+is(
+	${^TYPE_PARAMS_MULTISIG},
+	1,
+	'...${^TYPE_PARAMS_MULTISIG}',
+);
+
 is_deeply(
 	[ $sig->( [2.2,3.3,4.4], 1 ) ],
 	[ [2,3,4], 1 ],
 	'second choice in multi, coercion, should pass',
+);
+
+is(
+	${^TYPE_PARAMS_MULTISIG},
+	1,
+	'...${^TYPE_PARAMS_MULTISIG}',
 );
 
 like(
@@ -79,6 +103,12 @@ is_deeply(
 	[ $sig->( { a => 1.1, b => 7 } ) ],
 	[ { a => 1.1, b => 7 } ],
 	'third choice in multi, no coercion, should pass',
+);
+
+is(
+	${^TYPE_PARAMS_MULTISIG},
+	2,
+	'...${^TYPE_PARAMS_MULTISIG}',
 );
 
 like(

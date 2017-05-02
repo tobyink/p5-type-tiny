@@ -433,12 +433,17 @@ sub multisig
 	
 	for my $i (0 .. $#multi)
 	{
-		my $sig = $multi[$i];
+		my $flag = sprintf('${^TYPE_PARAMS_MULTISIG} = %d', $i);
+		my $sig  = $multi[$i];
 		my @cond;
 		push @cond, sprintf('@_ >= %s', $sig->{min_args}) if defined $sig->{min_args};
 		push @cond, sprintf('@_ <= %s', $sig->{max_args}) if defined $sig->{max_args};
+		if (defined $sig->{max_args} and defined $sig->{min_args}) {
+			@cond = sprintf('@_ == %s', $sig->{min_args})
+				if $sig->{max_args} == $sig->{min_args};
+		}
 		push @code, sprintf('if (%s){', join(' and ', @cond)) if @cond;
-		push @code, sprintf('eval { $r = [ $multi[%d]{closure}->(@_) ] };', $i);
+		push @code, sprintf('eval { $r = [ $multi[%d]{closure}->(@_) ]; %s };', $i, $flag);
 		push @code, 'return(@$r) if $r;';
 		push @code, '}' if @cond;
 	}
@@ -812,8 +817,8 @@ alternative signatures into one, and uses the first one that works:
 
 Coercions, slurpy parameters, etc still work.
 
-There's currently no indication of which of the multiple signatures
-succeeded.
+The magic global C<< ${^TYPE_PARAMS_MULTISIG} >> is set to the index of
+the first signature which succeeded.
 
 The present implementation involves compiling each signature independently,
 and trying them each (in their given order!) in an C<eval> block. The only
@@ -846,12 +851,14 @@ a full example:
             return ($meth, $obj);
          },
       );
+      
       my ($needle, $haystack) = $check->(@_);
       
-      is_HashRef($haystack)  ? $haystack->{$needle} :
-      is_ArrayRef($haystack) ? $haystack->[$needle] :
-      is_Object($haystack)   ? $haystack->$needle   :
-      die;
+      for (${^TYPE_PARAMS_MULTISIG) {
+         return $haystack->[$needle] if $_ == 0;
+         return $haystack->{$needle} if $_ == 1;
+         return $haystack->$needle   if $_ == 2;
+      }
    }
    
    get_from(0, \@array);      # returns $array[0]
