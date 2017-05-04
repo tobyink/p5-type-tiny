@@ -2317,3 +2317,30 @@
 		];
 	].
 
+`Type-Tiny 1.001_007 cpan:TOBYINK`
+	issued  2017-05-04;
+	label   "May the fourth be with you";
+	changeset [
+		dcs:versus `Type-Tiny 1.001_006 cpan:TOBYINK`;
+		item [
+			a dcs:Change;
+			label "Optimizations for Tuple and StrMatch type constraints from Types::Standard.";
+		];
+		item [
+			a dcs:Change;
+			label "Optimization of Type::Params positional parameter checking for simple cases with no slurpy parameter and no coercions.";
+		];
+		item [
+			a dcs:Addition;
+			label "Type::Params' `multisig` function now sets a variable `${^TYPE_PARAMS_MULTISIG}` to indicate which signature succeeded.";
+		];
+		item [
+			a dcs:Documentation;
+			label "Comparison of Type::Params with new(ish) CPAN module Params::ValidationCompiler.";
+		];
+		item [
+			a dcs:Documentation;
+			label "Show example of how to set defaults for parameters with Type::Params.";
+		];
+	].
+
