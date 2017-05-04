@@ -146,16 +146,16 @@ sub __inline_generator
 				(scalar @constraints == $min and not $slurpy)
 					? "\@{$v} == $min"
 					: (
-							"\@{$v} >= $min",
-							(
-								$slurpy_any
-									? ()
-									: (
-										$slurpy
-											? sprintf($tmpl, $v, $#constraints+1, $v, $slurpy->inline_check('$tmp'))
-											: sprintf("\@{$v} <= %d", scalar @constraints)
-									)
-							),
+						"\@{$v} >= $min",
+						(
+							$slurpy_any
+								? ()
+								: (
+									$slurpy
+										? sprintf($tmpl, $v, $#constraints+1, $v, $slurpy->inline_check('$tmp'))
+										: sprintf("\@{$v} <= %d", scalar @constraints)
+								)
+						),
 					)
 			),
 			map {
