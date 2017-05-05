@@ -70,8 +70,10 @@ sub add_types
 		my ($library, $types) = @_;
 		$library =~ s/^-/Types::/;
 		
-		local $SIG{__DIE__} = sub {};
-		eval "require $library";
+		{
+			local $SIG{__DIE__} = sub {};
+			eval "require $library";
+		};
 		
 		my %hash;
 		
@@ -186,8 +188,10 @@ sub foreign_lookup
 	my $library  = $1;
 	my $typename = $2;
 	
-	local $SIG{__DIE__} = sub {};
-	eval "require $library;";
+	{
+		local $SIG{__DIE__} = sub {};
+		eval "require $library;";
+	};
 	
 	if ( $library->isa('MooseX::Types::Base') )
 	{
