@@ -38,15 +38,31 @@ f`TODO.mm`
 	dc:license <http://dev.perl.org/licenses/>;
 	dc:rightsHolder cpan:TOBYINK.
 
-f`examples/benchmark-mkopt.pl`
+f`examples/benchmarking/benchmark-coercion.pl`
 	dc:license <http://dev.perl.org/licenses/>;
 	dc:rightsHolder cpan:TOBYINK.
 
-f`examples/benchmark-param-validation.pl`
+f`examples/benchmarking/benchmark-constraints.pl`
+	dc:license <http://dev.perl.org/licenses/>;
+	dc:rightsHolder cpan:TOBYINK.
+
+f`examples/benchmarking/benchmark-param-validation.pl`
+	dc:license <http://dev.perl.org/licenses/>;
+	dc:rightsHolder cpan:TOBYINK.
+
+f`examples/benchmarking/benchmark-named-param-validation.pl`
+	dc:license <http://dev.perl.org/licenses/>;
+	dc:rightsHolder cpan:TOBYINK.
+
+f`examples/benchmarking/versus-scalar-validation.pl`
 	dc:license <http://dev.perl.org/licenses/>;
 	dc:rightsHolder cpan:TOBYINK.
 
 f`examples/nonempty.pl`
+	dc:license <http://dev.perl.org/licenses/>;
+	dc:rightsHolder cpan:TOBYINK.
+
+f`examples/datetime-coercions.pl`
 	dc:license <http://dev.perl.org/licenses/>;
 	dc:rightsHolder cpan:TOBYINK.
 
