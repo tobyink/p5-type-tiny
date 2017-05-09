@@ -25,12 +25,15 @@ use lib qw( ./lib ./t/lib ../inc ./inc );
 
 use Test::More;
 use Test::TypeTiny;
+use Test::Fatal qw(exception);
 
-use Types::Standard qw( CycleTuple Int HashRef ArrayRef );
+use Types::Standard qw( CycleTuple Int HashRef ArrayRef Any Optional slurpy );
 use Type::Utils qw( class_type );
 
-my $type = CycleTuple[Int, HashRef, ArrayRef]
+my $type = CycleTuple[Int, HashRef, ArrayRef];
 
+should_fail(undef, $type);
+should_fail({}, $type);
 should_pass([], $type);
 should_fail([{}], $type);
 should_fail([1], $type);
@@ -38,6 +41,24 @@ should_fail([1,{}], $type);
 should_pass([1,{}, []], $type);
 should_fail([1,{}, [], undef], $type);
 should_fail([1,{}, [], 2], $type);
-should_pass([1,{}, [], 2, {}, []], $type);
+should_pass([1,{}, [], 2, {}, [1]], $type);
+
+#diag $type->inline_check('$THING');
+#diag CycleTuple->of(Any, Any)->inline_check('$BLAH');
+
+like(
+	exception { CycleTuple[Any, Optional[Any]] },
+	qr/cannot be optional/i,
+	'cannot make CycleTuples with optional slots',
+);
+
+like(
+	exception { CycleTuple[Any, slurpy ArrayRef] },
+	qr/cannot be slurpy/i,
+	'cannot make CycleTuples with slurpy slots',
+);
+
+# should probably write a test case for this.
+#diag exception { $type->assert_return([1,{},[],[],[],[]]) };
 
 done_testing;
