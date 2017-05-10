@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Types::Standard::Dict::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::Dict::VERSION   = '1.001_007';
+	$Types::Standard::Dict::VERSION   = '1.001_008';
 }
 
 use Types::Standard ();

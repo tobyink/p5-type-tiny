@@ -2344,3 +2344,26 @@
 		];
 	].
 
+`Type-Tiny 1.001_008 cpan:TOBYINK`
+	issued  2017-05-10;
+	changeset [
+		dcs:versus `Type-Tiny 1.001_007 cpan:TOBYINK`;
+		item [
+			a dcs:Documentation;
+			label "Rearrange the examples directory in the distribution.";
+		];
+		item [
+			a dcs:Addition;
+			label "Named parameter validation benchmarking script.";
+		];
+		item [
+			a dcs:Addition;
+			label "Reduce scope of local $SIG{__DIE__} in Type::Registry";
+			dcs:thanks cpan:HAARG;
+		];
+		item [
+			a dcs:Bugfix;
+			label "Type::Params should make sure Type::Utils is loaded before calling english_list().";
+		];
+	].
+
