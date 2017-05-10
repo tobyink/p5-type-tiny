@@ -28,6 +28,11 @@ our @ISA = 'Exporter::Tiny';
 our @EXPORT    = qw( compile compile_named );
 our @EXPORT_OK = qw( multisig validate validate_named Invocant );
 
+sub english_list {
+	require Type::Utils;
+	goto \&Type::Utils::english_list;
+}
+
 {
 	my $Invocant;
 	sub Invocant () {
@@ -373,7 +378,7 @@ sub compile_named
 	}
 	
 	if (!$had_slurpy) {
-		push @code, 'keys(%in) and "Error::TypeTiny"->throw(message => sprintf "Unrecognized parameter%s: %s", keys(%in)>1?"s":"", Type::Utils::english_list(sort keys %in));'
+		push @code, 'keys(%in) and "Error::TypeTiny"->throw(message => sprintf "Unrecognized parameter%s: %s", keys(%in)>1?"s":"", Type::Params::english_list(sort keys %in));'
 	}
 	
 	push @code, '\\%R;';
