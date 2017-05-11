@@ -39,6 +39,12 @@ BEGIN {
 		};
 };
 
+#my $HAS_RUXS = eval {
+#	require Ref::Util::XS;
+#	Ref::Util::XS::->VERSION(0.100);
+#	1;
+#};
+
 my $add_core_type = sub {
 	my $meta = shift;
 	my ($typedef) = @_;
