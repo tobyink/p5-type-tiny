@@ -80,7 +80,8 @@ sub __inline_generator
 	my $v_check = $v->inline_check('$v');
 	return sub {
 		my $h = $_[1];
-		"ref($h) eq 'HASH' and do { "
+		my $p = Types::Standard::HashRef->inline_check($h);
+		"$p and do { "
 		.  "my \$ok = 1; "
 		.  "for my \$v (values \%{$h}) { "
 		.    "(\$ok = 0, last) unless $v_check "

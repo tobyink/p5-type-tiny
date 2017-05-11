@@ -141,7 +141,7 @@ sub __inline_generator
 	{
 		my $v = $_[1];
 		join " and ",
-			"ref($v) eq 'ARRAY'",
+			Types::Standard::ArrayRef->inline_check($v),
 			(
 				(scalar @constraints == $min and not $slurpy)
 					? "\@{$v} == $min"

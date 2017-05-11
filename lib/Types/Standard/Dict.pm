@@ -93,7 +93,7 @@ sub __inline_generator
 		require B;
 		my $h = $_[1];
 		join " and ",
-			"ref($h) eq 'HASH'",
+			Types::Standard::HashRef->inline_check($h),
 			( $slurpy_is_any ? ()
 			: $slurpy_is_map ? do {
 				'(not grep {'

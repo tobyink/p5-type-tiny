@@ -67,7 +67,8 @@ sub __inline_generator
 	my $param_check = $param->inline_check('$i');
 	return sub {
 		my $v = $_[1];
-		"ref($v) eq 'HASH' and do { "
+		my $p = Types::Standard::HashRef->inline_check($v);
+		"$p and do { "
 		.  "my \$ok = 1; "
 		.  "for my \$i (values \%{$v}) { "
 		.    "(\$ok = 0, last) unless $param_check "

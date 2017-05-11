@@ -39,11 +39,11 @@ BEGIN {
 		};
 };
 
-#my $HAS_RUXS = eval {
-#	require Ref::Util::XS;
-#	Ref::Util::XS::->VERSION(0.100);
-#	1;
-#};
+my $HAS_RUXS = eval {
+	require Ref::Util::XS;
+	Ref::Util::XS::->VERSION(0.100);
+	1;
+};
 
 my $add_core_type = sub {
 	my $meta = shift;
@@ -282,7 +282,9 @@ $meta->$add_core_type({
 	name       => "CodeRef",
 	parent     => $_ref,
 	constraint => sub { ref $_ eq "CODE" },
-	inlined    => sub { "ref($_[1]) eq 'CODE'" },
+	inlined    => $HAS_RUXS
+		? sub { "Ref::Util::XS::is_plain_coderef($_[1])" }
+		: sub { "ref($_[1]) eq 'CODE'" },
 });
 
 $meta->$add_core_type({
@@ -296,7 +298,9 @@ $meta->$add_core_type({
 	name       => "GlobRef",
 	parent     => $_ref,
 	constraint => sub { ref $_ eq "GLOB" },
-	inlined    => sub { "ref($_[1]) eq 'GLOB'" },
+	inlined    => $HAS_RUXS
+		? sub { "Ref::Util::XS::is_plain_globref($_[1])" }
+		: sub { "ref($_[1]) eq 'GLOB'" },
 });
 
 $meta->$add_core_type({
@@ -316,7 +320,9 @@ my $_arr = $meta->$add_core_type({
 	name       => "ArrayRef",
 	parent     => $_ref,
 	constraint => sub { ref $_ eq "ARRAY" },
-	inlined    => sub { "ref($_[1]) eq 'ARRAY'" },
+	inlined    => $HAS_RUXS
+		? sub { "Ref::Util::XS::is_plain_arrayref($_[1])" }
+		: sub { "ref($_[1]) eq 'ARRAY'" },
 	constraint_generator => LazyLoad(ArrayRef => 'constraint_generator'),
 	inline_generator     => LazyLoad(ArrayRef => 'inline_generator'),
 	deep_explanation     => LazyLoad(ArrayRef => 'deep_explanation'),
@@ -327,7 +333,9 @@ my $_hash = $meta->$add_core_type({
 	name       => "HashRef",
 	parent     => $_ref,
 	constraint => sub { ref $_ eq "HASH" },
-	inlined    => sub { "ref($_[1]) eq 'HASH'" },
+	inlined    => $HAS_RUXS
+		? sub { "Ref::Util::XS::is_plain_hashref($_[1])" }
+		: sub { "ref($_[1]) eq 'HASH'" },
 	constraint_generator => LazyLoad(HashRef => 'constraint_generator'),
 	inline_generator     => LazyLoad(HashRef => 'inline_generator'),
 	deep_explanation     => LazyLoad(HashRef => 'deep_explanation'),
@@ -367,7 +375,9 @@ my $_obj = $meta->$add_core_type({
 	name       => "Object",
 	parent     => $_ref,
 	constraint => sub { blessed $_ },
-	inlined    => sub { "Scalar::Util::blessed($_[1])" },
+	inlined    => $HAS_RUXS
+		? sub { "Ref::Util::XS::is_blessed_ref($_[1])" }
+		: sub { "Scalar::Util::blessed($_[1])" },
 });
 
 $meta->$add_core_type({

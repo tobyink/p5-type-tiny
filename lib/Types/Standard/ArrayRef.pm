@@ -70,7 +70,8 @@ sub __inline_generator
 	my $param_check = $param->inline_check('$i');
 	return sub {
 		my $v = $_[1];
-		"ref($v) eq 'ARRAY' and do { "
+		my $p = Types::Standard::ArrayRef->inline_check($v);
+		"$p and do { "
 		.  "my \$ok = 1; "
 		.  "for my \$i (\@{$v}) { "
 		.    "(\$ok = 0, last) unless $param_check "
