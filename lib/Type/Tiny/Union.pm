@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Tiny::Union::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::Union::VERSION   = '1.001_008';
+	$Type::Tiny::Union::VERSION   = '1.001_009';
 }
 
 use Scalar::Util qw< blessed >;

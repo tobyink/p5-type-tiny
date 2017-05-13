@@ -2358,12 +2358,22 @@
 		];
 		item [
 			a dcs:Addition;
-			label "Reduce scope of local $SIG{__DIE__} in Type::Registry";
+			label "Reduce scope of local $SIG{__DIE__} in Type::Registry.";
 			dcs:thanks cpan:HAARG;
 		];
 		item [
 			a dcs:Bugfix;
 			label "Type::Params should make sure Type::Utils is loaded before calling english_list().";
+		];
+	].
+
+`Type-Tiny 1.001_009 cpan:TOBYINK`
+	issued  2017-05-13;
+	changeset [
+		dcs:versus `Type-Tiny 1.001_008 cpan:TOBYINK`;
+		item [
+			a dcs:Change;
+			label "Use Ref::Util::XS (if it's installed) to speed up certain type checks.";
 		];
 	].
 

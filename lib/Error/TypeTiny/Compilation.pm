@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Error::TypeTiny::Compilation::AUTHORITY = 'cpan:TOBYINK';
-	$Error::TypeTiny::Compilation::VERSION   = '1.001_008';
+	$Error::TypeTiny::Compilation::VERSION   = '1.001_009';
 }
 
 require Error::TypeTiny;
