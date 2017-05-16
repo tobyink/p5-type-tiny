@@ -27,6 +27,15 @@ use Test::More;
 sub diag_version
 {
 	my ($module, $version) = @_;
+	
+	if ($module eq 'Type::Tiny::XS' and $ENV{PATH} =~ m{\A/home/sand/bin:})
+	{
+		diag "**** ANDK BROKEN TESTING ENVIRONMENT DETECTED";
+		diag "**** SKIPPING REPORTING VERSION OF $module";
+		diag "**** EVERYTHING ELSE SHOULD BE OKAY"
+		return;
+	}
+	
 	$version = eval "require $module; $module->VERSION" unless defined $version;
 	
 	return diag sprintf('  %-30s    undef', $module) unless defined $version;
