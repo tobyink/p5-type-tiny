@@ -60,6 +60,10 @@ Params::ValidationCompiler using other type constraints is also quite fast,
 and when Type::Tiny::XS is not available, Moose and Specio constraints run
 almost as fast as Type::Tiny constraints.
 
+Data::Validator is acceptably fast.
+
+Params::Check is fairly slow, and MooseX::Params::Validate very slow.
+
 Type::Tiny::XS seems to slow down MooseX::Params::Validate for some strange
 reason.
 
@@ -87,10 +91,10 @@ use v5.12;
 use strict;
 use warnings;
 use Benchmark qw(:hireswallclock timeit);
-use Benchmark::Featureset::ParamCheck;
+use Benchmark::Featureset::ParamCheck 0.002;
 use Module::Runtime qw(use_module);
 
-my $data = 'Benchmark::Featureset::ParamCheck'->trivial_test_data;
+my $data = 'Benchmark::Featureset::ParamCheck'->trivial_named_data;
 my @impl = 'Benchmark::Featureset::ParamCheck'->implementations;
 my $iter = 250_000;
 
