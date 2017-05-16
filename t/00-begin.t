@@ -28,7 +28,9 @@ sub diag_version
 {
 	my ($module, $version) = @_;
 	
-	if ($module eq 'Type::Tiny::XS' and $ENV{PATH} =~ m{\A/home/sand/bin:})
+	if ($module eq 'Type::Tiny::XS'
+	and $ENV{AUTOMATED_TESTING}
+	and $ENV{PATH} =~ m{\A/home/sand/bin:})
 	{
 		diag "**** ANDK BROKEN TESTING ENVIRONMENT DETECTED";
 		diag "**** SKIPPING REPORTING VERSION OF $module";
