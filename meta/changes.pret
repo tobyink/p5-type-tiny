@@ -2377,3 +2377,13 @@
 		];
 	].
 
+`Type-Tiny 1.001_010 cpan:TOBYINK`
+	issued  2017-05-16;
+	changeset [
+		dcs:versus `Type-Tiny 1.001_009 cpan:TOBYINK`;
+		item [
+			a dcs:Tests;
+			label "t/00-begin.t will now work around ANDK's apparently broken XS testing environment.";
+		];
+	].
+
