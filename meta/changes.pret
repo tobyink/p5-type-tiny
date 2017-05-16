@@ -2375,6 +2375,10 @@
 			a dcs:Change;
 			label "Use Ref::Util::XS (if it's installed) to speed up certain type checks.";
 		];
+		item [
+			a dcs:Change;
+			label "Rewrite some benchmarking scripts to use Benchmark::Featureset::ParamCheck.";
+		];
 	].
 
 `Type-Tiny 1.001_010 cpan:TOBYINK`
