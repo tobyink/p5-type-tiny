@@ -2,90 +2,50 @@
 
 =encoding utf-8
 
-=head1 TEST 1: COMPLEX PARAMETER CHECKING
+=head1 DESCRIPTION
 
-Compares the run-time speed of several parameter validators for validating
-a fairly complex function signature. The function accepts an arrayref,
-an object providing C<print> and C<say> methods, and an integer less than
-90 as named parameters (C<a>, C<o>, and C<i>).
+Let's use L<Benchmark::Featureset::ParamCheck> to see how fast
+L<Type::Params> is compared with other modules for validating
+named parameters. (Hint: very fast.)
 
-The validators tested were:
+=head1 RESULTS
 
-=over
+The results of running the script on a fairly low-powered laptop.
+Each parameter checking implementation is called 250,000 times.
+The table below displays the average time taken for each call in
+nanoseconds.
 
-=item B<Params::ValidationCompiler> (shown as B<< PVC m|s|t >> in the results table)
+=head2 With Type::Tiny::XS
 
-L<Params::ValidationCompiler> with Moose, Specio, and Type::Tiny type
-constraints.
+ Type::Params ....................................   5079 ns (196850/s)
+ Params::ValidateCompiler with Type::Tiny ........   6599 ns (151515/s)
+ Pure Perl Implementation with Ref::Util::XS .....   7000 ns (142857/s)
+ Naive Pure Perl Implementation ..................   7560 ns (132275/s)
+ Data::Validator with Mouse ......................   8440 ns (118483/s)
+ Data::Validator with Type::Tiny .................   9840 ns (101626/s)
+ Params::ValidateCompiler with Moose .............  11279 ns (88652/s)
+ Params::ValidateCompiler with Specio ............  11320 ns (88339/s)
+ Data::Validator with Moose ......................  18319 ns (54585/s)
+ Params::Check with Type::Tiny ...................  21639 ns (46210/s)
+ Params::Check with coderefs .....................  28079 ns (35612/s)
+ MooseX::Params::Validate with Moose .............  48559 ns (20593/s)
+ MooseX::Params::Validate with Type::Tiny ........  54079 ns (18491/s)
 
-=item B<Data::Validator> (shown as B<D:V> in results table)
+=head2 Without Type::Tiny::XS
 
-=item B<Params::Validate> (shown as B<P:V> in results table)
-
-C<validate> given the following spec:
-
-   state $spec = {
-      {  type      => ARRAYREF,
-      },
-      {  can       => ["print", "say"],
-      },
-      {  type      => SCALAR,
-         regex     => qr{^\d+$},
-         callbacks => {
-            'less than 90' => sub { shift() < 90 },
-         },
-      },
-   };
-
-=item B<Params::Check> (shown as B<P:C> in results table)
-
-Given three coderefs to validate parameters.
-
-=item B<< Type::Params::validate_named() >> (shown as B<< T:P v >> in results table)
-
-Called as:
-
-   validate_named(\@_, a=>ArrayRef, o=>$PrintAndSay, i=>$SmallInt);
-
-Where C<< $PrintAndSay >> is a duck type, and C<< $SmallInt >> is a
-subtype of C<< Int >>, with inlining defined.
-
-=item B<< Type::Params::compile_named() >> (shown as B<< T:P c >> in results table)
-
-Using the same type constraints as C<< validate_named() >>
-
-=back
-
-=head2 Results
-
-B<< With Type::Tiny::XS: >>
-
-             Rate  [P:C] [P:V] [T:P v] [D:V] [PVC m] [PVC s] [PVC t] [T:P c]
- [P:C]    46987/s     --  -28%    -49%  -55%    -59%    -60%    -73%    -79%
- [P:V]    65535/s    39%    --    -28%  -37%    -43%    -44%    -62%    -71%
- [T:P v]  91413/s    95%   39%      --  -12%    -21%    -22%    -47%    -59%
- [D:V]   103722/s   121%   58%     13%    --    -10%    -11%    -40%    -54%
- [PVC m] 115369/s   146%   76%     26%   11%      --     -1%    -33%    -49%
- [PVC s] 117055/s   149%   79%     28%   13%      1%      --    -32%    -48%
- [PVC t] 173062/s   268%  164%     89%   67%     50%     48%      --    -23%
- [T:P c] 225563/s   380%  244%    147%  117%     96%     93%     30%      --
-
-B<< Without Type::Tiny::XS: >>
-
-             Rate  [P:C] [D:V] [P:V] [T:P v] [PVC s] [PVC m] [PVC t] [T:P c]
- [P:C]    47135/s     --  -24%  -29%    -41%    -59%    -59%    -67%    -73%
- [D:V]    61637/s    31%    --   -7%    -23%    -47%    -47%    -56%    -65%
- [P:V]    66354/s    41%    8%    --    -17%    -43%    -43%    -53%    -62%
- [T:P v]  79712/s    69%   29%   20%      --    -31%    -31%    -44%    -54%
- [PVC s] 115564/s   145%   87%   74%     45%      --     -0%    -18%    -34%
- [PVC m] 115967/s   146%   88%   75%     45%      0%      --    -18%    -34%
- [PVC t] 141276/s   200%  129%  113%     77%     22%     22%      --    -19%
- [T:P c] 174687/s   271%  183%  163%    119%     51%     51%     24%      --
-
-(Tested versions: Data::Validator 1.07 with Mouse 2.4.7,
-Params::ValidationCompiler 0.23 with Moose 2.2002 and Specio 0.34
-Params::Validate 1.26, Params::Check 0.38, and Type::Params 1.001_007
-with Type::Tiny::XS 0.012.)
+ Pure Perl Implementation with Ref::Util::XS .....   7120 ns (140449/s)
+ Naive Pure Perl Implementation ..................   7520 ns (132978/s)
+ Type::Params ....................................   7960 ns (125628/s)
+ Data::Validator with Mouse ......................   9000 ns (111111/s)
+ Params::ValidateCompiler with Type::Tiny ........   9159 ns (109170/s)
+ Params::ValidateCompiler with Moose .............  10159 ns (98425/s)
+ Params::ValidateCompiler with Specio ............  11240 ns (88967/s)
+ Data::Validator with Type::Tiny .................  14240 ns (70224/s)
+ Data::Validator with Moose ......................  18159 ns (55066/s)
+ Params::Check with Type::Tiny ...................  22039 ns (45372/s)
+ Params::Check with coderefs .....................  22479 ns (44483/s)
+ MooseX::Params::Validate with Moose .............  42920 ns (23299/s)
+ MooseX::Params::Validate with Type::Tiny ........  43360 ns (23062/s)
 
 =head1 ANALYSIS
 
@@ -100,13 +60,15 @@ Params::ValidationCompiler using other type constraints is also quite fast,
 and when Type::Tiny::XS is not available, Moose and Specio constraints run
 almost as fast as Type::Tiny constraints.
 
+Type::Tiny::XS seems to slow down MooseX::Params::Validate for some strange
+reason.
+
 =head1 DEPENDENCIES
 
 To run this script, you will need:
 
-L<Type::Tiny::XS>,
-L<Data::Validator>, L<Mouse>, L<Params::Check>, L<Params::Validate>,
-L<Params::ValidationCompiler>, L<Specio>, L<Moose>.
+L<Module::Runtime>,
+L<Benchmark::Featureset::ParamCheck>.
 
 =head1 AUTHOR
 
@@ -121,165 +83,31 @@ the same terms as the Perl 5 programming language system itself.
 
 =cut
 
+use v5.12;
 use strict;
 use warnings;
-use feature qw(state);
-use Benchmark qw(cmpthese);
+use Benchmark qw(:hireswallclock timeit);
+use Benchmark::Featureset::ParamCheck;
+use Module::Runtime qw(use_module);
 
-# In today's contest, we'll be comparing Type::Params...
-#
-use Type::Params qw( compile_named validate_named );
-use Type::Utils;
-use Types::Standard qw( -types );
+my $data = 'Benchmark::Featureset::ParamCheck'->trivial_test_data;
+my @impl = 'Benchmark::Featureset::ParamCheck'->implementations;
+my $iter = 250_000;
 
-# ... with Params::Validate...
-#
-BEGIN { $ENV{PARAMS_VALIDATE_IMPLEMENTATION} = 'XS' }; # ... which we'll give a fighting chance
-use Params::Validate qw( validate ARRAYREF SCALAR );
-
-# ... and Data::Validator...
-use Data::Validator ();
-use Mouse::Util::TypeConstraints ();
-
-# ... and Params::Check...
-use Params::Check ();
-
-# ... and Params::ValidationCompiler
-use Moose::Util::TypeConstraints ();
-use Specio::Declare ();
-BEGIN {
-	Specio::Helpers::install_t_sub(
-		__PACKAGE__,
-		Specio::Registry::internal_types_for_package(__PACKAGE__)
-	);
-}
-use Specio::Library::Builtins;
-use Params::ValidationCompiler ();
-
-# Define custom type constraints...
-my $PrintAndSay = duck_type PrintAndSay => ["print", "say"];
-my $SmallInt    = declare SmallInt => as Int,
-	where     { $_ < 90 },
-	inline_as { $_[0]->parent->inline_check($_)." and $_ < 90" };
-
-# ... and for Mouse...
-my $PrintAndSay2 = Mouse::Util::TypeConstraints::duck_type(PrintAndSay => ["print", "say"]);
-my $SmallInt2 = Mouse::Util::TypeConstraints::subtype(
-	"SmallInt",
-	Mouse::Util::TypeConstraints::as("Int"),
-	Mouse::Util::TypeConstraints::where(sub { $_ < 90 }),
-);
-
-# ... and Moose...
-my $SmallIntMoose = Moose::Util::TypeConstraints::subtype(
-	"SmallIntMoose",
-	Moose::Util::TypeConstraints::as("Int"),
-	Moose::Util::TypeConstraints::where(sub { $_ < 90 }),
-	Moose::Util::TypeConstraints::inline_as(sub { $_[0]->parent->_inline_check($_[1])." and ${\ $_[1]} < 90" }),
-);
-
-sub TypeParams_validate
-{
-	my @in = validate_named(\@_, a => ArrayRef, o => $PrintAndSay, i => $SmallInt);
-}
-
-sub TypeParams_compile
-{
-	state $spec = compile_named(a => ArrayRef, o => $PrintAndSay, i => $SmallInt);
-	my @in = $spec->(@_);
-}
-
-sub ParamsValidate
-{
-	state $spec = {
-		a => { type => ARRAYREF },
-		o => { can  => ["print", "say"] },
-		i => { type => SCALAR, regex => qr{^\d+$}, callbacks => { 'less than 90' => sub { shift() < 90 } } },
-	};
-	my @in = validate(@_, $spec);
-}
-
-sub ParamsValidationCompiler_moose
-{
-	state $check = Params::ValidationCompiler::validation_for(
-		params => {
-			a => { type => Moose::Util::TypeConstraints::find_type_constraint('ArrayRef') },
-			o => { type => Moose::Util::TypeConstraints::duck_type([qw/print say/]) },
-			i => { type => $SmallIntMoose },
-		},
-	);
-	my @in = $check->(@_);
-}
-
-sub ParamsValidationCompiler_tt
-{
-	state $check = Params::ValidationCompiler::validation_for(
-		params => {
-			a => { type => ArrayRef },
-			o => { type => $PrintAndSay },
-			i => { type => $SmallInt },
-		},
-	);
-	my @in = $check->(@_);
-}
-
-{
-	my $duck  = Specio::Declare::object_can_type('PrintAndSay', methods => [qw/print say/]);
-	my $smint = Specio::Declare::declare('SmallInt', parent => t('Int'), inline => sub {
-		my ($type, $var) = @_;
-		$type->parent->inline_check($var)." and $var < 90";
-	});	
-	sub ParamsValidationCompiler_specio
-	{
-		state $check = Params::ValidationCompiler::validation_for(
-			params => {
-				a => { type => t('ArrayRef') },
-				o => { type => $duck },
-				i => { type => $smint },
-			},
+say for
+	map {
+		sprintf(
+			'%s %s %6d ns (%d/s)',
+			$_->[0]->long_name,
+			'.' x (48 - length($_->[0]->long_name)),
+			1_000_000_000 * $_->[1]->cpu_a / $iter,
+			$iter / $_->[1]->cpu_a,
 		);
-		my @in = $check->(@_);
 	}
-}
-
-sub ParamsCheck
-{
-	state $spec = {
-		a => { required => 1, allow => sub { ref $_[0] eq 'ARRAY' }},
-		o => { required => 1, allow => sub { Scalar::Util::blessed($_[0]) and $_[0]->can("print") and $_[0]->can("say") }},
-		i => { required => 1, allow => sub  { !ref($_[0]) and $_[0] =~ m{^\d+$} and $_[0] < 90 }},
-	};
-	my @in = Params::Check::check($spec, {@_});
-}
-
-sub DataValidator
-{
-	state $spec = "Data::Validator"->new(
-		a => "ArrayRef",
-		o => $PrintAndSay2,
-		i => $SmallInt2,
-	);
-	my @in = $spec->validate(@_);
-}
-
-# Actually run the benchmarks...
-#
-
-use IO::Handle ();
-our @data = (
-	a => [1, 2, 3],
-	o => IO::Handle->new,
-	i => 50,
-);
-
-cmpthese(-3, {
-	'[D:V]'    => q{ DataValidator(@::data) },
-	'[P:V]'    => q{ ParamsValidate(@::data) },
-	'[P:C]'    => q{ ParamsCheck(@::data) },
-	'[T:P v]'  => q{ TypeParams_validate(@::data) },
-	'[T:P c]'  => q{ TypeParams_compile(@::data) },
-	'[PVC m]'  => q{ ParamsValidationCompiler_moose(@::data) },
-	'[PVC t]'  => q{ ParamsValidationCompiler_tt(@::data) },
-	'[PVC s]'  => q{ ParamsValidationCompiler_specio(@::data) },
-});
-
+	sort {
+		$a->[1]->cpu_a <=> $b->[1]->cpu_a;
+	}
+	map {
+		my $pkg = use_module($_);
+		[ $pkg, timeit 1, sub { $pkg->run_named_check($iter, $data) } ];
+	} @impl;
