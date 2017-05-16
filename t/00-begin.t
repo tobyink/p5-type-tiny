@@ -34,7 +34,7 @@ sub diag_version
 	{
 		diag "**** ANDK BROKEN TESTING ENVIRONMENT DETECTED";
 		diag "**** SKIPPING REPORTING VERSION OF $module";
-		diag "**** EVERYTHING ELSE SHOULD BE OKAY"
+		diag "**** EVERYTHING ELSE SHOULD BE OKAY";
 		return;
 	}
 	
