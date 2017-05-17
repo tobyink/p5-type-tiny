@@ -287,11 +287,11 @@ $meta->$add_core_type({
 		: sub { "ref($_[1]) eq 'CODE'" },
 });
 
-$meta->$add_core_type({
+my $_regexp = $meta->$add_core_type({
 	name       => "RegexpRef",
 	parent     => $_ref,
-	constraint => sub { ref($_) && !!re::is_regexp($_) },
-	inlined    => sub { "ref($_[1]) && !!re::is_regexp($_[1])" },
+	constraint => sub { ref($_) && !!re::is_regexp($_) or blessed($_) && $_->isa('Regexp') },
+	inlined    => sub { "(ref($_[1]) && !!re::is_regexp($_[1]) or blessed($_[1]) && $_[1]->isa('Regexp'))" },
 });
 
 $meta->$add_core_type({
@@ -687,6 +687,29 @@ $meta->add_type({
 });
 
 our %_StrMatch;
+my $has_regexp_util;
+my $serialize_regexp = sub {
+	$has_regexp_util = eval {
+		require Regexp::Util;
+		Regexp::Util->VERSION('0.003');
+		1;
+	} || 0 unless defined $has_regexp_util;
+	
+	my $re = shift;
+	my $serialized;
+	if ($has_regexp_util) {
+		$serialized = eval { Regexp::Util::serialize_regexp($re) };
+	}
+	
+	if (!$serialized) {
+		require Scalar::Util;
+		my $key = Scalar::Util::refaddr($re);
+		$_StrMatch{$key} = $re;
+		$serialized = sprintf('$Types::Standard::_StrMatch{%s}', B::perlstring($key));
+	}
+	
+	return $serialized;
+};
 $meta->add_type({
 	name       => "StrMatch",
 	parent     => $_str,
@@ -696,7 +719,7 @@ $meta->add_type({
 		
 		my ($regexp, $checker) = @_;
 		
-		ref($regexp) eq 'Regexp'
+		$_regexp->check($regexp)
 			or _croak("First parameter to StrMatch[`a] expected to be a Regexp; got $regexp");
 		
 		if (@_ > 1)
@@ -723,24 +746,24 @@ $meta->add_type({
 	{
 		require B;
 		my ($regexp, $checker) = @_;
-		my $regexp_string = "$regexp";
 		if ($checker)
 		{
 			return unless $checker->can_be_inlined;
 			
-			$_StrMatch{$regexp_string} = $regexp;
+			my $serialized_re = $regexp->$serialize_regexp;
 			return sub
 			{
 				my $v = $_[1];
 				sprintf
-					"!ref($v) and do { my \$m = [$v =~ \$Types::Standard::_StrMatch{%s}]; %s }",
-					B::perlstring($regexp_string),
+					"!ref($v) and do { my \$m = [$v =~ %s]; %s }",
+					$serialized_re,
 					$checker->inline_check('$m'),
 				;
 			};
 		}
 		else
 		{
+			my $regexp_string = "$regexp";
 			if ($regexp_string =~ /\A\(\?\^u?:(\.+)\)\z/) {
 				my $length = length $1;
 				return sub { "!ref($_) and length($_)>=$length" };
@@ -751,14 +774,11 @@ $meta->add_type({
 				return sub { "!ref($_) and length($_)==$length" };
 			}
 			
-			$_StrMatch{$regexp_string} = $regexp;
+			my $serialized_re = $regexp->$serialize_regexp;
 			return sub
 			{
 				my $v = $_[1];
-				sprintf
-					"!ref($v) and $v =~ \$Types::Standard::_StrMatch{%s}",
-					B::perlstring($regexp_string),
-				;
+				"!ref($v) and $v =~ $serialized_re";
 			};
 		}
 	},
