@@ -26,3 +26,4 @@
  - Fixed bug where Types::Standard::Int would *sometimes* accept
    an overloaded object. (It never should.)
  - Various performance enhancements and bug fixes.
+ - Types::Standard::CycleTuple added.
