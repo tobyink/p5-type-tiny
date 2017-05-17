@@ -291,7 +291,7 @@ my $_regexp = $meta->$add_core_type({
 	name       => "RegexpRef",
 	parent     => $_ref,
 	constraint => sub { ref($_) && !!re::is_regexp($_) or blessed($_) && $_->isa('Regexp') },
-	inlined    => sub { "ref($_[1]) && !!re::is_regexp($_[1]) or blessed($_[1]) && $_[1]->isa('Regexp')" },
+	inlined    => sub { "ref($_[1]) && !!re::is_regexp($_[1]) or Scalar::Util::blessed($_[1]) && $_[1]->isa('Regexp')" },
 });
 
 $meta->$add_core_type({
