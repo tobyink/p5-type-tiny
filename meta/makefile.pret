@@ -12,7 +12,15 @@
 	];
 	deps:runtime-recommendation [
 		deps:on "Type::Tiny::XS 0.011"^^deps:CpanId;
-		comment "Make stuff faster (I think)."@en;
+		comment "Make stuff faster."@en;
+	];
+	deps:runtime-recommendation [
+		deps:on "Ref::Util::XS 0.200"^^deps:CpanId;
+		comment "Make stuff faster."@en;
+	];
+	deps:runtime-recommendation [
+		deps:on "Regexp::Util 0.003"^^deps:CpanId;
+		comment "Saner serialization of StrMatch type constraints."@en;
 	];
 	deps:runtime-requirement [
 		deps:on "Exporter::Tiny 0.026"^^deps:CpanId;
