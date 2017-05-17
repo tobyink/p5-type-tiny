@@ -291,7 +291,7 @@ my $_regexp = $meta->$add_core_type({
 	name       => "RegexpRef",
 	parent     => $_ref,
 	constraint => sub { ref($_) && !!re::is_regexp($_) or blessed($_) && $_->isa('Regexp') },
-	inlined    => sub { "ref($_[1]) && !!re::is_regexp($_[1]) or Scalar::Util::blessed($_[1]) && $_[1]->isa('Regexp')" },
+	inlined    => sub { "ref($_[1]) && !!re::is_regexp($_[1]) or blessed($_[1]) && $_[1]->isa('Regexp')" },
 });
 
 $meta->$add_core_type({
@@ -1123,7 +1123,8 @@ Other customers also bought: C<< CodeLike >> from L<Types::TypeTiny>.
 
 =item C<< RegexpRef >>
 
-A value where C<< ref($value) eq "Regexp" >>.
+A reference where C<< re::is_regexp($value) >> is true, or
+a blessed reference where C<< $value->isa("Regexp") >> is true.
 
 =item C<< GlobRef >>
 
