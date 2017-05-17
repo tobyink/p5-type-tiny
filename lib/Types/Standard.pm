@@ -540,6 +540,7 @@ $meta->add_type({
 	constraint_generator => LazyLoad(CycleTuple => 'constraint_generator'),
 	inline_generator     => LazyLoad(CycleTuple => 'inline_generator'),
 	deep_explanation     => LazyLoad(CycleTuple => 'deep_explanation'),
+	coercion_generator   => LazyLoad(CycleTuple => 'coercion_generator'),
 });
 
 $meta->add_type({

@@ -129,64 +129,48 @@ sub __deep_explanation
 my $label_counter = 0;
 sub __coercion_generator
 {
-	die "TODO";
-	
 	my ($parent, $child, @tuple) = @_;
-	my $C = "Type::Coercion"->new(type_constraint => $child);
 	
-	my $slurpy;
-	if (exists $tuple[-1] and ref $tuple[-1] eq "HASH")
-	{
-		$slurpy = pop(@tuple)->{slurpy};
-	}
-	
+	my $child_coercions_exist = 0;
 	my $all_inlinable = 1;
-	for my $tc (@tuple, ($slurpy ? $slurpy : ()))
+	for my $tc (@tuple)
 	{
 		$all_inlinable = 0 if !$tc->can_be_inlined;
 		$all_inlinable = 0 if $tc->has_coercion && !$tc->coercion->can_be_inlined;
-		last if!$all_inlinable;
+		$child_coercions_exist++ if $tc->has_coercion;
 	}
-	
+
+	return unless $child_coercions_exist;
+	my $C = "Type::Coercion"->new(type_constraint => $child);
+
 	if ($all_inlinable)
 	{
 		$C->add_type_coercions($parent => Types::Standard::Stringable {
-			my $label = sprintf("TUPLELABEL%d", ++$label_counter);
+			my $label  = sprintf("CTUPLELABEL%d", ++$label_counter);
+			my $label2 = sprintf("CTUPLEINNER%d", $label_counter);
 			my @code;
 			push @code, 'do { my ($orig, $return_orig, $tmp, @new) = ($_, 0);';
 			push @code,       "$label: {";
-			push @code,       sprintf('(($return_orig = 1), last %s) if @$orig > %d;', $label, scalar @tuple) unless $slurpy;
+			push @code,       sprintf('(($return_orig = 1), last %s) if scalar(@$orig) %% %d != 0;', $label, scalar @tuple);
+			push @code,         sprintf('my $%s = 0; while ($%s < @$orig) {', $label2, $label2);
 			for my $i (0 .. $#tuple)
 			{
 				my $ct = $tuple[$i];
 				my $ct_coerce   = $ct->has_coercion;
-				my $ct_optional = $ct->is_a_type_of(Types::Standard::Optional);
 				
 				push @code, sprintf(
-					'if (@$orig > %d) { $tmp = %s; (%s) ? ($new[%d]=$tmp) : (($return_orig=1), last %s) }',
-					$i,
+					'do { $tmp = %s; (%s) ? ($new[$%s + %d]=$tmp) : (($return_orig=1), last %s) };',
 					$ct_coerce
-						? $ct->coercion->inline_coercion("\$orig->[$i]")
-						: "\$orig->[$i]",
+						? $ct->coercion->inline_coercion("\$orig->[\$$label2 + $i]")
+						: "\$orig->[\$$label2 + $i]",
 					$ct->inline_check('$tmp'),
+					$label2,
 					$i,
 					$label,
 				);
 			}
-			if ($slurpy)
-			{
-				my $size = @tuple;
-				push @code, sprintf('if (@$orig > %d) {', $size);
-				push @code, sprintf('my $tail = [ @{$orig}[%d .. $#$orig] ];', $size);
-				push @code, $slurpy->has_coercion
-					? sprintf('$tail = %s;', $slurpy->coercion->inline_coercion('$tail'))
-					: q();
-				push @code, sprintf(
-					'(%s) ? push(@new, @$tail) : ($return_orig++);',
-					$slurpy->inline_check('$tail'),
-				);
-				push @code, '}';
-			}
+			push @code, sprintf('$%s += %d;', $label2, scalar(@tuple));
+			push @code,         '}';
 			push @code,       '}';
 			push @code,    '$return_orig ? $orig : \\@new';
 			push @code, '}';
@@ -196,36 +180,24 @@ sub __coercion_generator
 	
 	else
 	{
-		my @is_optional = map !!$_->is_strictly_a_type_of($_Optional), @tuple;
-		
 		$C->add_type_coercions(
 			$parent => sub {
 				my $value = @_ ? $_[0] : $_;
 				
-				if (!$slurpy and @$value > @tuple)
+				if (scalar(@$value) % scalar(@tuple) != 0)
 				{
 					return $value;
 				}
 				
 				my @new;
-				for my $i (0 .. $#tuple)
+				for my $i (0 .. $#$value)
 				{
-					return \@new if $i > $#$value and $is_optional[$i];
-					
-					my $ct = $tuple[$i];
+					my $ct = $tuple[$i % @tuple];
 					my $x  = $ct->has_coercion ? $ct->coerce($value->[$i]) : $value->[$i];
 					
 					return $value unless $ct->check($x);
 					
 					$new[$i] = $x;
-				}
-				
-				if ($slurpy and @$value > @tuple)
-				{
-					my $tmp = $slurpy->has_coercion
-						? $slurpy->coerce([ @{$value}[@tuple .. $#$value] ])
-						: [ @{$value}[@tuple .. $#$value] ];
-					$slurpy->check($tmp) ? push(@new, @$tmp) : return($value);
 				}
 				
 				return \@new;

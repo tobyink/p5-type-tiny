@@ -226,7 +226,6 @@ my $label_counter = 0;
 sub __coercion_generator
 {
 	my ($parent, $child, @tuple) = @_;
-	my $C = "Type::Coercion"->new(type_constraint => $child);
 	
 	my $slurpy;
 	if (exists $tuple[-1] and ref $tuple[-1] eq "HASH")
@@ -243,8 +242,8 @@ sub __coercion_generator
 		$child_coercions_exist++ if $tc->has_coercion;
 	}
 
-	$child_coercions_exist++ if $slurpy && $slurpy->has_coercion;
 	return unless $child_coercions_exist;
+	my $C = "Type::Coercion"->new(type_constraint => $child);
 
 	if ($all_inlinable)
 	{

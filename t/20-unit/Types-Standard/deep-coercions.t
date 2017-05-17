@@ -29,6 +29,36 @@ use Test::More;
 use Types::Standard qw( -types slurpy );
 use Type::Utils;
 
+ok(
+	! Dict->of(x => Int)->has_coercion,
+	"Dict of type without coercion shouldn't have coercion",
+);
+
+ok(
+	Dict->of(x => Int->plus_coercions(Any, 1))->has_coercion,
+	"Dict of type with coercion should have coercion",
+);
+
+ok(
+	! Tuple->of(Int)->has_coercion,
+	"Tuple of type without coercion shouldn't have coercion",
+);
+
+ok(
+	Tuple->of(Int->plus_coercions(Any, 1))->has_coercion,
+	"Tuple of type with coercion should have coercion",
+);
+
+ok(
+	! Map->of(Str, Int)->has_coercion,
+	"Map of type without coercion shouldn't have coercion",
+);
+
+ok(
+	Map->of(Str, Int->plus_coercions(Any, 1))->has_coercion,
+	"Map of type with coercion should have coercion",
+);
+
 NONINLINED: {
 	my $Foo = declare Foo => as Int;
 	coerce $Foo, from Num, via { int($_) };
