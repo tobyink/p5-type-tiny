@@ -1,4 +1,4 @@
-Post-1.000000 Changes
+Post-1.002000 Changes
 =====================
 
 * Try to make inlining for ClassName, RoleName, StrMatch, etc more
@@ -17,12 +17,6 @@ Post-1.000000 Changes
   consider which can be added to Types::Standard/Types::Common::*.
   These would need to be constraints that can be implemented with no
   non-core dependencies.
-
-* Possibly add a NonEmpty type constraint, allowing NonEmpty[Str],
-  NonEmpty[HashRef[Int]], NonEmpty[ArrayRef], etc. This would be an
-  interesting one for optimizing.
-
-* CycleTuple[Int,Str,HashRef] should allow [1,foo=>{},2,bar=>{}].
 
 * Perhaps allow Type::Coercion::FromMoose's implementation of
   add_type_coercions to succeed?
