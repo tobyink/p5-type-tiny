@@ -234,14 +234,18 @@ sub __coercion_generator
 		$slurpy = pop(@tuple)->{slurpy};
 	}
 	
+	my $child_coercions_exist = 0;
 	my $all_inlinable = 1;
 	for my $tc (@tuple, ($slurpy ? $slurpy : ()))
 	{
 		$all_inlinable = 0 if !$tc->can_be_inlined;
 		$all_inlinable = 0 if $tc->has_coercion && !$tc->coercion->can_be_inlined;
-		last if!$all_inlinable;
+		$child_coercions_exist++ if $tc->has_coercion;
 	}
-	
+
+	$child_coercions_exist++ if $slurpy && $slurpy->has_coercion;
+	return unless $child_coercions_exist;
+
 	if ($all_inlinable)
 	{
 		$C->add_type_coercions($parent => Types::Standard::Stringable {
