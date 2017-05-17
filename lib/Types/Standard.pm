@@ -546,6 +546,20 @@ $meta->$add_core_type({
 });
 
 $meta->add_type({
+	name       => "CycleTuple",
+	parent     => $_arr,
+	name_generator => sub
+	{
+		my ($s, @a) = @_;
+		sprintf('%s[%s]', $s, join q[,], @a);
+	},
+	constraint_generator => LazyLoad(CycleTuple => 'constraint_generator'),
+	inline_generator     => LazyLoad(CycleTuple => 'inline_generator'),
+	deep_explanation     => LazyLoad(CycleTuple => 'deep_explanation'),
+	coercion_generator   => LazyLoad(CycleTuple => 'coercion_generator'),
+});
+
+$meta->add_type({
 	name       => "Dict",
 	parent     => $_hash,
 	name_generator => sub
@@ -1329,6 +1343,39 @@ C<Num> is being strict.
 Most people should probably use C<Num> or C<StrictNum>. Don't explicitly
 use C<LaxNum> unless you specifically need an attribute which will accept
 things like "Inf".
+
+=item C<< CycleTuple[`a] >>
+
+Similar to Tuple, but cyclical.
+
+   CycleTuple[Int, HashRef]
+
+will allow C<< [1,{}] >> and C<< [1,{},2,{}] >> but disallow
+C<< [1,{},2] >> and C<< [1,{},2,[]] >>.
+
+I think you understand CycleTuples already.
+
+Currently C<Optional> and C<slurpy> parameters are forbidden. There are
+fairly limited use cases for them, and it's not exactly clear what they
+should mean.
+
+The following is an efficient way of checking for an even-sized arrayref:
+
+   CycleTuple[Any, Any]
+
+The following is an arrayref which would be suitable for coercing to a
+hashref:
+
+   CycleTuple[Str, Any]
+
+All the examples so far have used two parameters, but the following is
+also a possible CycleTuple:
+
+   CycleTuple[Str, Int, HashRef]
+
+This will be an arrayref where the 0th, 3rd, 6th, etc values are
+strings, the 1st, 4th, 7th, etc values are integers, and the 2nd,
+5th, 8th, etc values are hashrefs.
 
 =back
 

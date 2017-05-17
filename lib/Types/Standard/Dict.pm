@@ -32,7 +32,7 @@ sub __constraint_generator
 		$constraints{$k} = Types::TypeTiny::to_TypeTiny($v);
 		$is_optional{$k} = !!$constraints{$k}->is_strictly_a_type_of($_optional);
 		Types::TypeTiny::TypeTiny->check($v)
-			or _croak("Parameter to Dict[`a] for key '$k' expected to be a type constraint; got $v");
+			or _croak("Parameter to Dict[`a] for key '$k' expected to be a type constraint; got $v");			
 	}
 	
 	return sub
@@ -180,15 +180,19 @@ sub __coercion_generator
 	my $C = "Type::Coercion"->new(type_constraint => $child);
 	
 	my $all_inlinable = 1;
+	my $child_coercions_exist = 0;
 	for my $tc (values %dict)
 	{
 		$all_inlinable = 0 if !$tc->can_be_inlined;
 		$all_inlinable = 0 if $tc->has_coercion && !$tc->coercion->can_be_inlined;
-		last if!$all_inlinable;
+		$child_coercions_exist++ if $tc->has_coercion;
 	}
 	$all_inlinable = 0 if $slurpy && !$slurpy->can_be_inlined;
 	$all_inlinable = 0 if $slurpy && $slurpy->has_coercion && !$slurpy->coercion->can_be_inlined;
-	
+
+	$child_coercions_exist++ if $slurpy && $slurpy->has_coercion;
+	return unless $child_coercions_exist;
+
 	if ($all_inlinable)
 	{
 		$C->add_type_coercions($parent => Types::Standard::Stringable {
