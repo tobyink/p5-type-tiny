@@ -32,7 +32,7 @@ sub __constraint_generator
 		$constraints{$k} = Types::TypeTiny::to_TypeTiny($v);
 		$is_optional{$k} = !!$constraints{$k}->is_strictly_a_type_of($_optional);
 		Types::TypeTiny::TypeTiny->check($v)
-			or _croak("Parameter to Dict[`a] for key '$k' expected to be a type constraint; got $v");			
+			or _croak("Parameter to Dict[`a] for key '$k' expected to be a type constraint; got $v");
 	}
 	
 	return sub
