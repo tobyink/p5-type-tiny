@@ -27,10 +27,14 @@ use Test::More;
 use Test::TypeTiny;
 use Test::Fatal qw(exception);
 
-use Types::Standard qw( CycleTuple Int HashRef ArrayRef Any Optional slurpy );
+use Types::Standard qw( CycleTuple Num Int HashRef ArrayRef Any Optional slurpy );
 use Type::Utils qw( class_type );
 
-my $type = CycleTuple[Int, HashRef, ArrayRef];
+my $type = CycleTuple[
+	Int->plus_coercions(Num, 'int($_)'),
+	HashRef,
+	ArrayRef,
+];
 
 should_fail(undef, $type);
 should_fail({}, $type);
@@ -42,6 +46,12 @@ should_pass([1,{}, []], $type);
 should_fail([1,{}, [], undef], $type);
 should_fail([1,{}, [], 2], $type);
 should_pass([1,{}, [], 2, {}, [1]], $type);
+
+is_deeply(
+	$type->coerce([1.1, {}, [], 2.2, {}, [3.3]]),
+	[1, {}, [], 2, {}, [3.3]],
+	'automagic coercion',
+);
 
 #diag $type->inline_check('$THING');
 #diag CycleTuple->of(Any, Any)->inline_check('$BLAH');
