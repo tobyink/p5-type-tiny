@@ -2391,3 +2391,17 @@
 		];
 	].
 
+`Type-Tiny 1.001_011 cpan:TOBYINK`
+	issued  2017-05-17;
+	changeset [
+		dcs:versus `Type-Tiny 1.001_010 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix;
+			label "Type constraints like Tuple[Int] shouldn't report they have a coercion if Int doesn't have a coercion.";
+		];
+		item [
+			a dcs:Addition;
+			label "Types::Standard now has a CycleTuple type.";
+		];
+	].
+
