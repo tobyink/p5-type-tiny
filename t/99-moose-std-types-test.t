@@ -571,6 +571,7 @@ my %tests = (
 		accept => [
 			$REGEX,
 			$REGEX_OBJ,
+			$FAKE_REGEX,
 		],
 		reject => [
 			$ZERO,
@@ -595,7 +596,6 @@ my %tests = (
 			$FH_OBJECT,
 			$OBJECT,
 			$UNDEF,
-			$FAKE_REGEX,
 		],
 	},
 	GlobRef => {
