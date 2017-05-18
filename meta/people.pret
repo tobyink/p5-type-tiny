@@ -122,6 +122,11 @@ cpan:TSIBLEY
 	:page <https://github.com/chorny>;
 	:name "Alexandr Ciornii".
 
+<urn:uuid:a96145d2-d9bc-4d1b-a278-be17c831edfd>
+	:page <https://github.com/andrewalker>;
+	:name "André Walker";
+	:homepage <http://www.andrewalker.net>.
+
 # We bundle some files made by these dudes...
 
 cpan:RJBS
