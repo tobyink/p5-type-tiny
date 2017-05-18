@@ -33,6 +33,10 @@ sub english_list {
 	goto \&Type::Utils::english_list;
 }
 
+my $QUOTE = ($^V < 5.010 && exists(&B::cstring))
+	? \&B::cstring
+	: \&B::perlstring;   # is buggy on Perl 5.8
+
 {
 	my $Invocant;
 	sub Invocant () {
@@ -65,7 +69,7 @@ sub _mkslurpy
 			'%s = (($#_-%d)%%2)==0 ? "Error::TypeTiny::WrongNumberOfParameters"->throw(message => sprintf("Odd number of elements in %%s", %s)) : +{ @_[%d..$#_] };',
 			$name,
 			$i,
-			B::perlstring("$tc"),
+			$QUOTE->("$tc"),
 			$i,
 		);
 }
@@ -186,7 +190,7 @@ sub compile
 					? $constraint->type_parameter->inline_check($varname)
 					: $constraint->inline_check($varname),
 				$constraint->{uniq},
-				B::perlstring($constraint),
+				$QUOTE->($constraint),
 				$varname,
 				$is_slurpy ? 'q{$SLURPY}' : sprintf('q{$_[%d]}', $arg),
 			);
@@ -200,7 +204,7 @@ sub compile
 				'%s or Type::Tiny::_failed_check(%d, %s, %s, varname => %s);',
 				sprintf(sprintf '$check[%d]->(%s)', $arg, $varname),
 				$constraint->{uniq},
-				B::perlstring($constraint),
+				$QUOTE->($constraint),
 				$varname,
 				$is_slurpy ? 'q{$SLURPY}' : sprintf('q{$_[%d]}', $arg),
 			);
@@ -309,8 +313,8 @@ sub compile_named
 		unless ($is_optional or $is_slurpy) {
 			push @code, sprintf(
 				'exists($in{%s}) or "Error::TypeTiny::WrongNumberOfParameters"->throw(message => sprintf "Missing required parameter: %%s", %s);',
-				B::perlstring($name),
-				B::perlstring($name),
+				$QUOTE->($name),
+				$QUOTE->($name),
 			);
 		}
 		
@@ -320,13 +324,13 @@ sub compile_named
 			$varname = '\\%in';
 		}
 		elsif ($is_optional) {
-			push @code, sprintf('if (exists($in{%s})) {', B::perlstring($name));
-			push @code, sprintf('$tmp = delete($in{%s});', B::perlstring($name));
+			push @code, sprintf('if (exists($in{%s})) {', $QUOTE->($name));
+			push @code, sprintf('$tmp = delete($in{%s});', $QUOTE->($name));
 			$varname = '$tmp';
 			++$need_to_close_if;
 		}
 		else {
-			push @code, sprintf('$tmp = delete($in{%s});', B::perlstring($name));
+			push @code, sprintf('$tmp = delete($in{%s});', $QUOTE->($name));
 			$varname = '$tmp';
 		}
 		
@@ -354,9 +358,9 @@ sub compile_named
 				'(%s) or Type::Tiny::_failed_check(%d, %s, %s, varname => %s);',
 				$constraint->inline_check($varname),
 				$constraint->{uniq},
-				B::perlstring($constraint),
+				$QUOTE->($constraint),
 				$varname,
-				$is_slurpy ? 'q{$SLURPY}' : sprintf('q{$_{%s}}', B::perlstring($name)),
+				$is_slurpy ? 'q{$SLURPY}' : sprintf('q{$_{%s}}', $QUOTE->($name)),
 			);
 		}
 		else
@@ -366,13 +370,13 @@ sub compile_named
 				'%s or Type::Tiny::_failed_check(%d, %s, %s, varname => %s);',
 				sprintf(sprintf '$check[%d]->(%s)', $arg, $varname),
 				$constraint->{uniq},
-				B::perlstring($constraint),
+				$QUOTE->($constraint),
 				$varname,
-				$is_slurpy ? 'q{$SLURPY}' : sprintf('q{$_{%s}}', B::perlstring($name)),
+				$is_slurpy ? 'q{$SLURPY}' : sprintf('q{$_{%s}}', $QUOTE->($name)),
 			);
 		}
 		
-		push @code, sprintf('$R{%s} = %s;', B::perlstring($name), $varname);
+		push @code, sprintf('$R{%s} = %s;', $QUOTE->($name), $varname);
 		
 		push @code, '}' if $need_to_close_if;
 	}
@@ -418,7 +422,7 @@ sub validate_named
 {
 	my $arr = shift;
 	my $sub = (
-		$compiled_named{ join ":", map(ref($_)?($_->{uniq}||"\@$_->{slurpy}"):B::perlstring($_), @_) }
+		$compiled_named{ join ":", map(ref($_)?($_->{uniq}||"\@$_->{slurpy}"):$QUOTE->($_), @_) }
 			||= compile_named({ caller_level => 1 }, @_)
 	);
 	@_ = @$arr;

@@ -23,7 +23,12 @@ unless (exists &B::perlstring)
 	};
 }
 
-push @B::EXPORT_OK, 'perlstring';
+unless (exists &B::cstring)
+{
+	*B::cstring = \&B::perlstring;
+}
+
+push @B::EXPORT_OK, qw( perlstring cstring );
 
 #### Done!
 
