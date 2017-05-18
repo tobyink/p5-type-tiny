@@ -99,6 +99,9 @@ cpan:TSIBLEY
 	:page <https://github.com/tsibley>;
 	:name "Thomas Sibley".
 
+cpan:ETHER
+	:name "Karen Etheridge".
+
 <urn:uuid:6c7beadd-14b0-489a-940c-57ccd2ec90df>
 	:mbox <mailto:peter@morch.com>;
 	:name "Peter Valdemar Mørch".
