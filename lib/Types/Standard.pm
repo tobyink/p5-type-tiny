@@ -291,7 +291,7 @@ my $_regexp = $meta->$add_core_type({
 	name       => "RegexpRef",
 	parent     => $_ref,
 	constraint => sub { ref($_) && !!re::is_regexp($_) or blessed($_) && $_->isa('Regexp') },
-	inlined    => sub { "ref($_[1]) && !!re::is_regexp($_[1]) or Scalar::Util::blessed($_[1]) && $_[1]->isa('Regexp')" },
+	inlined    => sub { my $v = $_[1]; "ref($v) && !!re::is_regexp($v) or Scalar::Util::blessed($v) && $v\->isa('Regexp')" },
 });
 
 $meta->$add_core_type({
@@ -702,8 +702,7 @@ my $serialize_regexp = sub {
 	}
 	
 	if (!$serialized) {
-		require Scalar::Util;
-		my $key = Scalar::Util::refaddr($re);
+		my $key = sprintf('%s|%s', ref($re), $re);
 		$_StrMatch{$key} = $re;
 		$serialized = sprintf('$Types::Standard::_StrMatch{%s}', B::perlstring($key));
 	}
