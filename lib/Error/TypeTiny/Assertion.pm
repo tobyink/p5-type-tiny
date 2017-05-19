@@ -76,7 +76,7 @@ sub _build_message
 	$msg .= sprintf(" at %s line %s", $c->{file}||'file?', $c->{line}||'NaN') if $c;
 	
 	my $explain = $e->explain;
-	return $msg unless @{ $explain || [] };
+	return "$msg\n" unless @{ $explain || [] };
 	
 	$msg .= "\n";
 	for my $line (@$explain) {
