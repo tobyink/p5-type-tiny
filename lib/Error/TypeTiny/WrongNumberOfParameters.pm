@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Error::TypeTiny::WrongNumberOfParameters::AUTHORITY = 'cpan:TOBYINK';
-	$Error::TypeTiny::WrongNumberOfParameters::VERSION   = '1.001_013';
+	$Error::TypeTiny::WrongNumberOfParameters::VERSION   = '1.001_014';
 }
 
 require Error::TypeTiny;

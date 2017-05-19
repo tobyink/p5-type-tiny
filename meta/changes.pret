@@ -2383,6 +2383,7 @@
 
 `Type-Tiny 1.001_010 cpan:TOBYINK`
 	issued  2017-05-16;
+	label   "Puppiversary";
 	changeset [
 		dcs:versus `Type-Tiny 1.001_009 cpan:TOBYINK`;
 		item [
@@ -2422,6 +2423,7 @@
 
 `Type-Tiny 1.001_013 cpan:TOBYINK`
 	issued  2017-05-18;
+	label   "Kittiversary";
 	changeset [
 		dcs:versus `Type-Tiny 1.001_012 cpan:TOBYINK`;
 		item [
@@ -2433,6 +2435,17 @@
 			label "Fixed crazy amount of UTF-8 warnings from Type::Params on Perl 5.6.x and Perl 5.8.x.";
 			seealso <https://github.com/tobyink/p5-type-tiny/pull/16>;
 			dcs:thanks <urn:uuid:a96145d2-d9bc-4d1b-a278-be17c831edfd>;
+		];
+	].
+
+`Type-Tiny 1.001_014 cpan:TOBYINK`
+	issued  2017-05-19;
+	changeset [
+		dcs:versus `Type-Tiny 1.001_013 cpan:TOBYINK`;
+		item [
+			a dcs:Change;
+			label "Include trailing line break at the end of stringified version of some exceptions.";
+			dcs:thanks <urn:uuid:6c7beadd-14b0-489a-940c-57ccd2ec90df>;
 		];
 	].
 
