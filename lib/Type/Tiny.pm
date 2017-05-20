@@ -53,25 +53,68 @@ BEGIN {
 		: sub () { !!0 };
 };
 
+sub __warn__ {
+	my ($msg, $thing) = @_==2 ? @_ : (Thing => @_);
+	my $string = do {
+		blessed($thing) && $thing->isa('Type::Tiny::Union') ? sprintf('Union[%s]', join q{, }, map $_->name, @{$thing->type_constraints}) :
+		blessed($thing) && $thing->isa('Type::Tiny') ? $thing->name :
+		blessed($thing) && $thing->isa('Type::Tiny::_HalfOp') ? sprintf('HalfOp[ q{%s}, %s, %s ]', $thing->{op}, $thing->{type}->name, $thing->{param}) :
+		!defined($thing) ? 'NIL' :
+		"$thing"
+	};
+	warn "$msg => $string\n";
+	$thing;
+}
+
 use overload
 	q("")      => sub { caller =~ m{^(Moo::HandleMoose|Sub::Quote)} ? overload::StrVal($_[0]) : $_[0]->display_name },
 	q(bool)    => sub { 1 },
 	q(&{})     => "_overload_coderef",
 	q(|)       => sub {
 		my @tc = _swap @_;
-		if (!_FIXED_PRECEDENCE && !blessed $tc[0] && ref $tc[0] eq 'ARRAY') {
-			require Type::Tiny::_HalfOp;
-			return "Type::Tiny::_HalfOp"->new('|', @tc);
-		}
+		if (!_FIXED_PRECEDENCE && $_[2]) {
+			if (blessed $tc[0]) {
+				if (blessed $tc[0] eq "Type::Tiny::_HalfOp") {
+					my $type  = $tc[0]->{type};
+					my $param = $tc[0]->{param};
+					my $op    = $tc[0]->{op};
+					require Type::Tiny::Union;
+					return "Type::Tiny::_HalfOp"->new(
+						$op,
+						$param,
+						"Type::Tiny::Union"->new(type_constraints => [$type, $tc[1]]),
+					);
+				}
+			}
+			elsif (ref $tc[0] eq 'ARRAY') {
+				require Type::Tiny::_HalfOp;
+				return "Type::Tiny::_HalfOp"->new('|', @tc);
+			}
+ 		}
 		require Type::Tiny::Union;
-		"Type::Tiny::Union"->new(type_constraints => \@tc)
+		return "Type::Tiny::Union"->new(type_constraints => \@tc)
 	},
 	q(&)       => sub {
 		my @tc = _swap @_;
-		if (!_FIXED_PRECEDENCE && !blessed $tc[0] && ref $tc[0] eq 'ARRAY') {
-			require Type::Tiny::_HalfOp;
-			return "Type::Tiny::_HalfOp"->new('&', @tc);
-		}
+		if (!_FIXED_PRECEDENCE && $_[2]) {
+			if (blessed $tc[0]) {
+				if (blessed $tc[0] eq "Type::Tiny::_HalfOp") {
+					my $type  = $tc[0]->{type};
+					my $param = $tc[0]->{param};
+					my $op    = $tc[0]->{op};
+					require Type::Tiny::Intersection;
+					return "Type::Tiny::_HalfOp"->new(
+						$op,
+						$param,
+						"Type::Tiny::Intersection"->new(type_constraints => [$type, $tc[1]]),
+					);
+				}
+			}
+			elsif (ref $tc[0] eq 'ARRAY') {
+				require Type::Tiny::_HalfOp;
+				return "Type::Tiny::_HalfOp"->new('&', @tc);
+			}
+ 		}
 		require Type::Tiny::Intersection;
 		"Type::Tiny::Intersection"->new(type_constraints => \@tc)
 	},
