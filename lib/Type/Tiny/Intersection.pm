@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Tiny::Intersection::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::Intersection::VERSION   = '1.001_014';
+	$Type::Tiny::Intersection::VERSION   = '1.001_015';
 }
 
 use Scalar::Util qw< blessed >;
