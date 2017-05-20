@@ -90,7 +90,7 @@ use overload
 				require Type::Tiny::_HalfOp;
 				return "Type::Tiny::_HalfOp"->new('|', @tc);
 			}
- 		}
+	}
 		require Type::Tiny::Union;
 		return "Type::Tiny::Union"->new(type_constraints => \@tc)
 	},
@@ -114,7 +114,7 @@ use overload
 				require Type::Tiny::_HalfOp;
 				return "Type::Tiny::_HalfOp"->new('&', @tc);
 			}
- 		}
+	}
 		require Type::Tiny::Intersection;
 		"Type::Tiny::Intersection"->new(type_constraints => \@tc)
 	},
