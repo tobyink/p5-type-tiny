@@ -1,24 +1,44 @@
-Post-1.002000 Changes
-=====================
+Type-Tiny 1.002xxx or 1.004000
+==============================
+
+* Resolve RT#102457. Error::TypeTiny::Assertion needs a better way of
+  identifying which stack frame to report the error at, or Type::Params
+  needs to mark its compiled subs more clearly.
+
+* Resolve RT#121763. Need to figure out the circumstances under which
+  this happens and fix.
+
+
+Type-Tiny 1.004000
+==================
+
+* December 2017 release date.
+
+* Rewrite Type::Tiny::Manual.
+
+* Resolve RT#120226 if HAARG will help me flesh out an API.
+
+* Loosen the definition of FileHandle so that it accepts any references
+  where Scalar::Util::openhandle($_) is true, not just unblessed GLOB
+  references. (It also currently accepts blessed references where
+  $_->isa('IO::Handle'). This will not change.)
+  
+  THIS CHANGE IS BACKWARDS INCOMPATIBLE AND DIFFERS FROM MOOSE'S
+  IMPLEMENTATION OF THE SAME-NAMED TYPE CONSTRAINT. YOU ARE HEREBY
+  WARNED!
+
+
+Long-Term
+=========
 
 * Try to make inlining for ClassName, RoleName, StrMatch, etc more
-  suitable for things like Mite.
+  suitable for things like Mite. Perhaps add a separate method to type
+  constraints for generating a string of Perl code that can be compiled
+  and executed without the presence of Type::Tiny and the type library.
 
-* Inform Type::Coercion when it *should have* been frozen (for example,
-  the parameterized ArrayRef, HashRef, Dict, and Tuple coercion
-  generators). 
-  
-  After that, $coercion->add_type_coercions can issue a warning about
-  that bad things are happening. On Perl 5.10, this can be done with
-  warnings::warnif. On earlier Perls that mechanism is unreliable, so
-  just use plain old warn.
+* Currently once ArrayRef[Foo] has been used somewhere, coercions on
+  Foo get frozen because changing them would lead to inconsistent
+  behaviour with ArrayRef[Foo]'s coercions. It should be possible
+  instead to have the coercion for Foo automatically update the
+  coercion for ArrayRef[Foo]
 
-* Investigate popular type constraints defined outside Type-Tiny, and
-  consider which can be added to Types::Standard/Types::Common::*.
-  These would need to be constraints that can be implemented with no
-  non-core dependencies.
-
-* Perhaps allow Type::Coercion::FromMoose's implementation of
-  add_type_coercions to succeed?
-
-* to_TypeTiny's _TypeTinyFromGeneric could support inlining?
