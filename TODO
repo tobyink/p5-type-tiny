@@ -35,10 +35,3 @@ Long-Term
   suitable for things like Mite. Perhaps add a separate method to type
   constraints for generating a string of Perl code that can be compiled
   and executed without the presence of Type::Tiny and the type library.
-
-* Currently once ArrayRef[Foo] has been used somewhere, coercions on
-  Foo get frozen because changing them would lead to inconsistent
-  behaviour with ArrayRef[Foo]'s coercions. It should be possible
-  instead to have the coercion for Foo automatically update the
-  coercion for ArrayRef[Foo]
-
