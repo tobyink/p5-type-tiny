@@ -62,6 +62,10 @@ f`examples/nonempty.pl`
 	dc:license <http://dev.perl.org/licenses/>;
 	dc:rightsHolder cpan:TOBYINK.
 
+f`examples/page-numbers.pl`
+	dc:license <http://dev.perl.org/licenses/>;
+	dc:rightsHolder cpan:TOBYINK.
+
 f`examples/datetime-coercions.pl`
 	dc:license <http://dev.perl.org/licenses/>;
 	dc:rightsHolder cpan:TOBYINK.

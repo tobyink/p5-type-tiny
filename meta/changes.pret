@@ -2462,3 +2462,13 @@
 		];
 	].
 
+`Type-Tiny 1.001_016 cpan:TOBYINK`
+	issued  2017-05-30;
+	changeset [
+		dcs:versus `Type-Tiny 1.001_015 cpan:TOBYINK`;
+		item [
+			a dcs:Documentation;
+			label "Include page-numbers.pl example";
+		];
+	].
+
