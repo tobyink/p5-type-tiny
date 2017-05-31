@@ -20,7 +20,7 @@ use Error::TypeTiny;
 use Error::TypeTiny::Assertion;
 use Error::TypeTiny::WrongNumberOfParameters;
 use Types::Standard -types;
-use Types::TypeTiny qw(CodeLike ArrayLike to_TypeTiny);
+use Types::TypeTiny qw(CodeLike TypeTiny ArrayLike to_TypeTiny);
 
 require Exporter::Tiny;
 our @ISA = 'Exporter::Tiny';
@@ -112,12 +112,19 @@ sub compile
 		my $is_slurpy;
 		my $varname;
 		
+		my $param_options = {};
+		$param_options = shift if HashRef->check($_[0]) && !exists $_[0]{slurpy};
+		
+		if ($param_options->{optional}) {
+			$is_optional = 1;
+		}
+
 		if (Bool->check($constraint))
 		{
 			$constraint = $constraint ? Any : Optional[Any];
 		}
-		
-		if (HashRef->check($constraint))
+
+		if (HashRef->check($constraint) and exists $constraint->{slurpy})
 		{
 			$constraint = to_TypeTiny(
 				$constraint->{slurpy}
@@ -138,7 +145,7 @@ sub compile
 		{
 			Error::TypeTiny::croak("Parameter following slurpy parameter") if $saw_slurpy;
 			
-			$is_optional     = grep $_->{uniq} == Optional->{uniq}, $constraint->parents;
+			$is_optional     += grep $_->{uniq} == Optional->{uniq}, $constraint->parents;
 			$really_optional = $is_optional && $constraint->parent->{uniq} eq Optional->{uniq} && $constraint->type_parameter;
 			
 			if ($is_optional)
@@ -291,12 +298,19 @@ sub compile_named
 		my $is_slurpy;
 		my $varname;
 		
+		my $param_options = {};		
+		$param_options = shift @_ if HashRef->check($_[0]) && !exists $_[0]{slurpy};
+		
+		if ($param_options->{optional}) {
+			$is_optional = 1;
+		}
+
 		if (Bool->check($constraint))
 		{
 			$constraint = $constraint ? Any : Optional[Any];
 		}
-		
-		if (HashRef->check($constraint))
+	
+		if (HashRef->check($constraint) and exists $constraint->{slurpy})
 		{
 			$constraint = to_TypeTiny($constraint->{slurpy});
 			++$is_slurpy;
@@ -304,12 +318,12 @@ sub compile_named
 		}
 		else
 		{
-			$is_optional     = grep $_->{uniq} == Optional->{uniq}, $constraint->parents;
+			$is_optional     += grep $_->{uniq} == Optional->{uniq}, $constraint->parents;
 			$really_optional = $is_optional && $constraint->parent->{uniq} eq Optional->{uniq} && $constraint->type_parameter;
 			
 			$constraint = $constraint->type_parameter if $really_optional;
 		}
-		
+
 		unless ($is_optional or $is_slurpy) {
 			push @code, sprintf(
 				'exists($in{%s}) or "Error::TypeTiny::WrongNumberOfParameters"->throw(message => sprintf "Missing required parameter: %%s", %s);',
@@ -405,27 +419,34 @@ sub compile_named
 	return $closure;
 }
 
+# Would be faster to inline this into validate and validate_named, but
+# that would complicate them. :/
+sub _mk_key {
+	local $_;
+	join ':', map {
+		HashRef->check($_)   ? do { my %h = %$_; sprintf('{%s}', _mk_key(map {; $_ => $h{$_} } sort keys %h)) } :
+		TypeTiny->check($_)  ? sprintf('TYPE=%s', $_->{uniq}) :
+		Ref->check($_)       ? sprintf('REF=%s', refaddr($_)) :
+		Undef->check($_)     ? sprintf('UNDEF') :
+		$QUOTE->($_)
+	} @_;
+}
+
 my %compiled;
 sub validate
 {
-	my $arr = shift;
-	my $sub = (
-		$compiled{ join ":", map($_->{uniq}||"\@$_->{slurpy}", @_) }
-			||= compile({ caller_level => 1 }, @_)
-	);
-	@_ = @$arr;
+	my $arg = shift;
+	my $sub = ($compiled{_mk_key(@_)} ||= compile({ caller_level => 1 }, @_));
+	@_ = @$arg;
 	goto $sub;
 }
 
 my %compiled_named;
 sub validate_named
 {
-	my $arr = shift;
-	my $sub = (
-		$compiled_named{ join ":", map(ref($_)?($_->{uniq}||"\@$_->{slurpy}"):$QUOTE->($_), @_) }
-			||= compile_named({ caller_level => 1 }, @_)
-	);
-	@_ = @$arr;
+	my $arg = shift;
+	my $sub = ($compiled_named{_mk_key(@_)} ||= compile_named({ caller_level => 1 }, @_));
+	@_ = @$arg;
 	goto $sub;
 }
 
