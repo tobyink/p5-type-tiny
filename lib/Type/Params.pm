@@ -268,9 +268,11 @@ sub compile
 	);
 	
 	return {
-		min_args   => $min_args,
-		max_args   => $saw_slurpy ? undef : $max_args,
-		closure    => $closure,
+		min_args    => $min_args,
+		max_args    => $saw_slurpy ? undef : $max_args,
+		closure     => $closure,
+		source      => $source,
+		environment => \%env,
 	} if $options{want_details};
 	
 	return $closure;
@@ -411,9 +413,11 @@ sub compile_named
 	);
 	
 	return {
-		min_args   => undef,  # always going to be 1 or 0
-		max_args   => undef,  # should be possible to figure out if no slurpy param
-		closure    => $closure,
+		min_args    => undef,  # always going to be 1 or 0
+		max_args    => undef,  # should be possible to figure out if no slurpy param
+		closure     => $closure,
+		source      => $source,
+		environment => \%env,
 	} if $options{want_details};
 	
 	return $closure;
