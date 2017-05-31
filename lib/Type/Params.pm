@@ -26,7 +26,7 @@ require Exporter::Tiny;
 our @ISA = 'Exporter::Tiny';
 
 our @EXPORT    = qw( compile compile_named );
-our @EXPORT_OK = qw( multisig validate validate_named Invocant );
+our @EXPORT_OK = qw( multisig validate validate_named compile_named_oo Invocant );
 
 sub english_list {
 	require Type::Utils;
@@ -477,7 +477,15 @@ sub compile_named
 		push @code, 'keys(%in) and "Error::TypeTiny"->throw(message => sprintf "Unrecognized parameter%s: %s", keys(%in)>1?"s":"", Type::Params::english_list(sort keys %in));'
 	}
 	
-	push @code, '\\%R;';
+	if ($options{bless}) {
+		push @code, sprintf('bless \\%%R, %s;', $QUOTE->($options{bless}));
+	}
+	elsif ($options{class}) {
+		push @code, sprintf('(%s)->%s(\\%R);', $QUOTE->($options{class}), $options{constructor}||'new');
+	}
+	else {
+		push @code, '\\%R;';
+	}
 	
 	my $source  = "sub { no warnings; ".join("\n", @code)." };";
 	return $source if $options{want_source};
@@ -497,6 +505,81 @@ sub compile_named
 	} if $options{want_details};
 	
 	return $closure;
+}
+
+my %klasses;
+my $kls_id = 0;
+sub _mkklass
+{
+	my $klass = sprintf('%s::OO::Klass%d', __PACKAGE__, ++$kls_id);
+	
+	eval {
+		require Class::XSAccessor;
+		'Class::XSAccessor'->import(
+			class             => $klass,
+			getters           => { map { defined($_->{getter})    ? ($_->{getter}    => $_->{slot}) : () } values %{$_[0]} },
+			exists_predicates => { map { defined($_->{predicate}) ? ($_->{predicate} => $_->{slot}) : () } values %{$_[0]} },
+		);
+		1;
+	}
+	or do {
+		for my $attr (values %{$_[0]}) {
+			defined($attr->{getter}) and eval sprintf(
+				'package %s; sub %s { $_[0]{%s} }; 1',
+				$klass,
+				$attr->{getter},
+				$attr->{slot},
+			) || die($@);
+			defined($attr->{predicate}) and eval sprintf(
+				'package %s; sub %s { exists $_[0]{%s} }; 1',
+				$klass,
+				$attr->{predicate},
+				$attr->{slot},
+			) || die($@);
+		}
+	};
+	
+	$klass;
+}
+
+sub compile_named_oo
+{
+	my %options    = (ref($_[0]) eq "HASH" && !$_[0]{slurpy}) ? %{+shift} : ();
+	my @rest       = @_;
+	
+	my %attribs;
+	while (@_) {
+		my ($name, $type) = splice(@_, 0, 2);
+		my $opts = (HashRef->check($_[0]) && !exists $_[0]{slurpy}) ? shift(@_) : {};
+			
+		my $is_optional = 0+!! $opts->{optional};
+		$is_optional += grep $_->{uniq} == Optional->{uniq}, $type->parents;
+		
+		my $getter = exists($opts->{getter})
+			? $opts->{getter}
+			: $name;
+		
+		Error::TypeTiny::croak("Bad accessor name: $getter")
+			unless $getter =~ /\A[A-Za-z][A-Za-z0-9_]*\z/;
+		
+		my $predicate = exists($opts->{predicate})
+			? ($opts->{predicate} eq '1' ? "has_$getter" : $opts->{predicate} eq '0' ? undef : $opts->{predicate})
+			: ($is_optional ? "has_$getter" : undef);
+		
+		$attribs{$name} = {
+			slot       => $name,
+			getter     => $getter,
+			predicate  => $predicate,
+		};
+	}
+	
+	my $kls = join '//',
+		map sprintf('%s*%s*%s', $attribs{$_}{slot}, $attribs{$_}{getter}, $attribs{$_}{predicate}||'0'),
+		sort keys %attribs;
+	
+	$klasses{$kls} ||= _mkklass(\%attribs);
+	
+	compile_named({ %options, bless => $klasses{$kls} }, @rest);
 }
 
 # Would be faster to inline this into validate and validate_named, but
