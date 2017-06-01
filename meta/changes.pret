@@ -2472,3 +2472,12 @@
 		];
 	].
 
+`Type-Tiny 1.002000 cpan:TOBYINK`
+	issued  2017-06-01;
+	changeset [
+		dcs:versus `Type-Tiny 1.001_016 cpan:TOBYINK`;
+		item [
+			a dcs:Packaging;
+			label "Stable version number.";
+		];
+	].
