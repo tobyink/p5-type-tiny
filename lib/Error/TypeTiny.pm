@@ -38,6 +38,8 @@ $CarpInternal{$_}++ for qw(
 	Type::Tiny::Role
 	Type::Tiny::Union
 	Type::Utils
+	Method::Generate::Constructor
+	Method::Generate::Accessor
 );
 
 sub new
