@@ -12,7 +12,7 @@ BEGIN {
 
 BEGIN {
 	$Types::Standard::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::VERSION   = '1.002000';
+	$Types::Standard::VERSION   = '1.002001';
 }
 
 use Type::Library -base;
