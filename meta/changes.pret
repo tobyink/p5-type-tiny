@@ -2481,3 +2481,18 @@
 			label "Stable version number.";
 		];
 	].
+
+`Type-Tiny 1.002001 cpan:TOBYINK`
+	issued  2017-06-08;
+	changeset [
+		dcs:versus `Type-Tiny 1.002000 cpan:TOBYINK`;
+		item [
+			a dcs:Packaging;
+			label "Ref::Util::XS 0.100 should be recommended, not 0.200 (which doesn't exist yet).";
+			dcs:fixes RT#121981;
+		];
+		item [
+			a dcs:Tests;
+			label "Skip t/30-integration/Moose/native-attribute-traits.t on older Moose because Test::Moose is broken.";
+		];
+	].
