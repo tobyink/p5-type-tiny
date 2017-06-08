@@ -19,7 +19,7 @@
 		comment "Make stuff faster."@en;
 	];
 	deps:runtime-recommendation [
-		deps:on "Ref::Util::XS 0.200"^^deps:CpanId;
+		deps:on "Ref::Util::XS 0.100"^^deps:CpanId;
 		comment "Make stuff faster."@en;
 	];
 	deps:runtime-recommendation [
