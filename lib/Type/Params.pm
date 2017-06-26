@@ -74,6 +74,33 @@ sub _mkslurpy
 		);
 }
 
+sub _mkdefault
+{
+	my $param_options = shift;
+	my $default;
+	
+	if (exists $param_options->{default}) {
+		$default = $param_options->{default};	
+		if (ArrayRef->check($default) and not @$default) {
+			$default = '[]';
+		}
+		elsif (HashRef->check($default) and not %$default) {
+			$default = '{}';
+		}
+		elsif (Str->check($default)) {
+			$default = $QUOTE->($default);
+		}
+		elsif (Undef->check($default)) {
+			$default = 'undef';
+		}
+		elsif (not CodeLike->check($default)) {
+			Error::TypeTiny::croak("Default expected to be string, coderef, undef, or reference to an empty hash or array");
+		}
+	}
+
+	$default;
+}
+
 sub compile
 {
 	my (@code, %env);
@@ -90,18 +117,21 @@ sub compile
 	$code[0] = 'my (%tmp, $tmp);';
 	PARAM: for my $param (@_) {
 		if (HashRef->check($param)) {
-			$code[0] = 'my (@R, %tmp, $tmp);';
+			$code[0] = 'my (@R, %tmp, $tmp, $dtmp);';
 			$return_default_list = !!0;
 			last PARAM;
 		}
 		elsif (not Bool->check($param)) {
 			if ($param->has_coercion) {
-				$code[0] = 'my (@R, %tmp, $tmp);';
+				$code[0] = 'my (@R, %tmp, $tmp, $dtmp);';
 				$return_default_list = !!0;
 				last PARAM;
 			}
 		}
 	}
+	
+	my @default_indices;
+	my @default_values;
 		
 	while (@_)
 	{
@@ -114,11 +144,12 @@ sub compile
 		
 		my $param_options = {};
 		$param_options = shift if HashRef->check($_[0]) && !exists $_[0]{slurpy};
+		my $default = $param_options->{default};
 		
-		if ($param_options->{optional}) {
+		if ($param_options->{optional} or defined $default) {
 			$is_optional = 1;
 		}
-
+		
 		if (Bool->check($constraint))
 		{
 			$constraint = $constraint ? Any : Optional[Any];
@@ -146,9 +177,32 @@ sub compile
 			Error::TypeTiny::croak("Parameter following slurpy parameter") if $saw_slurpy;
 			
 			$is_optional     += grep $_->{uniq} == Optional->{uniq}, $constraint->parents;
-			$really_optional = $is_optional && $constraint->parent->{uniq} eq Optional->{uniq} && $constraint->type_parameter;
+			$really_optional = $is_optional && $constraint->parent && $constraint->parent->{uniq} eq Optional->{uniq} && $constraint->type_parameter;
 			
-			if ($is_optional)
+			if (ref $default) {
+				$env{'@default'}[$arg] = $default;
+				push @code, sprintf(
+					'$dtmp = ($#_ < %d) ? $default[%d]->() : $_[%d];',
+					$arg,
+					$arg,
+					$arg,
+				);				
+				$saw_opt++;
+				$max_args++;
+				$varname = '$dtmp';
+			}
+			elsif (defined $default) {
+				push @code, sprintf(
+					'$dtmp = ($#_ < %d) ? %s : $_[%d];',
+					$arg,
+					$default,
+					$arg,
+				);				
+				$saw_opt++;
+				$max_args++;
+				$varname = '$dtmp';
+			}
+			elsif ($is_optional)
 			{
 				push @code, sprintf(
 					'return %s if $#_ < %d;',
@@ -157,15 +211,15 @@ sub compile
 				);
 				$saw_opt++;
 				$max_args++;
+				$varname = sprintf '$_[%d]', $arg;
 			}
 			else
 			{
 				Error::TypeTiny::croak("Non-Optional parameter following Optional parameter") if $saw_opt;
 				$min_args++;
 				$max_args++;
+				$varname = sprintf '$_[%d]', $arg;
 			}
-			
-			$varname = sprintf '$_[%d]', $arg;
 		}
 		
 		if ($constraint->has_coercion and $constraint->coercion->can_be_inlined)
@@ -299,14 +353,19 @@ sub compile_named
 		my $really_optional;
 		my $is_slurpy;
 		my $varname;
+		my $default;
+		
+		Str->check($name)
+			or Error::TypeTiny::croak("Expected parameter name as string, got $name");
 		
 		my $param_options = {};		
 		$param_options = shift @_ if HashRef->check($_[0]) && !exists $_[0]{slurpy};
+		$default = _mkdefault($param_options);
 		
-		if ($param_options->{optional}) {
+		if ($param_options->{optional} or defined $default) {
 			$is_optional = 1;
 		}
-
+	
 		if (Bool->check($constraint))
 		{
 			$constraint = $constraint ? Any : Optional[Any];
@@ -321,12 +380,29 @@ sub compile_named
 		else
 		{
 			$is_optional     += grep $_->{uniq} == Optional->{uniq}, $constraint->parents;
-			$really_optional = $is_optional && $constraint->parent->{uniq} eq Optional->{uniq} && $constraint->type_parameter;
+			$really_optional = $is_optional && $constraint->parent && $constraint->parent->{uniq} eq Optional->{uniq} && $constraint->type_parameter;
 			
 			$constraint = $constraint->type_parameter if $really_optional;
 		}
-
-		unless ($is_optional or $is_slurpy) {
+		
+		if (ref $default) {
+			$env{'@default'}[$arg] = $default;
+			push @code, sprintf(
+				'exists($in{%s}) or $in{%s} = $default[%d]->();',
+				$QUOTE->($name),
+				$QUOTE->($name),
+				$arg,
+			);
+		}
+		elsif (defined $default) {
+			push @code, sprintf(
+				'exists($in{%s}) or $in{%s} = %s;',
+				$QUOTE->($name),
+				$QUOTE->($name),
+				$default,
+			);
+		}
+		elsif (not $is_optional||$is_slurpy) {
 			push @code, sprintf(
 				'exists($in{%s}) or "Error::TypeTiny::WrongNumberOfParameters"->throw(message => sprintf "Missing required parameter: %%s", %s);',
 				$QUOTE->($name),
