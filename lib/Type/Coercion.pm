@@ -230,14 +230,23 @@ sub add_type_coercions
 	while (@args)
 	{
 		my $type     = Types::TypeTiny::to_TypeTiny(shift @args);
-		my $coercion = shift @args;
+
+                if ( blessed( $type ) and my $method = $type->can( 'type_coercion_map' ) ) {
+
+                    push @{$self->type_coercion_map}, @{$method->($type)};
+                }
+
+                else {
+
+                	my $coercion = shift @args;
 		
-		_croak "Types must be blessed Type::Tiny objects"
-			unless Types::TypeTiny::TypeTiny->check($type);
-		_croak "Coercions must be code references or strings"
-			unless Types::TypeTiny::StringLike->check($coercion) || Types::TypeTiny::CodeLike->check($coercion);
+			_croak "Types must be blessed Type::Tiny objects"
+				unless Types::TypeTiny::TypeTiny->check($type);
+			_croak "Coercions must be code references or strings"
+				unless Types::TypeTiny::StringLike->check($coercion) || Types::TypeTiny::CodeLike->check($coercion);
 		
-		push @{$self->type_coercion_map}, $type, $coercion;
+			push @{$self->type_coercion_map}, $type, $coercion;
+            }
 	}
 	
 	$self->_clear_compiled_coercion;
