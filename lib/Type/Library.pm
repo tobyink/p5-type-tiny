@@ -536,6 +536,11 @@ assume that the C<Types::Mine> library defines types C<Number> and C<String>.
    #
    use Types::Mine qw( :types );
    
+   # Exports "coerce_String" and "coerce_Number", as well as any other
+   # coercions
+   #
+   use Types::Mine qw( :coercions );
+   
    # Exports a sub "is_String" so that "is_String($foo)" is equivalent
    # to "String->check($foo)".
    #
