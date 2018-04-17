@@ -33,7 +33,10 @@ BEGIN {
 			return !!1 if exists $stash->{'ISA'};
 			return !!1 if exists $stash->{'VERSION'};
 			foreach my $globref (values %$stash) {
-				return !!1 if *{$globref}{CODE};
+				return !!1
+				  if ref \$globref eq 'GLOB'
+				     ? *{$globref}{CODE}
+				     : ref $globref; # const or sub ref
 			}
 			return !!0;
 		};
