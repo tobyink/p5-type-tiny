@@ -31,6 +31,13 @@ use Types::Standard -types, "slurpy";
 use Type::Utils;
 use Scalar::Util qw(refaddr);
 
+
+{
+	package
+	Type::Tiny::_Test::X;
+	sub new { bless $_[1], $_[0] }
+}
+
 sub simple_test {
 	my ($name, @spec) = @_;
 	
