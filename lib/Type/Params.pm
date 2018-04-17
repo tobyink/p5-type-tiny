@@ -599,7 +599,10 @@ my %compiled;
 sub validate
 {
 	my $arg = shift;
-	my $sub = ($compiled{_mk_key(@_)} ||= compile({ caller_level => 1 }, @_));
+	my $sub = ($compiled{_mk_key(@_)} ||= compile(
+		{ caller_level => 1, %{ref($_[0])eq'HASH'?shift(@_):()} },
+		@_,
+	));
 	@_ = @$arg;
 	goto $sub;
 }
@@ -608,7 +611,10 @@ my %compiled_named;
 sub validate_named
 {
 	my $arg = shift;
-	my $sub = ($compiled_named{_mk_key(@_)} ||= compile_named({ caller_level => 1 }, @_));
+	my $sub = ($compiled_named{_mk_key(@_)} ||= compile_named(
+		{ caller_level => 1, %{ref($_[0])eq'HASH'?shift(@_):()} },
+		@_,
+	));
 	@_ = @$arg;
 	goto $sub;
 }
@@ -1083,6 +1089,90 @@ a full example:
    get_from(0, \@array);      # returns $array[0]
    get_from('foo', \%hash);   # returns $hash{foo}
    get_from('foo', $obj);     # returns $obj->foo
+
+=head1 PARAMETER OBJECTS
+
+Here's a quick example function:
+
+   sub add_contact_to_database {
+      state $check = compile_named(
+         dbh     => Object,
+         id      => Int,
+         name    => Str,
+      );
+      my $arg = $check->(@_);
+      
+      my $sth = $arg{db}->prepare('INSERT INTO contacts VALUES (?, ?)');
+      $sth->execute($arg{id}, $arg{name});
+   }
+
+Looks simple, right? Did you spot that it will always die with an error
+message I<< Can't call method "prepare" on an undefined value >>?
+
+This is because we defined a parameter called 'db' but later tried to
+refer to it as C<< $arg{dbh} >>. Here, Perl gives us a pretty clear
+error, but sometimes the failures will be far more subtle. Wouldn't it
+be nice if instead we could do this?
+
+   sub add_contact_to_database {
+      state $check = compile_named_oo(
+         dbh     => Object,
+         id      => Int,
+         name    => Str,
+      );
+      my $arg = $check->(@_);
+      
+      my $sth = $arg->dbh->prepare('INSERT INTO contacts VALUES (?, ?)');
+      $sth->execute($arg->id, $arg->name);
+   }
+
+If we tried to call C<< $arg->db >>, it would fail because there was
+no such method.
+
+Well, that's exactly what C<compile_named_oo> does.
+
+As well as giving you nice protection against mistyped parameter names,
+It also looks kinda pretty, I think. Hash lookups are a little faster
+than method calls, of course (though Type::Params creates the methods
+using L<Class::XSAccessor> if it's installed, so they're still pretty
+fast).
+
+An optional parameter C<foo> will also get a nifty C<< $arg->has_foo >>
+predicate method. Yay!
+
+=head2 Options
+
+C<compile_named_oo> gives you some extra options for parameters.
+
+   sub add_contact_to_database {
+      state $check = compile_named_oo(
+         dbh     => Object,
+         id      => Int,    { default => '0', getter => 'identifier' },
+         name    => Str,    { optional => 1, predicate => 'has_name' },
+      );
+      my $arg = $check->(@_);
+      
+      my $sth = $arg->dbh->prepare('INSERT INTO contacts VALUES (?, ?)');
+      $sth->execute($arg->identifier, $arg->name) if $arg->has_name;
+   }
+
+The C<getter> option lets you choose the method name for getting the
+argument value. The C<predicate> option lets you choose the method name
+for checking the existence of an argument.
+
+By setting an explicit predicate method name, you can force a predicate
+method to be generated for non-optional arguments.
+
+=head2 Classes
+
+The objects returned by C<compile_named_oo> are blessed into lightweight
+classes which have been generated on the fly. Don't expect the names of
+the classes to be stable or predictable. It's probably a bad idea to be
+checking C<can>, C<isa>, or C<DOES> on any of these objects. If you're
+doing that, you've missed the point of them.
+
+They don't have any constructor (C<new> method). The C<< $check >>
+coderef effectively I<is> the constructor.
 
 =head1 COOKBOOK
 
