@@ -2496,3 +2496,14 @@
 			label "Skip t/30-integration/Moose/native-attribute-traits.t on older Moose because Test::Moose is broken.";
 		];
 	].
+
+`Type-Tiny 1.002002 cpan:TOBYINK`
+	issued  2018-04-17;
+	changeset [
+		dcs:versus `Type-Tiny 1.002001 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix;
+			label "Compatibility with constants and with CV-in-stash optimisation.";
+			dcs:fixes RT#123408;
+		];
+	].
