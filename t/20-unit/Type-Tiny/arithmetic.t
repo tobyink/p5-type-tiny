@@ -85,11 +85,13 @@ should_pass(undef, ~Value);
 {
 	package Local::Class4;
 	sub XYZ () { 1 }
+	package Local::Class5;
+	use constant XZY => 2
 }
 
 should_pass(undef, ~ClassName);
 should_pass([], ~ClassName);
-should_fail("Local::Class$_", ~ClassName) for 2..4;
+should_fail("Local::Class$_", ~ClassName) for 2..5;
 should_pass("Local::Dummy1", ~ClassName);
 
 should_fail([], ~(ArrayRef[Int]));
