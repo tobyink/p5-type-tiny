@@ -600,7 +600,7 @@ sub validate
 {
 	my $arg = shift;
 	my $sub = ($compiled{_mk_key(@_)} ||= compile(
-		{ caller_level => 1, %{ref($_[0])eq'HASH'?shift(@_):()} },
+		{ caller_level => 1, %{ref($_[0])eq'HASH'?shift(@_):+{}} },
 		@_,
 	));
 	@_ = @$arg;
@@ -612,7 +612,7 @@ sub validate_named
 {
 	my $arg = shift;
 	my $sub = ($compiled_named{_mk_key(@_)} ||= compile_named(
-		{ caller_level => 1, %{ref($_[0])eq'HASH'?shift(@_):()} },
+		{ caller_level => 1, %{ref($_[0])eq'HASH'?shift(@_):+{}} },
 		@_,
 	));
 	@_ = @$arg;
