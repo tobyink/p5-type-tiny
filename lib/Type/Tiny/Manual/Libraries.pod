@@ -142,7 +142,7 @@ L<Type::Tiny::Manual::Coercions>.
 
 Use a custom types library just like you would L<Types::Standard>:
 
-   packge MyClass;
+   package MyClass;
    use Moose;
    use DateTime;
    use Example::Types qw( Datetime ); # import the custom type
