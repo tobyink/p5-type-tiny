@@ -44,7 +44,8 @@ $meta->add_type(
 
 my ($pos_int, $posz_int);
 if (Type::Tiny::_USE_XS) {
-	$pos_int  = Type::Tiny::XS::get_coderef_for('PositiveInt');
+	$pos_int  = Type::Tiny::XS::get_coderef_for('PositiveInt')
+		if Type::Tiny::XS->VERSION >= 0.013; # fixed bug with "00"
 	$posz_int = Type::Tiny::XS::get_coderef_for('PositiveOrZeroInt');
 }
 
