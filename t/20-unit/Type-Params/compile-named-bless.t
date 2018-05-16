@@ -360,5 +360,4 @@ slurpy_test(
 	XXX => slurpy HashRef[$Rounded],
 ) if 0;
 
-
 done_testing;

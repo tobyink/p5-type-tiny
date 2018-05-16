@@ -106,7 +106,10 @@ sub compile
 	my (@code, %env);
 	push @code, '#placeholder', '#placeholder';  # @code[0,1]
 	
-	my %options    = (ref($_[0]) eq "HASH" && !$_[0]{slurpy}) ? %{+shift} : ();
+	my %options;
+	while (ref($_[0]) eq "HASH" && !$_[0]{slurpy}) {
+		%options = (%options, %{+shift});
+	}
 	my $arg        = -1;
 	my $saw_slurpy = 0;
 	my $min_args   = 0;
@@ -521,6 +524,7 @@ sub _mkklass
 	
 	eval {
 		require Class::XSAccessor;
+		Class::XSAccessor->VERSION('1.17'); # exists_predicates, June 2013
 		'Class::XSAccessor'->import(
 			class             => $klass,
 			getters           => { map { defined($_->{getter})    ? ($_->{getter}    => $_->{slot}) : () } values %{$_[0]} },
@@ -550,7 +554,10 @@ sub _mkklass
 
 sub compile_named_oo
 {
-	my %options    = (ref($_[0]) eq "HASH" && !$_[0]{slurpy}) ? %{+shift} : ();
+	my %options;
+	while (ref($_[0]) eq "HASH" && !$_[0]{slurpy}) {
+		%options = (%options, %{+shift});
+	}
 	my @rest       = @_;
 	
 	my %attribs;
@@ -859,6 +866,13 @@ object.
 B<< Named parameters only. >> Specify an alternative method name instead
 of C<new> for the C<class> option described above.
 
+=item C<< class => Tuple[ClassName, Str] >>
+
+B<< Named parameters only. >> Given a class name and constructor name pair,
+the check coderef will, instead of returning a simple hashref, call
+C<< $class->$constructor($hashref) >> and return a proper object. Shortcut
+for declaring both the C<class> and C<constructor> options at once.
+
 =item C<< bless => ClassName >>
 
 B<< Named parameters only. >> Bypass the constructor entirely and directly
@@ -1108,15 +1122,15 @@ Here's a quick example function:
       );
       my $arg = $check->(@_);
       
-      my $sth = $arg{db}->prepare('INSERT INTO contacts VALUES (?, ?)');
-      $sth->execute($arg{id}, $arg{name});
+      my $sth = $arg->{db}->prepare('INSERT INTO contacts VALUES (?, ?)');
+      $sth->execute($arg->{id}, $arg->{name});
    }
 
 Looks simple, right? Did you spot that it will always die with an error
 message I<< Can't call method "prepare" on an undefined value >>?
 
-This is because we defined a parameter called 'db' but later tried to
-refer to it as C<< $arg{dbh} >>. Here, Perl gives us a pretty clear
+This is because we defined a parameter called 'dbh' but later tried to
+refer to it as C<< $arg{db} >>. Here, Perl gives us a pretty clear
 error, but sometimes the failures will be far more subtle. Wouldn't it
 be nice if instead we could do this?
 
