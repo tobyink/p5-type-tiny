@@ -1362,11 +1362,6 @@ a L<Path::Tiny> object, you could coerce it from a string.
 
 =item *
 
-Params::Validate allows you to supply defaults for missing parameters;
-Type::Params does not, but you may be able to use coercion from Undef.
-
-=item *
-
 If you are primarily writing object-oriented code, using Moose or similar,
 and you are using Type::Tiny type constraints for your attributes, then
 using Type::Params allows you to use the same constraints for method calls.
@@ -1416,10 +1411,6 @@ Versus:
          { type => ArrayRef, slurpy => 1 },
       ],
    );
-
-=item *
-
-L<Params::ValidationCompiler> offers defaults.
 
 =item *
 
