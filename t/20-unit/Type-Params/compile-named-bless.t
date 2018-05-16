@@ -62,6 +62,12 @@ sub simple_test {
 			_simple_test( validate_named => $expected_class, sub { validate_named(\@_, $opts, @spec) } );
 			_simple_test( compile_named  => $expected_class, compile_named($opts, @spec) );
 		};
+		subtest "class => CLASS, constructor METHOD" => sub {
+			%$opts = (class => 'Type::Tiny::_Test::Blessed', constructor => 'new2');
+			$expected_class = 'Type::Tiny::_Test::Constructed2';
+			_simple_test( validate_named => $expected_class, sub { validate_named(\@_, $opts, @spec) } );
+			_simple_test( compile_named  => $expected_class, compile_named($opts, @spec) );
+		};
 	};
 }
 
@@ -71,8 +77,30 @@ sub slurpy_test {
 	my $expected_class = undef;
 	local $Test::Builder::Level = $Test::Builder::Level + 1;
 	subtest $name => sub {
-		_slurpy_test( validate_named => $expected_class, sub { validate_named(\@_, @spec) } );
-		_slurpy_test( compile_named  => $expected_class, compile_named(@spec) );
+		subtest "bless => CLASS" => sub {
+			%$opts = (bless => 'Type::Tiny::_Test::Blessed');
+			$expected_class = 'Type::Tiny::_Test::Blessed';
+			_slurpy_test( validate_named => $expected_class, sub { validate_named(\@_, $opts, @spec) } );
+			_slurpy_test( compile_named  => $expected_class, compile_named($opts, @spec) );
+		};
+		subtest "class => CLASS" => sub {
+			%$opts = (class => 'Type::Tiny::_Test::Blessed');
+			$expected_class = 'Type::Tiny::_Test::Constructed';
+			_slurpy_test( validate_named => $expected_class, sub { validate_named(\@_, $opts, @spec) } );
+			_slurpy_test( compile_named  => $expected_class, compile_named($opts, @spec) );
+		};
+		subtest "class => [CLASS, METHOD]" => sub {
+			%$opts = (class => ['Type::Tiny::_Test::Blessed', 'new2']);
+			$expected_class = 'Type::Tiny::_Test::Constructed2';
+			_slurpy_test( validate_named => $expected_class, sub { validate_named(\@_, $opts, @spec) } );
+			_slurpy_test( compile_named  => $expected_class, compile_named($opts, @spec) );
+		};
+		subtest "class => CLASS, constructor METHOD" => sub {
+			%$opts = (class => 'Type::Tiny::_Test::Blessed', constructor => 'new2');
+			$expected_class = 'Type::Tiny::_Test::Constructed2';
+			_slurpy_test( validate_named => $expected_class, sub { validate_named(\@_, $opts, @spec) } );
+			_slurpy_test( compile_named  => $expected_class, compile_named($opts, @spec) );
+		};
 	};
 }
 

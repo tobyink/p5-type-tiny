@@ -339,7 +339,10 @@ sub compile_named
 	@code = 'my (%R, %tmp, $tmp);';
 	push @code, '#placeholder';   # $code[1]
 	
-	my %options    = (ref($_[0]) eq "HASH" && !$_[0]{slurpy}) ? %{+shift} : ();
+	my %options;
+	while (ref($_[0]) eq "HASH" && !$_[0]{slurpy}) {
+		%options = (%options, %{+shift});
+	}
 	my $arg = -1;
 	my $had_slurpy;
 	
@@ -358,7 +361,7 @@ sub compile_named
 		Str->check($name)
 			or Error::TypeTiny::croak("Expected parameter name as string, got $name");
 		
-		my $param_options = {};		
+		my $param_options = {};
 		$param_options = shift @_ if HashRef->check($_[0]) && !exists $_[0]{slurpy};
 		$default = _mkdefault($param_options);
 		
@@ -480,8 +483,11 @@ sub compile_named
 	if ($options{bless}) {
 		push @code, sprintf('bless \\%%R, %s;', $QUOTE->($options{bless}));
 	}
+	elsif (ArrayRef->check($options{class})) {
+		push @code, sprintf('(%s)->%s(\\%%R);', $QUOTE->($options{class}[0]), $options{class}[1]||'new');
+	}
 	elsif ($options{class}) {
-		push @code, sprintf('(%s)->%s(\\%R);', $QUOTE->($options{class}), $options{constructor}||'new');
+		push @code, sprintf('(%s)->%s(\\%%R);', $QUOTE->($options{class}), $options{constructor}||'new');
 	}
 	else {
 		push @code, '\\%R;';
