@@ -2501,6 +2501,7 @@
 	issued  2017-06-08;
 	changeset [
 		dcs:versus `Type-Tiny 1.002000 cpan:TOBYINK`;
+		# ported from stable branch
 		item [
 			a dcs:Packaging;
 			label "Ref::Util::XS 0.100 should be recommended, not 0.200 (which doesn't exist yet).";
@@ -2509,5 +2510,41 @@
 		item [
 			a dcs:Tests;
 			label "Skip t/30-integration/Moose/native-attribute-traits.t on older Moose because Test::Moose is broken.";
+		];
+		item [
+			a dcs:Bugfix;
+			label "Compatibility with constants and with CV-in-stash optimisation.";
+			dcs:fixes RT#123408;
+		];
+		# new to dev branch
+		item [
+			a dcs:Addition;
+			label "Type::Params now exports a compile_named_oo function which returns a parameters object.";
+		];
+		item [
+			a dcs:Documentation;
+			label "Improvements to Type::Params documentation.";
+		];
+		item [
+			a dcs:Addition;
+			label "Type::Params now supports parameter defaults.";
+		];
+		item [
+			a dcs:Addition;
+			label "Type::Params compile_named now supports bless/class/constructor options.";
+		];
+		item [
+			a dcs:Change;
+			label "Don't use Type::Tiny::XS's implementation of PositiveInt in Types::Common::Numeric unless Type::Tiny::XS >= 0.013.";
+		];
+		item [
+			a dcs:Documentation;
+			label "Document Type::Library's :coercion export tag.";
+			dcs:blame cpan:DJERIUS;
+		];
+		item [
+			a dcs:Documentation;
+			label "Fix typo.";
+			dcs:blame cpan:BOOK;
 		];
 	].
