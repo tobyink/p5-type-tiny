@@ -2547,4 +2547,8 @@
 			label "Fix typo.";
 			dcs:blame cpan:BOOK;
 		];
+		item [
+			a dcs:Documentation;
+			label "Add a new CONTRIBUTING.pod file.";
+		];
 	].

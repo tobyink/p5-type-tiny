@@ -1,0 +1,58 @@
+=head1 NAME
+
+CONTRIBUTING - how to help with Type::Tiny
+
+=head1 DESCRIPTION
+
+=head2 Reporting bugs
+
+Bug reports (including wishlist items) can be submitted to RT.
+
+L<https://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
+
+Test cases written using L<Test::More> are always appreciated.
+
+=head2 Fixing bugs
+
+If something doesn't work as documented, or causes unexpected crashes,
+and you know how to fix it, then either attach a patch to the bug report
+(see above) or as a pull request to the project on GitHub.
+
+L<https://github.com/tobyink/p5-type-tiny>.
+
+Please try to follow the coding style used in the rest of the project.
+(Tab indents, spaces for alignment, British English spellings, pod at
+the end of code but the start of test cases, etc.)
+
+=head2 Adding Test Cases
+
+New test cases for the Type::Tiny test suite are always welcome.
+The coveralls page for Type::Tiny should reveal what parts of the
+code are most needing good test cases. Any files with below 95%
+coverage are highest priority.
+
+L<https://coveralls.io/github/tobyink/p5-type-tiny>.
+
+=head2 Improving Documentation
+
+While the documentation for each package in Type::Tiny is fairly
+complete, Type::Tiny::Manual needs a bit of work.
+
+=head2 Writing Type Libraries
+
+Though I'm unlikely to bundle many more type libraries in this distribution,
+uploading your own type libraries to CPAN will strengthen the Type::Tiny
+ecosystem.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2018 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
