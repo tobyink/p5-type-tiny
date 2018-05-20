@@ -80,7 +80,7 @@ sub _mkdefault
 	my $default;
 	
 	if (exists $param_options->{default}) {
-		$default = $param_options->{default};	
+		$default = $param_options->{default};
 		if (ArrayRef->check($default) and not @$default) {
 			$default = '[]';
 		}
@@ -189,7 +189,7 @@ sub compile
 					$arg,
 					$arg,
 					$arg,
-				);				
+				);
 				$saw_opt++;
 				$max_args++;
 				$varname = '$dtmp';
@@ -200,7 +200,7 @@ sub compile
 					$arg,
 					$default,
 					$arg,
-				);				
+				);
 				$saw_opt++;
 				$max_args++;
 				$varname = '$dtmp';

@@ -71,7 +71,7 @@ my $e = exception {
 	compile_named_oo( 999 => Int );
 };
 ok(Object->check($e), 'exception thrown for bad accessor name');
-like($e->message, qr/bad accessor name/i, 'correct message');	
+like($e->message, qr/bad accessor name/i, 'correct message');
 
 
 my $coderef2 = compile_named_oo(
