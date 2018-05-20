@@ -1,0 +1,68 @@
+=pod
+
+=encoding utf-8
+
+=head1 PURPOSE
+
+Test L<Type::Params> C<compile_named_oo> function.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2018 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
+use strict;
+use warnings;
+use Test::More;
+
+use Type::Params qw( compile_named_oo );
+use Types::Standard qw( -types );
+
+
+my $coderef = compile_named_oo(
+	foo    => Int,
+	bar    => Optional[Int],
+	baz    => Optional[HashRef], { getter => 'bazz', predicate => 'haz' },
+);
+
+ok(CodeRef->check($coderef), 'compile_named_oo returns a coderef');
+
+my @object;
+$object[0] = $coderef->(  foo => 42, bar => 69, baz => { quux => 666 }  );
+$object[1] = $coderef->({ foo => 42, bar => 69, baz => { quux => 666 } });
+$object[2] = $coderef->(  foo => 42  );
+$object[3] = $coderef->({ foo => 42 });
+
+for my $i (0 .. 1) {
+	ok(Object->check($object[$i]), "\$object[$i] is an object");
+	can_ok($object[$i], qw( foo bar has_bar bazz haz ));
+	is($object[$i]->foo, 42, "\$object[$i]->foo == 42");
+	is($object[$i]->bar, 69, "\$object[$i]->bar == 69");
+	is($object[$i]->bazz->{quux}, 666, "\$object[$i]->bazz->{quux} == 666");
+	ok($object[$i]->has_bar, "\$object[$i]->has_bar");
+	ok($object[$i]->haz, "\$object[$i]->haz");
+	ok(! $object[$i]->can("has_foo"), 'no has_foo method');
+	ok(! $object[$i]->can("has_baz"), 'no has_baz method');
+}
+
+for my $i (2 .. 3) {
+	ok(Object->check($object[$i]), "\$object[$i] is an object");
+	can_ok($object[$i], qw( foo bar has_bar bazz haz ));
+	is($object[$i]->foo, 42, "\$object[$i]->foo == 42");
+	is($object[$i]->bar, undef, "not defined \$object[$i]->bar");
+	is($object[$i]->bazz, undef, "not defined \$object[$i]->bazz");
+	ok(! $object[$i]->has_bar, "!\$object[$i]->has_bar");
+	ok(! $object[$i]->haz, "!\$object[$i]->haz");
+	ok(! $object[$i]->can("has_foo"), 'no has_foo method');
+	ok(! $object[$i]->can("has_baz"), 'no has_baz method');
+}
+
+done_testing;
