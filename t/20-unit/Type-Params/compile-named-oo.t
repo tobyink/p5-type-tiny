@@ -22,6 +22,7 @@ the same terms as the Perl 5 programming language system itself.
 use strict;
 use warnings;
 use Test::More;
+use Test::Fatal;
 
 use Type::Params qw( compile_named_oo );
 use Types::Standard qw( -types );
@@ -64,5 +65,22 @@ for my $i (2 .. 3) {
 	ok(! $object[$i]->can("has_foo"), 'no has_foo method');
 	ok(! $object[$i]->can("has_baz"), 'no has_baz method');
 }
+
+
+my $e = exception {
+	compile_named_oo( 999 => Int );
+};
+ok(Object->check($e), 'exception thrown for bad accessor name');
+like($e->message, qr/bad accessor name/i, 'correct message');	
+
+
+my $coderef2 = compile_named_oo(
+	bar    => Optional[ArrayRef],
+	baz    => Optional[CodeRef], { getter => 'bazz', predicate => 'haz' },
+	foo    => Num,
+);
+my $coderef2obj = $coderef2->(foo => 1.1, bar => []);
+is(ref($object[0]), ref($coderef2obj), 'packages reused when possible');
+
 
 done_testing;
