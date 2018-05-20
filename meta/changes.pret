@@ -2543,6 +2543,11 @@
 			dcs:blame cpan:DJERIUS;
 		];
 		item [
+			a dcs:Addition;
+			label "Allow Type::Coercion's add_type_coercion to accept a Type::Coercion object, which was already documented as working.";
+			dcs:blame cpan:DJERIUS;
+		];
+		item [
 			a dcs:Documentation;
 			label "Fix typo.";
 			dcs:blame cpan:BOOK;
