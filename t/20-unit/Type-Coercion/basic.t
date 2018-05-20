@@ -181,4 +181,28 @@ should_fail({},      ArrayRef->coercibles);
 
 is($arrayref_from_piped->coercibles, $arrayref_from_piped->coercibles, '$arrayref_from_piped->coercibles == $arrayref_from_piped->coercibles');
 
+# ensure that add_type_coercion can handle Type::Coercions
+subtest 'add a Type::Coercion to a Type::Coercion' => sub {
+
+    my $coercion = Type::Coercion->new;
+    ok(
+        !$coercion->has_coercion_for_type( Str ),
+        "empty coercion can't coerce a Str"
+    );
+
+    is( exception { $coercion->add_type_coercions( ArrayRefFromPiped ) },
+        undef, "add a coercion from Str" );
+
+    ok(
+        $coercion->has_coercion_for_type( Str ),
+        "check that coercion was added"
+    );
+
+    # now see if coercion actually works
+    my $arrayref_from_piped = ArrayRef->plus_coercions($coercion);
+    my $coercibles          = $arrayref_from_piped->coercibles;
+    should_pass('1|2|3', $coercibles, "can coerce from a Str");
+};
+
+
 done_testing;
