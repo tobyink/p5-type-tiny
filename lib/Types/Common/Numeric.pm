@@ -19,6 +19,7 @@ use Type::Library -base, -declare => qw(
 	NegativeNum NegativeOrZeroNum
 	NegativeInt NegativeOrZeroInt
 	SingleDigit
+	NumRange IntRange
 );
 
 use Type::Tiny ();
@@ -118,6 +119,72 @@ $meta->add_type(
 	inlined    => sub { undef, qq($_ >= -9), qq($_ <= 9) },
 	message    => sub { "Must be a single digit" },
 );
+
+for my $base (qw/Num Int/) {
+	$meta->add_type(
+		name       => "${base}Range",
+		parent     => Types::Standard->get_type($base),
+		constraint_generator => sub {
+			return $meta->get_type("${base}Range") unless @_;
+			
+			my ($min, $max, $min_excl, $max_excl) = @_;
+			# todo: validate parameters
+			
+			# this is complicated so defer to the inline generator
+			eval sprintf(
+				'sub { %s }',
+				join ' and ',
+					grep defined,
+					$meta->get_type("${base}Range")->inline_generator->(@_)->(undef, '$_[0]'),
+			);
+		},
+		inline_generator => sub {
+			my ($min, $max, $min_excl, $max_excl) = @_;
+			
+			my $gt = $min_excl ? '>' : '>=';
+			my $lt = $max_excl ? '<' : '<=';
+			
+			return sub {
+				my $v = $_[1];
+				my @code = (undef); # parent constraint
+				push @code, "$v $gt $min";
+				push @code, "$v $lt $max" if defined $max;
+				return @code;
+			};
+		},
+		deep_explanation => sub {
+			my ($type, $value, $varname) = @_;
+			my ($min, $max, $min_excl, $max_excl) = @{ $type->parameters || [] };
+			my @whines;
+			if (defined $max) {
+				push @whines, sprintf(
+					'"%s" expects %s to be %s %d and %s %d',
+					$type,
+					$varname,
+					$min_excl ? 'greater than' : 'at least',
+					$min,
+					$max_excl ? 'less than' : 'at most',
+					$max,
+				);
+			}
+			else {
+				push @whines, sprintf(
+					'"%s" expects %s to be %s %d',
+					$type,
+					$varname,
+					$min_excl ? 'greater than' : 'at least',
+					$min,
+				);
+			}
+			push @whines, sprintf(
+				"length(%s) is %d",
+				$varname,
+				length($value),
+			);
+			return \@whines;
+		},
+	);
+}
 
 __PACKAGE__->meta->make_immutable;
 
