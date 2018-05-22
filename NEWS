@@ -33,7 +33,8 @@
 
 2018-XX-XX Type-Tiny version 1.004000 released!
 
- - Types::Standard::FileHandle has a looser definition.
+ - Types::Standard::FileHandle has a looser definition, more consistent with
+   Mouse and Type::Tiny::XS.
  - Type::Params now has `compile_named_oo`.
  - Type::Params supports defaults for missing parameters.
  - Various bug fixes.
