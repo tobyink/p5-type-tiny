@@ -2498,7 +2498,7 @@
 	].
 
 `Type-Tiny 1.003_000 cpan:TOBYINK`
-	issued  2017-06-08;
+	issued  2018-05-20;
 	changeset [
 		dcs:versus `Type-Tiny 1.002000 cpan:TOBYINK`;
 		# ported from stable branch
@@ -2555,5 +2555,24 @@
 		item [
 			a dcs:Documentation;
 			label "Add a new CONTRIBUTING.pod file.";
+		];
+	].
+
+`Type-Tiny 1.003_001 cpan:TOBYINK`
+	issued  2018-05-22;
+	changeset [
+		dcs:versus `Type-Tiny 1.003_000 cpan:TOBYINK`;
+		item [
+			a dcs:Change;
+			label "Don't use Type::Tiny::XS's implementation of Bool in Types::Standard unless Type::Tiny::XS >= 0.014.";
+		];
+		item [
+			a dcs:Change;
+			label "Looser definition of FileHandle in Types::Standard.";
+			dcs:fixes RT#121762;
+		];
+		item [
+			a dcs:Tests;
+			label "Tests for coercions to CycleTuple from Types::Standard with non-inlineable type constraints.";
 		];
 	].
