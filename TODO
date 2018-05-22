@@ -3,17 +3,6 @@ Type-Tiny 1.004000
 
 * 2018 release date.
 
-* Resolve RT#102457. Error::TypeTiny::Assertion needs a better way of
-  identifying which stack frame to report the error at, or Type::Params
-  needs to mark its compiled subs more clearly.
-
-* Resolve RT#121763. Need to figure out the circumstances under which
-  this happens and fix.
-
-* Resolve RT#120226 if HAARG will help me flesh out an API.
-
-* Test cases for compile_named_oo.
-
 
 Long-Term
 =========
@@ -24,3 +13,12 @@ Long-Term
   suitable for things like Mite. Perhaps add a separate method to type
   constraints for generating a string of Perl code that can be compiled
   and executed without the presence of Type::Tiny and the type library.
+
+* Resolve RT#102457. Error::TypeTiny::Assertion needs a better way of
+  identifying which stack frame to report the error at, or Type::Params
+  needs to mark its compiled subs more clearly.
+
+* Resolve RT#121763. Need to figure out the circumstances under which
+  this happens and fix.
+
+* Resolve RT#120226 if HAARG will help me flesh out an API.
