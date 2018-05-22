@@ -12,7 +12,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2017 by Toby Inkster.
+This software is copyright (c) 2017, 2018 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -30,31 +30,53 @@ use Test::Fatal qw(exception);
 use Types::Standard qw( CycleTuple Num Int HashRef ArrayRef Any Optional slurpy );
 use Type::Utils qw( class_type );
 
-my $type = CycleTuple[
+my $type1 = CycleTuple[
 	Int->plus_coercions(Num, 'int($_)'),
 	HashRef,
 	ArrayRef,
 ];
 
-should_fail(undef, $type);
-should_fail({}, $type);
-should_pass([], $type);
-should_fail([{}], $type);
-should_fail([1], $type);
-should_fail([1,{}], $type);
-should_pass([1,{}, []], $type);
-should_fail([1,{}, [], undef], $type);
-should_fail([1,{}, [], 2], $type);
-should_pass([1,{}, [], 2, {}, [1]], $type);
+my $type2 = CycleTuple[
+	Int->where(sub{2})->plus_coercions(Num, 'int($_)'),
+	HashRef,
+	ArrayRef,
+];
 
-is_deeply(
-	$type->coerce([1.1, {}, [], 2.2, {}, [3.3]]),
-	[1, {}, [], 2, {}, [3.3]],
-	'automagic coercion',
-);
+my $type3 = CycleTuple[
+	Int->plus_coercions(Num->where(sub{2}), 'int($_)'),
+	HashRef,
+	ArrayRef,
+];
 
-#diag $type->inline_check('$THING');
-#diag CycleTuple->of(Any, Any)->inline_check('$BLAH');
+my $type4 = CycleTuple[
+	Int->where(sub{2})->plus_coercions(Num->where(sub{2}), 'int($_)'),
+	HashRef,
+	ArrayRef,
+];
+
+my $i;
+for my $type ($type1, $type2, $type3, $type4)
+{
+	++$i;
+	subtest "\$type$i" => sub {
+		should_fail(undef, $type);
+		should_fail({}, $type);
+		should_pass([], $type);
+		should_fail([{}], $type);
+		should_fail([1], $type);
+		should_fail([1,{}], $type);
+		should_pass([1,{}, []], $type);
+		should_fail([1,{}, [], undef], $type);
+		should_fail([1,{}, [], 2], $type);
+		should_pass([1,{}, [], 2, {}, [1]], $type);
+
+		is_deeply(
+			$type->coerce([1.1, {}, [], 2.2, {}, [3.3]]),
+			[1, {}, [], 2, {}, [3.3]],
+			'automagic coercion',
+		);
+	};
+}
 
 like(
 	exception { CycleTuple[Any, Optional[Any]] },
