@@ -14,15 +14,6 @@ Type-Tiny 1.004000
 
 * Test cases for compile_named_oo.
 
-* Loosen the definition of FileHandle so that it accepts any references
-  where Scalar::Util::openhandle($_) is true, not just unblessed GLOB
-  references. (It also currently accepts blessed references where
-  $_->isa('IO::Handle'). This will not change.)
-  
-  THIS CHANGE IS BACKWARDS INCOMPATIBLE AND DIFFERS FROM MOOSE'S
-  IMPLEMENTATION OF THE SAME-NAMED TYPE CONSTRAINT. YOU ARE HEREBY
-  WARNED!
-
 
 Long-Term
 =========

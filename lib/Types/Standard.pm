@@ -317,11 +317,11 @@ $meta->$add_core_type({
 	name       => "FileHandle",
 	parent     => $_ref,
 	constraint => sub {
-		(ref($_) eq "GLOB" && Scalar::Util::openhandle($_))
+		(ref($_) && Scalar::Util::openhandle($_))
 		or (blessed($_) && $_->isa("IO::Handle"))
 	},
 	inlined    => sub {
-		"(ref($_[1]) eq \"GLOB\" && Scalar::Util::openhandle($_[1])) ".
+		"(ref($_[1]) && Scalar::Util::openhandle($_[1])) ".
 		"or (Scalar::Util::blessed($_[1]) && $_[1]\->isa(\"IO::Handle\"))"
 	},
 });
