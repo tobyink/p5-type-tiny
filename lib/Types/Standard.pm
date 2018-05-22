@@ -65,7 +65,7 @@ my $add_core_type = sub {
 		$xsub     = Type::Tiny::XS::get_coderef_for($name);
 		$xsubname = Type::Tiny::XS::get_subname_for($name);
 	}
-		
+	
 	elsif ( Type::Tiny::_USE_MOUSE
 	and not ($name eq 'RegexpRef' or $name eq 'Int' or $name eq 'Object') ) {
 		require Mouse::Util::TypeConstraints;
@@ -73,6 +73,13 @@ my $add_core_type = sub {
 		$xsubname = "Mouse::Util::TypeConstraints::$name" if $xsub;
 	}
 	
+	if (Type::Tiny::_USE_XS
+	and Type::Tiny::XS->VERSION < 0.014
+	and $name eq 'Bool') {
+		# Broken implementation of Bool
+		$xsub = $xsubname = undef;
+	}
+
 	$typedef->{compiled_type_constraint} = $xsub if $xsub;
 	
 	$typedef->{inlined} = sub { "$xsubname\($_[1])" }
