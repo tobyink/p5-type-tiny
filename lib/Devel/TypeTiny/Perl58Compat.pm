@@ -21,7 +21,7 @@ unless (exists &re::is_regexp)
 
 #### Done!
 
-5.6;
+5.8;
 
 __END__
 
