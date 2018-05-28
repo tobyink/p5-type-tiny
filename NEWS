@@ -37,4 +37,6 @@
    Mouse and Type::Tiny::XS.
  - Type::Params now has `compile_named_oo`.
  - Type::Params supports defaults for missing parameters.
+ - Types::Common::Numeric includes IntRange and NumRange.
+ - Types::Common::String includes StrLength.
  - Various bug fixes.

@@ -2576,3 +2576,17 @@
 			label "Tests for coercions to CycleTuple from Types::Standard with non-inlineable type constraints.";
 		];
 	].
+
+`Type-Tiny 1.003_002 cpan:TOBYINK`
+	issued  2018-05-28;
+	changeset [
+		dcs:versus `Type-Tiny 1.003_001 cpan:TOBYINK`;
+		item [
+			a dcs:Addition;
+			label "Types::Common::Numeric now has NumRange and IntRange types.";
+		];
+		item [
+			a dcs:Addition;
+			label "Types::Common::String now has a StrLength type.";
+		];
+	].
