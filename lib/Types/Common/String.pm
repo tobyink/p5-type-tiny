@@ -259,6 +259,31 @@ L<MooseX::Types::Common::String>.
 
 =back
 
+This module also defines an extra type constraint not found in
+L<MooseX::Types::Common::String>.
+
+=over
+
+=item C<< StrLength[`min, `max] >>
+
+Type constraint for a string between min and max characters long. For
+example:
+
+  StrLength[4, 20]
+
+It is sometimes useful to combine this with another type constraint in an
+intersection.
+
+  (LowerCaseStr) & (StrLength[4, 20])
+
+The max length can be omitted.
+
+  StrLength[10]   # at least 10 characters
+
+Lengths are inclusive.
+
+=back
+
 =head1 BUGS
 
 Please report any bugs to

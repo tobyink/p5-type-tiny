@@ -234,10 +234,49 @@ L<MooseX::Types::Common::Numeric>.
 
 =item C<SingleDigit>
 
-=back
-
 C<SingleDigit> interestingly accepts the numbers -9 to -1; not
 just 0 to 9. 
+
+=back
+
+This module also defines an extra pair of type constraints not found in
+L<MooseX::Types::Common::Numeric>.
+
+=over
+
+=item C<< IntRange[`min, `max] >>
+
+Type constraint for an integer between min and max. For example:
+
+  IntRange[1, 10]
+
+The maximum can be omitted.
+
+  IntRange[10]   # at least 10
+
+The minimum and maximum are inclusive.
+
+=item C<< NumRange[`min, `max] >>
+
+Type constraint for a number between min and max. For example:
+
+  NumRange[0.1, 10.0]
+
+As with IntRange, the maximum can be omitted, and the minimum and maximum
+are inclusive.
+
+Exclusive ranges can be useful for non-integer values, so additional parameters
+can be given to make the minimum and maximum exclusive.
+
+  NumRange[0.1, 10.0, 0, 0]  # both inclusive
+  NumRange[0.1, 10.0, 0, 1]  # exclusive maximum, so 10.0 is invalid
+  NumRange[0.1, 10.0, 1, 0]  # exclusive minimum, so 0.1 is invalid
+  NumRange[0.1, 10.0, 1, 1]  # both exclusive
+
+Making one of the limits exclusive means that a C<< < >> or C<< > >> operator
+will be used instead of the usual C<< <= >> or C<< >= >> operators.
+
+=back
 
 =head1 BUGS
 
