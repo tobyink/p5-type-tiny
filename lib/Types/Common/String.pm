@@ -25,6 +25,7 @@ use Type::Library -base, -declare => qw(
 	NonEmptyStr
 	LowerCaseStr
 	UpperCaseStr
+	StrLength
 );
 
 use Type::Tiny ();
@@ -147,6 +148,65 @@ UpperCaseSimpleStr->coercion->add_type_coercions(
 	NonEmptySimpleStr, q[ uc($_) ],
 );
 
+$meta->add_type(
+	name       => StrLength,
+	parent     => Str,
+	constraint_generator => sub {
+		return $meta->get_type('StrLength') unless @_;
+		
+		my ($min, $max) = @_;
+		Types::Standard::Int->check($_)
+			|| Types::Standard::_croak("Parameters for StrLength[`min, `max] expected to be integers; got $_")
+			for @_;
+		
+		if (defined $max) {
+			return sub { length($_[0]) >= $min and length($_[0]) <= $max };
+		}
+		else {
+			return sub { length($_[0]) >= $min };
+		}
+	},
+	inline_generator => sub {
+		my ($min, $max) = @_;
+		
+		return sub {
+			my $v = $_[1];
+			my @code = (undef); # parent constraint
+			push @code, "length($v) >= $min";
+			push @code, "length($v) <= $max" if defined $max;
+			return @code;
+		};
+	},
+	deep_explanation => sub {
+		my ($type, $value, $varname) = @_;
+		my ($min, $max) = @{ $type->parameters || [] };
+		my @whines;
+		if (defined $max) {
+			push @whines, sprintf(
+				'"%s" expects length(%s) to be between %d and %d',
+				$type,
+				$varname,
+				$min,
+				$max,
+			);
+		}
+		else {
+			push @whines, sprintf(
+				'"%s" expects length(%s) to be at least %d',
+				$type,
+				$varname,
+				$min,
+			);
+		}
+		push @whines, sprintf(
+			"length(%s) is %d",
+			$varname,
+			length($value),
+		);
+		return \@whines;
+	},
+);
+
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -196,6 +256,31 @@ L<MooseX::Types::Common::String>.
 =item C<LowerCaseStr>
 
 =item C<UpperCaseStr>
+
+=back
+
+This module also defines an extra type constraint not found in
+L<MooseX::Types::Common::String>.
+
+=over
+
+=item C<< StrLength[`min, `max] >>
+
+Type constraint for a string between min and max characters long. For
+example:
+
+  StrLength[4, 20]
+
+It is sometimes useful to combine this with another type constraint in an
+intersection.
+
+  (LowerCaseStr) & (StrLength[4, 20])
+
+The max length can be omitted.
+
+  StrLength[10]   # at least 10 characters
+
+Lengths are inclusive.
 
 =back
 

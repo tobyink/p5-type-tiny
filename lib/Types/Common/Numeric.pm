@@ -19,6 +19,7 @@ use Type::Library -base, -declare => qw(
 	NegativeNum NegativeOrZeroNum
 	NegativeInt NegativeOrZeroInt
 	SingleDigit
+	NumRange IntRange
 );
 
 use Type::Tiny ();
@@ -119,6 +120,72 @@ $meta->add_type(
 	message    => sub { "Must be a single digit" },
 );
 
+for my $base (qw/Num Int/) {
+	$meta->add_type(
+		name       => "${base}Range",
+		parent     => Types::Standard->get_type($base),
+		constraint_generator => sub {
+			return $meta->get_type("${base}Range") unless @_;
+			
+			my ($min, $max, $min_excl, $max_excl) = @_;
+			# todo: validate parameters
+			
+			# this is complicated so defer to the inline generator
+			eval sprintf(
+				'sub { %s }',
+				join ' and ',
+					grep defined,
+					$meta->get_type("${base}Range")->inline_generator->(@_)->(undef, '$_[0]'),
+			);
+		},
+		inline_generator => sub {
+			my ($min, $max, $min_excl, $max_excl) = @_;
+			
+			my $gt = $min_excl ? '>' : '>=';
+			my $lt = $max_excl ? '<' : '<=';
+			
+			return sub {
+				my $v = $_[1];
+				my @code = (undef); # parent constraint
+				push @code, "$v $gt $min";
+				push @code, "$v $lt $max" if defined $max;
+				return @code;
+			};
+		},
+		deep_explanation => sub {
+			my ($type, $value, $varname) = @_;
+			my ($min, $max, $min_excl, $max_excl) = @{ $type->parameters || [] };
+			my @whines;
+			if (defined $max) {
+				push @whines, sprintf(
+					'"%s" expects %s to be %s %d and %s %d',
+					$type,
+					$varname,
+					$min_excl ? 'greater than' : 'at least',
+					$min,
+					$max_excl ? 'less than' : 'at most',
+					$max,
+				);
+			}
+			else {
+				push @whines, sprintf(
+					'"%s" expects %s to be %s %d',
+					$type,
+					$varname,
+					$min_excl ? 'greater than' : 'at least',
+					$min,
+				);
+			}
+			push @whines, sprintf(
+				"length(%s) is %d",
+				$varname,
+				length($value),
+			);
+			return \@whines;
+		},
+	);
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -167,10 +234,49 @@ L<MooseX::Types::Common::Numeric>.
 
 =item C<SingleDigit>
 
-=back
-
 C<SingleDigit> interestingly accepts the numbers -9 to -1; not
 just 0 to 9. 
+
+=back
+
+This module also defines an extra pair of type constraints not found in
+L<MooseX::Types::Common::Numeric>.
+
+=over
+
+=item C<< IntRange[`min, `max] >>
+
+Type constraint for an integer between min and max. For example:
+
+  IntRange[1, 10]
+
+The maximum can be omitted.
+
+  IntRange[10]   # at least 10
+
+The minimum and maximum are inclusive.
+
+=item C<< NumRange[`min, `max] >>
+
+Type constraint for a number between min and max. For example:
+
+  NumRange[0.1, 10.0]
+
+As with IntRange, the maximum can be omitted, and the minimum and maximum
+are inclusive.
+
+Exclusive ranges can be useful for non-integer values, so additional parameters
+can be given to make the minimum and maximum exclusive.
+
+  NumRange[0.1, 10.0, 0, 0]  # both inclusive
+  NumRange[0.1, 10.0, 0, 1]  # exclusive maximum, so 10.0 is invalid
+  NumRange[0.1, 10.0, 1, 0]  # exclusive minimum, so 0.1 is invalid
+  NumRange[0.1, 10.0, 1, 1]  # both exclusive
+
+Making one of the limits exclusive means that a C<< < >> or C<< > >> operator
+will be used instead of the usual C<< <= >> or C<< >= >> operators.
+
+=back
 
 =head1 BUGS
 
