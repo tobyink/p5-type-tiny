@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Registry::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Registry::VERSION   = '1.003_002';
+	$Type::Registry::VERSION   = '1.003_003';
 }
 
 use Exporter::Tiny qw( mkopt );

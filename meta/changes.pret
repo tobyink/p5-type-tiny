@@ -2590,3 +2590,18 @@
 			label "Types::Common::String now has a StrLength type.";
 		];
 	].
+
+
+`Type-Tiny 1.003_003 cpan:TOBYINK`
+	issued  2018-06-10;
+	changeset [
+		dcs:versus `Type-Tiny 1.003_003 cpan:TOBYINK`;
+		item [
+			a dcs:Addition;
+			label "Bool (Types::Standard) is stricter, no longer allowing blessed objects that overload stringification because that's weird.";
+		];
+		item [
+			a dcs:Addition;
+			label "Bool now allows coercion from Any.";
+		];
+	].
