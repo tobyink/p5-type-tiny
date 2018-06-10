@@ -153,12 +153,14 @@ my $_item = $meta->$add_core_type({
 	parent     => $_any,
 });
 
-$meta->$add_core_type({
+my $_bool = $meta->$add_core_type({
 	name       => "Bool",
 	parent     => $_item,
-	constraint => sub { !defined $_ or $_ eq q() or $_ eq '0' or $_ eq '1' },
-	inlined    => sub { "!defined $_[1] or $_[1] eq q() or $_[1] eq '0' or $_[1] eq '1'" },
+	constraint => sub {  !ref $_    and (!defined $_    or $_    eq q() or $_    eq '0' or $_    eq '1')  },
+	inlined    => sub { "!ref $_[1] and (!defined $_[1] or $_[1] eq q() or $_[1] eq '0' or $_[1] eq '1')" },
 });
+
+$_bool->coercion->add_type_coercions($_any, q{!!$_});
 
 my $_undef = $meta->$add_core_type({
 	name       => "Undef",
@@ -1411,8 +1413,12 @@ strings, the 1st, 4th, 7th, etc values are integers, and the 2nd,
 
 =head2 Coercions
 
-None of the types in this type library have any coercions by default.
-However some standalone coercions may be exported. These can be combined
+Most of the types in this type library have no coercions by default.
+
+The exception is C<Bool> as of Types::Standard 1.004000, which coerces
+from C<Any> via C<< !$_ >>.
+
+Some standalone coercions may be exported. These can be combined
 with type constraints using the C<< plus_coercions >> method.
 
 =over

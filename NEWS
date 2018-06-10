@@ -35,6 +35,8 @@
 
  - Types::Standard::FileHandle has a looser definition, more consistent with
    Mouse and Type::Tiny::XS.
+ - Types::Standard::Bool has a stricter definition, but also has a built-in
+   coercion from a very loose definition.
  - Type::Params now has `compile_named_oo`.
  - Type::Params supports defaults for missing parameters.
  - Types::Common::Numeric includes IntRange and NumRange.
