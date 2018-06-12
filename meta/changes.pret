@@ -2595,7 +2595,7 @@
 `Type-Tiny 1.003_003 cpan:TOBYINK`
 	issued  2018-06-10;
 	changeset [
-		dcs:versus `Type-Tiny 1.003_003 cpan:TOBYINK`;
+		dcs:versus `Type-Tiny 1.003_002 cpan:TOBYINK`;
 		item [
 			a dcs:Addition;
 			label "Bool (Types::Standard) is stricter, no longer allowing blessed objects that overload stringification because that's weird.";
@@ -2603,5 +2603,17 @@
 		item [
 			a dcs:Addition;
 			label "Bool now allows coercion from Any.";
+		];
+	].
+
+`Type-Tiny 1.003_004 cpan:TOBYINK`
+	issued  2018-06-12;
+	changeset [
+		dcs:versus `Type-Tiny 1.003_003 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix, dcs:Tests;
+			label "Load modules with `use` instead of `require` in 00-begin.t.";
+			dcs:fixes RT#124067;
+			dcs:thanks cpan:SREZIC, cpan:ANDK;
 		];
 	].
