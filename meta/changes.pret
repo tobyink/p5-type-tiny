@@ -2597,7 +2597,7 @@
 	changeset [
 		dcs:versus `Type-Tiny 1.003_002 cpan:TOBYINK`;
 		item [
-			a dcs:Addition;
+			a dcs:Change, dcs:BackCompat;
 			label "Bool (Types::Standard) is stricter, no longer allowing blessed objects that overload stringification because that's weird.";
 		];
 		item [
