@@ -194,7 +194,15 @@ sub new
 		
 		_croak "Parent must be an instance of %s", __PACKAGE__
 			unless blessed($params{parent}) && $params{parent}->isa(__PACKAGE__);
+		
+		if ($params{parent}->deprecated and not $params{allow_deprecated})
+		{
+			$params{deprecated} = 1 unless exists $params{deprecated};
+		}
 	}
+	
+	# canonicalize to a boolean
+	$params{deprecated} = !!$params{deprecated};
 	
 	$params{name} = "__ANON__" unless exists $params{name};
 	$params{uniq} = $uniq++;
@@ -347,6 +355,7 @@ sub coercion                 { $_[0]{coercion}       ||= $_[0]->_build_coercion 
 sub message                  { $_[0]{message} }
 sub library                  { $_[0]{library} }
 sub inlined                  { $_[0]{inlined} }
+sub deprecated               { $_[0]{deprecated} }
 sub constraint_generator     { $_[0]{constraint_generator} }
 sub inline_generator         { $_[0]{inline_generator} }
 sub name_generator           { $_[0]{name_generator} ||= $_[0]->_build_name_generator }
@@ -1342,6 +1351,15 @@ calculated from the C<name>.
 The package name of the type library this type is associated with.
 Optional. Informational only: setting this attribute does not install
 the type into the package.
+
+=item C<< deprecated >>
+
+Optional boolean indicating whether a type constraint is deprecated.
+L<Type::Library> will issue a warning if you attempt to import a deprecated
+type constraint, but otherwise the type will continue to function as normal.
+There will not be deprecation warnings every time you validate a value, for
+instance. If omitted, defaults to the parent's deprecation status (or false
+if there's no parent).
 
 =item C<< message >>
 

@@ -164,8 +164,15 @@ sub _exporter_install_sub
 	my ($name, $value, $globals, $sym) = @_;
 	
 	my $package = $globals->{into};
+	my $type = $class->get_type($name);
 	
-	if (!ref $package and my $type = $class->get_type($name))
+	Exporter::Tiny::_carp(
+		"Exporting deprecated type %s to %s",
+		$type->qualified_name,
+		ref($package) ? "reference" : "package $package",
+	) 	if (defined $type and $type->deprecated and not $globals->{allow_deprecated});
+	
+	if (!ref $package and defined $type)
 	{
 		my ($prefix) = grep defined, $value->{-prefix}, $globals->{prefix}, q();
 		my ($suffix) = grep defined, $value->{-suffix}, $globals->{suffix}, q();
