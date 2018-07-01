@@ -2617,3 +2617,14 @@
 			dcs:thanks cpan:SREZIC, cpan:ANDK;
 		];
 	].
+
+`Type-Tiny 1.003_005 cpan:TOBYINK`
+	issued  2018-07-01;
+	changeset [
+		dcs:versus `Type-Tiny 1.003_004 cpan:TOBYINK`;
+		item [
+			a dcs:Addition;
+			label "Allow type libraries to mark certain type constraints as deprecated.";
+			seeAlso RT#124728;
+		];
+	].
