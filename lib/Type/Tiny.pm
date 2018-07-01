@@ -195,9 +195,9 @@ sub new
 		_croak "Parent must be an instance of %s", __PACKAGE__
 			unless blessed($params{parent}) && $params{parent}->isa(__PACKAGE__);
 		
-		if ($params{parent}->deprecated and not $params{allow_deprecated})
+		if ($params{parent}->deprecated and not exists $params{deprecated})
 		{
-			$params{deprecated} = 1 unless exists $params{deprecated};
+			$params{deprecated} = 1;
 		}
 	}
 	
