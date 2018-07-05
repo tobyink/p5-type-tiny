@@ -2619,7 +2619,7 @@
 	].
 
 `Type-Tiny 1.003_005 cpan:TOBYINK`
-	issued  2018-07-01;
+	issued  2018-07-05;
 	changeset [
 		dcs:versus `Type-Tiny 1.003_004 cpan:TOBYINK`;
 		item [
