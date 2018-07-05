@@ -13,8 +13,8 @@ Type::Tiny::Manual::Coercions - adding coercions to type constraints
 B<< Stop! Don't do it! >>
 
 OK, it's fairly common practice in L<Moose>/L<Mouse> code to define
-coercions for type constraints. For example, suppose we have a type
-constraint:
+coercions for type constraints. For example, suppose we define a type
+constraint in a type library:
 
    class_type PathTiny, { class => "Path::Tiny" };
 
@@ -54,12 +54,12 @@ L<Type::Tiny> offers a method C<plus_coercions> which constructs a new
 anonymous type constraint, but with additional coercions. 
 
 In our earlier example, we'd define the C<PathTiny> type constraint
-as before:
+in our type library as before:
 
    class_type PathTiny, { class => "Path::Tiny" };
 
 But then not define any coercions for it. Later, when using the
-type constraint, we can add coercions:
+type constraint in a class, we can add coercions:
 
    my $ConfigFileType = PathTiny->plus_coercions(
       Str,   sub { "Path::Tiny"->new($_) },
@@ -178,6 +178,10 @@ C<Map>
 =item *
 
 C<Tuple>
+
+=item *
+
+C<CycleTuple>
 
 =item *
 
@@ -344,7 +348,7 @@ coercion. This makes the type's coercions immutable. If anybody wants
 to define any additional coercions, they'll have to create a child type
 to do it with.
 
-A shortcut exists for this:
+A shortcut exists to do this on all types in your library:
 
    __PACKAGE__->meta->make_immutable;
 
