@@ -170,7 +170,7 @@ sub _exporter_install_sub
 		"Exporting deprecated type %s to %s",
 		$type->qualified_name,
 		ref($package) ? "reference" : "package $package",
-	) 	if (defined $type and $type->deprecated and not $globals->{allow_deprecated});
+	) if (defined $type and $type->deprecated and not $globals->{allow_deprecated});
 	
 	if (!ref $package and defined $type)
 	{
