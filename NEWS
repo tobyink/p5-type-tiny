@@ -41,4 +41,5 @@
  - Type::Params supports defaults for missing parameters.
  - Types::Common::Numeric includes IntRange and NumRange.
  - Types::Common::String includes StrLength.
+ - Type::Tiny now allows types to be marked as deprecated.
  - Various bug fixes.
