@@ -320,7 +320,7 @@ sub compile
 	
 	my $closure = eval_closure(
 		source      => $source,
-		description => sprintf("parameter validation for '%s'", [caller(1+($options{caller_level}||0))]->[3] || '__ANON__'),
+		description => $options{description}||sprintf("parameter validation for '%s'", $options{subname}||[caller(1+($options{caller_level}||0))]->[3] || '__ANON__'),
 		environment => \%env,
 	);
 	
@@ -501,7 +501,7 @@ sub compile_named
 	
 	my $closure = eval_closure(
 		source      => $source,
-		description => sprintf("parameter validation for '%s'", [caller(1+($options{caller_level}||0))]->[3] || '__ANON__'),
+		description => $options{description}||sprintf("parameter validation for '%s'", $options{subname}||[caller(1+($options{caller_level}||0))]->[3] || '__ANON__'),
 		environment => \%env,
 	);
 	
@@ -877,6 +877,21 @@ for declaring both the C<class> and C<constructor> options at once.
 
 B<< Named parameters only. >> Bypass the constructor entirely and directly
 bless the hashref.
+
+=item C<< description => Str >>
+
+Description of the coderef that will show up in stack traces. Defaults to
+"parameter validation for X" where X is the caller sub name.
+
+=item C<< subname => Str >>
+
+If you wish to use the default description, but need to change the sub name,
+use this.
+
+=item C<< caller_level => Int >>
+
+If you wish to use the default description, but need to change the caller
+level for detecting the sub name, use this.
 
 =back
 
