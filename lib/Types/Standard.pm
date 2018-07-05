@@ -1414,9 +1414,8 @@ strings, the 1st, 4th, 7th, etc values are integers, and the 2nd,
 =head2 Coercions
 
 Most of the types in this type library have no coercions by default.
-
-The exception is C<Bool> as of Types::Standard 1.004000, which coerces
-from C<Any> via C<< !$_ >>.
+The exception is C<Bool> as of Types::Standard 1.003_003, which coerces
+from C<Any> via C<< !!$_ >>.
 
 Some standalone coercions may be exported. These can be combined
 with type constraints using the C<< plus_coercions >> method.
