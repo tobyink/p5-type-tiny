@@ -2627,4 +2627,9 @@
 			label "Allow type libraries to mark certain type constraints as deprecated.";
 			seeAlso RT#124728;
 		];
+		item [
+			a dcs:Documentation;
+			label "Type::Tiny::Manual::Coercions improvements.";
+			seeAlso RT#122305;
+		];
 	].
