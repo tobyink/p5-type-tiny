@@ -53,19 +53,6 @@ BEGIN {
 		: sub () { !!0 };
 };
 
-sub __warn__ {
-	my ($msg, $thing) = @_==2 ? @_ : (Thing => @_);
-	my $string = do {
-		blessed($thing) && $thing->isa('Type::Tiny::Union') ? sprintf('Union[%s]', join q{, }, map $_->name, @{$thing->type_constraints}) :
-		blessed($thing) && $thing->isa('Type::Tiny') ? $thing->name :
-		blessed($thing) && $thing->isa('Type::Tiny::_HalfOp') ? sprintf('HalfOp[ q{%s}, %s, %s ]', $thing->{op}, $thing->{type}->name, $thing->{param}) :
-		!defined($thing) ? 'NIL' :
-		"$thing"
-	};
-	warn "$msg => $string\n";
-	$thing;
-}
-
 use overload
 	q("")      => sub { caller =~ m{^(Moo::HandleMoose|Sub::Quote)} ? overload::StrVal($_[0]) : $_[0]->display_name },
 	q(bool)    => sub { 1 },
