@@ -31,9 +31,10 @@ our $VERSION   = '1.003_005';
 our @EXPORT    = qw( eval_closure );
 our @EXPORT_OK = qw( HAS_LEXICAL_SUBS HAS_LEXICAL_VARS );
 
+# See Types::TypeTiny for an explanation of this import method.
+#
 sub import
 {
-	# do the shuffle!
 	no warnings "redefine";
 	our @ISA = qw( Exporter::Tiny );
 	require Exporter::Tiny;
