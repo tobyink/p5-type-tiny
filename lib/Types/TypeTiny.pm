@@ -12,18 +12,23 @@ our @EXPORT_OK = ( __PACKAGE__->type_names, qw/to_TypeTiny/ );
 
 my %cache;
 
+# This `import` method is designed to avoid loading Exporter::Tiny.
+# This is so that if you stick to only using the purely OO parts of
+# Type::Tiny, you can skip loading the exporter.
+#
 sub import
 {
-	# do the shuffle!
+	# If this sub succeeds, it will replace itself, so it's uncoverable.
+	#
 	no warnings "redefine";
-	our @ISA = qw( Exporter::Tiny );
-	require Exporter::Tiny;
-	my $next = \&Exporter::Tiny::import;
-	*import = $next;
-	my $class = shift;
-	my $opts  = { ref($_[0]) ? %{+shift} : () };
-	$opts->{into} ||= scalar(caller);
-	return $class->$next($opts, @_);
+	our @ISA = qw( Exporter::Tiny );               # uncoverable statement
+	require Exporter::Tiny;                        # uncoverable statement
+	my $next = \&Exporter::Tiny::import;           # uncoverable statement
+	*import = $next;                               # uncoverable statement
+	my $class = shift;                             # uncoverable statement
+	my $opts  = { ref($_[0]) ? %{+shift} : () };   # uncoverable statement
+	$opts->{into} ||= scalar(caller);              # uncoverable statement
+	return $class->$next($opts, @_);               # uncoverable statement
 }
 
 sub meta
