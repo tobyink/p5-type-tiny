@@ -52,7 +52,7 @@ use Types::Standard qw(Str Int);
 {
 	sub check_int_manual {
 		my ($int) = @_;
-		die "no Int!" unless $int =~ /^\d+$/xa;
+		die "no Int!" unless $int =~ /^\d+$/;
 		is($int, 123, 'check_int_manual');
 	}
 }
@@ -68,7 +68,7 @@ use Types::Standard qw(Str Int);
 my $string = 'a123';
 
 subtest 'using temporary variable' => sub {
-	if ($string =~ /a(\d+)/xa) {
+	if ($string =~ /a(\d+)/) {
 		my $matched = $1;
 		check_int_tt_compile($matched);
 		check_int_manual($matched);
@@ -78,7 +78,7 @@ subtest 'using temporary variable' => sub {
 };
 
 subtest 'using direct $1' => sub {
-	if ($string =~ /a(\d+)/xa) {
+	if ($string =~ /a(\d+)/) {
 		check_int_tt_compile($1);
 		check_int_manual($1);
 		check_str_tt($1);
