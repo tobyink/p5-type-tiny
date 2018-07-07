@@ -31,6 +31,11 @@ use Test::Fatal;
 use Scalar::Util qw(refaddr);
 use Types::Standard slurpy => -types;
 
+require Error::TypeTiny::Assertion;
+
+my $tmp = Error::TypeTiny::Assertion->new(value => 1.1, type => Int, varname => '$bob');
+is($tmp->message, "Value \"1.1\" did not pass type constraint \"Int\" (in \$bob)", "autogeneration of \$e->message");
+
 my $supernum = Types::Standard::STRICTNUM ? "StrictNum" : "LaxNum";
 
 my $v = [];
