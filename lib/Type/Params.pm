@@ -147,7 +147,7 @@ sub compile
 		
 		my $param_options = {};
 		$param_options = shift if HashRef->check($_[0]) && !exists $_[0]{slurpy};
-		my $default = $param_options->{default};
+		my $default = _mkdefault($param_options);
 		
 		if ($param_options->{optional} or defined $default) {
 			$is_optional = 1;
