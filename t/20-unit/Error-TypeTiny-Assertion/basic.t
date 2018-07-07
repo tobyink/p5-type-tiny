@@ -236,6 +236,21 @@ is_deeply(
 	'$TupleOf1 explanation, given [1,2]',
 );
 
+my $CTuple = CycleTuple[ Int, Int ];
+
+is_deeply(
+	(exception { $CTuple->([1,"Foo"]) })->explain,
+	[
+		'Reference [1,"Foo"] did not pass type constraint "CycleTuple[Int,Int]"',
+		'"CycleTuple[Int,Int]" constrains value at index 1 of array with "Int"',
+		'"Int" is a subtype of "Num"',
+		'"Num" is a subtype of "LaxNum"',
+		'Value "Foo" did not pass type constraint "LaxNum" (in $_->[1])',
+		'"LaxNum" is defined as: (defined($_) && !ref($_) && Scalar::Util::looks_like_number($_))',
+	],
+	'$CTuple explanation, given [1,"Foo"]',
+);
+
 TODO: {
 	require Data::Dumper;
 	local $TODO =
