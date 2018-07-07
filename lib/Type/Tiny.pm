@@ -736,7 +736,7 @@ sub inline_check
 			unless $self->has_parent;
 		$r[0] = $self->parent->inline_check(@_);
 	}
-	my $r = join " && " => map { /[;{}]/ ? "do { $_ }" : "($_)" } @r;
+	my $r = join " && " => map { /[;{}]/ && !/\Ado \{.+\}\z/ ? "do { $_ }" : "($_)" } @r;
 	return @r==1 ? $r : "($r)";
 }
 
