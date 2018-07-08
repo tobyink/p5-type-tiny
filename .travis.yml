@@ -26,14 +26,16 @@ matrix:
         - cpanm -n indirect multidimensional bareword::filehandles strictures
         - cpanm -n Moo Moose Mouse MooseX::Types::Common MouseX::Types::Common
         - cpanm -n match::simple MooseX::Getopt Class::InsideOut Object::Accessor
-        - cpanm -n Type::Tie Validation::Class::Simple 
+        - cpanm -n Type::Tie Validation::Class::Simple Class::XSAccessor
         - cpan-install --toolchain
         - cpan-install --deps
         - cpan-install --coverage
       script:
         - export PERL_TYPE_TINY_XS=0
+        - export PERL_TYPE_PARAMS_XS=0
         - prove -r -Ilib -Iinc $(test-dirs)
         - export PERL_TYPE_TINY_XS=1
+        - export PERL_TYPE_PARAMS_XS=1
         - prove -r -Ilib -Iinc $(test-dirs)
     # Archaic Perls
     - perl: "5.6.1"
