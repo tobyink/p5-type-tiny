@@ -518,36 +518,55 @@ sub compile_named
 
 my %klasses;
 my $kls_id = 0;
+my $has_cxsa;
+my $want_cxsa;
 sub _mkklass
 {
 	my $klass = sprintf('%s::OO::Klass%d', __PACKAGE__, ++$kls_id);
 	
-	eval {
-		require Class::XSAccessor;
-		Class::XSAccessor->VERSION('1.17'); # exists_predicates, June 2013
-		'Class::XSAccessor'->import(
-			class             => $klass,
-			getters           => { map { defined($_->{getter})    ? ($_->{getter}    => $_->{slot}) : () } values %{$_[0]} },
-			exists_predicates => { map { defined($_->{predicate}) ? ($_->{predicate} => $_->{slot}) : () } values %{$_[0]} },
-		);
-		1;
-	}
-	or do {
-		for my $attr (values %{$_[0]}) {
-			defined($attr->{getter}) and eval sprintf(
-				'package %s; sub %s { $_[0]{%s} }; 1',
-				$klass,
-				$attr->{getter},
-				$attr->{slot},
-			) || die($@);
-			defined($attr->{predicate}) and eval sprintf(
-				'package %s; sub %s { exists $_[0]{%s} }; 1',
-				$klass,
-				$attr->{predicate},
-				$attr->{slot},
-			) || die($@);
+	if (!defined $has_cxsa or !defined $want_cxsa) {
+		$has_cxsa = !! eval {
+			require Class::XSAccessor;
+			'Class::XSAccessor'->VERSION('1.17'); # exists_predicates, June 2013
+			1;
+		};
+		
+		$want_cxsa =
+			$ENV{PERL_TYPE_PARAMS_XS}         ? 'XS' :
+			exists($ENV{PERL_TYPE_PARAMS_XS}) ? 'PP' :
+			$has_cxsa                         ? 'XS' : 'PP';
+		
+		if ($want_cxsa and not $has_cxsa) {
+			Error::TypeTiny::croak("Cannot load Class::XSAccessor");
 		}
-	};
+	}
+	
+	if ($want_cxsa eq 'XS') {
+		eval {
+			'Class::XSAccessor'->import(
+				redefine          => 1,
+				class             => $klass,
+				getters           => { map { defined($_->{getter})    ? ($_->{getter}    => $_->{slot}) : () } values %{$_[0]} },
+				exists_predicates => { map { defined($_->{predicate}) ? ($_->{predicate} => $_->{slot}) : () } values %{$_[0]} },
+			);
+			1;
+		} and return $klass;
+	}
+	
+	for my $attr (values %{$_[0]}) {
+		defined($attr->{getter}) and eval sprintf(
+			'package %s; sub %s { $_[0]{%s} }; 1',
+			$klass,
+			$attr->{getter},
+			$attr->{slot},
+		) || die($@);
+		defined($attr->{predicate}) and eval sprintf(
+			'package %s; sub %s { exists $_[0]{%s} }; 1',
+			$klass,
+			$attr->{predicate},
+			$attr->{slot},
+		) || die($@);
+	}
 	
 	$klass;
 }
