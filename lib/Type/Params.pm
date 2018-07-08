@@ -1367,6 +1367,20 @@ we've used C<< if @_ < 2 >>, but we could instead have done something like:
 Which would have defaulted C<< $colour >> to "black" if it were the empty
 string.
 
+=head1 ENVIRONMENT
+
+=over
+
+=item C<PERL_TYPE_PARAMS_XS>
+
+Affects the building of accessors for C<compile_named_oo>. If set to true,
+will use L<Class::XSAccessor>. If set to false, will use pure Perl. If this
+environment variable does not exist, will use L<Class::XSAccessor> if it
+is available.
+
+=back
+
+
 =head1 COMPARISONS WITH OTHER MODULES
 
 =head2 Params::Validate

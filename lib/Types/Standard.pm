@@ -1474,6 +1474,28 @@ alias for C<LaxNum>.)
 
 =back
 
+=head2 Environment
+
+=over
+
+=item C<PERL_TYPES_STANDARD_STRICTNUM>
+
+Switches to more strict regexp-based number checking instead of using
+C<looks_like_number>.
+
+=item C<PERL_TYPE_TINY_XS>
+
+If set to false, can be used to suppress the loading of XS implementions of
+some type constraints.
+
+=item C<PERL_ONLY>
+
+If C<PERL_TYPE_TINY_XS> does not exist, can be set to true to suppress XS
+usage similarly. (Several other CPAN distributions also pay attention to this
+environment variable.)
+
+=back
+
 =begin private
 
 =item Stringable

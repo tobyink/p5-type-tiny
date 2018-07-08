@@ -1837,6 +1837,18 @@ for easy localization.
 
 =back
 
+=head2 Environment
+
+=over
+
+=item C<PERL_TYPE_TINY_XS>
+
+Currently this has more effect on L<Types::Standard> than Type::Tiny. In
+future it may be used to trigger or suppress the loading XS implementations
+of parts of Type::Tiny.
+
+=back
+
 =head1 BUGS
 
 Please report any bugs to
