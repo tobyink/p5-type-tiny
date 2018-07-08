@@ -2634,3 +2634,38 @@
 		];
 	].
 
+`Type-Tiny 1.003_006 cpan:TOBYINK`
+	issued  2018-07-08;
+	changeset [
+		dcs:versus `Type-Tiny 1.003_005 cpan:TOBYINK`;
+		item [
+			a dcs:Tests;
+			label "Improve coverage.";
+		];
+		item [
+			a dcs:Addition;
+			label "Type::Params compile/compile_named now have subname and description options.";
+		];
+		item [
+			a dcs:Documentation;
+			label "Type::Params caller_level option is now documented.";
+		];
+		item [
+			a dcs:Bugfix;
+			label "Workaround for Regexp-based check for Int clobbering $1 sometimes (this will sometimes slow down Int checks a little, but is needed for correctness).";
+			dcs:fixes RT#125132;
+		];
+		item [
+			a dcs:Bugfix;
+			label "Fix issues with arrayref and hashref defaults in Type::Params.";
+		];
+		item [
+			a dcs:Addition;
+			label "PERL_TYPE_PARAMS_XS environment variable.";
+		];
+		item [
+			a dcs:Documentation;
+			label "Better documentation of environment variables.";
+		];
+	].
+
