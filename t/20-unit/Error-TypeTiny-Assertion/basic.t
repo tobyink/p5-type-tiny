@@ -241,17 +241,16 @@ is_deeply(
 	'$TupleOf1 explanation, given [1,2]',
 );
 
-my $CTuple = CycleTuple[ Int, Int ];
+my $CTuple = CycleTuple[ Int, ArrayRef ];
 
 is_deeply(
 	(exception { $CTuple->([1,"Foo"]) })->explain,
 	[
-		'Reference [1,"Foo"] did not pass type constraint "CycleTuple[Int,Int]"',
-		'"CycleTuple[Int,Int]" constrains value at index 1 of array with "Int"',
-		'"Int" is a subtype of "Num"',
-		'"Num" is a subtype of "LaxNum"',
-		'Value "Foo" did not pass type constraint "LaxNum" (in $_->[1])',
-		'"LaxNum" is defined as: (defined($_) && !ref($_) && Scalar::Util::looks_like_number($_))',
+		'Reference [1,"Foo"] did not pass type constraint "CycleTuple[Int,ArrayRef]"',
+		'"CycleTuple[Int,ArrayRef]" constrains value at index 1 of array with "ArrayRef"',
+		'"ArrayRef" is a subtype of "Ref"',
+		'Value "Foo" did not pass type constraint "Ref" (in $_->[1])',
+		'"Ref" is defined as: (!!ref($_))',
 	],
 	'$CTuple explanation, given [1,"Foo"]',
 );
