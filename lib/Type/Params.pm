@@ -536,8 +536,8 @@ sub _mkklass
 			exists($ENV{PERL_TYPE_PARAMS_XS}) ? 'PP' :
 			$has_cxsa                         ? 'XS' : 'PP';
 		
-		if ($want_cxsa and not $has_cxsa) {
-			Error::TypeTiny::croak("Cannot load Class::XSAccessor");
+		if ($want_cxsa eq 'XS' and not $has_cxsa) {
+			Error::TypeTiny::croak("Cannot load Class::XSAccessor"); # uncoverable statement
 		}
 	}
 	
@@ -550,7 +550,7 @@ sub _mkklass
 				exists_predicates => { map { defined($_->{predicate}) ? ($_->{predicate} => $_->{slot}) : () } values %{$_[0]} },
 			);
 			1;
-		} and return $klass;
+		} ? return($klass) : die($@);
 	}
 	
 	for my $attr (values %{$_[0]}) {
