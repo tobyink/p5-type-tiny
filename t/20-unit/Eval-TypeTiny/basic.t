@@ -174,4 +174,10 @@ like(
 	'"line" option works',
 );
 
+my $e3 = exception { eval_closure source => 'sub {' };
+ok( $e3->isa('Error::TypeTiny::Compilation'), 'proper exceptions thrown for compilation errors' );
+is( $e3->code, 'sub {', '$exception->code' );
+like( $e3->errstr, qr/Missing right curly/, '$exception->errstr' );
+is( ref $e3->context, 'HASH', '$exception->context' );
+
 done_testing;
