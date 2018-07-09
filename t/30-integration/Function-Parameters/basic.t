@@ -38,6 +38,8 @@ BEGIN {
 	or plan skip_all => "this test requires Moo 1.000000 or Moose 2.0000";
 };
 
+BEGIN { plan skip_all => 'Devel::Cover'  if $INC{'Devel/Cover.pm'} };
+
 use Types::Standard -types;
 use Function::Parameters qw(:strict);
 
