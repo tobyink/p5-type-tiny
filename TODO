@@ -22,3 +22,5 @@ Long-Term
   this happens and fix.
 
 * Resolve RT#120226 if HAARG will help me flesh out an API.
+
+* Overhaul is_subtype_of stuff.
