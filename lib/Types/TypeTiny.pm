@@ -19,7 +19,7 @@ my %cache;
 sub import
 {
 	# If this sub succeeds, it will replace itself.
-	#
+	# uncoverable subroutine
 	return unless @_ > 1;  # nothing exported by default
 	no warnings "redefine";
 	our @ISA = qw( Exporter::Tiny );

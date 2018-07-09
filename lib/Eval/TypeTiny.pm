@@ -35,6 +35,7 @@ our @EXPORT_OK = qw( HAS_LEXICAL_SUBS HAS_LEXICAL_VARS );
 #
 sub import
 {
+	# uncoverable subroutine
 	no warnings "redefine";
 	our @ISA = qw( Exporter::Tiny );
 	require Exporter::Tiny;
