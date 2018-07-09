@@ -502,4 +502,16 @@ TUPLE: {
 	);
 };
 
+TUPLE: {
+	my $IntFromStr = declare IntFromStr => as Int;
+	coerce $IntFromStr, from Str, q{ length($_) };
+	
+	is_deeply(
+		Tuple->of(HashRef, slurpy ArrayRef[$IntFromStr])->coerce([{}, 1, 2.2, "Hello", "world"]),
+		[{}, 1, 3, 5, 5],
+		'coercing Tuple with slurpy arrayref'
+	);
+};
+
 done_testing;
+
