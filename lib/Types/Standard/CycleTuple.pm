@@ -26,16 +26,16 @@ sub __constraint_generator
 {
 	my @params = map {
 		ref($_) eq 'HASH' and exists($_->{slurpy})
-			and _croak("Parameters to CycleTuple[`a] cannot be slurpy");
+			and _croak("Parameters to CycleTuple[...] cannot be slurpy");
 		my $param = Types::TypeTiny::to_TypeTiny($_);
 		Types::TypeTiny::TypeTiny->check($param)
-			or _croak("Parameter to CycleTuple[`a] expected to be a type constraint; got $param");
+			or _croak("Parameters to CycleTuple[...] expected to be type constraints; got $param");
 		$param;
 	} @_;
 	my $count  = @params;
 	my $tuple  = Types::Standard::Tuple()->of(@params);
 	
-	_croak("Parameters to CycleTuple[`a] cannot be optional")
+	_croak("Parameters to CycleTuple[...] cannot be optional")
 		if grep !!$_->is_strictly_a_type_of($_Optional), @params;
 	
 	sub {

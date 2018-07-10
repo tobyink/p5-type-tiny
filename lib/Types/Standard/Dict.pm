@@ -21,18 +21,38 @@ my $_any      = Types::Standard::Any;
 
 no warnings;
 
+sub pair_iterator {
+	_croak("Expected even-sized list") if @_ % 2;
+	my @array = @_;
+	sub {
+		return unless @array;
+		splice(@array, 0, 2);
+	};
+}
+
 sub __constraint_generator
 {
-	my $slurpy = ref($_[-1]) eq q(HASH) ? pop(@_)->{slurpy} : undef;
-	my %constraints = @_;
+	my $slurpy = ref($_[-1]) eq q(HASH) ? Types::TypeTiny::to_TypeTiny(pop(@_)->{slurpy}) : undef;
+	my $iterator = pair_iterator @_;
+	my %constraints;
 	my %is_optional;
+	my @keys;
 	
-	while (my ($k, $v) = each %constraints)
+	if ($slurpy)
+	{
+		Types::TypeTiny::TypeTiny->check($slurpy)
+			or _croak("Slurpy parameter to Dict[...] expected to be a type constraint; got $slurpy");
+	}
+	
+	while (my ($k, $v) = $iterator->())
 	{
 		$constraints{$k} = Types::TypeTiny::to_TypeTiny($v);
-		$is_optional{$k} = !!$constraints{$k}->is_strictly_a_type_of($_optional);
 		Types::TypeTiny::TypeTiny->check($v)
-			or _croak("Parameter to Dict[`a] for key '$k' expected to be a type constraint; got $v");
+			or _croak("Parameter for Dict[...] with key '$k' expected to be a type constraint; got $v");
+		Types::TypeTiny::StringLike->check($k)
+			or _croak("Key for Dict[...] expected to be string; got $k");
+		push @keys, $k;
+		$is_optional{$k} = !!$constraints{$k}->is_strictly_a_type_of($_optional);
 	}
 	
 	return sub
@@ -49,7 +69,7 @@ sub __constraint_generator
 		{
 			exists($constraints{$_}) || return for sort keys %$value;
 		}
-		for my $k (sort keys %constraints) {
+		for my $k (@keys) {
 			exists($value->{$k}) or ($is_optional{$k} ? next : return);
 			$constraints{$k}->check($value->{$k}) or return;
 		}
@@ -80,14 +100,18 @@ sub __inline_generator
 			&& [ $_any, $slurpy->parameters->[0] ]
 		));
 	
-	my %constraints = @_;
-	for my $c (values %constraints)
+	my $iterator = pair_iterator @_;
+	my %constraints;
+	my @keys;
+	
+	while (my ($k, $c) = $iterator->())
 	{
-		next if $c->can_be_inlined;
-		return;
+		return unless $c->can_be_inlined;
+		$constraints{$k} = $c;
+		push @keys, $k;
 	}
 	
-	my $regexp = join "|", map quotemeta, sort keys %constraints;
+	my $regexp = join "|", map quotemeta, @keys;
 	return sub
 	{
 		require B;
@@ -117,7 +141,7 @@ sub __inline_generator
 				$constraints{$_}->is_strictly_a_type_of( $_optional )
 					? sprintf('(!exists %s->{%s} or %s)', $h, $k, $constraints{$_}->inline_check("$h\->{$k}"))
 					: ( "exists($h\->{$k})", $constraints{$_}->inline_check("$h\->{$k}") )
-			} sort keys %constraints ),
+			} @keys ),
 	}
 }
 
@@ -128,9 +152,17 @@ sub __deep_explanation
 	my @params = @{ $type->parameters };
 	
 	my $slurpy = ref($params[-1]) eq q(HASH) ? pop(@params)->{slurpy} : undef;
-	my %constraints = @params;
-			
-	for my $k (sort keys %constraints)
+	my $iterator = pair_iterator @_;
+	my %constraints;
+	my @keys;
+	
+	while (my ($k, $c) = $iterator->())
+	{
+		push @keys, $k;
+		$constraints{$k} = $c;
+	}
+	
+	for my $k (@keys)
 	{
 		next if $constraints{$k}->parent == Types::Standard::Optional && !exists $value->{$k};
 		next if $constraints{$k}->check($value->{$k});

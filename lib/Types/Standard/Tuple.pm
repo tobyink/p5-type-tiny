@@ -61,6 +61,10 @@ sub __constraint_generator
 	my $slurp_hash  = $slurpy && $slurpy->is_a_type_of(Types::Standard::HashRef);
 	my $slurp_any   = $slurpy && $slurpy->equals(Types::Standard::Any);
 	
+	my @sorted_is_optional = sort @is_optional;
+	join("|", @sorted_is_optional) eq join("|", @is_optional)
+		or _croak("Optional parameters to Tuple[...] cannot precede required parameters");
+	
 	sub
 	{
 		my $value = $_[0];
