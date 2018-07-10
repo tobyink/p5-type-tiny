@@ -20,16 +20,16 @@ sub import
 {
 	# If this sub succeeds, it will replace itself.
 	# uncoverable subroutine
-	return unless @_ > 1;  # nothing exported by default
-	no warnings "redefine";
-	our @ISA = qw( Exporter::Tiny );
-	require Exporter::Tiny;
-	my $next = \&Exporter::Tiny::import;
-	*import = $next;
-	my $class = shift;
-	my $opts  = { ref($_[0]) ? %{+shift} : () };
-	$opts->{into} ||= scalar(caller);
-	return $class->$next($opts, @_);
+	return unless @_ > 1;                         # uncoverable statement
+	no warnings "redefine";                       # uncoverable statement
+	our @ISA = qw( Exporter::Tiny );              # uncoverable statement
+	require Exporter::Tiny;                       # uncoverable statement
+	my $next = \&Exporter::Tiny::import;          # uncoverable statement
+	*import = $next;                              # uncoverable statement
+	my $class = shift;                            # uncoverable statement
+	my $opts  = { ref($_[0]) ? %{+shift} : () };  # uncoverable statement
+	$opts->{into} ||= scalar(caller);             # uncoverable statement
+	return $class->$next($opts, @_);              # uncoverable statement
 }
 
 sub meta
