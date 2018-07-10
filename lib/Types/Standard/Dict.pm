@@ -12,7 +12,7 @@ BEGIN {
 use Types::Standard ();
 use Types::TypeTiny ();
 
-sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
+sub _croak ($;@) { require Carp; goto \&Carp::confess; require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
 my $_optional = Types::Standard::Optional;
 my $_hash     = Types::Standard::HashRef;
@@ -152,7 +152,7 @@ sub __deep_explanation
 	my @params = @{ $type->parameters };
 	
 	my $slurpy = ref($params[-1]) eq q(HASH) ? pop(@params)->{slurpy} : undef;
-	my $iterator = pair_iterator @_;
+	my $iterator = pair_iterator @params;
 	my %constraints;
 	my @keys;
 	
