@@ -2,6 +2,15 @@ package Eval::TypeTiny;
 
 use strict;
 
+sub _clean_eval
+{
+	local $@;
+	local $SIG{__DIE__};
+	my $r = eval $_[0];
+	my $e = $@;
+	return ($r, $e);
+}
+
 BEGIN {
 	*HAS_LEXICAL_SUBS = ($] >= 5.018) ? sub(){!!1} : sub(){!!0};
 };
@@ -41,15 +50,6 @@ BEGIN {
 BEGIN {
 	*_EXTENDED_TESTING = ($ENV{EXTENDED_TESTING}) ? sub(){!!1} : sub(){!!0};
 };
-
-sub _clean_eval
-{
-	local $@;
-	local $SIG{__DIE__};
-	my $r = eval $_[0];
-	my $e = $@;
-	return ($r, $e);
-}
 
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '1.003_006';
