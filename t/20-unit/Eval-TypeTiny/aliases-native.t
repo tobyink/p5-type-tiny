@@ -4,12 +4,11 @@
 
 =head1 PURPOSE
 
-Tests L<Eval::TypeTiny> supports alias=>1 even when L<Devel::LexAlias>
-is unavailable.
+Tests L<Eval::TypeTiny> supports alias=>1 using Perl refaliasing.
 
 =head1 DEPENDENCIES
 
-Requires L<Test::Without::Module>.
+Requires Perl 5.22.
 
 =head1 AUTHOR
 
@@ -29,13 +28,11 @@ use warnings;
 use lib qw( ./lib ./t/lib ../inc ./inc );
 
 use Test::More;
-
-#BEGIN { plan skip_all => "test currently not working (TODO)" };
-
-use Test::Requires 'Test::Without::Module';
-use Test::Without::Module 'Devel::LexAlias';
+use Test::Requires 'v5.22';
 
 use Eval::TypeTiny;
+
+Eval::TypeTiny::_force_implementation( Eval::TypeTiny::IMPLEMENTATION_NATIVE );
 
 my %env = (
 	'$foo' => do { my $x = "foo"; \$x },
@@ -58,8 +55,8 @@ SRC
 my $closure = eval_closure(source => $source, environment => \%env, alias => 1);
 
 ok(
-	$closure->(),
-	'tied implementation was loaded',
+	! $closure->(),
+	'tied implementation was not used',
 );
 
 is_deeply(

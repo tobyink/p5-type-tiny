@@ -6,7 +6,7 @@ BEGIN {
 	*HAS_LEXICAL_SUBS = ($] >= 5.018) ? sub(){!!1} : sub(){!!0};
 };
 
-{
+{  # this will be removed in a future version of Eval::TypeTiny
 	my $hlv;
 	sub HAS_LEXICAL_VARS () {
 		$hlv = !! eval {
@@ -14,6 +14,26 @@ BEGIN {
 			exists(&Devel::LexAlias::lexalias);
 		} unless defined $hlv;
 		$hlv;
+	}
+}
+
+BEGIN {
+	sub IMPLEMENTATION_DEVEL_LEXALIAS   () { 'Devel::LexAlias' }
+	sub IMPLEMENTATION_PADWALKER        () { 'PadWalker' }
+	sub IMPLEMENTATION_TIE              () { 'tie' }
+	sub IMPLEMENTATION_NATIVE           () { 'perl' }
+	
+	my $implementation;
+	sub ALIAS_IMPLEMENTATION () {
+		$implementation ||= do {
+			do   { $] ge '5.022'           } ? IMPLEMENTATION_NATIVE :
+			eval { require Devel::LexAlias } ? IMPLEMENTATION_DEVEL_LEXALIAS :
+			eval { require PadWalker       } ? IMPLEMENTATION_PADWALKER      : IMPLEMENTATION_TIE
+		};
+	}
+	
+	sub _force_implementation {
+		$implementation = shift;
 	}
 }
 
@@ -29,7 +49,7 @@ sub _clean_eval
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '1.003_006';
 our @EXPORT    = qw( eval_closure );
-our @EXPORT_OK = qw( HAS_LEXICAL_SUBS HAS_LEXICAL_VARS );
+our @EXPORT_OK = qw( HAS_LEXICAL_SUBS HAS_LEXICAL_VARS ALIAS_IMPLEMENTATION );
 
 # See Types::TypeTiny for an explanation of this import method.
 #
@@ -82,7 +102,9 @@ sub eval_closure
 		"}",
 	);
 	
-	_manufacture_ties() if $alias && !HAS_LEXICAL_VARS;
+	if ($alias and ALIAS_IMPLEMENTATION eq IMPLEMENTATION_TIE) {
+		_manufacture_ties();
+	}
 	
 	my ($compiler, $e) = _clean_eval($source);
 	if ($e)
@@ -99,10 +121,17 @@ sub eval_closure
 	my $code = $compiler->(@{$args{environment}}{@keys});
 	undef($compiler);
 
-	if ($alias && HAS_LEXICAL_VARS) {
-		Devel::LexAlias::lexalias($code, $_, $args{environment}{$_}) for grep !/^\&/, @keys;
+	if ($alias and ALIAS_IMPLEMENTATION eq IMPLEMENTATION_DEVEL_LEXALIAS) {
+		require Devel::LexAlias;
+		Devel::LexAlias::lexalias($code, $_ => $args{environment}{$_}) for grep !/^\&/, @keys;
 	}
-	
+
+	if ($alias and ALIAS_IMPLEMENTATION eq IMPLEMENTATION_PADWALKER) {
+		require PadWalker;
+		my %env = map +($_ => $args{environment}{$_}), grep !/^\&/, @keys;
+		PadWalker::set_closed_over($code, \%env);
+	}
+
 	return $code;
 }
 
@@ -126,7 +155,16 @@ sub _make_lexical_assignment
 		my $sigil = substr($key, 0, 1);
 		return "my $key = $sigil\{ \$_[$index] };";
 	}
-	elsif (HAS_LEXICAL_VARS) {
+	elsif (ALIAS_IMPLEMENTATION eq IMPLEMENTATION_NATIVE) {
+		return
+			"no warnings 'experimental::refaliasing';".
+			"use feature 'refaliasing';".
+			"my $key; \\$key = \$_[$index];"
+	}
+	elsif (ALIAS_IMPLEMENTATION eq IMPLEMENTATION_DEVEL_LEXALIAS) {
+		return "my $key;";
+	}
+	elsif (ALIAS_IMPLEMENTATION eq IMPLEMENTATION_PADWALKER) {
 		return "my $key;";
 	}
 	else {
