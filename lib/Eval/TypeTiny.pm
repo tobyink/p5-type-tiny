@@ -2,14 +2,15 @@ package Eval::TypeTiny;
 
 use strict;
 
-sub _clean_eval
-{
+sub _clean_eval {
 	local $@;
 	local $SIG{__DIE__};
 	my $r = eval $_[0];
 	my $e = $@;
 	return ($r, $e);
 }
+
+use warnings;
 
 BEGIN {
 	*HAS_LEXICAL_SUBS = ($] >= 5.018) ? sub(){!!1} : sub(){!!0};
@@ -62,8 +63,7 @@ our @EXPORT_OK = qw(
 
 # See Types::TypeTiny for an explanation of this import method.
 #
-sub import
-{
+sub import {
 	# uncoverable subroutine
 	no warnings "redefine";                       # uncoverable statement
 	our @ISA = qw( Exporter::Tiny );              # uncoverable statement
@@ -76,10 +76,7 @@ sub import
 	return $class->$next($opts, @_);              # uncoverable statement	
 }
 
-use warnings;
-
-sub eval_closure
-{
+sub eval_closure {
 	my (%args) = @_;
 	my $src    = ref $args{source} eq "ARRAY" ? join("\n", @{$args{source}}) : $args{source};
 	
@@ -118,8 +115,7 @@ sub eval_closure
 	}
 	
 	my ($compiler, $e) = _clean_eval($source);
-	if ($e)
-	{
+	if ($e) {
 		chomp $e;
 		require Error::TypeTiny::Compilation;
 		"Error::TypeTiny::Compilation"->throw(
@@ -147,8 +143,7 @@ sub eval_closure
 }
 
 my $tmp;
-sub _make_lexical_assignment
-{
+sub _make_lexical_assignment {
 	my ($key, $index, $alias) = @_;
 	my $name = substr($key, 1);
 	
@@ -194,9 +189,6 @@ sub _make_lexical_assignment
 	}
 }
 
-# This is only used when the alias option is switched on (off by default)
-# and Devel::LexAlias is unavailable.
-#
 { my $tie; sub _manufacture_ties { $tie ||= eval <<'FALLBACK'; } }
 no warnings qw(void once uninitialized numeric);
 
