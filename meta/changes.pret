@@ -2709,5 +2709,13 @@
 			a dcs:Change;
 			label "Eval::TypeTiny will now throw errors when it detects a mismatch between sigils and reference types in the environment hashref but only if EXTENDED_TESTING environment variable is true. Perl will probably give you its own error message for this later on anyway.";
 		];
+		item [
+			a dcs:Removal;
+			label "Eval::TypeTiny::HAS_LEXICAL_VARS constant is no longer documented and will be removed at a later date.";
+		];
+		item [
+			a dcs:Addition;
+			label "Eval::TypeTiny provides a collection of constants to indicate the current implementation of alias => 1.";
+		];
 	].
 
