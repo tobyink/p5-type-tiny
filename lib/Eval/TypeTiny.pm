@@ -6,7 +6,8 @@ BEGIN {
 	*HAS_LEXICAL_SUBS = ($] >= 5.018) ? sub(){!!1} : sub(){!!0};
 };
 
-{  # this will be removed in a future version of Eval::TypeTiny
+{
+	# this is unused now and will be removed in a future version of Eval::TypeTiny
 	my $hlv;
 	sub HAS_LEXICAL_VARS () {
 		$hlv = !! eval {
@@ -37,6 +38,10 @@ BEGIN {
 	}
 }
 
+BEGIN {
+	*_EXTENDED_TESTING = ($ENV{EXTENDED_TESTING}) ? sub(){!!1} : sub(){!!0};
+};
+
 sub _clean_eval
 {
 	local $@;
@@ -49,7 +54,11 @@ sub _clean_eval
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '1.003_006';
 our @EXPORT    = qw( eval_closure );
-our @EXPORT_OK = qw( HAS_LEXICAL_SUBS HAS_LEXICAL_VARS ALIAS_IMPLEMENTATION );
+our @EXPORT_OK = qw(
+	HAS_LEXICAL_SUBS HAS_LEXICAL_VARS ALIAS_IMPLEMENTATION
+	IMPLEMENTATION_DEVEL_LEXALIAS IMPLEMENTATION_PADWALKER
+	IMPLEMENTATION_NATIVE IMPLEMENTATION_TIE
+);
 
 # See Types::TypeTiny for an explanation of this import method.
 #
@@ -79,16 +88,18 @@ sub eval_closure
 	$args{description} =~ s/[^\w .:-\[\]\(\)\{\}\']//g if defined $args{description};
 	$src = qq{#line $args{line} "$args{description}"\n$src} if defined $args{description} && !($^P & 0x10);
 	$args{environment} ||= {};
-	
-#	for my $k (sort keys %{$args{environment}})
-#	{
-#		next if $k =~ /^\$/ && ref($args{environment}{$k}) =~ /^(SCALAR|REF)$/;
-#		next if $k =~ /^\@/ && ref($args{environment}{$k}) eq q(ARRAY);
-#		next if $k =~ /^\%/ && ref($args{environment}{$k}) eq q(HASH);
-#		
-#		require Error::TypeTiny;
-#		Error::TypeTiny::croak("Expected a variable name and ref; got %s => %s", $k, $args{environment}{$k});
-#	}
+
+	if (_EXTENDED_TESTING) {
+		for my $k (sort keys %{$args{environment}}) {
+			next if $k =~ /^\$/ && ref($args{environment}{$k}) =~ /^(SCALAR|REF)$/;
+			next if $k =~ /^\@/ && ref($args{environment}{$k}) eq q(ARRAY);
+			next if $k =~ /^\%/ && ref($args{environment}{$k}) eq q(HASH);
+			next if $k =~ /^\&/ && ref($args{environment}{$k}) eq q(CODE);
+			
+			require Error::TypeTiny;
+			Error::TypeTiny::croak("Expected a variable name and ref; got %s => %s", $k, $args{environment}{$k});
+		}
+	}
 	
 	my $sandpkg   = 'Eval::TypeTiny::Sandbox';
 	my $alias     = exists($args{alias}) ? $args{alias} : 0;
@@ -327,13 +338,35 @@ The following constants may be exported, but are not by default.
 Boolean indicating whether Eval::TypeTiny has support for lexical subs.
 (This feature requires Perl 5.18.)
 
-=item C<< HAS_LEXICAL_VARS >>
+=item C<< ALIAS_IMPLEMENTATION >>
 
-Don't worry; closing over lexical variables in the closures is always
-supported! However, if this constant is true, it means that
-L<Devel::LexAlias> is available, which makes them slightly faster than
-the fallback solution which uses tied variables. (This only makes any
-difference when the C<< alias => 1 >> option is used.)
+Returns a string indicating what implementation of C<< alias => 1 >> is
+being used. Eval::TypeTiny will automatically choose the best implementation.
+This constant can be matched against the C<< IMPLEMENTAION_* >> constants.
+
+=item C<< IMPLEMENTATION_NATIVE >>
+
+If C<< ALIAS_IMPLEMENTATION eq IMPLEMENTATION_NATIVE >> then Eval::TypeTiny is
+currently using Perl 5.22's native alias feature. This requires Perl 5.22.
+
+=item C<< IMPLEMENTATION_DEVEL_LEXALIAS >>
+
+If C<< ALIAS_IMPLEMENTATION eq IMPLEMENTATION_DEVEL_LEXALIAS >> then
+Eval::TypeTiny is currently using L<Devel::LexAlias> to provide aliases.
+
+=item C<< IMPLEMENTATION_PADWALKER >>
+
+If C<< ALIAS_IMPLEMENTATION eq IMPLEMENTATION_PADWALKER >> then
+Eval::TypeTiny is currently using L<PadWalker> to provide aliases.
+
+=item C<< IMPLEMENTATION_TIE >>
+
+If C<< ALIAS_IMPLEMENTATION eq IMPLEMENTATION_TIE >> then Eval::TypeTiny is
+using the fallback implementation of aliases using C<tie>. This is the
+slowest implementation, and may cause problems in certain edge cases, like
+trying to alias already-tied variables, but it's the only way to implement
+C<< alias => 1 >> without a recent version of Perl or one of the two optional
+modules mentioned above.
 
 =back
 
