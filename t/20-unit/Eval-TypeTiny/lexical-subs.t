@@ -40,6 +40,7 @@ my %env = (
 
 my $source = <<'SRC';
 sub {
+	package Kill::La::NonLexikill;
 	return $foo if $_[0] eq '$foo';
 	return @bar if $_[0] eq '@bar';
 	return %baz if $_[0] eq '%baz';

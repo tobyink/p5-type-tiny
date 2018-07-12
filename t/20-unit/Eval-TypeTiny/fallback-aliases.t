@@ -30,7 +30,7 @@ use lib qw( ./lib ./t/lib ../inc ./inc );
 
 use Test::More;
 
-BEGIN { plan skip_all => "test currently not working (TODO)" };
+#BEGIN { plan skip_all => "test currently not working (TODO)" };
 
 use Test::Requires 'Test::Without::Module';
 use Test::Without::Module 'Devel::LexAlias';
@@ -45,6 +45,9 @@ my %env = (
 
 my $source = <<'SRC';
 sub {
+	if (!@_) {
+		return defined tied($foo);
+	}
 	return $foo if $_[0] eq '$foo';
 	return @bar if $_[0] eq '@bar';
 	return %baz if $_[0] eq '%baz';
@@ -52,7 +55,12 @@ sub {
 }
 SRC
 
-my $closure = eval_closure(source => $source, environment => \%env);
+my $closure = eval_closure(source => $source, environment => \%env, alias => 1);
+
+ok(
+	$closure->(),
+	'tied implementation was loaded',
+);
 
 is_deeply(
 	[ $closure->('$foo') ],
@@ -71,6 +79,29 @@ is_deeply(
 	[ 'baz' => 1 ],
 	'closure over hash',
 );
+
+${ $env{'$foo'} } = 'FOO';
+@{ $env{'@bar'} } = ('BAR');
+%{ $env{'%baz'} } = ('BAZ' => 99);
+
+is_deeply(
+	[ $closure->('$foo') ],
+	[ 'FOO' ],
+	'closure over scalar - worked',
+);
+
+is_deeply(
+	[ $closure->('@bar') ],
+	[ 'BAR' ],
+	'closure over array - worked',
+);
+
+is_deeply(
+	[ $closure->('%baz') ],
+	[ 'BAZ' => 99 ],
+	'closure over hash - worked',
+);
+
 
 my $external = 40;
 my $closure2 = eval_closure(
@@ -108,7 +139,7 @@ is($external, 42, 'closing over variables really really really works!');
 	is($destroyed, 1, 'closed over variables disappear on cue');
 }
 
-{
+if (0) {  # BROKEN
 	my @store;
 	
 	{
@@ -165,48 +196,50 @@ is($external, 42, 'closing over variables really really really works!');
 	like($e, qr{^Can't call method "method_of_mine" on an undefined value}, '... can be untied');
 }
 
-my $e = exception { eval_closure(source => 'sub { 1 ]') };
+if (0) {   # ALSO BROKEN
+	my $e = exception { eval_closure(source => 'sub { 1 ]') };
 
-isa_ok(
-	$e,
-	'Error::TypeTiny::Compilation',
-	'$e',
-);
+	isa_ok(
+		$e,
+		'Error::TypeTiny::Compilation',
+		'$e',
+	);
 
-like(
-	$e,
-	qr{^Failed to compile source because: syntax error},
-	'throw exception when code does not compile',
-);
+	like(
+		$e,
+		qr{^Failed to compile source because: syntax error},
+		'throw exception when code does not compile',
+	);
 
-like(
-	$e->errstr,
-	qr{^syntax error},
-	'$e->errstr',
-);
+	like(
+		$e->errstr,
+		qr{^syntax error},
+		'$e->errstr',
+	);
 
-like(
-	$e->code,
-	qr{sub \{ 1 \]},
-	'$e->code',
-);
+	like(
+		$e->code,
+		qr{sub \{ 1 \]},
+		'$e->code',
+	);
 
-my $c1 = eval_closure(source => 'sub { die("BANG") }', description => 'test1');
-my $e1 = exception { $c1->() };
+	my $c1 = eval_closure(source => 'sub { die("BANG") }', description => 'test1');
+	my $e1 = exception { $c1->() };
 
-like(
-	$e1,
-	qr{^BANG at test1 line 1},
-	'"description" option works',
-);
+	like(
+		$e1,
+		qr{^BANG at test1 line 1},
+		'"description" option works',
+	);
 
-my $c2 = eval_closure(source => 'sub { die("BANG") }', description => 'test2', line => 222);
-my $e2 = exception { $c2->() };
+	my $c2 = eval_closure(source => 'sub { die("BANG") }', description => 'test2', line => 222);
+	my $e2 = exception { $c2->() };
 
-like(
-	$e2,
-	qr{^BANG at test2 line 222},
-	'"line" option works',
-);
+	like(
+		$e2,
+		qr{^BANG at test2 line 222},
+		'"line" option works',
+	);
+}
 
 done_testing;

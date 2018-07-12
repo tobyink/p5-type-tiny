@@ -145,6 +145,9 @@ sub _make_lexical_assignment
 	}
 }
 
+# This is only used when the alias option is switched on (off by default)
+# and Devel::LexAlias is unavailable.
+#
 { my $tie; sub _manufacture_ties { $tie ||= eval <<'FALLBACK'; } }
 no warnings qw(void once uninitialized numeric);
 
@@ -162,7 +165,7 @@ no warnings qw(void once uninitialized numeric);
 		my ($method) = (our $AUTOLOAD =~ /(\w+)$/);
 		defined tied(@$self) and return tied(@$self)->$method(@_);
 		require Carp;
-		Carp::croak(qq[Can't call method "$method" on an undefined value]);
+		Carp::croak(qq[Can't call method "$method" on an undefined value]) unless $method eq 'DESTROY';
 	}
 	sub can {
 		my $self = shift;
@@ -191,7 +194,7 @@ no warnings qw(void once uninitialized numeric);
 		my ($method) = (our $AUTOLOAD =~ /(\w+)$/);
 		defined tied(%$self) and return tied(%$self)->$method(@_);
 		require Carp;
-		Carp::croak(qq[Can't call method "$method" on an undefined value]);
+		Carp::croak(qq[Can't call method "$method" on an undefined value]) unless $method eq 'DESTROY';
 	}
 	sub can {
 		my $self = shift;
@@ -220,7 +223,7 @@ no warnings qw(void once uninitialized numeric);
 		my ($method) = (our $AUTOLOAD =~ /(\w+)$/);
 		defined tied($$self) and return tied($$self)->$method(@_);
 		require Carp;
-		Carp::croak(qq[Can't call method "$method" on an undefined value]);
+		Carp::croak(qq[Can't call method "$method" on an undefined value]) unless $method eq 'DESTROY';
 	}
 	sub can {
 		my $self = shift;
