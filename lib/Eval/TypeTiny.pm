@@ -73,7 +73,7 @@ sub import {
 	my $class = shift;                            # uncoverable statement
 	my $opts  = { ref($_[0]) ? %{+shift} : () };  # uncoverable statement
 	$opts->{into} ||= scalar(caller);             # uncoverable statement
-	return $class->$next($opts, @_);              # uncoverable statement	
+	return $class->$next($opts, @_);              # uncoverable statement
 }
 
 sub eval_closure {
