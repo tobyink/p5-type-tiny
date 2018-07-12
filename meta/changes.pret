@@ -2669,3 +2669,45 @@
 		];
 	].
 
+`Type-Tiny 1.003_007 cpan:TOBYINK`
+	issued  2018-07-12;
+	changeset [
+		dcs:versus `Type-Tiny 1.003_006 cpan:TOBYINK`;
+		item [
+			a dcs:Tests;
+			label "Improve coverage.";
+		];
+		item [
+			a dcs:Tests;
+			label "Add tests for deep coercions in Tuples.";
+		];
+		item [
+			a dcs:Tests;
+			label "Restructure Types::TypeTiny test cases so more of them run when Moose and Mouse aren't available.";
+		];
+		item [
+			a dcs:Change;
+			label "Improve progressive exporter in Types::TypeTiny to avoid loading Exporter::TypeTiny more often.";
+		];
+		item [
+			a dcs:Change;
+			label "Types::Standard does better at checking the parameters of parameterized types are valid.";
+		];
+		item [
+			a dcs:Tests;
+			label "Better tests for Eval::TypeTiny's implementations of alias=>1.";
+		];
+		item [
+			a dcs:Update;
+			label "Eval::TypeTiny now supports Perl 5.22 refaliasing as the preferred implementation of alias => 1.";
+		];
+		item [
+			a dcs:Addition;
+			label "Eval::TypeTiny now supports PadWalker as a fallback implementation of alias => 1.";
+		];
+		item [
+			a dcs:Change;
+			label "Eval::TypeTiny will now throw errors when it detects a mismatch between sigils and reference types in the environment hashref but only if EXTENDED_TESTING environment variable is true. Perl will probably give you its own error message for this later on anyway.";
+		];
+	].
+
