@@ -23,7 +23,9 @@ use Type::Library -base, -declare => qw(
 );
 
 use Type::Tiny ();
-use Types::Standard qw( Num Int );
+use Types::Standard qw( Num Int Bool );
+
+sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
 my $meta = __PACKAGE__->meta;
 
@@ -124,11 +126,16 @@ for my $base (qw/Num Int/) {
 	$meta->add_type(
 		name       => "${base}Range",
 		parent     => Types::Standard->get_type($base),
-		constraint_generator => sub {
+		constraint_generator => sub {			
 			return $meta->get_type("${base}Range") unless @_;
 			
+			my $base = Types::Standard->get_type($base);
+			
 			my ($min, $max, $min_excl, $max_excl) = @_;
-			# todo: validate parameters
+			!defined($min) or $base->check($min) or _croak("${base}Range min must be a %s; got %s", lc($base), $min);
+			!defined($max) or $base->check($max) or _croak("${base}Range max must be a %s; got %s", lc($base), $max);
+			!defined($min_excl) or Bool->check($min_excl) or _croak("${base}Range minexcl must be a boolean; got $min_excl");
+			!defined($max_excl) or Bool->check($max_excl) or _croak("${base}Range maxexcl must be a boolean; got $max_excl");
 			
 			# this is complicated so defer to the inline generator
 			eval sprintf(
