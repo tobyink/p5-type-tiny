@@ -17,23 +17,41 @@ use overload
 
 our %CarpInternal;
 $CarpInternal{$_}++ for qw(
-	Eval::TypeTiny
-	Eval::TypeTiny::Sandbox
+	Types::Standard::_Stringable
 	Exporter::Tiny
+	
+	Devel::TypeTiny::Perl56Compat
+	Devel::TypeTiny::Perl58Compat
+	Error::TypeTiny
+	Error::TypeTiny::Assertion
+	Error::TypeTiny::Compilation
+	Error::TypeTiny::WrongNumberOfParameters
+	Eval::TypeTiny
+	Reply::Plugin::TypeTiny
 	Test::TypeTiny
 	Type::Coercion
+	Type::Coercion::FromMoose
 	Type::Coercion::Union
-	Error::TypeTiny
 	Type::Library
 	Type::Params
+	Type::Parser
 	Type::Registry
+	Types::Common::Numeric
+	Types::Common::String
 	Types::Standard
-	Types::Standard::_Stringable
+	Types::Standard::ArrayRef
+	Types::Standard::CycleTuple
+	Types::Standard::Dict
+	Types::Standard::HashRef
+	Types::Standard::Map
+	Types::Standard::ScalarRef
+	Types::Standard::Tuple
 	Types::TypeTiny
 	Type::Tiny
 	Type::Tiny::Class
 	Type::Tiny::Duck
 	Type::Tiny::Enum
+	Type::Tiny::_HalfOp
 	Type::Tiny::Intersection
 	Type::Tiny::Role
 	Type::Tiny::Union
@@ -55,7 +73,7 @@ sub throw
 	while (
 		defined scalar caller($level) and $CarpInternal{scalar caller($level)}
 	) { $level++ };
-	if ( ((caller($level - 1))[1]||"") =~ /^parameter validation for '(.+?)'$/ )
+	if ( ((caller($level - 1))[1]||"") =~ /^(?:parameter validation for|exportable function) '(.+?)'$/ )
 	{
 		my ($pkg, $func) = ($1 =~ m{^(.+)::(\w+)$});
 		$level++ if caller($level) eq ($pkg||"");

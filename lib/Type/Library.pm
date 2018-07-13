@@ -108,7 +108,7 @@ sub _mksub
 		$type->qualified_name,
 		eval_closure(
 			source      => $source,
-			description => sprintf("exportable function '%s'", $type),
+			description => sprintf("exportable function '%s::%s'", $class, $type),
 			environment => {'$type' => \$type},
 		),
 	);
