@@ -23,7 +23,7 @@ sub __constraint_generator
 {
 	return $meta->get_type('Map') unless @_;
 	
-	my ($keys, $values) = map Types::TypeTiny::to_TypeTiny($_), @_;
+	my ($keys, $values) = @_;
 	Types::TypeTiny::TypeTiny->check($keys)
 		or _croak("First parameter to Map[`k,`v] expected to be a type constraint; got $keys");
 	Types::TypeTiny::TypeTiny->check($values)

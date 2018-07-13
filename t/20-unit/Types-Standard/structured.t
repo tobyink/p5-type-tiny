@@ -157,6 +157,22 @@ should_fail({ foo => 4.2, bar => 6.66, baz => "x" }, $gazetteer);
 should_fail({ foo => undef, baz => "x" }, $gazetteer);
 should_fail({ baz => "x" }, $gazetteer);
 
+subtest slurpy_coderef_thing => sub
+{
+	my $allow_extras = 1;
+	my $type = Tuple[Int, slurpy sub { $allow_extras }];
+
+	isa_ok($type->parameters->[-1]{slurpy}, 'Type::Tiny');
+
+	should_pass([1], $type);
+	should_pass([1, "extra"], $type);
+	
+	$allow_extras = 0;
+	
+	should_pass([1], $type);
+	should_fail([1, "extra"], $type);
+};
+
 subtest my_dict_is_slurpy => sub
 {
 	ok(!$struct5->my_dict_is_slurpy, 'On a non-slurpy Dict');

@@ -32,7 +32,8 @@ sub pair_iterator {
 
 sub __constraint_generator
 {
-	my $slurpy = ref($_[-1]) eq q(HASH) ? Types::TypeTiny::to_TypeTiny(pop(@_)->{slurpy}) : undef;
+	my $shash;
+	my $slurpy = ref($_[-1]) eq q(HASH) ? do { $shash = pop @_; Types::TypeTiny::to_TypeTiny($shash->{slurpy}) } : undef;
 	my $iterator = pair_iterator @_;
 	my %constraints;
 	my %is_optional;
@@ -42,11 +43,13 @@ sub __constraint_generator
 	{
 		Types::TypeTiny::TypeTiny->check($slurpy)
 			or _croak("Slurpy parameter to Dict[...] expected to be a type constraint; got $slurpy");
+		
+		$shash->{slurpy} = $slurpy;  # store canonicalized slurpy
 	}
 	
 	while (my ($k, $v) = $iterator->())
 	{
-		$constraints{$k} = Types::TypeTiny::to_TypeTiny($v);
+		$constraints{$k} = $v;
 		Types::TypeTiny::TypeTiny->check($v)
 			or _croak("Parameter for Dict[...] with key '$k' expected to be a type constraint; got $v");
 		Types::TypeTiny::StringLike->check($k)

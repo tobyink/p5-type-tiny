@@ -21,7 +21,7 @@ sub __constraint_generator
 {
 	return Types::Standard::ArrayRef unless @_;
 	
-	my $param = Types::TypeTiny::to_TypeTiny(shift);
+	my $param = shift;
 	Types::TypeTiny::TypeTiny->check($param)
 		or _croak("Parameter to ArrayRef[`a] expected to be a type constraint; got $param");
 	

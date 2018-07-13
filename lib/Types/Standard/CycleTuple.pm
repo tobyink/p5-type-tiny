@@ -27,7 +27,7 @@ sub __constraint_generator
 	my @params = map {
 		ref($_) eq 'HASH' and exists($_->{slurpy})
 			and _croak("Parameters to CycleTuple[...] cannot be slurpy");
-		my $param = Types::TypeTiny::to_TypeTiny($_);
+		my $param = $_;
 		Types::TypeTiny::TypeTiny->check($param)
 			or _croak("Parameters to CycleTuple[...] expected to be type constraints; got $param");
 		$param;
@@ -55,7 +55,7 @@ sub __constraint_generator
 sub __inline_generator
 {
 	my @params = map {
-		my $param = Types::TypeTiny::to_TypeTiny($_);
+		my $param = $_;
 		Types::TypeTiny::TypeTiny->check($param)
 			or _croak("Parameter to CycleTuple[`a] expected to be a type constraint; got $param");
 		$param;
