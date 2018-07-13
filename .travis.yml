@@ -28,7 +28,7 @@ matrix:
         - cpanm -n indirect multidimensional bareword::filehandles strictures
         - cpanm -n Moo Moose Mouse MooseX::Types::Common MouseX::Types::Common
         - cpanm -n match::simple MooseX::Getopt Class::InsideOut Object::Accessor
-        - cpanm -n Type::Tie Validation::Class::Simple Class::XSAccessor
+        - cpanm -n Type::Tie Validation::Class::Simple Class::XSAccessor PadWalker Devel::LexAlias
         - cpan-install --toolchain
         - cpan-install --deps
         - cpan-install --coverage
