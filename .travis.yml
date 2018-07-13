@@ -11,6 +11,8 @@ perl:
   - "5.20"
   - "5.22"
   - "5.24"
+  - "5.26"
+  - "5.28"
 matrix:
   allow_failures:
     - perl: "5.6.1"
@@ -18,7 +20,7 @@ matrix:
     - perl: "5.8.1"
   include:
     # Coverage report
-    - perl: "5.18"
+    - perl: "5.26"
       env: COVERAGE=1 EXTENDED_TESTING=1
       install:
         - cpanm Exporter::Tiny
@@ -64,7 +66,7 @@ matrix:
         - cpan-install --toolchain
         - cpan-install --deps
         - cpan-install --coverage
-    - perl: "5.20"
+    - perl: "5.26"
       env: PERL_TYPE_TINY_XS=0 EXTENDED_TESTING=1
       install:
         - cpanm Exporter::Tiny
@@ -77,9 +79,9 @@ matrix:
         - cpan-install --deps
         - cpan-install --coverage
     # Strict Num
-    - perl: "5.18"
+    - perl: "5.26"
       env: PERL_TYPES_STANDARD_STRICTNUM=1 PERL_TYPE_TINY_XS=0 EXTENDED_TESTING=1
-    - perl: "5.18"
+    - perl: "5.26"
       env: PERL_TYPES_STANDARD_STRICTNUM=1 PERL_TYPE_TINY_XS=1 EXTENDED_TESTING=1
     # Older Moose/Moo
     - perl: "5.20"
