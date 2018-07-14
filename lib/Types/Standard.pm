@@ -117,6 +117,7 @@ sub Stringable (&)
 	bless +{ code => $_[0] };
 }
 
+my $subname;
 sub LazyLoad ($$)
 {
 	package #private
@@ -132,6 +133,22 @@ sub LazyLoad ($$)
 			next unless ref($type->{$key}) eq __PACKAGE__;
 			my $f = $type->{$key}[1];
 			$type->{$key} = $class->can("__$f");
+		}
+		my $mm = $type->{my_methods} || {};
+		for my $key (keys %$mm)
+		{
+			$subname =
+				eval { require Sub::Util } ? \&Sub::Util::set_subname :
+				eval { require Sub::Name } ? \&Sub::Name::subname :
+				0
+				if not defined $subname;
+			next unless ref($mm->{$key}) eq __PACKAGE__;
+			my $f = $mm->{$key}[1];
+			$mm->{$key} = $class->can("__$f");
+			$subname and $subname->(
+				sprintf("%s::my_%s", $type->qualified_name, $key),
+				$mm->{$key},
+			);
 		}
 		return $class->can("__$function");
 	};
@@ -353,22 +370,8 @@ my $_hash = $meta->$add_core_type({
 	deep_explanation     => LazyLoad(HashRef => 'deep_explanation'),
 	coercion_generator   => LazyLoad(HashRef => 'coercion_generator'),
 	my_methods => {
-		hashref_allows_key => sub {
-			my $self = shift;
-			Str()->check($_[0]);
-		},
-		hashref_allows_value => sub {
-			my $self = shift;
-			my ($key, $value) = @_;
-			
-			return !!0 unless $self->my_hashref_allows_key($key);
-			return !!1 if $self==HashRef();
-			
-			my $href  = $self->find_parent(sub { $_->has_parent && $_->parent==HashRef() });
-			my $param = $href->type_parameter;
-			
-			Str()->check($key) and $param->check($value);
-		},
+		hashref_allows_key   => LazyLoad(HashRef => 'hashref_allows_key'),
+		hashref_allows_value => LazyLoad(HashRef => 'hashref_allows_value'),
 	},
 });
 
@@ -472,30 +475,8 @@ my $_map = $meta->$add_core_type({
 	deep_explanation     => LazyLoad(Map => 'deep_explanation'),
 	coercion_generator   => LazyLoad(Map => 'coercion_generator'),
 	my_methods => {
-		hashref_allows_key => sub {
-			my $self = shift;
-			my ($key) = @_;
-			
-			return Str()->check($key) if $self==Map();
-			
-			my $map = $self->find_parent(sub { $_->has_parent && $_->parent==Map() });
-			my ($kcheck, $vcheck) = @{ $map->parameters };
-			
-			($kcheck or Any())->check($key);
-		},
-		hashref_allows_value => sub {
-			my $self = shift;
-			my ($key, $value) = @_;
-			
-			return !!0 unless $self->my_hashref_allows_key($key);
-			return !!1 if $self==Map();
-			
-			my $map = $self->find_parent(sub { $_->has_parent && $_->parent==Map() });
-			my ($kcheck, $vcheck) = @{ $map->parameters };
-			
-			($kcheck or Any())->check($key)
-				and ($vcheck or Any())->check($value);
-		},
+		hashref_allows_key   => LazyLoad(Map => 'hashref_allows_key'),
+		hashref_allows_value => LazyLoad(Map => 'hashref_allows_value'),
 	},
 });
 
@@ -586,80 +567,9 @@ $meta->add_type({
 	deep_explanation     => LazyLoad(Dict => 'deep_explanation'),
 	coercion_generator   => LazyLoad(Dict => 'coercion_generator'),
 	my_methods => {
-		dict_is_slurpy => sub
-		{
-			my $self = shift;
-			
-			return !!0 if $self==Dict();
-			
-			my $dict = $self->find_parent(sub { $_->has_parent && $_->parent==Dict() });
-			ref($dict->parameters->[-1]) eq q(HASH)
-				? $dict->parameters->[-1]{slurpy}
-				: !!0
-		},
-		hashref_allows_key => sub
-		{
-			my $self = shift;
-			my ($key) = @_;
-			
-			return Str()->check($key) if $self==Dict();
-			
-			my $dict = $self->find_parent(sub { $_->has_parent && $_->parent==Dict() });
-			my %params;
-			my $slurpy = $dict->my_dict_is_slurpy;
-			if ($slurpy)
-			{
-				my @args = @{$dict->parameters};
-				pop @args;
-				%params = @args;
-			}
-			else
-			{
-				%params = @{ $dict->parameters }
-			}
-			
-			return !!1
-				if exists($params{$key});
-			return !!0
-				if !$slurpy;
-			return Str()->check($key)
-				if $slurpy==Any() || $slurpy==Item() || $slurpy==Defined() || $slurpy==Ref();
-			return $slurpy->my_hashref_allows_key($key)
-				if $slurpy->is_a_type_of(HashRef());
-			return !!0;
-		},
-		hashref_allows_value => sub
-		{
-			my $self = shift;
-			my ($key, $value) = @_;
-			
-			return !!0 unless $self->my_hashref_allows_key($key);
-			return !!1 if $self==Dict();
-			
-			my $dict = $self->find_parent(sub { $_->has_parent && $_->parent==Dict() });
-			my %params;
-			my $slurpy = $dict->my_dict_is_slurpy;
-			if ($slurpy)
-			{
-				my @args = @{$dict->parameters};
-				pop @args;
-				%params = @args;
-			}
-			else
-			{
-				%params = @{ $dict->parameters }
-			}
-			
-			return !!1
-				if exists($params{$key}) && $params{$key}->check($value);
-			return !!0
-				if !$slurpy;
-			return !!1
-				if $slurpy==Any() || $slurpy==Item() || $slurpy==Defined() || $slurpy==Ref();
-			return $slurpy->my_hashref_allows_value($key, $value)
-				if $slurpy->is_a_type_of(HashRef());
-			return !!0;
-		},
+		dict_is_slurpy       => LazyLoad(Dict => 'dict_is_slurpy'),
+		hashref_allows_key   => LazyLoad(Dict => 'hashref_allows_key'),
+		hashref_allows_value => LazyLoad(Dict => 'hashref_allows_value'),
 	},
 });
 
@@ -698,101 +608,11 @@ $meta->add_type({
 	},
 });
 
-our %_StrMatch;
-my $has_regexp_util;
-my $serialize_regexp = sub {
-	$has_regexp_util = eval {
-		require Regexp::Util;
-		Regexp::Util->VERSION('0.003');
-		1;
-	} || 0 unless defined $has_regexp_util;
-	
-	my $re = shift;
-	my $serialized;
-	if ($has_regexp_util) {
-		$serialized = eval { Regexp::Util::serialize_regexp($re) };
-	}
-	
-	if (!$serialized) {
-		my $key = sprintf('%s|%s', ref($re), $re);
-		$_StrMatch{$key} = $re;
-		$serialized = sprintf('$Types::Standard::_StrMatch{%s}', B::perlstring($key));
-	}
-	
-	return $serialized;
-};
 $meta->add_type({
 	name       => "StrMatch",
 	parent     => $_str,
-	constraint_generator => sub
-	{
-		return $meta->get_type('StrMatch') unless @_;
-		
-		my ($regexp, $checker) = @_;
-		
-		$_regexp->check($regexp)
-			or _croak("First parameter to StrMatch[`a] expected to be a Regexp; got $regexp");
-		
-		if (@_ > 1)
-		{
-			$checker = Types::TypeTiny::to_TypeTiny($checker);
-			Types::TypeTiny::TypeTiny->check($checker)
-				or _croak("Second parameter to StrMatch[`a] expected to be a type constraint; got $checker")
-		}
-		
-		$checker
-			? sub {
-				my $value = shift;
-				return if ref($value);
-				my @m = ($value =~ $regexp);
-				$checker->check(\@m);
-			}
-			: sub {
-				my $value = shift;
-				!ref($value) and $value =~ $regexp;
-			}
-		;
-	},
-	inline_generator => sub
-	{
-		require B;
-		my ($regexp, $checker) = @_;
-		if ($checker)
-		{
-			return unless $checker->can_be_inlined;
-			
-			my $serialized_re = $regexp->$serialize_regexp;
-			return sub
-			{
-				my $v = $_[1];
-				sprintf
-					"!ref($v) and do { my \$m = [$v =~ %s]; %s }",
-					$serialized_re,
-					$checker->inline_check('$m'),
-				;
-			};
-		}
-		else
-		{
-			my $regexp_string = "$regexp";
-			if ($regexp_string =~ /\A\(\?\^u?:(\.+)\)\z/) {
-				my $length = length $1;
-				return sub { "!ref($_) and length($_)>=$length" };
-			}
-			
-			if ($regexp_string =~ /\A\(\?\^u?:\\A(\.+)\\z\)\z/) {
-				my $length = length $1;
-				return sub { "!ref($_) and length($_)==$length" };
-			}
-			
-			my $serialized_re = $regexp->$serialize_regexp;
-			return sub
-			{
-				my $v = $_[1];
-				"!ref($v) and $v =~ $serialized_re";
-			};
-		}
-	},
+	constraint_generator => LazyLoad(StrMatch => 'constraint_generator'),
+	inline_generator     => LazyLoad(StrMatch => 'inline_generator'),
 });
 
 $meta->add_type({
@@ -842,45 +662,8 @@ $meta->add_type({
 		}
 		return sprintf("%s[%s]", $self, $param);
 	},
-	constraint_generator => sub
-	{
-		return $meta->get_type('Tied') unless @_;
-		
-		my $param = Types::TypeTiny::to_TypeTiny(shift);
-		unless (Types::TypeTiny::TypeTiny->check($param))
-		{
-			Types::TypeTiny::StringLike->check($param)
-				or _croak("Parameter to Tied[`a] expected to be a class name; got $param");
-			require Type::Tiny::Class;
-			$param = "Type::Tiny::Class"->new(class => "$param");
-		}
-		
-		my $check = $param->compiled_check;
-		return sub {
-			$check->(tied(Scalar::Util::reftype($_) eq 'HASH' ?  %{$_} : Scalar::Util::reftype($_) eq 'ARRAY' ?  @{$_} :  ${$_}));
-		};
-	},
-	inline_generator => sub {
-		my $param = Types::TypeTiny::to_TypeTiny(shift);
-		unless (Types::TypeTiny::TypeTiny->check($param))
-		{
-			Types::TypeTiny::StringLike->check($param)
-				or _croak("Parameter to Tied[`a] expected to be a class name; got $param");
-			require Type::Tiny::Class;
-			$param = "Type::Tiny::Class"->new(class => "$param");
-		}
-		return unless $param->can_be_inlined;
-		
-		return sub {
-			require B;
-			my $var = $_[1];
-			sprintf(
-				"%s and do { my \$TIED = tied(Scalar::Util::reftype($var) eq 'HASH' ? \%{$var} : Scalar::Util::reftype($var) eq 'ARRAY' ? \@{$var} : \${$var}); %s }",
-				Ref()->inline_check($var),
-				$param->inline_check('$TIED')
-			);
-		};
-	},
+	constraint_generator => LazyLoad(Tied => 'constraint_generator'),
+	inline_generator     => LazyLoad(Tied => 'inline_generator'),
 });
 
 $meta->add_type({

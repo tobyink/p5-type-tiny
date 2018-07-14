@@ -139,6 +139,24 @@ sub __coercion_generator
 	return $C;
 }
 
+sub __hashref_allows_key {
+	my $self = shift;
+	Types::Standard::Str()->check($_[0]);
+}
+
+sub __hashref_allows_value {
+	my $self = shift;
+	my ($key, $value) = @_;
+	
+	return !!0 unless $self->my_hashref_allows_key($key);
+	return !!1 if $self==Types::Standard::HashRef();
+	
+	my $href  = $self->find_parent(sub { $_->has_parent && $_->parent==Types::Standard::HashRef() });
+	my $param = $href->type_parameter;
+	
+	Types::Standard::Str()->check($key) and $param->check($value);
+}
+
 1;
 
 __END__

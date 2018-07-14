@@ -339,6 +339,84 @@ sub __coercion_generator
 	return $C;
 }
 
+sub __dict_is_slurpy
+{
+	my $self = shift;
+	
+	return !!0 if $self==Types::Standard::Dict();
+	
+	my $dict = $self->find_parent(sub { $_->has_parent && $_->parent==Types::Standard::Dict() });
+	ref($dict->parameters->[-1]) eq q(HASH)
+		? $dict->parameters->[-1]{slurpy}
+		: !!0
+}
+
+sub __hashref_allows_key
+{
+	my $self = shift;
+	my ($key) = @_;
+	
+	return Types::Standard::Str()->check($key) if $self==Types::Standard::Dict();
+	
+	my $dict = $self->find_parent(sub { $_->has_parent && $_->parent==Types::Standard::Dict() });
+	my %params;
+	my $slurpy = $dict->my_dict_is_slurpy;
+	if ($slurpy)
+	{
+		my @args = @{$dict->parameters};
+		pop @args;
+		%params = @args;
+	}
+	else
+	{
+		%params = @{ $dict->parameters }
+	}
+	
+	return !!1
+		if exists($params{$key});
+	return !!0
+		if !$slurpy;
+	return Types::Standard::Str()->check($key)
+		if $slurpy==Types::Standard::Any() || $slurpy==Types::Standard::Item() || $slurpy==Types::Standard::Defined() || $slurpy==Types::Standard::Ref();
+	return $slurpy->my_hashref_allows_key($key)
+		if $slurpy->is_a_type_of(Types::Standard::HashRef());
+	return !!0;
+}
+
+sub __hashref_allows_value
+{
+	my $self = shift;
+	my ($key, $value) = @_;
+	
+	return !!0 unless $self->my_hashref_allows_key($key);
+	return !!1 if $self==Types::Standard::Dict();
+	
+	my $dict = $self->find_parent(sub { $_->has_parent && $_->parent==Types::Standard::Dict() });
+	my %params;
+	my $slurpy = $dict->my_dict_is_slurpy;
+	if ($slurpy)
+	{
+		my @args = @{$dict->parameters};
+		pop @args;
+		%params = @args;
+	}
+	else
+	{
+		%params = @{ $dict->parameters }
+	}
+	
+	return !!1
+		if exists($params{$key}) && $params{$key}->check($value);
+	return !!0
+		if !$slurpy;
+	return !!1
+		if $slurpy==Types::Standard::Any() || $slurpy==Types::Standard::Item() || $slurpy==Types::Standard::Defined() || $slurpy==Types::Standard::Ref();
+	return $slurpy->my_hashref_allows_value($key, $value)
+		if $slurpy->is_a_type_of(Types::Standard::HashRef());
+	return !!0;
+}
+
+
 1;
 
 __END__

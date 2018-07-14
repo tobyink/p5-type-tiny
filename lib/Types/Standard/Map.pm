@@ -173,6 +173,32 @@ sub __coercion_generator
 	return $C;
 }
 
+sub __hashref_allows_key {
+	my $self = shift;
+	my ($key) = @_;
+	
+	return Types::Standard::Str()->check($key) if $self==Types::Standard::Map();
+	
+	my $map = $self->find_parent(sub { $_->has_parent && $_->parent==Types::Standard::Map() });
+	my ($kcheck, $vcheck) = @{ $map->parameters };
+	
+	($kcheck or Types::Standard::Any())->check($key);
+}
+
+sub __hashref_allows_value {
+	my $self = shift;
+	my ($key, $value) = @_;
+	
+	return !!0 unless $self->my_hashref_allows_key($key);
+	return !!1 if $self==Types::Standard::Map();
+	
+	my $map = $self->find_parent(sub { $_->has_parent && $_->parent==Types::Standard::Map() });
+	my ($kcheck, $vcheck) = @{ $map->parameters };
+	
+	($kcheck or Types::Standard::Any())->check($key)
+		and ($vcheck or Types::Standard::Any())->check($value);
+}
+
 1;
 
 __END__

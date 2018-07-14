@@ -269,7 +269,7 @@ sub new
 			if not defined $subname;
 		if ($subname)
 		{
-			$subname->(
+			(Scalar::Util::reftype($params{my_methods}{$_}) eq 'CODE') && $subname->(
 				sprintf("%s::my_%s", $self->qualified_name, $_),
 				$params{my_methods}{$_},
 			) for keys %{$params{my_methods}};
