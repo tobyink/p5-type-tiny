@@ -28,6 +28,24 @@ use Test::Fatal;
 
 use Eval::TypeTiny;
 
+subtest "constants exist" => sub {
+	my @constants = qw(
+		HAS_LEXICAL_VARS
+		HAS_LEXICAL_SUBS
+		ALIAS_IMPLEMENTATION
+		IMPLEMENTATION_DEVEL_LEXALIAS
+		IMPLEMENTATION_PADWALKER
+		IMPLEMENTATION_NATIVE
+		IMPLEMENTATION_TIE
+	);
+	for my $c (@constants) {
+		my $can = Eval::TypeTiny->can($c);
+		ok $can, "constant $c exists";
+		is exception { $can->() }, undef, "... and doesn't throw an error";
+		is $can->(undef), $can->(999), "... and seem s to be constant";
+	}
+};
+
 my %env = (
 	'$foo' => do { my $x = "foo"; \$x },
 	'@bar' => [ "bar" ],
