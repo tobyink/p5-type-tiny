@@ -66,4 +66,16 @@ my $SecureUrl = declare SecureUrl => as StrMatch[qr{^https://}];
 should_pass("https://www.google.com/", $SecureUrl);
 should_fail("http://www.google.com/", $SecureUrl);
 
+my $length_eq_3 = StrMatch[qr/\A...\z/];
+should_fail('ab', $length_eq_3);
+should_pass('abc', $length_eq_3);
+should_fail('abcd', $length_eq_3);
+#diag( $length_eq_3->inline_check('$x') );
+
+my $length_ge_3 = StrMatch[qr/\A.../];
+should_fail('ab', $length_ge_3);
+should_pass('abc', $length_ge_3);
+should_pass('abcd', $length_ge_3);
+#diag( $length_ge_3->inline_check('$x') );
+
 done_testing;

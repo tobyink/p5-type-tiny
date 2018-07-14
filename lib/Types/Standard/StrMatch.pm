@@ -93,7 +93,7 @@ sub __inline_generator
 	else
 	{
 		my $regexp_string = "$regexp";
-		if ($regexp_string =~ /\A\(\?\^u?:(\.+)\)\z/) {
+		if ($regexp_string =~ /\A\(\?\^u?:\\A(\.+)\)\z/) {
 			my $length = length $1;
 			return sub { "!ref($_) and length($_)>=$length" };
 		}
