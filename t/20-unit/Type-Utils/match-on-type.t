@@ -140,7 +140,7 @@ like(
 	'coderef compiled by compile_match_on_type with no match',
 );
 
-my $context;
+our $context;
 MATCH_VOID: {
 	match_on_type([], ArrayRef, sub { $context = wantarray });
 	ok(!defined($context), 'match_on_type void context');
@@ -152,6 +152,18 @@ MATCH_SCALAR: {
 MATCH_LIST: {
 	my @x = match_on_type([], ArrayRef, sub { $context = wantarray });
 	ok(defined($context) && $context, 'match_on_type list context');
+};
+MATCH_VOID_STRINGOFCODE: {
+	match_on_type([], ArrayRef, q{ $::context = wantarray });
+	ok(!defined($context), 'match_on_type void context (string of code)');
+};
+MATCH_SCALAR_STRINGOFCODE: {
+	my $x = match_on_type([], ArrayRef, q{ $::context = wantarray });
+	ok(defined($context) && !$context, 'match_on_type scalar context (string of code)');
+};
+MATCH_LIST_STRINGOFCODE: {
+	my @x = match_on_type([], ArrayRef, q{ $::context = wantarray });
+	ok(defined($context) && $context, 'match_on_type list context (string of code)');
 };
 my $compiled = compile_match_on_type(ArrayRef, sub { $context = wantarray });
 COMPILE_VOID: {
