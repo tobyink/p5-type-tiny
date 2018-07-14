@@ -25,9 +25,16 @@ use lib qw( . ./t ../inc ./inc );
 
 use Test::More;
 use Test::TypeTiny;
+use Test::Fatal;
 
 use Types::Standard -all, "slurpy";
 use Type::Utils;
+
+my $e = exception { StrMatch[{}] };
+like($e, qr/^First parameter to StrMatch\[\`a\] expected to be a Regexp/, 'error message 1');
+
+$e = exception { StrMatch[qr/(.)/, []] };
+like($e, qr/^Second parameter to StrMatch\[\`a\] expected to be a type constraint/, 'error message 2');
 
 my $DistanceUnit = enum DistanceUnit => [qw/ mm cm m km /];
 my $Distance = declare Distance => as StrMatch[
