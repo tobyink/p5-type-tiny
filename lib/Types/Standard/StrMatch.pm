@@ -17,7 +17,7 @@ sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
 no warnings;
 
-our %_StrMatch;
+our %expressions;
 my $has_regexp_util;
 my $serialize_regexp = sub {
 	$has_regexp_util = eval {
@@ -34,8 +34,8 @@ my $serialize_regexp = sub {
 	
 	if (!$serialized) {
 		my $key = sprintf('%s|%s', ref($re), $re);
-		$_StrMatch{$key} = $re;
-		$serialized = sprintf('$Types::Standard::_StrMatch{%s}', B::perlstring($key));
+		$expressions{$key} = $re;
+		$serialized = sprintf('$Types::Standard::StrMatch::expressions{%s}', B::perlstring($key));
 	}
 	
 	return $serialized;
