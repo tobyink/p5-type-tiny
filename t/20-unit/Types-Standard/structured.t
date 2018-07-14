@@ -157,6 +157,11 @@ should_fail({ foo => 4.2, bar => 6.66, baz => "x" }, $gazetteer);
 should_fail({ foo => undef, baz => "x" }, $gazetteer);
 should_fail({ baz => "x" }, $gazetteer);
 
+my $gazetteer2 = Dict[ foo => Int, bar => Optional[Int], slurpy Map[StrMatch[qr/^...$/], Num] ];
+should_pass({ foo => 99, jjj => '2.2' }, $gazetteer2);
+should_fail({ jjj => '2.2' }, $gazetteer2);
+should_fail({ foo => 99, jjjj => '2.2' }, $gazetteer2);
+
 subtest slurpy_coderef_thing => sub
 {
 	my $allow_extras = 1;
