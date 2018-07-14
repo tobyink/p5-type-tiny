@@ -19,21 +19,17 @@ our @EXPORT_OK = qw(t);
 
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
-sub _exporter_expand_sub
+sub _generate_t
 {
 	my $class = shift;
-	my ($name, $value, $globals, $permitted) = @_;
+	my ($name, $value, $globals) = @_;
 	
-	if ($name eq "t")
-	{
-		my $caller = $globals->{into};
-		my $reg = $class->for_class(
-			ref($caller) ? sprintf('HASH(0x%08X)', refaddr($caller)) : $caller
-		);
-		return t => sub (;$) { @_ ? $reg->lookup(@_) : $reg };
-	}
+	my $caller = $globals->{into};
+	my $reg = $class->for_class(
+		ref($caller) ? sprintf('HASH(0x%08X)', refaddr($caller)) : $caller
+	);
 	
-	return $class->SUPER::_exporter_expand_sub(@_);
+	sub (;$) { @_ ? $reg->lookup(@_) : $reg };
 }
 
 sub new
