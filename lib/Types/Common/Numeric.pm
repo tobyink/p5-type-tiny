@@ -126,7 +126,7 @@ for my $base (qw/Num Int/) {
 	$meta->add_type(
 		name       => "${base}Range",
 		parent     => Types::Standard->get_type($base),
-		constraint_generator => sub {			
+		constraint_generator => sub {
 			return $meta->get_type("${base}Range") unless @_;
 			
 			my $base = Types::Standard->get_type($base);
