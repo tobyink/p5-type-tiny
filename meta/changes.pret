@@ -2719,3 +2719,45 @@
 		];
 	].
 
+`Type-Tiny 1.003_008 cpan:TOBYINK`
+	issued  2018-07-16;
+	changeset [
+		dcs:versus `Type-Tiny 1.003_007 cpan:TOBYINK`;
+		item [
+			a dcs:Tests;
+			label "Improve test coverage.";
+		];
+		item [
+			a dcs:Update;
+			label "Make Error::TypeTiny aware of some newer internal modules.";
+		];
+		item [
+			label "Improve processing of parameters to Types::Standard's parameterized type constraints";
+		];
+		item [
+			a dcs:Change;
+			label "Types::Common::Numeric's IntRange and NumRange do better checking of parameters.";
+		];
+		item [
+			a dcs:Change;
+			label "Types::Common::String's StrLength does better checking of parameters.";
+		];
+		item [
+			a dcs:Tests;
+			label "Test Type::Utils' match_on_type's support for wantarray on strings of code.";
+		];
+		item [
+			a dcs:Change;
+			label "Simplify how Type::Registry generates the `t()` function.";
+		];
+		item [
+			a dcs:Change;
+			label "Split out some code from Types::Standard into autoloaded modules to speed up loading.";
+		];
+		item [
+			a dcs:Bugfix;
+			label "Fix error messages generating deep explanations of some parameterized types.";
+			dcs:fixes RT#125765;
+			dcs:thanks <urn:uuid:febe859c-fa5c-4abd-8c6c-464643c79e4e>;
+		];
+	].

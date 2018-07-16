@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Error::TypeTiny::AUTHORITY = 'cpan:TOBYINK';
-	$Error::TypeTiny::VERSION   = '1.003_007';
+	$Error::TypeTiny::VERSION   = '1.003_008';
 }
 
 use overload
@@ -45,6 +45,8 @@ $CarpInternal{$_}++ for qw(
 	Types::Standard::HashRef
 	Types::Standard::Map
 	Types::Standard::ScalarRef
+	Types::Standard::StrMatch
+	Types::Standard::Tied
 	Types::Standard::Tuple
 	Types::TypeTiny
 	Type::Tiny
