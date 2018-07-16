@@ -164,10 +164,10 @@ sub __deep_explanation
 		push @keys, $k;
 		$constraints{$k} = $c;
 	}
-	
+
 	for my $k (@keys)
 	{
-		next if $constraints{$k}->parent == Types::Standard::Optional && !exists $value->{$k};
+		next if $constraints{$k}->has_parent && ($constraints{$k}->parent == Types::Standard::Optional) && (!exists $value->{$k});
 		next if $constraints{$k}->check($value->{$k});
 		
 		return [
