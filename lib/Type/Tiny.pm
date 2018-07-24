@@ -1392,6 +1392,14 @@ passed to the constraint generator, but can be found in the package variable
 C<< $Type::Tiny::parameterize_type >>. The first parameter is also available
 as C<< $_ >>.
 
+Types I<can> be parameterized with an empty parameter list. For example,
+in L<Types::Standard>, C<Tuple> is just an alias for C<ArrayRef> but
+C<< Tuple[] >> will only allow zero-length arrayrefs to pass the constraint.
+If you wish C<< YourType >> and C<< YourType[] >> to mean the same thing,
+then do:
+
+ return $Type::Tiny::parameterize_type unless @_;
+
 The constraint generator should generate and return a new constraint coderef
 based on the parameters. Alternatively, the constraint generator can return a
 fully-formed Type::Tiny object, in which case the C<name_generator>,
