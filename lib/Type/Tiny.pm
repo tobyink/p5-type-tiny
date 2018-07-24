@@ -1382,26 +1382,49 @@ constraints. Unlike Moose, these aren't handled by separate subclasses.
 
 =item C<< constraint_generator >>
 
-Coderef that generates a new constraint coderef based on parameters.
-Alternatively, the constraint generator can return a fully-formed
-Type::Tiny object, in which case the C<name_generator>, C<inline_generator>,
-and C<coercion_generator> attributes documented below are ignored.
+Coderef that is called when a type constraint is parameterized. When called,
+it is passed the list of parameters, though any parameter which looks like a
+foreign type constraint (Moose type constraints, Mouse type constraints, etc,
+I<< and coderefs(!!!) >>) is first coerced to a native Type::Tiny object.
+
+Note that for compatibility with the Moose API, the base type is I<not>
+passed to the constraint generator, but can be found in the package variable
+C<< $Type::Tiny::parameterize_type >>. The first parameter is also available
+as C<< $_ >>.
+
+The constraint generator should generate and return a new constraint coderef
+based on the parameters. Alternatively, the constraint generator can return a
+fully-formed Type::Tiny object, in which case the C<name_generator>,
+C<inline_generator>, and C<coercion_generator> attributes documented below
+are ignored.
 
 Optional; providing a generator makes this type into a parameterizable
-type constraint.
+type constraint. If there is no generator, attempting to parameterize the
+type constraint will throw an exception.
 
 =item C<< name_generator >>
 
-A coderef which generates a new display_name based on parameters.
+A coderef which generates a new display_name based on parameters. Called with
+the same parameters and package variables as the C<constraint_generator>.
+Expected to return a string.
+
 Optional; the default is reasonable.
 
 =item C<< inline_generator >>
 
-A coderef which generates a new inlining coderef based on parameters.
+A coderef which generates a new inlining coderef based on parameters. Called
+with the same parameters and package variables as the C<constraint_generator>.
+Expected to return a coderef.
+
+Optional.
 
 =item C<< coercion_generator >>
 
 A coderef which generates a new L<Type::Coercion> object based on parameters.
+Called with the same parameters and package variables as the
+C<constraint_generator>. Expected to return a blessed object.
+
+Optional.
 
 =item C<< deep_explanation >>
 
