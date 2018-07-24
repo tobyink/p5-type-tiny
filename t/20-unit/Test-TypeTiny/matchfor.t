@@ -38,7 +38,7 @@ BEGIN
 	if (eval { require Test::Tester })
 	{
 		require Test::More;
-		Test::Tester->import(tests => 24);
+		Test::Tester->import(tests => 6);
 	}
 	else
 	{
@@ -49,53 +49,96 @@ BEGIN
 
 use Test::TypeTiny qw(matchfor);
 
-check_test(
-	sub {
-		Test::More::is(
-			"Hello world",
-			matchfor(qr/hello/i, qr/hiya/i, "Greeting::Global"),
-			'Yahoo',
-		);
-	},
-	{
-		ok    => 1,
-		name  => 'Yahoo',
-		diag  => '',
-		type  => '',
-	},
-	'successful matchfor(qr//)',
-);
+my $mf = matchfor("foo", "bar");
+Test::More::is("$mf", "foo", "stringification");
 
-check_test(
-	sub {
-		Test::More::is(
-			"Hiya world",
-			matchfor(qr/hello/i, qr/hiya/i, "Greeting::Global"),
-			'Yahoo',
-		);
-	},
-	{
-		ok    => 1,
-		name  => 'Yahoo',
-		diag  => '',
-		type  => '',
-	},
-	'successful matchfor(qr//)',
-);
+Test::More::subtest "successful matchfor(qr//)" => sub {
+	check_test(
+		sub {
+			Test::More::is(
+				"Hello world",
+				matchfor(qr/hello/i, qr/hiya/i, "Greeting::Global"),
+				'ONE',
+			);
+		},
+		{
+			ok    => 1,
+			name  => 'ONE',
+			diag  => '',
+			type  => '',
+		},
+		'successful matchfor(qr//)',
+	);
+};
 
-check_test(
-	sub {
-		Test::More::is(
-			bless({}, "Greeting::Global"),
-			matchfor(qr/hello/i, qr/hiya/i, "Greeting::Global"),
-			'Yahoo',
-		);
-	},
-	{
-		ok    => 1,
-		name  => 'Yahoo',
-		diag  => '',
-		type  => '',
-	},
-	'successful matchfor(CLASS)',
-);
+Test::More::subtest "successful matchfor(qr//) 2" => sub {
+	check_test(
+		sub {
+			Test::More::is(
+				"Hiya world",
+				matchfor(qr/hello/i, qr/hiya/i, "Greeting::Global"),
+				'TWO',
+			);
+		},
+		{
+			ok    => 1,
+			name  => 'TWO',
+			diag  => '',
+			type  => '',
+		},
+		'successful matchfor(qr//)',
+	);
+};
+
+Test::More::subtest 'unsuccessful matchfor(qr//)' => sub {
+	check_test(
+		sub {
+			Test::More::is(
+				"Booooooooooooooo",
+				matchfor(qr/hello/i, qr/hiya/i, "Greeting::Global"),
+				'THREE',
+			);
+		},
+		{
+			ok    => 0,
+			name  => 'THREE',
+		},
+		'unsuccessful matchfor(qr//)',
+	);
+};
+
+Test::More::subtest 'successful matchfor(CLASS)' => sub {
+	check_test(
+		sub {
+			Test::More::is(
+				bless({}, "Greeting::Global"),
+				matchfor(qr/hello/i, qr/hiya/i, "Greeting::Global"),
+				'FOUR',
+			);
+		},
+		{
+			ok    => 1,
+			name  => 'FOUR',
+			diag  => '',
+			type  => '',
+		},
+		'successful matchfor(CLASS)',
+	);
+};
+
+Test::More::subtest 'unsuccessful successful matchfor(CLASS)' => sub {
+	check_test(
+		sub {
+			Test::More::is(
+				bless({}, "Greeting::Local"),
+				matchfor(qr/hello/i, qr/hiya/i, "Greeting::Global"),
+				'FIVE',
+			);
+		},
+		{
+			ok    => 0,
+			name  => 'FIVE',
+		},
+		'unsuccessful successful matchfor(CLASS)',
+	);
+};

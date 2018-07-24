@@ -14,7 +14,6 @@ BEGIN {
 	$Type::Tiny::XS_VERSION  = '0.011';
 }
 
-use Eval::TypeTiny ();
 use Scalar::Util qw( blessed weaken refaddr isweak );
 use Types::TypeTiny ();
 
@@ -161,6 +160,7 @@ sub new
 	and not exists $params{constraint_generator}
 	and not exists $params{inline_generator})
 	{
+		require Eval::TypeTiny;
 		my $code = $params{constraint};
 		$params{constraint} = Eval::TypeTiny::eval_closure(
 			source      => sprintf('sub ($) { %s }', $code),
@@ -426,6 +426,7 @@ sub _build_compiled_check
 		return $self->parent->compiled_check;
 	}
 	
+	require Eval::TypeTiny;
 	return Eval::TypeTiny::eval_closure(
 		source      => sprintf('sub ($) { %s }', $self->inline_check('$_[0]')),
 		description => sprintf("compiled check '%s'", $self),
