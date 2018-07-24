@@ -2761,3 +2761,29 @@
 			dcs:thanks <urn:uuid:febe859c-fa5c-4abd-8c6c-464643c79e4e>;
 		];
 	].
+
+`Type-Tiny 1.003_009 cpan:TOBYINK`
+	issued  2018-07-24;
+	changeset [
+		dcs:versus `Type-Tiny 1.003_008 cpan:TOBYINK`;
+		item [
+			a dcs:Tests;
+			label "Improve testing of Test::TypeTiny itself; the matchfor() function in particular.";
+		];
+		item [
+			a dcs:Tests;
+			label "Test bad parameters to NumRange and IntRange.";
+		];
+		item [
+			a dcs:Tests;
+			label "Test late loading of Sub::Quote.";
+		];
+		item [
+			a dcs:Documentation;
+			label "Better documentation of parameterization API.";
+		];
+		item [
+			a dcs:Change;
+			label "Types::Standard::Defined->complementary_type will now return Types::Standard::Undef, and vice versa.";
+		];
+	].
