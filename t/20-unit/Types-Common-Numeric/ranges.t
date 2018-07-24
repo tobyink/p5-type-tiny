@@ -23,7 +23,8 @@ the same terms as the Perl 5 programming language system itself.
 use strict;
 use warnings FATAL => 'all';
 use Test::More;
-use Test::TypeTiny;
+use Test::TypeTiny qw( -all );
+use Test::Fatal;
 
 use Types::Common::Numeric -all;
 
@@ -95,5 +96,26 @@ should_fail($_, IntRange) for ([], {}, sub { 3 }, "hello world", '1.2345');
 should_pass(1, NumRange);
 should_fail($_, NumRange) for ([], {}, sub { 3 }, "hello world");
 should_pass('1.2345', NumRange);
+
+###########
+
+foreach my $test (
+	[NumRange, [{}, 5], qr/NumRange min must be a num/, "NumRange non-numeric min"],
+	[NumRange, [5, {}], qr/NumRange max must be a num/, "NumRange non-numeric max"],
+	[NumRange, [5, 10, {}], qr/NumRange minexcl must be a boolean/, "NumRange non-boolean minexcl"],
+	[NumRange, [5, 10, 0, {}], qr/NumRange maxexcl must be a boolean/, "NumRange non-boolean maxexcl"],
+	[NumRange, [{}, {}], qr/NumRange min must be a num/, "NumRange non-numeric min and max"],
+	[IntRange, [{}, 5], qr/IntRange min must be a int/, "IntRange non-numeric min"],
+	[IntRange, [5, {}], qr/IntRange max must be a int/, "IntRange non-numeric max"],
+	[IntRange, [5, 10, {}], qr/IntRange minexcl must be a boolean/, "IntRange non-boolean minexcl"],
+	[IntRange, [5, 10, 0, {}], qr/IntRange maxexcl must be a boolean/, "IntRange non-boolean maxexcl"],
+	[IntRange, [{}, {}], qr/IntRange min must be a int/, "IntRange non-numeric min and max"],
+	[IntRange, [1.1, 5], qr/IntRange min must be a int/, "IntRange non-integer min"],
+	[IntRange, [5, 9.9], qr/IntRange max must be a int/, "IntRange non-integer max"],
+) {
+	my ($base, $params, $qr, $desc) = @$test;
+	my $e = exception { $base->of(@$params) };
+	like($e, $qr, "Exception thrown for $desc");
+}
 
 done_testing;
