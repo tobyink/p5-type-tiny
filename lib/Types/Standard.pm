@@ -191,7 +191,11 @@ my $_def = $meta->$add_core_type({
 	parent     => $_item,
 	constraint => sub { defined $_ },
 	inlined    => sub { "defined($_[1])" },
+	complementary_type => $_undef,
 });
+
+# hackish, but eh
+Scalar::Util::weaken($_undef->{complementary_type} ||= $_def);
 
 my $_val = $meta->$add_core_type({
 	name       => "Value",
