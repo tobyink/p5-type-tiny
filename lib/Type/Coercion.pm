@@ -104,7 +104,7 @@ sub _maybe_restore_type_constraint
 	{
 		return Type::Tiny->new(constraint => $check);
 	}
-	return;
+	return; # uncoverable statement
 }
 
 sub add

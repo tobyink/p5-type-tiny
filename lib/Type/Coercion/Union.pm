@@ -31,7 +31,7 @@ sub _maybe_restore_type_constraint
 	{
 		return Type::Tiny::Union->new(type_constraints => $union);
 	}
-	return;
+	return; # uncoverable statement
 }
 
 sub type_coercion_map
