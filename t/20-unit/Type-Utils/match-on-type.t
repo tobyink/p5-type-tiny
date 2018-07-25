@@ -88,6 +88,18 @@ is(
 	'to_json_2 using match_on_type works',
 );
 
+like(
+	exception { to_json(do { my $x = "hello"; \$x }) },
+	qr{\ASCALAR\(\w+\) is not acceptable json type},
+	"fallthrough works for compile_match_on_type",
+);
+
+like(
+	exception { to_json_2(do { my $x = "hello"; \$x }) },
+	qr{\ASCALAR\(\w+\) is not acceptable json type},
+	"fallthrough works for match_on_type",
+);
+
 my $compiled1 = compile_match_on_type(
 	HashRef()  => sub { 'HASH' },
 	ArrayRef() => sub { 'ARRAY' },
