@@ -39,20 +39,16 @@ subtest "constants exist" => sub {
 		IMPLEMENTATION_TIE
 	);
 	for my $c (@constants) {
-		my $can = Eval::TypeTiny->can($c);
-		ok $can, "constant $c exists";
-		is exception { $can->() }, undef, "... and doesn't throw an error";
-		is $can->(undef), $can->(999), "... and seem s to be constant";
+		subtest "constant $c" => sub {
+			my $can = Eval::TypeTiny->can($c);
+			ok $can, "constant $c exists";
+			is exception { $can->() }, undef, "... and doesn't throw an error";
+			is $can->(undef), $can->(999), "... and seems to be constant";
+		};
 	}
 };
 
-my %env = (
-	'$foo' => do { my $x = "foo"; \$x },
-	'@bar' => [ "bar" ],
-	'%baz' => { "baz" => "1" },
-);
-
-my $source = <<'SRC';
+my $s = <<'SRC';
 sub {
 	return $foo if $_[0] eq '$foo';
 	return @bar if $_[0] eq '@bar';
@@ -61,25 +57,38 @@ sub {
 }
 SRC
 
-my $closure = eval_closure(source => $source, environment => \%env);
+my %sources = (string => $s, arrayref => [split /\n/, $s]);
 
-is_deeply(
-	[ $closure->('$foo') ],
-	[ 'foo' ],
-	'closure over scalar',
-);
+foreach my $key (reverse sort keys %sources) {
+	subtest "compiling $key source" => sub {
+		my %env = (
+			'$foo' => do { my $x = "foo"; \$x },
+			'@bar' => [ "bar" ],
+			'%baz' => { "baz" => "1" },
+		);
 
-is_deeply(
-	[ $closure->('@bar') ],
-	[ 'bar' ],
-	'closure over array',
-);
+		my $source  = $sources{$key};
+		my $closure = eval_closure(source => $source, environment => \%env);
 
-is_deeply(
-	[ $closure->('%baz') ],
-	[ 'baz' => 1 ],
-	'closure over hash',
-);
+		is_deeply(
+			[ $closure->('$foo') ],
+			[ 'foo' ],
+			'closure over scalar',
+		);
+
+		is_deeply(
+			[ $closure->('@bar') ],
+			[ 'bar' ],
+			'closure over array',
+		);
+
+		is_deeply(
+			[ $closure->('%baz') ],
+			[ 'baz' => 1 ],
+			'closure over hash',
+		);
+	};
+}
 
 my $external = 40;
 my $closure2 = eval_closure(
@@ -93,32 +102,36 @@ is($external, 42, 'closing over variables really really really works!');
 
 {
 	my $destroyed = 0;
-	
 	{
 		package MyIndicator;
 		sub DESTROY { $destroyed++ }
 	}
-	
-	{
-		my $number = bless \(my $foo), "MyIndicator";
-		$$number = 40;
-		my $closure = eval_closure(
-			source       => 'sub { $$xxx += 2 }',
-			environment  => { '$xxx' => \$number },
-			alias        => 1,
-		);
 		
-		$closure->();
+	subtest 'closed over variables disappear on cue' => sub {
 		
-		is($$number, 42);
-		is($destroyed, 0);
-	}
-	
-	is($destroyed, 1, 'closed over variables disappear on cue');
+		{
+			my $number = bless \(my $foo), "MyIndicator";
+			$$number = 40;
+			my $closure = eval_closure(
+				source       => 'sub { $$xxx += 2 }',
+				environment  => { '$xxx' => \$number },
+				alias        => 1,
+			);
+			
+			$closure->();
+			
+			is($$number, 42, 'closure works');
+			is($destroyed, 0, 'closed over variable still exists');
+		}
+		
+		is($destroyed, 1, 'closed over variable destroyed once closure has been destroyed');
+	};
 }
 
 {
 	my @store;
+	
+	Eval::TypeTiny::_force_implementation( Eval::TypeTiny::IMPLEMENTATION_TIE );
 	
 	{
 		package MyTie;
@@ -132,46 +145,49 @@ is($external, 42, 'closing over variables really really really works!');
 		sub method_of_mine { 42 }
 	}
 	
-	tie(my($var), 'MyTie');
-	
-	$var = 1;
-	
-	my $closure = eval_closure(
-		source       => 'sub { $xxx = $_[0]; tied($xxx)->method_of_mine }',
-		environment  => { '$xxx' => \$var },
-		alias        => 1,
-	);
-	
-	is($closure->(2), 42, 'can close over tied variables ... AUTOLOAD stuff');
-	$closure->(3);
-	
-	my $nother_closure = eval_closure(
-		source       => 'sub { tied($xxx)->can(@_) }',
-		environment  => { '$xxx' => \$var },
-		alias        => 1,
-	);
-	
-	ok( $nother_closure->('method_of_mine'), '... can');
-	ok(!$nother_closure->('your_method'), '... !can');
-
-	is_deeply(
-		\@store,
-		[ 1 .. 3],
-		'... tie still works',
-	);
-
 	{
 		package OtherTie;
 		our @ISA = 'MyTie';
 		sub method_of_mine { 666 }
 	}
 	
-	tie($var, 'OtherTie');
-	is($closure->(4), 666, '... can be retied');
+	tie(my($var), 'MyTie');
+	
+	$var = 1;
+	
+	subtest "tied variables can be closed over (even with tied alias implementation)" => sub {
+	
+		my $closure = eval_closure(
+			source       => 'sub { $xxx = $_[0]; tied($xxx)->method_of_mine }',
+			environment  => { '$xxx' => \$var },
+			alias        => 1,
+		);
+		
+		is($closure->(2), 42, 'can close over tied variables ... AUTOLOAD stuff');
+		$closure->(3);
+		
+		my $nother_closure = eval_closure(
+			source       => 'sub { tied($xxx)->can(@_) }',
+			environment  => { '$xxx' => \$var },
+			alias        => 1,
+		);
+		
+		ok( $nother_closure->('method_of_mine'), '... can');
+		ok(!$nother_closure->('your_method'), '... !can');
 
-	untie($var);
-	my $e = exception { $closure->(5) };
-	like($e, qr{^Can't call method "method_of_mine" on an undefined value}, '... can be untied');
+		is_deeply(
+			\@store,
+			[ 1 .. 3],
+			'... tie still works',
+		);
+		
+		tie($var, 'OtherTie');
+		is($closure->(4), 666, '... can be retied');
+
+		untie($var);
+		my $e = exception { $closure->(5) };
+		like($e, qr{^Can't call method "method_of_mine" on an undefined value}, '... can be untied');
+	};
 }
 
 my $c1 = eval_closure(source => 'sub { die("BANG") }', description => 'test1');
@@ -192,10 +208,20 @@ like(
 	'"line" option works',
 );
 
-my $e3 = exception { eval_closure source => 'sub {' };
-ok( $e3->isa('Error::TypeTiny::Compilation'), 'proper exceptions thrown for compilation errors' );
-is( $e3->code, 'sub {', '$exception->code' );
-like( $e3->errstr, qr/Missing right curly/, '$exception->errstr' );
-is( ref $e3->context, 'HASH', '$exception->context' );
+subtest "exceptions" => sub {
+	my $e3 = exception { eval_closure source => 'sub {' };
+	ok( $e3->isa('Error::TypeTiny::Compilation'), 'proper exceptions thrown for compilation errors' );
+	is( $e3->code, 'sub {', '$exception->code' );
+	like( $e3->errstr, qr/Missing right curly/, '$exception->errstr' );
+	is( ref $e3->context, 'HASH', '$exception->context' );
+};
+
+subtest "exceptions (given arrayref)" => sub {
+	my $e3 = exception { eval_closure source => ['sub {', ''] };
+	ok( $e3->isa('Error::TypeTiny::Compilation'), 'proper exceptions thrown for compilation errors' );
+	is( $e3->code, "sub {\n", '$exception->code' );
+	like( $e3->errstr, qr/Missing right curly/, '$exception->errstr' );
+	is( ref $e3->context, 'HASH', '$exception->context' );
+};
 
 done_testing;
