@@ -120,4 +120,8 @@ my $me2 = Person->new(
 
 is_deeply($me, $me2, 'coercion worked');
 
+my $you = $Person->plus_constructors->coerce({ name => "Livvy" });
+my $you2 = Person->new(name => "Livvy");
+is_deeply($you, $you2, 'coercion worked (plus_constructors with no parameters)');
+
 done_testing;
