@@ -513,5 +513,27 @@ TUPLE: {
 	);
 };
 
+THINGY1: {
+	my $IntFromStr = declare IntFromStr => as Int;
+	coerce $IntFromStr, from Str, q{ length($_) };
+	
+	is_deeply(
+		Tuple->of($IntFromStr)->coerce(["Hello","world"]),
+		["Hello","world"],
+		'inlinable coercion of Tuple with no slurpy given input with extra fields fails'
+	);
+};
+
+THINGY2: {
+	my $IntFromStr = declare IntFromStr => as Int;
+	coerce $IntFromStr, from Str, sub{ length($_) };
+	
+	is_deeply(
+		Tuple->of($IntFromStr)->coerce(["Hello","world"]),
+		["Hello","world"],
+		'non-inlinable coercion of Tuple with no slurpy given input with extra fields fails'
+	);
+};
+
 done_testing;
 
