@@ -208,7 +208,7 @@ like(
 	'"line" option works',
 );
 
-subtest "exceptions" => sub {
+subtest "exception for syntax error" => sub {
 	my $e3 = exception { eval_closure source => 'sub {' };
 	ok( $e3->isa('Error::TypeTiny::Compilation'), 'proper exceptions thrown for compilation errors' );
 	is( $e3->code, 'sub {', '$exception->code' );
@@ -216,12 +216,21 @@ subtest "exceptions" => sub {
 	is( ref $e3->context, 'HASH', '$exception->context' );
 };
 
-subtest "exceptions (given arrayref)" => sub {
+subtest "exception for syntax error (given arrayref)" => sub {
 	my $e3 = exception { eval_closure source => ['sub {', ''] };
 	ok( $e3->isa('Error::TypeTiny::Compilation'), 'proper exceptions thrown for compilation errors' );
 	is( $e3->code, "sub {\n", '$exception->code' );
 	like( $e3->errstr, qr/Missing right curly/, '$exception->errstr' );
 	is( ref $e3->context, 'HASH', '$exception->context' );
 };
+
+subtest "exception for wrong reference type" => sub {
+	my $e3 = exception { eval_closure source => 'sub {', environment => { '%foo' => [] } };	
+	ok($e3->isa('Error::TypeTiny'), 'exception was thrown');
+	if (Eval::TypeTiny::_EXTENDED_TESTING) {
+		like($e3->message, qr/^Expected a variable name and ref/, 'correct exception message');
+	}
+};
+
 
 done_testing;
