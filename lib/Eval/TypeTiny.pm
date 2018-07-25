@@ -87,11 +87,12 @@ sub eval_closure {
 	$args{environment} ||= {};
 
 	if (_EXTENDED_TESTING) {
+		require Scalar::Util;
 		for my $k (sort keys %{$args{environment}}) {
-			next if $k =~ /^\$/ && ref($args{environment}{$k}) =~ /^(SCALAR|REF)$/;
-			next if $k =~ /^\@/ && ref($args{environment}{$k}) eq q(ARRAY);
-			next if $k =~ /^\%/ && ref($args{environment}{$k}) eq q(HASH);
-			next if $k =~ /^\&/ && ref($args{environment}{$k}) eq q(CODE);
+			next if $k =~ /^\$/ && Scalar::Util::reftype($args{environment}{$k}) =~ /^(SCALAR|REF)$/;
+			next if $k =~ /^\@/ && Scalar::Util::reftype($args{environment}{$k}) eq q(ARRAY);
+			next if $k =~ /^\%/ && Scalar::Util::reftype($args{environment}{$k}) eq q(HASH);
+			next if $k =~ /^\&/ && Scalar::Util::reftype($args{environment}{$k}) eq q(CODE);
 			
 			require Error::TypeTiny;
 			Error::TypeTiny::croak("Expected a variable name and ref; got %s => %s", $k, $args{environment}{$k});
