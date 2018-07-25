@@ -68,6 +68,15 @@ ok(
 	'type registries are separate',
 );
 
+my $no_e = exception {
+	do {
+		my $obj = Type::Registry->new;
+	};
+	# DESTROY called
+};
+
+is($no_e, undef, 'DESTROY does not cause problems');
+
 my $r = Type::Registry->for_class("Local::Pkg1");
 
 should_pass([1, 2, 3], $r->lookup("ArrayRef[Integer]"));
