@@ -2787,3 +2787,13 @@
 			label "Types::Standard::Defined->complementary_type will now return Types::Standard::Undef, and vice versa.";
 		];
 	].
+
+`Type-Tiny 1.003_010 cpan:TOBYINK`
+	issued  2018-07-25;
+	changeset [
+		dcs:versus `Type-Tiny 1.003_009 cpan:TOBYINK`;
+		item [
+			a dcs:Tests;
+			label "Improve test coverage for Type::Utils, Type::Coercion, Types::Standard::Tuple, Eval::TypeTiny, Type::Registry, Type::Tiny::Class, and Types::Standard::Tied.";
+		];
+	].
