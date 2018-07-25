@@ -225,7 +225,7 @@ subtest "exception for syntax error (given arrayref)" => sub {
 };
 
 subtest "exception for wrong reference type" => sub {
-	my $e3 = exception { eval_closure source => 'sub {', environment => { '%foo' => [] } };	
+	my $e3 = exception { eval_closure source => 'sub {', environment => { '%foo' => [] } };
 	ok($e3->isa('Error::TypeTiny'), 'exception was thrown');
 	if (Eval::TypeTiny::_EXTENDED_TESTING) {
 		like($e3->message, qr/^Expected a variable name and ref/, 'correct exception message');
