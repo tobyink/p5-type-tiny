@@ -24,17 +24,18 @@ use warnings;
 use lib qw( ./lib ./t/lib ../inc ./inc );
 
 use Test::More;
+use Type::Tiny ();
 
 BEGIN {
-	$] <  5.010001 ? plan(skip_all => "Perl too old") :
-	$] >= 5.021000 ? plan(skip_all => "Perl too new") :
-	$] >= 5.018000 ? warnings->unimport('experimental::smartmatch') :
-	();
-};
+	Type::Tiny::SUPPORT_SMARTMATCH
+		or plan skip_all => 'smartmatch support not available for this version or Perl';
+}
 
 use Types::Standard qw( Num Int );
 
 my $type = Int->plus_coercions( Num, sub{+int} );
+
+no warnings; #!!
 
 ok     ( 3.1 ~~ $type->coercion );
 ok not ( [ ] ~~ $type->coercion );
