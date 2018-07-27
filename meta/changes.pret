@@ -2797,3 +2797,21 @@
 			label "Improve test coverage for Type::Utils, Type::Coercion, Types::Standard::Tuple, Eval::TypeTiny, Type::Registry, Type::Tiny::Class, and Types::Standard::Tied.";
 		];
 	].
+
+`Type-Tiny 1.004000 cpan:TOBYINK`
+	issued  2018-07-26;
+	changeset [
+		dcs:versus `Type-Tiny 1.003_010 cpan:TOBYINK`;
+		item [
+			a dcs:Packaging;
+			label "Repackage as a stable release. No functional changes since 1.003_010.";
+		];
+		item [
+			a dcs:Documentation;
+			label "Update TODO.";
+		];
+		item [
+			a dcs:Documentation;
+			label "Update NEWS.";
+		];
+	].
