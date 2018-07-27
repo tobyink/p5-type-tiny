@@ -4,11 +4,6 @@
    changes in development releases, see the "Changes" file instead.
 =======================================================================
 
-2014-07-18 Type-Tiny version 0.046 released!
-
- - Support for Type::Tiny::XS.
- - Test case improvements.
-
 2014-08-16 Type-Tiny version 1.000000 released!
 
  - Enhanced support for Type::Tiny::XS.
@@ -31,7 +26,7 @@
    an overloaded object. (It never should.)
  - Various performance enhancements and bug fixes.
 
-2018-XX-XX Type-Tiny version 1.004000 released!
+2018-07-27 Type-Tiny version 1.004000 released!
 
  - Types::Standard::FileHandle has a looser definition, more consistent with
    Mouse and Type::Tiny::XS.
@@ -42,4 +37,6 @@
  - Types::Common::Numeric includes IntRange and NumRange.
  - Types::Common::String includes StrLength.
  - Type::Tiny now allows types to be marked as deprecated.
+ - Improvements to Eval::TypeTiny.
  - Various bug fixes.
+ - Improved test suite.
