@@ -2823,6 +2823,7 @@
 		item [
 			a dcs:Bugfix;
 			label "Add Eval::TypeTiny::Sandbox to the list of packages which should be skipped as internal by Error::TypeTiny, as it was mistakenly removed in 1.003_008.";
+			dcs:fixes RT#125942;
 		];
 		item [
 			a dcs:Documentation;
