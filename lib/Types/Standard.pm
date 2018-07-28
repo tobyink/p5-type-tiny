@@ -1130,6 +1130,19 @@ You can optionally provide a type constraint for the array of subexpressions:
          ],
       ];
 
+Here's an example using L<RegExp::Common>:
+
+   package Local::Host {
+      use Moose;
+      use Regexp::Common;
+      has ip_address => (
+         is         => 'ro',
+         required   => 1.
+         isa        => StrMatch[/^$RE{net}{IPv4}$/],
+         default    => '127.0.0.1',
+      );
+   }
+
 On certain versions of Perl, type constraints of the forms
 C<< StrMatch[qr/../ >> and C<< StrMatch[qr/\A..\z/ >> with any number
 of intervening dots can be optimized to simple length checks.
