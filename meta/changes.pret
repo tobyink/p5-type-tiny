@@ -2728,7 +2728,7 @@
 			label "Improve test coverage.";
 		];
 		item [
-			a dcs:Update;
+			a dcs:Update, dcs:Regression;
 			label "Make Error::TypeTiny aware of some newer internal modules.";
 		];
 		item [
@@ -2799,7 +2799,7 @@
 	].
 
 `Type-Tiny 1.004000 cpan:TOBYINK`
-	issued  2018-07-26;
+	issued  2018-07-27;
 	changeset [
 		dcs:versus `Type-Tiny 1.003_010 cpan:TOBYINK`;
 		item [
@@ -2813,5 +2813,19 @@
 		item [
 			a dcs:Documentation;
 			label "Update NEWS.";
+		];
+	].
+
+`Type-Tiny 1.004001 cpan:TOBYINK`
+	issued  2018-07-28;
+	changeset [
+		dcs:versus `Type-Tiny 1.004001 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix;
+			label "Add Eval::TypeTiny::Sandbox to the list of packages which should be skipped as internal by Error::TypeTiny, as it was mistakenly removed in 1.003_008.";
+		];
+		item [
+			a dcs:Documentation;
+			label "Correct release date of 1.004000 in change log.";
 		];
 	].

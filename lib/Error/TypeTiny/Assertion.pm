@@ -10,7 +10,7 @@ BEGIN {
 
 BEGIN {
 	$Error::TypeTiny::Assertion::AUTHORITY = 'cpan:TOBYINK';
-	$Error::TypeTiny::Assertion::VERSION   = '1.004000';
+	$Error::TypeTiny::Assertion::VERSION   = '1.004001';
 }
 
 require Error::TypeTiny;
