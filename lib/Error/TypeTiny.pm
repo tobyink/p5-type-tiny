@@ -19,6 +19,7 @@ our %CarpInternal;
 $CarpInternal{$_}++ for qw(
 	Types::Standard::_Stringable
 	Exporter::Tiny
+	Eval::TypeTiny::Sandbox
 	
 	Devel::TypeTiny::Perl56Compat
 	Devel::TypeTiny::Perl58Compat
@@ -72,9 +73,10 @@ sub throw
 	my $class = shift;
 	
 	my ($level, @caller, %ctxt) = 0;
-	while (
-		defined scalar caller($level) and $CarpInternal{scalar caller($level)}
-	) { $level++ };
+	while (do {
+		my $caller = caller $level;
+		defined $caller and $CarpInternal{$caller};
+	}) { $level++ };
 	if ( ((caller($level - 1))[1]||"") =~ /^(?:parameter validation for|exportable function) '(.+?)'$/ )
 	{
 		my ($pkg, $func) = ($1 =~ m{^(.+)::(\w+)$});
