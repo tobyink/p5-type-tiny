@@ -85,6 +85,8 @@ matrix:
     # Older Moose/Moo
     - perl: "5.20"
       env: MOO_RELEASE=HAARG/Moo-1.004006.tar.gz
+    - perl: "5.18"
+      env: MOO_RELEASE=MSTROUT/Moo-1.003001.tar.gz
     - perl: "5.16"
       env: MOOSE_RELEASE=DOY/Moose-2.0604.tar.gz MOO_RELEASE=MSTROUT/Moo-1.000008.tar.gz
     - perl: "5.12"

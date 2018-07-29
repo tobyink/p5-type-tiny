@@ -29,7 +29,7 @@ use lib qw( ./lib ./t/lib ../inc ./inc );
 
 use Test::More;
 use Test::Fatal;
-use Test::Requires { "Moo" => "1.002001" };
+use Test::Requires { "Moo" => "1.004000" };
 
 BEGIN {
 	require Method::Generate::Accessor;
@@ -49,7 +49,7 @@ my $e_constructor = exception { Goo->new(number => "too") };
 
 isa_ok($e_constructor, 'Error::TypeTiny::Assertion', '$e_constructor');
 # Expect the error message to contain this file, 'exceptions.t'
-like($e_constructor, qr/exceptions\.t/, '$e_constructor location');
+like($e_constructor, qr/exceptions\.t/, '$e_constructor location') if Moo->VERSION ge '1.004';
 ok($e_constructor->has_attribute_name, '$e_constructor->has_attribute_name');
 is($e_constructor->attribute_name, 'number', '$e_constructor->attribute_name');
 ok($e_constructor->has_attribute_step, '$e_constructor->has_attribute_step');
