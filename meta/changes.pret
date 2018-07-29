@@ -2819,7 +2819,7 @@
 `Type-Tiny 1.004001 cpan:TOBYINK`
 	issued  2018-07-28;
 	changeset [
-		dcs:versus `Type-Tiny 1.004001 cpan:TOBYINK`;
+		dcs:versus `Type-Tiny 1.004000 cpan:TOBYINK`;
 		item [
 			a dcs:Bugfix;
 			label "Add Eval::TypeTiny::Sandbox to the list of packages which should be skipped as internal by Error::TypeTiny, as it was mistakenly removed in 1.003_008.";
@@ -2828,5 +2828,16 @@
 		item [
 			a dcs:Documentation;
 			label "Correct release date of 1.004000 in change log.";
+		];
+	].
+
+`Type-Tiny 1.004002 cpan:TOBYINK`
+	issued  2018-07-29;
+	changeset [
+		dcs:versus `Type-Tiny 1.004001 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix, dcs:Tests;
+			label "Skip one particular test on old versions of Moo because it relies on a feature introduced in Moo 1.004000.";
+			dcs:fixes RT#125948;
 		];
 	].

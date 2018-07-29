@@ -16,11 +16,11 @@
 	];
 	deps:runtime-recommendation [
 		deps:on "Type::Tiny::XS 0.011"^^deps:CpanId;
-		comment "Make stuff faster."@en;
+		comment "Makes a lot of stuff faster."@en;
 	];
 	deps:runtime-recommendation [
 		deps:on "Ref::Util::XS 0.100"^^deps:CpanId;
-		comment "Make stuff faster."@en;
+		comment "Makes some stuff faster."@en;
 	];
 	deps:runtime-recommendation [
 		deps:on "Regexp::Util 0.003"^^deps:CpanId;
@@ -63,8 +63,8 @@
 		comment "Type::Tiny works nicely with Mouse."@en;
 	];
 	deps:runtime-suggestion [
-		deps:on "Moo 1.000000"^^deps:CpanId;
-		comment "Type::Tiny works nicely with Moo."@en;
+		deps:on "Moo 1.006000"^^deps:CpanId;
+		comment "Type::Tiny works nicely with Moo. Use Moo 1.006000 or above for best results."@en;
 	];
 	deps:runtime-suggestion [
 		deps:on "Reply"^^deps:CpanId;
