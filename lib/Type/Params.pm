@@ -1429,7 +1429,7 @@ any other Type::Tiny type constraints.
 
 =back
 
-=head1 Params::ValidationCompiler
+=head2 Params::ValidationCompiler
 
 L<Params::ValidationCompiler> does basically the same thing as
 L<Type::Params>.
