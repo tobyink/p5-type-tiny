@@ -457,62 +457,109 @@ sub find_constraining_type
 	$self;
 }
 
+our @CMP;
+
+sub CMP_SUPERTYPE          () { -1 }
+sub CMP_EQUAL              () {  0 }
+sub CMP_EQUIVALENT         () { '0 but true' }
+sub CMP_SUBTYPE            () {  1 }
+sub CMP_UNKNOWN            () { ''; }
+
+# avoid getting mixed up with cmp operator at compile time
+*cmp = sub {
+	my ($A, $B) = _loose_to_TypeTiny($_[0], $_[1]);
+	return unless blessed($A) && $A->isa("Type::Tiny");
+	return unless blessed($B) && $B->isa("Type::Tiny");
+	for my $comparator (@CMP) {
+		my $result = $comparator->($A, $B);
+		next if $result eq CMP_UNKNOWN;
+		if ($result eq CMP_EQUIVALENT) {
+			my $prefer = @_==3 ? $_[2] : CMP_EQUAL;
+			return $prefer;
+		}
+		return $result;
+	}
+	return CMP_UNKNOWN;
+};
+
+push @CMP, sub {
+	my ($A, $B) = @_;
+	return CMP_EQUAL
+		if refaddr($A) == refaddr($B);
+	
+	return CMP_EQUIVALENT
+		if refaddr($A->compiled_check) == refaddr($B->compiled_check);
+
+	my $A_stem = $A->find_constraining_type;
+	my $B_stem = $B->find_constraining_type;
+	return CMP_EQUIVALENT
+		if refaddr($A_stem) == refaddr($B_stem);
+	return CMP_EQUIVALENT
+		if refaddr($A_stem->compiled_check) == refaddr($B_stem->compiled_check);	
+	
+	if ($A_stem->can_be_inlined and $B_stem->can_be_inlined) {
+		return 0 if $A_stem->inline_check('$WOLFIE') eq $B_stem->inline_check('$WOLFIE');
+	}
+
+	A_IS_SUBTYPE: {
+		my $A_prime = $A_stem;
+		while ($A_prime->has_parent) {
+			$A_prime = $A_prime->parent;
+			return CMP_SUBTYPE
+				if refaddr($A_prime) == refaddr($B_stem);
+			return CMP_SUBTYPE
+				if refaddr($A_prime->compiled_check) == refaddr($B_stem->compiled_check);	
+			if ($A_prime->can_be_inlined and $B_stem->can_be_inlined) {
+				return CMP_SUBTYPE
+					if $A_prime->inline_check('$WOLFIE') eq $B_stem->inline_check('$WOLFIE');
+			}
+		}
+	}
+
+	B_IS_SUBTYPE: {
+		my $B_prime = $B_stem;
+		while ($B_prime->has_parent) {
+			$B_prime = $B_prime->parent;
+			return CMP_SUPERTYPE
+				if refaddr($B_prime) == refaddr($A_stem);
+			return CMP_SUPERTYPE
+				if refaddr($B_prime->compiled_check) == refaddr($A_stem->compiled_check);
+			if ($A_stem->can_be_inlined and $B_prime->can_be_inlined) {
+				return CMP_SUPERTYPE
+					if $B_prime->inline_check('$WOLFIE') eq $A_stem->inline_check('$WOLFIE');
+			}
+		}
+	}
+	
+	return CMP_UNKNOWN;
+};
+
 sub equals
 {
-	my ($self, $other) = _loose_to_TypeTiny(@_);
-	return unless blessed($self)  && $self->isa("Type::Tiny");
-	return unless blessed($other) && $other->isa("Type::Tiny");
-	
-	return !!1 if refaddr($self) == refaddr($other);
-	
-	return !!1 if $self->has_parent  && $self->_is_null_constraint  && $self->parent==$other;
-	return !!1 if $other->has_parent && $other->_is_null_constraint && $other->parent==$self;
-	
-	return !!1 if refaddr($self->compiled_check) == refaddr($other->compiled_check);
-	
-	return $self->qualified_name eq $other->qualified_name
-		if $self->has_library && !$self->is_anon && $other->has_library && !$other->is_anon;
-	
-	return $self->inline_check('$x') eq $other->inline_check('$x')
-		if $self->can_be_inlined && $other->can_be_inlined;
-	
-	return;
+	my $result = Type::Tiny::cmp($_[0], $_[1]);
+	return unless defined $result;
+	$result eq CMP_EQUAL;
 }
 
 sub is_subtype_of
 {
-	my ($self, $other) = _loose_to_TypeTiny(@_);
-	return unless blessed($self)  && $self->isa("Type::Tiny");
-	return unless blessed($other) && $other->isa("Type::Tiny");
-
-#	my $this = $self;
-#	while (my $parent = $this->parent)
-#	{
-#		return !!1 if $parent->equals($other);
-#		$this = $parent;
-#	}
-#	return;
-
-	return unless $self->has_parent;
-	$self->parent->equals($other) or $self->parent->is_subtype_of($other);
+	my $result = Type::Tiny::cmp($_[0], $_[1], CMP_SUBTYPE);
+	return unless defined $result;
+	$result eq CMP_SUBTYPE;
 }
 
 sub is_supertype_of
 {
-	my ($self, $other) = _loose_to_TypeTiny(@_);
-	return unless blessed($self)  && $self->isa("Type::Tiny");
-	return unless blessed($other) && $other->isa("Type::Tiny");
-	
-	$other->is_subtype_of($self);
+	my $result = Type::Tiny::cmp($_[0], $_[1], CMP_SUBTYPE);
+	return unless defined $result;
+	$result eq CMP_SUPERTYPE;
 }
 
 sub is_a_type_of
 {
-	my ($self, $other) = _loose_to_TypeTiny(@_);
-	return unless blessed($self)  && $self->isa("Type::Tiny");
-	return unless blessed($other) && $other->isa("Type::Tiny");
-	
-	$self->equals($other) or $self->is_subtype_of($other);
+	my $result = Type::Tiny::cmp($_[0], $_[1]);
+	return unless defined $result;
+	$result eq CMP_SUBTYPE or $result eq CMP_EQUAL or $result eq CMP_EQUIVALENT;
 }
 
 sub strictly_equals
@@ -528,14 +575,6 @@ sub is_strictly_subtype_of
 	my ($self, $other) = _loose_to_TypeTiny(@_);
 	return unless blessed($self)  && $self->isa("Type::Tiny");
 	return unless blessed($other) && $other->isa("Type::Tiny");
-
-#	my $this = $self;
-#	while (my $parent = $this->parent)
-#	{
-#		return !!1 if $parent->strictly_equals($other);
-#		$this = $parent;
-#	}
-#	return;
 
 	return unless $self->has_parent;
 	$self->parent->strictly_equals($other) or $self->parent->is_strictly_subtype_of($other);
@@ -1102,6 +1141,10 @@ sub isa
 		return !!1;
 	}
 	
+	if (not @_) {
+		require Carp;
+		Carp::confess("ERROR: this should never happen");
+	}
 	$self->SUPER::isa(@_);
 }
 
