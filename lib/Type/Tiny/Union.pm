@@ -187,74 +187,123 @@ sub validate_explain
 	];
 }
 
-sub equals
-{
-	my ($self, $other) = Type::Tiny::_loose_to_TypeTiny(@_);
-	return unless blessed($self)  && $self->isa("Type::Tiny");
-	return unless blessed($other) && $other->isa("Type::Tiny");
+push @Type::Tiny::CMP, sub {
+	my $A = shift->find_constraining_type;
+	my $B = shift->find_constraining_type;
 	
-	return !!1 if $self->SUPER::equals($other);
-	return !!0 unless $other->isa(__PACKAGE__);
-	
-	my @self_constraints  = @{ $self->type_constraints };
-	my @other_constraints = @{ $other->type_constraints };
-	
-	return !!0 unless @self_constraints == @other_constraints;
-	
-	constraint: foreach my $constraint ( @self_constraints ) {
-		for ( my $i = 0; $i < @other_constraints; $i++ ) {
-			if ( $constraint->equals($other_constraints[$i]) ) {
-				splice @other_constraints, $i, 1;
-				next constraint;
+	if ($A->isa(__PACKAGE__) and $B->isa(__PACKAGE__)) {
+		my @A_constraints = @{ $A->type_constraints };
+		my @B_constraints = @{ $B->type_constraints };
+		
+		# If everything in @A_constraints is equal to something in @B_constraints and vice versa, then $A equiv to $B
+		EQUALITY: {
+			my $everything_in_a_is_equal = 1;
+			OUTER: for my $A_child (@A_constraints) {
+				INNER: for my $B_child (@B_constraints) {
+					if ($A_child->equals($B_child)) {
+						next OUTER;
+					}
+				}
+				$everything_in_a_is_equal = 0;
+				last OUTER;
 			}
+			
+			my $everything_in_b_is_equal = 1;
+			OUTER: for my $B_child (@B_constraints) {
+				INNER: for my $A_child (@A_constraints) {
+					if ($B_child->equals($A_child)) {
+						next OUTER;
+					}
+				}
+				$everything_in_b_is_equal = 0;
+				last OUTER;
+			}
+			
+			return Type::Tiny::CMP_EQUIVALENT
+				if $everything_in_a_is_equal && $everything_in_b_is_equal;
+		}
+		
+		# If everything in @A_constraints is a subtype of something in @B_constraints, then $A is subtype of $B
+		SUBTYPE: {
+			OUTER: for my $A_child (@A_constraints) {
+				my $a_child_is_subtype_of_something = 0;
+				INNER: for my $B_child (@B_constraints) {
+					if ($A_child->is_a_type_of($B_child)) {
+						++$a_child_is_subtype_of_something;
+						last INNER;
+					}
+				}
+				if (not $a_child_is_subtype_of_something) {
+					last SUBTYPE;
+				}
+			}
+			return Type::Tiny::CMP_SUBTYPE;
+		}
+		
+		# If everything in @B_constraints is a subtype of something in @A_constraints, then $A is supertype of $B
+		SUPERTYPE: {
+			OUTER: for my $B_child (@B_constraints) {
+				my $b_child_is_subtype_of_something = 0;
+				INNER: for my $A_child (@A_constraints) {
+					if ($B_child->is_a_type_of($A_child)) {
+						++$b_child_is_subtype_of_something;
+						last INNER;
+					}
+				}
+				if (not $b_child_is_subtype_of_something) {
+					last SUPERTYPE;
+				}
+			}
+			return Type::Tiny::CMP_SUPERTYPE;
+		}		
+	}
+	
+	# I think it might be possible to merge this into the first bit by treating $B as union[$B].
+	# Test cases first though.
+	if ($A->isa(__PACKAGE__)) {
+		my @A_constraints = @{ $A->type_constraints };
+		if (@A_constraints == 1) {
+			my $result = Type::Tiny::cmp($A_constraints[0], $B);
+			return $result unless $result eq Type::Tiny::CMP_UNKNOWN;
+		}
+		my $subtype = 1;
+		for my $child (@A_constraints) {
+			if ($B->is_a_type_of($child)) {
+				return Type::Tiny::CMP_SUPERTYPE;
+			}
+			if ($subtype and not $B->is_supertype_of($child)) {
+				$subtype = 0;
+			}
+		}
+		if ($subtype) {
+			return Type::Tiny::CMP_SUBTYPE;
+		}
+	}
+
+	# I think it might be possible to merge this into the first bit by treating $A as union[$A].
+	# Test cases first though.
+	if ($B->isa(__PACKAGE__)) {
+		my @B_constraints = @{ $B->type_constraints };
+		if (@B_constraints == 1) {
+			my $result = Type::Tiny::cmp($A, $B_constraints[0]);
+			return $result unless $result eq Type::Tiny::CMP_UNKNOWN;
+		}
+		my $supertype = 1;
+		for my $child (@B_constraints) {
+			if ($A->is_a_type_of($child)) {
+				return Type::Tiny::CMP_SUBTYPE;
+			}
+			if ($supertype and not $A->is_supertype_of($child)) {
+				$supertype = 0;
+			}
+		}
+		if ($supertype) {
+			return Type::Tiny::CMP_SUPERTYPE;
 		}
 	}
 	
-	@other_constraints == 0;
-}
-
-sub is_a_type_of
-{
-	my ($self, $other) = Type::Tiny::_loose_to_TypeTiny(@_);
-	return unless blessed($self)  && $self->isa("Type::Tiny");
-	return unless blessed($other) && $other->isa("Type::Tiny");
-	
-	return !!1 if $self->SUPER::is_a_type_of($other);
-	
-	for my $tc (@{ $self->type_constraints }) {
-		return !!0 unless $tc->is_a_type_of($other);
-	}
-	return !!1;
-}
-
-sub is_subtype_of
-{
-	my ($self, $other) = Type::Tiny::_loose_to_TypeTiny(@_);
-	return unless blessed($self)  && $self->isa("Type::Tiny");
-	return unless blessed($other) && $other->isa("Type::Tiny");
-	
-	return !!1 if $self->SUPER::is_subtype_of($other);
-	
-	for my $tc (@{ $self->type_constraints }) {
-		return !!0 unless $tc->is_subtype_of($other);
-	}
-	return !!1;
-}
-
-sub is_supertype_of
-{
-	my ($self, $other) = Type::Tiny::_loose_to_TypeTiny(@_);
-	return unless blessed($self)  && $self->isa("Type::Tiny");
-	return unless blessed($other) && $other->isa("Type::Tiny");
-	
-	return !!1 if $self->SUPER::is_supertype_of($other);
-	
-	for my $tc (@{ $self->type_constraints }) {
-		return !!1 if $tc->equals($other);
-		return !!1 if $tc->is_supertype_of($other);
-	}
-	return !!0;
-}
+	return Type::Tiny::CMP_UNKNOWN;
+};
 
 1;
 
