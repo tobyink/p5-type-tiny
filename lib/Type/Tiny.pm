@@ -461,7 +461,7 @@ our @CMP;
 
 sub CMP_SUPERTYPE          () { -1 }
 sub CMP_EQUAL              () {  0 }
-sub CMP_EQUIVALENT         () { '0 but true' }
+sub CMP_EQUIVALENT         () { '0E0' }
 sub CMP_SUBTYPE            () {  1 }
 sub CMP_UNKNOWN            () { ''; }
 
@@ -1759,6 +1759,43 @@ L<Types::Standard> do). This method only returns the first such parameter.
 L</"Attributes related to parameterizable and parameterized types">
 documents the C<parameters> attribute, which returns an arrayref of all
 the parameters.
+
+=back
+
+B<< Hint for people subclassing Type::Tiny: >>
+Since version 1.006000, the methods for determining subtype, supertype, and
+type equality should I<not> be overridden in subclasses of Type::Tiny. This
+is because of the problem of diamond inheritance. If X and Y are both
+subclasses of Type::Tiny, they I<both> need to be consulted to figure out
+how type constraints are related; not just one of them should be overriding
+these methods. See the source code for L<Type::Tiny::Enum> for an example of
+how subclasses can give hints about type relationships to Type::Tiny.
+Summary: push a coderef onto C<< @Type::Tiny::CMP >>. This coderef will be
+passed two type constraints. It should then return one of the constants
+Type::Tiny::CMP_SUBTYPE (first type is a subtype of second type),
+Type::Tiny::CMP_SUPERTYPE (second type is a subtype of first type),
+Type::Tiny::CMP_EQUAL (the two types are exactly the same),
+Type::Tiny::CMP_EQUIVALENT (the two types are effectively the same), or
+Type::Tiny::CMP_UNKNOWN (your coderef couldn't establish any relationship).
+
+=head3 Type relationship introspection function
+
+=over
+
+=item C<< Type::Tiny::cmp($type1, $type2) >>
+
+The subtype/supertype relationship between types results in a partial
+ordering of type constraints.
+
+This function will return one of the constants:
+Type::Tiny::CMP_SUBTYPE (first type is a subtype of second type),
+Type::Tiny::CMP_SUPERTYPE (second type is a subtype of first type),
+Type::Tiny::CMP_EQUAL (the two types are exactly the same),
+Type::Tiny::CMP_EQUIVALENT (the two types are effectively the same), or
+Type::Tiny::CMP_UNKNOWN (couldn't establish any relationship).
+In numeric contexts, these evaluate to -1, 1, 0, 0, and 0, making it
+potentially usable with C<sort> (though you may need to silence warnings
+about treating the empty string as a numeric value).
 
 =back
 
