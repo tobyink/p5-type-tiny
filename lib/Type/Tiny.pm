@@ -448,6 +448,15 @@ sub _build_compiled_check
 	};
 }
 
+sub find_constraining_type
+{
+	my $self = shift;
+	if ($self->_is_null_constraint and $self->has_parent) {
+		return $self->parent->find_constraining_type;
+	}
+	$self;
+}
+
 sub equals
 {
 	my ($self, $other) = _loose_to_TypeTiny(@_);
@@ -1678,6 +1687,15 @@ being checked is C<< $_ >>. Returns undef if there is no match.
 In list context also returns the number of type constraints which had
 been looped through before the matching constraint was found.
 
+=item C<< find_constraining_type >>
+
+Finds the nearest ancestor type constraint (including the type itself)
+which has a C<constraint> coderef.
+
+Equivalent to:
+
+   $type->find_parent(sub { not $_->_is_null_constraint })
+
 =item C<< coercibles >>
 
 Return a type constraint which is the union of type constraints that can be
@@ -1693,7 +1711,7 @@ parameters; otherwise returns undef. For example:
    ( ArrayRef[Int] )->parent;            # returns ArrayRef
 
 Note that parameterizable type constraints can perfectly legitimately take
-multiple parameters (several off the parameterizable type constraints in
+multiple parameters (several of the parameterizable type constraints in
 L<Types::Standard> do). This method only returns the first such parameter.
 L</"Attributes related to parameterizable and parameterized types">
 documents the C<parameters> attribute, which returns an arrayref of all

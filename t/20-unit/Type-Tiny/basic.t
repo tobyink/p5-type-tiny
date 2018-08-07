@@ -182,4 +182,11 @@ my ($found3, $n3) = $t6->find_parent(sub { $_->name eq 'Kristoff' });
 is($found3, undef, 'find_parent (null result)');
 is($3, undef, '... includes an undef count');
 
+{
+	my $Any  = "Type::Tiny"->new(name => "Any");
+	my $Blah = $Any->create_child_type->create_child_type(constraint => sub { "yes" });
+	my $Bleh = $Blah->create_child_type(name => "Bleh")->create_child_type;
+	
+	is($Bleh->find_constraining_type->{uniq}, $Blah->{uniq}, 'find_constraining_type');
+}
 done_testing;
