@@ -39,7 +39,7 @@ sub meta
 
 sub type_names
 {
-	qw( CodeLike StringLike TypeTiny HashLike ArrayLike );
+	qw( CodeLike StringLike TypeTiny HashLike ArrayLike _ForeignTypeConstraint );
 }
 
 sub has_type
@@ -127,14 +127,46 @@ sub TypeTiny ()
 		constraint => sub {  Scalar::Util::blessed($_   ) && $_   ->isa(q[Type::Tiny])  },
 		inlined    => sub { my $var = $_[1]; "Scalar::Util::blessed($var) && $var\->isa(q[Type::Tiny])" },
 		library    => __PACKAGE__,
+		_build_coercion => sub {
+			my $c = shift;
+			$c->add_type_coercions(_ForeignTypeConstraint(), \&to_TypeTiny);
+			$c->freeze;
+		},
+	);
+}
+
+sub _ForeignTypeConstraint ()
+{
+	require Type::Tiny;
+	$cache{_ForeignTypeConstraint} ||= "Type::Tiny"->new(
+		name       => "_ForeignTypeConstraint",
+		constraint => \&_is_ForeignTypeConstraint,
+		inlined    => sub { qq/ref($_[1]) && Types::TypeTiny::_is_ForeignTypeConstraint($_[1])/ },
+		library    => __PACKAGE__,
 	);
 }
 
 my %ttt_cache;
 
+sub _is_ForeignTypeConstraint
+{
+	my $t = @_ ? $_[0] : $_;
+	return !!1 if ref $t eq 'CODE';
+	if (my $class = blessed $t)
+	{
+		return !!0 if $class->isa("Type::Tiny");
+		return !!1 if $class->isa("Moose::Meta::TypeConstraint");
+		return !!1 if $class->isa("MooseX::Types::TypeDecorator");
+		return !!1 if $class->isa("Validation::Class::Simple");
+		return !!1 if $class->isa("Validation::Class");
+		return !!1 if $t->can("check") && $t->can("get_message");
+	}
+	!!0;
+}
+
 sub to_TypeTiny
 {
-	my $t = $_[0];
+	my $t = @_ ? $_[0] : $_;
 	
 	return $t unless (my $ref = ref $t);
 	return $t if $ref =~ /^Type::Tiny\b/;
@@ -380,6 +412,13 @@ Accepts coderefs and objects overloading codification.
 =item C<< TypeTiny >>
 
 Accepts blessed L<Type::Tiny> objects.
+
+=item C<< _ForeignTypeConstraint >>
+
+Any reference which to_TypeTiny recognizes as something that can be coerced
+to a Type::Tiny object.
+
+Yeah, the underscore is included.
 
 =back
 

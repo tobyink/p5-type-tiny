@@ -369,9 +369,10 @@ sub _default_message         { $_[0]{_default_message} ||= $_[0]->_build_default
 sub _assert_coercion
 {
 	my $self = shift;
+	return $self->coercion if $self->{_build_coercion}; # trigger auto build thing
 	_croak "No coercion for this type constraint"
 		unless $self->has_coercion && @{$self->coercion->type_coercion_map};
-	return $self->coercion;
+	$self->coercion;
 }
 
 my $null_constraint = sub { !!1 };
@@ -397,7 +398,9 @@ sub _build_coercion
 	my $self = shift;
 	my %opts = (type_constraint => $self);
 	$opts{display_name} = "to_$self" unless $self->is_anon;
-	return "Type::Coercion"->new(%opts);
+	my $coercion = "Type::Coercion"->new(%opts);
+	$self->{_build_coercion}->($coercion) if ref $self->{_build_coercion};
+	$coercion;
 }
 
 sub _build_default_message
