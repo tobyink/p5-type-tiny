@@ -39,6 +39,8 @@ use Test::TypeTiny -all;
 use Types::TypeTiny -all;
 use Moose::Util::TypeConstraints qw(find_type_constraint);
 
+ok(TypeTiny->has_coercion, "TypeTiny->has_coercion");
+
 subtest "Coercion from Moose type constraint object" => sub
 {
 	my $orig = find_type_constraint("Int");
