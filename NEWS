@@ -40,3 +40,8 @@
  - Improvements to Eval::TypeTiny.
  - Various bug fixes.
  - Improved test suite.
+
+2018-12-XX Type-Tiny version 1.006000 released!
+
+ - Improved is_subtype_of/is_supertype_of support.
+ - Better/faster Moo integration via a new API. (Requires Moo 2.XXXYYY.)
