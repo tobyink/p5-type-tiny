@@ -899,6 +899,13 @@ If parameterized, the elements of the array must pass the additional
 constraint. For example, C<< ArrayRef[Num] >> must be a reference to an
 array of numbers.
 
+As an extension to Moose's ArrayRef type, a minimum and maximum array
+length can be given:
+
+   ArrayRef[CodeRef, 1]        # ArrayRef of at least one CodeRef
+   ArrayRef[FileHandle, 0, 2]  # ArrayRef of up to two FileHandles
+   ArrayRef[Any, 0, 100]       # ArrayRef of up to 100 elements
+
 Other customers also bought: C<< ArrayLike >> from L<Types::TypeTiny>.
 
 =item C<< HashRef[`a] >>
