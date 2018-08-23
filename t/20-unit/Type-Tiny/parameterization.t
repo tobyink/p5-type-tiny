@@ -68,10 +68,10 @@ like(
 	'error message when a coderef dies',
 );
 
-like(
-	exception { ArrayRef[Int, Int] },
-	qr/^\QOnly one parameter to ArrayRef[`a] expected; got 2/,
-	'error message when ArrayRef[`a] passed multiple parameters'
-);
+#like(
+#	exception { ArrayRef[Int, Int] },
+#	qr/^\QOnly one parameter to ArrayRef[`a] expected; got 2/,
+#	'error message when ArrayRef[`a] passed multiple parameters'
+#);
 
 done_testing;
