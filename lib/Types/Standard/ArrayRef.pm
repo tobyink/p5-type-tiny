@@ -133,7 +133,7 @@ sub __deep_explanation
 		];		
 	}
 
-	if ($max != 0 and @$value > $max) {
+	if ($max > 0 and @$value > $max) {
 		return [
 			sprintf('"%s" constrains array length at most %d', $type, $max),
 			sprintf('@{%s} is %d', $varname, scalar @$value),
