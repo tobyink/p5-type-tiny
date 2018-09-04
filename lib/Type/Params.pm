@@ -20,7 +20,7 @@ use Error::TypeTiny;
 use Error::TypeTiny::Assertion;
 use Error::TypeTiny::WrongNumberOfParameters;
 use Types::Standard -types;
-use Types::TypeTiny qw(CodeLike TypeTiny ArrayLike to_TypeTiny);
+use Types::TypeTiny qw(CodeLike TypeTiny ArrayLike StringLike to_TypeTiny);
 
 require Exporter::Tiny;
 our @ISA = 'Exporter::Tiny';
@@ -654,12 +654,20 @@ sub validate_named
 sub multisig
 {
 	my %options = (ref($_[0]) eq "HASH" && !$_[0]{slurpy}) ? %{+shift} : ();
+    $options{message}     ||= "Parameter validation failed";
+    $options{description} ||= sprintf("parameter validation for '%s'", [caller(1+($options{caller_level}||0))]->[3] || '__ANON__');
+    for my $key ( qw[ message description ] )
+    {
+        StringLike->check($options{$key})
+            || Error::TypeTiny::croak("Option '$key' expected to be string or stringifiable object");
+    }
+
 	my @multi = map {
 		CodeLike->check($_)  ? { closure => $_ } :
 		ArrayLike->check($_) ? compile({ want_details => 1 }, @$_) :
 		$_;
 	} @_;
-	
+
 	my @code = 'sub { my $r; ';
 	
 	for my $i (0 .. $#multi)
@@ -679,12 +687,12 @@ sub multisig
 		push @code, '}' if @cond;
 	}
 	
-	push @code, '"Error::TypeTiny"->throw(message => "Parameter validation failed");';
+	push @code, sprintf('"Error::TypeTiny"->throw(message => "%s");', quotemeta("$options{message}"));
 	push @code, '}';
 	
 	eval_closure(
 		source      => \@code,
-		description => sprintf("parameter validation for '%s'", [caller(1+($options{caller_level}||0))]->[3] || '__ANON__'),
+		description => $options{description},
 		environment => { '@multi' => \@multi },
 	);
 }
@@ -1143,6 +1151,21 @@ a full example:
    get_from(0, \@array);      # returns $array[0]
    get_from('foo', \%hash);   # returns $hash{foo}
    get_from('foo', $obj);     # returns $obj->foo
+   
+The default error message is just C<"Parameter validation failed">.
+You can pass an option hashref as the first argument with a 
+hopefully more informative message string:
+
+    sub foo {
+        state $OptionsDict = Dict[...];
+        state $check = multisig(
+            { message => 'USAGE: $object->foo($string [, \%options|%options])', },
+            [ Object, StringLike, $OptionsDict ],
+            [ Object, StringLike, slurpy $OptionsDict ],
+        );
+        my($self, $string, $opt) = $check->(@_);
+        ...
+    }
 
 =head1 PARAMETER OBJECTS
 
