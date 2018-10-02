@@ -1288,7 +1288,7 @@ objects.
  use Type::Params qw( compile Invocant );
  
  sub my_method {
-   state $check = compile(Instance, ArrayRef, Int);
+   state $check = compile(Invocant, ArrayRef, Int);
    my ($self_or_class, $arr, $ix) = $check->(@_);
    
    return $arr->[ $ix ];
