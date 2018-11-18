@@ -129,7 +129,7 @@ $meta->add_type(
 	parent     => NonEmptySimpleStr,
 	constraint => sub { !/\p{Upper}/ms },
 	inlined    => sub { undef, qq($_ !~ /\\p{Upper}/ms) },
-	message    => sub { "Must not contain pper case letters" },
+	message    => sub { "Must not contain upper case letters" },
 );
 
 LowerCaseSimpleStr->coercion->add_type_coercions(
