@@ -1137,7 +1137,7 @@ You can optionally provide a type constraint for the array of subexpressions:
          ],
       ];
 
-Here's an example using L<RegExp::Common>:
+Here's an example using L<Regexp::Common>:
 
    package Local::Host {
       use Moose;
