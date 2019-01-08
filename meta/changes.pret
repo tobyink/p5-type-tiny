@@ -2841,3 +2841,27 @@
 			dcs:fixes RT#125948;
 		];
 	].
+
+`Type-Tiny 1.004003 cpan:TOBYINK`
+	issued  2019-01-08;
+	changeset [
+		dcs:versus `Type-Tiny 1.004002 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix;
+			label "Fix spelling in error message for Types::Common::String LowerCaseSimpleStr.";
+			dcs:blame cpan:RRWO;
+			seealso <https://github.com/tobyink/p5-type-tiny/pull/47>
+		];
+		item [
+			a dcs:Documentation;
+			label "Fix Types::Standard documentation error: incorrect third-party module name.";
+			dcs:blame <urn:uuid:c89062f8-6fb7-425e-a0ee-3dd3a46127cf>;
+			seealso <https://github.com/tobyink/p5-type-tiny/pull/46>
+		];
+		item [
+			a dcs:Documentation;
+			label "Fix Type::Params documentation error.";
+			dcs:blame <urn:uuid:c89062f8-6fb7-425e-a0ee-3dd3a46127cf>;
+			seealso <https://github.com/tobyink/p5-type-tiny/pull/45>
+		];
+	].
