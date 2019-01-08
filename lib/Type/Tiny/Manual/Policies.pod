@@ -86,14 +86,16 @@ These modules are considered part of Type::Tiny's internals, and not
 covered by the stability policy:
 L<Devel::TypeTiny::Perl56Compat>,
 L<Devel::TypeTiny::Perl58Compat>,
-L<Eval::TypeTiny>,
 L<Type::Coercion::FromMoose>,
 L<Type::Tiny::_HalfOp>,
 L<Types::Standard::ArrayRef>,
+L<Types::Standard::CycleTuple>,
 L<Types::Standard::Dict>,
 L<Types::Standard::HashRef>,
 L<Types::Standard::Map>,
-L<Types::Standard::ScalarRef>, and
+L<Types::Standard::ScalarRef>,
+L<Types::Standard::StrMatch>,
+L<Types::Standard::Tied>, and
 L<Types::Standard::Tuple>.
 
 =item *

@@ -299,9 +299,8 @@ __END__
 Eval::TypeTiny - utility to evaluate a string of Perl code in a clean environment
 
 =head1 STATUS
-
-This module is considered part of Type-Tiny's internals. It is not
-covered by the
+ 
+This module is covered by the
 L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
 
 =head1 DESCRIPTION
