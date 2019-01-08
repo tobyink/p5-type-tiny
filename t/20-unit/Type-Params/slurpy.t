@@ -36,6 +36,11 @@ is_deeply(
 	[ "Hello", { foo => 1, bar => 2 } ]
 );
 
+is_deeply(
+	[ $chk->("Hello", { foo => 1, bar => 2 }) ],
+	[ "Hello", { foo => 1, bar => 2 } ]
+);
+
 like(
 	exception { $chk->("Hello", foo => 1, bar => 2.1) },
 	qr{did not pass type constraint "HashRef\[Int\]" \(in \$SLURPY\)},
@@ -45,6 +50,11 @@ my $chk2 = compile(Str, slurpy HashRef);
 
 is_deeply(
 	[ $chk2->("Hello", foo => 1, bar => 2) ],
+	[ "Hello", { foo => 1, bar => 2 } ]
+);
+
+is_deeply(
+	[ $chk2->("Hello", { foo => 1, bar => 2 }) ],
 	[ "Hello", { foo => 1, bar => 2 } ]
 );
 

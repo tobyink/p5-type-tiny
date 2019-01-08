@@ -66,8 +66,11 @@ sub _mkslurpy
 			$i,
 		)
 		: sprintf(
-			'%s = (($#_-%d)%%2)==0 ? "Error::TypeTiny::WrongNumberOfParameters"->throw(message => sprintf("Odd number of elements in %%s", %s)) : +{ @_[%d..$#_] };',
+			'%s = (@_==%d and ref $_[%d] eq "HASH") ? +{ %%{$_[%d]} } : (($#_-%d)%%2)==0 ? "Error::TypeTiny::WrongNumberOfParameters"->throw(message => sprintf("Odd number of elements in %%s", %s)) : +{ @_[%d..$#_] };',
 			$name,
+			$i + 1,
+			$i,
+			$i,
 			$i,
 			$QUOTE->("$tc"),
 			$i,
@@ -976,6 +979,19 @@ For example:
 
 A specification have one or zero slurpy parameters. If there is a slurpy
 parameter, it must be the final one.
+
+From Type::Params 1.005000 onwards, slurpy hashrefs can be passed in as a
+true hashref (which will be shallow cloned) rather than key-value pairs.
+
+ sub xyz {
+   state $check = compile(Int, slurpy HashRef);
+   my ($num, $hr) = $check->(@_);
+ }
+ 
+ xyz( 5,   foo => 1, bar => 2   );   # works
+ xyz( 5, { foo => 1, bar => 2 } );   # works from 1.005000
+
+This feature is only implemented for slurpy hashrefs, not slurpy arrayrefs.
 
 Note that having a slurpy parameter will slightly slow down C<< $check >>
 because it means that C<< $check >> can't just check C<< @_ >> and return
