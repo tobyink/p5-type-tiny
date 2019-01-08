@@ -14,7 +14,7 @@ BEGIN {
 	$Type::Tiny::XS_VERSION  = '0.011';
 }
 
-use Scalar::Util qw( blessed weaken refaddr isweak );
+use Scalar::Util qw( blessed );
 use Types::TypeTiny ();
 
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
@@ -237,7 +237,7 @@ sub new
 		my $uniq = $self->{uniq};
 		
 		$ALL_TYPES{$uniq} = $self;
-		weaken( $ALL_TYPES{$uniq} );
+		Scalar::Util::weaken( $ALL_TYPES{$uniq} );
 		
 		package # no index
 			Moo::HandleMoose;
@@ -454,12 +454,12 @@ sub equals
 	return unless blessed($self)  && $self->isa("Type::Tiny");
 	return unless blessed($other) && $other->isa("Type::Tiny");
 	
-	return !!1 if refaddr($self) == refaddr($other);
+	return !!1 if Scalar::Util::refaddr($self) == Scalar::Util::refaddr($other);
 	
 	return !!1 if $self->has_parent  && $self->_is_null_constraint  && $self->parent==$other;
 	return !!1 if $other->has_parent && $other->_is_null_constraint && $other->parent==$self;
 	
-	return !!1 if refaddr($self->compiled_check) == refaddr($other->compiled_check);
+	return !!1 if Scalar::Util::refaddr($self->compiled_check) == Scalar::Util::refaddr($other->compiled_check);
 	
 	return $self->qualified_name eq $other->qualified_name
 		if $self->has_library && !$self->is_anon && $other->has_library && !$other->is_anon;
@@ -864,7 +864,7 @@ sub parameterize
 	if (defined $key)
 	{
 		$param_cache{$key} = $P;
-		weaken($param_cache{$key});
+		Scalar::Util::weaken($param_cache{$key});
 	}
 	
 	$P->coercion->freeze;
@@ -887,7 +887,7 @@ sub complementary_type
 {
 	my $self = shift;
 	my $r    = ($self->{complementary_type} ||= $self->_build_complementary_type);
-	weaken($self->{complementary_type}) unless isweak($self->{complementary_type});
+	Scalar::Util::weaken($self->{complementary_type}) unless Scalar::Util::isweak($self->{complementary_type});
 	return $r;
 }
 
@@ -1203,7 +1203,7 @@ sub __is_parameterized         { shift->is_parameterized(@_) }
 sub _add_type_coercions        { shift->coercion->add_type_coercions(@_) };
 sub _as_string                 { shift->qualified_name(@_) }
 sub _compiled_type_coercion    { shift->coercion->compiled_coercion(@_) };
-sub _identity                  { refaddr(shift) };
+sub _identity                  { Scalar::Util::refaddr(shift) };
 sub _unite                     { require Type::Tiny::Union; "Type::Tiny::Union"->new(type_constraints => \@_) };
 
 # Hooks for Type::Tie
