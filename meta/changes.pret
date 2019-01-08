@@ -2865,3 +2865,13 @@
 			seealso <https://github.com/tobyink/p5-type-tiny/pull/45>
 		];
 	].
+
+`Type-Tiny 1.004004 cpan:TOBYINK`
+	issued  2019-01-08;
+	changeset [
+		dcs:versus `Type-Tiny 1.004003 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix, dcs:Packaging;
+			label "Depend on Exporter::Tiny 0.040; older versions don't provide all the functions Type::Library needs.";
+		];
+	].
