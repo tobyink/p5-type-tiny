@@ -584,7 +584,7 @@ $meta->add_type({
 	inlined    => sub {
 		$INC{'overload.pm'}
 			? "Scalar::Util::blessed($_[1]) and overload::Overloaded($_[1])"
-			: "Scalar::Util::blessed($_[1]) and do { require overload; overload::Overloaded($_[1]) }"
+			: "Scalar::Util::blessed($_[1]) and do { use overload (); overload::Overloaded($_[1]) }"
 	},
 	constraint_generator => sub
 	{
