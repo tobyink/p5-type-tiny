@@ -52,8 +52,28 @@ BEGIN {
 		: sub () { !!0 };
 };
 
-use overload
-	q("")      => sub { caller =~ m{^(Moo::HandleMoose|Sub::Quote)} ? overload::StrVal($_[0]) : $_[0]->display_name },
+{
+	my $nil = sub {};
+	sub _install_overloads
+	{
+		no strict 'refs';
+		no warnings 'redefine', 'once';
+		my $class = shift;
+		*{$class . '::(('} = sub {};
+		*{$class . '::()'} = sub {};
+		*{$class . '::()'} = do { my $x = 1; \$x };
+		while (@_)
+		{
+			my $f = shift;
+			#*{$class . '::(' . $f} = $nil; # cargo culting overload.pm
+			#*{$class . '::(' . $f} = shift;
+			*{$class . '::(' . $f} = ref $_[0] ? shift : do { my $m = shift; sub { shift->$m(@_) } };
+		}
+	}
+}
+
+__PACKAGE__->_install_overloads(
+	q("")      => sub { caller =~ m{^(Moo::HandleMoose|Sub::Quote)} ? $_[0]->_stringify_no_magic : $_[0]->display_name },
 	q(bool)    => sub { 1 },
 	q(&{})     => "_overload_coderef",
 	q(|)       => sub {
@@ -76,7 +96,7 @@ use overload
 				require Type::Tiny::_HalfOp;
 				return "Type::Tiny::_HalfOp"->new('|', @tc);
 			}
-	}
+		}
 		require Type::Tiny::Union;
 		return "Type::Tiny::Union"->new(type_constraints => \@tc)
 	},
@@ -113,14 +133,11 @@ use overload
 	q(>=)      => sub { my $m = $_[0]->can('is_a_type_of');  $m->(reverse _swap @_) },
 	q(eq)      => sub { "$_[0]" eq "$_[1]" },
 	q(cmp)     => sub { $_[2] ? ("$_[1]" cmp "$_[0]") : ("$_[0]" cmp "$_[1]") },
-	fallback   => 1,
-;
-BEGIN {
-	overload->import(
-		q(~~)    => sub { $_[0]->check($_[1]) },
-		fallback => 1, # 5.10 loses the fallback otherwise
-	) if Type::Tiny::SUPPORT_SMARTMATCH;
-}
+);
+	
+__PACKAGE__->_install_overloads(
+	q(~~)    => sub { $_[0]->check($_[1]) },
+) if Type::Tiny::SUPPORT_SMARTMATCH;
 
 sub _overload_coderef
 {
@@ -239,11 +256,9 @@ sub new
 		$ALL_TYPES{$uniq} = $self;
 		Scalar::Util::weaken( $ALL_TYPES{$uniq} );
 		
-		package # no index
-			Moo::HandleMoose;
 		my $tmp = $self;
 		Scalar::Util::weaken($tmp);
-		$Moo::HandleMoose::TYPE_MAP{$self} = sub { $tmp };
+		$Moo::HandleMoose::TYPE_MAP{$self->_stringify_no_magic} = sub { $tmp };
 	}
 	
 	if (ref($params{coercion}) eq q(CODE))
@@ -283,9 +298,7 @@ sub DESTROY
 {
 	my $self = shift;
 	delete( $ALL_TYPES{$self->{uniq}} );
-	package # no index
-		Moo::HandleMoose;
-	delete( $Moo::HandleMoose::TYPE_MAP{$self} );
+	delete( $Moo::HandleMoose::TYPE_MAP{$self->_stringify_no_magic} );
 	return;
 }
 
@@ -295,6 +308,10 @@ sub _clone
 	my %opts;
 	$opts{$_} = $self->{$_} for qw< name display_name message >;
 	$self->create_child_type(%opts);
+}
+
+sub _stringify_no_magic {
+	sprintf('%s=%s(0x%08x)', blessed($_[0]), Scalar::Util::reftype($_[0]), Scalar::Util::refaddr($_[0]));
 }
 
 our $DD;
@@ -1161,7 +1178,7 @@ sub AUTOLOAD
 		if ($m =~ /\Amy_(.+)\z/)
 		{
 			my $method = $self->_lookup_my_method($1);
-			return $self->$method(@_) if $method;
+			return &$method($self, @_) if $method;
 		}
 	}
 	

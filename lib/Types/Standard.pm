@@ -109,50 +109,50 @@ my $meta = __PACKAGE__->meta;
 # better off looking at the code for Types::Common::Numeric
 # and Types::Common::String.
 
-sub Stringable (&)
 {
-	package #private
-	Types::Standard::_Stringable;
-	use overload q[""] => sub { $_[0]{text} ||= $_[0]{code}->() }, fallback => 1;
-	bless +{ code => $_[0] };
-}
+	sub Stringable (&) {
+		bless +{ code => $_[0] }, 'Types::Standard::_Stringable';
+	}
+	Types::Standard::_Stringable->Type::Tiny::_install_overloads(
+		q[""] => sub { $_[0]{text} ||= $_[0]{code}->() }
+	);
 
-my $subname;
-sub LazyLoad ($$)
-{
-	package #private
-	Types::Standard::LazyLoad;
-	use overload fallback => 1, q[&{}] => sub {
-		my ($typename, $function) = @{$_[0]};
-		my $type  = $meta->get_type($typename);
-		my $class = "Types::Standard::$typename";
-		eval "require $class; 1" or die($@);
-		# Majorly break encapsulation for Type::Tiny :-O
-		for my $key (keys %$type)
-		{
-			next unless ref($type->{$key}) eq __PACKAGE__;
-			my $f = $type->{$key}[1];
-			$type->{$key} = $class->can("__$f");
-		}
-		my $mm = $type->{my_methods} || {};
-		for my $key (keys %$mm)
-		{
-			$subname =
-				eval { require Sub::Util } ? \&Sub::Util::set_subname :
-				eval { require Sub::Name } ? \&Sub::Name::subname :
-				0
-				if not defined $subname;
-			next unless ref($mm->{$key}) eq __PACKAGE__;
-			my $f = $mm->{$key}[1];
-			$mm->{$key} = $class->can("__$f");
-			$subname and $subname->(
-				sprintf("%s::my_%s", $type->qualified_name, $key),
-				$mm->{$key},
-			);
-		}
-		return $class->can("__$function");
-	};
-	bless \@_;
+	my $subname;
+	sub LazyLoad ($$) {
+		bless \@_, 'Types::Standard::LazyLoad';
+	}
+	'Types::Standard::LazyLoad'->Type::Tiny::_install_overloads(
+		q[&{}] => sub {
+			my ($typename, $function) = @{$_[0]};
+			my $type  = $meta->get_type($typename);
+			my $class = "Types::Standard::$typename";
+			eval "require $class; 1" or die($@);
+			# Majorly break encapsulation for Type::Tiny :-O
+			for my $key (keys %$type)
+			{
+				next unless ref($type->{$key}) eq __PACKAGE__;
+				my $f = $type->{$key}[1];
+				$type->{$key} = $class->can("__$f");
+			}
+			my $mm = $type->{my_methods} || {};
+			for my $key (keys %$mm)
+			{
+				$subname =
+					eval { require Sub::Util } ? \&Sub::Util::set_subname :
+					eval { require Sub::Name } ? \&Sub::Name::subname :
+					0
+					if not defined $subname;
+				next unless ref($mm->{$key}) eq __PACKAGE__;
+				my $f = $mm->{$key}[1];
+				$mm->{$key} = $class->can("__$f");
+				$subname and $subname->(
+					sprintf("%s::my_%s", $type->qualified_name, $key),
+					$mm->{$key},
+				);
+			}
+			return $class->can("__$function");
+		},
+	);
 }
 
 no warnings;
@@ -577,12 +577,15 @@ $meta->add_type({
 	},
 });
 
-use overload ();
 $meta->add_type({
 	name       => "Overload",
 	parent     => $_obj,
-	constraint => sub { overload::Overloaded($_) },
-	inlined    => sub { "Scalar::Util::blessed($_[1]) and overload::Overloaded($_[1])" },
+	constraint => sub { require overload; overload::Overloaded($_) },
+	inlined    => sub {
+		$INC{'overload.pm'}
+			? "Scalar::Util::blessed($_[1]) and overload::Overloaded($_[1])"
+			: "Scalar::Util::blessed($_[1]) and do { require overload; overload::Overloaded($_[1]) }"
+	},
 	constraint_generator => sub
 	{
 		return $meta->get_type('Overload') unless @_;
@@ -593,6 +596,7 @@ $meta->add_type({
 				: _croak("Parameters to Overload[`a] expected to be a strings; got $_");
 		} @_;
 		
+		require overload;
 		return sub {
 			my $value = shift;
 			for my $op (@operations) {
@@ -604,6 +608,7 @@ $meta->add_type({
 	inline_generator => sub {
 		my @operations = @_;
 		return sub {
+			require overload;
 			my $v = $_[1];
 			join " and ",
 				"Scalar::Util::blessed($v)",

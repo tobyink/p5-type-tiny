@@ -75,13 +75,51 @@ sub get_coercion
 	&{$_[0]}();  # uncoverable statement
 }
 
+my ($__get_linear_isa_dfs, $tried_mro);
+$__get_linear_isa_dfs = sub {
+	if (!$tried_mro && eval { require mro }) {
+		$__get_linear_isa_dfs = \&mro::get_linear_isa;
+		goto $__get_linear_isa_dfs;
+	}
+	no strict 'refs';
+	my $classname = shift;
+	my @lin = ($classname);
+	my %stored;
+	foreach my $parent (@{"$classname\::ISA"})
+	{
+		my $plin = $__get_linear_isa_dfs->($parent);
+		foreach (@$plin) {
+			next if exists $stored{$_};
+			push(@lin, $_);
+			$stored{$_} = 1;
+		}
+	}
+	return \@lin;
+};
+
+sub _check_overload
+{
+	my $package = shift;
+	if (ref $package) {
+		$package = blessed($package);
+		return !!0 if !defined $package;
+	}
+	my $op  = shift;
+	my $mro = $__get_linear_isa_dfs->($package);
+	foreach my $p (@$mro) {
+		my $fqmeth = $p . q{::(} . $op;
+		return !!1 if defined &{$fqmeth};
+	}
+	!!0;
+}
+
 sub StringLike ()
 {
 	require Type::Tiny;
 	$cache{StringLike} ||= "Type::Tiny"->new(
 		name       => "StringLike",
-		constraint => sub {    defined($_   ) && !ref($_   ) or Scalar::Util::blessed($_   ) && overload::Method($_   , q[""])  },
-		inlined    => sub { qq/defined($_[1]) && !ref($_[1]) or Scalar::Util::blessed($_[1]) && overload::Method($_[1], q[""])/ },
+		constraint => sub {    defined($_   ) && !ref($_   ) or Scalar::Util::blessed($_   ) && Types::TypeTiny::_check_overload($_   , q[""])  },
+		inlined    => sub { qq/defined($_[1]) && !ref($_[1]) or Scalar::Util::blessed($_[1]) && Types::TypeTiny::_check_overload($_[1], q[""])/ },
 		library    => __PACKAGE__,
 	);
 }
@@ -91,8 +129,8 @@ sub HashLike ()
 	require Type::Tiny;
 	$cache{HashLike} ||= "Type::Tiny"->new(
 		name       => "HashLike",
-		constraint => sub {    ref($_   ) eq q[HASH] or Scalar::Util::blessed($_   ) && overload::Method($_   , q[%{}])  },
-		inlined    => sub { qq/ref($_[1]) eq q[HASH] or Scalar::Util::blessed($_[1]) && overload::Method($_[1], q[\%{}])/ },
+		constraint => sub {    ref($_   ) eq q[HASH] or Scalar::Util::blessed($_   ) && Types::TypeTiny::_check_overload($_   , q[%{}])  },
+		inlined    => sub { qq/ref($_[1]) eq q[HASH] or Scalar::Util::blessed($_[1]) && Types::TypeTiny::_check_overload($_[1], q[\%{}])/ },
 		library    => __PACKAGE__,
 	);
 }
@@ -102,8 +140,8 @@ sub ArrayLike ()
 	require Type::Tiny;
 	$cache{ArrayLike} ||= "Type::Tiny"->new(
 		name       => "ArrayLike",
-		constraint => sub {    ref($_   ) eq q[ARRAY] or Scalar::Util::blessed($_   ) && overload::Method($_   , q[@{}])  },
-		inlined    => sub { qq/ref($_[1]) eq q[ARRAY] or Scalar::Util::blessed($_[1]) && overload::Method($_[1], q[\@{}])/ },
+		constraint => sub {    ref($_   ) eq q[ARRAY] or Scalar::Util::blessed($_   ) && Types::TypeTiny::_check_overload($_   , q[@{}])  },
+		inlined    => sub { qq/ref($_[1]) eq q[ARRAY] or Scalar::Util::blessed($_[1]) && Types::TypeTiny::_check_overload($_[1], q[\@{}])/ },
 		library    => __PACKAGE__,
 	);
 }
@@ -113,8 +151,8 @@ sub CodeLike ()
 	require Type::Tiny;
 	$cache{CodeLike} ||= "Type::Tiny"->new(
 		name       => "CodeLike",
-		constraint => sub {    ref($_   ) eq q[CODE] or Scalar::Util::blessed($_   ) && overload::Method($_   , q[&{}])  },
-		inlined    => sub { qq/ref($_[1]) eq q[CODE] or Scalar::Util::blessed($_[1]) && overload::Method($_[1], q[\&{}])/ },
+		constraint => sub {    ref($_   ) eq q[CODE] or Scalar::Util::blessed($_   ) && Types::TypeTiny::_check_overload($_   , q[&{}])  },
+		inlined    => sub { qq/ref($_[1]) eq q[CODE] or Scalar::Util::blessed($_[1]) && Types::TypeTiny::_check_overload($_[1], q[\&{}])/ },
 		library    => __PACKAGE__,
 	);
 }

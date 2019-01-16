@@ -14,10 +14,12 @@ use Types::TypeTiny ();
 
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
-use overload q[@{}] => sub { $_[0]{type_constraints} ||= [] };
-
 use Type::Tiny ();
 our @ISA = 'Type::Tiny';
+
+__PACKAGE__->_install_overloads(
+	q[@{}] => sub { $_[0]{type_constraints} ||= [] },
+);
 
 sub new {
 	my $proto = shift;

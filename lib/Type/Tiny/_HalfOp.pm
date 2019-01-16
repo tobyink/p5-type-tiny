@@ -9,8 +9,6 @@ BEGIN {
 	$Type::Tiny::_HalfOp::VERSION   = '1.004002';
 }
 
-use overload ();
-
 sub new {
 	my ($class, $op, $param, $type) = @_;
 	bless {
@@ -21,6 +19,7 @@ sub new {
 }
 
 sub complete {
+	require overload;
 	my ($self, $type) = @_;
 	my $complete_type = $type->parameterize(@{$self->{param}});
 	my $method = overload::Method($complete_type, $self->{op});

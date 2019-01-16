@@ -6,6 +6,7 @@ use warnings;
 use Test::More qw();
 use Scalar::Util qw(blessed);
 use Types::TypeTiny qw(to_TypeTiny);
+use Type::Tiny ();
 
 require Exporter::Tiny;
 our @ISA = 'Exporter::Tiny';
@@ -19,17 +20,18 @@ our $VERSION   = '1.004002';
 our @EXPORT    = qw( should_pass should_fail ok_subtype );
 our @EXPORT_OK = qw( EXTENDED_TESTING matchfor );
 
+my $overloads_installed = 0;
 sub matchfor
 {
 	my @matchers = @_;
 	bless \@matchers, do {
 		package #
 		Test::TypeTiny::Internal::MATCHFOR;
-		use overload
+		Test::TypeTiny::Internal::MATCHFOR->Type::Tiny::_install_overloads(
 			q[==] => 'match',
 			q[eq] => 'match',
 			q[""] => 'to_string',
-			fallback => 1;
+		) unless $overloads_installed++;
 		sub to_string {
 			$_[0][0]
 		}

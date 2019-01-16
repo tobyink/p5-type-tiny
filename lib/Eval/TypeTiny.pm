@@ -192,6 +192,7 @@ sub _make_lexical_assignment {
 
 { my $tie; sub _manufacture_ties { $tie ||= eval <<'FALLBACK'; } }
 no warnings qw(void once uninitialized numeric);
+use Type::Tiny ();
 
 {
 	package #
@@ -215,12 +216,11 @@ no warnings qw(void once uninitialized numeric);
 			|| (defined tied(@$self) and tied(@$self)->can(@_));
 		return $code;
 	}
-	use overload
+	__PACKAGE__->Type::Tiny::_install_overloads(
 		q[bool]  => sub { !!   tied @{$_[0]} },
 		q[""]    => sub { '' . tied @{$_[0]} },
 		q[0+]    => sub { 0  + tied @{$_[0]} },
-		fallback => 1,
-	;
+	);
 }
 {
 	package #
@@ -244,12 +244,11 @@ no warnings qw(void once uninitialized numeric);
 			|| (defined tied(%$self) and tied(%$self)->can(@_));
 		return $code;
 	}
-	use overload
+	__PACKAGE__->Type::Tiny::_install_overloads(
 		q[bool]  => sub { !!   tied %{$_[0]} },
 		q[""]    => sub { '' . tied %{$_[0]} },
 		q[0+]    => sub { 0  + tied %{$_[0]} },
-		fallback => 1,
-	;
+	);
 }
 {
 	package #
@@ -273,12 +272,11 @@ no warnings qw(void once uninitialized numeric);
 			|| (defined tied($$self) and tied($$self)->can(@_));
 		return $code;
 	}
-	use overload
+	__PACKAGE__->Type::Tiny::_install_overloads(
 		q[bool]  => sub { !!   tied ${$_[0]} },
 		q[""]    => sub { '' . tied ${$_[0]} },
 		q[0+]    => sub { 0  + tied ${$_[0]} },
-		fallback => 1,
-	;
+	);
 }
 
 1;

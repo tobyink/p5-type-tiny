@@ -11,10 +11,12 @@ BEGIN {
 
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
-use overload q[@{}] => 'values';
-
 use Type::Tiny ();
 our @ISA = 'Type::Tiny';
+
+__PACKAGE__->_install_overloads(
+	q[@{}] => sub { shift->values },
+);
 
 sub new
 {
