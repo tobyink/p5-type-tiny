@@ -152,6 +152,10 @@ cpan:SREZIC
 cpan:JONASBN
 	:name "Jonas B Nielsen".
 
+<urn:uuid:c89062f8-6fb7-425e-a0ee-3dd3a46127cf>
+	:name "Nelo Onyiah";
+	:page <https://github.com/j1n3l0>.
+
 # We bundle some files made by these dudes...
 
 cpan:RJBS
