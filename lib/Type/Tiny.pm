@@ -274,7 +274,15 @@ sub new
 		$self->{coercion} = $self->_build_coercion;
 		$self->coercion->add_type_coercions(@$arr);
 	}
-	
+
+	# Documenting this here because it's too weird to be in the pod.
+	# There's a secret attribute called "_build_coercion" which takes a
+	# coderef. If present, then when $type->coercion is lazy built,
+	# the blank Type::Coercion object gets passed to the coderef,
+	# allowing the coderef to manipulate it a little. This is used by
+	# Types::TypeTiny to allow it to build a coercion for the TypeTiny
+	# type constraint without needing to load Type::Coercion yet.
+
 	if ($params{my_methods})
 	{
 		$subname =
@@ -372,7 +380,6 @@ sub my_methods               { $_[0]{my_methods}     ||= $_[0]->_build_my_method
 
 sub has_parent               { exists $_[0]{parent} }
 sub has_library              { exists $_[0]{library} }
-sub has_coercion             {        $_[0]{coercion} and !!@{ $_[0]{coercion}->type_coercion_map } }
 sub has_inlined              { exists $_[0]{inlined} }
 sub has_constraint_generator { exists $_[0]{constraint_generator} }
 sub has_inline_generator     { exists $_[0]{inline_generator} }
@@ -383,12 +390,19 @@ sub has_deep_explanation     { exists $_[0]{deep_explanation} }
 
 sub _default_message         { $_[0]{_default_message} ||= $_[0]->_build_default_message }
 
+sub has_coercion
+{
+	$_[0]->coercion if $_[0]{_build_coercion}; # trigger auto build thing
+	$_[0]{coercion} and !!@{ $_[0]{coercion}->type_coercion_map }
+}
+
 sub _assert_coercion
 {
 	my $self = shift;
+	return $self->coercion if $self->{_build_coercion}; # trigger auto build thing
 	_croak "No coercion for this type constraint"
 		unless $self->has_coercion && @{$self->coercion->type_coercion_map};
-	return $self->coercion;
+	$self->coercion;
 }
 
 my $null_constraint = sub { !!1 };
@@ -414,7 +428,9 @@ sub _build_coercion
 	my $self = shift;
 	my %opts = (type_constraint => $self);
 	$opts{display_name} = "to_$self" unless $self->is_anon;
-	return "Type::Coercion"->new(%opts);
+	my $coercion = "Type::Coercion"->new(%opts);
+	$self->{_build_coercion}->($coercion) if ref $self->{_build_coercion};
+	$coercion;
 }
 
 sub _build_default_message
