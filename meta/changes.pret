@@ -2899,10 +2899,6 @@
 			dcs:blame <urn:uuid:c89062f8-6fb7-425e-a0ee-3dd3a46127cf>;
 			seealso <https://github.com/tobyink/p5-type-tiny/pull/45>;
 		];
-		item [
-			a dcs:Bugfix, dcs:Packaging;
-			label "Depend on Exporter::Tiny 0.040; older versions don't provide all the functions Type::Library needs.";
-		];
 		# new development
 		item [
 			a dcs:Documentation;
