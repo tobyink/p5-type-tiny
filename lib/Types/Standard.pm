@@ -1255,7 +1255,7 @@ Split a string on a regexp.
    
    has name => (
       is     => "ro",
-      isa    => (ArrayRef[Str])->plus_coercions(Split[qr/\s/]),
+      isa    => ArrayRef->of(Str)->plus_coercions(Split[qr/\s/]),
       coerce => 1,
    );
 
