@@ -58,22 +58,22 @@ sub __constraint_generator
 		return if @$array < $min;
 		$param->check($_) || return for @$array;
 		return !!1;
-	} if $max==-1;	
-
+	} if $max==-1;
+	
 	return sub {
 		my $array = shift;
 		return if @$array > $max;
 		$param->check($_) || return for @$array;
 		return !!1;
-	} if $min==0;	
-
+	} if $min==0;
+	
 	return sub {
 		my $array = shift;
 		return if @$array < $min;
 		return if @$array > $max;
 		$param->check($_) || return for @$array;
 		return !!1;
-	};	
+	};
 }
 
 sub __inline_generator
@@ -98,7 +98,7 @@ sub __inline_generator
 		my $v = $_[1];
 		
 		my $p = Types::Standard::ArrayRef->inline_check($v);
-
+		
 		if ($min != 0) {
 			$p .= sprintf(' and @{%s} >= %d', $v, $min);
 		}
@@ -125,21 +125,21 @@ sub __deep_explanation
 	my ($min, $max) = (0, -1);
 	$min = $type->parameters->[1] if @{$type->parameters} > 1;  # TODO
 	$max = $type->parameters->[2] if @{$type->parameters} > 2;  # TODO
-
+	
 	if ($min != 0 and @$value < $min) {
 		return [
 			sprintf('"%s" constrains array length at least %s', $type, $min),
 			sprintf('@{%s} is %d', $varname, scalar @$value),
-		];		
+		];
 	}
-
+	
 	if ($max > 0 and @$value > $max) {
 		return [
 			sprintf('"%s" constrains array length at most %d', $type, $max),
 			sprintf('@{%s} is %d', $varname, scalar @$value),
-		];		
+		];
 	}
-
+	
 	for my $i (0 .. $#$value)
 	{
 		my $item = $value->[$i];

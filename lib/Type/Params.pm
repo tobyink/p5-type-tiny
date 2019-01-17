@@ -657,20 +657,20 @@ sub validate_named
 sub multisig
 {
 	my %options = (ref($_[0]) eq "HASH" && !$_[0]{slurpy}) ? %{+shift} : ();
-    $options{message}     ||= "Parameter validation failed";
-    $options{description} ||= sprintf("parameter validation for '%s'", [caller(1+($options{caller_level}||0))]->[3] || '__ANON__');
-    for my $key ( qw[ message description ] )
-    {
-        StringLike->check($options{$key})
-            || Error::TypeTiny::croak("Option '$key' expected to be string or stringifiable object");
-    }
-
+	$options{message}     ||= "Parameter validation failed";
+	$options{description} ||= sprintf("parameter validation for '%s'", [caller(1+($options{caller_level}||0))]->[3] || '__ANON__');
+	for my $key ( qw[ message description ] )
+	{
+		StringLike->check($options{$key})
+			or Error::TypeTiny::croak("Option '$key' expected to be string or stringifiable object");
+	}
+	
 	my @multi = map {
 		CodeLike->check($_)  ? { closure => $_ } :
 		ArrayLike->check($_) ? compile({ want_details => 1 }, @$_) :
 		$_;
 	} @_;
-
+	
 	my @code = 'sub { my $r; ';
 	
 	for my $i (0 .. $#multi)
