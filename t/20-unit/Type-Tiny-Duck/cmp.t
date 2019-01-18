@@ -38,4 +38,14 @@ ok($type2->equals($type1));
 ok($type3->is_subtype_of($type2));
 ok($type2->is_supertype_of($type3));
 
+ok($type1->equals($type2->create_child_type));
+ok($type2->equals($type1->create_child_type));
+ok($type3->is_subtype_of($type2->create_child_type));
+ok($type2->is_supertype_of($type3->create_child_type));
+
+ok($type1->create_child_type->equals($type2));
+ok($type2->create_child_type->equals($type1));
+ok($type3->create_child_type->is_subtype_of($type2));
+ok($type2->create_child_type->is_supertype_of($type3));
+
 done_testing;
