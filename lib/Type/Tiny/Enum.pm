@@ -44,6 +44,8 @@ sub new
 sub values      { $_[0]{values} }
 sub constraint  { $_[0]{constraint} ||= $_[0]->_build_constraint }
 
+sub _is_null_constraint { 0 }
+
 sub _build_display_name
 {
 	my $self = shift;

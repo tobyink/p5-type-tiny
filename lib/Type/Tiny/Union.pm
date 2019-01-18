@@ -59,6 +59,8 @@ sub new {
 sub type_constraints { $_[0]{type_constraints} }
 sub constraint       { $_[0]{constraint} ||= $_[0]->_build_constraint }
 
+sub _is_null_constraint { 0 }
+
 sub _build_display_name
 {
 	my $self = shift;

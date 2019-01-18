@@ -35,6 +35,8 @@ sub inlined     { $_[0]{inlined} ||= $_[0]->_build_inlined }
 
 sub has_inlined { !!1 }
 
+sub _is_null_constraint { 0 }
+
 sub _build_constraint
 {
 	my $self = shift;
