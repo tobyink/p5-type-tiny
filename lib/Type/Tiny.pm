@@ -481,62 +481,118 @@ sub _build_compiled_check
 	};
 }
 
+sub find_constraining_type
+{
+	my $self = shift;
+	if ($self->_is_null_constraint and $self->has_parent) {
+		return $self->parent->find_constraining_type;
+	}
+	$self;
+}
+
+our @CMP;
+
+sub CMP_SUPERTYPE          () { -1 }
+sub CMP_EQUAL              () {  0 }
+sub CMP_EQUIVALENT         () { '0E0' }
+sub CMP_SUBTYPE            () {  1 }
+sub CMP_UNKNOWN            () { ''; }
+
+# avoid getting mixed up with cmp operator at compile time
+*cmp = sub {
+	my ($A, $B) = _loose_to_TypeTiny($_[0], $_[1]);
+	return unless blessed($A) && $A->isa("Type::Tiny");
+	return unless blessed($B) && $B->isa("Type::Tiny");
+	for my $comparator (@CMP) {
+		my $result = $comparator->($A, $B);
+		next if $result eq CMP_UNKNOWN;
+		if ($result eq CMP_EQUIVALENT) {
+			my $prefer = @_==3 ? $_[2] : CMP_EQUAL;
+			return $prefer;
+		}
+		return $result;
+	}
+	return CMP_UNKNOWN;
+};
+
+push @CMP, sub {
+	my ($A, $B) = @_;
+	return CMP_EQUAL
+		if Scalar::Util::refaddr($A) == Scalar::Util::refaddr($B);
+	
+	return CMP_EQUIVALENT
+		if Scalar::Util::refaddr($A->compiled_check) == Scalar::Util::refaddr($B->compiled_check);
+
+	my $A_stem = $A->find_constraining_type;
+	my $B_stem = $B->find_constraining_type;
+	return CMP_EQUIVALENT
+		if Scalar::Util::refaddr($A_stem) == Scalar::Util::refaddr($B_stem);
+	return CMP_EQUIVALENT
+		if Scalar::Util::refaddr($A_stem->compiled_check) == Scalar::Util::refaddr($B_stem->compiled_check);	
+	
+	if ($A_stem->can_be_inlined and $B_stem->can_be_inlined) {
+		return 0 if $A_stem->inline_check('$WOLFIE') eq $B_stem->inline_check('$WOLFIE');
+	}
+
+	A_IS_SUBTYPE: {
+		my $A_prime = $A_stem;
+		while ($A_prime->has_parent) {
+			$A_prime = $A_prime->parent;
+			return CMP_SUBTYPE
+				if Scalar::Util::refaddr($A_prime) == Scalar::Util::refaddr($B_stem);
+			return CMP_SUBTYPE
+				if Scalar::Util::refaddr($A_prime->compiled_check) == Scalar::Util::refaddr($B_stem->compiled_check);	
+			if ($A_prime->can_be_inlined and $B_stem->can_be_inlined) {
+				return CMP_SUBTYPE
+					if $A_prime->inline_check('$WOLFIE') eq $B_stem->inline_check('$WOLFIE');
+			}
+		}
+	}
+
+	B_IS_SUBTYPE: {
+		my $B_prime = $B_stem;
+		while ($B_prime->has_parent) {
+			$B_prime = $B_prime->parent;
+			return CMP_SUPERTYPE
+				if Scalar::Util::refaddr($B_prime) == Scalar::Util::refaddr($A_stem);
+			return CMP_SUPERTYPE
+				if Scalar::Util::refaddr($B_prime->compiled_check) == Scalar::Util::refaddr($A_stem->compiled_check);
+			if ($A_stem->can_be_inlined and $B_prime->can_be_inlined) {
+				return CMP_SUPERTYPE
+					if $B_prime->inline_check('$WOLFIE') eq $A_stem->inline_check('$WOLFIE');
+			}
+		}
+	}
+	
+	return CMP_UNKNOWN;
+};
+
 sub equals
 {
-	my ($self, $other) = _loose_to_TypeTiny(@_);
-	return unless blessed($self)  && $self->isa("Type::Tiny");
-	return unless blessed($other) && $other->isa("Type::Tiny");
-	
-	return !!1 if Scalar::Util::refaddr($self) == Scalar::Util::refaddr($other);
-	
-	return !!1 if $self->has_parent  && $self->_is_null_constraint  && $self->parent==$other;
-	return !!1 if $other->has_parent && $other->_is_null_constraint && $other->parent==$self;
-	
-	return !!1 if Scalar::Util::refaddr($self->compiled_check) == Scalar::Util::refaddr($other->compiled_check);
-	
-	return $self->qualified_name eq $other->qualified_name
-		if $self->has_library && !$self->is_anon && $other->has_library && !$other->is_anon;
-	
-	return $self->inline_check('$x') eq $other->inline_check('$x')
-		if $self->can_be_inlined && $other->can_be_inlined;
-	
-	return;
+	my $result = Type::Tiny::cmp($_[0], $_[1]);
+	return unless defined $result;
+	$result eq CMP_EQUAL;
 }
 
 sub is_subtype_of
 {
-	my ($self, $other) = _loose_to_TypeTiny(@_);
-	return unless blessed($self)  && $self->isa("Type::Tiny");
-	return unless blessed($other) && $other->isa("Type::Tiny");
-
-#	my $this = $self;
-#	while (my $parent = $this->parent)
-#	{
-#		return !!1 if $parent->equals($other);
-#		$this = $parent;
-#	}
-#	return;
-
-	return unless $self->has_parent;
-	$self->parent->equals($other) or $self->parent->is_subtype_of($other);
+	my $result = Type::Tiny::cmp($_[0], $_[1], CMP_SUBTYPE);
+	return unless defined $result;
+	$result eq CMP_SUBTYPE;
 }
 
 sub is_supertype_of
 {
-	my ($self, $other) = _loose_to_TypeTiny(@_);
-	return unless blessed($self)  && $self->isa("Type::Tiny");
-	return unless blessed($other) && $other->isa("Type::Tiny");
-	
-	$other->is_subtype_of($self);
+	my $result = Type::Tiny::cmp($_[0], $_[1], CMP_SUBTYPE);
+	return unless defined $result;
+	$result eq CMP_SUPERTYPE;
 }
 
 sub is_a_type_of
 {
-	my ($self, $other) = _loose_to_TypeTiny(@_);
-	return unless blessed($self)  && $self->isa("Type::Tiny");
-	return unless blessed($other) && $other->isa("Type::Tiny");
-	
-	$self->equals($other) or $self->is_subtype_of($other);
+	my $result = Type::Tiny::cmp($_[0], $_[1]);
+	return unless defined $result;
+	$result eq CMP_SUBTYPE or $result eq CMP_EQUAL or $result eq CMP_EQUIVALENT;
 }
 
 sub strictly_equals
@@ -552,14 +608,6 @@ sub is_strictly_subtype_of
 	my ($self, $other) = _loose_to_TypeTiny(@_);
 	return unless blessed($self)  && $self->isa("Type::Tiny");
 	return unless blessed($other) && $other->isa("Type::Tiny");
-
-#	my $this = $self;
-#	while (my $parent = $this->parent)
-#	{
-#		return !!1 if $parent->strictly_equals($other);
-#		$this = $parent;
-#	}
-#	return;
 
 	return unless $self->has_parent;
 	$self->parent->strictly_equals($other) or $self->parent->is_strictly_subtype_of($other);
@@ -1711,6 +1759,15 @@ being checked is C<< $_ >>. Returns undef if there is no match.
 In list context also returns the number of type constraints which had
 been looped through before the matching constraint was found.
 
+=item C<< find_constraining_type >>
+
+Finds the nearest ancestor type constraint (including the type itself)
+which has a C<constraint> coderef.
+
+Equivalent to:
+
+   $type->find_parent(sub { not $_->_is_null_constraint })
+
 =item C<< coercibles >>
 
 Return a type constraint which is the union of type constraints that can be
@@ -1726,11 +1783,48 @@ parameters; otherwise returns undef. For example:
    ( ArrayRef[Int] )->parent;            # returns ArrayRef
 
 Note that parameterizable type constraints can perfectly legitimately take
-multiple parameters (several off the parameterizable type constraints in
+multiple parameters (several of the parameterizable type constraints in
 L<Types::Standard> do). This method only returns the first such parameter.
 L</"Attributes related to parameterizable and parameterized types">
 documents the C<parameters> attribute, which returns an arrayref of all
 the parameters.
+
+=back
+
+B<< Hint for people subclassing Type::Tiny: >>
+Since version 1.006000, the methods for determining subtype, supertype, and
+type equality should I<not> be overridden in subclasses of Type::Tiny. This
+is because of the problem of diamond inheritance. If X and Y are both
+subclasses of Type::Tiny, they I<both> need to be consulted to figure out
+how type constraints are related; not just one of them should be overriding
+these methods. See the source code for L<Type::Tiny::Enum> for an example of
+how subclasses can give hints about type relationships to Type::Tiny.
+Summary: push a coderef onto C<< @Type::Tiny::CMP >>. This coderef will be
+passed two type constraints. It should then return one of the constants
+Type::Tiny::CMP_SUBTYPE (first type is a subtype of second type),
+Type::Tiny::CMP_SUPERTYPE (second type is a subtype of first type),
+Type::Tiny::CMP_EQUAL (the two types are exactly the same),
+Type::Tiny::CMP_EQUIVALENT (the two types are effectively the same), or
+Type::Tiny::CMP_UNKNOWN (your coderef couldn't establish any relationship).
+
+=head3 Type relationship introspection function
+
+=over
+
+=item C<< Type::Tiny::cmp($type1, $type2) >>
+
+The subtype/supertype relationship between types results in a partial
+ordering of type constraints.
+
+This function will return one of the constants:
+Type::Tiny::CMP_SUBTYPE (first type is a subtype of second type),
+Type::Tiny::CMP_SUPERTYPE (second type is a subtype of first type),
+Type::Tiny::CMP_EQUAL (the two types are exactly the same),
+Type::Tiny::CMP_EQUIVALENT (the two types are effectively the same), or
+Type::Tiny::CMP_UNKNOWN (couldn't establish any relationship).
+In numeric contexts, these evaluate to -1, 1, 0, 0, and 0, making it
+potentially usable with C<sort> (though you may need to silence warnings
+about treating the empty string as a numeric value).
 
 =back
 
