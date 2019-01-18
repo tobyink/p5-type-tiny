@@ -2935,4 +2935,7 @@
 		item [
 			label "Type::Params signatures with slurpy hashrefs now allow true hashrefs to be passed to them.";
 		];
+		item [
+			label "Better implementation of is_subtype_of/is_supertype_of and related functions.";
+		];
 	].
