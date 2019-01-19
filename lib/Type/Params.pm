@@ -1157,7 +1157,7 @@ a full example:
       
       my ($needle, $haystack) = $check->(@_);
       
-      for (${^TYPE_PARAMS_MULTISIG) {
+      for (${^TYPE_PARAMS_MULTISIG}) {
          return $haystack->[$needle] if $_ == 0;
          return $haystack->{$needle} if $_ == 1;
          return $haystack->$needle   if $_ == 2;
@@ -1169,19 +1169,23 @@ a full example:
    get_from('foo', $obj);     # returns $obj->foo
    
 The default error message is just C<"Parameter validation failed">.
-You can pass an option hashref as the first argument with a 
-hopefully more informative message string:
+You can pass an option hashref as the first argument with an informative
+message string:
 
-    sub foo {
-        state $OptionsDict = Dict[...];
-        state $check = multisig(
-            { message => 'USAGE: $object->foo($string [, \%options|%options])', },
-            [ Object, StringLike, $OptionsDict ],
-            [ Object, StringLike, slurpy $OptionsDict ],
-        );
-        my($self, $string, $opt) = $check->(@_);
-        ...
-    }
+   sub foo {
+      state $OptionsDict = Dict[...];
+      state $check = multisig(
+         { message => 'USAGE: $object->foo(\%options?, $string)' },
+         [ Object, $OptionsDict, StringLike ],
+         [ Object, StringLike ],
+      );
+      my ($self, @args) = $check->(@_);
+      my ($opts, $str)  = ${^TYPE_PARAMS_MULTISIG} ? ({}, @args) : @_;
+      ...;
+   }
+   
+   $obj->foo(\%opts, "Hello");
+   $obj->foo("World");
 
 =head1 PARAMETER OBJECTS
 
