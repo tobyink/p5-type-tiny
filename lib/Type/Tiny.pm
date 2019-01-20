@@ -58,6 +58,11 @@ BEGIN {
 	{
 		no strict 'refs';
 		no warnings 'redefine', 'once';
+		if ($] < 5.010) {
+			require overload;
+			push @_, fallback => 1;
+			goto \&overload::OVERLOAD;
+		};
 		my $class = shift;
 		*{$class . '::(('} = sub {};
 		*{$class . '::()'} = sub {};
