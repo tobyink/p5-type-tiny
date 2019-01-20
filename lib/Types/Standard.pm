@@ -142,7 +142,7 @@ my $meta = __PACKAGE__->meta;
 					eval { require Sub::Name } ? \&Sub::Name::subname :
 					0
 					if not defined $subname;
-				next unless ref($mm->{$key}) eq __PACKAGE__;
+				next unless ref($mm->{$key}) eq 'Types::Standard::LazyLoad';
 				my $f = $mm->{$key}[1];
 				$mm->{$key} = $class->can("__$f");
 				$subname and $subname->(
