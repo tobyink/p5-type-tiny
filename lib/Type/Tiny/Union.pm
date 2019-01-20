@@ -259,7 +259,7 @@ push @Type::Tiny::CMP, sub {
 				}
 			}
 			return Type::Tiny::CMP_SUPERTYPE;
-		}		
+		}
 	}
 	
 	# I think it might be possible to merge this into the first bit by treating $B as union[$B].

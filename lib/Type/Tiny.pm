@@ -533,7 +533,7 @@ push @CMP, sub {
 	return CMP_EQUIVALENT
 		if Scalar::Util::refaddr($A_stem) == Scalar::Util::refaddr($B_stem);
 	return CMP_EQUIVALENT
-		if Scalar::Util::refaddr($A_stem->compiled_check) == Scalar::Util::refaddr($B_stem->compiled_check);	
+		if Scalar::Util::refaddr($A_stem->compiled_check) == Scalar::Util::refaddr($B_stem->compiled_check);
 	
 	if ($A_stem->can_be_inlined and $B_stem->can_be_inlined) {
 		return 0 if $A_stem->inline_check('$WOLFIE') eq $B_stem->inline_check('$WOLFIE');
@@ -546,7 +546,7 @@ push @CMP, sub {
 			return CMP_SUBTYPE
 				if Scalar::Util::refaddr($A_prime) == Scalar::Util::refaddr($B_stem);
 			return CMP_SUBTYPE
-				if Scalar::Util::refaddr($A_prime->compiled_check) == Scalar::Util::refaddr($B_stem->compiled_check);	
+				if Scalar::Util::refaddr($A_prime->compiled_check) == Scalar::Util::refaddr($B_stem->compiled_check);
 			if ($A_prime->can_be_inlined and $B_stem->can_be_inlined) {
 				return CMP_SUBTYPE
 					if $A_prime->inline_check('$WOLFIE') eq $B_stem->inline_check('$WOLFIE');
