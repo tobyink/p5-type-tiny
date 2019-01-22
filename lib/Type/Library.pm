@@ -147,12 +147,49 @@ sub _exporter_expand_sub
 			$type, "is_$type", "assert_$type", "to_$type";
 	}
 	
-	if (my $type = $class->get_type($name))
+	my $typename = $name;
+	my $thingy   = undef;
+	if ($name =~ /^(is|assert|to)_(.+)$/)
 	{
-		my $post_method = q();
-		$post_method = '->mouse_type' if $globals->{mouse};
-		$post_method = '->moose_type' if $globals->{moose};
-		return ($name => $class->_mksub($type, $post_method)) if $post_method;
+		$thingy   = $1;
+		$typename = $2;
+	}
+	
+	if (my $type = $class->get_type($typename))
+	{
+		my $custom_type = 0;
+		for my $param (qw/ of where /)
+		{
+			exists $value->{$param} or next;
+			defined $value->{-as}
+				or _croak("Parameter '-as' not supplied");
+			$type = $type->$param($value->{$param});
+			$name = $value->{-as};
+			++$custom_type;
+		}
+		
+		if (!defined $thingy)
+		{
+			my $post_method = q();
+			$post_method = '->mouse_type' if $globals->{mouse};
+			$post_method = '->moose_type' if $globals->{moose};
+			return ($name => $class->_mksub($type, $post_method)) if $post_method || $custom_type;
+		}
+		elsif ($thingy eq 'is')
+		{
+			return ($value->{-as} || "is_$typename" => $type->compiled_check) if $custom_type;
+		}
+		elsif ($thingy eq 'assert')
+		{
+			return ($value->{-as} || "assert_$typename" => $type->_overload_coderef) if $custom_type;
+		}
+		elsif ($thingy eq 'to')
+		{
+			my $to_type = $type->has_coercion && $type->coercion->frozen
+				? $type->coercion->compiled_coercion
+				: sub ($) { $type->coerce($_[0]) };
+			return ($value->{-as} || "to_$typename" => $to_type) if $custom_type;
+		}
 	}
 	
 	return $class->SUPER::_exporter_expand_sub(@_);
