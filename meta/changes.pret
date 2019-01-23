@@ -2939,3 +2939,13 @@
 			label "Better implementation of is_subtype_of/is_supertype_of and related functions.";
 		];
 	].
+
+`Type-Tiny 1.005_001 cpan:TOBYINK`
+	issued  2019-01-23;
+	changeset [
+		dcs:versus `Type-Tiny 1.005_000 cpan:TOBYINK`;
+		item [
+			a dcs:Addition;
+			label "Type::Library now supports `of` and `where` options when importing type constraints.";
+		];
+	].

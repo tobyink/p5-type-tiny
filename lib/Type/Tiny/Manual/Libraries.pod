@@ -270,6 +270,41 @@ four key-value pairs. Here's how you'd do it:
          };
       };
 
+=head2 Tricks Importing Types
+
+You can use an "of" option when importing a type to parameterize it.
+
+  use Types::Standard 'Int';
+  use Types::Standard ArrayRef => { of => Int, -as => 'ArrayOfInt' };
+  
+  has numbers => (is => "ro", isa => ArrayOfInts);
+
+If you need a type (like C<Int> in the example above) to use as a parameter,
+make sure you already imported that.
+
+There's also a "where" option:
+
+  use Types::Standard Ref => {
+    where => sub { ref($_[0]) =~ /^(ARRAY|HASH)$/ },
+    -as   => 'Container',
+  };
+  
+  has things => (is => "ro", isa => Container);
+
+When using either C<of> or C<where>, you must also use C<< -as >>.
+You can use both C<of> and C<where> together; the C<of> will be applied
+first.
+
+It is possible to do this:
+
+  use Types::Standard -moose => qw(:all);
+
+And you'll get native Moose type constraints instead of Type::Tiny ones.
+This was once necessary for Moose, but 99.9% of the time it shouldn't be
+needed now. (And it'll probably be a little slower!)
+
+And yes, C<< -mouse >> works too.
+
 =head1 SEE ALSO
 
 Some type libraries on CPAN:

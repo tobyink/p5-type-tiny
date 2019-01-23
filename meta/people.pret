@@ -121,6 +121,9 @@ cpan:ANDK
 cpan:SREZIC
 	:name "Slaven Rezić".
 
+cpan:RRWO
+	:name "Robert Rothenberg".
+
 <urn:uuid:6c7beadd-14b0-489a-940c-57ccd2ec90df>
 	:mbox <mailto:peter@morch.com>;
 	:name "Peter Valdemar Mørch".
