@@ -2949,3 +2949,14 @@
 			label "Type::Library now supports `of` and `where` options when importing type constraints.";
 		];
 	].
+
+`Type-Tiny 1.005_002 cpan:TOBYINK`
+	issued  2019-01-28;
+	changeset [
+		dcs:versus `Type-Tiny 1.005_001 cpan:TOBYINK`;
+		item [
+			a dcs:Addition;
+			label "Type::Params named_to_list feature.";
+			seealso <https://rt.cpan.org/Ticket/Display.html?id=128337>;
+		];
+	].
