@@ -353,10 +353,12 @@ sub compile_named
 	my $had_slurpy;
 	
 	push @code, 'my %in = ((@_==1) && ref($_[0]) eq "HASH") ? %{$_[0]} : (@_ % 2) ? "Error::TypeTiny::WrongNumberOfParameters"->throw(message => "Odd number of elements in hash") : @_;';
+	my @names;
 	
 	while (@_) {
 		++$arg;
 		my ($name, $constraint) = splice(@_, 0, 2);
+		push @names, $name;
 		
 		my $is_optional;
 		my $really_optional;
@@ -486,7 +488,12 @@ sub compile_named
 		push @code, 'keys(%in) and "Error::TypeTiny"->throw(message => sprintf "Unrecognized parameter%s: %s", keys(%in)>1?"s":"", Type::Params::english_list(sort keys %in));'
 	}
 	
-	if ($options{bless}) {
+	if ($options{named_to_list}) {
+		Error::TypeTiny::croak("named_to_list option cannot be used with slurpy") if $had_slurpy;
+		my @order = ref $options{named_to_list} ? @{$options{named_to_list}} : @names;
+		push @code, sprintf('@R{%s}', join ",", map $QUOTE->($_), @order);
+	}
+	elsif ($options{bless}) {
 		push @code, sprintf('bless \\%%R, %s;', $QUOTE->($options{bless}));
 	}
 	elsif (ArrayRef->check($options{class})) {
@@ -907,6 +914,31 @@ for declaring both the C<class> and C<constructor> options at once.
 
 B<< Named parameters only. >> Bypass the constructor entirely and directly
 bless the hashref.
+
+=item C<< named_to_list => Bool >>
+
+B<< Named parameters only. >> Instead of returning a hashref, return a hash
+slice.
+
+ myfunc(bar => "x", foo => "y");
+ 
+ sub myfunc {
+    state $check = compile_named(
+       { named_to_list => 1 },
+       foo => Str, { optional => 1 },
+       bar => Str, { optional => 1 },
+    );
+    my ($foo, $bar) = $check->(@_);
+    ...; ## $foo is "y" and $bar is "x"
+ }
+
+The order of keys for the hash slice is the same as the order of the names
+passed to C<compile_named>.
+
+=item C<< named_to_list => ArrayRef[Str] >>
+
+B<< Named parameters only. >> As above, but explicitly specify the keys of
+the hash slice.
 
 =item C<< description => Str >>
 
