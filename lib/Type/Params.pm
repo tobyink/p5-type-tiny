@@ -933,7 +933,8 @@ slice.
  }
 
 The order of keys for the hash slice is the same as the order of the names
-passed to C<compile_named>.
+passed to C<compile_named>. For missing named parameters, C<undef> is
+returned in the list.
 
 =item C<< named_to_list => ArrayRef[Str] >>
 
