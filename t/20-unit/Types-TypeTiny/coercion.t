@@ -4,7 +4,8 @@
 
 =head1 PURPOSE
 
-Test L<Types::TypeTiny::to_TypeTiny> pseudo-coercion.
+Test L<Types::TypeTiny::to_TypeTiny> pseudo-coercion and the
+L<Types::TypeTiny::_ForeignTypeConstraint> type.
 
 =head1 DEPENDENCIES
 
@@ -46,6 +47,9 @@ subtest "Coercion from Moose type constraint object" => sub
 	my $orig = find_type_constraint("Int");
 	my $type = to_TypeTiny $orig;
 	
+	should_pass($orig, _ForeignTypeConstraint);
+	should_fail($type, _ForeignTypeConstraint);
+	
 	should_pass($type, TypeTiny, 'to_TypeTiny converted a Moose type constraint to a Type::Tiny one');
 	is($type->name, 'Int', '... which has the correct name');
 	ok($type->can_be_inlined, '... and which can be inlined');
@@ -70,6 +74,9 @@ subtest "Coercion from Mouse type constraint object" => sub
 	my $orig = Mouse::Util::TypeConstraints::find_type_constraint("Int");
 	my $type = to_TypeTiny $orig;
 	
+	should_pass($orig, _ForeignTypeConstraint);
+	should_fail($type, _ForeignTypeConstraint);
+	
 	should_pass($type, TypeTiny, 'to_TypeTiny converted a Mouse type constraint to a Type::Tiny one');
 	subtest "... and it works" => sub
 	{
@@ -85,7 +92,11 @@ subtest "Coercion from Mouse type constraint object" => sub
 
 subtest "Coercion from predicate-like coderef" => sub
 {
-	my $type = to_TypeTiny sub { $_[0] =~ /\A-?[0-9]+\z/ };
+	my $orig = sub { $_[0] =~ /\A-?[0-9]+\z/ };
+	my $type = to_TypeTiny $orig;
+	
+	should_pass($orig, _ForeignTypeConstraint);
+	should_fail($type, _ForeignTypeConstraint);
 	
 	should_pass($type, TypeTiny, 'to_TypeTiny converted the coderef to a Type::Tiny object');
 	subtest "... and it works" => sub
@@ -97,7 +108,11 @@ subtest "Coercion from predicate-like coderef" => sub
 
 subtest "Coercion from assertion-like coderef" => sub
 {
-	my $type = to_TypeTiny sub { $_[0] =~ /\A-?[0-9]+\z/ or die("not an integer") };
+	my $orig = sub { $_[0] =~ /\A-?[0-9]+\z/ or die("not an integer") };
+	my $type = to_TypeTiny $orig;
+	
+	should_pass($orig, _ForeignTypeConstraint);
+	should_fail($type, _ForeignTypeConstraint);
 	
 	should_pass($type, TypeTiny, 'to_TypeTiny converted the coderef to a Type::Tiny object');
 	subtest "... and it works" => sub
@@ -115,7 +130,11 @@ subtest "Coercion from assertion-like coderef" => sub
 subtest "Coercion from Sub::Quote coderef" => sub
 {
 	require Sub::Quote;
-	my $type = to_TypeTiny Sub::Quote::quote_sub(q{ $_[0] =~ /\A-?[0-9]+\z/ });
+	my $orig = Sub::Quote::quote_sub(q{ $_[0] =~ /\A-?[0-9]+\z/ });
+	my $type = to_TypeTiny $orig;
+	
+	should_pass($orig, _ForeignTypeConstraint);
+	should_fail($type, _ForeignTypeConstraint);
 	
 	should_pass($type, TypeTiny, 'to_TypeTiny converted the coderef to a Type::Tiny object');
 	ok($type->can_be_inlined, '... which can be inlined');

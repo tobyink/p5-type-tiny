@@ -32,10 +32,10 @@ use Test::More;
 use Test::Requires { "Validation::Class" => "7.900017" };
 use Test::TypeTiny;
 
-use Types::TypeTiny qw( to_TypeTiny );
+use Types::TypeTiny qw( to_TypeTiny _ForeignTypeConstraint );
 use Validation::Class::Simple;
 
-my $type = to_TypeTiny "Validation::Class::Simple"->new(
+my $orig = "Validation::Class::Simple"->new(
 	fields => {
 		name  => { required => 1, pattern => qr{^\w+(\s\w+)*$}, filters => [qw/trim/] },
 		email => { required => 1 },
@@ -43,6 +43,10 @@ my $type = to_TypeTiny "Validation::Class::Simple"->new(
 		pass2 => { required => 1, matches => 'pass' },
 	},
 );
+my $type = to_TypeTiny $orig;
+
+should_pass($orig, _ForeignTypeConstraint);
+should_fail($type, _ForeignTypeConstraint);
 
 isa_ok($type, "Type::Tiny", 'can create a child type constraint from Validation::Class::Simple');
 
