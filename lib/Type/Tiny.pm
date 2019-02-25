@@ -59,20 +59,17 @@ BEGIN {
 	{
 		no strict 'refs';
 		no warnings 'redefine', 'once';
-		if ($] < 5.010) {
-			require overload;
-			push @_, fallback => 1;
-			goto \&overload::OVERLOAD;
+		if ($] < 5.010) {              # Coverage is checked on Perl 5.26
+			require overload;           # uncoverable statement
+			push @_, fallback => 1;     # uncoverable statement
+			goto \&overload::OVERLOAD;  # uncoverable statement
 		};
 		my $class = shift;
 		*{$class . '::(('} = sub {};
 		*{$class . '::()'} = sub {};
 		*{$class . '::()'} = do { my $x = 1; \$x };
-		while (@_)
-		{
+		while (@_) {
 			my $f = shift;
-			#*{$class . '::(' . $f} = $nil; # cargo culting overload.pm
-			#*{$class . '::(' . $f} = shift;
 			*{$class . '::(' . $f} = ref $_[0] ? shift : do { my $m = shift; sub { shift->$m(@_) } };
 		}
 	}
