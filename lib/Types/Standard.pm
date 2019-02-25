@@ -130,7 +130,7 @@ my $meta = __PACKAGE__->meta;
 			# Majorly break encapsulation for Type::Tiny :-O
 			for my $key (keys %$type)
 			{
-				next unless ref($type->{$key}) eq __PACKAGE__;
+				next unless ref($type->{$key}) eq 'Types::Standard::LazyLoad';
 				my $f = $type->{$key}[1];
 				$type->{$key} = $class->can("__$f");
 			}
