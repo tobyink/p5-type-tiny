@@ -387,8 +387,8 @@ Evaluate: {
 		
 		if (@_ and $_[0] ne $r->type)
 		{
-			unshift @{$self->{stack}}, pop @{$self->{done}};
-			Type::Parser::_croak("Expected $_[0]; got ".$r->type);
+			unshift @{$self->{stack}}, pop @{$self->{done}};        # uncoverable statement
+			Type::Parser::_croak("Expected $_[0]; got ".$r->type);  # uncoverable statement
 		}
 		
 		return $r;
