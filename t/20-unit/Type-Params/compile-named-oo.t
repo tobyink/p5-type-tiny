@@ -82,5 +82,7 @@ my $coderef2 = compile_named_oo(
 my $coderef2obj = $coderef2->(foo => 1.1, bar => []);
 is(ref($object[0]), ref($coderef2obj), 'packages reused when possible');
 
+my $details = compile_named_oo( { want_details => 1 }, fooble => Int );
+like($details->{source}, qr/fooble/, 'want_details');
 
 done_testing;

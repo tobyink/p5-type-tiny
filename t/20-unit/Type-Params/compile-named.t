@@ -314,5 +314,24 @@ slurpy_test(
 	XXX => slurpy HashRef[$Rounded],
 );
 
+subtest "Shortcuts for Any and Optional[Any]" => sub {
+	my $chk = compile_named(foo => 1, bar => 0);
+	is(
+		exception { $chk->(foo => "xyz") },
+		undef,
+	);
+	is(
+		exception { $chk->(foo => "xyz", bar => "abc") },
+		undef,
+	);
+	like(
+		exception { $chk->(foo => "xyz", bar => "abc", baz => "def") },
+		qr/Unrecognized parameter/,
+	);
+	like(
+		exception { $chk->(bar => "abc") },
+		qr/^Missing required parameter/,
+	);
+};
 
 done_testing;

@@ -133,5 +133,10 @@ is_deeply(
 	'compile_named: default applied correctly via undef'
 );
 
+like(
+	exception { compile(HashRef, { default => \*STDOUT } ) },
+	qr/Default expected to be/,
+	'compile: exception because bad default'
+);
 
 done_testing;
