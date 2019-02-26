@@ -2960,3 +2960,16 @@
 			seealso <https://rt.cpan.org/Ticket/Display.html?id=128337>;
 		];
 	].
+
+`Type-Tiny 1.005_003 cpan:TOBYINK`
+	issued  2019-02-26;
+	changeset [
+		dcs:versus `Type-Tiny 1.005_002 cpan:TOBYINK`;
+		item [
+			a dcs:Tests;
+			label "Improve test coverage.";
+		];
+		item [
+			label "Fix Types::Standard's LazyLoad implementation.";
+		];
+	].
