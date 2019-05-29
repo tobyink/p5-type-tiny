@@ -1271,6 +1271,68 @@ sub _has_xsub
 sub of                         { shift->parameterize(@_) }
 sub where                      { shift->create_child_type(constraint => @_) }
 
+{
+	my $i = 0;
+	my $_where_expressions = sub {
+		my $self = shift;
+		my $name = shift;
+		$name ||= "where expression check";
+		my (%env, @codes);
+		while (@_) {
+			my $expr       = shift;
+			my $constraint = shift;
+			if (!ref $constraint) {
+				push @codes, sprintf('do { local $_ = %s; %s }', $expr, $constraint);
+			}
+			else {
+				my $type = Types::TypeTiny::to_TypeTiny($constraint);
+				if ($type->can_be_inlined) {
+					push @codes, sprintf('do { my $tmp = %s; %s }', $expr, $type->inline_check('$tmp'));
+				}
+				else {
+					++$i;
+					$env{'$chk'.$i} = do { my $chk = $type->compiled_check; \$chk };
+					push @codes, sprintf('$chk%d->(%s)', $i, $expr);
+				}
+			}
+		}
+		
+		if (keys %env) {
+			# cannot inline
+			my $sub = Eval::TypeTiny::eval_closure(
+				source      => sprintf('sub ($) { local $_ = shift; %s }', join(q( and ), @codes)),
+				description => sprintf('%s for %s', $name, $self->name),
+				environment => \%env,
+			);
+			return $self->where($sub);
+		}
+		else {
+			return $self->where(join(q( and ), @codes));
+		}
+	};
+	
+	sub stringifies_as {
+		my $self         = shift;
+		my ($constraint) = @_;
+		$self->$_where_expressions("stringification check", q{"$_"}, $constraint);
+	}
+	
+	sub numifies_as {
+		my $self         = shift;
+		my ($constraint) = @_;
+		$self->$_where_expressions("numification check", q{0+$_}, $constraint);
+	}
+	
+	sub attributes_as {
+		my $self         = shift;
+		my ($constraint) = @_;
+		$self->$_where_expressions(
+			"attributes check",
+			map { my $attr = $_; qq{\$_->$attr} => $constraint->{$attr} } sort keys %$constraint
+		);
+	}
+}
+
 # fill out Moose-compatible API
 sub inline_environment         { +{} }
 sub _inline_check              { shift->inline_check(@_) }

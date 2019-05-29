@@ -53,4 +53,18 @@ is_deeply(
 	'FBB->values works',
 );
 
+#is_deeply(
+#	FBB->values,
+#	[qw/foo bar baz/],
+#	'FBB->values retains order',
+#);
+
+use Scalar::Util qw(refaddr);
+
+is(
+	refaddr(FBB->compiled_check),
+	refaddr(enum(FBB2 => [qw/bar baz foo/])->compiled_check),
+	"don't create duplicate coderefs",
+);
+
 done_testing;
