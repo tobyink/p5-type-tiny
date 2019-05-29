@@ -28,14 +28,19 @@ sub new
 	_croak "Enum type constraints cannot have a inlining coderef passed to the constructor" if exists $opts{inlined};
 	_croak "Need to supply list of values" unless exists $opts{values};
 	
-	my %tmp =
-		map { $_ => 1 }
-		@{ ref $opts{values} eq "ARRAY" ? $opts{values} : [$opts{values}] };
-	$opts{values} = [sort keys %tmp];
+	no warnings 'uninitialized';
+	$opts{values} = [
+		map "$_",
+		@{ ref $opts{values} eq 'ARRAY' ? $opts{values} : [$opts{values}] }
+	];
 	
-	if (Type::Tiny::_USE_XS and not grep /[^-\w]/, @{$opts{values}})
+	my %tmp;
+	undef $tmp{$_} for @{$opts{values}};
+	$opts{unique_values}  = [sort keys %tmp];
+	
+	if (Type::Tiny::_USE_XS and not grep /[^-\w]/, @{$opts{unique_values}})
 	{
-		my $enum = join ",", @{$opts{values}};
+		my $enum = join ",", @{$opts{unique_values}};
 		my $xsub = Type::Tiny::XS::get_coderef_for("Enum[$enum]");
 		$opts{compiled_type_constraint} = $xsub if $xsub;
 	}
@@ -43,22 +48,23 @@ sub new
 	return $proto->SUPER::new(%opts);
 }
 
-sub values      { $_[0]{values} }
-sub constraint  { $_[0]{constraint} ||= $_[0]->_build_constraint }
+sub values        { $_[0]{values} }
+sub unique_values { $_[0]{unique_values} }
+sub constraint    { $_[0]{constraint} ||= $_[0]->_build_constraint }
 
 sub _is_null_constraint { 0 }
 
 sub _build_display_name
 {
 	my $self = shift;
-	sprintf("Enum[%s]", join q[,], @$self);
+	sprintf("Enum[%s]", join q[,], @{$self->unique_values});
 }
 
 sub _build_constraint
 {
 	my $self = shift;
 	
-	my $regexp = join "|", map quotemeta, @$self;
+	my $regexp = join "|", map quotemeta, @{$self->unique_values};
 	return sub { defined and m{\A(?:$regexp)\z} };
 }
 
@@ -73,12 +79,12 @@ sub inline_check
 	
 	if (Type::Tiny::_USE_XS)
 	{
-		my $enum = join ",", @{$self->values};
+		my $enum = join ",", @{$self->unique_values};
 		my $xsub = Type::Tiny::XS::get_subname_for("Enum[$enum]");
 		return "$xsub\($_[0]\)" if $xsub;
 	}
 	
-	my $regexp = join "|", map quotemeta, @$self;
+	my $regexp = join "|", map quotemeta, @{$self->unique_values};
 	$_[0] eq '$_'
 		? "(defined and !ref and m{\\A(?:$regexp)\\z})"
 		: "(defined($_[0]) and !ref($_[0]) and $_[0] =~ m{\\A(?:$regexp)\\z})";
@@ -142,10 +148,10 @@ push @Type::Tiny::CMP, sub {
 	return Type::Tiny::CMP_UNKNOWN unless $A->isa(__PACKAGE__) && $B->isa(__PACKAGE__);
 	
 	my %seen;
-	for my $word (@{$A->values}) {
+	for my $word (@{$A->unique_values}) {
 		$seen{$word} += 1;
 	}
-	for my $word (@{$B->values}) {
+	for my $word (@{$B->unique_values}) {
 		$seen{$word} += 2;
 	}
 	
@@ -210,6 +216,16 @@ Instead rely on the default.
 
 Parent is always Types::Standard::Str, and cannot be passed to the
 constructor.
+
+=back
+
+=head2 Methods
+
+=over
+
+=item C<unique_values>
+
+Returns the list of 
 
 =back
 

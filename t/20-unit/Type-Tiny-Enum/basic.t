@@ -53,11 +53,11 @@ is_deeply(
 	'FBB->values works',
 );
 
-#is_deeply(
-#	FBB->values,
-#	[qw/foo bar baz/],
-#	'FBB->values retains order',
-#);
+is_deeply(
+	FBB->values,
+	[qw/foo bar baz/],
+	'FBB->values retains order',
+);
 
 use Scalar::Util qw(refaddr);
 
