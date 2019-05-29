@@ -217,15 +217,10 @@ Instead rely on the default.
 Parent is always Types::Standard::Str, and cannot be passed to the
 constructor.
 
-=back
-
-=head2 Methods
-
-=over
-
 =item C<unique_values>
 
-Returns the list of 
+The list of C<values> but sorted and with duplicates removed. This cannot
+be passed to the constructor.
 
 =back
 
