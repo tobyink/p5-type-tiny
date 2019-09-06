@@ -1075,7 +1075,7 @@ Given no parameters, just equivalent to C<Object>.
 
 =head2 More
 
-There are a few other types exported by this function:
+There are a few other types exported by this module:
 
 =over
 
