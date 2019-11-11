@@ -80,6 +80,13 @@ my $add_core_type = sub {
 		$xsub = $xsubname = undef;
 	}
 
+	if (Type::Tiny::_USE_XS
+	and Type::Tiny::XS->VERSION < 0.016
+	and $name eq 'Int') {
+		# Broken implementation of Int
+		$xsub = $xsubname = undef;
+	}
+
 	$typedef->{compiled_type_constraint} = $xsub if $xsub;
 	
 	$typedef->{inlined} = sub { "$xsubname\($_[1])" }
