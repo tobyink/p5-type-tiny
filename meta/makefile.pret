@@ -42,6 +42,12 @@
 		deps:on "Test::Warnings"^^deps:CpanId;
 		comment "For testing Type::Utils."@en;
 	];
+	deps:test-suggestion [
+		deps:on "Test::Memory::Cycle"^^deps:CpanId;
+	];
+	deps:develop-recommendation [
+		deps:on "Test::Memory::Cycle"^^deps:CpanId;
+	];
 	deps:runtime-recommendation [
 		deps:on "Type::Tie"^^deps:CpanId;
 		comment "Type::Tie is needed if you want to constrain the type of a scalar, array or hash variable."@en;
