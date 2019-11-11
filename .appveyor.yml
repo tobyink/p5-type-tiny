@@ -14,7 +14,7 @@ install:
   - cpanm -n Text::sprintfn Dist::Inkt::Profile::TOBYINK
 
 build_script:
-  - distinkt-dist --TRAVIS
+  - distinkt-dist --TRAVIS --targetdir=build
   - cd build
   - perl Makefile.PL
   - gmake
