@@ -48,3 +48,4 @@
  - Eval::TypeTiny's API is now considered to be stable.
  - Slurpy HashRefs passed to coderefs returned by Type::Params can now
    be true hashrefs.
+ - More import options for Type::Library

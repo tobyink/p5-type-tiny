@@ -11,7 +11,7 @@ install:
   - cpanm -n Moo Moose Mouse MooseX::Types::Common MouseX::Types::Common
   - cpanm -n match::simple MooseX::Getopt Class::InsideOut Object::Accessor
   - cpanm -n Type::Tie
-  - cpanm -n Dist::Inkt::Profile::TOBYINK
+  - cpanm -n Text::sprintfn Dist::Inkt::Profile::TOBYINK
 
 build_script:
   - distinkt-dist --TRAVIS
