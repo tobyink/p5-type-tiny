@@ -38,7 +38,8 @@ sub _overload_coderef
 	}
 	else
 	{
-		$self->{_overload_coderef} ||= sub { $self->coerce(@_) };
+		Scalar::Util::weaken(my $weak = $self);
+		$self->{_overload_coderef} ||= sub { $weak->coerce(@_) };
 	}
 	
 	$self->{_overload_coderef};

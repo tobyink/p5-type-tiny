@@ -159,7 +159,8 @@ sub _overload_coderef
 	}
 	else
 	{
-		$self->{_overload_coderef} ||= sub { $self->assert_return(@_) };
+		Scalar::Util::weaken(my $weak = $self);
+		$self->{_overload_coderef} ||= sub { $weak->assert_return(@_) };
 	}
 	
 	$self->{_overload_coderef};
