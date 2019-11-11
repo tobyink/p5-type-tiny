@@ -2973,3 +2973,32 @@
 			label "Fix Types::Standard's LazyLoad implementation.";
 		];
 	].
+
+`Type-Tiny 1.005_004 cpan:TOBYINK`
+	issued  2019-11-11;
+	changeset [
+		dcs:versus `Type-Tiny 1.005_003 cpan:TOBYINK`;
+		item [
+			label "Eliminate memory cycles created by coderef overloading in Type::Tiny and Type::Coercion.";
+			dcs:fixes RT#130823;
+			dcs:thanks <urn:uuid:6d23dbc6-4302-4a97-a47c-b44252549040>;
+		];
+		item [
+			label "Added a `unique_values` method to Type::Tiny::Enum.";
+			seealso <https://rt.cpan.org/Ticket/Display.html?id=129650>;
+		];
+		item [
+			label "The `values` attribute of Type::Tiny::Enum now preserves order.";
+			dcs:fixes RT#129650;
+			dcs:thanks cpan:SCHROEER;
+		];
+		item [
+			label "Types::Standard documentation fix.";
+			dcs:blame cpan:LSBUCHALA;
+			seealso <https://github.com/tobyink/p5-type-tiny/pull/48>;
+		];
+		item [
+			seealso <https://rt.cpan.org/Ticket/Display.html?id=130411>;
+			label "Don't use Int from Type::Tiny::XS unless version 0.016 is available.";
+		];
+	].

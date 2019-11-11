@@ -159,6 +159,16 @@ cpan:JONASBN
 	:name "Nelo Onyiah";
 	:page <https://github.com/j1n3l0>.
 
+cpan:SCHROEER
+	:name "Daniel Schröer".
+
+<urn:uuid:6d23dbc6-4302-4a97-a47c-b44252549040>
+	:name "Ivanov Anton";
+	:mbox <mailto:x86mail@gmail.com>.
+
+cpan:LSBUCHALA
+	:name "Lucas Buchala".
+
 # We bundle some files made by these dudes...
 
 cpan:RJBS
