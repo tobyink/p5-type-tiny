@@ -60,12 +60,17 @@ sub _build_display_name
 	sprintf("Enum[%s]", join q[,], @{$self->unique_values});
 }
 
-sub _build_constraint
+my %cached;
 {
-	my $self = shift;
-	
-	my $regexp = join "|", map quotemeta, @{$self->unique_values};
-	return sub { defined and m{\A(?:$regexp)\z} };
+	sub _build_constraint
+	{
+		my $self = shift;
+		
+		my $regexp  = join "|", map quotemeta, @{$self->unique_values};
+		my $coderef = sub { defined and m{\A(?:$regexp)\z} };
+		Scalar::Util::weaken($cached{$regexp} ||= $coderef);
+		return $coderef;
+	}
 }
 
 sub can_be_inlined

@@ -63,7 +63,7 @@ use Scalar::Util qw(refaddr);
 
 is(
 	refaddr(FBB->compiled_check),
-	refaddr(enum(FBB2 => [qw/bar baz foo/])->compiled_check),
+	refaddr(enum(FBB2 => [qw/foo foo foo bar baz/])->compiled_check),
 	"don't create duplicate coderefs",
 );
 
