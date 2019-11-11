@@ -60,15 +60,29 @@ sub _build_display_name
 	sprintf("Enum[%s]", join q[,], @{$self->unique_values});
 }
 
-my %cached;
 {
+	my %cached;
 	sub _build_constraint
 	{
 		my $self = shift;
 		
 		my $regexp  = join "|", map quotemeta, @{$self->unique_values};
-		my $coderef = sub { defined and m{\A(?:$regexp)\z} };
-		Scalar::Util::weaken($cached{$regexp} ||= $coderef);
+		return $cached{$regexp} if $cached{$regexp};
+		my $coderef = ($cached{$regexp} = sub { defined and m{\A(?:$regexp)\z} });
+		Scalar::Util::weaken($cached{$regexp});
+		return $coderef;
+	}
+}
+
+{
+	my %cached;
+	sub _build_compiled_check
+	{
+		my $self = shift;
+		my $regexp  = join "|", map quotemeta, @{$self->unique_values};
+		return $cached{$regexp} if $cached{$regexp};
+		my $coderef = ($cached{$regexp} = $self->SUPER::_build_compiled_check(@_));
+		Scalar::Util::weaken($cached{$regexp});
 		return $coderef;
 	}
 }
