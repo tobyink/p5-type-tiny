@@ -2985,7 +2985,7 @@
 		];
 		item [
 			a dcs:Addition;
-			label "Added a `unique_values` method to Type::Tiny::Enum.";
+			label "Type::Tiny::Enum now has a `unique_values` method.";
 			seealso <https://rt.cpan.org/Ticket/Display.html?id=129650>;
 		];
 		item [
@@ -2994,6 +2994,7 @@
 			dcs:thanks cpan:SCHROEER;
 		];
 		item [
+			a dcs:Documentation;
 			label "Types::Standard documentation fix.";
 			dcs:blame cpan:LSBUCHALA;
 			seealso <https://github.com/tobyink/p5-type-tiny/pull/48>;
@@ -3070,7 +3071,7 @@
 		];
 		item [
 			a dcs:Addition;
-			label "Added a `unique_values` method to Type::Tiny::Enum.";
+			label "Type::Tiny::Enum now has a `unique_values` method.";
 			seealso <https://rt.cpan.org/Ticket/Display.html?id=129650>;
 		];
 		item [
@@ -3079,6 +3080,7 @@
 			dcs:thanks cpan:SCHROEER;
 		];
 		item [
+			a dcs:Documentation;
 			label "Types::Standard documentation fix.";
 			dcs:blame cpan:LSBUCHALA;
 			seealso <https://github.com/tobyink/p5-type-tiny/pull/48>;
