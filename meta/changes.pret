@@ -3093,4 +3093,8 @@
 			a dcs:Packaging;
 			label "Type::Tiny::XS 0.016 is recommended.";
 		];
+		item [
+			a dcs:Documentation;
+			label "Links to Type::Tiny on GitHub/Travis/AppVeyor/Coveralls in Type::Tiny pod.";
+		];
 	].
