@@ -15,7 +15,7 @@
 		comment "This module was spun off from the Type-Tiny distribution."@en;
 	];
 	deps:runtime-recommendation [
-		deps:on "Type::Tiny::XS 0.011"^^deps:CpanId;
+		deps:on "Type::Tiny::XS 0.016"^^deps:CpanId;
 		comment "Makes a lot of stuff faster."@en;
 	];
 	deps:runtime-recommendation [
