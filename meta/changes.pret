@@ -3002,3 +3002,86 @@
 			label "Don't use Int from Type::Tiny::XS unless version 0.016 is available.";
 		];
 	].
+
+`Type-Tiny 1.006000 cpan:TOBYINK`
+	issued  2019-11-12;
+	changeset [
+		dcs:versus `Type-Tiny 1.004004 cpan:TOBYINK`;
+		item [
+			a dcs:Documentation;
+			label "Minor correction to POD header for Type::Params";
+			seealso <https://github.com/tobyink/p5-type-tiny/pull/43>;
+			dcs:blame cpan:JONASBN;
+		];
+		item [
+			a dcs:Addition;
+			label "Types::Standard ArrayRef parameterized type can now take a second parameter, the minimum array length.";
+		];
+		item [
+			label "Tidy up Type::Tiny namespace a little by fully-referencing some functions instead of importing them.";
+		];
+		item [
+			a dcs:Packaging;
+			label "Bump minimum required version of Exporter::Tiny to 1.000000.";
+		];
+		item [
+			label "Eval::TypeTiny's API is now considered to be stable.";
+		];
+		item [
+			label "Tweaks to Type::Tiny and Type::Coercion to avoid unnecessarily loading overload.pm and overloading.pm.";
+		];
+		item [
+			a dcs:Addition;
+			label "Type::Params multisig function now supports custom error messages.";
+			dcs:blame <urn:uuid:580d3dfe-fe45-42ef-9f58-1310ffee7004>;
+			seealso <https://github.com/tobyink/p5-type-tiny/pull/44>;
+		];
+		item [
+			label "Types::TypeTiny::TypeTiny->has_coercion is now true.";
+		];
+		item [
+			label "Type::Params signatures with slurpy hashrefs now allow true hashrefs to be passed to them.";
+		];
+		item [
+			label "Better implementation of is_subtype_of/is_supertype_of and related functions.";
+		];
+		item [
+			a dcs:Addition;
+			label "Type::Library now supports `of` and `where` options when importing type constraints.";
+		];
+		item [
+			a dcs:Addition;
+			label "Type::Params named_to_list feature.";
+			seealso <https://rt.cpan.org/Ticket/Display.html?id=128337>;
+		];
+		item [
+			a dcs:Tests;
+			label "Improve test coverage.";
+		];
+		item [
+			label "Fix Types::Standard's LazyLoad implementation.";
+		];
+		item [
+			label "Eliminate memory cycles created by coderef overloading in Type::Tiny and Type::Coercion.";
+			dcs:fixes RT#130823;
+			dcs:thanks <urn:uuid:6d23dbc6-4302-4a97-a47c-b44252549040>;
+		];
+		item [
+			label "Added a `unique_values` method to Type::Tiny::Enum.";
+			seealso <https://rt.cpan.org/Ticket/Display.html?id=129650>;
+		];
+		item [
+			label "The `values` attribute of Type::Tiny::Enum now preserves order.";
+			dcs:fixes RT#129650;
+			dcs:thanks cpan:SCHROEER;
+		];
+		item [
+			label "Types::Standard documentation fix.";
+			dcs:blame cpan:LSBUCHALA;
+			seealso <https://github.com/tobyink/p5-type-tiny/pull/48>;
+		];
+		item [
+			seealso <https://rt.cpan.org/Ticket/Display.html?id=130411>;
+			label "Don't use Int from Type::Tiny::XS unless version 0.016 is available.";
+		];
+	].
