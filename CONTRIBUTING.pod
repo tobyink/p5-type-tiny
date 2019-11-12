@@ -38,6 +38,16 @@ L<https://coveralls.io/github/tobyink/p5-type-tiny>.
 While the documentation for each package in Type::Tiny is fairly
 complete, Type::Tiny::Manual needs a bit of work.
 
+=head2 Type::Tiny::XS
+
+I'm not really a C programmer, nor am I that familiar with Perl's internals,
+so help with L<Type::Tiny::XS> is always appreciated. There are some type
+constraints in L<Types::Standard>, L<Types::Common::String>, and
+L<Types::Common::Numeric> which don't have XS implementations, and
+I<none> of L<Types::TypeTiny> has an XS implementation. (Given that
+the last module is used internally by Type::Tiny a I<lot>, an XS
+implementation of that could provide a good speed boost!)
+
 =head2 Writing Type Libraries
 
 Though I'm unlikely to bundle many more type libraries in this distribution,
@@ -50,7 +60,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2018 by Toby Inkster.
+This software is copyright (c) 2019 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
