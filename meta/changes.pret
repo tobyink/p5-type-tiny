@@ -2984,6 +2984,7 @@
 			dcs:thanks <urn:uuid:6d23dbc6-4302-4a97-a47c-b44252549040>;
 		];
 		item [
+			a dcs:Addition;
 			label "Added a `unique_values` method to Type::Tiny::Enum.";
 			seealso <https://rt.cpan.org/Ticket/Display.html?id=129650>;
 		];
@@ -3040,6 +3041,7 @@
 			label "Types::TypeTiny::TypeTiny->has_coercion is now true.";
 		];
 		item [
+			a dcs:Addition;
 			label "Type::Params signatures with slurpy hashrefs now allow true hashrefs to be passed to them.";
 		];
 		item [
@@ -3067,6 +3069,7 @@
 			dcs:thanks <urn:uuid:6d23dbc6-4302-4a97-a47c-b44252549040>;
 		];
 		item [
+			a dcs:Addition;
 			label "Added a `unique_values` method to Type::Tiny::Enum.";
 			seealso <https://rt.cpan.org/Ticket/Display.html?id=129650>;
 		];
@@ -3083,5 +3086,9 @@
 		item [
 			seealso <https://rt.cpan.org/Ticket/Display.html?id=130411>;
 			label "Don't use Int from Type::Tiny::XS unless version 0.016 is available.";
+		];
+		item [
+			a dcs:Packaging;
+			label "Type::Tiny::XS 0.016 is recommended.";
 		];
 	].
