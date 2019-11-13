@@ -67,4 +67,33 @@ should_fail([], HashLike);
 	);
 }
 
+BEGIN {
+	package MyMooseTypes;
+	use MooseX::Types -declare => ['RoundedInt'];
+	use MooseX::Types::Moose qw(Int Num);
+	subtype RoundedInt, as Int;
+	coerce RoundedInt, from Num, via { int($_) };
+	$INC{'MyMooseTypes.pm'} = __FILE__;
+};
+
+{
+	package Local::XYZ1234;
+	use MyMooseTypes qw(RoundedInt);
+	::is( RoundedInt->coerce(3.1), 3, 'MooseX::Types coercion works as expected' );
+}
+
+BEGIN {
+	package MyTinyTypes;
+	use Type::Library -base;
+	use Type::Utils 'extends';
+	extends 'MyMooseTypes';
+	$INC{'MyTinyTypes.pm'} = __FILE__;
+};
+
+{
+	package Local::XYZ12345678;
+	use MyTinyTypes qw(RoundedInt);
+	::is( RoundedInt->coerce(3.1), 3, 'Type::Tiny coercion works built from MooseX::Types extension' );
+}
+
 done_testing;
