@@ -349,8 +349,6 @@ sub _TypeTinyFromGeneric
 {
 	my $t = $_[0];
 	
-	# XXX - handle inlining??
-	
 	my %opts = (
 		constraint => sub { $t->check(@_ ? @_ : $_) },
 		message    => sub { $t->get_message(@_ ? @_ : $_) },
@@ -360,6 +358,10 @@ sub _TypeTinyFromGeneric
 	
 	$opts{coercion} = sub { $t->coerce(@_ ? @_ : $_) }
 		if $t->can("has_coercion") && $t->has_coercion && $t->can("coerce");
+	
+	if ($t->can('can_be_inlined') && $t->can_be_inlined && $t->can('inline_check')) {
+		$opts{inlined} = sub { $t->inline_check($_[1]) };
+	}
 	
 	require Type::Tiny;
 	my $new = "Type::Tiny"->new(%opts);
