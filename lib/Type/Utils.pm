@@ -59,8 +59,9 @@ sub extends
 			{
 				my $moose = Moose::Util::TypeConstraints::find_type_constraint($types->{$name});
 				my $tt    = Types::TypeTiny::to_TypeTiny($moose);
+				my $c     = $moose->has_coercion && @{ $moose->coercion->type_coercion_map || [] };
 				$caller->add_type(
-					$tt->create_child_type(library => $caller, name => $name, coercion => $moose->has_coercion ? 1 : 0)
+					$tt->create_child_type(library => $caller, name => $name, coercion => $c ? 1 : 0)
 				);
 			}
 		}
