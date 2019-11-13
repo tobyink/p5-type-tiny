@@ -216,6 +216,7 @@ sub to_TypeTiny
 		return $t                               if $class->isa("Type::Tiny");
 		return _TypeTinyFromMoose($t)           if $class->isa("Moose::Meta::TypeConstraint");
 		return _TypeTinyFromMoose($t)           if $class->isa("MooseX::Types::TypeDecorator");
+		return _TypeTinyFromMouse($t)           if $class->isa("Mouse::Meta::TypeConstraint");
 		return _TypeTinyFromValidationClass($t) if $class->isa("Validation::Class::Simple");
 		return _TypeTinyFromValidationClass($t) if $class->isa("Validation::Class");
 		return _TypeTinyFromGeneric($t)         if $t->can("check") && $t->can("get_message"); # i.e. Type::API::Constraint
@@ -249,7 +250,16 @@ sub _TypeTinyFromMoose
 	$opts{inlined}      = sub { shift; $t->_inline_check(@_) } if $t->can("can_be_inlined") && $t->can_be_inlined;
 	$opts{message}      = sub { $t->get_message($_) }          if $t->has_message;
 	$opts{moose_type}   = $t;
-	
+
+	if ($t->can('parameterize')) {
+		$opts{constraint_generator} = sub {
+			# convert args into Moose native types; not strictly necessary
+			my @args    = map { TypeTiny->check($_) ? $_->moose_type : $_ } @_;
+			my $paramd  = $t->parameterize(@args);
+			_TypeTinyFromMoose($paramd);
+		};
+	}
+
 	require Type::Tiny;
 	my $new = 'Type::Tiny'->new(%opts);
 	$ttt_cache{ refaddr($t) } = $new;
@@ -262,7 +272,7 @@ sub _TypeTinyFromMoose
 			moose_coercion  => $t->coercion,
 		);
 	} if $t->has_coercion;
-	
+		
 	return $new;
 }
 
@@ -351,6 +361,36 @@ sub _TypeTinyFromGeneric
 	$opts{coercion} = sub { $t->coerce(@_ ? @_ : $_) }
 		if $t->can("has_coercion") && $t->has_coercion && $t->can("coerce");
 	
+	require Type::Tiny;
+	my $new = "Type::Tiny"->new(%opts);
+	$ttt_cache{ refaddr($t) } = $new;
+	weaken($ttt_cache{ refaddr($t) });
+	return $new;
+}
+
+sub _TypeTinyFromMouse
+{
+	my $t = $_[0];
+	
+	my %opts = (
+		constraint => sub { $t->check(@_ ? @_ : $_) },
+		message    => sub { $t->get_message(@_ ? @_ : $_) },
+	);
+	
+	$opts{display_name} = $t->name if $t->can("name");
+	
+	$opts{coercion} = sub { $t->coerce(@_ ? @_ : $_) }
+		if $t->can("has_coercion") && $t->has_coercion && $t->can("coerce");
+
+	if ($t->{'constraint_generator'}) {
+		$opts{constraint_generator} = sub {
+			# convert args into Moose native types; not strictly necessary
+			my @args    = map { TypeTiny->check($_) ? $_->mouse_type : $_ } @_;
+			my $paramd  = $t->parameterize(@args);
+			_TypeTinyFromMouse($paramd);
+		};
+	}
+
 	require Type::Tiny;
 	my $new = "Type::Tiny"->new(%opts);
 	$ttt_cache{ refaddr($t) } = $new;
