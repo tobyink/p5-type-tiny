@@ -248,6 +248,10 @@ sub compile
 			);
 			$varname = '$tmp'.($is_optional ? '{x}' : '');
 		}
+
+		# unweaken the constraint in the cache
+		undef $Type::Tiny::ALL_TYPES{ $constraint->{uniq} };
+		$Type::Tiny::ALL_TYPES{ $constraint->{uniq} } = $constraint;
 		
 		if ($constraint->can_be_inlined)
 		{
@@ -281,7 +285,7 @@ sub compile
 			push @code, sprintf 'push @R, %s;', $varname;
 		}
 	}
-	
+		
 	if ($min_args == $max_args and not $saw_slurpy)
 	{
 		$code[1] = sprintf(
