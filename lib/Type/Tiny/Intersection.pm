@@ -149,6 +149,36 @@ sub validate_explain
 	return;  # uncoverable statement
 }
 
+my $_delegate = sub {
+	my ($self, $method) = (shift, shift);
+	my @types = @{ $self->type_constraints };
+	my $found = 0;
+	for my $i (0 .. $#types) {
+		my $type = $types[$i];
+		if ($type->can($method)) {
+			$types[$i] = $type->$method(@_);
+			++$found;
+			last;
+		}
+	}
+	_croak('Could not apply method %s to any type within the intersection', $method) unless $found;
+	ref($self)->new(type_constraints => \@types);
+};
+
+sub stringifies_to {
+	my $self = shift;
+	$self->$_delegate(stringifies_to => @_);
+}
+
+sub numifies_to {
+	my $self = shift;
+	$self->$_delegate(numifies_to => @_);
+}
+
+sub with_attribute_values {
+	my $self = shift;
+	$self->$_delegate(with_attribute_values => @_);
+}
 
 my $comparator;
 $comparator = sub {
@@ -232,6 +262,24 @@ A parent will instead be automatically calculated.
 
 (Technically any of the types in the intersection could be treated as a
 parent type; we choose the first arbitrarily.)
+
+=back
+
+=head2 Methods
+
+=over
+
+=item C<< stringifies_to($constraint) >>
+
+See L<Type::Tiny::ConstrainedObject>.
+
+=item C<< numifies_to($constraint) >>
+
+See L<Type::Tiny::ConstrainedObject>.
+
+=item C<< with_attribute_values($attr1 => $constraint1, ...) >>
+
+See L<Type::Tiny::ConstrainedObject>.
 
 =back
 

@@ -404,6 +404,7 @@ my $_obj = $meta->$add_core_type({
 	inlined    => $HAS_RUXS
 		? sub { "Ref::Util::XS::is_blessed_ref($_[1])" }
 		: sub { "Scalar::Util::blessed($_[1])" },
+	is_object  => 1,
 });
 
 $meta->$add_core_type({
@@ -622,6 +623,7 @@ $meta->add_type({
 				map "overload::Method($v, q[$_])", @operations;
 		};
 	},
+	is_object  => 1,
 });
 
 $meta->add_type({

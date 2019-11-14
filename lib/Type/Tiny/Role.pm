@@ -130,6 +130,24 @@ constructor.
 
 =back
 
+=head2 Methods
+
+=over
+
+=item C<< stringifies_to($constraint) >>
+
+See L<Type::Tiny::ConstrainedObject>.
+
+=item C<< numifies_to($constraint) >>
+
+See L<Type::Tiny::ConstrainedObject>.
+
+=item C<< with_attribute_values($attr1 => $constraint1, ...) >>
+
+See L<Type::Tiny::ConstrainedObject>.
+
+=back
+
 =head1 BUGS
 
 Please report any bugs to

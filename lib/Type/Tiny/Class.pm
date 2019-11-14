@@ -317,10 +317,22 @@ Because coercing C<HashRef> via constructor is a common desire, if
 you call C<plus_constructors> with no arguments at all, this is the
 default.
 
-   $classtype->plus_constructors(Types::Standard::HashRef, "new")
+   $classtype->plus_constructors(HashRef, "new")
    $classtype->plus_constructors()  ## identical to above
 
 This is handy for Moose/Mouse/Moo-based classes.
+
+=item C<< stringifies_to($constraint) >>
+
+See L<Type::Tiny::ConstrainedObject>.
+
+=item C<< numifies_to($constraint) >>
+
+See L<Type::Tiny::ConstrainedObject>.
+
+=item C<< with_attribute_values($attr1 => $constraint1, ...) >>
+
+See L<Type::Tiny::ConstrainedObject>.
 
 =back
 
