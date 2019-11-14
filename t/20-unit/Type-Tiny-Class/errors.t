@@ -30,18 +30,18 @@ use Types::Standard qw(Int);
 use Type::Tiny::Class;
 
 like(
-	exception { Type::Tiny::Class->new(parent => Int) },
-	qr/^Class type constraints cannot have a parent constraint/,
+	exception { Type::Tiny::Class->new(parent => Int, class => 'Foo') },
+	qr/^Class type constraints cannot have a parent/,
 );
 
 like(
-	exception { Type::Tiny::Class->new(constraint => sub { 1 }) },
+	exception { Type::Tiny::Class->new(constraint => sub { 1 }, class => 'Foo') },
 	qr/^Class type constraints cannot have a constraint coderef/,
 );
 
 like(
-	exception { Type::Tiny::Class->new(inlined => sub { 1 }) },
-	qr/^Class type constraints cannot have a inlining coderef/,
+	exception { Type::Tiny::Class->new(inlined => sub { 1 }, class => 'Foo') },
+	qr/^Class type constraints cannot have an inlining coderef/,
 );
 
 like(

@@ -30,18 +30,18 @@ use Types::Standard qw(Int);
 use Type::Tiny::Duck;
 
 like(
-	exception { Type::Tiny::Duck->new(parent => Int) },
-	qr/^Duck type constraints cannot have a parent constraint/,
+	exception { Type::Tiny::Duck->new(parent => Int, methods => []) },
+	qr/^Duck type constraints cannot have a parent/,
 );
 
 like(
-	exception { Type::Tiny::Duck->new(constraint => sub { 1 }) },
+	exception { Type::Tiny::Duck->new(constraint => sub { 1 }, methods => []) },
 	qr/^Duck type constraints cannot have a constraint coderef/,
 );
 
 like(
-	exception { Type::Tiny::Duck->new(inlined => sub { 1 }) },
-	qr/^Duck type constraints cannot have a inlining coderef/,
+	exception { Type::Tiny::Duck->new(inlined => sub { 1 }, methods => []) },
+	qr/^Duck type constraints cannot have an inlining coderef/,
 );
 
 like(

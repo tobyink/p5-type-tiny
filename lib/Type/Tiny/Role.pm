@@ -13,20 +13,16 @@ use Scalar::Util qw< blessed weaken >;
 
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
-require Type::Tiny;
-our @ISA = 'Type::Tiny';
+require Type::Tiny::ConstrainedObject;
+our @ISA = 'Type::Tiny::ConstrainedObject';
+sub _short_name { 'Role' }
 
 my %cache;
 
 sub new {
 	my $proto = shift;
-	
 	my %opts = (@_==1) ? %{$_[0]} : @_;
-	_croak "Role type constraints cannot have a parent constraint passed to the constructor" if exists $opts{parent};
-	_croak "Role type constraints cannot have a constraint coderef passed to the constructor" if exists $opts{constraint};
-	_croak "Role type constraints cannot have a inlining coderef passed to the constructor" if exists $opts{inlined};
-	_croak "Need to supply role name" unless exists $opts{role};
-	
+	_croak "Need to supply role name" unless exists $opts{role};	
 	return $proto->SUPER::new(%opts);
 }
 
@@ -61,17 +57,6 @@ sub _build_default_message
 	return sub { sprintf '%s did not pass type constraint (not DOES %s)', Type::Tiny::_dd($_[0]), $c } if $self->is_anon;
 	my $name = "$self";
 	return sub { sprintf '%s did not pass type constraint "%s" (not DOES %s)', Type::Tiny::_dd($_[0]), $name, $c };
-}
-
-sub has_parent
-{
-	!!1;
-}
-
-sub parent
-{
-	require Types::Standard;
-	Types::Standard::Object();
 }
 
 sub validate_explain

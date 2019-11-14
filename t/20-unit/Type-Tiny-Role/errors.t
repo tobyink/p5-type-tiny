@@ -30,18 +30,18 @@ use Types::Standard qw(Int);
 use Type::Tiny::Role;
 
 like(
-	exception { Type::Tiny::Role->new(parent => Int) },
-	qr/^Role type constraints cannot have a parent constraint/,
+	exception { Type::Tiny::Role->new(parent => Int, role => 'Foo') },
+	qr/^Role type constraints cannot have a parent/,
 );
 
 like(
-	exception { Type::Tiny::Role->new(constraint => sub { 1 }) },
+	exception { Type::Tiny::Role->new(constraint => sub { 1 }, role => 'Foo') },
 	qr/^Role type constraints cannot have a constraint coderef/,
 );
 
 like(
-	exception { Type::Tiny::Role->new(inlined => sub { 1 }) },
-	qr/^Role type constraints cannot have a inlining coderef/,
+	exception { Type::Tiny::Role->new(inlined => sub { 1 }, role => 'Foo') },
+	qr/^Role type constraints cannot have an inlining coderef/,
 );
 
 like(
