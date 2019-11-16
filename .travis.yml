@@ -154,12 +154,7 @@ matrix:
     - perl: "5.8.1"
 before_install:
   - export DIST_INKT_PROFILE="Dist::Inkt::Profile::TOBYINK"
-  - git clone git://github.com/tobyink/perl-travis-helper ~/perl-travis-helper
-  - source ~/perl-travis-helper/init
-  - build-perl
-  - perl -V
-  - build-dist
-  - cd $BUILD_DIR
+  - eval $(curl https://travis-perl.github.io/init) --auto
 install:
   - cpan-install --toolchain
   - cpan-install --deps
@@ -169,8 +164,6 @@ install:
   - '[ -n "$MOO_RELEASE" ]   && cpan-install "$MOO_RELEASE"   || echo "MOO_RELEASE is not set"'
 before_script:
   - coverage-setup
-script:
-  - prove -r -Ilib -Iinc $(test-dirs)
 after_success:
   - coverage-report -select_re '^lib/'
 notifications:
