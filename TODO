@@ -3,11 +3,6 @@ Long-Term
 
 * Rewrite Type::Tiny::Manual.
 
-* Try to make inlining for ClassName, RoleName, StrMatch, etc more
-  suitable for things like Mite. Perhaps add a separate method to type
-  constraints for generating a string of Perl code that can be compiled
-  and executed without the presence of Type::Tiny and the type library.
-
 * Resolve RT#102457. Error::TypeTiny::Assertion needs a better way of
   identifying which stack frame to report the error at, or Type::Params
   needs to mark its compiled subs more clearly.

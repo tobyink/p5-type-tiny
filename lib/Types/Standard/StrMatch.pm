@@ -34,7 +34,7 @@ my $serialize_regexp = sub {
 		$serialized = eval { Regexp::Util::serialize_regexp($re) };
 	}
 	
-	if (!$serialized) {
+	unless (Types::Standard::_AVOID_CALLBACKS or defined $serialized) {
 		my $key = sprintf('%s|%s', ref($re), $re);
 		$expressions{$key} = $re;
 		$serialized = sprintf('$Types::Standard::StrMatch::expressions{%s}', B::perlstring($key));
@@ -77,11 +77,12 @@ sub __inline_generator
 {
 	require B;
 	my ($regexp, $checker) = @_;
+	my $serialized_re = $regexp->$serialize_regexp or return;
+	
 	if ($checker)
 	{
 		return unless $checker->can_be_inlined;
 		
-		my $serialized_re = $regexp->$serialize_regexp;
 		return sub
 		{
 			my $v = $_[1];
@@ -105,7 +106,6 @@ sub __inline_generator
 			return sub { "!ref($_) and length($_)==$length" };
 		}
 		
-		my $serialized_re = $regexp->$serialize_regexp;
 		return sub
 		{
 			my $v = $_[1];
