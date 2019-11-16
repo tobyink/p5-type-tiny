@@ -153,6 +153,11 @@ matrix:
     - perl: "5.8.1"
       env: PERL_TYPE_TINY_XS=0
       dist: trusty
+    # Cutting edge
+    - perl: "dev"
+      env: PERL_TYPE_TINY_XS=0
+    - perl: "dev"
+      env: PERL_TYPE_TINY_XS=1
     - perl: "blead"
       env: PERL_TYPE_TINY_XS=0
     - perl: "blead"
