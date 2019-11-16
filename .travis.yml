@@ -169,6 +169,8 @@ install:
   - '[ -n "$MOO_RELEASE" ]   && cpan-install "$MOO_RELEASE"   || echo "MOO_RELEASE is not set"'
 before_script:
   - coverage-setup
+script:
+  - prove -r -Ilib -Iinc $(test-dirs)
 after_success:
   - coverage-report -select_re '^lib/'
 notifications:
