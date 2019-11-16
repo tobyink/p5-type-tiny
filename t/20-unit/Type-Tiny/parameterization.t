@@ -31,7 +31,7 @@ use Test::More;
 use Test::TypeTiny -all;
 use Test::Fatal;
 
-use Types::Standard -types;
+use Types::Standard qw/ -types slurpy /;
 
 my $p1 = ArrayRef[Int];
 my $p2 = ArrayRef[Int];
@@ -67,6 +67,11 @@ like(
 	qr{^not Bob},
 	'error message when a coderef dies',
 );
+
+my $p7 = ArrayRef[Dict[foo =>Int, slurpy Any]];
+my $p8 = ArrayRef[Dict[foo =>Int, slurpy Any]];
+is($p7->inline_check(q/$X/), $p8->inline_check(q/$X/), '$p7 and $p8 stringify the same');
+is($p7->{uniq}, $p8->{uniq}, '$p7 and $p8 are the same');
 
 #like(
 #	exception { ArrayRef[Int, Int] },

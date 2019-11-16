@@ -892,69 +892,79 @@ sub is_parameterized
 	shift->has_parameters;
 }
 
-my %param_cache;
-sub parameterize
 {
-	my $self = shift;
-	
-	$self->is_parameterizable
-		or @_ ? _croak("Type '%s' does not accept parameters", "$self") : return($self);
-	
-	@_ = map Types::TypeTiny::to_TypeTiny($_), @_;
+	my %seen;
+	sub ____make_key {
+		join ',', map {
+			Types::TypeTiny::TypeTiny->check($_) ? sprintf('$Type::Tiny::ALL_TYPES{%d}', $_->{uniq}) :
+			ref eq 'ARRAY'                       ? do { $seen{$_}++ ? '____CANNOT_KEY____' : sprintf('[%s]', ____make_key(@$_)) } :
+			ref eq 'HASH'                        ? do { $seen{$_}++ ? '____CANNOT_KEY____' : sprintf('{%s}', ____make_key(%$_)) } :
+			ref eq 'SCALAR' || ref eq 'REF'      ? do { $seen{$_}++ ? '____CANNOT_KEY____' : sprintf('do { my $x = %s; \\$x }', ____make_key($$_)) } :
+			!defined                             ? 'undef' :
+			!ref                                 ? do { require B; B::perlstring($_) } :
+			'____CANNOT_KEY____';
+		} @_;
+	}
+	my %param_cache;
+	sub parameterize
+	{
+		my $self = shift;
+		
+		$self->is_parameterizable
+			or @_ ? _croak("Type '%s' does not accept parameters", "$self") : return($self);
+		
+		@_ = map Types::TypeTiny::to_TypeTiny($_), @_;
 
-	# Generate a key for caching parameterized type constraints,
-	# but only if all the parameters are strings or type constraints.
-	my $key;
-	if ( not grep(ref($_) && !Types::TypeTiny::TypeTiny->check($_), @_) )
-	{
-		require B;
-		$key = join ":", map(Types::TypeTiny::TypeTiny->check($_) ? $_->{uniq} : B::perlstring($_), $self, @_);
-	}
-	
-	return $param_cache{$key} if defined $key && defined $param_cache{$key};
-	
-	local $Type::Tiny::parameterize_type = $self;
-	local $_ = $_[0];
-	my $P;
-	
-	my ($constraint, $compiled) = $self->constraint_generator->(@_);
-	
-	if (Types::TypeTiny::TypeTiny->check($constraint))
-	{
-		$P = $constraint;
-	}
-	else
-	{
-		my %options = (
-			constraint   => $constraint,
-			display_name => $self->name_generator->($self, @_),
-			parameters   => [@_],
-		);
-		$options{compiled_type_constraint} = $compiled
-			if $compiled;
-		$options{inlined} = $self->inline_generator->(@_)
-			if $self->has_inline_generator;
-		exists $options{$_} && !defined $options{$_} && delete $options{$_}
-			for keys %options;
+		# Generate a key for caching parameterized type constraints,
+		# but only if all the parameters are strings or type constraints.
+		%seen = ();
+		my $key = $self->____make_key(@_);
+		undef($key) if $key =~ /____CANNOT_KEY____/;		
+		return $param_cache{$key} if defined $key && defined $param_cache{$key};
 		
-		$P = $self->create_child_type(%options);
+		local $Type::Tiny::parameterize_type = $self;
+		local $_ = $_[0];
+		my $P;
 		
-		my $coercion;
-		$coercion = $self->coercion_generator->($self, $P, @_)
-			if $self->has_coercion_generator;
-		$P->coercion->add_type_coercions( @{$coercion->type_coercion_map} )
-			if $coercion;
+		my ($constraint, $compiled) = $self->constraint_generator->(@_);
+		
+		if (Types::TypeTiny::TypeTiny->check($constraint))
+		{
+			$P = $constraint;
+		}
+		else
+		{
+			my %options = (
+				constraint   => $constraint,
+				display_name => $self->name_generator->($self, @_),
+				parameters   => [@_],
+			);
+			$options{compiled_type_constraint} = $compiled
+				if $compiled;
+			$options{inlined} = $self->inline_generator->(@_)
+				if $self->has_inline_generator;
+			exists $options{$_} && !defined $options{$_} && delete $options{$_}
+				for keys %options;
+			
+			$P = $self->create_child_type(%options);
+			
+			my $coercion;
+			$coercion = $self->coercion_generator->($self, $P, @_)
+				if $self->has_coercion_generator;
+			$P->coercion->add_type_coercions( @{$coercion->type_coercion_map} )
+				if $coercion;
+		}
+		
+		if (defined $key)
+		{
+			$param_cache{$key} = $P;
+			Scalar::Util::weaken($param_cache{$key});
+		}
+		
+		$P->coercion->freeze;
+		
+		return $P;
 	}
-	
-	if (defined $key)
-	{
-		$param_cache{$key} = $P;
-		Scalar::Util::weaken($param_cache{$key});
-	}
-	
-	$P->coercion->freeze;
-	
-	return $P;
 }
 
 sub child_type_class
