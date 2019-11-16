@@ -85,15 +85,4 @@ should_pass('abc', $length_ge_3);
 should_pass('abcd', $length_ge_3);
 #diag( $length_ge_3->inline_check('$x') );
 
-
-my $z;
-my $complex = StrMatch->of(qr/x(?{$z})/);  # closure so can't be easily inlined
-if (Types::Standard::_AVOID_CALLBACKS) {
-	ok(!$complex->can_be_inlined, "if avoiding callbacks, can't inline this complex regexp");
-}
-else {
-	ok($complex->can_be_inlined, "using callbacks, this complex regexp can be inlined");
-	like($complex->inline_check('$_'), qr/Types::Standard::StrMatch/, '... and looks okay');
-}
-
 done_testing;
