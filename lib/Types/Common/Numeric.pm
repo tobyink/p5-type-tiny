@@ -10,8 +10,10 @@ BEGIN {
 
 BEGIN {
 	$Types::Common::Numeric::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Common::Numeric::VERSION   = '1.006000';
+	$Types::Common::Numeric::VERSION   = '1.007_000';
 }
+
+$Types::Common::Numeric::VERSION =~ tr/_//d;
 
 use Type::Library -base, -declare => qw(
 	PositiveNum PositiveOrZeroNum

@@ -53,13 +53,15 @@ BEGIN {
 };
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '1.006000';
+our $VERSION   = '1.007_000';
 our @EXPORT    = qw( eval_closure );
 our @EXPORT_OK = qw(
 	HAS_LEXICAL_SUBS HAS_LEXICAL_VARS ALIAS_IMPLEMENTATION
 	IMPLEMENTATION_DEVEL_LEXALIAS IMPLEMENTATION_PADWALKER
 	IMPLEMENTATION_NATIVE IMPLEMENTATION_TIE
 );
+
+$VERSION =~ tr/_//d;
 
 # See Types::TypeTiny for an explanation of this import method.
 #

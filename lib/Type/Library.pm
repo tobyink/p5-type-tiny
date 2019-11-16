@@ -6,8 +6,10 @@ use warnings;
 
 BEGIN {
 	$Type::Library::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Library::VERSION   = '1.006000';
+	$Type::Library::VERSION   = '1.007_000';
 }
+
+$Type::Library::VERSION =~ tr/_//d;
 
 use Eval::TypeTiny qw< eval_closure >;
 use Scalar::Util qw< blessed refaddr >;

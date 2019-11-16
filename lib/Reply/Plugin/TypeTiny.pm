@@ -5,8 +5,10 @@ use warnings;
 
 BEGIN {
 	$Reply::Plugin::TypeTiny::AUTHORITY = 'cpan:TOBYINK';
-	$Reply::Plugin::TypeTiny::VERSION   = '1.006000';
+	$Reply::Plugin::TypeTiny::VERSION   = '1.007_000';
 };
+
+$Reply::Plugin::TypeTiny::VERSION =~ tr/_//d;
 
 require Reply::Plugin;
 our @ISA = 'Reply::Plugin';

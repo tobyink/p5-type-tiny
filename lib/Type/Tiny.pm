@@ -11,9 +11,11 @@ BEGIN {
 
 BEGIN {
 	$Type::Tiny::AUTHORITY   = 'cpan:TOBYINK';
-	$Type::Tiny::VERSION     = '1.006000';
+	$Type::Tiny::VERSION     = '1.007_000';
 	$Type::Tiny::XS_VERSION  = '0.011';
 }
+
+$Type::Tiny::XS_VERSION =~ tr/_//d;
 
 use Scalar::Util qw( blessed );
 use Types::TypeTiny ();

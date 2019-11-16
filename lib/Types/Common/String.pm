@@ -11,8 +11,10 @@ BEGIN {
 
 BEGIN {
 	$Types::Common::String::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Common::String::VERSION   = '1.006000';
+	$Types::Common::String::VERSION   = '1.007_000';
 }
+
+$Types::Common::String::VERSION =~ tr/_//d;
 
 use Type::Library -base, -declare => qw(
 	SimpleStr

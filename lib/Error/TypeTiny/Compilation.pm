@@ -6,8 +6,10 @@ use warnings;
 
 BEGIN {
 	$Error::TypeTiny::Compilation::AUTHORITY = 'cpan:TOBYINK';
-	$Error::TypeTiny::Compilation::VERSION   = '1.006000';
+	$Error::TypeTiny::Compilation::VERSION   = '1.007_000';
 }
+
+$Error::TypeTiny::Compilation::VERSION =~ tr/_//d;
 
 require Error::TypeTiny;
 our @ISA = 'Error::TypeTiny';

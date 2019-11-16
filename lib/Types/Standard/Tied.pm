@@ -6,8 +6,10 @@ use warnings;
 
 BEGIN {
 	$Types::Standard::Tied::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::Tied::VERSION   = '1.006000';
+	$Types::Standard::Tied::VERSION   = '1.007_000';
 }
+
+$Types::Standard::Tied::VERSION =~ tr/_//d;
 
 use Type::Tiny ();
 use Types::Standard ();

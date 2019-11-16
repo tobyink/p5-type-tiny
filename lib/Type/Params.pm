@@ -10,8 +10,10 @@ BEGIN {
 
 BEGIN {
 	$Type::Params::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Params::VERSION   = '1.006000';
+	$Type::Params::VERSION   = '1.007_000';
 }
+
+$Type::Params::VERSION =~ tr/_//d;
 
 use B qw();
 use Eval::TypeTiny;

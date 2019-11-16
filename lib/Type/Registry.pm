@@ -6,8 +6,10 @@ use warnings;
 
 BEGIN {
 	$Type::Registry::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Registry::VERSION   = '1.006000';
+	$Type::Registry::VERSION   = '1.007_000';
 }
+
+$Type::Registry::VERSION =~ tr/_//d;
 
 use Exporter::Tiny qw( mkopt );
 use Scalar::Util qw( refaddr );

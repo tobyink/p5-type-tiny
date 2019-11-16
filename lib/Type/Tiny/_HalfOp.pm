@@ -6,8 +6,10 @@ use warnings;
 
 BEGIN {
 	$Type::Tiny::_HalfOp::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::_HalfOp::VERSION   = '1.006000';
+	$Type::Tiny::_HalfOp::VERSION   = '1.007_000';
 }
+
+$Type::Tiny::_HalfOp::VERSION =~ tr/_//d;
 
 sub new {
 	my ($class, $op, $param, $type) = @_;

@@ -6,8 +6,10 @@ use warnings;
 
 BEGIN {
 	$Error::TypeTiny::AUTHORITY = 'cpan:TOBYINK';
-	$Error::TypeTiny::VERSION   = '1.006000';
+	$Error::TypeTiny::VERSION   = '1.007_000';
 }
+
+$Error::TypeTiny::VERSION =~ tr/_//d;
 
 require Type::Tiny;
 __PACKAGE__->Type::Tiny::_install_overloads(
