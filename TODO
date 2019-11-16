@@ -12,7 +12,4 @@ Long-Term
   identifying which stack frame to report the error at, or Type::Params
   needs to mark its compiled subs more clearly.
 
-* Resolve RT#121763. Need to figure out the circumstances under which
-  this happens and fix.
-
 * Resolve RT#120226 if HAARG will help me flesh out an API.
