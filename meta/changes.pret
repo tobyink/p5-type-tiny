@@ -3153,7 +3153,7 @@
 			label "Smarter caching and reuse of parameterized types.";
 		];
 		item [
-			dcs:Bugfix, dcs:Packaging;
+			a dcs:Bugfix, dcs:Packaging;
 			dcs:fixes RT#125839;
 			label "Strip underscores in version numbers for dev releases.";
 			seealso <https://rt.cpan.org/Ticket/Display.html?id=125839>;
