@@ -53,7 +53,7 @@ BEGIN {
 	
 	*_USE_RUXS = !_AVOID_CALLBACKS() && eval { require Ref::Util::XS; Ref::Util::XS::->VERSION(0.100); 1; }
 		? sub () { !!1 }
-		: sub () { !!0 };	
+		: sub () { !!0 };
 };
 
 

@@ -39,7 +39,7 @@ ok  $Int->can_be_inlined;
 
 my $check_x = $Int->inline_check('$x');
 
-ok do { my $x = '4';    eval $check_x }; 
-ok do { my $x = '4.1'; !eval $check_x }; 
+ok do { my $x = '4';    eval $check_x };
+ok do { my $x = '4.1'; !eval $check_x };
 
 done_testing;

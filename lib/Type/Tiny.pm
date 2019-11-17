@@ -921,7 +921,7 @@ sub is_parameterized
 		# but only if all the parameters are strings or type constraints.
 		%seen = ();
 		my $key = $self->____make_key(@_);
-		undef($key) if $key =~ /____CANNOT_KEY____/;		
+		undef($key) if $key =~ /____CANNOT_KEY____/;
 		return $param_cache{$key} if defined $key && defined $param_cache{$key};
 		
 		local $Type::Tiny::parameterize_type = $self;

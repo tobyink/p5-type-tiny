@@ -24,7 +24,7 @@ my %cache;
 sub new {
 	my $proto = shift;
 	my %opts = (@_==1) ? %{$_[0]} : @_;
-	_croak "Need to supply role name" unless exists $opts{role};	
+	_croak "Need to supply role name" unless exists $opts{role};
 	return $proto->SUPER::new(%opts);
 }
 

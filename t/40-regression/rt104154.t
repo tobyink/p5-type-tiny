@@ -3,32 +3,28 @@ use warnings;
 use Type::Tiny;
 use Test::More;
 
-my $type_without = "Type::Tiny"->new
-  (
-   name       => "HasParam_without",
-   message    => sub { "$_ ain't got a number" },
-   constraint_generator => sub { sub { 0 } }, # Reject everything
-   deep_explanation => sub { ["love to contradict"] },
+my $type_without = "Type::Tiny"->new(
+	name       => "HasParam_without",
+	message    => sub { "$_ ain't got a number" },
+	constraint_generator => sub { sub { 0 } }, # Reject everything
+	deep_explanation => sub { ["love to contradict"] },
 );
 
-my $type_with = "Type::Tiny"->new
-  (
-   constraint => sub { 1 }, # Un-parameterized accepts al
-   name       => "HasParam_with",
-   message    => sub { "$_ ain't got a number" },
-   constraint_generator => sub { sub { 0 } }, # Reject everything
-   deep_explanation => sub { ["love to contradict"] },
+my $type_with = "Type::Tiny"->new(
+	constraint => sub { 1 }, # Un-parameterized accepts al
+	name       => "HasParam_with",
+	message    => sub { "$_ ain't got a number" },
+	constraint_generator => sub { sub { 0 } }, # Reject everything
+	deep_explanation => sub { ["love to contradict"] },
 );
 
-my $type_parent = "Type::Tiny"->new
-  (
-   parent => $type_without,
-   name       => "HasParam_parent",
-   message    => sub { "$_ ain't got a number" },
-   constraint_generator => sub { sub { 0 } }, # Reject everything
-   deep_explanation => sub { ["love to contradict"] },
-  );
-
+my $type_parent = "Type::Tiny"->new(
+	parent => $type_without,
+	name       => "HasParam_parent",
+	message    => sub { "$_ ain't got a number" },
+	constraint_generator => sub { sub { 0 } }, # Reject everything
+	deep_explanation => sub { ["love to contradict"] },
+);
 
 my $s = 'a string';
 my $param_with = $type_with->parameterize('an ignored parameter');
