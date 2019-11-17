@@ -1309,6 +1309,8 @@ sub _actually_compile_type_constraint   { shift->_build_compiled_check }
 sub hand_optimized_type_constraint      { shift->{hand_optimized_type_constraint} }
 sub has_hand_optimized_type_constraint  { exists(shift->{hand_optimized_type_constraint}) }
 sub type_parameter             { (shift->parameters || [])->[0] }
+sub parameterized_from         { $_[0]->is_parameterized ? shift->parent : _croak("Not a parameterized type") }
+sub has_parameterized_from     { $_[0]->is_parameterized }
 
 # some stuff for Mouse-compatible API
 sub __is_parameterized         { shift->is_parameterized(@_) }
@@ -1619,6 +1621,10 @@ Returns true iff the type constraint does not have a C<name>.
 Indicates whether a type has been parameterized (e.g. C<< ArrayRef[Int] >>)
 or could potentially be (e.g. C<< ArrayRef >>).
 
+=item C<< has_parameterized_from >>
+
+Useless alias for C<is_parameterized>.
+
 =back
 
 =head3 Validation and coercion
@@ -1819,6 +1825,11 @@ L<Types::Standard> do). This method only returns the first such parameter.
 L</"Attributes related to parameterizable and parameterized types">
 documents the C<parameters> attribute, which returns an arrayref of all
 the parameters.
+
+=item C<< parameterized_from >>
+
+Harder to spell alias for C<parent> that only works for parameterized
+types.
 
 =back
 
