@@ -40,7 +40,7 @@ sub new
 	undef $tmp{$_} for @{$opts{values}};
 	$opts{unique_values}  = [sort keys %tmp];
 	
-	if (Type::Tiny::_USE_XS and not grep /[^-\w]/, @{$opts{unique_values}})
+	if (Type::Tiny::_USE_XS and not grep /-/, @{$opts{unique_values}})
 	{
 		my $enum = join ",", @{$opts{unique_values}};
 		my $xsub = Type::Tiny::XS::get_coderef_for("Enum[$enum]");
@@ -98,7 +98,7 @@ sub inline_check
 {
 	my $self = shift;
 	
-	if (Type::Tiny::_USE_XS)
+	if (Type::Tiny::_USE_XS and not grep /-/, @{$self->unique_values})
 	{
 		my $enum = join ",", @{$self->unique_values};
 		my $xsub = Type::Tiny::XS::get_subname_for("Enum[$enum]");
