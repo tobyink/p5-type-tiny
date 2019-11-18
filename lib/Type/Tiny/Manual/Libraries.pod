@@ -89,9 +89,9 @@ want your library to I<extend> another library, do this instead:
 
    BEGIN { extends "Types::AnotherLibrary" };
 
-(Note: if your code breaks here when you upgrade from version 0.006 or
-below, saying that the 'extends' keyword has not been declared, just add
-'-all' after use Type::Utils.)
+It is possible to extend type libraries written with Type::Tiny, MooseX::Types,
+or MouseX::Types, and there is some support (though not perfect) for Specio
+type libraries.
 
 OK, now we're ready to declare a few types.
 

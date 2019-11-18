@@ -80,6 +80,18 @@ sub extends
 				);
 			}
 		}
+		elsif ($lib->isa('Specio::Exporter'))
+		{
+			my $types = $lib->Specio::Registry::exportable_types_for_package;
+			for my $name (sort keys %$types)
+			{
+				my $specio = $types->{$name};
+				my $tt     = Types::TypeTiny::to_TypeTiny($specio);
+				$caller->add_type(
+					$tt->create_child_type(library => $caller, name => $name)
+				);
+			}
+		}
 		else
 		{
 			_croak("'$lib' is not a type constraint library");
