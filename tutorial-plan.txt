@@ -1,0 +1,101 @@
+
+- Manual [Manual.pod]
+
+  - Synopsis
+  - Manual
+  - Installation
+    - Dependencies
+  - Type::Tiny versus X
+
+- Basic Use with Moo [UsingWithMoo.pod]
+  - Attribute type constraints
+    - Str
+      - NonEmptyStr
+    - Num
+    - Int
+      - PositiveInt
+      - PositiveOrZeroInt
+    - ArrayRef
+    - HashRef
+    - CodeRef
+    - Bool
+    - Any
+  - Parameterization
+    - ArrayRef
+    - HashRef
+    - Map
+    - Dict
+    - Tuple
+    - InstanceOf / ConsumerOf / HasMethods
+    - StrMatch / Enum
+    - IntRange / NumRange
+  - Coercions
+    - built-in coercions
+      - Bool
+      - LowerCaseStr
+      - UpperCaseStr
+    - plus_coercions
+  - Method parameter checking
+    - positional parameters
+    - slurpy
+    - named parameters
+    - named_to_positional
+    - named_oo
+
+- Advanced use with Moo [UsingWithMoo2.pod]
+  - types are objects and can be put in variables
+  - `where`
+  - unions and intersections
+  - stringifies_to / numifies_to / with_attribute_values
+  - tied variables
+
+- Other usage styles [UsingWithMoo3.pod]
+  - type registry t()
+  - exported functions
+    - is_*
+    - assert_*
+    - to_*
+  - dwim_type
+
+- Defining a type library [Libraries.pod]
+  - extending existing libraries versus importing
+  - defining a few types
+  - adding coercions
+  - defining parameterizable types
+  - declarative style 
+
+- Use with Moose [UsingWithMoose.pod]
+  - Advantages of Type::Tiny over built-ins
+    - per-attribute coercions
+    - speed
+    - deep coercions
+  - `moose_type` attribute
+  - `-moose` import hint
+
+- Use with Mouse [UsingWithMouse.pod]
+  - Advantages of Type::Tiny over built-ins
+    - per-attribute coercions
+    - deep coercions
+  - `mouse_type` attribute
+  - `-mouse` import hint
+
+- Use with Class::Tiny [UsingWithClassTiny.pod]
+  - Using Type::Tiny in BUILD
+  - Third-party shims
+    - Class::Tiny::Antlers
+    - Class::Tiny::ConstrainedAccessor
+
+- Use with Other OO System [UsingWithOther.pod]
+  - Class::InsideOut
+  - Params::Check
+  - Object::Accessor
+
+- Using Type::Tiny with Test::More [UsingWithTestMore.pod]
+
+- Using Type::Tiny in Procedural Programming [NonOO.pod]
+
+- Optimization [Optimization.pod]
+
+- Index of Bundled Types [AllTypes.pod]
+
+- Policies [Policies.pod]

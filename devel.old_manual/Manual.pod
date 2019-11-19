@@ -23,129 +23,57 @@ constraints.
 L<Type::Params> is also provided, to allow very fast checking and coercion
 of function and method parameters.
 
-=head1 MANUAL
-
-Even if you are using Type::Tiny with other object-oriented programming
-toolkits (such as Moose or Mouse), you should start with the Moo sections
-of the manual. Most of the information is directly transferrable and the
-Moose and Mouse sections of the manual list the minor differences between
-using Type::Tiny with Moo and with them.
-
-In general, this manual assumes you use Perl 5.12 or above and may use
-examples that do not work on older versions of Perl. Type::Tiny does work
-on earlier versions of Perl, but not all the examples and features in
-the manual will run without adjustment. (For instance, you may need to
-replace C<state> variables with lexical variables, avoid the
-C<< package NAME { BLOCK } >> syntax, etc.)
+=head1 SEE ALSO
 
 =over
 
-=item * L<Type::Tiny::Manual::UsingWithMoo>
+=item *
 
-Basic use of Type::Tiny with Moo, including attribute type constraints,
-parameterized type constraints, coercions, and method parameter checking.
+L<Libraries|Type::Tiny::Manual::Libraries> - how to build a type library with Type::Tiny, Type::Library and Type::Utils
 
-=item * L<Type::Tiny::Manual::UsingWithMoo2>
+=item *
 
-Advanced use of Type::Tiny with Moo, including unions and intersections,
-C<stringifies_to>, C<numifies_to>, C<with_attribute_values>, and C<where>.
+L<Coercions|Type::Tiny::Manual::Coercions> - adding coercions to type constraints
 
-=item * L<Type::Tiny::Manual::UsingWithMoo3>
+=item *
 
-There's more than one way to do it! Alternative ways of using Type::Tiny,
-including type registries, exported functions, and C<dwim_type>.
+L<Using with Moose|Type::Tiny::Manual::UsingWithMoose> - how to use Type::Tiny and Type::Library with Moose
 
-=item * L<Type::Tiny::Manual::Libraries>
+=item *
 
-Defining your own type libraries, including extending existing libraries,
-defining new types, adding coercions, defining parameterizable types,
-and the declarative style.
+L<Using with Mouse|Type::Tiny::Manual::UsingWithMouse> - how to use Type::Tiny and Type::Library with Mouse
 
-=item * L<Type::Tiny::Manual::UsingWithMoose>
+=item *
 
-How to use Type::Tiny with Moose, including the advantages of Type::Tiny
-over built-in type constraints, and Moose-specific features.
+L<Using with Moo|Type::Tiny::Manual::UsingWithMoo> - how to use Type::Tiny and Type::Library with Moo
 
-=item * L<Type::Tiny::Manual::UsingWithMouse>
+=item *
 
-How to use Type::Tiny with Mouse, including the advantages of Type::Tiny
-over built-in type constraints, and Mouse-specific features.
+L<Using with Other OO Frameworks|Type::Tiny::Manual::UsingWithOther> - how to use Type::Tiny and Type::Library with other OO frameworks
 
-=item * L<Type::Tiny::Manual::UsingWithClassTiny>
+=item *
 
-Including how to Type::Tiny in your object's C<BUILD> method, and
-third-party shims between Type::Tiny and Class::Tiny.
+Type::Tiny and friends don't need to be used within an OO framework. See L<FreeMind::Node> for an example that does not.
 
-=item * L<Type::Tiny::Manual::UsingWithOther>
+=item *
 
-Using Type::Tiny with Class::InsideOut, Params::Check, and Object::Accessor.
+L<Processing arguments to subs|Type::Tiny::Manual::Params> - coerce and validate arguments to functions and methods.
 
-=item * L<Type::Tiny::Manual::UsingWithTestMore>
+=item *
 
-Type::Tiny for test suites.
+Other modules using Type::Tiny in interesting ways: L<Type::Tie>, L<Test::Mocha>, L<Scalar::Does>, L<Set::Equivalence>...
 
-=item * L<Type::Tiny::Manual::NonOO>
+=item *
 
-Type::Tiny in non-object-oriented code.
+L<Optimization|Type::Tiny::Manual::Optimization> - squeeze the most out of your CPU.
 
-=item * L<Type::Tiny::Manual::Optimization>
+=item *
 
-Type::Tiny in non-object-oriented code.
-
-=item * L<Type::Tiny::Manual::AllTypes>
-
-An alphabetical list of all type constraints bundled with Type::Tiny.
-
-=item * L<Type::Tiny::Manual::Policies>
-
-Policies related to Type::Tiny development.
+L<Type::Tiny maintenance policies|Type::Tiny::Manual::Policies> - the stability policy.
 
 =back
 
-=head1 INSTALLATION
-
-Installing Type-Tiny should be straightforward.
-
-=head2 Installation with cpanminus
-
-If you have cpanm, you only need one line:
-
-  % cpanm Type::Tiny
-
-If you are installing into a system-wide directory, you may need to pass
-the "-S" flag to cpanm, which uses sudo to install the module:
-
-  % cpanm -S Type::Tiny
-
-=head2 Installation with the CPAN Shell
-
-Alternatively, if your CPAN shell is set up, you should just be able to
-do:
-
-  % cpan Type::Tiny
-
-=head2 Manual Installation
-
-As a last resort, you can manually install it. Download the tarball and
-unpack it.
-
-Consult the file META.json for a list of pre-requisites. Install these
-first.
-
-To build Type-Tiny:
-
-  % perl Makefile.PL
-  % make && make test
-
-Then install it:
-
-  % make install
-
-If you are installing into a system-wide directory, you may need to run:
-
-  % sudo make install
-
-=head2 Dependencies
+=head1 DEPENDENCIES
 
 Type::Tiny requires at least Perl 5.6.1, though certain Unicode-related
 features (e.g. non-ASCII type constraint names) may work better in newer
@@ -260,4 +188,3 @@ WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
 =cut
-
