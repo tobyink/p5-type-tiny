@@ -6,7 +6,9 @@
 
 Type::Tiny::Manual::UsingWithMoo - basic use of Type::Tiny with Moo
 
-=head1 TYPE CONSTRAINTS
+=head1 MANUAL
+
+=head2 Type Constraints
 
 Consider the following basic Moo class:
 
@@ -114,7 +116,20 @@ An example of using the latter:
 The B<< Bool >> type constraint accepts "1" as a true value, and
 "0", "", or undef as false values. No other values are accepted.
 
-Another useful type constraint to know about is B<Any>:
+There exists an B<Object> type constraint that accepts any blessed
+object.
+
+  package Horse {
+    use Moo;
+    use Types::Standard qw( Object );
+    use namespace::autoclean;
+    
+    ...;  # name, gender, age, children
+    has father => ( is => 'ro', isa => Object );
+    has mother => ( is => 'ro', isa => Object );
+  }
+
+Finally, another useful type constraint to know about is B<Any>:
 
   use Types::Standard qw( Any );
   has stuff => ( is => 'rw', isa => Any );
@@ -124,7 +139,7 @@ any type check, but makes your intent clearer. Where possible, Type::Tiny will
 optimize away this type check, so it should have little (if any) impact on
 performance.
 
-=head1 PARAMETERIZED TYPES
+=head2 Parameterized Types
 
 Let's imagine we want to keep track of our horse's race wins:
 
@@ -406,7 +421,7 @@ Parameterized type constraints are one of the most powerful features of
 Type::Tiny, allowing a small set of constraints to be combined in
 useful ways.
 
-=head1 TYPE COERCIONS
+=head2 Type Coercions
 
 It is often good practice to be liberal in what you accept.
 
@@ -498,7 +513,7 @@ And of course you can still add more coercions to the inherited ones...
   );
 
 
-=head1 METHOD PARAMETERS
+=head2 Method Parameters
 
 So far we have just concentrated on the definition of object attributes, but
 type constraints are also useful to validate method parameters.
@@ -818,6 +833,28 @@ Advanced use of Type::Tiny with Moo, including unions and intersections,
 C<stringifies_to>, C<numifies_to>, C<with_attribute_values>, and C<where>.
 
 =back
+
+=head1 NOTES
+
+On very old versions of Moo C<< coerce => 1 >> is not supported. Instead
+you will need to provide a coderef or object overloading C<< &{} >> to
+coerce. Type::Tiny can provide you with an overloaded object.
+
+  package Horse {
+    use Moo;
+    use Types::Standard qw( Str Num ArrayRef Bool );
+    use namespace::autoclean;
+    
+    ...;  # name, gender, age, children, wins
+    has is_alive => (
+      is      => 'rw',
+      isa     => Bool,
+      coerce  => Bool->coercion,  # overloaded object
+    );
+  }
+
+If you have a very old version of Moo, please upgrade to at least Moo 1.006000
+which was the version that added support for C<< coerce => 1 >>.
 
 =head1 AUTHOR
 

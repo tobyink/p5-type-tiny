@@ -69,6 +69,7 @@
     - per-attribute coercions
     - speed
     - deep coercions
+  - Use with MooseX::Types
   - `moose_type` attribute
   - `-moose` import hint
 
@@ -76,6 +77,7 @@
   - Advantages of Type::Tiny over built-ins
     - per-attribute coercions
     - deep coercions
+  - Use with MouseX::Types
   - `mouse_type` attribute
   - `-mouse` import hint
 
