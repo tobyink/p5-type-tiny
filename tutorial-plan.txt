@@ -23,11 +23,6 @@
     - Class::Tiny::Antlers
     - Class::Tiny::ConstrainedAccessor
 
-- Use with Other OO System [UsingWithOther.pod]
-  - Class::InsideOut
-  - Params::Check
-  - Object::Accessor
-
 - Using Type::Tiny with Test::More [UsingWithTestMore.pod]
 
 - Using Type::Tiny in Procedural Programming [NonOO.pod]

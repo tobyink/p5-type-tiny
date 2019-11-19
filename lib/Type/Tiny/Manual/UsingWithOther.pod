@@ -1,0 +1,117 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Type::Tiny::Manual::UsingWithOther - using Type::Tiny with Class::InsideOut, Params::Check, and Object::Accessor.
+
+=head1 MANUAL
+
+The antlers crew aren't the only object-oriented programming toolkits
+in Perl town. Although Type::Tiny might have been built with Moose,
+Mouse, and Moo in mind, it can be used with other toolkits.
+
+These toolkits are... well... hmm... okay... they exist.
+
+If you are starting a new project, there's very little reason not to
+use Class::Tiny, Moo, or Moose. Don't use these.
+
+=head2 Class::InsideOut
+
+You want L<Class::InsideOut> 1.13 or above, which has support for blessed
+and overloaded objects (including Type::Tiny type constraints) for the
+C<get_hook> and C<set_hook> options.
+
+  package Person {
+    use Class::InsideOut qw( public );
+    use Types::Standard qw( Str Int );
+    use Types::Common::Numeric qw( PositiveInt );
+    use Type::Params qw( compile );
+    
+    # Type checks are really easy.
+    # Just supply the type as a set hook.
+    public name => my %_name, {
+      set_hook => Str,
+    };
+    
+    # Define a type that silently coerces negative values
+    # to positive. It's silly, but it works as an example!
+    my $Years = PositiveInt->plus_coercions(Int, q{ abs($_) });
+    
+    # Coercions are more annoying, but possible.
+    public age => my %_age, {
+      set_hook => sub { $_ = $Years->assert_coerce($_) },
+    };
+    
+    # Parameter checking for methods is as expected.
+    sub get_older {
+      state $check = compile( $Years );
+      my $self = shift;
+      my ($years) = $check->(@_);
+      $self->_set_age($self->age + $years);
+    }
+  }
+
+=head2 Params::Check and Object::Accessor
+
+The Params::Check C<< allow() >> function, the C<allow> option for the
+Params::Check C<< check() >> function, and the input validation mechanism
+for Object::Accessor all work in the same way, which is basically a
+limited pure-Perl implementation of the smart match operator. While this
+doesn't directly support Type::Tiny constraints, it does support coderefs.
+You can use Type::Tiny's C<compiled_check> method to obtain a suitable
+coderef.
+
+B<< L<Param::Check> example: >>
+
+  my $tmpl = {
+    name => { allow => Str->compiled_check },
+    age  => { allow => Int->compiled_check },
+  };
+  check($tmpl, { name => "Bob", age => 32 })
+    or die Params::Check::last_error();
+
+B<< L<Object::Accessor> example: >>
+
+  my $obj = Object::Accessor->new;
+  $obj->mk_accessors(
+    { name => Str->compiled_check },
+    { age  => Int->compiled_check },
+  );
+
+B<< Caveat: >> Object::Accessor doesn't die when a value fails to meet its
+type constraint; instead it outputs a warning to STDERR. This behaviour can
+be changed by setting C<< $Object::Accessor::FATAL = 1 >>.
+
+=head1 NEXT STEPS
+
+Here's your next step:
+
+=over
+
+=item * L<Type::Tiny::Manual::UsingWithTestMore>
+
+Type::Tiny for test suites.
+
+=back
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013-2014, 2017-2019 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+=cut
+
