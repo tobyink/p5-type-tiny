@@ -577,6 +577,31 @@ automatic) and can even add in defaults:
     NonEmptyStr, { default => sub { "Eddie" } },
   );
 
+On older versions of Perl (prioer to 5.10), C<state> variables are not
+available. A workaround is to replace this:
+
+  sub foo {
+    state $x = bar();
+    ...;
+  }
+
+With this:
+
+  {         # outer braces prevent other subs seeing $x
+    my $x;  # declare $x before sub foo()
+    sub foo {
+      $x = bar();
+      ...;
+    }
+  }
+
+(While we're having a general Perl syntax lesson, I'll note that
+C<< &$check >> with an ampersand and no parentheses is a shortcut for
+C<< $check->(@_) >> and actually runs slightly faster because it reuses
+the C<< @_ >> array for the called coderef. A lot of people dislike calling
+subs with an ampersand, so we will stick to the C<< $check->(@_) >> syntax
+in these examples. But do consider using the shortcut!)
+
 The generalized syntax for C<compile> is:
 
   state $check = compile(
@@ -769,6 +794,21 @@ Now C<< $args >> is a blessed object that you can call methods on. There is
 of course a performance penalty for this, but it's surprisingly small.
 
 =head1 NEXT STEPS
+
+Congratulations! I know this was probably a lot to take in, but you've
+covered all of the essentials.
+
+You can now set type constraints and coercions for attributes and method
+parameters in Moo! You are familiar with a lot of the most important
+and useful type constraints and understand parameterization and how
+it can be used to build more specific type constraints.
+
+(And I'll let you in on a secret. Using Type::Tiny with L<Moose> or
+L<Mouse> instead of L<Moo> is exactly the same. You can just replace
+L<use Moo> with L<use Moose> in any of these examples and they should
+work fine!)
+
+Here's your next step:
 
 =over
 
