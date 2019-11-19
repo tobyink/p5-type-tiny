@@ -93,7 +93,7 @@ B<Int> and C<Num>, such as B<PositiveInt> and B<PositiveOrZeroInt>.
 The last type constraint we've used in this example is B<ArrayRef>.
 This requires the value to be a reference to an array.
 
-Types::Standard also provides B<HashRef> and C<CodeRef> type constraints.
+Types::Standard also provides B<HashRef> and B<CodeRef> type constraints.
 An example of using the latter:
 
   package Task {
@@ -170,7 +170,7 @@ Which way you choose is largely a style preference. TIMTOWTDI!
 Note that although the constructor and any setter/accessor method will perform
 type checks, it is possible to bypass them using:
 
-  @{ $br->wins }, $not_a_string;
+  push @{ $br->wins }, $not_a_string;
 
 The constructor isn't being called here, and although the accessor I<is>
 being called, it's being called as a reader, not a writer, so never gets
@@ -577,7 +577,7 @@ automatic) and can even add in defaults:
     NonEmptyStr, { default => sub { "Eddie" } },
   );
 
-On older versions of Perl (prioer to 5.10), C<state> variables are not
+On older versions of Perl (prior to 5.10), C<state> variables are not
 available. A workaround is to replace this:
 
   sub foo {
