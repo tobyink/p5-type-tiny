@@ -178,7 +178,7 @@ Type::Tiny in non-object-oriented code.
 
 =item * L<Type::Tiny::Manual::Optimization>
 
-Type::Tiny in non-object-oriented code.
+Squeeze the most out of your CPU.
 
 =item * L<Type::Tiny::Manual::AllTypes>
 

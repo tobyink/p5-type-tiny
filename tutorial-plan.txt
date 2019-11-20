@@ -17,12 +17,6 @@
   - `mouse_type` attribute
   - `-mouse` import hint
 
-- Use with Class::Tiny [UsingWithClassTiny.pod]
-  - Using Type::Tiny in BUILD
-  - Third-party shims
-    - Class::Tiny::Antlers
-    - Class::Tiny::ConstrainedAccessor
-
 - Using Type::Tiny with Test::More [UsingWithTestMore.pod]
 
 - Using Type::Tiny in Procedural Programming [NonOO.pod]

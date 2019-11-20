@@ -1,0 +1,140 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Type::Tiny::Manual::Optimization - squeeze the most out of your CPU
+
+=head1 MANUAL
+
+Type::Tiny is written with efficiency in mind, but there are techniques
+you can use to get the best performance out of it.
+
+=head2 XS
+
+The simplest thing you can do to increase performance of many of
+the built-in type constraints is to install L<Type::Tiny::XS>, a
+set of ultra-fast type constraint checks implemented in C.
+
+L<Type::Tiny> will attempt to load L<Type::Tiny::XS> and use its
+type checks. If L<Type::Tiny::XS> is not available, it will then
+try to use L<Mouse> B<< if it is already loaded >>, but Type::Tiny
+won't attempt to load Mouse for you.
+
+Certain type constraints can also be accelerated if you have
+L<Ref::Util::XS> installed.
+
+=head3 Types that can be accelerated by Type::Tiny::XS
+
+The following simple type constraints from L<Types::Standard> will
+be accelerated by Type::Tiny::XS: C<Any>, C<ArrayRef>, C<Bool>,
+C<ClassName>, C<CodeRef>, C<Defined>, C<FileHandle>, C<GlobRef>,
+C<HashRef>, C<Int>, C<Item>, C<Object>, C<Map>, C<Ref>, C<ScalarRef>,
+C<Str>, C<Tuple>, C<Undef>, and C<Value>. (Note that C<Num> and
+C<RegexpRef> are B<not> on that list.)
+
+The parameterized form of C<Ref> cannot be accelerated.
+
+The parameterized forms of C<ArrayRef>, C<HashRef>, and C<Map> can be
+accelerated only if their parameters are.
+
+The parameterized form of C<Tuple> can be accelerated if its
+parameters are, it has no C<Optional> components, and it does not use
+C<slurpy>.
+
+Certain type constraints may benefit partially from Type::Tiny::XS.
+For example, C<RoleName> inherits from C<ClassName>, so part of the
+type check will be conducted by Type::Tiny::XS.
+
+The parameterized C<InstanceOf>, C<HasMethods>, and C<Enum> type
+constraints will be accelerated. So will L<Type::Tiny::Class>,
+L<Type::Tiny::Duck>, and L<Type::Tiny::Enum> objects. (But enums will
+only be accelerated if the list of allowed string values consist
+entirely of word characters and hyphens - that is:
+C<< not grep /[^\w-]/, @values >>.)
+
+The C<PositiveInt> and C<PositiveOrZeroInt> type constraints from
+L<Types::Common::Numeric> will be accelerated, as will the
+C<NonEmptyStr> type constraint from L<Types::Common::String>.
+
+L<Type::Tiny::Union> and L<Type::Tiny::Intersection> will also be
+accelerated if their constituent type constraints are.
+
+=head3 Types that can be accelerated by Mouse
+
+The following simple type constraints from L<Types::Standard> will
+be accelerated by Type::Tiny::XS: C<Any>, C<ArrayRef>, C<Bool>,
+C<ClassName>, C<CodeRef>, C<Defined>, C<FileHandle>, C<GlobRef>,
+C<HashRef>, C<Ref>, C<ScalarRef>, C<Str>, C<Undef>, and C<Value>.
+(Note that C<Item>, C<Num>, C<Int>, C<Object>, and C<RegexpRef>
+are B<not> on that list.)
+
+The parameterized form of C<Ref> cannot be accelerated.
+
+The parameterized forms of C<ArrayRef> and C<HashRef> can be
+accelerated only if their parameters are.
+
+Certain type constraints may benefit partially from Mouse. For
+example, C<RoleName> inherits from C<ClassName>, so part of the
+type check will be conducted by Mouse.
+
+The parameterized C<InstanceOf> and C<HasMethods> type constraints
+will be accelerated. So will L<Type::Tiny::Class> and
+L<Type::Tiny::Duck> objects.
+
+=head2 Inlining Type Constraints
+
+TODO
+
+=head2 Inlining Coercions
+
+TODO
+
+=head2 Common Sense
+
+The C<< HashRef[ArrayRef] >> type constraint can probably be checked
+faster than C<< HashRef[ArrayRef[Num]] >>. If you find yourself using
+very complex and slow type constraints, you should consider switching
+to simpler and faster ones. (Though this means you have to place a
+little more trust in your caller to not supply you with bad data.)
+
+(A counter-intuitive exception to this: even though C<Int> is more
+restrictive than C<Num>, in most circumstances C<Int> checks will run
+faster.)
+
+=head2 Devel::StrictMode
+
+TODO
+
+=head1 NEXT STEPS
+
+Here's your next step:
+
+=over
+
+=item * L<Type::Tiny::Manual::AllTypes>
+
+An alphabetical list of all type constraints bundled with Type::Tiny.
+
+=back
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013-2014, 2017-2019 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+=cut
+
