@@ -1,0 +1,151 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Type::Tiny::Manual::UsingWithClassTiny - use of Type::Tiny with Class::Tiny
+
+=head1 MANUAL
+
+L<Class::Tiny> is an even-smaller-than-Moo class builder.
+
+Let's translate the classic Horse class from Moo to Class::Tiny.
+
+Moo:
+
+  package Horse {
+    use Moo;
+    use Types::Standard qw( Str Num ArrayRef );
+    use namespace::autoclean;
+    
+    has name       => ( is => 'ro',    isa => Str, required => 1 );
+    has gender     => ( is => 'ro',    isa => Str );
+    has age        => ( is => 'rw',    isa => Num );
+    has children   => ( is => 'lazy',  isa => ArrayRef );
+    
+    sub _build_children {
+      return [];
+    }
+  }
+
+Class::Tiny:
+
+  package Horse {
+    use Class::Tiny qw( gender age ), {
+      name     => sub { die "name is required"; },
+      children => sub { return [] },
+    };
+    use Types::Standard qw( Str Num ArrayRef Dict Optional slurpy Any);
+    use Type::Params qw( wrap_methods compile );
+    use namespace::autoclean;
+    
+    # type checks
+    wrap_methods(
+      BUILD    => [Dict[
+        name       => Str,
+        gender     => Optional[Str],
+        age        => Optional[Num],
+        children   => Optional[ArrayRef],
+        slurpy Any,
+      ]],
+      name     => [],
+      gender   => [],
+      age      => Optional[Num],
+      children => [],
+    );
+  }
+
+What's going on here?
+
+Well, Class::Tiny, after it has built a new object, will do this:
+
+  $self->BUILD($args);
+
+(Technically, it calls C<BUILD> not just for the current class, but for all
+parent classes too.) We can hook onto this in order to check type constraints
+for the constructor.
+
+We use C<wrap_methods> from L<Type::Params> to wrap the original C<BUILD>
+method (which doesn't exist, so C<wrap_methods> will just assume an empty
+sub) with a type check for C<< $args >>. The type check is just a B<Dict>
+that checks the class's required and optional attributes and includes
+C<< slurpy Any >> at the end to be flexible for subclasses adding new
+attributes.
+
+Then we wrap the C<name>, C<gender>, and C<children> methods with checks
+to make sure they're only being called as getters, and we wrap C<age>,
+allowing it to be called as a setter with a B<Num>.
+
+There are also a couple of CPAN modules that can help you out.
+
+=head2 Class::Tiny::ConstrainedAccessor
+
+  package Horse {
+    use Types::Standard qw( Str Num ArrayRef );
+    use Class::Tiny::ConstrainedAccessor {
+      name     => Str,
+      gender   => Str,
+      age      => Num,
+      children => ArrayRef,
+    };
+    use Class::Tiny qw( gender age ), {
+      name     => sub { die "name is required"; },
+      children => sub { return [] },
+    };
+  }
+
+=head2 Class::Tiny::Antlers
+
+Moose-like syntax for Class::Tiny, including support for C<isa>.
+
+  package Horse {
+    use Class::Tiny::Antlers qw(has);
+    use Types::Standard qw( Str Num ArrayRef );
+    use namespace::autoclean;
+    
+    has name       => (
+      is        => 'ro',
+      isa       => Str,
+      default   => sub { die "name is required" },
+    );
+    has gender     => ( is => 'ro',    isa => Str );
+    has age        => ( is => 'rw',    isa => Num );
+    has children   => (
+      is        => 'lazy',
+      isa       => ArrayRef,
+      default   => sub { return [] },
+    );
+  }
+
+=head1 NEXT STEPS
+
+Here's your next step:
+
+=over
+
+=item * L<Type::Tiny::Manual::UsingWithOther>
+
+Using Type::Tiny with Class::InsideOut, Params::Check, and Object::Accessor.
+
+=back
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013-2014, 2017-2019 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+=cut
+

@@ -28,7 +28,7 @@ require Exporter::Tiny;
 our @ISA = 'Exporter::Tiny';
 
 our @EXPORT    = qw( compile compile_named );
-our @EXPORT_OK = qw( multisig validate validate_named compile_named_oo Invocant );
+our @EXPORT_OK = qw( multisig validate validate_named compile_named_oo Invocant wrap_subs wrap_methods );
 
 sub english_list {
 	require Type::Utils;
@@ -713,6 +713,47 @@ sub multisig
 	);
 }
 
+sub wrap_methods {
+	my $opts = ref($_[0]) eq 'HASH' ? shift : {};
+	$opts->{caller}         ||= caller;
+	$opts->{skip_invocant}    = 1;
+	unshift @_, $opts;
+	goto \&_wrap_subs;
+}
+
+sub wrap_subs {
+	my $opts = ref($_[0]) eq 'HASH' ? shift : {};
+	$opts->{caller}         ||= caller;
+	$opts->{skip_invocant}    = 0;
+	unshift @_, $opts;
+	goto \&_wrap_subs;
+}
+
+sub _wrap_subs {
+	my $opts = shift;
+	my $subname =
+		eval { require Sub::Util } ? \&Sub::Util::set_subname :
+		eval { require Sub::Name } ? \&Sub::Name::subname : 0;
+	while (@_) {
+		my ($name, $proto) = splice @_, 0, 2;
+		my $fullname = ($name =~ /::/) ? $name : sprintf('%s::%s', $opts->{caller}, $name);
+		my $orig = do {
+			no strict 'refs';
+			exists &$fullname ? \&$fullname : sub {};
+		};
+		my $check = ref($proto) eq 'CODE' ? $proto : undef;
+		my $co = { description => "parameter validation for '$name'" };
+		my $new = $opts->{skip_invocant}
+			? sub { my $s = shift; $check ||= compile($co, @$proto); $orig->($s, &$check) }
+			: sub { $check ||= compile($co, @$proto); $orig->(&$check) };
+		$new = $subname->($fullname, $new) if $subname;
+		no strict 'refs';
+		no warnings 'redefine';
+		*$fullname = $new;
+	}
+	1;
+}
+
 1;
 
 __END__
@@ -1309,6 +1350,42 @@ doing that, you've missed the point of them.
 
 They don't have any constructor (C<new> method). The C<< $check >>
 coderef effectively I<is> the constructor.
+
+=head1 WRAPPING SUBS
+
+It's possible to turn the check inside-out and instead of the sub calling
+the check, the check can call the original sub.
+
+Normal way:
+
+   use Type::Param qw(compile);
+   use Types::Standard qw(Int Str);
+   
+   sub foobar {
+      state $check = compile(Int, Str);
+      my ($foo, $bar) = @_;
+      ...;
+   }
+
+Inside-out way:
+
+   use Type::Param qw(wrap_subs);
+   use Types::Standard qw(Int Str);
+   
+   sub foobar {
+      my ($foo, $bar) = @_;
+      ...;
+   }
+   
+   wrap_subs foobar => [Int, Str];
+
+C<wrap_subs> takes a hash of subs to wrap. The keys are the sub names and the
+values are either arrayrefs of arguments to pass to C<compile> to make a check,
+or coderefs that have already been built by C<compile>, C<compile_named>, or
+C<compile_named_oo>.
+
+C<wrap_methods> also exists, which shifts off the invocant from C<< @_ >>
+before the check, but unshifts it before calling the original sub.
 
 =head1 COOKBOOK
 

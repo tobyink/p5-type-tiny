@@ -8,14 +8,15 @@ Type::Tiny::Manual::UsingWithOther - using Type::Tiny with Class::InsideOut, Par
 
 =head1 MANUAL
 
-The antlers crew aren't the only object-oriented programming toolkits
-in Perl town. Although Type::Tiny might have been built with Moose,
-Mouse, and Moo in mind, it can be used with other toolkits.
+The antlers crew aren't the only object-oriented programming toolkits in
+Perl town. Although Type::Tiny might have been built with Moose, Mouse,
+and Moo in mind, it can be used with other toolkits.
 
 These toolkits are... well... hmm... okay... they exist.
 
-If you are starting a new project, there's very little reason not to
-use Class::Tiny, Moo, or Moose. Don't use these.
+If you are starting a new project, there's very little reason not to use
+Class::Tiny, Moo, or Moose. So you're probably okay to skip this part of
+the fine manual and go straight to L<Type::Tiny::Manual::UsingWithTestMore>.
 
 =head2 Class::InsideOut
 
