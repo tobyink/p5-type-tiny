@@ -19,7 +19,7 @@ __DATA__
 Any	Types::Standard	No	No	Anything. Absolutely anything.
 ArrayLike	Types::TypeTiny	No	No	Arrayrefs and objects overloading arrayfication.
 ArrayRef	Types::Standard	No	Yes	Arrayrefs.
-Bool	Types::Standard	Yes	No	Booleans; the numbers or strings “0” and “1”, the empty string, or undef. 
+Bool	Types::Standard	Yes	No	Booleans; the numbers or strings "0" and "1", the empty string, or undef. 
 ClassName	Types::Standard	No	No	Any loaded package name.
 CodeLike	Types::TypeTiny	No	No	Coderefs and objects overloading coderefification.
 CodeRef	Types::Standard	No	No	Coderefs.
@@ -37,7 +37,7 @@ InstanceOf	Types::Standard	No	Yes	An object that isa particular class.
 Int	Types::Standard	No	No	A whole number, either positive, negative, or zero.
 IntRange	Types::Common::Numeric	No	Yes	An integer within a particular numeric range.
 Item	Types::Standard	No	No	Any single item; effectively the same as Any.
-LaxNum	Types::Standard	No	No	A number; relaxed constraint that allows “inf”.
+LaxNum	Types::Standard	No	No	A number; relaxed constraint that allows "inf".
 LowerCaseSimpleStr	Types::Common::String	Yes	No	A string less than 256 characters long with no line breaks or uppercase letters.
 LowerCaseStr	Types::Common::String	Yes	No	A string with no uppercase letters.
 Map	Types::Standard	No	Yes	A hashref with a constraint for the values and keys.

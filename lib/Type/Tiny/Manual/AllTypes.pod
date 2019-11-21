@@ -8,6 +8,10 @@ Type::Tiny::Manual::AllTypes - alphabetical list of all type constraints bundled
 
 =head1 MANUAL
 
+The following is a list of type constraints bundled with Type::Tiny,
+with very brief descriptions. For more information, see the type
+library's documentation, and the test cases in C<< t/21-types/ >>.
+
 =over
 
 =item *
