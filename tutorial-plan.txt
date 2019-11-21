@@ -21,8 +21,4 @@
 
 - Using Type::Tiny in Procedural Programming [NonOO.pod]
 
-- Optimization [Optimization.pod]
-
-- Index of Bundled Types [AllTypes.pod]
-
 - Policies [Policies.pod]

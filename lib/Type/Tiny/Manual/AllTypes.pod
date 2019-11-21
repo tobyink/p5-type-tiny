@@ -1,0 +1,423 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Type::Tiny::Manual::AllTypes - alphabetical list of all type constraints bundled with Type::Tiny
+
+=head1 MANUAL
+
+=over
+
+=item *
+
+B<< Any >> in L<Types::Standard>
+
+Anything. Absolutely anything.
+
+=item *
+
+B<< ArrayLike >> in L<Types::TypeTiny>
+
+Arrayrefs and objects overloading arrayfication.
+
+=item *
+
+B<< ArrayRef >> I<< [parameterizable] >> in L<Types::Standard>
+
+Arrayrefs.
+
+=item *
+
+B<< Bool >> I<< [has coercion] >> in L<Types::Standard>
+
+Booleans; the numbers or strings "0" and "1", the empty string, or undef. 
+
+=item *
+
+B<< ClassName >> in L<Types::Standard>
+
+Any loaded package name.
+
+=item *
+
+B<< CodeLike >> in L<Types::TypeTiny>
+
+Coderefs and objects overloading coderefification.
+
+=item *
+
+B<< CodeRef >> in L<Types::Standard>
+
+Coderefs.
+
+=item *
+
+B<< ConsumerOf >> I<< [parameterizable] >> in L<Types::Standard>
+
+An object that DOES a particular role.
+
+=item *
+
+B<< CycleTuple >> I<< [parameterizable] >> in L<Types::Standard>
+
+An arrayref with a repeating pattern of constraints on its values.
+
+=item *
+
+B<< Defined >> in L<Types::Standard>
+
+Any value other than undef.
+
+=item *
+
+B<< Dict >> I<< [parameterizable] >> in L<Types::Standard>
+
+A hashref with constraints on each of its values.
+
+=item *
+
+B<< Enum >> I<< [parameterizable] >> in L<Types::Standard>
+
+A string from an allowed set of strings.
+
+=item *
+
+B<< FileHandle >> in L<Types::Standard>
+
+A reference where Scalar::Util::openhandle returns true, or a blessed object in the IO::Handle class.
+
+=item *
+
+B<< GlobRef >> in L<Types::Standard>
+
+Globrefs
+
+=item *
+
+B<< HashLike >> in L<Types::TypeTiny>
+
+Hashrefs and objects overloading hashrefification.
+
+=item *
+
+B<< HashRef >> I<< [parameterizable] >> in L<Types::Standard>
+
+Hashrefs.
+
+=item *
+
+B<< HasMethods >> I<< [parameterizable] >> in L<Types::Standard>
+
+An object that can do particular methods.
+
+=item *
+
+B<< InstanceOf >> I<< [parameterizable] >> in L<Types::Standard>
+
+An object that isa particular class.
+
+=item *
+
+B<< Int >> in L<Types::Standard>
+
+A whole number, either positive, negative, or zero.
+
+=item *
+
+B<< IntRange >> I<< [parameterizable] >> in L<Types::Common::Numeric>
+
+An integer within a particular numeric range.
+
+=item *
+
+B<< Item >> in L<Types::Standard>
+
+Any single item; effectively the same as Any.
+
+=item *
+
+B<< LaxNum >> in L<Types::Standard>
+
+A number; relaxed constraint that allows "inf".
+
+=item *
+
+B<< LowerCaseSimpleStr >> I<< [has coercion] >> in L<Types::Common::String>
+
+A string less than 256 characters long with no line breaks or uppercase letters.
+
+=item *
+
+B<< LowerCaseStr >> I<< [has coercion] >> in L<Types::Common::String>
+
+A string with no uppercase letters.
+
+=item *
+
+B<< Map >> I<< [parameterizable] >> in L<Types::Standard>
+
+A hashref with a constraint for the values and keys.
+
+=item *
+
+B<< Maybe >> I<< [parameterizable] >> in L<Types::Standard>
+
+When parameterized, the same as its parameter, but also allows undef.
+
+=item *
+
+B<< NegativeInt >> in L<Types::Common::Numeric>
+
+An integer below 0.
+
+=item *
+
+B<< NegativeNum >> in L<Types::Common::Numeric>
+
+A number below 0.
+
+=item *
+
+B<< NegativeOrZeroInt >> in L<Types::Common::Numeric>
+
+An integer below 0, or 0.
+
+=item *
+
+B<< NegativeOrZeroNum >> in L<Types::Common::Numeric>
+
+A number below 0, or 0.
+
+=item *
+
+B<< NonEmptySimpleStr >> in L<Types::Common::String>
+
+A string with more than 0 but less than 256 characters with no line breaks.
+
+=item *
+
+B<< NonEmptyStr >> in L<Types::Common::String>
+
+A string with more than 0 characters.
+
+=item *
+
+B<< Num >> in L<Types::Standard>
+
+The same as LaxNum or StrictNum depending on environment.
+
+=item *
+
+B<< NumericCode >> I<< [has coercion] >> in L<Types::Common::String>
+
+A string containing only digits.
+
+=item *
+
+B<< NumRange >> I<< [parameterizable] >> in L<Types::Common::Numeric>
+
+A number within a particular numeric range.
+
+=item *
+
+B<< Object >> in L<Types::Standard>
+
+A blessed object.
+
+=item *
+
+B<< Optional >> I<< [parameterizable] >> in L<Types::Standard>
+
+Used in conjunction with Dict, Tuple, or CycleTuple.
+
+=item *
+
+B<< OptList >> in L<Types::Standard>
+
+An arrayref of arrayrefs, where each of the inner arrayrefs are two values, the first value being a string.
+
+=item *
+
+B<< Overload >> I<< [parameterizable] >> in L<Types::Standard>
+
+An overloaded object.
+
+=item *
+
+B<< Password >> in L<Types::Common::String>
+
+A string at least 4 characters long and less than 256 characters long with no line breaks.
+
+=item *
+
+B<< PositiveInt >> in L<Types::Common::Numeric>
+
+An integer above 0.
+
+=item *
+
+B<< PositiveNum >> in L<Types::Common::Numeric>
+
+A number above 0.
+
+=item *
+
+B<< PositiveOrZeroInt >> in L<Types::Common::Numeric>
+
+An integer above 0, or 0.
+
+=item *
+
+B<< PositiveOrZeroNum >> in L<Types::Common::Numeric>
+
+An number above 0, or 0.
+
+=item *
+
+B<< Ref >> I<< [parameterizable] >> in L<Types::Standard>
+
+Any reference.
+
+=item *
+
+B<< RegexpRef >> in L<Types::Standard>
+
+A regular expression.
+
+=item *
+
+B<< RoleName >> in L<Types::Standard>
+
+Any loaded package name where there is no `new` method.
+
+=item *
+
+B<< ScalarRef >> I<< [parameterizable] >> in L<Types::Standard>
+
+Scalarrefs.
+
+=item *
+
+B<< SimpleStr >> in L<Types::Common::String>
+
+A string with less than 256 characters with no line breaks.
+
+=item *
+
+B<< SingleDigit >> in L<Types::Common::Numeric>
+
+A single digit number. This includes single digit negative numbers!
+
+=item *
+
+B<< Str >> in L<Types::Standard>
+
+A string.
+
+=item *
+
+B<< StrictNum >> in L<Types::Standard>
+
+A number; strict constaint.
+
+=item *
+
+B<< StringLike >> in L<Types::TypeTiny>
+
+Strings and objects overloading stringification.
+
+=item *
+
+B<< StrLength >> I<< [parameterizable] >> in L<Types::Common::String>
+
+A string with length in a particular range.
+
+=item *
+
+B<< StrMatch >> I<< [parameterizable] >> in L<Types::Standard>
+
+A string matching a particular regular expression.
+
+=item *
+
+B<< StrongPassword >> in L<Types::Common::String>
+
+A string at least 4 characters long and less than 256 characters long with no line breaks and at least one non-alphabetic character.
+
+=item *
+
+B<< Tied >> I<< [parameterizable] >> in L<Types::Standard>
+
+A reference to a tied variable.
+
+=item *
+
+B<< Tuple >> I<< [parameterizable] >> in L<Types::Standard>
+
+An arrayref with constraints on its values.
+
+=item *
+
+B<< TypeTiny >> I<< [has coercion] >> in L<Types::TypeTiny>
+
+Blessed objects in the Type::Tiny class.
+
+=item *
+
+B<< Undef >> in L<Types::Standard>
+
+undef.
+
+=item *
+
+B<< UpperCaseSimpleStr >> I<< [has coercion] >> in L<Types::Common::String>
+
+A string less than 256 characters long with no line breaks or lowercase letters.
+
+=item *
+
+B<< UpperCaseStr >> I<< [has coercion] >> in L<Types::Common::String>
+
+A string with no lowercase letters.
+
+=item *
+
+B<< Value >> in L<Types::Standard>
+
+Any non-reference value, including undef.
+
+=back
+
+=head1 NEXT STEPS
+
+Here's your next step:
+
+=over
+
+=item * L<Type::Tiny::Manual::Policies>
+
+Policies related to Type::Tiny development.
+
+=back
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013-2014, 2017-2019 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+=cut
+
