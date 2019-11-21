@@ -90,7 +90,7 @@ Or because negative numbers make little sense as an age:
   has age => ( is => 'rw', isa => PositiveOrZeroInt );
 
 The L<Types::Common::Numeric> library defines many useful subtypes of
-B<Int> and C<Num>, such as B<PositiveInt> and B<PositiveOrZeroInt>.
+B<Int> and B<Num>, such as B<PositiveInt> and B<PositiveOrZeroInt>.
 
 The last type constraint we've used in this example is B<ArrayRef>.
 This requires the value to be a reference to an array.
@@ -209,7 +209,7 @@ The B<HashRef> type constraint can also be parameterized:
   }
   
   my $eiffel65 = Design->new(
-    colours => { walls => "blue", floor => "blue" },
+    colours => { house => "blue", little_window => "blue" },
   );
 
 The B<< HashRef[Str] >> type constraint ensures the I<values> of the hashref
