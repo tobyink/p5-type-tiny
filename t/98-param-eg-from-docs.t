@@ -64,7 +64,10 @@ subtest 'coercion' => sub {
 	is($MultipleOfThree->coerce(6), 6);
 	is($MultipleOfThree->coerce(7), 6);
 	is($MultipleOfThree->coerce(8), 6);
+	is($MultipleOfThree->coerce(8.9), 6);
 };
+
+#diag( $MultipleOfThree->inline_check('$VALUE') );
 
 done_testing;
 
