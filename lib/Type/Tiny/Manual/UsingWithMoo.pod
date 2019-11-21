@@ -675,7 +675,7 @@ It would be called like this:
   );
 
 The additional parameters are slurped into an arrayref and checked against
-B<< ArrayRef[NonEmptyStr >>.
+B<< ArrayRef[NonEmptyStr] >>.
 
 Optional parameters are only allowed after required parameters, and slurpy
 parameters are only allowed at the end. (And there can only be a at most
