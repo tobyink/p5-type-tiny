@@ -1,0 +1,142 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Type::Tiny::Manual::Policies - Type::Tiny policies
+
+=head1 MANUAL
+
+=head2 Type::Tiny Stability Policy
+
+Type::Tiny 1.000000 is considered stable. Any changes to the API that
+are big enough to I<require> changes to the test suite will be preceded
+by a I<< six month >> notice period, with the following exceptions:
+
+=over
+
+=item *
+
+Any changes which are necessary to maintain compatibility with new
+releases of L<Moose>, L<Moo>, and other software that Type::Tiny needs
+to integrate with.
+
+=item *
+
+Changes to maintain compatibility with future versions of Perl itself.
+
+=item *
+
+Where a change fixes a contradiction between the implementation and
+documentation of Type::Tiny.
+
+=item *
+
+Where a feature is explicitly documented as being "experimental" or
+"unstable".
+
+=item *
+
+Improvements to the text of error messages.
+
+=back
+
+=head2 Experimental and Unstable Type::Tiny Features
+
+The following list is currently non-exhaustive.
+
+=over
+
+=item *
+
+L<Type::Tiny> inlining subs (i.e. C<inline_as>) may return a list of
+strings (with C<undef> being allowed as the first item on the list).
+This is experimental. See L<Type::Utils>.
+
+=item *
+
+L<Type::Tiny>'s C<my_methods> attribute and the functionality it
+provides is experimental.
+
+=item *
+
+The L<parameterizable coercion API|Type::Coercion> is subject to change.
+
+=item *
+
+The interaction of deep coercions and mutable coercions currently results
+in ill-defined behaviour. This could change at any time.
+
+=item *
+
+L<Type::Registry>'s ability to import L<MooseX::Types> and L<MouseX::Types>
+type libraries is experimental.
+
+=item *
+
+Integration with L<Type::Tiny::XS>.
+
+=item *
+
+These modules are considered part of Type::Tiny's internals, and not
+covered by the stability policy:
+L<Devel::TypeTiny::Perl56Compat>,
+L<Devel::TypeTiny::Perl58Compat>,
+L<Type::Coercion::FromMoose>,
+L<Type::Tiny::_HalfOp>,
+L<Types::Standard::ArrayRef>,
+L<Types::Standard::CycleTuple>,
+L<Types::Standard::Dict>,
+L<Types::Standard::HashRef>,
+L<Types::Standard::Map>,
+L<Types::Standard::ScalarRef>,
+L<Types::Standard::StrMatch>,
+L<Types::Standard::Tied>, and
+L<Types::Standard::Tuple>.
+
+=item *
+
+L<Reply::Plugin::TypeTiny> is not covered by the stability policy.
+
+=back
+
+=head2 Type::Tiny Versioning Policy
+
+As of 1.000000, this distribution follows a versioning scheme similar
+to L<Moo>, which is based on a L<semver|http://semver.org/>-like three
+component version number, but with the last two components each
+represented by three decimal digits in the fractional part of the
+version number. That is, version 1.003002 of the software represents
+"1.3.2".
+
+Additionally, releases where the second component is an odd number will
+be considered unstable/trial releases. (These will also include an
+underscore in the version number as per the usual CPAN convention.)
+
+=head1 NEXT STEPS
+
+You've reached the end of the manual!
+
+But each class, type library, and other package includes more detailed
+documentation.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013-2014, 2017-2019 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+=cut
+
