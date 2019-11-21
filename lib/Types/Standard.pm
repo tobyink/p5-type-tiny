@@ -679,12 +679,12 @@ $meta->add_type({
 	name       => "Tied",
 	parent     => $_ref,
 	constraint => sub {
-		!!tied(Scalar::Util::reftype($_) eq 'HASH' ?  %{$_} : Scalar::Util::reftype($_) eq 'ARRAY' ?  @{$_} :  ${$_})
+		!!tied(Scalar::Util::reftype($_) eq 'HASH' ?  %{$_} : Scalar::Util::reftype($_) eq 'ARRAY' ?  @{$_} : Scalar::Util::reftype($_) =~ /^(SCALAR|REF)$/ ?  ${$_} :  undef)
 	},
 	inlined    => sub {
 		my ($self, $var) = @_;
 		$self->parent->inline_check($var)
-		. " and !!tied(Scalar::Util::reftype($var) eq 'HASH' ? \%{$var} : Scalar::Util::reftype($var) eq 'ARRAY' ? \@{$var} : \${$var})"
+		. " and !!tied(Scalar::Util::reftype($var) eq 'HASH' ? \%{$var} : Scalar::Util::reftype($var) eq 'ARRAY' ? \@{$var} : Scalar::Util::reftype($var) =~ /^(SCALAR|REF)\$/ ? \${$var} : undef)"
 	},
 	name_generator => sub
 	{
