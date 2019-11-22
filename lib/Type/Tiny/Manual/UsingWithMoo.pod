@@ -808,6 +808,9 @@ code.
 Now C<< $args >> is a blessed object that you can call methods on. There is
 of course a performance penalty for this, but it's surprisingly small.
 
+For more information on Type::Params, and third-party alternatives,
+see L<Type::Tiny::Manual::Params>.
+
 =head1 NEXT STEPS
 
 Congratulations! I know this was probably a lot to take in, but you've

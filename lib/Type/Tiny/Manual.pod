@@ -172,6 +172,11 @@ Using Type::Tiny with Class::InsideOut, Params::Check, and Object::Accessor.
 
 Type::Tiny for test suites.
 
+=item * L<Type::Tiny::Manual::Params>
+
+Advanced information on Type::Params, and using Type::Tiny with other
+signature modules like Function::Parameters and Kavorka.
+
 =item * L<Type::Tiny::Manual::NonOO>
 
 Type::Tiny in non-object-oriented code.

@@ -1,0 +1,223 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Type::Tiny::Manual::Params - advanced information on Type::Params
+  
+=head1 MANUAL
+
+To get started with Type::Params, please read
+L<Type::Tiny::Manual::UsingWithMoo> which will cover a lot of the basics,
+even if you're not using Moo.
+
+=head2 C<validate> and C<validate_named>
+
+The generally recommended way of using Type::Params is this:
+
+  sub mysub {
+    state $check = compile( SIGNATURE );
+    my @args = $check->( @_ );
+  }
+
+But it is possible to do it in one call:
+
+  sub mysub {
+    my @args = validate( \@_, SIGNATURE );
+  }
+
+There is also a C<validate_named> function which acts as a counterpart for
+C<compile_named>.
+
+This will generally be slower and less efficient than using C<compile> first
+because Type::Tiny can do a lot of optimizations in that first stage to make
+the second stage a lot faster. (And the results of C<compile> get stored in
+the C<state> variable so that only has to happen once.)
+
+There is rarely a reason to use L<validate> and L<validate_named>, but
+they exist if you want them.
+
+=head2 C<multisig>
+
+TODO
+
+=head2 C<wrap_subs> and C<wrap_methods>
+
+TODO
+
+=head2 Proper Signatures
+
+Don't you wish your subs could look like this?
+
+  sub set_name (Object $self, Str $name) {
+    $self->{name} = $name;
+  }
+
+Well; here are a few solutions for sub signatures that work with
+L<Type::Tiny>...
+
+=head3 Kavorka
+
+L<Kavorka> is a sub signatures implementation written to natively use
+L<Type::Utils>' C<dwim_type> for type constraints, and take advantage
+of Type::Tiny's features such as inlining, and coercions.
+
+  method set_name (Str $name) {
+    $self->{name} = $name;
+  }
+
+Kavorka's signatures provide a lot more flexibility, and slightly more
+speed than Type::Params. (The speed comes from inlining almost all type
+checks into the body of the sub being declared.)
+
+Kavorka also includes support for type checking of the returned value.
+
+Kavorka can also be used as part of L<Moops>, a larger framework for
+object oriented programming in Perl.
+
+=head3 Function::Parameters
+
+Function::Parameters offers support for Type::Tiny and MooseX::Types.
+
+  use Types::Standard qw( Str );
+  use Function::Parameters;
+  
+  method set_name (Str $name) {
+      $self->{name} = $name;
+  }
+
+=head3 Attribute::Contract
+
+Both Kavorka and Function::Parameters require a relatively recent
+version of Perl. L<Attribute::Contract> supports older versions by
+using a lot less magic.
+
+You want Attribute::Contract 0.03 or above.
+
+  use Attribute::Contract -types => [qw/Object Str/];
+  
+  sub set_name :ContractRequires(Object, Str) {
+      my ($self, $name) = @_;
+      $self->{name} = $name;
+  }
+
+Attribute::Contract also includes support for type checking of the
+returned value.
+
+=head2 Type::Params versus X
+
+=head3 Params::Validate
+
+L<Type::Params> is not really a drop-in replacement for L<Params::Validate>;
+the API differs far too much to claim that. Yet it performs a similar task,
+so it makes sense to compare them.
+
+=over
+
+=item *
+
+Type::Params will tend to be faster if you've got a sub which is called
+repeatedly, but may be a little slower than Params::Validate for subs that
+are only called a few times. This is because it does a bunch of work the
+first time your sub is called to make subsequent calls a lot faster.
+
+=item *
+
+Params::Validate doesn't appear to have a particularly natural way of
+validating a mix of positional and named parameters.
+
+=item *
+
+Type::Utils allows you to coerce parameters. For example, if you expect
+a L<Path::Tiny> object, you could coerce it from a string.
+
+=item *
+
+If you are primarily writing object-oriented code, using Moose or similar,
+and you are using Type::Tiny type constraints for your attributes, then
+using Type::Params allows you to use the same constraints for method calls.
+
+=item *
+
+Type::Params comes bundled with Types::Standard, which provides a much
+richer vocabulary of types than the type validation constants that come
+with Params::Validate. For example, Types::Standard provides constraints
+like C<< ArrayRef[Int] >> (an arrayref of integers), while the closest from
+Params::Validate is C<< ARRAYREF >>, which you'd need to supplement with
+additional callbacks if you wanted to check that the arrayref contained
+integers.
+
+Whatsmore, Type::Params doesn't just work with Types::Standard, but also
+any other Type::Tiny type constraints.
+
+=back
+
+=head3 Params::ValidationCompiler
+
+L<Params::ValidationCompiler> does basically the same thing as
+L<Type::Params>.
+
+=over
+
+=item *
+
+Params::ValidationCompiler and Type::Params are likely to perform fairly
+similarly. In most cases, recent versions of Type::Params seem to be
+I<slightly> faster, but except in very trivial cases, you're unlikely to
+notice the speed difference. Speed probably shouldn't be a factor when
+choosing between them.
+
+=item *
+
+Type::Params's syntax is more compact:
+
+   state $check = compile(Object, Optional[Int], slurpy ArrayRef);
+
+Versus:
+
+   state $check = validation_for(
+      params => [
+         { type => Object },
+         { type => Int,      optional => 1 },
+         { type => ArrayRef, slurpy => 1 },
+      ],
+   );
+
+=item *
+
+L<Params::ValidationCompiler> probably has slightly better exceptions.
+
+=back
+
+=head1 NEXT STEPS
+
+Here's your next step:
+
+=over
+
+=item * L<Type::Tiny::Manual::NonOO>
+
+Type::Tiny in non-object-oriented code.
+
+=back
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013-2014, 2017-2019 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+=cut
+
