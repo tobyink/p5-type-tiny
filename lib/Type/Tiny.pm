@@ -1025,6 +1025,11 @@ sub _build_moose_type
 	}
 	else
 	{
+		# Type::Tiny is more flexible than Moose, allowing
+		# inlined to return a list. So we need to wrap the
+		# inlined coderef to make sure Moose gets a single
+		# string.
+		#
 		my $wrapped_inlined = sub {
 			shift;
 			$self->inline_check(@_);
@@ -1429,6 +1434,11 @@ If provided, must be a Type::Tiny object.
 
 A coderef which returns a string of Perl code suitable for inlining this
 type. Optional.
+
+(The coderef will be called in list context and can actually return
+a list of strings which will be joined with C<< && >>. If the first item
+on the list is undef, it will be substituted with the type's parent's
+inline check.)
 
 If C<constraint> (above) is a coderef generated via L<Sub::Quote>, then
 Type::Tiny I<may> be able to automatically generate C<inlined> for you.

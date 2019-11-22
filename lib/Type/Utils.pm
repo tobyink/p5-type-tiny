@@ -762,7 +762,7 @@ significant performance improvements.
    
    warn EvenInt->inline_check('$xxx');  # demonstration
 
-B<Experimental:> your C<inline_as> block can return a list, in which case
+Your C<inline_as> block can return a list, in which case
 these will be smushed together with "&&". The first item on the list may
 be undef, in which case the undef will be replaced by the inlined parent
 type constraint. (And will throw an exception if there is no parent.)
@@ -773,10 +773,6 @@ type constraint. (And will throw an exception if there is no parent.)
       inline_as {
          return (undef, "($_ % 2 == 0)");
       };
-
-Returning a list like this is considered experimental, is not tested very
-much, and I offer no guarantees that it will necessarily work with
-Moose/Mouse/Moo.
 
 =item C<< class_type $name, { class => $package, %options } >>
 

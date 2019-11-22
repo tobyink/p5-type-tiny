@@ -79,12 +79,6 @@ B<StringLike> type constraint but not the B<Str> type constraint.
 
 =item *
 
-L<Type::Tiny> inlining subs (i.e. C<inline_as>) may return a list of
-strings (with C<undef> being allowed as the first item on the list).
-This is experimental. See L<Type::Utils>.
-
-=item *
-
 L<Type::Tiny>'s C<my_methods> attribute and the functionality it
 provides is experimental.
 
