@@ -31,7 +31,7 @@ BEGIN {
 	$is_class_loaded = q{sub {
 		return !!0 if ref $_[0];
 		return !!0 if not $_[0];
-		return !!0 if ref(\$_[0]) ne 'SCALAR';
+		return !!0 if ref(my $tmpstr = \$_[0]) ne 'SCALAR';
 		my $stash = do { no strict 'refs'; \%{"$_[0]\::"} };
 		return !!1 if exists $stash->{'ISA'};
 		return !!1 if exists $stash->{'VERSION'};
