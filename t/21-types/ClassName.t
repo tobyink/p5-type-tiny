@@ -50,7 +50,7 @@ my @tests = (
 	fail => 'whitespace'               => ' ',
 	fail => 'line break'               => "\n",
 	fail => 'random string'            => 'abc123',
-	todo => 'loaded package name'      => 'Type::Tiny',
+	pass => 'loaded package name'      => 'Type::Tiny',
 	fail => 'unloaded package name'    => 'This::Has::Probably::Not::Been::Loaded',
 	fail => 'a reference to undef'     => do { my $x = undef; \$x },
 	fail => 'a reference to false'     => do { my $x = !!0; \$x },
