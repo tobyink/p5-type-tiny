@@ -40,11 +40,77 @@ they exist if you want them.
 
 =head2 C<multisig>
 
-TODO
+Multisig allows you to allow multiple ways of calling a sub.
+
+ sub repeat_string {
+   state $check = multisig(
+     compile(
+       Int,
+       Str,
+     ),
+     compile_named(
+       { named_to_list => 1 },
+       count  => Int,
+       string => Str,
+     ),
+   );
+   
+   my ($count, $string) = $check->(@_);
+   return $string x $count;
+ }
+ 
+ repeat_string(            "Hello",          42  );    # works
+ repeat_string(  string => "Hello", count => 42  );    # works
+ repeat_string({ string => "Hello", count => 42 });    # works
+ repeat_string( qr/hiya/ );                            # dies
+
+It combines multiple checks and tries each until one works.
 
 =head2 C<wrap_subs> and C<wrap_methods>
 
-TODO
+C<wrap_subs> turns the C<compile> idea inside out.
+
+Instead of this:
+
+ sub foobar {
+   state $check = compile(Int, Str);
+   my ($foo, $bar) = @_;
+   ...;
+ }
+
+You do this:
+
+ sub foobar {
+   my ($foo, $bar) = @_;
+   ...;
+ }
+ wrap_subs foobar => [ Int, Str ];
+
+Or this:
+
+ sub foobar {
+   my ($foo, $bar) = @_;
+   ...;
+ }
+ wrap_subs foobar => compile( Int, Str );
+
+=head2 Mixed Named and Positional Parameters
+
+This can be faked using positional parameters and a slurpy dictionary.
+
+ state $check = compile(
+   Int,
+   slurpy Dict[
+     foo => Int,
+     bar => Optional[Int],
+     baz => Optional[Int],
+   ],
+ );
+ 
+ @_ = (42, foo => 21);                 # ok
+ @_ = (42, foo => 21, bar  => 84);     # ok
+ @_ = (42, foo => 21, bar  => 10.5);   # not ok
+ @_ = (42, foo => 21, quux => 84);     # not ok
 
 =head2 Proper Signatures
 
