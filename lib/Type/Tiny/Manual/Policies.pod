@@ -50,6 +50,35 @@ The following list is currently non-exhaustive.
 
 =item *
 
+The following type checks result may vary based on your version of
+Perl and whether Type::Tiny::XS is installed. Their outcome is currently
+considered undefined, and may change in future versions.
+
+=over
+
+=item *
+
+Using B<Object> and similar type checks on unblessed regular expression
+references, the outcome is undefined.
+
+=item *
+
+On all current versions of Perl, false (C<< !!0 >>) stringifies to the
+empty string (but using Devel::Peek you can tell the difference between
+this value and a normal empty string), so B<Int> and subtypes of B<Int>
+do not consider it to be an integer. If Perl's behaviour ever changes,
+you might not be able to rely on this outcome. True (C<< !!1 >>)
+stringifies as "1", so is considered an integer.
+
+=item *
+
+A glob (not a globref but an actual glob) currently passes the
+B<StringLike> type constraint but not the B<Str> type constraint.
+
+=back
+
+=item *
+
 L<Type::Tiny> inlining subs (i.e. C<inline_as>) may return a list of
 strings (with C<undef> being allowed as the first item on the list).
 This is experimental. See L<Type::Utils>.
