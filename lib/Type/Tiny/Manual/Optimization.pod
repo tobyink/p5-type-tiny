@@ -113,9 +113,9 @@ Here's your next step:
 
 =over
 
-=item * L<Type::Tiny::Manual::AllTypes>
+=item * L<Type::Tiny::Manual::Coercions>
 
-An alphabetical list of all type constraints bundled with Type::Tiny.
+Advanced information on coercions.
 
 =back
 

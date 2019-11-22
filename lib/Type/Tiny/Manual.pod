@@ -180,6 +180,10 @@ Type::Tiny in non-object-oriented code.
 
 Squeeze the most out of your CPU.
 
+=item * L<Type::Tiny::Manual::Coercions>
+
+Advanced information on coercions.
+
 =item * L<Type::Tiny::Manual::AllTypes>
 
 An alphabetical list of all type constraints bundled with Type::Tiny.
