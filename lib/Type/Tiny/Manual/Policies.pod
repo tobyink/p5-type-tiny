@@ -98,10 +98,6 @@ type libraries is experimental.
 
 =item *
 
-Integration with L<Type::Tiny::XS>.
-
-=item *
-
 These modules are considered part of Type::Tiny's internals, and not
 covered by the stability policy:
 L<Devel::TypeTiny::Perl56Compat>,
