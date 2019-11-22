@@ -1,0 +1,147 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Type::Tiny::Manual::UsingWithMouse - how to use Type::Tiny with Mouse
+
+=head1 MANUAL
+
+First read L<Type::Tiny::Manual::Moo>, L<Type::Tiny::Manual::Moo2>, and
+L<Type::Tiny::Manual::Moo3>. Everything in those parts of the manual
+should work exactly the same in Mouse.
+
+This part of the manual will focus on Mouse-specifics.
+
+Overall, Type::Tiny is less well-tested with Mouse than it is with
+Moose and Moo, but there are still a good number of test cases for
+using Type::Tiny with Mouse, and there are no known major issues
+with Type::Tiny's Mouse support.
+
+=head2 Why Use Type::Tiny At All?
+
+Mouse does have a built-in type constraint system which is fairly
+convenient to use, but there are several reasons you should consider
+using Type::Tiny instead.
+
+=over
+
+=item *
+
+Type::Tiny provides helpful methods like C<where> and C<plus_coercions>
+that allow type constraints and coercions to be easily tweaked on a
+per-attribute basis.
+
+Something like this is much harder to do with plain Mouse types:
+
+  has name => (
+    is      => "ro",
+    isa     => Str->plus_coercions(
+      ArrayRef[Str], sub { join " ", @$_ },
+    ),
+    coerce  => 1,
+  );
+
+Mouse tends to encourage defining coercions globally, so if you wanted
+one B<Str> attribute to be able to coerce from B<< ArrayRef[Str] >>, then
+I<all> B<Str> attributes would coerce from B<< ArrayRef[Str] >>, and they'd
+all do that coercion in the same way. (Even if it might make sense to
+join by a space in some places, a comma in others, and a line break in
+others!)
+
+=item *
+
+Type::Tiny provides automatic deep coercions, so if type B<Xyz> has a coercion,
+the following should "just work":
+
+  isa xyzlist => ( is => 'ro', isa => ArrayRef[Xyz], coerce => 1 );
+
+=item *
+
+Type::Tiny offers a wider selection of built-in types.
+
+=item *
+
+By using Type::Tiny, you can use the same type constraints and coercions
+for attributes and method parameters, in Mouse and non-Mouse code.
+
+=back
+
+=head2 Type::Utils
+
+TODO
+
+=head2 Type::Tiny and MouseX::Types
+
+L<Types::Standard> should be a drop-in replacement for L<MooseX::Types>.
+And L<Types::Common::Numeric> and L<Types::Common::String> should easily
+replace L<MouseX::Types::Common::Numeric> and L<MouseX::Types::Common::String>.
+
+That said, if you do with to use a mixture of Type::Tiny and MouseX::Types,
+they should fit together pretty seamlessly.
+
+  use Types::Standard qw( ArrayRef );
+  use MouseX::Types::Mouse qw( Int );
+  
+  # this should just work
+  my $list_of_nums = ArrayRef[Int];
+  
+  # and this
+  my $list_or_num = ArrayRef | Int;
+
+=head2 C<< -mouse >> Import Parameter
+
+TODO
+
+=head2 C<< mouse_type >> Method
+
+TODO
+
+=head2 Type::Tiny Performance
+
+Type::Tiny should run pretty much as fast as Mouse types do. This is
+because, when possible, it will use Mouse's XS implementations of type
+checks to do the heavy lifting.
+
+There are a few type constraints where Type::Tiny prefers to do things
+without Mouse's help though, for consistency and correctness. For example,
+the Mouse XS implementation of B<Bool> is... strange... it accepts blessed
+objects that overload C<bool>, but only if they return false. If they return
+true, it's a type constraint error.
+
+Using Type::Tiny instead of Mouse's type constraints shouldn't make a
+significant difference to the performance of your code.
+
+=head1 NEXT STEPS
+
+Here's your next step:
+
+=over
+
+=item * L<Type::Tiny::Manual::UsingWithClassTiny>
+
+Including how to Type::Tiny in your object's C<BUILD> method, and
+third-party shims between Type::Tiny and Class::Tiny.
+
+=back
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013-2014, 2017-2019 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+=cut
+

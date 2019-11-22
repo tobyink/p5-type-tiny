@@ -1,0 +1,133 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Type::Tiny::Manual::UsingWithMoose - how to use Type::Tiny with Moose
+
+=head1 MANUAL
+
+First read L<Type::Tiny::Manual::Moo>, L<Type::Tiny::Manual::Moo2>, and
+L<Type::Tiny::Manual::Moo3>. Everything in those parts of the manual
+should work exactly the same in Moose.
+
+This part of the manual will focus on Moose-specifics.
+
+=head2 Why Use Type::Tiny At All?
+
+Moose does have a built-in type constraint system which is fairly
+convenient to use, but there are several reasons you should consider
+using Type::Tiny instead.
+
+=over
+
+=item *
+
+Type::Tiny type constraints will usually be faster than Moose built-ins.
+Even without Type::Tiny::XS installed, Type::Tiny usually produces more
+efficient inline code than Moose. Coercions will usually be a lot faster.
+
+=item *
+
+Type::Tiny provides helpful methods like C<where> and C<plus_coercions>
+that allow type constraints and coercions to be easily tweaked on a
+per-attribute basis.
+
+Something like this is much harder to do with plain Moose types:
+
+  has name => (
+    is      => "ro",
+    isa     => Str->plus_coercions(
+      ArrayRef[Str], sub { join " ", @$_ },
+    ),
+    coerce  => 1,
+  );
+
+Moose tends to encourage defining coercions globally, so if you wanted
+one B<Str> attribute to be able to coerce from B<< ArrayRef[Str] >>, then
+I<all> B<Str> attributes would coerce from B<< ArrayRef[Str] >>, and they'd
+all do that coercion in the same way. (Even if it might make sense to
+join by a space in some places, a comma in others, and a line break in
+others!)
+
+=item *
+
+Type::Tiny provides automatic deep coercions, so if type B<Xyz> has a coercion,
+the following should "just work":
+
+  isa xyzlist => ( is => 'ro', isa => ArrayRef[Xyz], coerce => 1 );
+
+=item *
+
+Type::Tiny offers a wider selection of built-in types.
+
+=item *
+
+By using Type::Tiny, you can use the same type constraints and coercions
+for attributes and method parameters, in Moose and non-Moose code.
+
+=back
+
+=head2 Type::Utils
+
+TODO
+
+=head2 Type::Tiny and MooseX::Types
+
+L<Types::Standard> should be a drop-in replacement for L<MooseX::Types>.
+And L<Types::Common::Numeric> and L<Types::Common::String> should easily
+replace L<MooseX::Types::Common::Numeric> and L<MooseX::Types::Common::String>.
+
+That said, if you do with to use a mixture of Type::Tiny and MooseX::Types,
+they should fit together pretty seamlessly.
+
+  use Types::Standard qw( ArrayRef );
+  use MooseX::Types::Common::Numeric qw( PositiveInt );
+  
+  # this should just work
+  my $list_of_nums = ArrayRef[PositiveInt];
+  
+  # and this
+  my $list_or_num = ArrayRef | PositiveInt;
+
+=head2 C<< -moose >> Import Parameter
+
+TODO
+
+=head2 C<< moose_type >> Method
+
+TODO
+
+=head1 NEXT STEPS
+
+Here's your next step:
+
+=over
+
+=item * L<Type::Tiny::Manual::UsingWithMouse>
+
+How to use Type::Tiny with Mouse, including the advantages of Type::Tiny
+over built-in type constraints, and Mouse-specific features.
+
+=back
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013-2014, 2017-2019 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+=cut
+
