@@ -131,11 +131,11 @@ for my $base (qw/Num Int/) {
 		constraint_generator => sub {
 			return $meta->get_type("${base}Range") unless @_;
 			
-			my $base = Types::Standard->get_type($base);
+			my $base_obj = Types::Standard->get_type($base);
 			
 			my ($min, $max, $min_excl, $max_excl) = @_;
-			!defined($min) or $base->check($min) or _croak("${base}Range min must be a %s; got %s", lc($base), $min);
-			!defined($max) or $base->check($max) or _croak("${base}Range max must be a %s; got %s", lc($base), $max);
+			!defined($min) or $base_obj->check($min) or _croak("${base}Range min must be a %s; got %s", lc($base), $min);
+			!defined($max) or $base_obj->check($max) or _croak("${base}Range max must be a %s; got %s", lc($base), $max);
 			!defined($min_excl) or Bool->check($min_excl) or _croak("${base}Range minexcl must be a boolean; got $min_excl");
 			!defined($max_excl) or Bool->check($max_excl) or _croak("${base}Range maxexcl must be a boolean; got $max_excl");
 			
