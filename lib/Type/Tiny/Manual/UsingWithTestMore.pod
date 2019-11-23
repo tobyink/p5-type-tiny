@@ -36,6 +36,8 @@ the value passes all their constraints.
 If a normal check and strict check differ, this is usually a problem
 in the inlining code somewhere.
 
+See L<Test::TypeTiny> for more information.
+
 =head2 Type::Tiny as a Replacement for Test::Deep
 
 Here's one of the examples from the Test::Deep documentation:
