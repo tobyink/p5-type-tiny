@@ -1,6 +1,3 @@
 - Using Type::Tiny with Test::More [UsingWithTestMore.pod]
 
 - Using Type::Tiny in Procedural Programming [NonOO.pod]
-
-- Using Type::Tiny with Kavorka/Function::Parameters/etc [Signatures.pod]
-  - move all the stuff from cookbook into here

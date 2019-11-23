@@ -902,7 +902,7 @@ Instead of returning a coderef, return a hashref of stuff including the
 coderef. This is mostly for people extending Type::Params and I won't go
 into too many details about what else this hashref contains.
 
-=item C<< description => Str >>
+=item C<< description >> B<< Str >>
 
 Description of the coderef that will show up in stack traces. Defaults to
 "parameter validation for X" where X is the caller sub name.
@@ -1011,7 +1011,7 @@ it unaltered if it's valid — it needs to build a new array to return.
 =back
 
 As a special case, the numbers 0 and 1 may be used as shortcuts for
-C<< Optional[Any] >> and C<< Any >>.
+B<< Optional[Any] >> and B<< Any >>.
 
  # Positional parameters
  state $check = compile(1, 0, 0);
@@ -1172,7 +1172,7 @@ As above, but explicitly specify the keys of the hash slice.
 =back
 
 Like C<compile>, the numbers 0 and 1 may be used as shortcuts for
-C<< Optional[Any] >> and C<< Any >>.
+B<< Optional[Any] >> and B<< Any >>.
 
  state $check = compile_named(foo => 1, bar => 0, baz => 0);
  my $args = $check->(@_);  # $args->{bar} and $args->{baz} are optional
