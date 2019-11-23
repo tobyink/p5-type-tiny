@@ -82,6 +82,7 @@ my @tests = (
 	pass => 'ref to hashref'           => do { my $x = {}; \$x },
 	pass => 'ref to coderef'           => do { my $x = sub { 1 }; \$x },
 	pass => 'ref to blessed hashref'   => do { my $x = bless({}, 'SomePkg'); \$x },
+#TESTS
 );
 
 while (@tests) {
