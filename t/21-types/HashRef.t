@@ -108,7 +108,104 @@ while (@tests) {
 	}
 }
 
-note("TODO: write tests for parameterized types");
+#
+# HashRef is parameterizable
+#
+
+my $HashOfInts = HashRef->of( Types::Standard::Int );
+
+isa_ok($HashOfInts, 'Type::Tiny', '$HashOfInts');
+is($HashOfInts->display_name, 'HashRef[Int]', '$HashOfInts has correct display_name');
+ok($HashOfInts->is_anon, '$HashOfInts has no name');
+ok($HashOfInts->can_be_inlined, '$HashOfInts can be inlined');
+is(exception { $HashOfInts->inline_check(q/$xyz/) }, undef, "Inlining \$HashOfInts doesn't throw an exception");
+ok(!$HashOfInts->has_coercion, "\$HashOfInts doesn't have a coercion");
+ok(!$HashOfInts->is_parameterizable, "\$HashOfInts is not parameterizable");
+ok_subtype(HashRef, $HashOfInts);
+
+should_fail( 1,               $HashOfInts );
+should_fail( [],              $HashOfInts );
+should_pass( {             }, $HashOfInts );
+should_fail( { foo =>  []  }, $HashOfInts );
+should_fail( { foo =>  1.1 }, $HashOfInts );
+should_pass( { foo =>  1   }, $HashOfInts );
+should_pass( { foo =>  0   }, $HashOfInts );
+should_pass( { foo => -1   }, $HashOfInts );
+should_fail( { foo => \1   }, $HashOfInts );
+should_fail( { 123 => \1   }, $HashOfInts );
+should_pass( { 123 =>  1   }, $HashOfInts );
+
+#
+# HashRef has deep coercions
+#
+
+my $Rounded = Types::Standard::Int->plus_coercions( Types::Standard::Num, q{ int($_) } );
+my $HashOfRounded = HashRef->of( $Rounded );
+
+isa_ok($HashOfRounded, 'Type::Tiny', '$HashOfRounded');
+is($HashOfRounded->display_name, 'HashRef[Int]', '$HashOfRounded has correct display_name');
+ok($HashOfRounded->is_anon, '$HashOfRounded has no name');
+ok($HashOfRounded->can_be_inlined, '$HashOfRounded can be inlined');
+is(exception { $HashOfRounded->inline_check(q/$xyz/) }, undef, "Inlining \$HashOfRounded doesn't throw an exception");
+ok($HashOfRounded->has_coercion, "\$HashOfRounded has a coercion");
+ok($HashOfRounded->coercion->has_coercion_for_type(HashRef), '$HashRefOfRounded can coerce from HashRef');
+ok($HashOfRounded->coercion->has_coercion_for_type(HashRef->of(Types::Standard::Num)), '$HashRefOfRounded can coerce from HashRef[Num]');
+ok(!$HashOfRounded->is_parameterizable, "\$HashOfRounded is not parameterizable");
+ok_subtype(HashRef, $HashOfRounded);
+
+should_fail( 1,               $HashOfRounded );
+should_fail( [],              $HashOfRounded );
+should_pass( {             }, $HashOfRounded );
+should_fail( { foo =>  []  }, $HashOfRounded );
+should_fail( { foo =>  1.1 }, $HashOfRounded );
+should_pass( { foo =>  1   }, $HashOfRounded );
+should_pass( { foo =>  0   }, $HashOfRounded );
+should_pass( { foo => -1   }, $HashOfRounded );
+should_fail( { foo => \1   }, $HashOfRounded );
+should_fail( { 123 => \1   }, $HashOfRounded );
+should_pass( { 123 =>  1   }, $HashOfRounded );
+
+use Scalar::Util qw(refaddr);
+
+do {
+	my $orig    = { foo => 42 };
+	my $coerced = $HashOfRounded->coerce($orig);
+	
+	is( refaddr($orig), refaddr($coerced), "just returned orig unchanged" );
+};
+
+do {
+	my $orig    = { foo => 42.1 };
+	my $coerced = $HashOfRounded->coerce($orig);
+	
+	isnt( refaddr($orig), refaddr($coerced), "coercion happened" );
+	is($coerced->{foo}, 42, "... and data looks good");
+	should_pass($coerced, $HashOfRounded, "... and now passes type constraint");
+};
+
+do {
+	my $orig    = { foo => [] };
+	my $coerced = $HashOfRounded->coerce($orig);
+	
+	is( refaddr($orig), refaddr($coerced), "coercion failed, so orig was returned" );
+	should_fail($coerced, $HashOfRounded);
+};
+
+#
+# Parameterization fails with bad parameters
+#
+
+do {
+	my $e = exception { HashRef['hello world'] };
+	like($e, qr/expected to be a type constraint/, 'can only be parameterized with another type');
+};
+
+# this should probably issue an exception, but doesn't currently...
+
+#do {
+#	my $e = exception { HashRef[HashRef, HashRef] };
+#	isnt($e, undef);
+#};
 
 done_testing;
 
