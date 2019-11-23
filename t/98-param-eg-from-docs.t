@@ -7,7 +7,7 @@ BEGIN {
 	package My::Types;
 	use Type::Library -base;
 	use Type::Utils 'extends';
-	BEGIN { extends 'Types::Standard' };	
+	BEGIN { extends 'Types::Standard' };
 	__PACKAGE__->add_type(
 		name       => 'MultipleOf',
 		parent     => Int,
