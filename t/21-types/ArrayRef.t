@@ -109,7 +109,7 @@ while (@tests) {
 }
 
 #
-# HashRef is parameterizable
+# ArrayRef is parameterizable
 #
 
 my $ArrayOfInts = ArrayRef->of( Types::Standard::Int );
@@ -136,7 +136,7 @@ should_pass( [  1,   2 ], $ArrayOfInts );
 should_fail( [  1,  [] ], $ArrayOfInts );
 
 #
-# HashRef has deep coercions
+# ArrayRef has deep coercions
 #
 
 my $Rounded = Types::Standard::Int->plus_coercions( Types::Standard::Num, q{ int($_) } );
