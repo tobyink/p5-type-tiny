@@ -1,3 +1,1 @@
-- Using Type::Tiny with Test::More [UsingWithTestMore.pod]
-
 - Using Type::Tiny in Procedural Programming [NonOO.pod]
