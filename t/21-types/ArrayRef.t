@@ -108,7 +108,87 @@ while (@tests) {
 	}
 }
 
-note("TODO: write tests for parameterized types");
+#
+# HashRef is parameterizable
+#
+
+my $ArrayOfInts = ArrayRef->of( Types::Standard::Int );
+
+isa_ok($ArrayOfInts, 'Type::Tiny', '$ArrayOfInts');
+is($ArrayOfInts->display_name, 'ArrayRef[Int]', '$ArrayOfInts has correct display_name');
+ok($ArrayOfInts->is_anon, '$ArrayOfInts has no name');
+ok($ArrayOfInts->can_be_inlined, '$ArrayOfInts can be inlined');
+is(exception { $ArrayOfInts->inline_check(q/$xyz/) }, undef, "Inlining \$ArrayOfInts doesn't throw an exception");
+ok(!$ArrayOfInts->has_coercion, "\$ArrayOfInts doesn't have a coercion");
+ok(!$ArrayOfInts->is_parameterizable, "\$ArrayOfInts is not parameterizable");
+ok_subtype(ArrayRef, $ArrayOfInts);
+
+should_fail( 1,        $ArrayOfInts );
+should_fail( {},       $ArrayOfInts );
+should_pass( [      ], $ArrayOfInts );
+should_fail( [ []   ], $ArrayOfInts );
+should_fail( [  1.1 ], $ArrayOfInts );
+should_pass( [  1   ], $ArrayOfInts );
+should_pass( [  0   ], $ArrayOfInts );
+should_pass( [ -1   ], $ArrayOfInts );
+should_fail( [ \1   ], $ArrayOfInts );
+should_pass( [  1,   2 ], $ArrayOfInts );
+should_fail( [  1,  [] ], $ArrayOfInts );
+
+#
+# HashRef has deep coercions
+#
+
+my $Rounded = Types::Standard::Int->plus_coercions( Types::Standard::Num, q{ int($_) } );
+my $ArrayOfRounded = ArrayRef->of( $Rounded );
+
+isa_ok($ArrayOfRounded, 'Type::Tiny', '$ArrayOfRounded');
+is($ArrayOfRounded->display_name, 'ArrayRef[Int]', '$ArrayOfRounded has correct display_name');
+ok($ArrayOfRounded->is_anon, '$ArrayOfRounded has no name');
+ok($ArrayOfRounded->can_be_inlined, '$ArrayOfRounded can be inlined');
+is(exception { $ArrayOfRounded->inline_check(q/$xyz/) }, undef, "Inlining \$ArrayOfRounded doesn't throw an exception");
+ok($ArrayOfRounded->has_coercion, "\$ArrayOfRounded has a coercion");
+ok($ArrayOfRounded->coercion->has_coercion_for_type(ArrayRef), '$ArrayRefOfRounded can coerce from ArrayRef');
+ok($ArrayOfRounded->coercion->has_coercion_for_type(ArrayRef->of(Types::Standard::Num)), '$ArrayRefOfRounded can coerce from ArrayRef[Num]');
+ok(!$ArrayOfRounded->is_parameterizable, "\$ArrayOfRounded is not parameterizable");
+ok_subtype(ArrayRef, $ArrayOfRounded);
+
+should_fail( 1,        $ArrayOfRounded );
+should_fail( {},       $ArrayOfRounded );
+should_pass( [      ], $ArrayOfRounded );
+should_fail( [ []   ], $ArrayOfRounded );
+should_fail( [  1.1 ], $ArrayOfRounded );
+should_pass( [  1   ], $ArrayOfRounded );
+should_pass( [  0   ], $ArrayOfRounded );
+should_pass( [ -1   ], $ArrayOfRounded );
+should_fail( [ \1   ], $ArrayOfRounded );
+should_pass( [  1,   2 ], $ArrayOfRounded );
+should_fail( [  1,  [] ], $ArrayOfRounded );
+
+use Scalar::Util qw(refaddr);
+
+do {
+	my $orig    = [ 42 ];
+	my $coerced = $ArrayOfRounded->coerce($orig);
+	
+	is( refaddr($orig), refaddr($coerced), "just returned orig unchanged" );
+};
+
+do {
+	my $orig    = [ 42.1 ];
+	my $coerced = $ArrayOfRounded->coerce($orig);
+	
+	isnt( refaddr($orig), refaddr($coerced), "coercion happened" );
+	is($coerced->[0], 42, "... and data looks good");
+	should_pass($coerced, $ArrayOfRounded, "... and now passes type constraint");
+};
+
+do {
+	my $orig    = [ [] ];
+	my $coerced = $ArrayOfRounded->coerce($orig);
+	
+	is( refaddr($orig), refaddr($coerced), "coercion failed, so orig was returned" );
+	should_fail($coerced, $ArrayOfRounded);
+};
 
 done_testing;
-
