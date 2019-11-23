@@ -134,6 +134,8 @@ should_pass( { foo => -1   }, $HashOfInts );
 should_fail( { foo => \1   }, $HashOfInts );
 should_fail( { 123 => \1   }, $HashOfInts );
 should_pass( { 123 =>  1   }, $HashOfInts );
+should_pass( { foo =>  1, bar =>  2 }, $HashOfInts );
+should_fail( { foo =>  1, bar => [] }, $HashOfInts );
 
 #
 # HashRef has deep coercions
@@ -164,6 +166,8 @@ should_pass( { foo => -1   }, $HashOfRounded );
 should_fail( { foo => \1   }, $HashOfRounded );
 should_fail( { 123 => \1   }, $HashOfRounded );
 should_pass( { 123 =>  1   }, $HashOfRounded );
+should_pass( { foo =>  1, bar =>  2 }, $HashOfRounded );
+should_fail( { foo =>  1, bar => [] }, $HashOfRounded );
 
 use Scalar::Util qw(refaddr);
 
