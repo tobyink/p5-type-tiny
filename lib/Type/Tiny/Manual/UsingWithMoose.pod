@@ -71,7 +71,59 @@ for attributes and method parameters, in Moose and non-Moose code.
 
 =head2 Type::Utils
 
-TODO
+If you've used L<Moose::Util::TypeConstraints>, you may be accustomed to
+using a DSL for declaring type constraints:
+
+  use Moose::Util::TypeConstraints;
+  
+  subtype 'Natural',
+    as 'Int',
+    where { $_ > 0 };
+
+There's a module called L<Type::Utils> that provides a very similar DSL for
+declaring types in Type::Library-based type libraries.
+
+  package My::Types {
+    use Type::Library -base;
+    use Type::Utils;
+    use Types::Standard qw( Int );
+    
+    declare 'Natural',
+      as Int,
+      where { $_ > 0 };
+  }
+
+Personally I prefer the more object-oriented way to declare types though.
+
+In Moose you might also declare types like this within classes and roles too.
+Unlike Moose, Type::Tiny doesn't keep types in a single global flat namespace,
+so this doesn't work quite the same with Type::Utils. It still creates the
+type, but it doesn't store it in any type library; the type is returned.
+
+  package My::Class {
+    use Moose;
+    use Type::Utils;
+    use Types::Standard qw( Int );
+    
+    my $Natural =          # store type in a variable
+      declare 'Natural',
+      as Int,
+      where { $_ > 0 };
+    
+    has number => ( is => 'ro', isa => $Natural );
+  }
+
+But really, isn't the object-oriented way cleaner?
+
+  package My::Class {
+    use Moose;
+    use Types::Standard qw( Int );
+    
+    has number => (
+      is   => 'ro',
+      isa  => Int->where('$_ > 0'),
+    );
+  }
 
 =head2 Type::Tiny and MooseX::Types
 
