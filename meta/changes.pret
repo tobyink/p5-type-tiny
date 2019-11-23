@@ -3099,7 +3099,6 @@
 		];
 	].
 
-
 `Type-Tiny 1.007_000 cpan:TOBYINK`
 	issued  2019-11-17;
 	changeset [
@@ -3177,5 +3176,45 @@
 		item [
 			a dcs:Packaging, dcs:Removal;
 			label "Dropped the TODO file from the repo and distribution because it was mostly out of date. Use RT instead.";
+		];
+	].
+
+`Type-Tiny 1.007_001 cpan:TOBYINK`
+	issued  2019-11-23;
+	changeset [
+		dcs:versus `Type-Tiny 1.007_000 cpan:TOBYINK`;
+		item [
+			a dcs:Documentation;
+			label "Complete rewrite of the Type::Tiny manual.";
+		];
+		item [
+			a dcs:Tests, dcs:Documentation, dcs:Addition;
+			label "Add a huge amount of tests for the built-in type constraints, intended as documentation as well as tests.";
+		];
+		item [
+			a dcs:Addition;
+			label "The `extends` function is now able to extend Specio::Exporter libraries.";
+		];
+		item [
+			a dcs:Addition;
+			label "Type::Params now has `wrap_subs` and `wrap_methods` functions.";
+		];
+		item [
+			a dcs:Bugfix;
+			label "The `Tied` type no longer assumes that any reference which isn't a HASH or ARRAY must be a SCALAR.";
+		];
+		item [
+			a dcs:Bugfix;
+			label "Fix the 'my variable $base masks earlier declaration' warning caused by IntRange/NumRange.";
+		];
+		item [
+			a dcs:Bugfix;
+			label "ClassName/RoleName no longer accepts a glob.";
+		];
+		item [
+			label "Returning a list of strings from an inlining coderef is now officially supported and no longer experimental.";
+		];
+		item [
+			label "Type::Tiny::XS integration is now officially supported and no longer experimental.";
 		];
 	].
