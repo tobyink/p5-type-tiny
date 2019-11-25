@@ -35,7 +35,7 @@ because Type::Tiny can do a lot of optimizations in that first stage to make
 the second stage a lot faster. (And the results of C<compile> get stored in
 the C<state> variable so that only has to happen once.)
 
-There is rarely a reason to use L<validate> and L<validate_named>, but
+There is rarely a reason to use C<validate> and C<validate_named>, but
 they exist if you want them.
 
 =head2 C<multisig>
