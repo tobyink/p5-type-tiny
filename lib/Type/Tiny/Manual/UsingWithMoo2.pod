@@ -186,6 +186,13 @@ If you need a number that is I<not> an integer:
 
   Num & ~Int
 
+L<Types::Standard> includes two types which are complements of each other:
+B<Undef> and B<Defined>.
+
+B<NegativeInt> might seem to be the complement of B<PositiveOrZeroInt> but
+when you think about it, it is not. There are values that fall into neither
+category, such as non-integers, non-numeric strings, references, undef, etc.
+
 =head2 C<stringifies_to> and C<numifies_to>
 
 The B<Object> type constraint provides C<stringifies_to> and C<numifies_to>

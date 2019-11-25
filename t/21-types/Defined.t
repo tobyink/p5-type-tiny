@@ -108,5 +108,7 @@ while (@tests) {
 	}
 }
 
+is(~Defined, Types::Standard::Undef, 'The complement of Defined is Undef');
+
 done_testing;
 

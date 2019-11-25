@@ -38,6 +38,7 @@ is(exception { Any->inline_check(q/$xyz/) }, undef, "Inlining Any doesn't throw 
 ok(!Any->has_coercion, "Any doesn't have a coercion");
 ok(!Any->is_parameterizable, "Any isn't parameterizable");
 
+my @none_tests = 
 my @tests = (
 	pass => 'undef'                    => undef,
 	pass => 'false'                    => !!0,
@@ -107,6 +108,27 @@ while (@tests) {
 		fail("expected '$expect'?!");
 	}
 }
+
+my $None = ~Any;
+is($None->name, "None", "Complement of Any is None.");
+ok($None->can_be_inlined, "None can be inlined.");
+subtest "None fails where Any passes and vice versa" => sub {
+	while (@none_tests) {
+		my ($expect, $label, $value) = splice(@none_tests, 0 , 3);
+		if ($expect eq 'todo') {
+			note("TODO: $label");
+		}
+		elsif ($expect eq 'pass') {
+			should_fail($value, $None, ucfirst("$label should fail None"));
+		}
+		elsif ($expect eq 'fail') {
+			should_pass($value, $None, ucfirst("$label should pass None"));
+		}
+		else {
+			fail("expected '$expect'?!");
+		}
+	}
+};
 
 done_testing;
 
