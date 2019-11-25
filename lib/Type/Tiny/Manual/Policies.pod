@@ -135,10 +135,15 @@ underscore in the version number as per the usual CPAN convention.)
 
 =head1 NEXT STEPS
 
-You've reached the end of the manual!
+Here's your next step:
 
-But each class, type library, and other package includes more detailed
-documentation.
+=over
+
+=item * L<Type::Tiny::Manual::Contributing>
+
+Contributing to Type::Tiny development.
+
+=back
 
 =head1 AUTHOR
 

@@ -197,6 +197,10 @@ An alphabetical list of all type constraints bundled with Type::Tiny.
 
 Policies related to Type::Tiny development.
 
+=item * L<Type::Tiny::Manual::Contributing>
+
+Contributing to Type::Tiny development.
+
 =back
 
 =head2 Type::Tiny versus X
