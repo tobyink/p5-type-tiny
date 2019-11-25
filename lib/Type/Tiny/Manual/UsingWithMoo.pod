@@ -373,7 +373,7 @@ B<ArrayRef> constraint:
 
 The B<< InstanceOf["Horse"] >> type constraint checks that a value is
 a blessed object in the Horse class. So the horse's children should be
-an arrayref of other House objects.
+an arrayref of other Horse objects.
 
 Internally it just checks C<< $_->isa("Horse") >> on each item in the
 arrayref.
