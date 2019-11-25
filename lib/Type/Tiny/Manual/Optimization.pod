@@ -105,7 +105,52 @@ faster.)
 
 =head2 Devel::StrictMode
 
-TODO
+One possibility is to use strict type checks when you're running your
+release tests, and faster, more permissive type checks at other times.
+Devel::StrictMode can make this easier.
+
+This provides a C<STRICT> constant that indicates whether your code is
+operating in "strict mode" based on certain environment variables.
+
+=head3 Attributes
+
+ use Types::Standard qw( ArrayRef Num );
+ use Devel::StrictMode qw( STRICT );
+ 
+ has numbers => (
+   is      => 'ro',
+   isa     => STRICT ? ArrayRef[Num] : ArrayRef,
+   default => sub { [] },
+ );
+
+It is inadvisible to do this on attributes that have coercions because
+it can lead to inconsistent and unpredictable behaviour.
+
+=head3 Type::Params
+
+ use Types::Standard qw( Num Object );
+ use Type::Params qw( compile );
+ use Devel::StrictMode qw( STRICT );
+ 
+ sub add_number {
+   state $check;
+   $check = compile(Object, Num) if STRICT;
+   
+   my ($self, $num) = STRICT ? $check->(@_) : @_;
+   push @{ $self->numbers }, $num;
+   return $self;
+ }
+
+Again, you need to be careful to ensure consistent behaviour if you're
+using coercions, defaults, slurpies, etc.
+
+=head3 Ad-Hoc Type Checks
+
+ ...;
+ my $x = get_some_number();
+ assert_Int($x) if STRICT;
+ return $x + 1;
+ ...;
 
 =head1 NEXT STEPS
 
