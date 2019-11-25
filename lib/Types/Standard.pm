@@ -181,6 +181,7 @@ BEGIN { *STRICTNUM = $ENV{PERL_TYPES_STANDARD_STRICTNUM} ? sub(){!!1} : sub(){!!
 my $_any = $meta->$add_core_type({
 	name       => "Any",
 	inlined    => sub { "!!1" },
+	complement_name => 'None',
 });
 
 my $_item = $meta->$add_core_type({

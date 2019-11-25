@@ -1000,6 +1000,8 @@ sub _build_complementary_type
 	$opts{display_name} =~ s/^\~{2}//;
 	$opts{inlined} = sub { shift; "not(".$self->inline_check(@_).")" }
 		if $self->can_be_inlined;
+	$opts{display_name} = $opts{name} = $self->{complement_name}
+		if $self->{complement_name};
 	return "Type::Tiny"->new(%opts);
 }
 
