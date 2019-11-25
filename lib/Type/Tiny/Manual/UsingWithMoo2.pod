@@ -168,6 +168,24 @@ around each type. This is to disambiguate the meaning of C<< & >> for Perl,
 because Perl uses it as the bitwise and operator but also as the sigil for
 subs.
 
+=head2 Complements
+
+For any type B<Foo> there is a complementary type B<< ~Foo >> (pronounced
+"not Foo").
+
+  package My::Class {
+    use Moo;
+    use Types::Standard qw( ArrayRef CodeRef );
+    
+    has things => ( is => 'ro', isa => ArrayRef[~CodeRef] );
+  }
+
+C<things> is now an arrayref of anything except coderefs.
+
+If you need a number that is I<not> an integer:
+
+  Num & ~Int
+
 =head2 C<stringifies_to> and C<numifies_to>
 
 The B<Object> type constraint provides C<stringifies_to> and C<numifies_to>
