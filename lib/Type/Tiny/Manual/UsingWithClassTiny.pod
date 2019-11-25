@@ -81,6 +81,10 @@ There are also a couple of CPAN modules that can help you out.
 
 =head2 Class::Tiny::ConstrainedAccessor
 
+L<Class::Tiny::ConstrainedAccessor> creates a C<BUILD> and accessors that
+enforce Type::Tiny constraints.  Attribute types are passed to
+Class::Tiny::ConstrainedAccessor; attribute defaults are passed to Class::Tiny.
+
   package Horse {
     use Types::Standard qw( Str Num ArrayRef );
     use Class::Tiny::ConstrainedAccessor {
@@ -97,7 +101,8 @@ There are also a couple of CPAN modules that can help you out.
 
 =head2 Class::Tiny::Antlers
 
-Moose-like syntax for Class::Tiny, including support for C<isa>.
+L<Class::Tiny::Antlers> provides Moose-like syntax for Class::Tiny, including
+support for C<isa>.  You do not also need to use Class::Tiny itself.
 
   package Horse {
     use Class::Tiny::Antlers qw(has);
