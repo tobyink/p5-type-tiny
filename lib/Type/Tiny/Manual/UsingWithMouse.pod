@@ -70,7 +70,59 @@ for attributes and method parameters, in Mouse and non-Mouse code.
 
 =head2 Type::Utils
 
-TODO
+If you've used L<Mouse::Util::TypeConstraints>, you may be accustomed to
+using a DSL for declaring type constraints:
+
+  use Mouse::Util::TypeConstraints;
+  
+  subtype 'Natural',
+    as 'Int',
+    where { $_ > 0 };
+
+There's a module called L<Type::Utils> that provides a very similar DSL for
+declaring types in Type::Library-based type libraries.
+
+  package My::Types {
+    use Type::Library -base;
+    use Type::Utils;
+    use Types::Standard qw( Int );
+    
+    declare 'Natural',
+      as Int,
+      where { $_ > 0 };
+  }
+
+Personally I prefer the more object-oriented way to declare types though.
+
+In Mouse you might also declare types like this within classes and roles too.
+Unlike Mouse, Type::Tiny doesn't keep types in a single global flat namespace,
+so this doesn't work quite the same with Type::Utils. It still creates the
+type, but it doesn't store it in any type library; the type is returned.
+
+  package My::Class {
+    use Mouse;
+    use Type::Utils;
+    use Types::Standard qw( Int );
+    
+    my $Natural =          # store type in a variable
+      declare 'Natural',
+      as Int,
+      where { $_ > 0 };
+    
+    has number => ( is => 'ro', isa => $Natural );
+  }
+
+But really, isn't the object-oriented way cleaner?
+
+  package My::Class {
+    use Mouse;
+    use Types::Standard qw( Int );
+    
+    has number => (
+      is   => 'ro',
+      isa  => Int->where('$_ > 0'),
+    );
+  }
 
 =head2 Type::Tiny and MouseX::Types
 
@@ -92,11 +144,43 @@ they should fit together pretty seamlessly.
 
 =head2 C<< -mouse >> Import Parameter
 
-TODO
+If you have read this far in the manual, you will know that this is the
+usual way to import type constraints:
+
+  use Types::Standard qw( Int );
+
+And the C<Int> which is imported is a function that takes no arguments and
+returns the B<Int> type constraint, which is a blessed object in the
+L<Type::Tiny> class.
+
+Type::Tiny mocks the L<Mouse::Meta::TypeConstraint> API so well that most
+Mouse and MouseX code will not be able to tell the difference.
+
+But what if you need a real Mouse::Meta::TypeConstraint object?
+
+  use Types::Standard -mouse, qw( Int );
+
+Now the C<Int> function imported will return a genuine native Mouse type
+constraint.
+
+This flag is mostly a throwback from when Type::Tiny native objects
+I<< didn't >> directly work in Mouse. In 99.9% of cases, there is no
+reason to use it and plenty of reasons not to. (Mouse native type
+constraints don't offer helpful methods like C<plus_coercions> and
+C<where>.)
 
 =head2 C<< mouse_type >> Method
 
-TODO
+Another quick way to get a native Mouse type constraint object from a
+Type::Tiny object is to call the C<mouse_type> method:
+
+  use Types::Standard qw( Int );
+  
+  my $tiny_type   = Int;
+  my $mouse_type  = $tiny_type->mouse_type;
+
+Internally, this is what the C<< -mouse >> flag makes imported functions
+do.
 
 =head2 Type::Tiny Performance
 
