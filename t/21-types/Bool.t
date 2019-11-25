@@ -108,7 +108,92 @@ while (@tests) {
 	}
 }
 
-note("TODO: write tests for coercions");
+my @tests2 = (
+	false => 'undef'                    => undef,
+	false => 'false'                    => !!0,
+	true  => 'true'                     => !!1,
+	false => 'zero'                     =>  0,
+	true  => 'one'                      =>  1,
+	true  => 'negative one'             => -1,
+	true  => 'non integer'              =>  3.1416,
+	false => 'empty string'             => '',
+	true  => 'whitespace'               => ' ',
+	true  => 'line break'               => "\n",
+	true  => 'random string'            => 'abc123',
+	true  => 'loaded package name'      => 'Type::Tiny',
+	true  => 'unloaded package name'    => 'This::Has::Probably::Not::Been::Loaded',
+	true  => 'a reference to undef'     => do { my $x = undef; \$x },
+	true  => 'a reference to false'     => do { my $x = !!0; \$x },
+	true  => 'a reference to true'      => do { my $x = !!1; \$x },
+	true  => 'a reference to zero'      => do { my $x = 0; \$x },
+	true  => 'a reference to one'       => do { my $x = 1; \$x },
+	true  => 'a reference to empty string' => do { my $x = ''; \$x },
+	true  => 'a reference to random string' => do { my $x = 'abc123'; \$x },
+	true  => 'blessed scalarref'        => bless(do { my $x = undef; \$x }, 'SomePkg'),
+	true  => 'empty arrayref'           => [],
+	true  => 'arrayref with one zero'   => [0],
+	true  => 'arrayref of integers'     => [1..10],
+	true  => 'arrayref of numbers'      => [1..10, 3.1416],
+	true  => 'blessed arrayref'         => bless([], 'SomePkg'),
+	true  => 'empty hashref'            => {},
+	true  => 'hashref'                  => { foo => 1 },
+	true  => 'blessed hashref'          => bless({}, 'SomePkg'),
+	true  => 'coderef'                  => sub { 1 },
+	true  => 'blessed coderef'          => bless(sub { 1 }, 'SomePkg'),
+	true  => 'glob'                     => do { no warnings 'once'; *SOMETHING },
+	true  => 'globref'                  => do { no warnings 'once'; my $x = *SOMETHING; \$x },
+	true  => 'blessed globref'          => bless(do { no warnings 'once'; my $x = *SOMETHING; \$x }, 'SomePkg'),
+	true  => 'regexp'                   => qr/./,
+	true  => 'blessed regexp'           => bless(qr/./, 'SomePkg'),
+	true  => 'filehandle'               => do { open my $x, '<', $0 or die; $x },
+	true  => 'filehandle object'        => do { require IO::File; 'IO::File'->new($0, 'r') },
+	true  => 'ref to scalarref'         => do { my $x = undef; my $y = \$x; \$y },
+	true  => 'ref to arrayref'          => do { my $x = []; \$x },
+	true  => 'ref to hashref'           => do { my $x = {}; \$x },
+	true  => 'ref to coderef'           => do { my $x = sub { 1 }; \$x },
+	true  => 'ref to blessed hashref'   => do { my $x = bless({}, 'SomePkg'); \$x },
+	true  => 'object stringifying to ""' => do { package Local::OL::StringEmpty; use overload q[bool] => sub { !!1 }; bless [] },
+	true  => 'object stringifying to "1"' => do { package Local::OL::StringOne; use overload q[bool] => sub { !!1 }; bless [] },
+	false => 'object boolifying to false' => do { package Local::OL::BoolFalse; use overload q[bool] => sub { !!0 }; bless [] },
+	true  => 'object boolifying to true' => do { package Local::OL::BoolTrue; use overload q[bool] => sub { !!1 }; bless [] },
+	true  => 'object numifying to 0'    => do { package Local::OL::NumZero; use overload q[bool] => sub { !!1 }; bless [] },
+	true  => 'object numifying to 1'    => do { package Local::OL::NumOne; use overload q[bool] => sub { !!1 }; bless [] },
+	true  => 'object overloading arrayref' => do { package Local::OL::Array; use overload q[bool] => sub { !!1 }; bless {array=>[]} },
+	true  => 'object overloading hashref' => do { package Local::OL::Hash; use overload q[bool] => sub { !!1 }; bless [{}] },
+	true  => 'object overloading coderef' => do { package Local::OL::Code; use overload q[bool] => sub { !!1 }; bless [sub { 1 }] },
+);
+
+while (@tests2) {
+	my ($expect, $label, $value) = splice(@tests2, 0 , 3);
+	my $coerced;
+	my $exception = exception { $coerced = Bool->assert_coerce($value) };
+	is($exception, undef, "Bool coerced $label successfully");
+	if ($expect eq 'true') {
+		ok($coerced, "Bool coerced $label to true");
+	}
+	elsif ($expect eq 'false') {
+		ok(!$coerced, "Bool coerced $label to false");
+	}
+	else {
+		fail("expected '$expect'?!");
+	}
+}
+
+if (eval { require JSON::PP }) {
+	my $JSON_true  = JSON::PP::true();
+	my $JSON_false = JSON::PP::false();
+	
+	my @values;
+	my $exception = exception {
+		@values = map Bool->assert_coerce($_), $JSON_true, $JSON_false;
+	};
+	
+	should_fail($JSON_true,  Bool, "JSON::PP::true does NOT pass Bool");
+	should_fail($JSON_false, Bool, "JSON::PP::false does NOT pass Bool");
+	is($exception, undef, "Bool coerced JSON::PP::true and JSON::PP::false");
+	ok($values[0], "Bool coerced JSON::PP::true to true");
+	ok(!$values[1], "Bool coerced JSON::PP::false to false");
+}
 
 done_testing;
 
