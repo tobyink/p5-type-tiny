@@ -49,3 +49,10 @@
  - Slurpy HashRefs passed to coderefs returned by Type::Params can now
    be true hashrefs.
  - More import options for Type::Library
+
+2019-12-11 Type-Tiny version 1.008000 released!
+
+ - Rewrite of the manual.
+ - Lots more test cases.
+ - wrap_methods/wrap_subs in Type::Params.
+
