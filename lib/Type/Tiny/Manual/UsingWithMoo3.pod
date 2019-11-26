@@ -128,7 +128,7 @@ This collection is part of your API.
 
 =back
 
-=head2 Exporting Functions
+=head2 Importing Functions
 
 We've seen how, for instance, Types::Standard exports a sub called
 C<Int> that returns the B<Int> type object.

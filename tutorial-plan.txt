@@ -1,1 +1,0 @@
-- Using Type::Tiny in Procedural Programming [NonOO.pod]

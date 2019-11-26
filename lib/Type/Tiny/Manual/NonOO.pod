@@ -1,0 +1,54 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Type::Tiny::Manual::NonOO - Type::Tiny in non-object-oriented code
+  
+=head1 MANUAL
+
+Although Type::Tiny was designed with object-oriented programming in mind,
+especially Moose-style classes and roles, it can be used in procedural and
+imperative programming.
+
+If you have read L<Type::Tiny::Manual::UsingWithMoo>, you should understand
+how L<Type::Params> can be used to validate method parametters. This same
+technique can be applied to regular subs too; just don't C<shift> off
+C<< $self >>. More information about checking parameters can be found in 
+L<Type::Tiny::Manual::Params>.
+
+The C<< is_* >> and C<< assert_* >> functions exported by type libraries
+may be useful in non-OO code too. See L<Type::Tiny::Manual::UsingWithMoo3>.
+
+=head1 NEXT STEPS
+
+Here's your next step:
+
+=over
+
+=item * L<Type::Tiny::Manual::Optimization>
+
+Squeeze the most out of your CPU.
+
+=back
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013-2014, 2017-2019 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+=cut
+
