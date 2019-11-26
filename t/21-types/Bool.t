@@ -108,6 +108,10 @@ while (@tests) {
 	}
 }
 
+#
+# Bool has coercions from everything.
+#
+
 my @tests2 = (
 	false => 'undef'                    => undef,
 	false => 'false'                    => !!0,
@@ -178,6 +182,10 @@ while (@tests2) {
 		fail("expected '$expect'?!");
 	}
 }
+
+#
+# Bool and JSON::PP is worth showing.
+#
 
 if (eval { require JSON::PP }) {
 	my $JSON_true  = JSON::PP::true();

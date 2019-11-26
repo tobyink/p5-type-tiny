@@ -109,6 +109,10 @@ while (@tests) {
 	}
 }
 
+#
+# The complement of Any is None, which rejects everything.
+#
+
 my $None = ~Any;
 is($None->name, "None", "Complement of Any is None.");
 ok($None->can_be_inlined, "None can be inlined.");
