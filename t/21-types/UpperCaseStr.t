@@ -108,7 +108,43 @@ while (@tests) {
 	}
 }
 
-note("TODO: write tests for coercions");
+#
+# These examples are probably obvious.
+#
+
+should_pass('ABCDEF', UpperCaseStr);
+should_pass('ABC123', UpperCaseStr);
+should_fail('abc123', UpperCaseStr);
+should_fail('abcdef', UpperCaseStr);
+
+#
+# A string with only non-letter characters passes.
+#
+
+should_pass('123456', UpperCaseStr);
+should_pass(' ', UpperCaseStr);
+
+#
+# But the empty string fails.
+# (Which is weird, but consistent with MooseX::Types::Common::String.)
+#
+
+should_fail('', UpperCaseStr);
+
+#
+# Can coerce from lowercase strings.
+#
+
+is(UpperCaseStr->coerce('abc123'), 'ABC123', 'coercion success');
+
+#
+# Won't even attempt to coerce non-strings.
+#
+
+use Scalar::Util qw( refaddr );
+my $arr      = [];
+my $coerced  = UpperCaseStr->coerce($arr);
+is(refaddr($coerced), refaddr($arr), 'does not coerce non-strings');
 
 done_testing;
 
