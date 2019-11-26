@@ -895,7 +895,7 @@ Types::Standard - bundled set of built-in types for Type::Tiny
    age     => 0,
  );
  
- $bold_ruler->add_child( $secretariat );
+ $boldruler->add_child( $secretariat );
  
  use Types::Standard qw( is_Object assert_Object );
  

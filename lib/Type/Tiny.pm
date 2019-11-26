@@ -1404,7 +1404,7 @@ Type::Tiny - tiny, yet Moo(se)-compatible type constraint
    age     => 0,
  );
  
- $bold_ruler->add_child( $secretariat );
+ $boldruler->add_child( $secretariat );
 
 =head1 STATUS
 

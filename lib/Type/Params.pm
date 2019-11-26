@@ -796,9 +796,9 @@ Type::Params - Params::Validate-like parameter validation using Type::Tiny type 
  
  my $boldruler = Horse->new;
  
- $bold_ruler->add_child( Horse->new );
+ $boldruler->add_child( Horse->new );
  
- $bold_ruler->add_child( 123 );   # dies (123 is not an Object!)
+ $boldruler->add_child( 123 );   # dies (123 is not an Object!)
 
 =head1 STATUS
 
