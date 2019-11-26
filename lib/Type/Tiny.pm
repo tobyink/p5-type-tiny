@@ -1351,6 +1351,74 @@ Type::Tiny - tiny, yet Moo(se)-compatible type constraint
 
 =head1 SYNOPSIS
 
+ use v5.12;
+ use strict;
+ use warnings;
+ 
+ package Horse {
+   use Moo;
+   use Types::Standard qw( Str Int Enum ArrayRef Object );
+   use Type::Params qw( compile );
+   use namespace::autoclean;
+   
+   has name => (
+     is       => 'ro',
+     isa      => Str,
+     required => 1,
+   );
+   has gender => (
+     is       => 'ro',
+     isa      => Enum[qw( f m )],
+   );
+   has age => (
+     is       => 'rw',
+     isa      => Int->where( '$_ >= 0' ),
+   );
+   has children => (
+     is       => 'ro',
+     isa      => ArrayRef[Object],
+     default  => sub { return [] },
+   );
+   
+   sub add_child {
+     state $check = compile( Object, Object );  # method signature
+     
+     my ($self, $child) = $check->(@_);         # unpack @_
+     push @{ $self->children }, $child;
+     
+     return $self;
+   }
+ }
+ 
+ package main;
+ 
+ my $boldruler = Horse->new(
+   name    => "Bold Ruler",
+   gender  => 'm',
+   age     => 16,
+ );
+ 
+ my $secretariat = Horse->new(
+   name    => "Secretariat",
+   gender  => 'm',
+   age     => 0,
+ );
+ 
+ $bold_ruler->add_child( $secretariat );
+
+=head1 STATUS
+
+This module is covered by the
+L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
+
+=head1 DESCRIPTION
+
+This documents the internals of the L<Type::Tiny> class. L<Type::Tiny::Manual>
+is a better starting place if you're new.
+
+L<Type::Tiny> is a small class for creating Moose-like type constraint
+objects which are compatible with Moo, Moose and Mouse.
+
    use Scalar::Util qw(looks_like_number);
    use Type::Tiny;
    
@@ -1375,21 +1443,8 @@ Type::Tiny - tiny, yet Moo(se)-compatible type constraint
       has favourite_number => (is => "ro", isa => $NUM);
    }
 
-=head1 STATUS
-
-This module is covered by the
-L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
-
-=head1 DESCRIPTION
-
-L<Type::Tiny> is a tiny class for creating Moose-like type constraint
-objects which are compatible with Moo, Moose and Mouse.
-
 Maybe now we won't need to have separate MooseX, MouseX and MooX versions
 of everything? We can but hope...
-
-This documents the internals of L<Type::Tiny>. L<Type::Tiny::Manual> is
-a better starting place if you're new.
 
 =head2 Constructor
 

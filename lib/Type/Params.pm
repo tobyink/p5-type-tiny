@@ -770,23 +770,35 @@ Type::Params - Params::Validate-like parameter validation using Type::Tiny type 
 
 =head1 SYNOPSIS
 
- use v5.10;
+ use v5.12;
  use strict;
  use warnings;
  
- use Type::Params qw( compile );
- use Types::Standard qw( slurpy Str ArrayRef Num );
+ package Horse {
+   use Moo;
+   use Types::Standard qw( Object );
+   use Type::Params qw( compile );
+   use namespace::autoclean;
    
- sub deposit_monies
- {
-    state $check = compile( Str, Str, slurpy ArrayRef[Num] );
-    my ($sort_code, $account_number, $monies) = $check->(@_);
-    
-    my $account = Local::BankAccount->new($sort_code, $account_number);
-    $account->deposit($_) for @$monies;
+   ...;   # define attributes, etc
+   
+   sub add_child {
+     state $check = compile( Object, Object );  # method signature
+     
+     my ($self, $child) = $check->(@_);         # unpack @_
+     push @{ $self->children }, $child;
+     
+     return $self;
+   }
  }
  
- deposit_monies("12-34-56", "11223344", 1.2, 3, 99.99);
+ package main;
+ 
+ my $boldruler = Horse->new;
+ 
+ $bold_ruler->add_child( Horse->new );
+ 
+ $bold_ruler->add_child( 123 );   # dies (123 is not an Object!)
 
 =head1 STATUS
 
@@ -794,6 +806,9 @@ This module is covered by the
 L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
 
 =head1 DESCRIPTION
+
+This documents the details of the L<Type::Params> package.
+L<Type::Tiny::Manual> is a better starting place if you're new.
 
 Type::Params uses L<Type::Tiny> constraints to validate the parameters to a
 sub. It takes the slightly unorthodox approach of separating validation
@@ -820,28 +835,27 @@ If you're using a modern version of Perl, you can use the C<state> keyword
 which was a feature added to Perl in 5.10. If you're stuck on Perl 5.8, the
 example from the SYNOPSIS could be rewritten as:
 
- my $deposit_monies_check;
- sub deposit_monies
- {
-    $deposit_monies_check ||= compile( Str, Str, slurpy ArrayRef[Num] );
-    my ($sort_code, $account_number, $monies) = $deposit_monies_check->(@_);
-    
-    ...;
- }
+   my $add_child_check;
+   sub add_child {
+     $add_child_check ||= compile( Object, Object );
+     
+     my ($self, $child) = $add_child_check->(@_);  # unpack @_
+     push @{ $self->children }, $child;
+     
+     return $self;
+   }
 
 Not quite as neat, but not awful either.
 
 If you don't like the two step, there's a shortcut reducing it to one step:
 
- use Type::Params qw( validate );
- 
- sub deposit_monies
- {
-    my ($sort_code, $account_number, $monies) = 
-       validate( \@_, Str, Str, slurpy ArrayRef[Num] );
-    
-    ...;
- }
+   use Type::Params qw( validate );
+   
+   sub add_child {
+     my ($self, $child) = validate(\@_, Object, Object);
+     push @{ $self->children }, $child;
+     return $self;
+   }
 
 Type::Params has a few tricks up its sleeve to make sure performance doesn't
 suffer too much with the shortcut, but it's never going to be as fast as the

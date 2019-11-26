@@ -840,12 +840,80 @@ __END__
 
 Types::Standard - bundled set of built-in types for Type::Tiny
 
+=head1 SYNOPSIS
+
+ use v5.12;
+ use strict;
+ use warnings;
+ 
+ package Horse {
+   use Moo;
+   use Types::Standard qw( Str Int Enum ArrayRef Object );
+   use Type::Params qw( compile );
+   use namespace::autoclean;
+   
+   has name => (
+     is       => 'ro',
+     isa      => Str,
+     required => 1,
+   );
+   has gender => (
+     is       => 'ro',
+     isa      => Enum[qw( f m )],
+   );
+   has age => (
+     is       => 'rw',
+     isa      => Int->where( '$_ >= 0' ),
+   );
+   has children => (
+     is       => 'ro',
+     isa      => ArrayRef[Object],
+     default  => sub { return [] },
+   );
+   
+   sub add_child {
+     state $check = compile( Object, Object );  # method signature
+     
+     my ($self, $child) = $check->(@_);         # unpack @_
+     push @{ $self->children }, $child;
+     
+     return $self;
+   }
+ }
+ 
+ package main;
+ 
+ my $boldruler = Horse->new(
+   name    => "Bold Ruler",
+   gender  => 'm',
+   age     => 16,
+ );
+ 
+ my $secretariat = Horse->new(
+   name    => "Secretariat",
+   gender  => 'm',
+   age     => 0,
+ );
+ 
+ $bold_ruler->add_child( $secretariat );
+ 
+ use Types::Standard qw( is_Object assert_Object );
+ 
+ # is_Object($thing) returns a boolean
+ my $is_it_an_object = is_Object($boldruler);
+ 
+ # assert_Object($thing) returns $thing or dies
+ say assert_Object($boldruler)->name;  # says "Bold Ruler"
+
 =head1 STATUS
 
 This module is covered by the
 L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
 
 =head1 DESCRIPTION
+
+This documents the details of the L<Types::Standard> type library.
+L<Type::Tiny::Manual> is a better starting place if you're new.
 
 L<Type::Tiny> bundles a few types which seem to be useful.
 
