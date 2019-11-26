@@ -135,6 +135,21 @@ should_fail( [ \1   ], $ArrayOfInts );
 should_pass( [  1,   2 ], $ArrayOfInts );
 should_fail( [  1,  [] ], $ArrayOfInts );
 
+use Scalar::Util qw( refaddr );
+
+my $plain  = ArrayRef;
+my $paramd = ArrayRef[];
+is(
+	refaddr($plain),
+	refaddr($paramd),
+	'parameterizing with [] has no effect'
+);
+
+my $p1 = ArrayRef[Types::Standard::Int];
+my $p2 = ArrayRef[Types::Standard::Int];
+is(refaddr($p1), refaddr($p2), 'parameterizing is cached');
+
+
 #
 # ArrayRef has deep coercions
 #
@@ -164,8 +179,6 @@ should_pass( [ -1   ], $ArrayOfRounded );
 should_fail( [ \1   ], $ArrayOfRounded );
 should_pass( [  1,   2 ], $ArrayOfRounded );
 should_fail( [  1,  [] ], $ArrayOfRounded );
-
-use Scalar::Util qw(refaddr);
 
 do {
 	my $orig    = [ 42 ];
