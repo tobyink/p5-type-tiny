@@ -108,5 +108,45 @@ while (@tests) {
 	}
 }
 
+#
+# RoleName accepts Role::Tiny, Moo::Role, Moose::Role, and Mouse::Role roles
+#
+
+if (eval q{ package Local::Role::RoleTiny; use Role::Tiny; 1 }) {
+	should_pass('Local::Role::RoleTiny', RoleName);
+}
+
+if (eval q{ package Local::Role::MooRole; use Moo::Role; 1 }) {
+	should_pass('Local::Role::MooRole', RoleName);
+}
+
+if (eval q{ package Local::Role::MooseRole; use Moose::Role; 1 }) {
+	should_pass('Local::Role::MooseRole', RoleName);
+}
+
+if (eval q{ package Local::Role::MouseRole; use Mouse::Role; 1 }) {
+	should_pass('Local::Role::MouseRole', RoleName);
+}
+
+#
+# RoleName rejects Class::Tiny, Moo, Moose, and Mouse classes
+#
+
+if (eval q{ package Local::Class::ClassTiny; use Class::Tiny; 1 }) {
+	should_fail('Local::Class::ClassTiny', RoleName);
+}
+
+if (eval q{ package Local::Class::Moo; use Moo; 1 }) {
+	should_fail('Local::Class::Moo', RoleName);
+}
+
+if (eval q{ package Local::Class::Moose; use Moose; 1 }) {
+	should_fail('Local::Class::Moose', RoleName);
+}
+
+if (eval q{ package Local::Class::Mouse; use Mouse; 1 }) {
+	should_fail('Local::Class::Mouse', RoleName);
+}
+
 done_testing;
 
