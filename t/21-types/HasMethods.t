@@ -108,7 +108,85 @@ while (@tests) {
 	}
 }
 
-note("TODO: write tests for parameterized types");
+use Scalar::Util qw( refaddr );
+my $plain  = HasMethods;
+my $paramd = HasMethods[];
+is(
+	refaddr($plain),
+	refaddr($paramd),
+	'parameterizing with [] has no effect'
+);
+
+my $p1 = HasMethods['foo'];
+my $p2 = HasMethods['foo'];
+is(refaddr($p1), refaddr($p2), 'parameterizing is cached');
+
+
+#
+# We need a real object to test HasMethods on.
+# Luckily HasMethods IS an object!
+#
+
+should_pass(
+	HasMethods,
+	HasMethods['constraint'],
+	"Parameterized with one method name",
+);
+
+should_pass(
+	HasMethods,
+	HasMethods['constraint', 'name'],
+	"Parameterized with multiple method names",
+);
+
+should_fail(
+	HasMethods,
+	HasMethods['constraint', 'should_not_exist'],
+	"... acts as intersection (requires the object to support ALL the methods)"
+);
+
+{
+	# A package where $thing->foo works but
+	# $thing->can("foo") is false.
+	package Local::Liar1;
+	sub foo { 1 }
+	sub can {
+		return if $_[1] eq 'foo';
+		goto \&UNIVERSAL::can;
+	}
+}
+
+should_fail(
+	bless([], 'Local::Liar1'),
+	HasMethods['foo'],
+	"HasMethods should believe \$object->can() if it returns false."
+);
+
+{
+	# A package where $thing->foo breaks but
+	# $thing->can("foo") is true.
+	package Local::Liar2;
+	sub can {
+		return sub { 1 } if $_[1] eq 'foo';
+		goto \&UNIVERSAL::can;
+	}
+}
+
+should_pass(
+	bless([], 'Local::Liar2'),
+	HasMethods['foo'],
+	"HasMethods should believe \$object->can() if it returns true."
+);
+
+#
+# HasMethods is for blessed objects only.
+#
+
+should_fail(
+	'Local::Liar2',
+	HasMethods['foo'],
+	"HasMethods does't work on class names, even if they can do a method."
+);
 
 done_testing;
 
