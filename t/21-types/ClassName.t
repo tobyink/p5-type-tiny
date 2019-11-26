@@ -108,5 +108,49 @@ while (@tests) {
 	}
 }
 
+#
+# ClassName accepts Class::Tiny, Moo, Moose, and Mouse classes
+#
+
+if (eval q{ package Local::Class::ClassTiny; use Class::Tiny; 1 }) {
+	should_pass('Local::Class::ClassTiny', ClassName);
+}
+
+if (eval q{ package Local::Class::Moo; use Moo; 1 }) {
+	should_pass('Local::Class::Moo', ClassName);
+}
+
+if (eval q{ package Local::Class::Moose; use Moose; 1 }) {
+	should_pass('Local::Class::Moose', ClassName);
+}
+
+if (eval q{ package Local::Class::Mouse; use Mouse; 1 }) {
+	should_pass('Local::Class::Mouse', ClassName);
+}
+
+#
+# ClassName accepts Role::Tiny, Moo::Role, Moose::Role, and Mouse::Role roles.
+#
+# This is because there's no way of knowing that these roles cannot be
+# used as a class. Even if there's no method called `new`, there might
+# be a constructor with a different name.
+#
+
+if (eval q{ package Local::Role::RoleTiny; use Role::Tiny; 1 }) {
+	should_pass('Local::Role::RoleTiny', ClassName);
+}
+
+if (eval q{ package Local::Role::MooRole; use Moo::Role; 1 }) {
+	should_pass('Local::Role::MooRole', ClassName);
+}
+
+if (eval q{ package Local::Role::MooseRole; use Moose::Role; 1 }) {
+	should_pass('Local::Role::MooseRole', ClassName);
+}
+
+if (eval q{ package Local::Role::MouseRole; use Mouse::Role; 1 }) {
+	should_pass('Local::Role::MouseRole', ClassName);
+}
+
 done_testing;
 
