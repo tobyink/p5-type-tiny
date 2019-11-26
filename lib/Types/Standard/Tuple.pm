@@ -106,10 +106,11 @@ sub __inline_generator
 	{
 		$slurpy = pop(@constraints)->{slurpy};
 	}
-
+	
 	return if grep { not $_->can_be_inlined } @constraints;
 	return if defined $slurpy && !$slurpy->can_be_inlined;
-
+	
+	my $xsubname;
 	if (Type::Tiny::_USE_XS and !$slurpy)
 	{
 		my @known = map {
@@ -121,10 +122,9 @@ sub __inline_generator
 		
 		if (@known == @constraints)
 		{
-			my $xsub = Type::Tiny::XS::get_subname_for(
+			$xsubname = Type::Tiny::XS::get_subname_for(
 				sprintf "Tuple[%s]", join(',', @known)
 			);
-			return sub { my $var = $_[1]; "$xsub\($var\)" } if $xsub;
 		}
 	}
 	
@@ -146,6 +146,7 @@ sub __inline_generator
 	return sub
 	{
 		my $v = $_[1];
+		return "$xsubname\($v\)" if $xsubname && !$Type::Tiny::AvoidCallbacks;
 		join " and ",
 			Types::Standard::ArrayRef->inline_check($v),
 			(

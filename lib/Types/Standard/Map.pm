@@ -62,6 +62,7 @@ sub __inline_generator
 	my ($k, $v) = @_;
 	return unless $k->can_be_inlined && $v->can_be_inlined;
 	
+	my $xsubname;
 	if (Type::Tiny::_USE_XS)
 	{
 		my @known = map {
@@ -71,18 +72,18 @@ sub __inline_generator
 		
 		if (@known == 2)
 		{
-			my $xsub = Type::Tiny::XS::get_subname_for(
+			$xsubname = Type::Tiny::XS::get_subname_for(
 				sprintf "Map[%s,%s]", @known
 			);
-			return sub { my $var = $_[1]; "$xsub\($var\)" } if $xsub;
 		}
 	}
 	
-	my $k_check = $k->inline_check('$k');
-	my $v_check = $v->inline_check('$v');
 	return sub {
 		my $h = $_[1];
+		return "$xsubname\($h\)" if $xsubname && !$Type::Tiny::AvoidCallbacks;
 		my $p = Types::Standard::HashRef->inline_check($h);
+		my $k_check = $k->inline_check('$k');
+		my $v_check = $v->inline_check('$v');
 		"$p and do { "
 		.  "my \$ok = 1; "
 		.  "for my \$v (values \%{$h}) { "

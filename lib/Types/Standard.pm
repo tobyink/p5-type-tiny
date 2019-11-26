@@ -48,11 +48,7 @@ BEGIN {
 		? \&Type::Tiny::XS::Util::is_class_loaded
 		: eval $is_class_loaded;
 	
-	*_AVOID_CALLBACKS = $ENV{'PERL_TYPE_TINY_AVOID_CALLBACKS'}
-		? sub () { 1 }
-		: sub () { 0 };
-	
-	*_USE_RUXS = !_AVOID_CALLBACKS() && eval { require Ref::Util::XS; Ref::Util::XS::->VERSION(0.100); 1; }
+	*_HAS_REFUTILXS = eval { require Ref::Util::XS; Ref::Util::XS::->VERSION(0.100); 1; }
 		? sub () { !!1 }
 		: sub () { !!0 };
 };
@@ -99,18 +95,21 @@ my $add_core_type = sub {
 	
 	$typedef->{compiled_type_constraint} = $xsub if $xsub;
 	
-	$typedef->{inlined} = sub { "$xsubname\($_[1])" }
-		if  !_AVOID_CALLBACKS
-		and defined($xsubname)
-		and (
-			# These should be faster than their normal inlined
-			# equivalents
-			$name eq 'Str' or
-			$name eq 'Bool' or
-			$name eq 'ClassName' or
-			$name eq 'RegexpRef' or
-			$name eq 'FileHandle'
-		);
+	#### TODO
+	my $orig_inlined = $typedef->{inlined};
+	if (defined($xsubname) and (
+		# These should be faster than their normal inlined
+		# equivalents
+		$name eq 'Str' or
+		$name eq 'Bool' or
+		$name eq 'ClassName' or
+		$name eq 'RegexpRef' or
+		$name eq 'FileHandle'
+	)) {
+		$typedef->{inlined} = sub {
+			$Type::Tiny::AvoidCallbacks ? goto($orig_inlined) : "$xsubname\($_[1])"
+		};
+	}
 	
 	$meta->add_type($typedef);
 };
@@ -283,7 +282,7 @@ my $_classn = $meta->add_type({
 	parent     => $_str,
 	constraint => \&_is_class_loaded,
 	inlined    => sub {
-		_AVOID_CALLBACKS
+		$Type::Tiny::AvoidCallbacks
 			? "($is_class_loaded)->(do { my \$tmp = $_[1] })"
 			: "Types::Standard::_is_class_loaded(do { my \$tmp = $_[1] })"
 	},
@@ -294,7 +293,7 @@ $meta->add_type({
 	parent     => $_classn,
 	constraint => sub { not $_->can("new") },
 	inlined    => sub {
-		_AVOID_CALLBACKS
+		$Type::Tiny::AvoidCallbacks
 			? "($is_class_loaded)->(do { my \$tmp = $_[1] }) and not $_[1]\->can('new')"
 			: "Types::Standard::_is_class_loaded(do { my \$tmp = $_[1] }) and not $_[1]\->can('new')"
 	},
@@ -343,9 +342,11 @@ $meta->$add_core_type({
 	name       => "CodeRef",
 	parent     => $_ref,
 	constraint => sub { ref $_ eq "CODE" },
-	inlined    => _USE_RUXS
-		? sub { "Ref::Util::XS::is_plain_coderef($_[1])" }
-		: sub { "ref($_[1]) eq 'CODE'" },
+	inlined    => sub {
+		_HAS_REFUTILXS && !$Type::Tiny::AvoidCallbacks
+			? "Ref::Util::XS::is_plain_coderef($_[1])"
+			: "ref($_[1]) eq 'CODE'"
+	},
 });
 
 my $_regexp = $meta->$add_core_type({
@@ -359,9 +360,11 @@ $meta->$add_core_type({
 	name       => "GlobRef",
 	parent     => $_ref,
 	constraint => sub { ref $_ eq "GLOB" },
-	inlined    => _USE_RUXS
-		? sub { "Ref::Util::XS::is_plain_globref($_[1])" }
-		: sub { "ref($_[1]) eq 'GLOB'" },
+	inlined    => sub {
+		_HAS_REFUTILXS && !$Type::Tiny::AvoidCallbacks
+			? "Ref::Util::XS::is_plain_globref($_[1])"
+			: "ref($_[1]) eq 'GLOB'"
+	},
 });
 
 $meta->$add_core_type({
@@ -381,9 +384,11 @@ my $_arr = $meta->$add_core_type({
 	name       => "ArrayRef",
 	parent     => $_ref,
 	constraint => sub { ref $_ eq "ARRAY" },
-	inlined    => _USE_RUXS
-		? sub { "Ref::Util::XS::is_plain_arrayref($_[1])" }
-		: sub { "ref($_[1]) eq 'ARRAY'" },
+	inlined    => sub {
+		_HAS_REFUTILXS && !$Type::Tiny::AvoidCallbacks
+			? "Ref::Util::XS::is_plain_arrayref($_[1])"
+			: "ref($_[1]) eq 'ARRAY'"
+	},
 	constraint_generator => LazyLoad(ArrayRef => 'constraint_generator'),
 	inline_generator     => LazyLoad(ArrayRef => 'inline_generator'),
 	deep_explanation     => LazyLoad(ArrayRef => 'deep_explanation'),
@@ -394,9 +399,11 @@ my $_hash = $meta->$add_core_type({
 	name       => "HashRef",
 	parent     => $_ref,
 	constraint => sub { ref $_ eq "HASH" },
-	inlined    => _USE_RUXS
-		? sub { "Ref::Util::XS::is_plain_hashref($_[1])" }
-		: sub { "ref($_[1]) eq 'HASH'" },
+	inlined    => sub {
+		_HAS_REFUTILXS && !$Type::Tiny::AvoidCallbacks
+			? "Ref::Util::XS::is_plain_hashref($_[1])"
+			: "ref($_[1]) eq 'HASH'"
+	},
 	constraint_generator => LazyLoad(HashRef => 'constraint_generator'),
 	inline_generator     => LazyLoad(HashRef => 'inline_generator'),
 	deep_explanation     => LazyLoad(HashRef => 'deep_explanation'),
@@ -422,9 +429,11 @@ my $_obj = $meta->$add_core_type({
 	name       => "Object",
 	parent     => $_ref,
 	constraint => sub { blessed $_ },
-	inlined    => _USE_RUXS
-		? sub { "Ref::Util::XS::is_blessed_ref($_[1])" }
-		: sub { "Scalar::Util::blessed($_[1])" },
+	inlined    => sub {
+		_HAS_REFUTILXS && !$Type::Tiny::AvoidCallbacks
+			? "Ref::Util::XS::is_blessed_ref($_[1])"
+			: "Scalar::Util::blessed($_[1])"
+	},
 	is_object  => 1,
 });
 
@@ -1335,18 +1344,6 @@ some type constraints.
 If C<PERL_TYPE_TINY_XS> does not exist, can be set to true to suppress XS
 usage similarly. (Several other CPAN distributions also pay attention to this
 environment variable.)
-
-=item C<PERL_TYPE_TINY_AVOID_CALLBACKS>
-
-Tells Types::Standard that when generating inlined code, this code should
-avoid calling any functions except Perl built-ins, L<re>, L<overload>,
-and L<Scalar::Util>. This might be useful if you want to store the generated
-code and run it on a machine that might not have Type::Tiny installed, or run
-it without loading Type::Tiny into memory. It's for things like L<Mite> and
-L<Mo> (which are both pretty dead projects, but the idea is interesting).
-This currently only affects StrMatch, ClassName, and RoleName. Other types
-in this library don't make any callbacks to other functions anyway. Many
-of the types in L<Types::TypeTiny> do though.
 
 =back
 

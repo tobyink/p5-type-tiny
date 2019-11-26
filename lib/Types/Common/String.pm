@@ -94,7 +94,7 @@ $meta->add_type(
 	inlined    => sub {
 		if ($nestr) {
 			my $xsub = Type::Tiny::XS::get_subname_for($_[0]->name);
-			return "$xsub($_[1])" if $xsub;
+			return "$xsub($_[1])" if $xsub && !$Type::Tiny::AvoidCallbacks;
 		}
 		undef, qq(length($_) > 0);
 	},

@@ -460,6 +460,8 @@ sub _build_compiled_check
 {
 	my $self = shift;
 	
+	local our $AvoidCallbacks = 0;
+	
 	if ($self->_is_null_constraint and $self->has_parent)
 	{
 		return $self->parent->compiled_check;
@@ -760,6 +762,7 @@ sub _perlcode
 {
 	my $self = shift;
 	
+	local our $AvoidCallbacks = 1;
 	return $self->inline_check('$_')
 		if $self->can_be_inlined;
 	
@@ -2047,6 +2050,28 @@ dumps. (Default limit is 72.)
 
 This is a package variable (rather than get/set class methods) to allow
 for easy localization.
+
+=item C<< $Type::Tiny::AvoidCallbacks >>
+
+If this variable is set to true (you should usually do it in a
+C<local> scope), it acts as a hint for type constraints, when
+generating inlined code, to avoid making any callbacks to
+variables and functions defined outside the inlined code itself.
+
+This should have the effect that C<< $type->inline_check('$foo') >>
+will return a string of code capable of checking the type on
+Perl installations that don't have Type::Tiny installed. This
+is intended to allow Type::Tiny to be used with things like
+L<Mite>.
+
+The variable works on the honour system. Types need to explicitly
+check it and decide to generate different code based on its
+truth value. The bundled types in L<Types::Standard>,
+L<Types::Common::Numeric>, and L<Types::Common::String> all do.
+(B<StrMatch> is sometimes unable to, and will issue a warning
+if it needs to rely on callbacks when asked not to.)
+
+Most normal users can ignore this.
 
 =back
 

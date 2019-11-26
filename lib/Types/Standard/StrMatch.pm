@@ -34,7 +34,7 @@ my $serialize_regexp = sub {
 		$serialized = eval { Regexp::Util::serialize_regexp($re) };
 	}
 	
-	unless (Types::Standard::_AVOID_CALLBACKS or defined $serialized) {
+	unless (defined $serialized) {
 		my $key = sprintf('%s|%s', ref($re), $re);
 		$expressions{$key} = $re;
 		$serialized = sprintf('$Types::Standard::StrMatch::expressions{%s}', B::perlstring($key));
@@ -86,6 +86,10 @@ sub __inline_generator
 		return sub
 		{
 			my $v = $_[1];
+			if ($Type::Tiny::AvoidCallbacks and $serialized_re =~ /Types::Standard::StrMatch::expressions/) {
+				require Carp;
+				Carp::carp("Cannot serialize regexp without callbacks; serializing using callbacks");
+			}
 			sprintf
 				"!ref($v) and do { my \$m = [$v =~ %s]; %s }",
 				$serialized_re,
@@ -109,6 +113,10 @@ sub __inline_generator
 		return sub
 		{
 			my $v = $_[1];
+			if ($Type::Tiny::AvoidCallbacks and $serialized_re =~ /Types::Standard::StrMatch::expressions/) {
+				require Carp;
+				Carp::carp("Cannot serialize regexp without callbacks; serializing using callbacks");
+			}
 			"!ref($v) and $v =~ $serialized_re";
 		};
 	}

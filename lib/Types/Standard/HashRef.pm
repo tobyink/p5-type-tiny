@@ -58,18 +58,20 @@ sub __inline_generator
 	my $param = shift;
 	
 	my $compiled = $param->compiled_check;
-	if (Type::Tiny::_USE_XS)
+	my $xsubname;
+	if (Type::Tiny::_USE_XS and not $Type::Tiny::AvoidCallbacks)
 	{
 		my $paramname = Type::Tiny::XS::is_known($compiled);
-		my $xsubname  = Type::Tiny::XS::get_subname_for("HashRef[$paramname]");
-		return sub { "$xsubname\($_[1]\)" } if $xsubname;
+		$xsubname  = Type::Tiny::XS::get_subname_for("HashRef[$paramname]");
 	}
 	
 	return unless $param->can_be_inlined;
-	my $param_check = $param->inline_check('$i');
 	return sub {
 		my $v = $_[1];
+		return "$xsubname\($v\)" if $xsubname && !$Type::Tiny::AvoidCallbacks;
 		my $p = Types::Standard::HashRef->inline_check($v);
+		my $param_check = $param->inline_check('$i');
+		
 		"$p and do { "
 		.  "my \$ok = 1; "
 		.  "for my \$i (values \%{$v}) { "

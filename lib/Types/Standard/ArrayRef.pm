@@ -86,19 +86,18 @@ sub __inline_generator
 	$max = shift if @_;
 	
 	my $param_compiled_check = $param->compiled_check;
+	my $xsubname;
 	if (Type::Tiny::_USE_XS and $min==0 and $max==-1)
 	{
 		my $paramname = Type::Tiny::XS::is_known($param_compiled_check);
-		my $xsubname  = Type::Tiny::XS::get_subname_for("ArrayRef[$paramname]");
-		return sub { "$xsubname\($_[1]\)" } if $xsubname;
+		$xsubname  = Type::Tiny::XS::get_subname_for("ArrayRef[$paramname]");
 	}
 	
 	return unless $param->can_be_inlined;
-	my $param_check = $param->inline_check('$i');
 	
 	return sub {
 		my $v = $_[1];
-		
+		return "$xsubname\($v\)" if $xsubname && !$Type::Tiny::AvoidCallbacks;
 		my $p = Types::Standard::ArrayRef->inline_check($v);
 		
 		if ($min != 0) {
@@ -108,6 +107,7 @@ sub __inline_generator
 			$p .= sprintf(' and @{%s} <= %d', $v, $max);
 		}
 		
+		my $param_check = $param->inline_check('$i');
 		return $p if $param->{uniq} eq Types::Standard::Any->{uniq};
 		
 		"$p and do { "

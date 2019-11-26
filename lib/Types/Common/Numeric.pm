@@ -61,7 +61,7 @@ $meta->add_type(
 	inlined    => sub {
 		if ($pos_int) {
 			my $xsub = Type::Tiny::XS::get_subname_for($_[0]->name);
-			return "$xsub($_[1])" if $xsub;
+			return "$xsub($_[1])" if $xsub && !$Type::Tiny::AvoidCallbacks;
 		}
 		undef, qq($_ > 0);
 	},
@@ -76,7 +76,7 @@ $meta->add_type(
 	inlined    => sub {
 		if ($posz_int) {
 			my $xsub = Type::Tiny::XS::get_subname_for($_[0]->name);
-			return "$xsub($_[1])" if $xsub;
+			return "$xsub($_[1])" if $xsub && !$Type::Tiny::AvoidCallbacks;
 		}
 		undef, qq($_ >= 0);
 	},

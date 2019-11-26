@@ -5,7 +5,7 @@
 =head1 PURPOSE
 
 Checks various values against C<StrMatch> from Types::Standard
-when PERL_TYPE_TINY_AVOID_CALLBACKS is true.
+when C<< $Type::Tiny::AvoidCallbacks >> is true.
 
 =head1 AUTHOR
 
@@ -20,20 +20,23 @@ the same terms as the Perl 5 programming language system itself.
 
 =cut
 
-BEGIN { $ENV{PERL_TYPE_TINY_AVOID_CALLBACKS} = 1 };
-
 use strict;
 use warnings;
 use lib qw( . ./t ../inc ./inc );
 use Test::More;
 use Test::Requires '5.018';
+use Test::Requires 'Test::Warnings';
 
 use Types::Standard 'StrMatch';
+use Test::Warnings 'warning';
 
-ok(Types::Standard::_AVOID_CALLBACKS, "constant set correctly");
+$Type::Tiny::AvoidCallbacks = 1;
 
 my $z;
 my $complex = StrMatch->of(qr/x(?{$z})/);  # closure so can't be easily inlined
-ok(!$complex->can_be_inlined, "if avoiding callbacks, can't inline this complex regexp");
-	
+my $warning = warning { $z = $complex->inline_check('$VALUE') };
+
+like($z, qr/Types::Standard::StrMatch::expressions/);
+like($warning, qr/without callbacks/);
+
 done_testing;
