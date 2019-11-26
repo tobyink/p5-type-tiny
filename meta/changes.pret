@@ -3218,3 +3218,32 @@
 			label "Type::Tiny::XS integration is now officially supported and no longer experimental.";
 		];
 	].
+
+`Type-Tiny 1.007_002 cpan:TOBYINK`
+	issued  2019-11-26;
+	changeset [
+		dcs:versus `Type-Tiny 1.007_001 cpan:TOBYINK`;
+		item [
+			a dcs:Documentation;
+			label "More work on the Type::Tiny manual.";
+		];
+		item [
+			a dcs:Tests, dcs:Documentation;
+			label "Expand per-type tests of bundled type libraries.";
+		];
+		item [
+			label "Control over whether types are allowed to make callbacks in inlined code is now via a package variable instead of an environment variable and can be toggled at runtime.";
+		];
+		item [
+			a dcs:Documentation;
+			label "Move CONTRIBUTING.pod into the manual.";
+		];
+		item [
+			a dcs:Change;
+			label "(~Types::Standard::Any)->name is now 'None'";
+		];
+		item [
+			a dcs:Documentation;
+			label "Various documentation typos.";
+		];
+	].
