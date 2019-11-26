@@ -38,7 +38,7 @@ is(exception { Any->inline_check(q/$xyz/) }, undef, "Inlining Any doesn't throw 
 ok(!Any->has_coercion, "Any doesn't have a coercion");
 ok(!Any->is_parameterizable, "Any isn't parameterizable");
 
-my @none_tests = 
+my @none_tests =
 my @tests = (
 	pass => 'undef'                    => undef,
 	pass => 'false'                    => !!0,
