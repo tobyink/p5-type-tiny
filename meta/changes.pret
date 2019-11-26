@@ -3244,6 +3244,18 @@
 		];
 		item [
 			a dcs:Documentation;
-			label "Various documentation typos.";
+			label "Fix various documentation typos.";
+		];
+		item [
+			a dcs:Documentation;
+			label "Improve Type::Tiny SYNOPSIS.";
+		];
+		item [
+			a dcs:Documentation;
+			label "Improve Type::Params SYNOPSIS.";
+		];
+		item [
+			a dcs:Documentation;
+			label "Types::Standard now has a SYNOPSIS.";
 		];
 	].
