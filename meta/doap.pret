@@ -10,7 +10,6 @@
 	:download-page        <https://metacpan.org/release/Type-Tiny>;
 	:bug-database         <http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>;
 	:repository           [ a :GitRepository; :browse <https://github.com/tobyink/p5-type-tiny> ];
-	cpant:x_IRC           <irc://irc.perl.org/#moops>;
 	:created              2013-03-23;
 	:license              <http://dev.perl.org/licenses/>;
 	:maintainer           cpan:TOBYINK;
