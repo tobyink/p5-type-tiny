@@ -3254,3 +3254,18 @@
 			label "Types::Standard now has a SYNOPSIS.";
 		];
 	].
+
+`Type-Tiny 1.007_003 cpan:TOBYINK`
+	issued  2019-11-27;
+	changeset [
+		dcs:versus `Type-Tiny 1.007_002 cpan:TOBYINK`;
+		item [
+			a dcs:Documentation;
+			label "More work on the Type::Tiny manual.";
+			dcs:thanks [ foaf:nick "jplindstrom"; foaf:page <https://www.reddit.com/user/jplindstrom/> ];
+		];
+		item [
+			a dcs:Tests, dcs:Documentation;
+			label "Expand per-type tests of bundled type libraries.";
+		]
+	].

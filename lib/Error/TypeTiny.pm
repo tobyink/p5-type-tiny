@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Error::TypeTiny::AUTHORITY = 'cpan:TOBYINK';
-	$Error::TypeTiny::VERSION   = '1.007_002';
+	$Error::TypeTiny::VERSION   = '1.007_003';
 }
 
 $Error::TypeTiny::VERSION =~ tr/_//d;
