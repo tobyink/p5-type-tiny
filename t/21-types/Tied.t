@@ -117,7 +117,7 @@ tie my $var, 'Tie::StdScalar';
 
 should_pass( \$var, Tied );
 should_pass( \$var, Tied['Tie::StdScalar'] );
-should_pass( \$var, Tied['Tie::Scalar'] ); 
+should_pass( \$var, Tied['Tie::Scalar'] );
 should_fail( \$var, Tied['IO::File'] );    # Tie::StdScalar inherits
 
 #
@@ -125,8 +125,8 @@ should_fail( \$var, Tied['IO::File'] );    # Tie::StdScalar inherits
 #
 
 bless(\$var, 'Bleh');
-should_pass( \$var, Tied['Tie::Scalar'] ); 
-should_fail( \$var, Tied['Bleh'] ); 
+should_pass( \$var, Tied['Tie::Scalar'] );
+should_fail( \$var, Tied['Bleh'] );
 
 #
 # Tied is for blessed references only!
@@ -144,7 +144,7 @@ require Tie::Array;
 tie my @arr, 'Tie::StdArray';
 should_pass( \@arr, Tied );
 should_pass( \@arr, Tied['Tie::StdArray'] );
-should_pass( \@arr, Tied['Tie::Array'] ); 
+should_pass( \@arr, Tied['Tie::Array'] );
 should_fail( \@arr, Tied['IO::File'] );    # Tie::StdArray inherits
 
 #
@@ -152,8 +152,8 @@ should_fail( \@arr, Tied['IO::File'] );    # Tie::StdArray inherits
 #
 
 bless(\@arr, 'Bleh');
-should_pass( \@arr, Tied['Tie::Array'] ); 
-should_fail( \@arr, Tied['Bleh'] ); 
+should_pass( \@arr, Tied['Tie::Array'] );
+should_fail( \@arr, Tied['Bleh'] );
 
 #
 # Test with tied hash
@@ -164,7 +164,7 @@ require Tie::Hash;
 tie my %h, 'Tie::StdHash';
 should_pass( \%h, Tied );
 should_pass( \%h, Tied['Tie::StdHash'] );
-should_pass( \%h, Tied['Tie::Hash'] ); 
+should_pass( \%h, Tied['Tie::Hash'] );
 should_fail( \%h, Tied['IO::File'] );    # Tie::StdHash inherits
 
 #
@@ -172,8 +172,8 @@ should_fail( \%h, Tied['IO::File'] );    # Tie::StdHash inherits
 #
 
 bless(\%h, 'Bleh');
-should_pass( \%h, Tied['Tie::Hash'] ); 
-should_fail( \%h, Tied['Bleh'] ); 
+should_pass( \%h, Tied['Tie::Hash'] );
+should_fail( \%h, Tied['Bleh'] );
 
 done_testing;
 

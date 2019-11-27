@@ -145,7 +145,7 @@ subtest "Can coerce from MouseX::Types to TypeTiny" => sub {
 	);
 	should_pass( $Arrayref, TypeTiny );
 	should_pass( [], $Arrayref );
-	should_fail( {}, $Arrayref );	
+	should_fail( {}, $Arrayref );
 	ok($Arrayref->is_parameterizable);
 } if eval q{ package Local::Dummy3; use MouseX::Types::Mouse qw(ArrayRef); 1 };
 
