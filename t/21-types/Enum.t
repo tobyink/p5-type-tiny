@@ -108,7 +108,38 @@ while (@tests) {
 	}
 }
 
-note("TODO: write tests for parameterized types");
+my $enum1 = Enum[qw/ foo bar bar baz /];
+should_pass('foo', $enum1);
+should_pass('bar', $enum1);
+should_pass('baz', $enum1);
+should_fail('bat', $enum1);
+is_deeply($enum1->values, [qw/ foo bar bar baz /]);
+is_deeply($enum1->unique_values, [qw/ bar baz foo /]);
+is_deeply([@$enum1], [qw/ foo bar bar baz /]);
+
+#
+# Enum allows you to pass objects overloading stringification when
+# creating the type, but rejects blessed objects (even overloaded)
+# when checking values.
+#
+
+{
+	package Local::Stringy;
+	use overload q[""] => sub { ${$_[0]} };
+	sub new { my ($class, $str) = @_; bless \$str, $class }
+}
+
+my $enum2 = Enum[
+	map Local::Stringy->new($_), qw/ foo bar bar baz /
+];
+should_pass('foo', $enum2);
+should_pass('bar', $enum2);
+should_pass('baz', $enum2);
+should_fail('bat', $enum2);
+should_fail(Local::Stringy->new('foo'), $enum2);
+is_deeply($enum2->values, [qw/ foo bar bar baz /]);
+is_deeply($enum2->unique_values, [qw/ bar baz foo /]);
+is_deeply([@$enum2], [qw/ foo bar bar baz /]);
 
 done_testing;
 
