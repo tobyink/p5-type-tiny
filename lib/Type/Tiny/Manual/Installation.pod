@@ -1,0 +1,126 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Type::Tiny::Manual::Installation - how to install Type::Tiny
+
+=head1 MANUAL
+
+Installing Type-Tiny should be straightforward.
+
+=head2 Installation with cpanminus
+
+If you have cpanm, you only need one line:
+
+  % cpanm Type::Tiny
+
+If you are installing into a system-wide directory, you may need to pass
+the "-S" flag to cpanm, which uses sudo to install the module:
+
+  % cpanm -S Type::Tiny
+
+=head2 Installation with the CPAN Shell
+
+Alternatively, if your CPAN shell is set up, you should just be able to
+do:
+
+  % cpan Type::Tiny
+
+=head2 Manual Installation
+
+As a last resort, you can manually install it. Download the tarball and
+unpack it.
+
+Consult the file META.json for a list of pre-requisites. Install these
+first.
+
+To build Type-Tiny:
+
+  % perl Makefile.PL
+  % make && make test
+
+Then install it:
+
+  % make install
+
+If you are installing into a system-wide directory, you may need to run:
+
+  % sudo make install
+
+=head2 Dependencies
+
+Type::Tiny requires at least Perl 5.6.1, though certain Unicode-related
+features (e.g. non-ASCII type constraint names) may work better in newer
+versions of Perl.
+
+Type::Tiny requires L<Exporter::Tiny>, a module that was previously
+bundled in this distribution, but has since been spun off as a separate
+distribution. Don't worry - it's quick and easy to install.
+
+At run-time, Type::Tiny also requires the following modules: L<B>,
+L<B::Deparse>, L<Carp>, L<Data::Dumper>, L<Scalar::Util>, L<Text::Balanced>,
+L<overload>, L<strict> and L<warnings>. All of these come bundled with
+Perl itself. Prior to Perl 5.8, L<Scalar::Util> and L<Text::Balanced>
+do not come bundled with Perl and will need installing separately from
+the CPAN.
+
+Certain features require additional modules. Tying a variable to a
+type constraint (e.g. C<< tie my $count, Int >>) requires L<Type::Tie>;
+stack traces on exceptions require L<Devel::StackTrace>. The
+L<Reply::Plugin::TypeTiny> plugin for L<Reply> requires L<Reply>
+(obviously). L<Devel::LexAlias> may I<slightly> increase the speed
+of some of Type::Tiny's compiled coderefs.
+
+L<Type::Tiny::XS> is not required, but if available provides a speed
+boost for some type checks. (Setting the environment variable
+C<PERL_TYPE_TINY_XS> to false, or setting C<PERL_ONLY> to true will
+suppress the use of Type::Tiny::XS, even if it is available.)
+
+The test suite additionally requires L<Test::More>, L<Test::Fatal>
+and L<Test::Requires>. Test::More comes bundled with Perl, but if
+you are using a version of Perl older than 5.14, you will need to
+upgrade to at least Test::More version 0.96. Test::Requires and
+Test::Fatal (plus Try::Tiny which Test::Fatal depends on) are bundled
+with Type::Tiny in the C<inc> directory, so you do not need to
+install them separately.
+
+If using Type::Tiny in conjunction with L<Moo>, then at least Moo
+1.006000 is recommended. If using Type::Tiny with L<Moose>, then at
+least Moose 2.0000 is recommended. If using Type::Tiny with L<Mouse>,
+then at least Mouse 1.00 is recommended. Type::Tiny is mostly
+untested against older versions of these packages.
+
+=head1 NEXT STEPS
+
+Here's your next step:
+
+=over
+
+=item * L<Type::Tiny::Manual::UsingWithMoo>
+
+Basic use of Type::Tiny with Moo, including attribute type constraints,
+parameterized type constraints, coercions, and method parameter checking.
+
+=back
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013-2014, 2017-2019 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+=cut
+
