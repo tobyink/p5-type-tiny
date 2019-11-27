@@ -108,7 +108,62 @@ while (@tests) {
 	}
 }
 
-note("TODO: write tests for parameterized types");
+#
+# If there's one parameter, it is an inclusive minimum.
+#
+
+my $IntRange_2 = IntRange[2];
+
+should_fail(-2, $IntRange_2);
+should_fail(-1, $IntRange_2);
+should_fail( 0, $IntRange_2);
+should_fail( 1, $IntRange_2);
+should_pass( 2, $IntRange_2);
+should_pass( 3, $IntRange_2);
+should_pass( 4, $IntRange_2);
+should_pass( 5, $IntRange_2);
+should_pass( 6, $IntRange_2);
+should_fail(3.1416, $IntRange_2);
+should_fail([], $IntRange_2);
+
+#
+# If there's two parameters, they are inclusive minimum and maximum.
+#
+
+my $IntRange_2_4 = IntRange[2, 4];
+
+should_fail(-2, $IntRange_2_4);
+should_fail(-1, $IntRange_2_4);
+should_fail( 0, $IntRange_2_4);
+should_fail( 1, $IntRange_2_4);
+should_pass( 2, $IntRange_2_4);
+should_pass( 3, $IntRange_2_4);
+should_pass( 4, $IntRange_2_4);
+should_fail( 5, $IntRange_2_4);
+should_fail( 6, $IntRange_2_4);
+should_fail(3.1416, $IntRange_2_4);
+should_fail([], $IntRange_2_4);
+
+#
+# Can set an exclusive minimum and maximum.
+#
+
+my $IntRange_2_4_ex = IntRange[2, 4, 1, 1];
+
+should_fail(-2, $IntRange_2_4_ex);
+should_fail(-1, $IntRange_2_4_ex);
+should_fail( 0, $IntRange_2_4_ex);
+should_fail( 1, $IntRange_2_4_ex);
+should_fail( 2, $IntRange_2_4_ex);
+should_pass( 3, $IntRange_2_4_ex);
+should_fail( 4, $IntRange_2_4_ex);
+should_fail( 5, $IntRange_2_4_ex);
+should_fail( 6, $IntRange_2_4_ex);
+should_fail(3.1416, $IntRange_2_4_ex);
+should_fail([], $IntRange_2_4_ex);
+
+my $e = exception { IntRange[1.1] };
+like($e, qr/min must be/, 'bad parameter');
 
 done_testing;
 

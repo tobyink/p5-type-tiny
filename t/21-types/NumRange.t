@@ -108,7 +108,80 @@ while (@tests) {
 	}
 }
 
-note("TODO: write tests for parameterized types");
+#
+# If there's one parameter, it is an inclusive minimum.
+#
+
+my $NumRange_2 = NumRange[2];
+
+should_fail(-2, $NumRange_2);
+should_fail(-1, $NumRange_2);
+should_fail( 0, $NumRange_2);
+should_fail( 1, $NumRange_2);
+should_pass( 2, $NumRange_2);
+should_pass( 3, $NumRange_2);
+should_pass( 4, $NumRange_2);
+should_pass( 5, $NumRange_2);
+should_pass( 6, $NumRange_2);
+should_pass(3.1416, $NumRange_2);
+should_fail([], $NumRange_2);
+
+#
+# If there's two parameters, they are inclusive minimum and maximum.
+#
+
+my $NumRange_2_4 = NumRange[2, 4];
+
+should_fail(-2, $NumRange_2_4);
+should_fail(-1, $NumRange_2_4);
+should_fail( 0, $NumRange_2_4);
+should_fail( 1, $NumRange_2_4);
+should_pass( 2, $NumRange_2_4);
+should_pass( 3, $NumRange_2_4);
+should_pass( 4, $NumRange_2_4);
+should_fail( 5, $NumRange_2_4);
+should_fail( 6, $NumRange_2_4);
+should_pass(3.1416, $NumRange_2_4);
+should_fail([], $NumRange_2_4);
+
+#
+# Can set an exclusive minimum and maximum.
+#
+
+my $NumRange_2_4_ex = NumRange[2, 4, 1, 1];
+
+should_fail(-2, $NumRange_2_4_ex);
+should_fail(-1, $NumRange_2_4_ex);
+should_fail( 0, $NumRange_2_4_ex);
+should_fail( 1, $NumRange_2_4_ex);
+should_fail( 2, $NumRange_2_4_ex);
+should_pass( 3, $NumRange_2_4_ex);
+should_fail( 4, $NumRange_2_4_ex);
+should_fail( 5, $NumRange_2_4_ex);
+should_fail( 6, $NumRange_2_4_ex);
+should_pass(3.1416, $NumRange_2_4_ex);
+should_fail([], $NumRange_2_4_ex);
+
+#
+# NumRange allows minimum and maximum to be non-integers
+#
+
+my $NumRange_nonint = NumRange[1.5, 3.5];
+should_fail(-2, $NumRange_nonint);
+should_fail(-1, $NumRange_nonint);
+should_fail( 0, $NumRange_nonint);
+should_fail( 1, $NumRange_nonint);
+should_pass( 2, $NumRange_nonint);
+should_pass( 3, $NumRange_nonint);
+should_fail( 4, $NumRange_nonint);
+should_fail( 5, $NumRange_nonint);
+should_fail( 6, $NumRange_nonint);
+should_pass(3.1416, $NumRange_nonint);
+should_fail([], $NumRange_nonint);
+
+
+my $e = exception { NumRange[{}] };
+like($e, qr/min must be/, 'bad parameter');
+
 
 done_testing;
-
