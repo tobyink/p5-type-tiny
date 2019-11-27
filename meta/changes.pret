@@ -3111,7 +3111,6 @@
 			a dcs:Bugfix;
 			dcs:fixes RT#102748;
 			label "When extending a MooseX::Types library, be more careful checking to see if types have coercions, because a Moose::Meta::TypeCoercion object may be an empty list of coercions.";
-			seealso <https://rt.cpan.org/Ticket/Display.html?id=102748>;
 		];
 		item [
 			a dcs:Tests;
@@ -3141,7 +3140,6 @@
 			a dcs:Bugfix;
 			dcs:fixes RT#121763;
 			label "Type::Params will now keep a reference to all type constraints passed to it; this may use more memory in some cases, but will improve exceptions thrown.";
-			seealso <https://rt.cpan.org/Ticket/Display.html?id=121763>;
 		];
 		item [
 			a dcs:Tests;
@@ -3155,7 +3153,6 @@
 			a dcs:Bugfix, dcs:Packaging;
 			dcs:fixes RT#125839;
 			label "Strip underscores in version numbers for dev releases.";
-			seealso <https://rt.cpan.org/Ticket/Display.html?id=125839>;
 		];
 		item [
 			a dcs:Addition;
@@ -3165,13 +3162,11 @@
 			a dcs:Bugfix;
 			dcs:fixes RT#129729;
 			label "Type::Tiny::Enum will now avoid triggering a Type::Tiny::XS bug involving hyphens in strings.";
-			seealso <https://rt.cpan.org/Ticket/Display.html?id=129729>;
 		];
 		item [
 			a dcs:Bugfix;
 			dcs:fixes RT#114915;
 			label "Type::Tiny better mimics the Moose::Meta::TypeConstraint::Parameterized API, adding `parameterized_from` and `has_parameterized_from` methods.";
-			seealso <https://rt.cpan.org/Ticket/Display.html?id=114915>;
 		];
 		item [
 			a dcs:Packaging, dcs:Removal;
