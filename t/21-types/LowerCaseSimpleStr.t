@@ -108,7 +108,64 @@ while (@tests) {
 	}
 }
 
-note("TODO: write tests for coercions");
+# Cyrillic Small Letter Zhe
+should_pass("\x{0436}", LowerCaseSimpleStr);
+
+# Cyrillic Capital Letter Zhe
+should_fail("\x{0416}", LowerCaseSimpleStr);
+
+#
+# SimpleStr is limited to 255 characters
+#
+
+should_pass("a" x 255, LowerCaseSimpleStr);
+should_fail("a" x 256, LowerCaseSimpleStr);
+
+#
+# Length counts are characters, not bytes,
+# so test with a multibyte character.
+#
+
+should_pass("\x{0436}" x 255, LowerCaseSimpleStr);
+should_fail("\x{0436}" x 256, LowerCaseSimpleStr);
+
+#
+# These examples are probably obvious.
+#
+
+should_fail('ABCDEF', LowerCaseSimpleStr);
+should_fail('ABC123', LowerCaseSimpleStr);
+should_pass('abc123', LowerCaseSimpleStr);
+should_pass('abcdef', LowerCaseSimpleStr);
+
+#
+# A string with only non-letter characters passes.
+#
+
+should_pass('123456', LowerCaseSimpleStr);
+should_pass(' ', LowerCaseSimpleStr);
+
+#
+# But the empty string fails.
+# (Which is weird, but consistent with MooseX::Types::Common::String.)
+#
+
+should_fail('', LowerCaseSimpleStr);
+
+#
+# Can coerce from uppercase strings.
+#
+
+is(LowerCaseSimpleStr->coerce('ABC123'), 'abc123', 'coercion success');
+
+#
+# Won't even attempt to coerce non-strings.
+#
+
+use Scalar::Util qw( refaddr );
+my $arr      = [];
+my $coerced  = LowerCaseSimpleStr->coerce($arr);
+is(refaddr($coerced), refaddr($arr), 'does not coerce non-strings');
 
 done_testing;
 
