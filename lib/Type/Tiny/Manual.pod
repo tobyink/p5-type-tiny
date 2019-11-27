@@ -31,7 +31,7 @@ be changed to C<use Moose> or C<use Mouse> and it would still work.
  
  package Horse {
    use Moo;
-   use Types::Standard qw( Str Int Enum ArrayRef Object );
+   use Types::Standard qw( Str Int Enum ArrayRef InstanceOf );
    use Type::Params qw( compile );
    use namespace::autoclean;
    
@@ -50,14 +50,15 @@ be changed to C<use Moose> or C<use Mouse> and it would still work.
    );
    has children => (
      is       => 'ro',
-     isa      => ArrayRef[Object],
+     isa      => ArrayRef[ InstanceOf['Horse'] ],
      default  => sub { return [] },
    );
    
    sub add_child {
-     state $check = compile( Object, Object );  # method signature
+     # method signature
+     state $check = compile( InstanceOf['Horse'], InstanceOf['Horse'] );
      
-     my ($self, $child) = $check->(@_);         # unpack @_
+     my ($self, $child) = $check->(@_);   # unpack @_
      push @{ $self->children }, $child;
      
      return $self;
