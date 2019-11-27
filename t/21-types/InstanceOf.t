@@ -108,7 +108,38 @@ while (@tests) {
 	}
 }
 
-note("TODO: write tests for parameterized types");
+#
+# Parameterized InstanceOf returns a Type::Tiny::Class.
+#
+
+should_pass(InstanceOf['Foo'], InstanceOf['Type::Tiny::Class']);
+should_pass(InstanceOf['Foo'], InstanceOf['Type::Tiny']);
+
+#
+# If Foo::Bar is a subclass of Foo, then Foo::Bar objects
+# should pass InstanceOf['Foo'] but not the other way around.
+#
+
+@Foo::Bar::ISA = qw( Foo );
+should_pass( bless([], 'Foo::Bar'),  InstanceOf['Foo::Bar'] );
+should_pass( bless([], 'Foo::Bar'),  InstanceOf['Foo']      );
+should_fail( bless([], 'Foo'),       InstanceOf['Foo::Bar'] );
+should_pass( bless([], 'Foo'),       InstanceOf['Foo']      );
+
+#
+# Parameterized InstanceOf with two parameters returns
+# a Type::Tiny::Union of two Type::Tiny::Class objects.
+#
+
+my $fb = InstanceOf['Foo','Bar'];
+should_pass($fb, InstanceOf['Type::Tiny::Union']);
+should_pass($fb, InstanceOf['Type::Tiny']);
+is(scalar(@$fb), 2);
+should_pass($fb->[0], InstanceOf['Type::Tiny::Class']);
+should_pass($fb->[1], InstanceOf['Type::Tiny::Class']);
+
+should_pass( bless([], 'Foo'), $fb );
+should_pass( bless([], 'Bar'), $fb );
 
 done_testing;
 

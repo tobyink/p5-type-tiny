@@ -108,7 +108,101 @@ while (@tests) {
 	}
 }
 
-note("TODO: write tests for parameterized types");
+#
+# Parameterized ConsumerOf returns a Type::Tiny::Role.
+#
+
+should_pass(ConsumerOf['Foo'], ConsumerOf['Type::Tiny::Role']);
+should_pass(ConsumerOf['Foo'], ConsumerOf['Type::Tiny']);
+
+#
+# If Foo::Bar is a subclass of Foo, then Foo::Bar objects
+# should pass ConsumerOf['Foo'] but not the other way around.
+# (Note: UNIVERSAL::DOES calls $object->isa.)
+#
+
+@Foo::Bar::ISA = qw( Foo );
+should_pass( bless([], 'Foo::Bar'),  ConsumerOf['Foo::Bar'] );
+should_pass( bless([], 'Foo::Bar'),  ConsumerOf['Foo']      );
+should_fail( bless([], 'Foo'),       ConsumerOf['Foo::Bar'] );
+should_pass( bless([], 'Foo'),       ConsumerOf['Foo']      );
+
+#
+# Parameterized ConsumerOf with two parameters returns a
+# Type::Tiny::Intersection of two Type::Tiny::Role objects.
+#
+
+my $fb = ConsumerOf['Foo','Bar'];
+should_pass($fb, ConsumerOf['Type::Tiny::Intersection']);
+should_pass($fb, ConsumerOf['Type::Tiny']);
+is(scalar(@$fb), 2);
+should_pass($fb->[0], ConsumerOf['Type::Tiny::Role']);
+should_pass($fb->[1], ConsumerOf['Type::Tiny::Role']);
+
+{ package Foo; package Bar; }
+@MyConsumer::ISA = qw( Foo Bar );
+should_pass( bless([], 'MyConsumer'), $fb );
+
+#
+# Test using Class::Tiny and Role::Tiny
+#
+
+if (eval q{
+	package My::TinyRole;
+	use Role::Tiny;
+	package My::TinyClass;
+	use Class::Tiny;
+	use Role::Tiny::With;
+	with 'My::TinyRole';
+	1 }) {
+	should_pass(My::TinyClass->new, ConsumerOf['My::TinyRole']);
+	should_pass(My::TinyClass->new, ConsumerOf['My::TinyClass']);
+}
+
+#
+# Test using Moo
+#
+
+if (eval q{
+	package My::MooRole;
+	use Moo::Role;
+	package My::MooClass;
+	use Moo;
+	with 'My::MooRole';
+	1 }) {
+	should_pass(My::MooClass->new, ConsumerOf['My::MooRole']);
+	should_pass(My::MooClass->new, ConsumerOf['My::MooClass']);
+}
+
+#
+# Test using Moose
+#
+
+if (eval q{
+	package My::MooseRole;
+	use Moose::Role;
+	package My::MooseClass;
+	use Moose;
+	with 'My::MooseRole';
+	1 }) {
+	should_pass(My::MooseClass->new, ConsumerOf['My::MooseRole']);
+	should_pass(My::MooseClass->new, ConsumerOf['My::MooseClass']);
+}
+
+#
+# Test using Mouse
+#
+
+if (eval q{
+	package My::MouseRole;
+	use Mouse::Role;
+	package My::MouseClass;
+	use Mouse;
+	with 'My::MouseRole';
+	1 }) {
+	should_pass(My::MouseClass->new, ConsumerOf['My::MouseRole']);
+	should_pass(My::MouseClass->new, ConsumerOf['My::MouseClass']);
+}
 
 done_testing;
 
