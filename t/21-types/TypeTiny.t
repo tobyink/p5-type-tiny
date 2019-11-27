@@ -108,7 +108,56 @@ while (@tests) {
 	}
 }
 
-note("TODO: write tests for coercions");
+should_pass(TypeTiny, TypeTiny);  # dogfooding
+
+subtest "Can coerce from coderef to TypeTiny" => sub {
+	my $Arrayref = TypeTiny->coerce(
+		sub { ref($_) eq 'ARRAY' }
+	);
+	should_pass( $Arrayref, TypeTiny );
+	should_pass( [], $Arrayref );
+	should_fail( {}, $Arrayref );
+};
+
+subtest "Can coerce from Type::Nano to TypeTiny" => sub {
+	my $Arrayref = TypeTiny->coerce(
+		Local::Dummy1::ArrayRef()
+	);
+	should_pass( $Arrayref, TypeTiny );
+	should_pass( [], $Arrayref );
+	should_fail( {}, $Arrayref );
+} if eval q{ package Local::Dummy1; use Type::Nano qw(ArrayRef); 1 };
+
+subtest "Can coerce from MooseX::Types to TypeTiny" => sub {
+	my $Arrayref = TypeTiny->coerce(
+		Local::Dummy2::ArrayRef()
+	);
+	should_pass( $Arrayref, TypeTiny );
+	should_pass( [], $Arrayref );
+	should_fail( {}, $Arrayref );
+	ok($Arrayref->is_parameterizable);
+	ok($Arrayref->can_be_inlined);
+} if eval q{ package Local::Dummy2; use MooseX::Types::Moose qw(ArrayRef); 1 };
+
+subtest "Can coerce from MouseX::Types to TypeTiny" => sub {
+	my $Arrayref = TypeTiny->coerce(
+		Local::Dummy3::ArrayRef()
+	);
+	should_pass( $Arrayref, TypeTiny );
+	should_pass( [], $Arrayref );
+	should_fail( {}, $Arrayref );	
+	ok($Arrayref->is_parameterizable);
+} if eval q{ package Local::Dummy3; use MouseX::Types::Mouse qw(ArrayRef); 1 };
+
+subtest "Can coerce from Specio to TypeTiny" => sub {
+	my $Arrayref = TypeTiny->coerce(
+		Local::Dummy4::t('ArrayRef')
+	);
+	should_pass( $Arrayref, TypeTiny );
+	should_pass( [], $Arrayref );
+	should_fail( {}, $Arrayref );
+	ok($Arrayref->can_be_inlined);
+} if eval q{ package Local::Dummy4; use Specio::Library::Builtins; 1 };
 
 done_testing;
 
