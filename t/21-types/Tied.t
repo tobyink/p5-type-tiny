@@ -108,7 +108,72 @@ while (@tests) {
 	}
 }
 
-note("TODO: write tests for parameterized types");
+#
+# Test with tied scalar
+#
+
+require Tie::Scalar;
+tie my $var, 'Tie::StdScalar';
+
+should_pass( \$var, Tied );
+should_pass( \$var, Tied['Tie::StdScalar'] );
+should_pass( \$var, Tied['Tie::Scalar'] ); 
+should_fail( \$var, Tied['IO::File'] );    # Tie::StdScalar inherits
+
+#
+# Blessed scalarrefs can still be tied
+#
+
+bless(\$var, 'Bleh');
+should_pass( \$var, Tied['Tie::Scalar'] ); 
+should_fail( \$var, Tied['Bleh'] ); 
+
+#
+# Tied is for blessed references only!
+# Couldn't reliably test non-reference even if we wanted to.
+#
+
+ok(tied($var), '$var is tied');
+should_fail( $var, Tied );
+
+#
+# Test with tied array
+#
+
+require Tie::Array;
+tie my @arr, 'Tie::StdArray';
+should_pass( \@arr, Tied );
+should_pass( \@arr, Tied['Tie::StdArray'] );
+should_pass( \@arr, Tied['Tie::Array'] ); 
+should_fail( \@arr, Tied['IO::File'] );    # Tie::StdArray inherits
+
+#
+# Blessed arrayrefs can still be tied
+#
+
+bless(\@arr, 'Bleh');
+should_pass( \@arr, Tied['Tie::Array'] ); 
+should_fail( \@arr, Tied['Bleh'] ); 
+
+#
+# Test with tied hash
+#
+
+require Tie::Hash;
+@Tie::StdHash::ISA = qw(Tie::Hash);
+tie my %h, 'Tie::StdHash';
+should_pass( \%h, Tied );
+should_pass( \%h, Tied['Tie::StdHash'] );
+should_pass( \%h, Tied['Tie::Hash'] ); 
+should_fail( \%h, Tied['IO::File'] );    # Tie::StdHash inherits
+
+#
+# Blessed hashrefs can still be tied
+#
+
+bless(\%h, 'Bleh');
+should_pass( \%h, Tied['Tie::Hash'] ); 
+should_fail( \%h, Tied['Bleh'] ); 
 
 done_testing;
 
