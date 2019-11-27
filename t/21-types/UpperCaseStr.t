@@ -108,6 +108,12 @@ while (@tests) {
 	}
 }
 
+# Cyrillic Small Letter Zhe
+should_fail("\x{0436}", UpperCaseStr);
+
+# Cyrillic Capital Letter Zhe
+should_pass("\x{0416}", UpperCaseStr);
+
 #
 # These examples are probably obvious.
 #
