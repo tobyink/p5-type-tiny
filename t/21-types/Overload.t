@@ -108,7 +108,46 @@ while (@tests) {
 	}
 }
 
-note("TODO: write tests for parameterized types");
+#
+# Type::Tiny itself overloads q[&{}] and q[""] but not q[${}].
+#
+
+should_pass(Overload, Overload[ q[&{}] ]);
+should_pass(Overload, Overload[ q[""] ]);
+should_fail(Overload, Overload[ q[${}] ]);
+
+#
+# It's possible to check multiple overloaded operations.
+#
+
+should_pass(Overload, Overload[ q[&{}], q[""] ]);
+should_fail(Overload, Overload[ q[""], q[${}] ]);
+should_fail(Overload, Overload[ q[&{}], q[${}] ]);
+
+#
+# In the following example, $fortytwo_withfallback doesn't overload
+# '+' but still passes Overload['+'] because it provides a numification
+# overload and allows fallbacks.
+#
+
+my $fortytwo_nofallback = do {
+	package Local::OL::NoFallback;
+	use overload q[0+] => sub { ${$_[0]} };
+	my $x = 42;
+	bless \$x;
+};
+
+my $fortytwo_withfallback = do {
+	package Local::OL::WithFallback;
+	use overload q[0+] => sub { ${$_[0]} }, fallback => 1;
+	my $x = 42;
+	bless \$x;
+};
+
+should_pass($fortytwo_nofallback, Overload['0+']);
+should_pass($fortytwo_withfallback, Overload['0+']);
+should_fail($fortytwo_nofallback, Overload['+']);
+should_fail($fortytwo_withfallback, Overload['+']);
 
 done_testing;
 
