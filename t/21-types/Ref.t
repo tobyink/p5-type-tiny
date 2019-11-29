@@ -108,7 +108,57 @@ while (@tests) {
 	}
 }
 
-note("TODO: write tests for parameterized types");
+#
+# Tests for parameterized Ref
+# Ref['HASH']
+# Ref['ARRAY']
+# Ref['SCALAR']
+# Ref['CODE']
+# Ref['GLOB']
+# Ref['LVALUE']
+#
+
+my $x = 1;
+my %more_tests = (
+	HASH      => [ {}, bless({}, 'Foo') ],
+	ARRAY     => [ [], bless([], 'Foo') ],
+	SCALAR    => [ do { my $x; \$x }, bless(do { my $x; \$x }, 'Foo') ],
+	CODE      => [ sub { 1 }, bless(sub { 1 }, 'Foo') ],
+	GLOB      => do { no warnings;[ \*BLEH, bless(\*BLEH2, 'Foo') ] },
+#	LVALUE    => [ \substr($x, 0, 1), bless(\substr($x, 0, 1), 'Foo') ],
+);
+my @reftypes = sort keys %more_tests;
+
+# The LVALUE examples *do* work, but generating output for the test
+# via Data::Dumper results in annoying warning messages, so the tests
+# are disabled.
+
+# Regexp, IO, FORMAT, VSTRING are all "todo".
+
+for my $reftype (@reftypes) {
+	my $type = Ref[$reftype];
+	
+	note("== $type ==");
+	
+	isa_ok($type, 'Type::Tiny', '$type');
+	ok($type->is_anon, '$type is not anonymous');
+	ok($type->can_be_inlined, '$type can be inlined');
+	is(exception { $type->inline_check(q/$xyz/) }, undef, "Inlining \$type doesn't throw an exception");
+	ok(!$type->has_coercion, "\$type doesn't have a coercion");
+	ok(!$type->is_parameterizable, "\$type isn't parameterizable");
+	ok($type->is_parameterized, "\$type is parameterized");
+	is($type->parameterized_from, Ref, "\$type's parent is Ref");
+	
+	foreach my $other (@reftypes) {
+		my @values = @{ $more_tests{$other} };
+		if ($reftype eq $other) {
+			should_pass($_, $type) for @values;
+		}
+		else {
+			should_fail($_, $type) for @values;
+		}
+	}
+}
 
 done_testing;
 

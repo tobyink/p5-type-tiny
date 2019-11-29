@@ -108,7 +108,7 @@ while (@tests) {
 	}
 }
 
-note("TODO: write tests for coercions");
+is(NumericCode->coerce('123-456 789-0'), '1234567890', 'coercion from string');
 
 done_testing;
 
