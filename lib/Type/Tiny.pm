@@ -1284,7 +1284,8 @@ sub AUTOLOAD
 	if ($self->{is_object} && $object_methods{$m}) {
 		require Type::Tiny::ConstrainedObject;
 		unshift @_, $self;
-		goto( Type::Tiny::ConstrainedObject->can($m) );
+		no strict 'refs';
+		goto \&{"Type::Tiny::ConstrainedObject::$m"};
 	}
 	
 	_croak q[Can't locate object method "%s" via package "%s"], $m, ref($self)||$self;
