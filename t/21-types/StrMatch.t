@@ -108,7 +108,97 @@ while (@tests) {
 	}
 }
 
-note("TODO: write tests for parameterized types");
+#
+# This should be pretty obvious.
+#
+
+my $type1 = StrMatch[ qr/a[b]c/i ];
+
+should_pass('abc', $type1);
+should_pass('ABC', $type1);
+should_pass('fooabcbar', $type1);
+should_pass('fooABCbar', $type1);
+should_fail('a[b]c', $type1);
+
+#
+# StrMatch only accepts true strings.
+#
+
+{
+	package Local::OL::Stringy;
+	use overload q[""] => sub { ${$_[0]} };
+	sub new { my ($class, $str) = @_; bless(\$str, $class) }
+}
+
+my $abc_obj = Local::OL::Stringy->new('abc');
+is("$abc_obj", "abc");
+should_fail($abc_obj, $type1);
+
+#
+# But you can do this to create a type accepting a overloaded objects
+# that stringify to a string matching $type1.
+#
+
+use Types::Standard qw(Overload);
+my $type2 = Overload->of(q[""])->stringifies_to($type1);
+should_pass($abc_obj, $type2);
+should_fail('abc', $type2);  # ... though that doesn't accept real strings.
+
+#
+# Union type constraint to the rescue!
+#
+
+my $type3 = $type1 | $type2;
+should_pass($abc_obj, $type3);
+should_pass('abc', $type3);
+
+#
+# Okay, it was fun looking at overloaded objects, but let's look at
+# something else...
+#
+
+use Types::Standard qw( +Num Enum Tuple );
+
+my $metric_distance = StrMatch[
+	# Strings must match this regexp
+	qr/^(\S+) (\S+)$/,
+	# Captures get checked against this constraint
+	Tuple[
+		Num,
+		Enum[qw/ mm cm m km /],
+	],
+];
+
+should_pass('1 km', $metric_distance);
+should_pass('-1.6 cm', $metric_distance);
+should_fail('xyz km', $metric_distance);
+should_fail('7 miles', $metric_distance);
+should_fail('7 km   ', $metric_distance);
+
+#
+# You could implement it like this instead because a coderef
+# returning a boolean can be used like a type constraint.
+#
+
+$metric_distance = StrMatch[
+	# Strings must match this regexp
+	qr/^(\S+) (\S+)$/,
+	sub {
+		my $captures = shift;
+		return !!0 unless is_Num $captures->[0];
+		return !!1 if $captures->[1] eq 'mm';
+		return !!1 if $captures->[1] eq 'cm';
+		return !!1 if $captures->[1] eq 'm';
+		return !!1 if $captures->[1] eq 'km';
+		return !!0;
+	}
+];
+
+should_pass('1 km', $metric_distance);
+should_pass('-1.6 cm', $metric_distance);
+should_fail('xyz km', $metric_distance);
+should_fail('7 miles', $metric_distance);
+should_fail('7 km   ', $metric_distance);
 
 done_testing;
 
