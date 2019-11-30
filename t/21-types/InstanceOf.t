@@ -73,7 +73,7 @@ my @tests = (
 	fail => 'glob'                     => do { no warnings 'once'; *SOMETHING },
 	fail => 'globref'                  => do { no warnings 'once'; my $x = *SOMETHING; \$x },
 	pass => 'blessed globref'          => bless(do { no warnings 'once'; my $x = *SOMETHING; \$x }, 'SomePkg'),
-	todo => 'regexp'                   => qr/./,
+	xxxx => 'regexp'                   => qr/./,
 	pass => 'blessed regexp'           => bless(qr/./, 'SomePkg'),
 	fail => 'filehandle'               => do { open my $x, '<', $0 or die; $x },
 	pass => 'filehandle object'        => do { require IO::File; 'IO::File'->new($0, 'r') },
@@ -94,8 +94,8 @@ my @tests = (
 
 while (@tests) {
 	my ($expect, $label, $value) = splice(@tests, 0 , 3);
-	if ($expect eq 'todo') {
-		note("TODO: $label");
+	if ($expect eq 'xxxx') {
+		note("UNDEFINED OUTCOME: $label");
 	}
 	elsif ($expect eq 'pass') {
 		should_pass($value, InstanceOf, ucfirst("$label should pass InstanceOf"));

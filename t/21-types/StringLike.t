@@ -70,7 +70,7 @@ my @tests = (
 	fail => 'blessed hashref'          => bless({}, 'SomePkg'),
 	fail => 'coderef'                  => sub { 1 },
 	fail => 'blessed coderef'          => bless(sub { 1 }, 'SomePkg'),
-	todo => 'glob'                     => do { no warnings 'once'; *SOMETHING },
+	xxxx => 'glob'                     => do { no warnings 'once'; *SOMETHING },
 	fail => 'globref'                  => do { no warnings 'once'; my $x = *SOMETHING; \$x },
 	fail => 'blessed globref'          => bless(do { no warnings 'once'; my $x = *SOMETHING; \$x }, 'SomePkg'),
 	fail => 'regexp'                   => qr/./,
@@ -94,8 +94,8 @@ my @tests = (
 
 while (@tests) {
 	my ($expect, $label, $value) = splice(@tests, 0 , 3);
-	if ($expect eq 'todo') {
-		note("TODO: $label");
+	if ($expect eq 'xxxx') {
+		note("UNDEFINED OUTCOME: $label");
 	}
 	elsif ($expect eq 'pass') {
 		should_pass($value, StringLike, ucfirst("$label should pass StringLike"));

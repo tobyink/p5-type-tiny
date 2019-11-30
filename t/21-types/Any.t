@@ -95,8 +95,8 @@ my @tests = (
 
 while (@tests) {
 	my ($expect, $label, $value) = splice(@tests, 0 , 3);
-	if ($expect eq 'todo') {
-		note("TODO: $label");
+	if ($expect eq 'xxxx') {
+		note("UNDEFINED OUTCOME: $label");
 	}
 	elsif ($expect eq 'pass') {
 		should_pass($value, Any, ucfirst("$label should pass Any"));
@@ -119,8 +119,8 @@ ok($None->can_be_inlined, "None can be inlined.");
 subtest "None fails where Any passes and vice versa" => sub {
 	while (@none_tests) {
 		my ($expect, $label, $value) = splice(@none_tests, 0 , 3);
-		if ($expect eq 'todo') {
-			note("TODO: $label");
+		if ($expect eq 'xxxx') {
+			note("UNDEFINED OUTCOME: $label");
 		}
 		elsif ($expect eq 'pass') {
 			should_fail($value, $None, ucfirst("$label should fail None"));

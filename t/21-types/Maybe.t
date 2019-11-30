@@ -94,8 +94,8 @@ my @tests = (
 
 while (@tests) {
 	my ($expect, $label, $value) = splice(@tests, 0 , 3);
-	if ($expect eq 'todo') {
-		note("TODO: $label");
+	if ($expect eq 'xxxx') {
+		note("UNDEFINED OUTCOME: $label");
 	}
 	elsif ($expect eq 'pass') {
 		should_pass($value, Maybe, ucfirst("$label should pass Maybe"));

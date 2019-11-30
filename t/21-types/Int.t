@@ -40,7 +40,7 @@ ok(!Int->is_parameterizable, "Int isn't parameterizable");
 
 my @tests = (
 	fail => 'undef'                    => undef,
-	todo => 'false'                    => !!0,
+	xxxx => 'false'                    => !!0,
 	pass => 'true'                     => !!1,
 	pass => 'zero'                     =>  0,
 	pass => 'one'                      =>  1,
@@ -94,8 +94,8 @@ my @tests = (
 
 while (@tests) {
 	my ($expect, $label, $value) = splice(@tests, 0 , 3);
-	if ($expect eq 'todo') {
-		note("TODO: $label");
+	if ($expect eq 'xxxx') {
+		note("UNDEFINED OUTCOME: $label");
 	}
 	elsif ($expect eq 'pass') {
 		should_pass($value, Int, ucfirst("$label should pass Int"));
