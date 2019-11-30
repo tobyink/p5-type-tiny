@@ -108,7 +108,55 @@ while (@tests) {
 	}
 }
 
-note("TODO: write tests for parameterized types");
+use Scalar::Util qw( refaddr );
+
+my $plain  = ScalarRef;
+my $paramd = ScalarRef[];
+is(
+	refaddr($plain),
+	refaddr($paramd),
+	'parameterizing with [] has no effect'
+);
+
+#
+# Parameterization with a type constraint
+#
+
+my $IntRef = ScalarRef[ Types::Standard::Int ];
+should_pass(\"1", $IntRef);
+should_fail(\"1.2", $IntRef);
+should_fail(\"abc", $IntRef);
+
+#
+# Deep coercion
+#
+
+my $Rounded = Types::Standard::Int->plus_coercions(
+	Types::Standard::Num, 'int($_)'
+);
+
+my $RoundedRef = ScalarRef[ $Rounded ];
+should_pass(\"1", $RoundedRef);
+should_fail(\"1.2", $RoundedRef);
+should_fail(\"abc", $RoundedRef);
+ok($RoundedRef->has_coercion);
+is_deeply($RoundedRef->coerce(\"3.1"), \"3");
+
+#
+# Let's do it with a reference to a reference.
+#
+
+my $RoundedArrayRefRef = ScalarRef[ Types::Standard::ArrayRef[$Rounded] ];
+should_pass(\[], $RoundedArrayRefRef);
+should_pass(\["1"], $RoundedArrayRefRef);
+should_fail(\["1.2"], $RoundedArrayRefRef);
+should_fail(\["abc"], $RoundedArrayRefRef);
+should_fail([], $RoundedArrayRefRef);
+should_fail(["1"], $RoundedArrayRefRef);
+should_fail(["1.2"], $RoundedArrayRefRef);
+should_fail(["abc"], $RoundedArrayRefRef);
+ok($RoundedArrayRefRef->has_coercion);
+is_deeply($RoundedArrayRefRef->coerce(\["3.1"]), \["3"]);
 
 done_testing;
 
