@@ -3269,3 +3269,24 @@
 			label "Expand per-type tests of bundled type libraries.";
 		]
 	].
+
+`Type-Tiny 1.007_004 cpan:TOBYINK`
+	issued  2019-11-30;
+	changeset [
+		dcs:versus `Type-Tiny 1.007_003 cpan:TOBYINK`;
+		item [
+			label "Improvements to $AvoidCallbacks support for Types::Standard::Maybe.";
+		];
+		item [
+			a dcs:Bugfix;
+			label "Fixes for some edge cases in the overidden `can` method on old Perl 5.8.x versions for types with the secret `is_object` parameter set to true. (There were problems in 5.8.1 but 5.8.9 was okay; not sure the exact version where the delta was that affected it. Either way, fixed now.)";
+		];
+		item [
+			a dcs:Tests;
+			label "Clean up some warnings and stuff from test output.";
+		];
+		item [
+			a dcs:Tests, dcs:Documentation;
+			label "Expand per-type tests of bundled type libraries.";
+		]
+	].
