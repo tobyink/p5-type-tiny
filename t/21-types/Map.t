@@ -108,7 +108,108 @@ while (@tests) {
 	}
 }
 
-note("TODO: write tests for parameterized types");
+
+#
+# Map to constrain keys of hash
+#
+
+my $MapWithIntKeys = Map->of( Types::Standard::Int, Types::Standard::Any );
+
+isa_ok($MapWithIntKeys, 'Type::Tiny', '$MapWithIntKeys');
+is($MapWithIntKeys->display_name, 'Map[Int,Any]', '$MapWithIntKeys has correct display_name');
+ok($MapWithIntKeys->is_anon, '$MapWithIntKeys has no name');
+ok($MapWithIntKeys->can_be_inlined, '$MapWithIntKeys can be inlined');
+is(exception { $MapWithIntKeys->inline_check(q/$xyz/) }, undef, "Inlining \$MapWithIntKeys doesn't throw an exception");
+ok(!$MapWithIntKeys->has_coercion, "\$MapWithIntKeys doesn't have a coercion");
+ok(!$MapWithIntKeys->is_parameterizable, "\$MapWithIntKeys is not parameterizable");
+ok_subtype(Types::Standard::HashRef, $MapWithIntKeys);
+
+should_fail( 1,               $MapWithIntKeys );
+should_fail( [],              $MapWithIntKeys );
+should_pass( {             }, $MapWithIntKeys );
+should_fail( { 1.1 =>  []  }, $MapWithIntKeys );
+should_pass( { 1   =>  1   }, $MapWithIntKeys );
+should_pass( { 1   =>  0   }, $MapWithIntKeys );
+should_pass( { 1   => -1   }, $MapWithIntKeys );
+should_pass( { 1   => \1   }, $MapWithIntKeys );
+should_pass( { -1  => -1   }, $MapWithIntKeys );
+should_fail( { foo =>  1   }, $MapWithIntKeys );
+
+
+#
+# Map to constrain values of hash.
+# Basically like HashRef[Int]
+#
+
+my $HashOfInts = Map->of( Types::Standard::Any, Types::Standard::Int );
+
+isa_ok($HashOfInts, 'Type::Tiny', '$HashOfInts');
+is($HashOfInts->display_name, 'Map[Any,Int]', '$HashOfInts has correct display_name');
+ok($HashOfInts->is_anon, '$HashOfInts has no name');
+ok($HashOfInts->can_be_inlined, '$HashOfInts can be inlined');
+is(exception { $HashOfInts->inline_check(q/$xyz/) }, undef, "Inlining \$HashOfInts doesn't throw an exception");
+ok(!$HashOfInts->has_coercion, "\$HashOfInts doesn't have a coercion");
+ok(!$HashOfInts->is_parameterizable, "\$HashOfInts is not parameterizable");
+ok_subtype(Types::Standard::HashRef, $HashOfInts);
+
+should_fail( 1,               $HashOfInts );
+should_fail( [],              $HashOfInts );
+should_pass( {             }, $HashOfInts );
+should_fail( { foo =>  []  }, $HashOfInts );
+should_fail( { foo =>  1.1 }, $HashOfInts );
+should_pass( { foo =>  1   }, $HashOfInts );
+should_pass( { foo =>  0   }, $HashOfInts );
+should_pass( { foo => -1   }, $HashOfInts );
+should_fail( { foo => \1   }, $HashOfInts );
+should_fail( { 123 => \1   }, $HashOfInts );
+should_pass( { 123 =>  1   }, $HashOfInts );
+should_pass( { foo =>  1, bar =>  2 }, $HashOfInts );
+should_fail( { foo =>  1, bar => [] }, $HashOfInts );
+
+
+#
+# Map has deep coercions
+#
+
+my $Rounded = Types::Standard::Int->plus_coercions( Types::Standard::Num, q{ int($_) } );
+my $HashOfRounded = Map->of( $Rounded, $Rounded );
+
+use Scalar::Util qw(refaddr);
+
+do {
+	my $orig    = { 3 => 4 };
+	my $coerced = $HashOfRounded->coerce($orig);
+	
+	is( refaddr($orig), refaddr($coerced), "just returned orig unchanged" );
+};
+
+do {
+	my $orig    = { 3.1 => 4.2 };
+	my $coerced = $HashOfRounded->coerce($orig); # {3=>4}
+	
+	isnt( refaddr($orig), refaddr($coerced), "coercion happened" );
+	is($coerced->{3}, 4, "... and data looks good");
+	should_pass($coerced, $HashOfRounded, "... and now passes type constraint");
+};
+
+do {
+	my $orig    = { foo => [] };
+	my $coerced = $HashOfRounded->coerce($orig);
+	
+	is( refaddr($orig), refaddr($coerced), "coercion failed, so orig was returned" );
+	should_fail($coerced, $HashOfRounded);
+};
+
+
+#
+# Parameterization fails with bad parameters
+#
+
+do {
+	my $e = exception { Map[qw(hello world)] };
+	like($e, qr/expected to be a type constraint/, 'bad parameters');
+};
+
 
 done_testing;
 
