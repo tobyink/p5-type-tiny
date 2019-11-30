@@ -108,7 +108,81 @@ while (@tests) {
 	}
 }
 
-note("TODO: write tests for parameterized types");
+#
+# String with a minimum length
+#
+
+my $StrLength_2 = StrLength[2];
+
+should_fail('',          $StrLength_2);
+should_fail('1',         $StrLength_2);
+should_pass('12',        $StrLength_2);
+should_pass('123',       $StrLength_2);
+should_pass('1234',      $StrLength_2);
+should_pass('12345',     $StrLength_2);
+should_pass('123456',    $StrLength_2);
+should_pass('1234567',   $StrLength_2);
+should_pass('12345678',  $StrLength_2);
+should_pass('123456789', $StrLength_2);
+
+# Cyrillic Small Letter Zhe - two bytes as UTF-8 but only one character
+should_fail("\x{0436}" x 1, $StrLength_2);
+should_pass("\x{0436}" x 2, $StrLength_2);
+should_pass("\x{0436}" x 6, $StrLength_2);
+
+#
+# String with a minimum and maximum length
+#
+
+my $StrLength_2_5 = StrLength[2, 5];
+
+should_fail('',          $StrLength_2_5);
+should_fail('1',         $StrLength_2_5);
+should_pass('12',        $StrLength_2_5);
+should_pass('123',       $StrLength_2_5);
+should_pass('1234',      $StrLength_2_5);
+should_pass('12345',     $StrLength_2_5);
+should_fail('123456',    $StrLength_2_5);
+should_fail('1234567',   $StrLength_2_5);
+should_fail('12345678',  $StrLength_2_5);
+should_fail('123456789', $StrLength_2_5);
+should_fail("\x{0436}" x 1, $StrLength_2_5);
+should_pass("\x{0436}" x 2, $StrLength_2_5);
+should_fail("\x{0436}" x 6, $StrLength_2_5);
+
+#
+# Overloaded objects are not allowed
+#
+
+{
+	package Local::OL::Stringy;
+	use overload q[""] => sub { ${$_[0]} };
+	sub new { my ($class, $str) = @_; bless(\$str, $class) }
+}
+
+my $abc_obj = Local::OL::Stringy->new('abc');
+is("$abc_obj", "abc");
+should_fail($abc_obj, $StrLength_2_5);
+
+#
+# But you can do this to create a type accepting a overloaded objects
+# that stringify to a string matching $StrLength_2_5.
+#
+
+use Types::Standard qw(Overload);
+my $Overloaded_StrLength_2_5
+	= Overload->of(q[""])->stringifies_to($StrLength_2_5);
+should_pass($abc_obj, $Overloaded_StrLength_2_5);
+# ... though that doesn't accept real strings.
+should_fail('abc', $Overloaded_StrLength_2_5);
+
+#
+# Union type constraint to the rescue!
+#
+
+my $Union_2_5 = $StrLength_2_5 | $Overloaded_StrLength_2_5;
+should_pass($abc_obj, $Union_2_5);
+should_pass('abc', $Union_2_5);
+
 
 done_testing;
-
