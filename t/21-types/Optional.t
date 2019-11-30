@@ -108,7 +108,110 @@ while (@tests) {
 	}
 }
 
-note("TODO: write tests for parameterized types");
+#
+# Optional[X] is basically just the same as X. Optional acts like a no-op.
+# Optional is just a hint to Dict/Tuple/CycleTuple and Type::Params.
+#
+
+my $type = Optional[ Types::Standard::Int ];
+should_pass(0, $type);
+should_pass(1, $type);
+should_fail(1.1, $type);
+should_fail(undef, $type);
+
+if (eval q{
+	package Local::MyClass::Moo;
+	use Moo;
+	use Types::Standard qw( Int Optional );
+	has xyz => ( is => 'ro', isa => Optional[Int] );
+	1;
+}) {
+	my $e;
+	
+	$e = exception {
+		Local::MyClass::Moo->new( xyz => 0 );
+	};
+	is($e, undef);
+	
+	$e = exception {
+		Local::MyClass::Moo->new( xyz => 1 );
+	};
+	is($e, undef);
+	
+	$e = exception {
+		Local::MyClass::Moo->new( xyz => 1.1 );
+	};
+	like($e, qr/type constraint/);
+	
+	$e = exception {
+		Local::MyClass::Moo->new( xyz => undef );
+	};
+	like($e, qr/type constraint/);
+}
+
+if (eval q{
+	package Local::MyClass::Moose;
+	use Moose;
+	use Types::Standard qw( Int Optional );
+	has xyz => ( is => 'ro', isa => Optional[Int] );
+	1;
+}) {
+	my $e;
+	
+	$e = exception {
+		Local::MyClass::Moose->new( xyz => 0 );
+	};
+	is($e, undef);
+	
+	$e = exception {
+		Local::MyClass::Moose->new( xyz => 1 );
+	};
+	is($e, undef);
+	
+	$e = exception {
+		Local::MyClass::Moose->new( xyz => 1.1 );
+	};
+	like($e, qr/type constraint/);
+	
+	$e = exception {
+		Local::MyClass::Moose->new( xyz => undef );
+	};
+	like($e, qr/type constraint/);
+}
+
+if (eval q{
+	package Local::MyClass::Mouse;
+	use Mouse;
+	use Types::Standard qw( Int Optional );
+	has xyz => ( is => 'ro', isa => Optional[Int] );
+	1;
+}) {
+	my $e;
+	
+	$e = exception {
+		Local::MyClass::Mouse->new( xyz => 0 );
+	};
+	is($e, undef);
+	
+	$e = exception {
+		Local::MyClass::Mouse->new( xyz => 1 );
+	};
+	is($e, undef);
+	
+	$e = exception {
+		Local::MyClass::Mouse->new( xyz => 1.1 );
+	};
+	like($e, qr/type constraint/);
+	
+	$e = exception {
+		Local::MyClass::Mouse->new( xyz => undef );
+	};
+	like($e, qr/type constraint/);
+}
+
+#
+# See also: Dict.t, Tuple.t, CycleTuple.t.
+#
 
 done_testing;
 
