@@ -463,7 +463,7 @@ $meta->$add_core_type({
 			push @xsub, $maker->($param) if $maker;
 		}
 		
-		return(
+		return (
 			sub
 			{
 				my $value = shift;
@@ -477,16 +477,17 @@ $meta->$add_core_type({
 		my $param = shift;
 		
 		my $param_compiled_check = $param->compiled_check;
+		my $xsubname;
 		if (Type::Tiny::_USE_XS)
 		{
 			my $paramname = Type::Tiny::XS::is_known($param_compiled_check);
-			my $xsubname  = Type::Tiny::XS::get_subname_for("Maybe[$paramname]");
-			return sub { "$xsubname\($_[1]\)" } if $xsubname;
+			$xsubname = Type::Tiny::XS::get_subname_for("Maybe[$paramname]");
 		}
 		
 		return unless $param->can_be_inlined;
 		return sub {
 			my $v = $_[1];
+			return "$xsubname\($v\)" if $xsubname && !$Type::Tiny::AvoidCallbacks;
 			my $param_check = $param->inline_check($v);
 			"!defined($v) or $param_check";
 		};

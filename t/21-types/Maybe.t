@@ -108,7 +108,15 @@ while (@tests) {
 	}
 }
 
-note("TODO: write tests for parameterized types");
+#
+# Maybe[X] is an undef-tolerant version of X.
+#
+
+my $type = Maybe[ Types::Standard::Int ];
+should_pass(0, $type);
+should_pass(1, $type);
+should_fail(1.1, $type);
+should_pass(undef, $type);
 
 done_testing;
 
