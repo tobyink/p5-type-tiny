@@ -25,6 +25,14 @@ use warnings;
 use Test::More;
 use Test::Fatal;
 
+BEGIN {
+	$ENV{AUTOMATED_TESTING}
+	or $ENV{EXTENDED_TESTING}
+	or $ENV{AUTHOR_TESTING}
+	or $ENV{RELEASE_TESTING}
+	or plan skip_all => 'EXTENDED_TESTING'
+};
+
 use Test::Requires "Kavorka";
 
 note "simple type constraint";

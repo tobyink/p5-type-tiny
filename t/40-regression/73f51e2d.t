@@ -25,7 +25,7 @@ use Test::More;
 
 use Config;
 BEGIN {
-	plan skip_all => "your perl does not support ithreads"
+	plan skip_all => "ithreads"
 		unless $Config{useithreads};
 };
 

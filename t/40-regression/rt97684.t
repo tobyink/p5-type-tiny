@@ -23,6 +23,8 @@ the same terms as the Perl 5 programming language system itself.
 
 =cut
 
+BEGIN { $ENV{'DEVEL_HIDE_VERBOSE'} = 0 };
+
 use strict;
 use warnings;
 use Test::More;

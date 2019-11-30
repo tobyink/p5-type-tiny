@@ -60,7 +60,7 @@ sub test_requires {
             }
         };
         if ( $e =~ /^Can't locate/ ) {
-            $skip_all->("Test requires module '$mod' but it's not found");
+            $skip_all->("requires $mod");
         }
         else {
             $skip_all->("$e");

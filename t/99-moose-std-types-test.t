@@ -42,7 +42,7 @@ BEGIN {
 	or $ENV{EXTENDED_TESTING}
 	or $ENV{AUTHOR_TESTING}
 	or $ENV{RELEASE_TESTING}
-	or plan skip_all => 'set EXTENDED_TESTING to true if you want to run this test'
+	or plan skip_all => 'EXTENDED_TESTING'
 };
 
 use strict;
