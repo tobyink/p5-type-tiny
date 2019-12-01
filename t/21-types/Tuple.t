@@ -108,6 +108,7 @@ while (@tests) {
 	}
 }
 
+
 #
 # A basic tuple.
 #
@@ -127,6 +128,7 @@ should_fail( [42,[1..4]], $type1 );  # not enough slots
 should_fail( [], $type1 );  # not enough slots (empty arrayref)
 should_fail( 42, $type1 );  # not even an arrayref
 should_fail( bless([42,[1..10],undef], 'Foo'), $type1 ); # blessed
+
 
 #
 # Some Optional slots.
@@ -149,6 +151,7 @@ should_fail([], $type2); # missing required first slot
 # can't put undef in slot 3 as a way to supply a value for slot 4
 should_fail([42,[],undef,\0], $type2);
 
+
 #
 # The difference between Optional and Maybe
 #
@@ -165,11 +168,12 @@ my $type3 = Tuple[
 should_fail([42,[],{}], $type3);         # missing fourth slot fails!
 should_pass([42,[],{},undef], $type3);   # ... but undef is okay
 
-use Types::Standard qw(slurpy);
 
 #
 # Simple slurpy example
 #
+
+use Types::Standard qw(slurpy);
 
 my $type4 = Tuple[
 	Types::Standard::RegexpRef,
@@ -184,6 +188,7 @@ should_fail([qr//,1..4,qr//], $type4);
 # note that the slurpy slurps stuff into an arrayref to check
 # so it will fail when there's an actual arrayref there.
 should_fail([qr//,[1..4]], $type4);
+
 
 #
 # Optional + slurpy example
@@ -202,6 +207,7 @@ should_pass([qr//,{}], $type5);
 should_pass([qr//,{},1..4], $type5);
 # can't omit Optional element but still provide slurpy
 should_fail([qr//,1..4], $type5);
+
 
 #
 # Slurpy Tuple inside a Tuple
@@ -222,6 +228,7 @@ should_fail([qr//,1,2,3], $type6);
 should_fail([qr//,1,2,3,4], $type6);
 should_fail([qr//,1,2,3,4,5], $type6);
 
+
 #
 # Optional + slurpy Tuple inside a Tuple
 #
@@ -235,30 +242,90 @@ my $type7 = Tuple[
 	],
 ];
 
-diag($type7->inline_check('$VALUE'));
-
 should_pass([qr//], $type7);
 should_pass([qr//,qr//], $type7);
 should_fail([qr//,qr//,1], $type7);
 should_pass([qr//,qr//,1,2], $type7); # pass because two ints after optional
-should_fail([qr//,1,2], $type7); # fail because two ints with no optional
+should_fail([qr//,1,2], $type7);      # fail because two ints with no optional
 should_fail([qr//,qr//,1,2,3], $type7);
 should_fail([qr//,qr//,1,2,3,4], $type7);
 should_fail([qr//,qr//,1,2,3,4,5], $type7);
+
+
+#
+# Simple slurpy hashref example
+#
+
+my $type8 = Tuple[
+	Types::Standard::RegexpRef,
+	slurpy Types::Standard::HashRef[
+		Types::Standard::Int,
+	],
+];
+
+should_pass([qr//], $type8);
+should_pass([qr//,foo=>1,bar=>2], $type8);
+should_fail([qr//,foo=>1,bar=>2,qr//], $type8);
+# note that the slurpy slurps stuff into an hashref to check
+# so it will fail when there's an actual hashref there.
+should_fail([qr//,[foo=>1,bar=>2]], $type8);
+
+
+#
+# Optional + slurpy hashref example
+#
+
+my $type9 = Tuple[
+	Types::Standard::RegexpRef,
+	Optional[ Types::Standard::ScalarRef ],
+	slurpy Types::Standard::HashRef[
+		Types::Standard::Int,
+	],
+];
+
+should_pass([qr//], $type9);
+should_pass([qr//,\1], $type9);
+should_pass([qr//,\1,foo=>1,bar=>2], $type9);
+# can't omit Optional element but still provide slurpy
+should_fail([qr//,foo=>1,bar=>2], $type9);
+
 
 #
 # Deep coercions
 #
 
 my $Rounded = Types::Standard::Int->plus_coercions(
-	Types::Standard::Num, q{ int($_) },
+	Types::Standard::Num, sub{ int($_) },
 );
 
-my $coercing_type = Tuple[
+my $type10 = Tuple[
 	$Rounded,
 	Types::Standard::ArrayRef[$Rounded],
+	Optional[$Rounded],
 	slurpy Types::Standard::HashRef[$Rounded],
 ];
+
+my $coerced = $type10->coerce([
+	3.1,
+	[ 1.1, 1.2, 1.3 ],
+	4.2,
+	foo => 5.1, bar => 6.1,
+]);
+subtest 'coercion happened as expected' => sub {
+	is($coerced->[0], 3);
+	is_deeply($coerced->[1], [1,1,1]);
+	is($coerced->[2], 4);
+	is_deeply({@$coerced[3..6]}, {foo=>5,bar=>6});
+};
+
+# One thing to note is that coercions succeed as a whole or fail as a whole.
+# The tuple had to coerce the first element to an integer, the second to an
+# arrayref of integers, the third (if it existed) to an integer, and whatever
+# was left, it slurped into a temp hashef, coerced that to a hashref of
+# integers, and then flattened that back into the tuple it was returning.
+# If any single part of it had ended up not conforming to the target type,
+# then the original tuple would have been returned with no coercions done
+# at all!
 
 done_testing;
 
