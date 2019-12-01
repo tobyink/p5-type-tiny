@@ -108,7 +108,157 @@ while (@tests) {
 	}
 }
 
-note("TODO: write tests for parameterized types");
+#
+# A basic tuple.
+#
+
+my $type1 = Tuple[
+	Types::Standard::Int,
+	Types::Standard::ArrayRef,
+	Types::Standard::Undef,
+];
+
+should_pass( [42,[1..4],undef], $type1 );
+should_fail( [{},[1..4],undef], $type1 ); # first slot fails
+should_fail( [42,{    },undef], $type1 ); # second slot fails
+should_fail( [42,[1..4],{  } ], $type1 ); # third slot fails
+should_fail( [42,[1..4],undef,1], $type1 );  # too many slots
+should_fail( [42,[1..4]], $type1 );  # not enough slots
+should_fail( [], $type1 );  # not enough slots (empty arrayref)
+should_fail( 42, $type1 );  # not even an arrayref
+should_fail( bless([42,[1..10],undef], 'Foo'), $type1 ); # blessed
+
+#
+# Some Optional slots.
+#
+
+use Types::Standard qw( Optional );
+
+my $type2 = Tuple[
+	Types::Standard::Int,
+	Types::Standard::ArrayRef,
+	Optional[ Types::Standard::HashRef ],
+	Optional[ Types::Standard::ScalarRef ],
+];
+
+should_pass([42,[],{},\0], $type2);
+should_pass([42,[],{}], $type2);  # missing optional fourth slot
+should_pass([42,[]], $type2);  # missing optional third slot
+should_fail([42], $type2);  # missing required second slot
+should_fail([], $type2); # missing required first slot
+# can't put undef in slot 3 as a way to supply a value for slot 4
+should_fail([42,[],undef,\0], $type2);
+
+#
+# The difference between Optional and Maybe
+#
+
+use Types::Standard qw( Maybe );
+
+my $type3 = Tuple[
+	Types::Standard::Int,
+	Types::Standard::ArrayRef,
+	Maybe[ Types::Standard::HashRef ],
+	Maybe[ Types::Standard::ScalarRef ],
+];
+
+should_fail([42,[],{}], $type3);         # missing fourth slot fails!
+should_pass([42,[],{},undef], $type3);   # ... but undef is okay
+
+use Types::Standard qw(slurpy);
+
+#
+# Simple slurpy example
+#
+
+my $type4 = Tuple[
+	Types::Standard::RegexpRef,
+	slurpy Types::Standard::ArrayRef[
+		Types::Standard::Int,
+	],
+];
+
+should_pass([qr//], $type4);
+should_pass([qr//,1..4], $type4);
+should_fail([qr//,1..4,qr//], $type4);
+# note that the slurpy slurps stuff into an arrayref to check
+# so it will fail when there's an actual arrayref there.
+should_fail([qr//,[1..4]], $type4);
+
+#
+# Optional + slurpy example
+#
+
+my $type5 = Tuple[
+	Types::Standard::RegexpRef,
+	Optional[ Types::Standard::HashRef ],
+	slurpy Types::Standard::ArrayRef[
+		Types::Standard::Int,
+	],
+];
+
+should_pass([qr//], $type5);
+should_pass([qr//,{}], $type5);
+should_pass([qr//,{},1..4], $type5);
+# can't omit Optional element but still provide slurpy
+should_fail([qr//,1..4], $type5);
+
+#
+# Slurpy Tuple inside a Tuple
+#
+
+my $type6 = Tuple[
+	Types::Standard::RegexpRef,
+	slurpy Types::Standard::Tuple[
+		Types::Standard::Int,
+		Types::Standard::Int,
+	],
+];
+
+should_pass([qr//], $type6);
+should_fail([qr//,1], $type6);
+should_pass([qr//,1,2], $type6); # pass because two ints
+should_fail([qr//,1,2,3], $type6);
+should_fail([qr//,1,2,3,4], $type6);
+should_fail([qr//,1,2,3,4,5], $type6);
+
+#
+# Optional + slurpy Tuple inside a Tuple
+#
+
+my $type7 = Tuple[
+	Types::Standard::RegexpRef,
+	Optional[ Types::Standard::RegexpRef ],
+	slurpy Types::Standard::Tuple[
+		Types::Standard::Int,
+		Types::Standard::Int,
+	],
+];
+
+diag($type7->inline_check('$VALUE'));
+
+should_pass([qr//], $type7);
+should_pass([qr//,qr//], $type7);
+should_fail([qr//,qr//,1], $type7);
+should_pass([qr//,qr//,1,2], $type7); # pass because two ints after optional
+should_fail([qr//,1,2], $type7); # fail because two ints with no optional
+should_fail([qr//,qr//,1,2,3], $type7);
+should_fail([qr//,qr//,1,2,3,4], $type7);
+should_fail([qr//,qr//,1,2,3,4,5], $type7);
+
+#
+# Deep coercions
+#
+
+my $Rounded = Types::Standard::Int->plus_coercions(
+	Types::Standard::Num, q{ int($_) },
+);
+
+my $coercing_type = Tuple[
+	$Rounded,
+	Types::Standard::ArrayRef[$Rounded],
+	slurpy Types::Standard::HashRef[$Rounded],
+];
 
 done_testing;
 
