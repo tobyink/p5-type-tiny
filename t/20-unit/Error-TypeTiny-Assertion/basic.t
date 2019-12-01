@@ -168,7 +168,7 @@ is_deeply(
 );
 
 TODO: {
-	require Data::Dumper;
+	no warnings 'numeric'; require Data::Dumper;
 	local $TODO =
 		(Data::Dumper->VERSION > 2.145) ? "Data::Dumper output changed after 2.145" :
 		(Data::Dumper->VERSION < 2.121) ? "Data::Dumper too old" :
@@ -187,7 +187,7 @@ TODO: {
 }
 
 TODO: {
-	require Data::Dumper;
+	no warnings 'numeric'; require Data::Dumper;
 	local $TODO =
 		(Data::Dumper->VERSION < 2.121) ? "Data::Dumper too old" :
 		undef;
@@ -256,7 +256,7 @@ is_deeply(
 );
 
 TODO: {
-	require Data::Dumper;
+	no warnings 'numeric'; require Data::Dumper;
 	local $TODO =
 		(Data::Dumper->VERSION < 2.121) ? "Data::Dumper too old" :
 		undef;
