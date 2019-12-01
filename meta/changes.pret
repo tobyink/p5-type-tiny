@@ -3290,3 +3290,20 @@
 			label "Expand per-type tests of bundled type libraries.";
 		]
 	].
+
+`Type-Tiny 1.007_005 cpan:TOBYINK`
+	issued  2019-12-01;
+	changeset [
+		dcs:versus `Type-Tiny 1.007_004 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix;
+			label "Fixes for inlining Tuples which have a combination of Optional and slurpy slots.";
+		];
+		item [
+			label "Improvements to deep coercions for Tuples.";
+		];
+		item [
+			a dcs:Tests, dcs:Documentation;
+			label "Expand per-type tests of bundled type libraries.";
+		]
+	].
