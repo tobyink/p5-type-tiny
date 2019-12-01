@@ -216,6 +216,7 @@ sub to_TypeTiny
 	if (my $class = blessed $t)
 	{
 		return $t                               if $class->isa("Type::Tiny");
+		return _TypeTinyFromMoose($t)           if $class eq "MooseX::Types::TypeDecorator";  # needed before MooseX::Types 0.35.
 		return _TypeTinyFromMoose($t)           if $class->isa("Moose::Meta::TypeConstraint");
 		return _TypeTinyFromMoose($t)           if $class->isa("MooseX::Types::TypeDecorator");
 		return _TypeTinyFromMouse($t)           if $class->isa("Mouse::Meta::TypeConstraint");
@@ -252,7 +253,7 @@ sub _TypeTinyFromMoose
 	$opts{inlined}      = sub { shift; $t->_inline_check(@_) } if $t->can("can_be_inlined") && $t->can_be_inlined;
 	$opts{message}      = sub { $t->get_message($_) }          if $t->has_message;
 	$opts{moose_type}   = $t;
-
+	
 	if ($t->can('parameterize')) {
 		$opts{constraint_generator} = sub {
 			# convert args into Moose native types; not strictly necessary
