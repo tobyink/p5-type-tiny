@@ -252,6 +252,8 @@ sub __coercion_generator
 	return unless $child_coercions_exist;
 	my $C = "Type::Coercion"->new(type_constraint => $child);
 
+	my $slurpy_is_hashref = $slurpy->is_a_type_of(Types::Standard::HashRef);
+
 	if ($all_inlinable)
 	{
 		$C->add_type_coercions($parent => Types::Standard::Stringable {
@@ -281,13 +283,19 @@ sub __coercion_generator
 			{
 				my $size = @tuple;
 				push @code, sprintf('if (@$orig > %d) {', $size);
-				push @code, sprintf('my $tail = [ @{$orig}[%d .. $#$orig] ];', $size);
+				push @code, sprintf(
+					($slurpy_is_hashref
+						? 'my $tail = do { no warnings; +{ @{$orig}[%d .. $#$orig]} };'
+						: 'my $tail = [ @{$orig}[%d .. $#$orig] ];'),
+					$size,
+				);
 				push @code, $slurpy->has_coercion
 					? sprintf('$tail = %s;', $slurpy->coercion->inline_coercion('$tail'))
 					: q();
 				push @code, sprintf(
-					'(%s) ? push(@new, @$tail) : ($return_orig++);',
+					'(%s) ? push(@new, %s$tail) : ($return_orig++);',
 					$slurpy->inline_check('$tail'),
+					($slurpy_is_hashref ? '%' : '@'),
 				);
 				push @code, '}';
 			}
@@ -326,10 +334,12 @@ sub __coercion_generator
 				
 				if ($slurpy and @$value > @tuple)
 				{
-					my $tmp = $slurpy->has_coercion
-						? $slurpy->coerce([ @{$value}[@tuple .. $#$value] ])
+					no warnings;
+					my $tmp = $slurpy_is_hashref
+						? { @{$value}[@tuple .. $#$value] }
 						: [ @{$value}[@tuple .. $#$value] ];
-					$slurpy->check($tmp) ? push(@new, @$tmp) : return($value);
+					$tmp = $slurpy->coerce($tmp) if  $slurpy->has_coercion;
+					$slurpy->check($tmp) ? push(@new, $slurpy_is_hashref ? %$tmp : @$tmp) : return($value);
 				}
 				
 				return \@new;
