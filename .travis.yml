@@ -123,10 +123,10 @@ matrix:
       env: MOO_RELEASE=MSTROUT/Moo-1.003001.tar.gz
       dist: trusty
     - perl: "5.16"
-      env: MOOSE_RELEASE=DOY/Moose-2.0604.tar.gz MOO_RELEASE=MSTROUT/Moo-1.000008.tar.gz
+      env: MOOSE_RELEASE=DOY/Moose-2.0604.tar.gz MXT_RELEASE=DROLSKY/MooseX-Types-0.31.tar.gz MOO_RELEASE=MSTROUT/Moo-1.000008.tar.gz
       dist: trusty
     - perl: "5.12"
-      env: MOOSE_RELEASE=FLORA/Moose-2.0007.tar.gz EC_RELEASE="https://cpan.metacpan.org/authors/id/D/DO/DOY/Eval-Closure-0.06.tar.gz"
+      env: MOOSE_RELEASE=FLORA/Moose-2.0007.tar.gz MXT_RELEASE=FLORA/MooseX-Types-0.24.tar.gz EC_RELEASE="https://cpan.metacpan.org/authors/id/D/DO/DOY/Eval-Closure-0.06.tar.gz"
       dist: trusty
     # Threaded Perls
     - perl: "5.8.9-thr"
@@ -170,6 +170,7 @@ install:
   - cpan-install --deps
   - cpan-install --coverage
   - '[ -n "$MOOSE_RELEASE" ] && cpan-install "$MOOSE_RELEASE" || echo "MOOSE_RELEASE is not set"'
+  - '[ -n "$MXT_RELEASE" ]   && cpan-install "$MXT_RELEASE"   || echo "MXT_RELEASE is not set"'
   - '[ -n "$EC_RELEASE" ]    && cpan-install "$EC_RELEASE"    || echo "EC_RELEASE is not set"'
   - '[ -n "$MOO_RELEASE" ]   && cpan-install "$MOO_RELEASE"   || echo "MOO_RELEASE is not set"'
 before_script:
