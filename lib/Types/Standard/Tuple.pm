@@ -252,7 +252,7 @@ sub __coercion_generator
 	return unless $child_coercions_exist;
 	my $C = "Type::Coercion"->new(type_constraint => $child);
 
-	my $slurpy_is_hashref = $slurpy->is_a_type_of(Types::Standard::HashRef);
+	my $slurpy_is_hashref = $slurpy && $slurpy->is_a_type_of(Types::Standard::HashRef);
 
 	if ($all_inlinable)
 	{
