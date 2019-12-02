@@ -108,7 +108,74 @@ while (@tests) {
 	}
 }
 
-note("TODO: write tests for parameterized types");
+#
+# Basic example.
+#
+
+my $type1 = CycleTuple[
+	Types::Standard::Int,
+	Types::Standard::HashRef,
+	Types::Standard::RegexpRef,
+];
+
+should_pass([ 1,{},qr//                                        ], $type1);
+should_pass([ 1,{},qr// => 2,{},qr//                           ], $type1);
+should_pass([ 1,{},qr// => 2,{},qr// => 3,{},qr//              ], $type1);
+should_pass([ 1,{},qr// => 2,{},qr// => 3,{},qr// => 4,{},qr// ], $type1);
+should_fail([ 1,{},qr// => 2,{},qr// => 3,{},qr// => 4,{}      ], $type1); # fails because missing slot
+should_fail([ 1,{},qr// => 2,{},qr// => 3,{},qr// => 4,{},[]   ], $type1); # fails because bad value in slot
+
+
+#
+# Empty arrayref
+#
+
+use Types::Standard qw( ArrayRef Any );
+
+# An empty arrayref is okay
+should_pass( [], $type1 );
+
+# Here's one way to make sure the arrayref isn't empty
+should_fail( [], $type1->where('@$_>0') );
+
+# Here's another way
+should_fail( [], ArrayRef[Any,1] & $type1 );
+
+
+#
+# Optional is not allowed.
+#
+
+my $e = exception {
+	CycleTuple[
+		Types::Standard::Optional[
+			Types::Standard::Int,
+		],
+	]
+};
+like($e, qr/cannot be optional/, 'correct exception');
+
+
+#
+# Deep coercions
+#
+
+my $type2 = CycleTuple[
+	Types::Standard::Int->plus_coercions(
+		Types::Standard::Num, q{ int($_) },
+	),
+	Types::Standard::HashRef,
+];
+
+my $coerced = $type2->coerce(
+	[ 1.1,{} => 2.1,{} => 3.1,{} => 4.1,{} ]
+);
+
+is_deeply(
+	$coerced,
+	[ 1,{} => 2,{} => 3,{} => 4,{} ],
+	'coercion worked',
+);
 
 done_testing;
 
