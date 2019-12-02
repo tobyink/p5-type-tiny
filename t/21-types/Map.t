@@ -137,6 +137,21 @@ should_fail( { foo =>  1   }, $MapWithIntKeys );
 
 
 #
+# Map has these cool extra methods...
+#
+
+ok(
+	$MapWithIntKeys->my_hashref_allows_key('1234'),
+	"my_hashref_allows_key('1234')",
+);
+
+ok(
+	!$MapWithIntKeys->my_hashref_allows_key('abc'),
+	"!my_hashref_allows_key('abc')",
+);
+
+
+#
 # Map to constrain values of hash.
 # Basically like HashRef[Int]
 #
@@ -165,6 +180,26 @@ should_fail( { 123 => \1   }, $HashOfInts );
 should_pass( { 123 =>  1   }, $HashOfInts );
 should_pass( { foo =>  1, bar =>  2 }, $HashOfInts );
 should_fail( { foo =>  1, bar => [] }, $HashOfInts );
+
+
+#
+# More Map extra methods...
+#
+
+ok(
+	$HashOfInts->my_hashref_allows_key('foo'),
+	"my_hashref_allows_key('foo')",
+);
+
+ok(
+	$HashOfInts->my_hashref_allows_value('foo', 1234),
+	"my_hashref_allows_value('foo', 1234)",
+);
+
+ok(
+	! $HashOfInts->my_hashref_allows_value('foo', qr//),
+	"!my_hashref_allows_value('foo', qr//)",
+);
 
 
 #

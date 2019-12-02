@@ -138,6 +138,26 @@ should_pass( { foo =>  1, bar =>  2 }, $HashOfInts );
 should_fail( { foo =>  1, bar => [] }, $HashOfInts );
 
 #
+# HashRef has these cool extra methods...
+#
+
+ok(
+	$HashOfInts->my_hashref_allows_key('foo'),
+	"my_hashref_allows_key('foo')",
+);
+
+ok(
+	$HashOfInts->my_hashref_allows_value('foo', 1234),
+	"my_hashref_allows_value('foo', 1234)",
+);
+
+ok(
+	! $HashOfInts->my_hashref_allows_value('foo', qr//),
+	"!my_hashref_allows_value('foo', qr//)",
+);
+
+
+#
 # HashRef has deep coercions
 #
 

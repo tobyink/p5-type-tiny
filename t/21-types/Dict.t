@@ -108,7 +108,38 @@ while (@tests) {
 	}
 }
 
-note("TODO: write tests for parameterized types");
+#
+# Basic parameterized example
+#
+
+my $type1 = Dict[
+	foo => Types::Standard::Int,
+	bar => Types::Standard::RegexpRef,
+];
+
+should_pass( { foo => 42, bar => qr// }, $type1 );
+should_fail( { foo => [], bar => qr// }, $type1 );
+should_fail( { foo => 42, bar => 1234 }, $type1 );
+should_fail( { foo => [], bar => 1234 }, $type1 );
+should_fail( { foo => 42              }, $type1 );
+should_fail( {            bar => qr// }, $type1 );
+should_fail( [ foo => 42, bar => qr// ], $type1 );
+should_fail( { foo => 42, bar => qr//, baz => undef }, $type1 );
+
+ok(  $type1->my_hashref_allows_key('bar'),  'my_hashref_allows_key("bar")' );
+ok( !$type1->my_hashref_allows_key('baz'), '!my_hashref_allows_key("baz")' );
+ok(  $type1->my_hashref_allows_value('bar', qr//),  'my_hashref_allows_value("bar", qr//)' );
+ok( !$type1->my_hashref_allows_value('bar', 1234), '!my_hashref_allows_value("bar", 1234)' );
+
+
+### todo... ###
+
+note('TODO: parameterized example with Optional');
+note('TODO: parameterized example with slurpy');
+note('TODO: parameterized example with slurpy and Optional');
+note('TODO: deep coercion');
+note('TODO: deep coercion with slurpy');
+note('TODO: deep coercion where Optional cannot be coerced');
 
 done_testing;
 
