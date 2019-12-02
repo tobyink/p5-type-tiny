@@ -108,6 +108,7 @@ while (@tests) {
 	}
 }
 
+
 #
 # ArrayRef is parameterizable
 #
@@ -148,6 +149,27 @@ is(
 my $p1 = ArrayRef[Types::Standard::Int];
 my $p2 = ArrayRef[Types::Standard::Int];
 is(refaddr($p1), refaddr($p2), 'parameterizing is cached');
+
+
+#
+# ArrayRef can accept a second parameter.
+#
+
+my $ArrayOfAtLeastTwoInts = ArrayRef->of( Types::Standard::Int, 2 );
+
+should_fail( 1,        $ArrayOfAtLeastTwoInts );
+should_fail( {},       $ArrayOfAtLeastTwoInts );
+should_fail( [      ], $ArrayOfAtLeastTwoInts );
+should_fail( [ []   ], $ArrayOfAtLeastTwoInts );
+should_fail( [  1.1 ], $ArrayOfAtLeastTwoInts );
+should_fail( [  1   ], $ArrayOfAtLeastTwoInts );
+should_fail( [  0   ], $ArrayOfAtLeastTwoInts );
+should_fail( [ -1   ], $ArrayOfAtLeastTwoInts );
+should_fail( [ \1   ], $ArrayOfAtLeastTwoInts );
+should_pass( [  1,   2 ], $ArrayOfAtLeastTwoInts );
+should_fail( [  1,  [] ], $ArrayOfAtLeastTwoInts );
+should_pass( [  1,  -1 ], $ArrayOfAtLeastTwoInts );
+should_pass( [  1 .. 9 ], $ArrayOfAtLeastTwoInts );
 
 
 #
