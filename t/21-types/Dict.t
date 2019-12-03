@@ -225,9 +225,27 @@ ok(  $type4->my_hashref_allows_value('123', []),  'my_hashref_allows_value("123"
 ok( !$type4->my_hashref_allows_value('123', qr//),  '!my_hashref_allows_value("123", qr//)' );
 
 
-### todo... ###
+#
+# Simple deep coercion
+#
 
-note('TODO: deep coercion');
+my $Rounded = Types::Standard::Int->plus_coercions(
+	Types::Standard::Num, q{ int($_) }
+);
+my $type5 = Dict[foo => $Rounded];
+
+is_deeply(
+	$type5->coerce({ foo => 4.1 }),
+	{ foo => 4 },
+	'deep coercion',
+);
+
+is_deeply(
+	$type5->coerce({ foo => 4.1, bar => 'xyz' }),
+	{ foo => 4.1, bar => 'xyz' },
+	'cowardly refuses to drop keys to allow coercion to work',
+);
+
 note('TODO: deep coercion with slurpy');
 note('TODO: deep coercion where Optional cannot be coerced');
 
