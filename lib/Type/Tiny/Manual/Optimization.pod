@@ -85,7 +85,95 @@ L<Type::Tiny::Duck> objects.
 
 =head2 Inlining Type Constraints
 
-TODO
+In the case of a type constraint like this:
+
+ my $type = Int->where(sub { $_ >= 0 });
+
+Type::Tiny will need to call one sub to verify a value meets the B<Int>
+type constraint, and your coderef to check that the value is above zero.
+
+Sub calls in Perl are relatively expensive in terms of memory and CPU
+usage, so it would be good if it could be done all in one sub call.
+
+The B<Int> type constraint knows how to create a string of Perl code
+that checks an integer. It's something like the following. (It's actually
+more complicated, but this is close enough as an example.)
+
+ $_ =~ /^-?[0-9]+$/
+
+If you provide your check as a string instead of a coderef, like this:
+
+ my $type = Int->where(q{ $_ >= 0 });
+
+Then Type::Tiny will be able to combine them into one string:
+
+ ( $_ =~ /^-?[0-9]+$/ ) && ( $_ >= 0 )
+
+So Type::Tiny will be able to check values in one sub call. Providing
+constraints as strings is a really simple and easy way of optimizing
+type checks.
+
+But it can be made even more efficient. Type::Tiny needs to localize
+C<< $_ >> and copy the value into it for the above check. If you're
+checking B<< ArrayRef[$type] >> this will be done for each element of
+the array. Things could be made more efficient if Type::Tiny were able
+to directly check:
+
+ ( $arrayref->[$i] =~ /^-?[0-9]+$/ ) && ( $arrayref->[$i] >= 0 )
+
+This can be done by providing an inlining sub. The sub is given a
+variable name and can use that in the string of code it generates.
+
+ my $type = Type::Tiny->new(
+   parent  => Int,
+   inlined => sub {
+     my ($self, $varname) = @_;
+     return sprintf(
+       '(%s) && ( %s >= 0 )',
+       $self->parent->inline_check($varname),
+       $varname,
+     );
+   }
+ );
+
+Because it's pretty common to want to call your parent's inline check and
+C<< && >> your own string with it, Type::Tiny provides a shortcut for this.
+Just return a list of strings to smush together with C<< && >>, and if the
+first one is C<undef>, Type::Tiny will fill in the blank with the parent
+type check.
+
+ my $type = Type::Tiny->new(
+   parent  => Int,
+   inlined => sub {
+     my ($self, $varname) = @_;
+     return (
+       undef,
+       sprintf('%s >= 0', $varname),
+     );
+   }
+ );
+
+There is one further optimization which can be applied to this particular
+case. You'll note that we're checking the string matches C<< /^-?[0-9+]$/ >>
+and then checking it's greater than or equal to zero. But a non-negative
+integer won't ever start with a minus sign, so we could inline the check to
+something like:
+
+ $_ =~ /^[0-9]+$/
+
+While an inlined check I<can> call its parent type check, it is not required
+to.
+
+ my $type = Type::Tiny->new(
+   parent  => Int,
+   inlined => sub {
+     my ($self, $varname) = @_;
+     return sprintf('%s =~ /^[0-9]+$/', $varname);
+   }
+ );
+
+If you opt not to call the parent type check, then you need to ensure your
+own check is at least as rigorous.
 
 =head2 Inlining Coercions
 
