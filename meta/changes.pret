@@ -3317,3 +3317,17 @@
 			label "Expand per-type tests of bundled type libraries.";
 		]
 	].
+
+`Type-Tiny 1.007_007 cpan:TOBYINK`
+	issued  2019-12-03;
+	changeset [
+		dcs:versus `Type-Tiny 1.007_006 cpan:TOBYINK`;
+		item [
+			a dcs:Documentation;
+			label "More work on the Type::Tiny manual.";
+		];
+		item [
+			a dcs:Tests, dcs:Documentation;
+			label "Expand per-type tests of bundled type libraries.";
+		]
+	].
