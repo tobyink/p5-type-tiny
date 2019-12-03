@@ -132,11 +132,101 @@ ok(  $type1->my_hashref_allows_value('bar', qr//),  'my_hashref_allows_value("ba
 ok( !$type1->my_hashref_allows_value('bar', 1234), '!my_hashref_allows_value("bar", 1234)' );
 
 
+#
+# Optional parameterized example
+#
+
+use Types::Standard qw( Optional );
+
+# this is mostly the same as $type1...
+my $type2 = Dict[
+	foo => Types::Standard::Int,
+	bar => Optional[ Types::Standard::RegexpRef ],
+];
+
+should_pass( { foo => 42, bar => qr// }, $type2 );
+should_fail( { foo => [], bar => qr// }, $type2 );
+should_fail( { foo => 42, bar => 1234 }, $type2 );
+should_fail( { foo => [], bar => 1234 }, $type2 );
+should_pass( { foo => 42              }, $type2 );  # this fails with $type1
+should_fail( {            bar => qr// }, $type2 );
+should_fail( [ foo => 42, bar => qr// ], $type2 );
+should_fail( { foo => 42, bar => qr//, baz => undef }, $type2 );
+
+ok(  $type2->my_hashref_allows_key('bar'),  'my_hashref_allows_key("bar")' );
+ok( !$type2->my_hashref_allows_key('baz'), '!my_hashref_allows_key("baz")' );
+ok(  $type2->my_hashref_allows_value('bar', qr//),  'my_hashref_allows_value("bar", qr//)' );
+ok( !$type2->my_hashref_allows_value('bar', 1234), '!my_hashref_allows_value("bar", 1234)' );
+
+
+#
+# Example with slurpy
+#
+
+use Types::Standard qw( slurpy Map );
+
+my $type3 = Dict[
+	foo => Types::Standard::Int,
+	bar => Types::Standard::RegexpRef,
+	slurpy Map[ Types::Standard::Int, Types::Standard::ArrayRef ],
+];
+
+should_pass( { foo => 42, bar => qr// }, $type3 );
+should_fail( { foo => [], bar => qr// }, $type3 );
+should_fail( { foo => 42, bar => 1234 }, $type3 );
+should_fail( { foo => [], bar => 1234 }, $type3 );
+should_fail( { foo => 42              }, $type3 );
+should_fail( {            bar => qr// }, $type3 );
+should_fail( [ foo => 42, bar => qr// ], $type3 );
+should_fail( { foo => 42, bar => qr//, baz => undef }, $type3 );
+should_pass( { foo => 42, bar => qr//, 123 => [] }, $type3 );
+should_pass( { foo => 42, bar => qr//, 123 => [], 456 => [] }, $type3 );
+should_fail( { foo => 42, bar => qr//, 123 => qr// }, $type3 );
+should_fail( { foo => 42, bar => qr//, 123 => qr//, 456 => [] }, $type3 );
+
+ok(  $type3->my_hashref_allows_key('bar'),  'my_hashref_allows_key("bar")' );
+ok( !$type3->my_hashref_allows_key('baz'), '!my_hashref_allows_key("baz")' );
+ok(  $type3->my_hashref_allows_value('bar', qr//),  'my_hashref_allows_value("bar", qr//)' );
+ok( !$type3->my_hashref_allows_value('bar', 1234), '!my_hashref_allows_value("bar", 1234)' );
+ok(  $type3->my_hashref_allows_key('123'),  'my_hashref_allows_key("123")' );
+ok(  $type3->my_hashref_allows_value('123', []),  'my_hashref_allows_value("123", [])' );
+ok( !$type3->my_hashref_allows_value('123', qr//),  '!my_hashref_allows_value("123", qr//)' );
+
+
+#
+# Example with slurpy and Optional
+#
+
+my $type4 = Dict[
+	foo => Types::Standard::Int,
+	bar => Optional[ Types::Standard::RegexpRef ],
+	slurpy Map[ Types::Standard::Int, Types::Standard::ArrayRef ],
+];
+
+should_pass( { foo => 42, bar => qr// }, $type4 );
+should_fail( { foo => [], bar => qr// }, $type4 );
+should_fail( { foo => 42, bar => 1234 }, $type4 );
+should_fail( { foo => [], bar => 1234 }, $type4 );
+should_pass( { foo => 42              }, $type4 );  # this fails with $type3
+should_fail( {            bar => qr// }, $type4 );
+should_fail( [ foo => 42, bar => qr// ], $type4 );
+should_fail( { foo => 42, bar => qr//, baz => undef }, $type4 );
+should_pass( { foo => 42, bar => qr//, 123 => [] }, $type4 );
+should_pass( { foo => 42, bar => qr//, 123 => [], 456 => [] }, $type4 );
+should_fail( { foo => 42, bar => qr//, 123 => qr// }, $type4 );
+should_fail( { foo => 42, bar => qr//, 123 => qr//, 456 => [] }, $type4 );
+
+ok(  $type4->my_hashref_allows_key('bar'),  'my_hashref_allows_key("bar")' );
+ok( !$type4->my_hashref_allows_key('baz'), '!my_hashref_allows_key("baz")' );
+ok(  $type4->my_hashref_allows_value('bar', qr//),  'my_hashref_allows_value("bar", qr//)' );
+ok( !$type4->my_hashref_allows_value('bar', 1234), '!my_hashref_allows_value("bar", 1234)' );
+ok(  $type4->my_hashref_allows_key('123'),  'my_hashref_allows_key("123")' );
+ok(  $type4->my_hashref_allows_value('123', []),  'my_hashref_allows_value("123", [])' );
+ok( !$type4->my_hashref_allows_value('123', qr//),  '!my_hashref_allows_value("123", qr//)' );
+
+
 ### todo... ###
 
-note('TODO: parameterized example with Optional');
-note('TODO: parameterized example with slurpy');
-note('TODO: parameterized example with slurpy and Optional');
 note('TODO: deep coercion');
 note('TODO: deep coercion with slurpy');
 note('TODO: deep coercion where Optional cannot be coerced');
