@@ -177,7 +177,13 @@ own check is at least as rigorous.
 
 =head2 Inlining Coercions
 
-TODO
+Moo is the only object-oriented programming toolkit that fully supports
+coercions being inlined, but even for Moose and Mouse, providing coercions
+as strings can help Type::Tiny optimize its coercion features.
+
+For Moo, if you want your coercion to be inlinable, all the types you're
+coercing from and to need to be inlinable, plus the coercion needs to be
+given as a string of Perl code.
 
 =head2 Common Sense
 
