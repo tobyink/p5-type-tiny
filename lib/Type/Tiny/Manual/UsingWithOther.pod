@@ -85,6 +85,43 @@ B<< Caveat: >> Object::Accessor doesn't die when a value fails to meet its
 type constraint; instead it outputs a warning to STDERR. This behaviour can
 be changed by setting C<< $Object::Accessor::FATAL = 1 >>.
 
+=head2 Class::Struct
+
+This is proof-of-concept of how Type::Tiny can be used to constrain
+attributes for Class::Struct. It's probably not a good idea to use this
+in production as it slows down C<UNIVERSAL::isa> globally.
+
+  use Types::Standard -types;
+  use Class::Struct;
+
+  {
+    my %MAP;
+    my $orig_isa = \&UNIVERSAL::isa;
+    *UNIVERSAL::isa = sub {
+      return $MAP{$1}->check($_[0])
+        if $_[1] =~ /^CLASSSTRUCT::TYPETINY::(.+)$/ && exists $MAP{$1};
+      goto $orig;
+    };
+    my $orig_dn = \&Type::Tiny::display_name;
+    *Type::Tiny::display_name = sub {
+      if (caller(1) eq 'Class::Struct') {
+        $MAP{$_[0]{uniq}} = $_[0];
+        return "CLASSSTRUCT::TYPETINY::".$_[0]{uniq};
+      }
+      goto $orig_dn;
+    };
+  }
+
+  struct Person => [ name => Str, age => Int ];
+
+  my $bob = Person->new(
+    name => "Bob",
+    age  => 21,
+  );
+
+  $bob->name("Robert");   # okay
+  $bob->name([]);         # dies
+
 =head1 NEXT STEPS
 
 Here's your next step:
