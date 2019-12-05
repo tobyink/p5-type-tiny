@@ -14,7 +14,7 @@ matrix:
         - cpan-install --toolchain
         - cpan-install --deps
       script:
-        - export PERL5OPT=-MDevel::Cover
+        - export HARNESS_PERL_SWITCHES="-MDevel::Cover=+ignore,^inc/|^t/"
         - export PERL_TYPE_TINY_XS=0
         - export PERL_TYPE_PARAMS_XS=0
         - prove -r -Ilib -Iinc $(test-dirs)
