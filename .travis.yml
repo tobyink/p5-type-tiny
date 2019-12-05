@@ -13,8 +13,8 @@ matrix:
         - cpanm -n Type::Tie Validation::Class::Simple Class::XSAccessor PadWalker Devel::LexAlias
         - cpan-install --toolchain
         - cpan-install --deps
-        - cpan-install --coverage
       script:
+        - export PERL5OPT=-MDevel::Cover
         - export PERL_TYPE_TINY_XS=0
         - export PERL_TYPE_PARAMS_XS=0
         - prove -r -Ilib -Iinc $(test-dirs)
@@ -34,7 +34,6 @@ matrix:
         - cpanm -n Type::Tie
         - cpan-install --toolchain
         - cpan-install --deps
-        - cpan-install --coverage
     - perl: "5.30"
       env: PERL_TYPE_TINY_XS=0 EXTENDED_TESTING=1
       install:
@@ -46,7 +45,6 @@ matrix:
         - cpanm -n Type::Tie Validation::Class::Simple 
         - cpan-install --toolchain
         - cpan-install --deps
-        - cpan-install --coverage
     # Standard testing for modern and vaguely modern Perls
     - perl: "5.10"
       env: PERL_TYPE_TINY_XS=0
@@ -168,17 +166,17 @@ before_install:
 install:
   - cpan-install --toolchain
   - cpan-install --deps
-  - cpan-install --coverage
   - '[ -n "$MOOSE_RELEASE" ] && cpan-install "$MOOSE_RELEASE" || echo "MOOSE_RELEASE is not set"'
   - '[ -n "$MXT_RELEASE" ]   && cpan-install "$MXT_RELEASE"   || echo "MXT_RELEASE is not set"'
   - '[ -n "$EC_RELEASE" ]    && cpan-install "$EC_RELEASE"    || echo "EC_RELEASE is not set"'
   - '[ -n "$MOO_RELEASE" ]   && cpan-install "$MOO_RELEASE"   || echo "MOO_RELEASE is not set"'
+  - '[ -n "$COVERAGE" ]      && cpan-install Devel::Cover::Report::Codecov || echo "COVERAGE is not set"'
 before_script:
-  - coverage-setup
+  - '[ -n "$COVERAGE" ] && cover -delete
 script:
   - prove -r -Ilib -Iinc $(test-dirs)
 after_success:
-  - coverage-report -select_re '^lib/'
+  - '[ -n "$COVERAGE" ] && cover -report codecov
 notifications:
   irc:
     channels:
