@@ -172,11 +172,11 @@ install:
   - '[ -n "$EC_RELEASE" ]    && cpan-install "$EC_RELEASE"    || echo "EC_RELEASE is not set"'
   - '[ -n "$MOO_RELEASE" ]   && cpan-install "$MOO_RELEASE"   || echo "MOO_RELEASE is not set"'
 before_script:
-  - '[ -n "$COVERAGE" ] && cover -delete'
+  - '[ -n "$COVERAGE" ] && cover -delete || echo "COVERAGE is not set"'
 script:
   - prove -r -Ilib -Iinc $(test-dirs)
 after_success:
-  - '[ -n "$COVERAGE" ] && cover -report codecov'
+  - '[ -n "$COVERAGE" ] && cover -report codecov || echo "COVERAGE is not set"'
 notifications:
   irc:
     channels:
