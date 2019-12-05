@@ -24,20 +24,20 @@ sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
 sub _swap { $_[2] ? @_[1,0] : @_[0,1] }
 
-BEGIN {
-	($] < 5.010001)
-		? eval q{ sub SUPPORT_SMARTMATCH () { !!0 } }
-		: eval q{ sub SUPPORT_SMARTMATCH () { !!1 } };
-	($] >= 5.014)
-		? eval q{ sub _FIXED_PRECEDENCE () { !!1 } }
-		: eval q{ sub _FIXED_PRECEDENCE () { !!0 } };
-};
+BEGIN {                                              # uncoverable statement
+	($] < 5.010001)                                   # uncoverable statement
+		? eval q{ sub SUPPORT_SMARTMATCH () { !!0 } }  # uncoverable statement
+		: eval q{ sub SUPPORT_SMARTMATCH () { !!1 } }; # uncoverable statement
+	($] >= 5.014)                                     # uncoverable statement
+		? eval q{ sub _FIXED_PRECEDENCE () { !!1 } }   # uncoverable statement
+		: eval q{ sub _FIXED_PRECEDENCE () { !!0 } };  # uncoverable statement
+};                                                   # uncoverable statement
 
 BEGIN {
-	my $try_xs =
-		exists($ENV{PERL_TYPE_TINY_XS}) ? !!$ENV{PERL_TYPE_TINY_XS} :
-		exists($ENV{PERL_ONLY})         ?  !$ENV{PERL_ONLY} :
-		1;
+	my $try_xs =                                                         # uncoverable statement
+		exists($ENV{PERL_TYPE_TINY_XS}) ? !!$ENV{PERL_TYPE_TINY_XS} :     # uncoverable statement
+		exists($ENV{PERL_ONLY})         ?  !$ENV{PERL_ONLY} :             # uncoverable statement
+		1;                                                                # uncoverable statement
 	
 	my $use_xs = 0;
 	$try_xs and eval {
@@ -61,11 +61,12 @@ BEGIN {
 	{
 		no strict 'refs';
 		no warnings 'redefine', 'once';
-		if ($] < 5.010) {              # Coverage is checked on Perl 5.26
+		# Coverage is checked on Perl 5.26
+		if ($] < 5.010) {              # uncoverable statement
 			require overload;           # uncoverable statement
 			push @_, fallback => 1;     # uncoverable statement
 			goto \&overload::OVERLOAD;  # uncoverable statement
-		};
+		};                             # uncoverable statement
 		my $class = shift;
 		*{$class . '::(('} = sub {};
 		*{$class . '::()'} = sub {};
@@ -196,8 +197,7 @@ sub new
 		};
 	}
 	
-	if (exists $params{parent})
-	{
+	if (exists $params{parent}) {
 		$params{parent} = ref($params{parent}) =~ /^Type::Tiny\b/
 			? $params{parent}
 			: Types::TypeTiny::to_TypeTiny($params{parent});
@@ -205,8 +205,7 @@ sub new
 		_croak "Parent must be an instance of %s", __PACKAGE__
 			unless blessed($params{parent}) && $params{parent}->isa(__PACKAGE__);
 		
-		if ($params{parent}->deprecated and not exists $params{deprecated})
-		{
+		if ($params{parent}->deprecated and not exists $params{deprecated}) {
 			$params{deprecated} = 1;
 		}
 	}
@@ -217,16 +216,14 @@ sub new
 	$params{name} = "__ANON__" unless exists $params{name};
 	$params{uniq} = $uniq++;
 	
-	if ($params{name} ne "__ANON__")
-	{
+	if ($params{name} ne "__ANON__") {
 		# First try a fast ASCII-only expression, but fall back to Unicode
 		$params{name} =~ /^_{0,2}[A-Z][A-Za-z0-9_]+$/sm
 			or eval q( use 5.008; $params{name} =~ /^_{0,2}\p{Lu}[\p{L}0-9_]+$/sm )
 			or _croak '"%s" is not a valid type name', $params{name};
 	}
 	
-	if (exists $params{coercion} and !ref $params{coercion} and $params{coercion})
-	{
+	if (exists $params{coercion} and !ref $params{coercion} and $params{coercion}) {
 		$params{parent}->has_coercion
 			or _croak "coercion => 1 requires type to have a direct parent with a coercion";
 		
@@ -236,8 +233,7 @@ sub new
 	if (!exists $params{inlined}
 	and exists $params{constraint}
 	and ( !exists $params{parent} or $params{parent}->can_be_inlined )
-	and $QFS ||= "Sub::Quote"->can("quoted_from_sub"))
-	{
+	and $QFS ||= "Sub::Quote"->can("quoted_from_sub")) {
 		my (undef, $perlstring, $captures) = @{ $QFS->($params{constraint}) || [] };
 		
 		$params{inlined} = sub {
@@ -255,8 +251,7 @@ sub new
 	
 	my $self = bless \%params, $class;
 	
-	unless ($params{tmp})
-	{
+	unless ($params{tmp}) {
 		my $uniq = $self->{uniq};
 		
 		$ALL_TYPES{$uniq} = $self;
@@ -267,15 +262,13 @@ sub new
 		$Moo::HandleMoose::TYPE_MAP{$self->_stringify_no_magic} = sub { $tmp };
 	}
 	
-	if (ref($params{coercion}) eq q(CODE))
-	{
+	if (ref($params{coercion}) eq q(CODE)) {
 		require Types::Standard;
 		my $code = delete($params{coercion});
 		$self->{coercion} = $self->_build_coercion;
 		$self->coercion->add_type_coercions(Types::Standard::Any(), $code);
 	}
-	elsif (ref($params{coercion}) eq q(ARRAY))
-	{
+	elsif (ref($params{coercion}) eq q(ARRAY)) {
 		my $arr = delete($params{coercion});
 		$self->{coercion} = $self->_build_coercion;
 		$self->coercion->add_type_coercions(@$arr);
@@ -289,15 +282,13 @@ sub new
 	# Types::TypeTiny to allow it to build a coercion for the TypeTiny
 	# type constraint without needing to load Type::Coercion yet.
 
-	if ($params{my_methods})
-	{
+	if ($params{my_methods}) {
 		$subname =
 			eval { require Sub::Util } ? \&Sub::Util::set_subname :
 			eval { require Sub::Name } ? \&Sub::Name::subname :
 			0
 			if not defined $subname;
-		if ($subname)
-		{
+		if ($subname) {
 			(Scalar::Util::reftype($params{my_methods}{$_}) eq 'CODE') && $subname->(
 				sprintf("%s::my_%s", $self->qualified_name, $_),
 				$params{my_methods}{$_},
@@ -308,16 +299,14 @@ sub new
 	return $self;
 }
 
-sub DESTROY
-{
+sub DESTROY {
 	my $self = shift;
 	delete( $ALL_TYPES{$self->{uniq}} );
 	delete( $Moo::HandleMoose::TYPE_MAP{$self->_stringify_no_magic} );
 	return;
 }
 
-sub _clone
-{
+sub _clone {
 	my $self = shift;
 	my %opts;
 	$opts{$_} = $self->{$_} for qw< name display_name message >;
@@ -355,8 +344,7 @@ sub _dd
 	}
 }
 
-sub _loose_to_TypeTiny
-{
+sub _loose_to_TypeTiny {
 	map +(
 		ref($_)
 			? Types::TypeTiny::to_TypeTiny($_)
@@ -847,8 +835,7 @@ sub inline_assert
 	return $code;
 }
 
-sub _failed_check
-{
+sub _failed_check {
 	require Error::TypeTiny::Assertion;
 	
 	my ($self, $name, $value, %attrs) = @_;
@@ -856,8 +843,7 @@ sub _failed_check
 	
 	my $exception_class = delete($attrs{exception_class}) || "Error::TypeTiny::Assertion";
 	
-	if ($self)
-	{
+	if ($self) {
 		$exception_class->throw(
 			message => $self->get_message($value),
 			type    => $self,
@@ -865,8 +851,7 @@ sub _failed_check
 			%attrs,
 		);
 	}
-	else
-	{
+	else {
 		$exception_class->throw(
 			message => sprintf('%s did not pass type constraint "%s"', _dd($value), $name),
 			value   => $value,
