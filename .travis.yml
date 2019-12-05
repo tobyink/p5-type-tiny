@@ -13,9 +13,9 @@ matrix:
         - cpanm -n Type::Tie Validation::Class::Simple Class::XSAccessor PadWalker Devel::LexAlias
         - cpan-install --toolchain
         - cpan-install --deps
+        - cpan-install --coverage
         - cpanm -n Devel::Cover Devel::Cover::Report::Codecov
       script:
-        - export HARNESS_PERL_SWITCHES="-MDevel::Cover=+ignore,^inc/|^t/"
         - export PERL_TYPE_TINY_XS=0
         - export PERL_TYPE_PARAMS_XS=0
         - prove -r -Ilib -Iinc $(test-dirs)
@@ -172,11 +172,13 @@ install:
   - '[ -n "$EC_RELEASE" ]    && cpan-install "$EC_RELEASE"    || echo "EC_RELEASE is not set"'
   - '[ -n "$MOO_RELEASE" ]   && cpan-install "$MOO_RELEASE"   || echo "MOO_RELEASE is not set"'
 before_script:
+  - coverage-setup
   - '[ -n "$COVERAGE" ] && cover -delete || echo "COVERAGE is not set"'
 script:
   - prove -r -Ilib -Iinc $(test-dirs)
 after_success:
-  - '[ -n "$COVERAGE" ] && cover -report codecov || echo "COVERAGE is not set"'
+  - '[ -n "$COVERAGE" ] && cover -select_re "^lib/" -report codecov || echo "COVERAGE is not set"'
+  - coverage-report -select_re '^lib/'
 notifications:
   irc:
     channels:
