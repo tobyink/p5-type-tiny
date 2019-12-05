@@ -246,8 +246,69 @@ is_deeply(
 	'cowardly refuses to drop keys to allow coercion to work',
 );
 
-note('TODO: deep coercion with slurpy');
-note('TODO: deep coercion where Optional cannot be coerced');
+
+#
+# Deep coercion with Optional
+#
+
+my $type6 = Dict[
+	foo => $Rounded,
+	bar => Optional[$Rounded],
+];
+
+is_deeply(
+	$type6->coerce({ foo => 4.1 }),
+	{ foo => 4 },
+	'deep coercion',
+);
+
+is_deeply(
+	$type6->coerce({ foo => 4.1, bar => 5.1 }),
+	{ foo => 4, bar => 5 },
+	'can coerce optional slots',
+);
+
+is_deeply(
+	$type6->coerce({ foo => 4.1, bar => 'xyz' }),
+	{ foo => 4.1, bar => 'xyz' },
+	'cowardly refuses to drop keys to allow coercion to work',
+);
+
+
+#
+# Deep coercion with slurpy
+#
+
+my $type7 = Dict[
+	foo => $Rounded,
+	bar => Optional[$Rounded],
+	slurpy Types::Standard::HashRef[$Rounded]
+];
+
+is_deeply(
+	$type7->coerce({ foo => 4.1 }),
+	{ foo => 4 },
+	'deep coercion',
+);
+
+is_deeply(
+	$type7->coerce({ foo => 4.1, bar => 5.1 }),
+	{ foo => 4, bar => 5 },
+	'can coerce optional slots',
+);
+
+is_deeply(
+	$type7->coerce({ foo => 4.1, quux => 6.1 }),
+	{ foo => 4, quux => 6 },
+	'can coerce slurpy',
+);
+
+is_deeply(
+	$type7->coerce({ foo => 4.1, bar => 'xyz' }),
+	{ foo => 4.1, bar => 'xyz' },
+	'cowardly refuses to drop keys to allow coercion to work',
+);
+
 
 done_testing;
 
