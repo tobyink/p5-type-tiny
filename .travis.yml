@@ -13,6 +13,7 @@ matrix:
         - cpanm -n Type::Tie Validation::Class::Simple Class::XSAccessor PadWalker Devel::LexAlias
         - cpan-install --toolchain
         - cpan-install --deps
+        - cpanm -n Devel::Cover Devel::Cover::Report::Codecov
       script:
         - export HARNESS_PERL_SWITCHES="-MDevel::Cover=+ignore,^inc/|^t/"
         - export PERL_TYPE_TINY_XS=0
@@ -170,7 +171,6 @@ install:
   - '[ -n "$MXT_RELEASE" ]   && cpan-install "$MXT_RELEASE"   || echo "MXT_RELEASE is not set"'
   - '[ -n "$EC_RELEASE" ]    && cpan-install "$EC_RELEASE"    || echo "EC_RELEASE is not set"'
   - '[ -n "$MOO_RELEASE" ]   && cpan-install "$MOO_RELEASE"   || echo "MOO_RELEASE is not set"'
-  - '[ -n "$COVERAGE" ]      && cpan-install Devel::Cover::Report::Codecov || echo "COVERAGE is not set"'
 before_script:
   - '[ -n "$COVERAGE" ] && cover -delete'
 script:
