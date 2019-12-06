@@ -37,6 +37,11 @@ coverage are highest priority.
 
 L<https://coveralls.io/github/tobyink/p5-type-tiny>.
 
+Type::Tiny is now also on Codecov which does coverage accounting
+slightly differently, giving some stricter targets to aim for.
+
+L<https://codecov.io/gh/tobyink/p5-type-tiny>
+
 =head2 Improving Documentation
 
 While the documentation for each package in Type::Tiny is fairly
