@@ -430,6 +430,7 @@ sub _build_coercion
 sub _build_default_message
 {
 	my $self = shift;
+	$self->{is_using_default_message} = 1;
 	return sub { sprintf '%s did not pass type constraint', _dd($_[0]) } if "$self" eq "__ANON__";
 	my $name = "$self";
 	return sub { sprintf '%s did not pass type constraint "%s"', _dd($_[0]), $name };
@@ -823,16 +824,41 @@ sub inline_assert
 {
 	require B;
 	my $self = shift;
-	my $varname = $_[0];
-	my $code = sprintf(
-		q[do { no warnings "void"; %s ? %s : Type::Tiny::_failed_check(%d, %s, %s) };],
-		$self->inline_check(@_),
-		$varname,
-		$self->{uniq},
-		B::perlstring("$self"),
-		$varname,
-	);
-	return $code;
+	my ($varname, $typevarname, @extras) = @_;
+	
+	my $inline_check;
+	if ($self->can_be_inlined) {
+		$inline_check = sprintf('(%s)', $self->inline_check($varname));
+	}
+	elsif ($typevarname) {
+		$inline_check = sprintf('%s->check(%s)', $typevarname, $varname);
+	}
+	else {
+		_croak 'Cannot inline type constraint check for "%s"', $self;
+	}
+	
+	my $inline_throw;
+	if ($typevarname) {
+		require B;
+		$inline_throw = sprintf(
+			'Type::Tiny::_failed_check(%s, %s, %s, %s)',
+			$typevarname,
+			B::perlstring("$self"),
+			$varname,
+			join(',', map B::perlstring($_), @extras),
+		);
+	}
+	else {
+		$inline_throw = sprintf(
+			'Type::Tiny::_failed_check(%s, %s, %s, %s)',
+			$self->{uniq},
+			B::perlstring("$self"),
+			$varname,
+			join(',', map B::perlstring($_), @extras),
+		);
+	}
+	
+	qq[do { no warnings "void"; $inline_check or $inline_throw };]
 }
 
 sub _failed_check {
@@ -1956,10 +1982,15 @@ For Moose-compat, there is an alias C<< _inline_check >> for this method.
 
 Much like C<inline_check> but outputs a statement of the form:
 
-   die ... unless ...;
+   ... or die ...;
 
-Note that if this type has a custom error message, the inlined code will
-I<ignore> this custom message!!
+Can also be called line C<< inline_assert($varname, $typevarname, %extras) >>.
+In this case, it will generate a string of code that may include
+C<< $typevarname >> which is supposed to be the name of a variable holding
+the type itself. (This is kinda complicated, but it allows a useful string
+to still be produced if the type is not inlineable.) The C<< %extras >> are
+additional options to be passed to L<Error::TypeTiny::Assertion>'s constructor
+and must be key-value pairs of strings only, no references or undefs.
 
 =back
 
