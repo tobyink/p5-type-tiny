@@ -717,6 +717,7 @@ sub wrap_methods {
 	my $opts = ref($_[0]) eq 'HASH' ? shift : {};
 	$opts->{caller}         ||= caller;
 	$opts->{skip_invocant}    = 1;
+	$opts->{use_can}          = 1;
 	unshift @_, $opts;
 	goto \&_wrap_subs;
 }
@@ -725,6 +726,7 @@ sub wrap_subs {
 	my $opts = ref($_[0]) eq 'HASH' ? shift : {};
 	$opts->{caller}         ||= caller;
 	$opts->{skip_invocant}    = 0;
+	$opts->{use_can}          = 0;
 	unshift @_, $opts;
 	goto \&_wrap_subs;
 }
@@ -739,13 +741,15 @@ sub _wrap_subs {
 		my $fullname = ($name =~ /::/) ? $name : sprintf('%s::%s', $opts->{caller}, $name);
 		my $orig = do {
 			no strict 'refs';
-			exists &$fullname ? \&$fullname : sub {};
+			exists &$fullname
+				? \&$fullname
+				: $opts->{use_can} ? ($opts->{caller}->can($name)||sub{}) : sub {}
 		};
 		my $check = ref($proto) eq 'CODE' ? $proto : undef;
 		my $co = { description => "parameter validation for '$name'" };
 		my $new = $opts->{skip_invocant}
-			? sub { my $s = shift; $check ||= compile($co, @$proto); $orig->($s, &$check) }
-			: sub { $check ||= compile($co, @$proto); $orig->(&$check) };
+			? sub { my $s = shift; $check ||= compile($co, @$proto); @_ = ($s, &$check); goto $orig }
+			: sub { $check ||= compile($co, @$proto); @_ = (&$check); goto $orig };
 		$new = $subname->($fullname, $new) if $subname;
 		no strict 'refs';
 		no warnings 'redefine';
