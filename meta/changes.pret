@@ -3345,3 +3345,19 @@
 			label "Expand per-type tests of bundled type libraries.";
 		]
 	].
+
+`Type-Tiny 1.007_009 cpan:TOBYINK`
+	issued  2019-12-06;
+	changeset [
+		dcs:versus `Type-Tiny 1.007_008 cpan:TOBYINK`;
+		item [
+			label "Type::Tiny's inline_assert method has been overhauled.";
+		];
+		item [
+			label "Obscure changes to Error::TypeTiny::Assertion.";
+		];
+		item [
+			a dcs:Tests, dcs:Documentation;
+			label "Document some undocumented files in the test suite.";
+		]
+	].
