@@ -33,7 +33,18 @@ sub new
 	my $class = shift;
 	my $self  = $class->SUPER::new(@_);
 	
-	if (ref $Method::Generate::Accessor::CurrentAttribute)
+	# Supported but undocumented parameter is `mgaca`.
+	# This indicates whether Error::TypeTiny::Assertion
+	# should attempt to figure out which attribute caused
+	# the error from Method::Generate::Accessor's info.
+	# Can be set to true/false or not set. If not set,
+	# the current behaviour is true, but this may change
+	# in the future. If set to false, will ignore the
+	# $Method::Generate::Accessor::CurrentAttribute hashref.
+	#
+	
+	if (ref $Method::Generate::Accessor::CurrentAttribute
+	and $self->{mgaca} || !exists $self->{mgaca})
 	{
 		require B;
 		my %d = %{$Method::Generate::Accessor::CurrentAttribute};
