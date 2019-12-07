@@ -865,7 +865,7 @@ sub _failed_check {
 	require Error::TypeTiny::Assertion;
 	
 	my ($self, $name, $value, %attrs) = @_;
-	$self = $ALL_TYPES{$self} unless ref $self;
+	$self = $ALL_TYPES{$self} if defined $self && !ref $self;
 	
 	my $exception_class = delete($attrs{exception_class}) || "Error::TypeTiny::Assertion";
 	
