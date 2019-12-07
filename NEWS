@@ -4,43 +4,6 @@
    changes in development releases, see the "Changes" file instead.
 =======================================================================
 
-2014-08-16 Type-Tiny version 1.000000 released!
-
- - Enhanced support for Type::Tiny::XS.
- - More test case improvements.
- - Saner implementations of slurpy and Optional within Tuples and Dicts.
- - More aggressive at freezing coercions.
- - Better behaviour of non-frozen coercions.
-   (For example, they are no longer considered to be inlineable.)
- - Better integration between Type::Library and Type::Registry.
-
-2017-06-01 Type-Tiny version 1.002000 released!
-
- - Type::Params now has `compile_named` and `validate_named`.
- - Type::Tiny's `constraint` parameter may be a string of code.
- - Types::Standard::CycleTuple added.
- - Types::Standard::RegexpRef now accepts blessed objects where
-   $object->isa('Regexp'). This plays better with re::engine::*
-   pragmas.
- - Fixed bug where Types::Standard::Int would *sometimes* accept
-   an overloaded object. (It never should.)
- - Various performance enhancements and bug fixes.
-
-2018-07-27 Type-Tiny version 1.004000 released!
-
- - Types::Standard::FileHandle has a looser definition, more consistent with
-   Mouse and Type::Tiny::XS.
- - Types::Standard::Bool has a stricter definition, but also has a built-in
-   coercion from a very loose definition.
- - Type::Params now has `compile_named_oo`.
- - Type::Params supports defaults for missing parameters.
- - Types::Common::Numeric includes IntRange and NumRange.
- - Types::Common::String includes StrLength.
- - Type::Tiny now allows types to be marked as deprecated.
- - Improvements to Eval::TypeTiny.
- - Various bug fixes.
- - Improved test suite.
-
 2019-11-12 Type-Tiny version 1.006000 released!
 
  - Improved is_subtype_of/is_supertype_of support.
@@ -52,7 +15,8 @@
 
 2019-12-11 Type-Tiny version 1.008000 released!
 
- - Resolved all bugs from RT!
+ - Resolved all bugs from RT.
+ - Completed everything on TODO.
  - Rewrite of the manual.
  - Lots more test cases.
  - wrap_methods/wrap_subs in Type::Params.
