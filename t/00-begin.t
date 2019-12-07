@@ -26,18 +26,29 @@ use Test::More;
 
 sub diag_version
 {
-	my ($module, $version) = @_;
+	my ($module, $version, $return) = @_;
+	
+	if ($module =~ /\//) {
+		my @modules  = split /\s*\/\s*/, $module;
+		my @versions = map diag_version($_, undef, 1), @modules;
+		return @versions if $return;
+		return diag sprintf('  %-43s %s', join("/", @modules), join("/", @versions));		
+	}
 	
 	unless (defined $version) {
 		eval "use $module ()";
 		$version =  $module->VERSION;
 	}
 	
-	return diag sprintf('  %-30s    undef', $module) unless defined $version;
+	if (!defined $version) {
+		return 'undef' if $return;
+		return diag sprintf('  %-40s    undef', $module);
+	}
 	
 	my ($major, $rest) = split /\./, $version;
 	$major =~ s/^v//;
-	return diag sprintf('  %-30s % 4d.%s', $module, $major, $rest);
+	return "$major\.$rest" if $return;
+	return diag sprintf('  %-40s % 4d.%s', $module, $major, $rest);
 }
 
 sub diag_env
@@ -45,7 +56,7 @@ sub diag_env
 	require B;
 	require Devel::TypeTiny::Perl56Compat;
 	my $var = shift;
-	return diag sprintf('  $%-30s   %s', $var, exists $ENV{$var} ? B::perlstring($ENV{$var}) : "undef");
+	return diag sprintf('  $%-40s   %s', $var, exists $ENV{$var} ? B::perlstring($ENV{$var}) : "undef");
 }
 
 while (<DATA>)
@@ -94,9 +105,17 @@ Exporter::Tiny
 Type::Tie
 Type::Tiny::XS
 
+Scalar::Util/Sub::Util
+Ref::Util/Ref::Util::XS
+Regexp::Util
+Class::XSAccessor
+Devel::LexAlias/PadWalker
+Devel::StackTrace
+
+Class::Tiny
 Moo
-Moose
-Mouse
+Moose/MooseX::Types
+Mouse/MouseX::Types
 
 $AUTOMATED_TESTING
 $NONINTERACTIVE_TESTING
