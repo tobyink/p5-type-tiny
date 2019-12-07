@@ -178,6 +178,16 @@ subtest slurpy_coderef_thing => sub
 	should_fail([1, "extra"], $type);
 };
 
+# this is mostly for better coverage
+{
+	my $type = Any->where('1');  # needs to be inlineable but not a standard type
+	my $dict = Dict[foo => Int, slurpy $type];
+	should_fail([foo=>123         ], $dict);
+	should_pass({foo=>123         }, $dict);
+	should_pass({foo=>123,bar=>456}, $dict);
+	should_fail({         bar=>456}, $dict);
+}
+
 subtest my_dict_is_slurpy => sub
 {
 	ok(!$struct5->my_dict_is_slurpy, 'On a non-slurpy Dict');
