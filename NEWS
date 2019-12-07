@@ -52,7 +52,7 @@
 
 2019-12-11 Type-Tiny version 1.008000 released!
 
+ - Resolved all bugs from RT!
  - Rewrite of the manual.
  - Lots more test cases.
  - wrap_methods/wrap_subs in Type::Params.
-
