@@ -66,4 +66,10 @@ is(
 	'DWIM Type::Tiny::Class::new',
 );
 
+is(
+	'Type::Tiny::Class'->new(  class => 'Xyzzy'  )->inline_check('$x'),
+	'Type::Tiny::Class'->new({ class => 'Xyzzy' })->inline_check('$x'),
+	'constructor can be passed a hash or hashref',
+);
+
 done_testing;

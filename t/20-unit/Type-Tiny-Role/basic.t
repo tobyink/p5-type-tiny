@@ -45,4 +45,10 @@ should_fail(FooBaz, DoesQuux);
 should_fail(DoesQuux, DoesQuux);
 should_fail("Quux", DoesQuux);
 
+is(
+	'Type::Tiny::Role'->new(  role => 'Xyzzy'  )->inline_check('$x'),
+	'Type::Tiny::Role'->new({ role => 'Xyzzy' })->inline_check('$x'),
+	'constructor can be passed a hash or hashref',
+);
+
 done_testing;
