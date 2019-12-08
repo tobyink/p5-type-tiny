@@ -32,7 +32,7 @@ sub diag_version
 		my @modules  = split /\s*\/\s*/, $module;
 		my @versions = map diag_version($_, undef, 1), @modules;
 		return @versions if $return;
-		return diag sprintf('  %-43s %s', join("/", @modules), join("/", @versions));		
+		return diag sprintf('  %-43s %s', join("/", @modules), join("/", @versions));
 	}
 	
 	unless (defined $version) {
