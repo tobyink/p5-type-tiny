@@ -65,7 +65,9 @@ $@ = undef;
 $r = eval "$inline_assert; 1234";
 is($r, undef, 'successful throw even when $type is undef');
 like($@, qr/Value "1.2" did not pass type constraint "Int"/, '... with correct exception');
-is($@->type, undef, '... but the exception does not know which type it was thrown by');
+if (ref $@) {
+	is($@->type, undef, '... but the exception does not know which type it was thrown by');
+}
 
 note("INLINE ASSERTION, NON-INLINABLE TYPE, NO TYPEVAR");
 $type = Int->where(sub {1});  # cannot be inlined
