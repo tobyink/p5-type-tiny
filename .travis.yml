@@ -159,9 +159,6 @@ matrix:
     - perl: "blead"
       env: PERL_TYPE_TINY_XS=1
   allow_failures:
-    - perl: "5.6.1"
-    - perl: "5.6.2"
-    - perl: "5.8.1"
     - perl: "blead"
 before_install:
   - export DIST_INKT_PROFILE="Dist::Inkt::Profile::TOBYINK"
