@@ -3361,3 +3361,17 @@
 			label "Document some undocumented files in the test suite.";
 		]
 	].
+
+`Type-Tiny 1.007_010 cpan:TOBYINK`
+	issued  2019-12-08;
+	changeset [
+		dcs:versus `Type-Tiny 1.007_009 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix;
+			label "Avoid undef warnings from Type::Tiny::_failed_check when the type has become undefined before the error message can be generated.";
+		];
+		item [
+			a dcs:Tests;
+			label "Minor improvements to the test suite.";
+		]
+	].
