@@ -19,14 +19,14 @@ Moo:
     use Types::Standard qw( Str Num ArrayRef );
     use namespace::autoclean;
     
-    has name       => ( is => 'ro',    isa => Str, required => 1 );
-    has gender     => ( is => 'ro',    isa => Str );
-    has age        => ( is => 'rw',    isa => Num );
-    has children   => ( is => 'lazy',  isa => ArrayRef );
-    
-    sub _build_children {
-      return [];
-    }
+    has name       => ( is => 'ro', isa => Str, required => 1 );
+    has gender     => ( is => 'ro', isa => Str );
+    has age        => ( is => 'rw', isa => Num );
+    has children   => (
+      is       => 'ro',
+      isa      => ArrayRef,
+      default  => sub { return [] },
+    );
   }
 
 Class::Tiny:
@@ -117,7 +117,7 @@ support for C<isa>.  You do not also need to use Class::Tiny itself.
     has gender     => ( is => 'ro',    isa => Str );
     has age        => ( is => 'rw',    isa => Num );
     has children   => (
-      is        => 'lazy',
+      is        => 'ro',
       isa       => ArrayRef,
       default   => sub { return [] },
     );

@@ -19,11 +19,7 @@ Consider the following basic Moo class:
     has name       => ( is => 'ro' );
     has gender     => ( is => 'ro' );
     has age        => ( is => 'rw' );
-    has children   => ( is => 'lazy' );
-    
-    sub _build_children {
-      return [];
-    }
+    has children   => ( is => 'ro', default => sub { [] } );
   }
 
 Code like this seems simple enough:
@@ -49,14 +45,14 @@ some basic sanity-checking on its own attributes.
     use Types::Standard qw( Str Num ArrayRef );
     use namespace::autoclean;
     
-    has name       => ( is => 'ro',    isa => Str );
-    has gender     => ( is => 'ro',    isa => Str );
-    has age        => ( is => 'rw',    isa => Num );
-    has children   => ( is => 'lazy',  isa => ArrayRef );
-    
-    sub _build_children {
-      return [];
-    }
+    has name       => ( is => 'ro', isa => Str );
+    has gender     => ( is => 'ro', isa => Str );
+    has age        => ( is => 'rw', isa => Num );
+    has children   => (
+      is      => 'ro',
+      isa     => ArrayRef,
+      default => sub { return  [] },
+    );
   }
 
 Now, if you instantiate a horse like this, it will throw an error:
@@ -149,12 +145,11 @@ Let's imagine we want to keep track of our horse's race wins:
     use namespace::autoclean;
     
     ...;  # name, gender, age, children
-    has wins => ( is => 'lazy', isa => ArrayRef );
-    
-    ...;
-    sub _build_wins {
-      return [];
-    }
+    has wins => (
+      is      => 'ro',
+      isa     => ArrayRef,
+      default => sub { return [] },
+    );
   }
 
 We can create a horse like this:
@@ -171,14 +166,22 @@ prevents it from being set to a hashref, for example, but it doesn't
 ensure that everything in the arrayref is a string. To do that, we need
 to parameterize the type constraint:
 
-  has wins => ( is => 'lazy', isa => ArrayRef[Str] );
+  has wins => (
+    is      => 'ro',
+    isa     => ArrayRef[Str],
+    default => sub { return [] },
+  );
 
 Thanks to the B<< ArrayRef[Str] >> parameterized type, the constructor will
 throw an error if the arrayref you pass to it contains anything non-string.
 
 An alternative way of writing this is:
 
-  has wins => ( is => 'lazy', isa => ArrayRef->of(Str) );
+  has wins => (
+    is      => 'ro',
+    isa     => ArrayRef->of(Str),
+    default => sub { return [] },
+  );
 
 Which way you choose is largely a style preference. TIMTOWTDI!
 
@@ -233,8 +236,9 @@ Another useful type constraint is the B<< Tuple >> type constraint.
   use Types::Common::String qw( NonEmptyStr );
   
   has wins => (
-    is  => 'lazy',
-    isa => ArrayRef[ Tuple[PositiveInt, NonEmptyStr] ],
+    is      => 'ro',
+    isa     => ArrayRef[ Tuple[PositiveInt, NonEmptyStr] ],
+    default => sub { return [] },
   );
 
 The B<< Tuple[PositiveInt, NonEmptyStr] >> type constraint checks that a value
@@ -261,10 +265,11 @@ wish to include the jockey name in our race wins when it is known.
   use Types::Common::String qw( NonEmptyStr );
   
   has wins => (
-    is  => 'lazy',
-    isa => ArrayRef[
+    is      => 'ro',
+    isa     => ArrayRef[
       Tuple[ PositiveInt, NonEmptyStr, Optional[NonEmptyStr] ]
     ],
+    default => sub { return [] },
   );
 
 The third element will be checked if it is present, but forgiven if it is
@@ -278,10 +283,11 @@ after the year and race name:
   use Types::Common::String qw( NonEmptyStr );
   
   has wins => (
-    is  => 'lazy',
-    isa => ArrayRef[
+    is      => 'ro',
+    isa     => ArrayRef[
       Tuple[ PositiveInt, NonEmptyStr, slurpy ArrayRef[Str] ]
     ],
+    default => sub { return [] },
   );
 
 The C<slurpy> indicator will "slurp" all the remaining items in the tuple
@@ -294,10 +300,11 @@ It's even possible to do this:
   use Types::Common::String qw( NonEmptyStr );
   
   has wins => (
-    is  => 'lazy',
-    isa => ArrayRef[ 
+    is      => 'ro',
+    isa     => ArrayRef[ 
       Tuple[ PositiveInt, NonEmptyStr, slurpy Any ]
     ],
+    default => sub { return [] },
   );
 
 With this type constraint, any elements after the first two will be slurped
@@ -312,14 +319,15 @@ B<Dict> is the equivalent of B<Tuple> for checking values of hashrefs.
   use Types::Common::String qw( NonEmptyStr );
   
   has wins => (
-    is  => 'lazy',
-    isa => ArrayRef[
+    is      => 'ro',
+    isa     => ArrayRef[
       Dict[
         year    => PositiveInt,
         race    => NonEmptyStr,
         jockey  => Optional[NonEmptyStr],
       ],
     ],
+    default => sub { return [] },
   );
 
 An example of using it:
@@ -358,17 +366,14 @@ B<ArrayRef> constraint:
     use Types::Standard qw( Str Num ArrayRef );
     use namespace::autoclean;
     
-    has name       => ( is => 'ro',    isa => Str );
-    has gender     => ( is => 'ro',    isa => Str );
-    has age        => ( is => 'rw',    isa => Num );
+    has name       => ( is => 'ro', isa => Str );
+    has gender     => ( is => 'ro', isa => Str );
+    has age        => ( is => 'rw', isa => Num );
     has children   => (
-      is   => 'lazy',
-      isa  => ArrayRef[ InstanceOf["Horse"] ],
+      is      => 'ro',
+      isa     => ArrayRef[ InstanceOf["Horse"] ],
+      default => sub { return [] },
     );
-    
-    sub _build_children {
-      return [];
-    }
   }
 
 The B<< InstanceOf["Horse"] >> type constraint checks that a value is
@@ -525,10 +530,11 @@ Let's remember our attribute for keeping track of a horse's race wins:
   use Types::Common::String qw( NonEmptyStr );
   
   has wins => (
-    is  => 'lazy',
-    isa => ArrayRef[
+    is      => 'ro',
+    isa     => ArrayRef[
       Tuple[ PositiveInt, NonEmptyStr, Optional[NonEmptyStr] ]
     ],
+    default => sub { return [] },
   );
 
 Because we don't trust outside code to push new entries onto this array,
