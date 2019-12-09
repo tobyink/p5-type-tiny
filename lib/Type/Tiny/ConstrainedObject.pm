@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Tiny::ConstrainedObject::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::ConstrainedObject::VERSION   = '1.007_010';
+	$Type::Tiny::ConstrainedObject::VERSION   = '1.007_011';
 }
 
 $Type::Tiny::ConstrainedObject::VERSION =~ tr/_//d;

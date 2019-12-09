@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Registry::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Registry::VERSION   = '1.007_010';
+	$Type::Registry::VERSION   = '1.007_011';
 }
 
 $Type::Registry::VERSION =~ tr/_//d;

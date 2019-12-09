@@ -3375,3 +3375,17 @@
 			label "Minor improvements to the test suite.";
 		]
 	].
+
+`Type-Tiny 1.007_011 cpan:TOBYINK`
+	issued  2019-12-09;
+	changeset [
+		dcs:versus `Type-Tiny 1.007_010 cpan:TOBYINK`;
+		item [
+			a dcs:Documentation;
+			label "Rewrite Type::Tiny::Manual::Coercions.";
+		];
+		item [
+			a dcs:Documentation;
+			label "Make the Moo parts of the manual use less Moo-specific syntax, so it is more applicable to Moose and Mouse.";
+		]
+	].
