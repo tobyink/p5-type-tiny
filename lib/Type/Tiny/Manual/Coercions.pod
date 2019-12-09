@@ -6,147 +6,240 @@
 
 Type::Tiny::Manual::Coercions - advanced information on coercions
 
-=head1 NOTE
-
-This part of the manual is kind of old and needs a bit of updating.
-It still contains valuable information though.
-
 =head1 MANUAL
 
-B<< Stop! Don't do it! >>
+This section of the manual assumes you've already read
+L<Type::Tiny::Manual::UsingWithMoo>.
 
-OK, it's fairly common practice in L<Moose>/L<Mouse> code to define
-coercions for type constraints. For example, suppose we define a type
-constraint in a type library:
+Type::Tiny takes a slightly different approach to type constraints from Moose.
+In Moose, there is a single flat namespace for type constraints. Moose defines
+a type constraint called B<Str> for strings and a type constraint called
+B<ArrayRef> for arrayrefs. If you want to define strings differently (maybe
+you think that the empty string doesn't really count as a string, or maybe you
+think objects overloading C<< q[""] >> should count as strings) then you
+can't call it B<Str>; you need to choose a different name.
 
-   class_type PathTiny, { class => "Path::Tiny" };
+With Type::Tiny, two type libraries can each offer a string type constraint
+with their own definitions for what counts as a string, and you can choose
+which one to import, or import them both with different names:
 
-We may wish to define a coercion (i.e. a conversion routine) to handle
-strings, and convert them into Path::Tiny objects:
+  use Some::Types qw( Str );
+  use Other::Types "Str" => { -as => "Str2" };
 
-   coerce PathTiny,
-      from Str, via { "Path::Tiny"->new($_) };
+This might seem to be a small advantage of Type::Tiny, but where this
+global-versus-local philosophy really makes a difference is coercions.
 
-However, there are good reasons to avoid this practice. It ties the
-coercion routine to the type constraint. Any people wishing to use your
-C<PathTiny> type constraint need to buy in to your idea of how they
-should be coerced from C<Str>. With L<Path::Tiny> this is unlikely to
-be controversial, however consider:
+Let's imagine for a part of your application that deals with reading username
+and password data you need to have a "username:password" string. You may
+wish to accept a C<< [$username, $password] >> arrayref and coerce it to
+a string using C<< join ":", @$arrayref >>. But another part of your
+application deals with slurping log files, and wants to coerce a string from
+an arrayref using C<< join "\n", @$arrayref >>. These are both perfectly
+sensible ways to coerce an arrayref. In Moose, a typical way to do this
+would be:
 
-   coerce ArrayRef,
-      from Str, via { [split /\n/] };
+  package My::UserManager {
+    use Moose;
+    use Moose::Util::TypeConstraints;
+    
+    coerce 'Str',
+      from 'ArrayRef', via { join ":", @$_ };
+    
+    ...;
+  }
+  
+  package My::LogReader {
+    use Moose;
+    use Moose::Util::TypeConstraints;
+    
+    coerce 'Str',
+      from 'ArrayRef', via { join "\n", @$_ };
+    
+    ...;
+  }
 
-In one part of the application (dealing with parsing log files for
-instance), this could be legitimate. But another part (dealing with
-logins perhaps) might prefer to split on colons. Another (dealing with
-web services) might attempt to parse the string as a JSON array.
+However, because in Moose all types and coercions are global, if both these
+classes are loaded, only one of them will work. One class will overrule the
+other's coercion. Which one "wins" will depend on load order.
 
-If all these coercions have attached themselves to the C<ArrayRef>
-type constraint, coercing a string becomes a complicated proposition!
-In a large application where coercions are defined across many different
-files, the application can start to suffer from "spooky action at a
-distance".
+It is possible to solve this with Moose native types, but it requires extra
+work. (The solution is for My::UserManager and My::LogReader to each create
+a subtype of B<Str> and define the coercion on that subtype instead of on
+B<Str> directly.)
 
-In the interests of Moose-compatibility, L<Type::Tiny> and L<Type::Coercion>
-do allow you to define coercions this way, but they also provide an
-alternative that you should consider: C<plus_coercions>.
+Type::Tiny solves this in two ways:
 
-=head2 plus_coercions
+=over
 
-L<Type::Tiny> offers a method C<plus_coercions> which constructs a new
-anonymous type constraint, but with additional coercions. 
+=item 1.
 
-In our earlier example, we'd define the C<PathTiny> type constraint
-in our type library as before:
+Type::Tiny makes it possible for type libraries to "protect" their type
+constraints to prevent external code from adding new coercions to them.
 
-   class_type PathTiny, { class => "Path::Tiny" };
+  $type->coercion->freeze();
 
-But then not define any coercions for it. Later, when using the
-type constraint in a class, we can add coercions:
+You can freeze coercions for your entire type library using:
 
-   my $ConfigFileType = PathTiny->plus_coercions(
-      Str,   sub { "Path::Tiny"->new($_) },
-      Undef, sub { "Path::Tiny"->new("/etc/myapp/default.conf") },
-   );
-   
-   has config_file => (
-      is     => "ro",
-      isa    => $ConfigFileType,
-      coerce => 1,
-   );
+  __PACKAGE__->make_immutable;
 
-Where the C<PathTiny> constraint is used in another part of the code, it
-will not see these coercions, because they were added to the new anonymous
-type constraint, not to the C<PathTiny> constraint itself!
+If you try to add coercions to a type constraint that has frozen coercions,
+it will throw an error.
+
+  use Types::Standard qw( Str ArrayRef );
+  
+  Str->coercion->add_type_coercions(
+    ArrayRef, sub { join "\n", @$_ },
+  );
+
+=item 2.
+
+Type::Tiny makes the above-mentioned pattern of adding coercions to a subtype
+much easier.
+
+  use Types::Standard ( Str ArrayRef );
+  
+  my $subtype = Str->plus_coercions(
+    ArrayRef, sub { join "\n", @$_ },
+  );
+
+The C<plus_coercions> method creates a new child type, adds new coercions to
+it, copies any existing coercions from the parent type, and then freezes
+coercions for the new child type.
+
+The end result is you now have a "copy" of B<Str> that can coerce from
+B<ArrayRef> but other copies of B<Str> won't be affected by your coercion.
+
+=back
+
+=head2 Defining Coercions within Type Libraries
+
+Some coercions like joining an arrayref to make a string are not going to be
+coercions that everybody will agree on. Join with a line break in between
+them as above? Or with a colon, a tab, a space, some other chanaracter? It
+depends a lot on your application.
+
+Others, like coercing a L<Path::Tiny> object from a string, are likely to be
+very obvious. It is this kind of coercion that it makes sense to define within
+the library itself so it's available to any packages that use the library.
+
+  my $pt = __PACKAGE__->add_type(
+    Type::Tiny::Class->new(
+      name    => 'Path',
+      class   => 'Path::Tiny',
+    ),
+  );
+  
+  $pt->coercion->add_type_coercions(
+    Str, q{ Path::Tiny::path($_) },
+  );
+  
+  $pt->coercion->freeze;
+
+=head2 Tweak Coercions Outside Type Libraries
+
+The C<plus_coercions> method creates a new type constraint with additional
+coercions. If the original type already had coercions, the new coercions
+have a higher priority.
+
+There's also a C<plus_fallback_coercions> method which does the same as
+C<plus_coercions> but adds the new coercions with a lower priority than
+any existing ones.
+
+L<Type::Tiny::Class> provides a C<plus_constructors> method as a shortcut
+for coercing via a constructor method. The following two are the same:
+
+  Path->plus_constructors(Str, "new")
+  
+  Path->plus_coercions(Str, q{ Path::Tiny->new($_) })
+
+To create a type constraint without particular existing coercions, you
+can use C<minus_coercions>. The following uses the B<Datetime> type
+defined in L<Type::Tiny::Manual::Libraries>, removing the coercion from
+B<Int> but keeping the coercions from B<Undef> and B<Dict>.
+
+  use Types::Standard qw( Int );
+  use Example::Types qw( Datetime );
+  
+  has start_date => (
+    is      => 'ro',
+    isa     => Datetime->minus_coercions(Int),
+    coerce  => 1,
+  );
+
+There's also a C<no_coercions> method that creates a subtype with no
+coercions at all. This is most useful either to create a "blank slate" for
+C<plus_coercions>:
+
+  my $Path = Path->no_coercions->plus_coercions(Str, sub { ... });
+
+Or to disable coercions for L<Type::Params>. Type::Params will always
+automatically coerce a parameter if there is a coercion for that type.
+
+  use Types::Standard qw( Object );
+  use Types::Common::String qw( UpperCaseStr );
+  use Type::Params;
+  
+  sub set_account_name {
+    state $check = compile( Object, UpperCaseStr->no_coercions );
+    my ($self, $name) = $check->(@_);
+    $self->_account_name($name);
+    $self->db->update($self);
+    return $self;
+  }
+  
+  # This will die instead of coercing from lowercase
+  $robert->_set_account_name('bob');
 
 =head2 Named Coercions
 
-A type library may define a named set of coercions to a particular
-type. For example, let's define that coercion from C<Str> to C<ArrayRef>:
+A compromise between defining a coercion in the type library or defining them
+in the package that uses the type library is for a type library to define a
+named collection of coercions which can be optionally added to a type
+constraint.
 
-   declare_coercion "LinesFromStr",
-      to_type ArrayRef,
-      from Str, q{ [split /\n/] };
+  {
+    package MyApp::Types;
+    use Type::Library -base;
+    use Type::Utils qw( extends );
+    
+    BEGIN { extends 'Types::Standard' };
+    
+    __PACKAGE__->add_coercion(
+      name              => "FromLines",
+      type_constraint   => ArrayRef,
+      type_coercion_map => [
+        Str,     q{ [split /\n/] },
+        Undef,   q{ [] },
+      ],
+    );
+  }
 
-Now we can import that coercion using a name, and it makes our code
-look a little cleaner:
+This set of coercions has a name and can be imported and used:
 
-   use Types::Standard qw(ArrayRef);
-   use MyApp::Types qw(LinesFromStr);
-   
-   has lines => (
-      is     => "ro",
-      isa    => ArrayRef->plus_coercions(LinesFromStr),
-      coerce => 1,
-   );
+  use MyApp::Types qw( ArrayRef FromLines );
+  
+  has lines => (
+    is      => 'ro',
+    isa     => ArrayRef->plus_coercions( FromLines ),
+    coerce  => 1,
+  );
+
+L<Types::Standard> defines a named coercion B<MkOpt> designed to be used
+for B<OptList>.
+
+  use Types::Standard qw( OptList MkOpt );
+  my $OptList = OptList->plus_coercions(MkOpt);
 
 =head2 Parameterized Coercions
 
-Parameterized type constraints are familiar from Moose. For example, an
-arrayref of integers:
+Named coercions can also be parameterizable.
 
-   ArrayRef[Int]
+  my $ArrayOfLines = ArrayRef->plus_coercions( Split[ qr{\n} ] );
 
-L<Type::Coercion> supports parameterized named coercions too. For example,
-the following type constraint has a coercion from strings that splits them
-into lines:
-
-   use Types::Standard qw( ArrayRef Split );
-   
-   my $ArrayOfLines = ArrayRef->plus_coercions( Split[ qr{\n} ] );
+L<Types::Standard> defines B<Split> and B<Join> parameterizable coercions. 
 
 Viewing the source code for L<Types::Standard> should give you hints as
 to how they are implemented.
-
-=head2 plus_fallback_coercions, minus_coercions and no_coercions
-
-Getting back to the C<plus_coercions> method, there are some other
-methods that perform coercion maths.
-
-C<plus_fallback_coercions> is the same as C<plus_coercions> but the
-added coercions have a lower priority than any existing coercions.
-
-C<minus_coercions> can be given a list of type constraints that we
-wish to ignore coercions for. Imagine our C<PathTiny> constraint already
-has a coercion from C<Str>, then the following creates a new anonymous
-type constraint without that coercion:
-
-   PathTiny->minus_coercions(Str)
-
-C<no_coercions> gives us a new type anonymous constraint without any
-of its parents coercions. This is useful as a way to create a blank slate
-for a subsequent C<plus_coercions>:
-
-   PathTiny->no_coercions->plus_coercions(...)
-
-=head2 plus_constructors
-
-The C<plus_constructors> method defined in L<Type::Tiny::Class> is sugar
-for C<plus_coercions>. The following two are the same:
-
-   PathTiny->plus_coercions(Str, q{ Path::Tiny->new($_) })
-   
-   PathTiny->plus_constructors(Str, "new");
 
 =head2 "Deep" Coercions
 
@@ -164,74 +257,79 @@ ones from L<Types::Standard>:
 
 =item *
 
-C<ScalarRef>
+B<ScalarRef>
 
 =item *
 
-C<ArrayRef>
+B<ArrayRef>
 
 =item *
 
-C<HashRef>
+B<HashRef>
 
 =item *
 
-C<Map>
+B<Map>
 
 =item *
 
-C<Tuple>
+B<Tuple>
 
 =item *
 
-C<CycleTuple>
+B<CycleTuple>
 
 =item *
 
-C<Dict>
+B<Dict>
 
 =item *
 
-C<Optional>
+B<Optional>
 
 =item *
 
-C<Maybe>
+B<Maybe>
 
 =back
 
-Imagine we're declaring a type library:
+Imagine we're defining a type B<Paths> in a type library:
 
-   declare Paths, as ArrayRef[PathTiny];
+  __PACKAGE__->add_type(
+    name      => 'Paths',
+    parent    => ArrayRef[Path],
+  );
 
-The C<PathTiny> type (declared earlier in the tutorial) has a coercion
-from C<Str>, so C<Paths> should be able to coerce from an arrayref of
-strings, right?
+The B<Path> type has a coercion from B<Str>, so B<Paths> should be able to
+coerce from an arrayref of strings, right?
 
-B<< Wrong! >> C<< ArrayRef[PathTiny] >> can coerce from an arrayref of
-strings, but C<Paths> is a separate type constraint which, although it
-inherits from C<< ArrayRef[PathTiny] >> has its own (currently empty)
-set of coercions.
+B<< Wrong! >> Although B<< ArrayRef[Path] >> could coerce from an arrayref
+of strings, B<Paths> is a separate type constraint which, although it inherits
+from B<< ArrayRef[Path] >> has its own (currently empty) set of coercions.
 
 Because that is often not what you want, Type::Tiny provides a shortcut
 when declaring a subtype to copy the parent type constraint's coercions:
 
-   declare Paths, as ArrayRef[PathTiny], coercion => 1;
+  __PACKAGE__->add_type(
+    name      => 'Paths',
+    parent    => ArrayRef[Path],
+    coercion  => 1,   # inherit
+  );
 
-Now C<Paths> can coerce from an arrayref of strings.
+Now B<Paths> can coerce from an arrayref of strings.
 
 =head3 Deep Caveat
 
 Currently there exists ill-defined behaviour resulting from mixing deep
 coercions and mutable (non-frozen) coercions. Consider the following:
 
-   class_type PathTiny, { class => "Path::Tiny" };
-   coerce PathTiny,
+   class_type Path, { class => "Path::Tiny" };
+   coerce Path,
       from Str, via { "Path::Tiny"->new($_) };
    
-   declare Paths, as ArrayRef[PathTiny], coercion => 1;
+   declare Paths, as ArrayRef[Path], coercion => 1;
    
-   coerce PathTiny,
+   coerce Path,
       from InstanceOf["My::File"], via { $_->get_path };
 
 An arrayref of strings can now be coerced to an arrayref of Path::Tiny
@@ -242,15 +340,13 @@ Currently the answer is "no", but this is mostly down to implementation
 details. It's not clear what the best way to behave in this situation
 is, and it could start working at some point in the future.
 
-You should avoid falling into this trap by following the advice found
-under L</"The (Lack of) Zen of Coercions">.
+This is why you should freeze coercions.
 
 =head2 Chained Coercions
 
 Consider the following type library:
 
-   {
-      package Types::Geometric;
+   package Types::Geometric {
       use Type::Library -base, -declare => qw(
          VectorArray
          VectorArray3D
@@ -290,24 +386,24 @@ Consider the following type library:
    }
 
 Given an arrayref C<< [1, 1] >> you might reasonably expect it to be
-coercible to a C<Point3D> object; it matches the type constraint
-C<VectorArray> so can be coerced to C<VectorArray3D> and thus to
-C<Point3D>.
+coercible to a B<Point3D> object; it matches the type constraint
+B<VectorArray> so can be coerced to B<VectorArray3D> and thus to
+B<Point3D>.
 
 However, L<Type::Coercion> does not automatically chain coercions
 like this. Firstly, it would be incompatible with Moose's type coercion
 system which does not chain coercions. Secondly, it's ambiguous; in our
 example, the arrayref could be coerced along two different paths (via
-C<VectorArray3D> or via C<Point>); in this case the end result would be
+B<VectorArray3D> or via B<Point>); in this case the end result would be
 the same, but in other cases it might not. Thirdly, it runs the risk of
 accidentally creating loops.
 
 Doing the chaining manually though is pretty simple. Firstly, we'll
 take note of the C<coercibles> method in L<Type::Tiny>. This method
 called as C<< VectorArray3D->coercibles >> returns a type constraint
-meaning "anything that can be coerced to a C<VectorArray3D>".
+meaning "anything that can be coerced to a B<VectorArray3D>".
 
-So we can define the coercions for C<Point3D> as:
+So we can define the coercions for B<Point3D> as:
 
    coerce Point3D,
       from VectorArray3D->coercibles, via {
@@ -320,59 +416,11 @@ So we can define the coercions for C<Point3D> as:
 
 ... and now coercing from C<< [1, 1] >> will work.
 
-=head2 The (Lack of) Zen of Coercions
-
-Coercions can lead to ugliness.
-
-Let's say we define a type constraint C<Path> which has a coercion from
-C<Str>. Now we define a class which uses that type constraint.
-
-Now in another class, we define a coercion from C<ArrayRef> to C<Path>.
-This kind of action at a distance is not really desirable. And in fact,
-things will probably subtly break - the first class may have already
-built a constructor inlining a bunch of code from the coercion.
-
-However, you too can achieve coercion zen by following these
-L<three weird tricks|http://www.slate.com/articles/business/moneybox/2013/07/how_one_weird_trick_conquered_the_internet_what_happens_when_you_click_on.html>:
-
-=over
-
-=item 1.
-
-If you want to define coercions for a type, do it I<< within your type
-constraint library >>, so the coercions are all defined before the
-type constraint is ever used.
-
-=item 2.
-
-At the end of your type constraint library, consider calling
-C<< $type->coercion->freeze >> on each type constraint that has a
-coercion. This makes the type's coercions immutable. If anybody wants
-to define any additional coercions, they'll have to create a child type
-to do it with.
-
-A shortcut exists to do this on all types in your library:
-
-   __PACKAGE__->meta->make_immutable;
-
-=item 3.
-
-Use C<plus_coercions> and similar methods to easily create a child
-type constraint of any existing type, and add more coercions to it.
-Don't fiddle directly with the existing type constraint which may be
-being used elsewhere.
-
-Note that these methods all return type constraint objects with
-frozen (immutable) coercions.
-
-=back
-
-That's it.
-
 =head1 SEE ALSO
 
 L<Moose::Manual::BestPractices>,
-L<http://www.catalyzed.org/2009/06/keeping-your-coercions-to-yourself.html>.
+L<https://web.archive.org/web/20090624164256/http://www.catalyzed.org/2009/06/keeping-your-coercions-to-yourself.html>,
+L<MooseX::Types::MoreUtils>.
 
 =head1 NEXT STEPS
 
