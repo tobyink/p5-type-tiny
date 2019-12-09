@@ -15,6 +15,7 @@ BEGIN {
 	$Type::Tiny::XS_VERSION  = '0.011';
 }
 
+$Type::Tiny::VERSION    =~ tr/_//d;
 $Type::Tiny::XS_VERSION =~ tr/_//d;
 
 use Scalar::Util qw( blessed );
