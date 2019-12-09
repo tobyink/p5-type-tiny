@@ -12,7 +12,7 @@ BEGIN {
 BEGIN {
 	$Type::Tiny::AUTHORITY   = 'cpan:TOBYINK';
 	$Type::Tiny::VERSION     = '1.007_011';
-	$Type::Tiny::XS_VERSION  = '0.011';
+	$Type::Tiny::XS_VERSION  = '0.016';
 }
 
 $Type::Tiny::VERSION    =~ tr/_//d;
