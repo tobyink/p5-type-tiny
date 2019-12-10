@@ -2,7 +2,7 @@
 
 =encoding utf-8
 
-=for highlighter language=Text
+=for highlighter language=ChangeLog
 
 =head1 NAME
 
