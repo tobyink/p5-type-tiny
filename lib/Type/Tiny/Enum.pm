@@ -235,7 +235,7 @@ Instead rely on the default.
 
 =item C<parent>
 
-Parent is always Types::Standard::Str, and cannot be passed to the
+Parent is always B<Types::Standard::Str>, and cannot be passed to the
 constructor.
 
 =item C<unique_values>

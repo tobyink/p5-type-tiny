@@ -127,7 +127,7 @@ Instead rely on the default.
 
 =item C<parent>
 
-Parent is always Types::Standard::Object, and cannot be passed to the
+Parent is always B<Types::Standard::Object>, and cannot be passed to the
 constructor.
 
 =back
