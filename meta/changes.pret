@@ -3389,3 +3389,25 @@
 			label "Make the Moo parts of the manual use less Moo-specific syntax, so it is more applicable to Moose and Mouse.";
 		]
 	].
+
+`Type-Tiny 1.007_012 cpan:TOBYINK`
+	issued  2019-12-10;
+	changeset [
+		dcs:versus `Type-Tiny 1.007_011 cpan:TOBYINK`;
+		item [
+			a dcs:Documentation;
+			label "Minor tweaks to Type::Tiny::Manual.";
+		];
+		item [
+			a dcs:Bugfix;
+			label "Fix tr/// stuff on $Type::Tiny::VERSION.";
+		];
+		item [
+			a dcs:Update;
+			label "Type::Tiny will stop trying to use very old versions of Type::Tiny::XS. (It already recommended newer versions in META.json.)";
+		];
+		item [
+			a dcs:Packaging;
+			label "Metadata updates.";
+		]
+	].
