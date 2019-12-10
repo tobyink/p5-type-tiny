@@ -3435,3 +3435,17 @@
 			label "Mostly formatting changes.";
 		]
 	].
+
+`Type-Tiny 1.007_015 cpan:TOBYINK`
+	issued  2019-12-10;
+	changeset [
+		dcs:versus `Type-Tiny 1.007_014 cpan:TOBYINK`;
+		item [
+			a dcs:Documentation;
+			label "Minor formatting changes.";
+		];
+		item [
+			a dcs:Documentation;
+			label "No longer suggest that Type::Tiny::Manual needs rewriting in Contriubuting.pod.";
+		]
+	].
