@@ -103,6 +103,7 @@ m`Type::Tiny Type-Tiny`
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Tiny/constraint-strings.t Type-Tiny`; :purpose "Checks Type::Tiny works accepts strings of Perl code as constraints." ];
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Tiny/deprecation.t Type-Tiny`; :purpose "Checks Type::Tiny's 'deprecated' attribute works." ];
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Tiny/esoteric.t Type-Tiny`; :purpose "Checks various undocumented Type::Tiny methods. The fact that these are tested here should not be construed to mean tht they are any any way a stable, supported part of the Type::Tiny API." ];
+	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Tiny/inline-assert.t Type-Tiny`; :purpose "Tests for Type::Tiny's 'inline_assert' method." ];
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Tiny/my-methods.t Type-Tiny`; :purpose "Checks Type::Tiny's 'my_methods' attribute." ];
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Tiny/parameterization.t Type-Tiny`; :purpose "There are loads of tests for parameterization in 'stdlib.t', 'stdlib-overload.t', 'stdlib-strmatch.t', 'stdlib-structures.t', 'syntax.t', 'stdlib-automatic.t', etc. This file includes a handful of other parameterization-related tests that didn't fit anywhere else." ];
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Tiny/shortcuts.t Type-Tiny`; :purpose "Test the '->of' and '->where' shortcut methods." ];
