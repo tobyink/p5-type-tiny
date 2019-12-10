@@ -42,11 +42,6 @@ slightly differently, giving some stricter targets to aim for.
 
 L<https://codecov.io/gh/tobyink/p5-type-tiny>
 
-=head2 Improving Documentation
-
-While the documentation for each package in Type::Tiny is fairly
-complete, Type::Tiny::Manual needs a bit of work.
-
 =head2 Type::Tiny::XS
 
 I'm not really a C programmer, nor am I that familiar with Perl's internals,
