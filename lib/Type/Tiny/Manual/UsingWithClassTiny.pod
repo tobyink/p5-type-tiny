@@ -70,7 +70,7 @@ We use C<wrap_methods> from L<Type::Params> to wrap the original C<BUILD>
 method (which doesn't exist, so C<wrap_methods> will just assume an empty
 sub) with a type check for C<< $args >>. The type check is just a B<Dict>
 that checks the class's required and optional attributes and includes
-C<< slurpy Any >> at the end to be flexible for subclasses adding new
+B<< slurpy Any >> at the end to be flexible for subclasses adding new
 attributes.
 
 Then we wrap the C<name>, C<gender>, and C<children> methods with checks
