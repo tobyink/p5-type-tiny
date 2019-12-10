@@ -3446,6 +3446,6 @@
 		];
 		item [
 			a dcs:Documentation;
-			label "No longer suggest that Type::Tiny::Manual needs rewriting in Contriubuting.pod.";
+			label "No longer suggest that Type::Tiny::Manual needs rewriting in Contributing.pod.";
 		]
 	].
