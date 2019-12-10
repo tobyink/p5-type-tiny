@@ -15,7 +15,7 @@ simply a module that was previously distributed as part of Type::Tiny
 but has since been spun off), and can be used with L<Moose>, L<Mouse>,
 or L<Moo> (or none of the above).
 
-Type::Tiny is used by over 800 Perl distributions on CPAN (the Comprehensive
+Type::Tiny is used by over 800 Perl distributions on the CPAN (Comprehensive
 Perl Archive Network) and can be considered a stable and mature framework for
 efficiently and reliably enforcing data types.
 
