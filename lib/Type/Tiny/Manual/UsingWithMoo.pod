@@ -161,7 +161,7 @@ We can create a horse like this:
     wins    => ["Futurity Stakes 1956", "Juvenile Stakes 1956"],
   );
 
-The list of wins is an arrayref of strings. The C<ArrayRef> type constraint
+The list of wins is an arrayref of strings. The B<ArrayRef> type constraint
 prevents it from being set to a hashref, for example, but it doesn't
 ensure that everything in the arrayref is a string. To do that, we need
 to parameterize the type constraint:
