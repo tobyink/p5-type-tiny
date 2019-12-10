@@ -239,25 +239,45 @@ L<MooseX::Types::Common::String>.
 
 =over
 
-=item C<SimpleStr>
+=item *
 
-=item C<NonEmptySimpleStr>
+B<SimpleStr>
 
-=item C<NumericCode>
+=item *
 
-=item C<LowerCaseSimpleStr>
+B<NonEmptySimpleStr>
 
-=item C<UpperCaseSimpleStr>
+=item *
 
-=item C<Password>
+B<NumericCode>
 
-=item C<StrongPassword>
+=item *
 
-=item C<NonEmptyStr>
+B<LowerCaseSimpleStr>
 
-=item C<LowerCaseStr>
+=item *
 
-=item C<UpperCaseStr>
+B<UpperCaseSimpleStr>
+
+=item *
+
+B<Password>
+
+=item *
+
+B<StrongPassword>
+
+=item *
+
+B<NonEmptyStr>
+
+=item *
+
+B<LowerCaseStr>
+
+=item *
+
+B<UpperCaseStr>
 
 =back
 
@@ -266,7 +286,9 @@ L<MooseX::Types::Common::String>.
 
 =over
 
-=item C<< StrLength[`min, `max] >>
+=item *
+
+B<< StrLength[`min, `max] >>
 
 Type constraint for a string between min and max characters long. For
 example:

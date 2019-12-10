@@ -925,134 +925,176 @@ L<Moose::Util::TypeConstraints>.
 
 =over
 
-=item C<< Any >>
+=item *
+
+B<< Any >>
 
 Absolutely any value passes this type constraint (even undef).
 
-=item C<< Item >>
+=item *
 
-Essentially the same as C<Any>. All other type constraints in this library
-inherit directly or indirectly from C<Item>.
+B<< Item >>
 
-=item C<< Bool >>
+Essentially the same as B<Any>. All other type constraints in this library
+inherit directly or indirectly from B<Item>.
+
+=item *
+
+B<< Bool >>
 
 Values that are reasonable booleans. Accepts 1, 0, the empty string and
 undef.
 
-=item C<< Maybe[`a] >>
+=item *
+
+B<< Maybe[`a] >>
 
 Given another type constraint, also accepts undef. For example,
-C<< Maybe[Int] >> accepts all integers plus undef.
+B<< Maybe[Int] >> accepts all integers plus undef.
 
-=item C<< Undef >>
+=item *
+
+B<< Undef >>
 
 Only undef passes this type constraint.
 
-=item C<< Defined >>
+=item *
+
+B<< Defined >>
 
 Only undef fails this type constraint.
 
-=item C<< Value >>
+=item *
+
+B<< Value >>
 
 Any defined, non-reference value.
 
-=item C<< Str >>
+=item *
+
+B<< Str >>
 
 Any string.
 
-(The only difference between C<Value> and C<Str> is that the former accepts
+(The only difference between B<Value> and B<Str> is that the former accepts
 typeglobs and vstrings.)
 
-Other customers also bought: C<< StringLike >> from L<Types::TypeTiny>.
+Other customers also bought: B<< StringLike >> from L<Types::TypeTiny>.
 
-=item C<< Num >>
+=item *
 
-See C<LaxNum> and C<StrictNum> below.
+B<< Num >>
 
-=item C<< Int >>
+See B<LaxNum> and B<StrictNum> below.
+
+=item *
+
+B<< Int >>
 
 An integer; that is a string of digits 0 to 9, optionally prefixed with a
 hyphen-minus character.
 
-=item C<< ClassName >>
+=item *
+
+B<< ClassName >>
 
 The name of a loaded package. The package must have C<< @ISA >> or
 C<< $VERSION >> defined, or must define at least one sub to be considered
 a loaded package.
 
-=item C<< RoleName >>
+=item *
 
-Like C<< ClassName >>, but the package must I<not> define a method called
+B<< RoleName >>
+
+Like B<< ClassName >>, but the package must I<not> define a method called
 C<new>. This is subtly different from Moose's type constraint of the same
 name; let me know if this causes you any problems. (I can't promise I'll
 change anything though.)
 
-=item C<< Ref[`a] >>
+=item *
+
+B<< Ref[`a] >>
 
 Any defined reference value, including blessed objects.
 
-Unlike Moose, C<Ref> is a parameterized type, allowing Scalar::Util::reftype
+Unlike Moose, B<Ref> is a parameterized type, allowing Scalar::Util::reftype
 checks, a la
 
    Ref["HASH"]  # hashrefs, including blessed hashrefs
 
-=item C<< ScalarRef[`a] >>
+=item *
+
+B<< ScalarRef[`a] >>
 
 A value where C<< ref($value) eq "SCALAR" or ref($value) eq "REF" >>.
 
 If parameterized, the referred value must pass the additional constraint.
-For example, C<< ScalarRef[Int] >> must be a reference to a scalar which
+For example, B<< ScalarRef[Int] >> must be a reference to a scalar which
 holds an integer value.
 
-=item C<< ArrayRef[`a] >>
+=item *
+
+B<< ArrayRef[`a] >>
 
 A value where C<< ref($value) eq "ARRAY" >>.
 
 If parameterized, the elements of the array must pass the additional
-constraint. For example, C<< ArrayRef[Num] >> must be a reference to an
+constraint. For example, B<< ArrayRef[Num] >> must be a reference to an
 array of numbers.
 
-As an extension to Moose's ArrayRef type, a minimum and maximum array
+As an extension to Moose's B<ArrayRef> type, a minimum and maximum array
 length can be given:
 
    ArrayRef[CodeRef, 1]        # ArrayRef of at least one CodeRef
    ArrayRef[FileHandle, 0, 2]  # ArrayRef of up to two FileHandles
    ArrayRef[Any, 0, 100]       # ArrayRef of up to 100 elements
 
-Other customers also bought: C<< ArrayLike >> from L<Types::TypeTiny>.
+Other customers also bought: B<< ArrayLike >> from L<Types::TypeTiny>.
 
-=item C<< HashRef[`a] >>
+=item *
+
+B<< HashRef[`a] >>
 
 A value where C<< ref($value) eq "HASH" >>.
 
 If parameterized, the values of the hash must pass the additional
-constraint. For example, C<< HashRef[Num] >> must be a reference to an
+constraint. For example, B<< HashRef[Num] >> must be a reference to an
 hash where the values are numbers. The hash keys are not constrained,
-but Perl limits them to strings; see C<Map> below if you need to further
+but Perl limits them to strings; see B<Map> below if you need to further
 constrain the hash values.
 
-Other customers also bought: C<< HashLike >> from L<Types::TypeTiny>.
+Other customers also bought: B<< HashLike >> from L<Types::TypeTiny>.
 
-=item C<< CodeRef >>
+=item *
+
+B<< CodeRef >>
 
 A value where C<< ref($value) eq "CODE" >>.
 
-Other customers also bought: C<< CodeLike >> from L<Types::TypeTiny>.
+Other customers also bought: B<< CodeLike >> from L<Types::TypeTiny>.
 
-=item C<< RegexpRef >>
+=item *
+
+B<< RegexpRef >>
 
 A reference where C<< re::is_regexp($value) >> is true, or
 a blessed reference where C<< $value->isa("Regexp") >> is true.
 
-=item C<< GlobRef >>
+=item *
+
+B<< GlobRef >>
 
 A value where C<< ref($value) eq "GLOB" >>.
 
-=item C<< FileHandle >>
+=item *
+
+B<< FileHandle >>
 
 A file handle.
 
-=item C<< Object >>
+=item *
+
+B<< Object >>
 
 A blessed object.
 
@@ -1066,46 +1108,54 @@ OK, so I stole some ideas from L<MooseX::Types::Structured>.
 
 =over
 
-=item C<< Map[`k, `v] >>
+=item *
 
-Similar to C<HashRef> but parameterized with type constraints for both the
+B<< Map[`k, `v] >>
+
+Similar to B<HashRef> but parameterized with type constraints for both the
 key and value. The constraint for keys would typically be a subtype of
-C<Str>.
+B<Str>.
 
-=item C<< Tuple[...] >>
+=item *
 
-Subtype of C<ArrayRef>, accepting a list of type constraints for
+B<< Tuple[...] >>
+
+Subtype of B<ArrayRef>, accepting a list of type constraints for
 each slot in the array.
 
-C<< Tuple[Int, HashRef] >> would match C<< [1, {}] >> but not C<< [{}, 1] >>.
+B<< Tuple[Int, HashRef] >> would match C<< [1, {}] >> but not C<< [{}, 1] >>.
 
-=item C<< Dict[...] >>
+=item *
 
-Subtype of C<HashRef>, accepting a list of type constraints for
+B<< Dict[...] >>
+
+Subtype of B<HashRef>, accepting a list of type constraints for
 each slot in the hash.
 
-For example C<< Dict[name => Str, id => Int] >> allows
+For example B<< Dict[name => Str, id => Int] >> allows
 C<< { name => "Bob", id => 42 } >>.
 
-=item C<< Optional[`a] >>
+=item *
 
-Used in conjunction with C<Dict> and C<Tuple> to specify slots that are
+B<< Optional[`a] >>
+
+Used in conjunction with B<Dict> and B<Tuple> to specify slots that are
 optional and may be omitted (but not necessarily set to an explicit undef).
 
-C<< Dict[name => Str, id => Optional[Int]] >> allows C<< { name => "Bob" } >>
+B<< Dict[name => Str, id => Optional[Int]] >> allows C<< { name => "Bob" } >>
 but not C<< { name => "Bob", id => "BOB" } >>.
 
-Note that any use of C<< Optional[`a] >> outside the context of
-parameterized C<Dict> and C<Tuple> type constraints makes little sense,
+Note that any use of B<< Optional[`a] >> outside the context of
+parameterized B<Dict> and B<Tuple> type constraints makes little sense,
 and its behaviour is undefined. (An exception: it is used by
-L<Type::Params> for a similar purpose to how it's used in C<Tuple>.)
+L<Type::Params> for a similar purpose to how it's used in B<Tuple>.)
 
 =back
 
 This module also exports a C<slurpy> function, which can be used as
 follows.
 
-It can cause additional trailing values in a C<Tuple> to be slurped
+It can cause additional trailing values in a B<Tuple> to be slurped
 into a structure and validated. For example, slurping into an ArrayRef:
 
    my $type = Tuple[Str, slurpy ArrayRef[Int]];
@@ -1121,7 +1171,7 @@ Or into a hashref:
    $type2->( ["Hello"] );                               # ok
    $type2->( ["Hello", 1, qr/one/i, 2, qr/two/] );      # ok
 
-It can cause additional values in a C<Dict> to be slurped into a
+It can cause additional values in a B<Dict> to be slurped into a
 hashref and validated:
 
    my $type3 = Dict[ values => ArrayRef, slurpy HashRef[Str] ];
@@ -1130,11 +1180,11 @@ hashref and validated:
    $type3->( { values => [], name => "Foo" } );         # ok
    $type3->( { values => [], name => [] } );            # not ok
 
-In either C<Tuple> or C<Dict>, C<< slurpy Any >> can be used to indicate
+In either B<Tuple> or B<Dict>, B<< slurpy Any >> can be used to indicate
 that additional values are acceptable, but should not be constrained in
 any way. 
 
-C<< slurpy Any >> is an optimized code path. Although the following are
+B<< slurpy Any >> is an optimized code path. Although the following are
 essentially equivalent checks, the former should run a lot faster:
 
    Tuple[Int, slurpy Any]
@@ -1152,32 +1202,38 @@ OK, so I stole some ideas from L<MooX::Types::MooseLike::Base>.
 
 =over
 
-=item C<< InstanceOf[`a] >>
+=item *
+
+B<< InstanceOf[`a] >>
 
 Shortcut for a union of L<Type::Tiny::Class> constraints.
 
-C<< InstanceOf["Foo", "Bar"] >> allows objects blessed into the C<Foo>
+B<< InstanceOf["Foo", "Bar"] >> allows objects blessed into the C<Foo>
 or C<Bar> classes, or subclasses of those.
 
-Given no parameters, just equivalent to C<Object>.
+Given no parameters, just equivalent to B<Object>.
 
-=item C<< ConsumerOf[`a] >>
+=item *
+
+B<< ConsumerOf[`a] >>
 
 Shortcut for an intersection of L<Type::Tiny::Role> constraints.
 
-C<< ConsumerOf["Foo", "Bar"] >> allows objects where C<< $o->DOES("Foo") >>
+B<< ConsumerOf["Foo", "Bar"] >> allows objects where C<< $o->DOES("Foo") >>
 and C<< $o->DOES("Bar") >> both return true.
 
-Given no parameters, just equivalent to C<Object>.
+Given no parameters, just equivalent to B<Object>.
 
-=item C<< HasMethods[`a] >>
+=item *
+
+B<< HasMethods[`a] >>
 
 Shortcut for a L<Type::Tiny::Duck> constraint.
 
-C<< HasMethods["foo", "bar"] >> allows objects where C<< $o->can("foo") >>
+B<< HasMethods["foo", "bar"] >> allows objects where C<< $o->can("foo") >>
 and C<< $o->can("bar") >> both return true.
 
-Given no parameters, just equivalent to C<Object>.
+Given no parameters, just equivalent to B<Object>.
 
 =back
 
@@ -1187,7 +1243,9 @@ There are a few other types exported by this module:
 
 =over
 
-=item C<< Overload[`a] >>
+=item *
+
+B<< Overload[`a] >>
 
 With no parameters, checks that the value is an overloaded object. Can
 be given one or more string parameters, which are specific operations
@@ -1196,7 +1254,9 @@ which overload addition and subtraction.
 
    Overload["+", "-"]
 
-=item C<< Tied[`a] >>
+=item *
+
+B<< Tied[`a] >>
 
 A reference to a tied scalar, array or hash.
 
@@ -1232,7 +1292,9 @@ a tied hash, use an intersection:
    \%h ~~ $TiedHash;     # true
    \$s ~~ $TiedHash;     # false
 
-=item C<< StrMatch[`a] >>
+=item *
+
+B<< StrMatch[`a] >>
 
 A string that matches a regular expression:
 
@@ -1264,50 +1326,58 @@ Here's an example using L<Regexp::Common>:
    }
 
 On certain versions of Perl, type constraints of the forms
-C<< StrMatch[qr/../ >> and C<< StrMatch[qr/\A..\z/ >> with any number
+B<< StrMatch[qr/../ >> and B<< StrMatch[qr/\A..\z/ >> with any number
 of intervening dots can be optimized to simple length checks.
 
-=item C<< Enum[`a] >>
+=item *
+
+B<< Enum[`a] >>
 
 As per MooX::Types::MooseLike::Base:
 
    has size => (is => "ro", isa => Enum[qw( S M L XL XXL )]);
 
-=item C<< OptList >>
+=item *
+
+B<< OptList >>
 
 An arrayref of arrayrefs in the style of L<Data::OptList> output.
 
-=item C<< LaxNum >>, C<< StrictNum >>
+=item *
 
-In Moose 2.09, the C<Num> type constraint implementation was changed from
+B<< LaxNum >>, B<< StrictNum >>
+
+In Moose 2.09, the B<Num> type constraint implementation was changed from
 being a wrapper around L<Scalar::Util>'s C<looks_like_number> function to
 a stricter regexp (which disallows things like "-Inf" and "Nan").
 
-Types::Standard provides I<both> implementations. C<LaxNum> is measurably
+Types::Standard provides I<both> implementations. B<LaxNum> is measurably
 faster.
 
-The C<Num> type constraint is currently an alias for C<LaxNum> unless you
+The B<Num> type constraint is currently an alias for B<LaxNum> unless you
 set the C<PERL_TYPES_STANDARD_STRICTNUM> environment variable to true before
-loading Types::Standard, in which case it becomes an alias for C<StrictNum>.
+loading Types::Standard, in which case it becomes an alias for B<StrictNum>.
 The constant C<< Types::Standard::STRICTNUM >> can be used to check if
-C<Num> is being strict.
+B<Num> is being strict.
 
-Most people should probably use C<Num> or C<StrictNum>. Don't explicitly
-use C<LaxNum> unless you specifically need an attribute which will accept
+Most people should probably use B<Num> or B<StrictNum>. Don't explicitly
+use B<LaxNum> unless you specifically need an attribute which will accept
 things like "Inf".
 
-=item C<< CycleTuple[`a] >>
+=item *
 
-Similar to Tuple, but cyclical.
+B<< CycleTuple[`a] >>
+
+Similar to B<Tuple>, but cyclical.
 
    CycleTuple[Int, HashRef]
 
 will allow C<< [1,{}] >> and C<< [1,{},2,{}] >> but disallow
 C<< [1,{},2] >> and C<< [1,{},2,[]] >>.
 
-I think you understand CycleTuples already.
+I think you understand B<CycleTuple> already.
 
-Currently C<Optional> and C<slurpy> parameters are forbidden. There are
+Currently B<Optional> and C<slurpy> parameters are forbidden. There are
 fairly limited use cases for them, and it's not exactly clear what they
 should mean.
 
@@ -1321,7 +1391,7 @@ hashref:
    CycleTuple[Str, Any]
 
 All the examples so far have used two parameters, but the following is
-also a possible CycleTuple:
+also a possible B<CycleTuple>:
 
    CycleTuple[Str, Int, HashRef]
 
@@ -1334,17 +1404,19 @@ strings, the 1st, 4th, 7th, etc values are integers, and the 2nd,
 =head2 Coercions
 
 Most of the types in this type library have no coercions by default.
-The exception is C<Bool> as of Types::Standard 1.003_003, which coerces
-from C<Any> via C<< !!$_ >>.
+The exception is B<Bool> as of Types::Standard 1.003_003, which coerces
+from B<Any> via C<< !!$_ >>.
 
 Some standalone coercions may be exported. These can be combined
 with type constraints using the C<< plus_coercions >> method.
 
 =over
 
-=item C<< MkOpt >>
+=item *
 
-A coercion from C<ArrayRef>, C<HashRef> or C<Undef> to C<OptList>. Example
+B<< MkOpt >>
+
+A coercion from B<ArrayRef>, B<HashRef> or B<Undef> to B<OptList>. Example
 usage in a Moose attribute:
 
    use Types::Standard qw( OptList MkOpt );
@@ -1355,7 +1427,9 @@ usage in a Moose attribute:
       coerce => 1,
    );
 
-=item C<< Split[`a] >>
+=item *
+
+B<< Split[`a] >>
 
 Split a string on a regexp.
 
@@ -1367,7 +1441,9 @@ Split a string on a regexp.
       coerce => 1,
    );
 
-=item C<< Join[`a] >>
+=item *
+
+B<< Join[`a] >>
 
 Join an array of strings with a delimiter.
 
@@ -1389,8 +1465,8 @@ Join an array of strings with a delimiter.
 
 =item C<< Types::Standard::STRICTNUM >>
 
-Indicates whether C<Num> is an alias for C<StrictNum>. (It is usually an
-alias for C<LaxNum>.)
+Indicates whether B<Num> is an alias for B<StrictNum>. (It is usually an
+alias for B<LaxNum>.)
 
 =back
 
@@ -1443,9 +1519,9 @@ L<MooseX::Types::Structured>.
 
 L<Types::XSD> provides some type constraints based on XML Schema's data
 types; this includes constraints for ISO8601-formatted datetimes, integer
-ranges (e.g. C<< PositiveInteger[maxInclusive=>10] >> and so on.
+ranges (e.g. B<< PositiveInteger[maxInclusive=>10] >> and so on.
 
-L<Types::Encodings> provides C<Bytes> and C<Chars> type constraints that
+L<Types::Encodings> provides B<Bytes> and B<Chars> type constraints that
 were formerly found in Types::Standard.
 
 L<Types::Common::Numeric> and L<Types::Common::String> provide replacements

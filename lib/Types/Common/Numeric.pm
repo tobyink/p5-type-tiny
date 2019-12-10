@@ -225,23 +225,41 @@ L<MooseX::Types::Common::Numeric>.
 
 =over
 
-=item C<PositiveNum>
+=item *
 
-=item C<PositiveOrZeroNum>
+B<PositiveNum>
 
-=item C<PositiveInt>
+=item *
 
-=item C<PositiveOrZeroInt>
+B<PositiveOrZeroNum>
 
-=item C<NegativeNum>
+=item *
 
-=item C<NegativeOrZeroNum>
+B<PositiveInt>
 
-=item C<NegativeInt>
+=item *
 
-=item C<NegativeOrZeroInt>
+B<PositiveOrZeroInt>
 
-=item C<SingleDigit>
+=item *
+
+B<NegativeNum>
+
+=item *
+
+B<NegativeOrZeroNum>
+
+=item *
+
+B<NegativeInt>
+
+=item *
+
+B<NegativeOrZeroInt>
+
+=item *
+
+B<SingleDigit>
 
 C<SingleDigit> interestingly accepts the numbers -9 to -1; not
 just 0 to 9. 
@@ -253,7 +271,9 @@ L<MooseX::Types::Common::Numeric>.
 
 =over
 
-=item C<< IntRange[`min, `max] >>
+=item *
+
+B<< IntRange[`min, `max] >>
 
 Type constraint for an integer between min and max. For example:
 
@@ -265,7 +285,9 @@ The maximum can be omitted.
 
 The minimum and maximum are inclusive.
 
-=item C<< NumRange[`min, `max] >>
+=item *
+
+B<< NumRange[`min, `max] >>
 
 Type constraint for a number between min and max. For example:
 
