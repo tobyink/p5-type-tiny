@@ -1417,7 +1417,7 @@ values are either arrayrefs of arguments to pass to C<compile> to make a check,
 or coderefs that have already been built by C<compile>, C<compile_named>, or
 C<compile_named_oo>.
 
-=head3 << wrap_methods( $subname1, $wrapper1, ... ) >>
+=head3 C<< wrap_methods( $subname1, $wrapper1, ... ) >>
 
 C<wrap_methods> also exists, which shifts off the invocant from C<< @_ >>
 before the check, but unshifts it before calling the original sub.
@@ -1432,11 +1432,10 @@ before the check, but unshifts it before calling the original sub.
    
    wrap_subs foobar => [Int, Str];
 
-=head3 C<Invocant>
+=head3 B<Invocant>
 
-Type::Params exports an additional keyword C<Invocant> on request. This
-gives you a type constraint which accepts classnames I<and> blessed
-objects.
+Type::Params exports a type B<Invocant> on request. This gives you a type
+constraint which accepts classnames I<and> blessed objects.
 
  use Type::Params qw( compile Invocant );
  
