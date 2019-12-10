@@ -1156,7 +1156,7 @@ This module also exports a C<slurpy> function, which can be used as
 follows.
 
 It can cause additional trailing values in a B<Tuple> to be slurped
-into a structure and validated. For example, slurping into an ArrayRef:
+into a structure and validated. For example, slurping into an arrayfef:
 
    my $type = Tuple[Str, slurpy ArrayRef[Int]];
    
