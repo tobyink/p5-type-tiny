@@ -1860,7 +1860,7 @@ Returns a list of all this type constraint's ancestor constraints. For
 example, if called on the C<Str> type constraint would return the list
 C<< (Value, Defined, Item, Any) >>.
 
-B<< Due to a historical misunderstanding, this differs from the Moose
+I<< Due to a historical misunderstanding, this differs from the Moose
 implementation of the C<parents> method. In Moose, C<parents> only returns the
 immediate parent type constraints, and because type constraints only have
 one immediate parent, this is effectively an alias for C<parent>. The
@@ -1916,7 +1916,7 @@ types.
 
 =back
 
-B<< Hint for people subclassing Type::Tiny: >>
+I<< Hint for people subclassing Type::Tiny: >>
 Since version 1.006000, the methods for determining subtype, supertype, and
 type equality should I<not> be overridden in subclasses of Type::Tiny. This
 is because of the problem of diamond inheritance. If X and Y are both

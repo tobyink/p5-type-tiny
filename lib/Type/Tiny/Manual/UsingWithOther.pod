@@ -64,7 +64,7 @@ doesn't directly support Type::Tiny constraints, it does support coderefs.
 You can use Type::Tiny's C<compiled_check> method to obtain a suitable
 coderef.
 
-B<< L<Param::Check> example: >>
+L<Param::Check> example:
 
   my $tmpl = {
     name => { allow => Str->compiled_check },
@@ -73,7 +73,7 @@ B<< L<Param::Check> example: >>
   check($tmpl, { name => "Bob", age => 32 })
     or die Params::Check::last_error();
 
-B<< L<Object::Accessor> example: >>
+L<Object::Accessor> example:
 
   my $obj = Object::Accessor->new;
   $obj->mk_accessors(
@@ -81,7 +81,7 @@ B<< L<Object::Accessor> example: >>
     { age  => Int->compiled_check },
   );
 
-B<< Caveat: >> Object::Accessor doesn't die when a value fails to meet its
+I<< Caveat: >> Object::Accessor doesn't die when a value fails to meet its
 type constraint; instead it outputs a warning to STDERR. This behaviour can
 be changed by setting C<< $Object::Accessor::FATAL = 1 >>.
 

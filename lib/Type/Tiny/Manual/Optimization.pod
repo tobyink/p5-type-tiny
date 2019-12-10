@@ -19,7 +19,7 @@ set of ultra-fast type constraint checks implemented in C.
 
 L<Type::Tiny> will attempt to load L<Type::Tiny::XS> and use its
 type checks. If L<Type::Tiny::XS> is not available, it will then
-try to use L<Mouse> B<< if it is already loaded >>, but Type::Tiny
+try to use L<Mouse> I<< if it is already loaded >>, but Type::Tiny
 won't attempt to load Mouse for you.
 
 Certain type constraints can also be accelerated if you have
@@ -32,7 +32,7 @@ be accelerated by Type::Tiny::XS: C<Any>, C<ArrayRef>, C<Bool>,
 C<ClassName>, C<CodeRef>, C<Defined>, C<FileHandle>, C<GlobRef>,
 C<HashRef>, C<Int>, C<Item>, C<Object>, C<Map>, C<Ref>, C<ScalarRef>,
 C<Str>, C<Tuple>, C<Undef>, and C<Value>. (Note that C<Num> and
-C<RegexpRef> are B<not> on that list.)
+C<RegexpRef> are I<not> on that list.)
 
 The parameterized form of C<Ref> cannot be accelerated.
 
@@ -68,7 +68,7 @@ be accelerated by Type::Tiny::XS: C<Any>, C<ArrayRef>, C<Bool>,
 C<ClassName>, C<CodeRef>, C<Defined>, C<FileHandle>, C<GlobRef>,
 C<HashRef>, C<Ref>, C<ScalarRef>, C<Str>, C<Undef>, and C<Value>.
 (Note that C<Item>, C<Num>, C<Int>, C<Object>, and C<RegexpRef>
-are B<not> on that list.)
+are I<not> on that list.)
 
 The parameterized form of C<Ref> cannot be accelerated.
 

@@ -680,7 +680,7 @@ specify the parent type (if any) and (possibly) refine its definition.
 
    my $EvenInt = declare as Int, where { $_ % 2 == 0 };
 
-B<< NOTE: >>
+I<< NOTE: >>
 If the caller package inherits from L<Type::Library> then any non-anonymous
 types declared in the package will be automatically installed into the
 library.

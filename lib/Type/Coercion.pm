@@ -881,7 +881,7 @@ to call C<add>. Support for this was dropped after 0.040.
 
 =over
 
-=item B<< Attempt to add coercion code to a Type::Coercion which has been frozen >>
+=item I<< Attempt to add coercion code to a Type::Coercion which has been frozen >>
 
 Type::Tiny type constraints are designed as immutable objects. Once you've
 created a constraint, rather than modifying it you generally create child

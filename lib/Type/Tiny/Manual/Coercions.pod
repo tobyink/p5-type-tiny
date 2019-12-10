@@ -303,7 +303,7 @@ Imagine we're defining a type B<Paths> in a type library:
 The B<Path> type has a coercion from B<Str>, so B<Paths> should be able to
 coerce from an arrayref of strings, right?
 
-B<< Wrong! >> Although B<< ArrayRef[Path] >> could coerce from an arrayref
+I<< Wrong! >> Although B<< ArrayRef[Path] >> could coerce from an arrayref
 of strings, B<Paths> is a separate type constraint which, although it inherits
 from B<< ArrayRef[Path] >> has its own (currently empty) set of coercions.
 
