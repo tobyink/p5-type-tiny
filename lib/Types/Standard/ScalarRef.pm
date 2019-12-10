@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Types::Standard::ScalarRef::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::ScalarRef::VERSION   = '1.007_013';
+	$Types::Standard::ScalarRef::VERSION   = '1.007_014';
 }
 
 $Types::Standard::ScalarRef::VERSION =~ tr/_//d;

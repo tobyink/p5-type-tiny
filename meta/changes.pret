@@ -3412,7 +3412,6 @@
 		]
 	].
 
-
 `Type-Tiny 1.007_013 cpan:TOBYINK`
 	issued  2019-12-10;
 	changeset [
@@ -3424,5 +3423,15 @@
 		item [
 			a dcs:Packaging;
 			label "Rebuild with newer RDF::DOAP.";
+		]
+	].
+
+`Type-Tiny 1.007_014 cpan:TOBYINK`
+	issued  2019-12-10;
+	changeset [
+		dcs:versus `Type-Tiny 1.007_013 cpan:TOBYINK`;
+		item [
+			a dcs:Documentation;
+			label "Mostly formatting changes.";
 		]
 	].
