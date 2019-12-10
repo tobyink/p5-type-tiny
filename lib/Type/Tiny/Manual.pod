@@ -8,11 +8,12 @@ Type::Tiny::Manual - an overview of Type::Tiny
 
 =head1 SYNOPSIS
 
-L<Type::Tiny> is a small class for writing type constraints, inspired by
-L<Moose>'s type constraint API and L<MooseX::Types>. It has only one
-non-core dependency (and even that is simply a module that was previously
-distributed as part of Type::Tiny but has since been spun off), and can be
-used with L<Moose>, L<Mouse> and L<Moo> (or none of the above).
+L<Type::Tiny> is a small L<Perl|http://www.perl.org/> class for writing
+type constraints, inspired by L<Moose>'s type constraint API and
+L<MooseX::Types>. It has only one non-core dependency (and even that is
+simply a module that was previously distributed as part of Type::Tiny
+but has since been spun off), and can be used with L<Moose>, L<Mouse>,
+or L<Moo> (or none of the above).
 
 Type::Tiny is bundled with L<Type::Library> a framework for organizing type
 constraints into collections. Also bundled is L<Types::Standard>, a
