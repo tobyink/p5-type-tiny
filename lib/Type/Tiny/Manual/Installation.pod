@@ -2,6 +2,8 @@
 
 =encoding utf-8
 
+=for highlighter language=Text
+
 =head1 NAME
 
 Type::Tiny::Manual::Installation - how to install Type::Tiny
