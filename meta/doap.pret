@@ -20,6 +20,7 @@
 		<https://github.com/tobyink/p5-type-tiny>,
 		<https://travis-ci.org/tobyink/p5-type-tiny>,
 		<https://ci.appveyor.com/project/tobyink/p5-type-tiny>,
+		<https://codecov.io/gh/tobyink/p5-type-tiny>,
 		<https://coveralls.io/github/tobyink/p5-type-tiny>;	
 	:category
 		[ label "Moo" ],

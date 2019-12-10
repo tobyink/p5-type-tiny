@@ -829,7 +829,7 @@ it can be used to build more specific type constraints.
 
 (And I'll let you in on a secret. Using Type::Tiny with L<Moose> or
 L<Mouse> instead of L<Moo> is exactly the same. You can just replace
-L<use Moo> with L<use Moose> in any of these examples and they should
+C<< use Moo >> with C<< use Moose >> in any of these examples and they should
 work fine!)
 
 Here's your next step:
