@@ -12,7 +12,7 @@ BEGIN {
 
 BEGIN {
 	$Types::Standard::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::VERSION   = '1.007_012';
+	$Types::Standard::VERSION   = '1.007_013';
 }
 
 $Types::Standard::VERSION =~ tr/_//d;
@@ -1430,6 +1430,8 @@ Please report any bugs to
 L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
 
 =head1 SEE ALSO
+
+L<The Type::Tiny homepage|http://typetiny.toby.ink/>.
 
 L<Type::Tiny::Manual>.
 

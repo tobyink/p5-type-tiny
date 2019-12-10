@@ -3411,3 +3411,18 @@
 			label "Metadata updates.";
 		]
 	].
+
+
+`Type-Tiny 1.007_013 cpan:TOBYINK`
+	issued  2019-12-10;
+	changeset [
+		dcs:versus `Type-Tiny 1.007_012 cpan:TOBYINK`;
+		item [
+			a dcs:Documentation;
+			label "Add links to homepage in pod.";
+		];
+		item [
+			a dcs:Packaging;
+			label "Rebuild with newer RDF::DOAP.";
+		]
+	].
