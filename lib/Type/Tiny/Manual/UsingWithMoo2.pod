@@ -24,7 +24,7 @@ the B<Int> type is and is responsible for checking values meet its definition.
   my $type = HashRef[Int];
 
 The C<< HashRef >> function, if called with no parameters returns the object
-defining the C<HashRef> type, just like the C<< Int >> function did before.
+defining the B<HashRef> type, just like the C<< Int >> function did before.
 But the difference here is that it's called with a parameter, an arrayref
 containing the B<Int> type object. It uses this to make the B<< HashRef[Int] >>
 type and returns that.
