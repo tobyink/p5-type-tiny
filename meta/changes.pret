@@ -3449,3 +3449,13 @@
 			label "No longer suggest that Type::Tiny::Manual needs rewriting in Contributing.pod.";
 		]
 	].
+
+`Type-Tiny 1.008000 cpan:TOBYINK`
+	issued  2019-12-10;
+	changeset [
+		dcs:versus `Type-Tiny 1.007_015 cpan:TOBYINK`;
+		item [
+			a dcs:Packaging;
+			label "Repackage as stable.";
+		]
+	].

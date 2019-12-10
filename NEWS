@@ -19,6 +19,6 @@
  - Resolved all bugs from RT.
  - Completed everything on TODO.
  - Rewrite of the manual.
- - Lots more test cases.
+ - Lots more test cases. (Now almost 14,000 test cases total!)
  - wrap_methods/wrap_subs in Type::Params.
 
