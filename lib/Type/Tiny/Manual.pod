@@ -15,15 +15,15 @@ simply a module that was previously distributed as part of Type::Tiny
 but has since been spun off), and can be used with L<Moose>, L<Mouse>,
 or L<Moo> (or none of the above).
 
+Type::Tiny is used by over 800 Perl distributions on CPAN (the Comprehensive
+Perl Archive Network) and can be considered a stable and mature framework for
+efficiently and reliably enforcing data types.
+
 Type::Tiny is bundled with L<Type::Library> a framework for organizing type
 constraints into collections. Also bundled is L<Types::Standard>, a
 Moose-inspired library of useful type constraints. L<Type::Params> is also
 provided, to allow very fast checking and coercion of function and method
 parameters.
-
-Type::Tiny is used by over 800 other Perl modules on CPAN (the Comprehensive
-Perl Archive Network) and can be considered a stable and mature framework
-for efficiently and reliably enforcing data types.
 
 The following example gives you an idea of some of the features of these
 modules. If you don't understand it all, that's fine; that's what the rest
