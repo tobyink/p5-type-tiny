@@ -2287,7 +2287,7 @@
 			a dcs:Documentation, dcs:Bugfix;
 			label "Fix variable name typo in documentation for Type::Params.";
 			seealso <https://github.com/tobyink/p5-type-tiny/pull/37>;
-			dcs:blame <urn:uuid:ed3a6a47-b3b7-4dd1-af20-6c1ab58e9228>;
+			dcs:blame cpan:LSBUCHALA;
 		];
 		item [
 			a dcs:Tests, dcs:Bugfix;

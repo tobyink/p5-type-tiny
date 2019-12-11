@@ -137,11 +137,6 @@ cpan:RRWO
 	:page <https://github.com/dionys>;
 	:name "Denis Ibaev".
 
-<urn:uuid:ed3a6a47-b3b7-4dd1-af20-6c1ab58e9228>
-	:mbox <mailto:lucasbuchala@gmail.com>;
-	:page <https://github.com/lucasbuchala>;
-	:name "Lucas Buchala".
-
 <urn:uuid:aae4d20c-4388-4267-9336-f71176b27c75>
 	:mbox <mailto:alexchorny@gmail.com>;
 	:page <https://github.com/chorny>;
@@ -167,6 +162,7 @@ cpan:SCHROEER
 	:mbox <mailto:x86mail@gmail.com>.
 
 cpan:LSBUCHALA
+	:page <https://github.com/lucasbuchala>;
 	:name "Lucas Buchala".
 
 # We bundle some files made by these dudes...
