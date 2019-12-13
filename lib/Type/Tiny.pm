@@ -148,23 +148,48 @@ __PACKAGE__->_install_overloads(
 
 sub _overload_coderef
 {
-	my $self = shift;
-	$self->message unless exists $self->{message};
+	my $self = shift;	
 	
-#	if ($self->has_parent && $self->_is_null_constraint)
-#	{
-#		$self->{_overload_coderef} ||= $self->parent->_overload_coderef;
-#	}
-#	els
-	if (!exists($self->{message}) && exists(&Sub::Quote::quote_sub) && $self->can_be_inlined)
-	{
-		$self->{_overload_coderef} = Sub::Quote::quote_sub($self->inline_assert('$_[0]'))
-			if !$self->{_overload_coderef} || !$self->{_sub_quoted}++;
+	# Bypass generating a coderef if we've already got the best possible one.
+	#
+	return $self->{_overload_coderef} if $self->{_sub_quoted};
+	
+	# Subclasses of Type::Tiny might override assert_return to do some kind
+	# of interesting thing. In that case, we can't rely on it having identical
+	# behaviour to inline_assert.
+	#
+	my $assert_return_sub = $self->can('assert_return');
+	
+	if ($assert_return_sub == \&assert_return) {
+		if (exists(&Sub::Quote::quote_sub)) {
+			# Use `=` instead of `||=` because we want to overwrite non-Sub::Quote
+			# coderef if possible.
+			$self->{_overload_coderef} = $self->can_be_inlined
+				? Sub::Quote::quote_sub($self->inline_assert('$_[0]'))
+				: Sub::Quote::quote_sub($self->inline_assert('$_[0]', '$type'), { '$type' => \$self });
+			++ $self->{_sub_quoted};
+		}
+		else {
+			require Eval::TypeTiny;
+			$self->{_overload_coderef} ||= $self->can_be_inlined
+				? Eval::TypeTiny::eval_closure(
+					source      => sprintf('sub { %s; $_[0] }', $self->inline_assert('$_[0]')),
+					description => sprintf("compiled assertion 'assert_%s'", $self),
+				)
+				: Eval::TypeTiny::eval_closure(
+					source      => sprintf('sub { %s; $_[0] }', $self->inline_assert('$_[0]', '$type')),
+					description => sprintf("compiled assertion 'assert_%s'", $self),
+					environment => { '$type' => \$self },
+				);
+		}
 	}
+	
 	else
 	{
-		Scalar::Util::weaken(my $weak = $self);
-		$self->{_overload_coderef} ||= sub { $weak->assert_return(@_) };
+		$self->{_overload_coderef} ||= do {
+			Scalar::Util::weaken(my $weak = $self);
+			sub { $weak->assert_return(@_) };
+		};
 	}
 	
 	$self->{_overload_coderef};
