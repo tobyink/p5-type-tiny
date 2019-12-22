@@ -11,7 +11,7 @@ BEGIN {
 
 BEGIN {
 	$Type::Tiny::AUTHORITY   = 'cpan:TOBYINK';
-	$Type::Tiny::VERSION     = '1.008000';
+	$Type::Tiny::VERSION     = '1.008001';
 	$Type::Tiny::XS_VERSION  = '0.016';
 }
 
@@ -146,52 +146,58 @@ __PACKAGE__->_install_overloads(
 	q(~~)    => sub { $_[0]->check($_[1]) },
 ) if Type::Tiny::SUPPORT_SMARTMATCH;
 
+# Would be easy to just return sub { $self->assert_return(@_) }
+# but try to build a more efficient coderef whenever possible.
+#
 sub _overload_coderef
 {
 	my $self = shift;	
 	
 	# Bypass generating a coderef if we've already got the best possible one.
 	#
-	return $self->{_overload_coderef} if $self->{_sub_quoted};
+	return $self->{_overload_coderef} if $self->{_overload_coderef_no_rebuild};
 	
 	# Subclasses of Type::Tiny might override assert_return to do some kind
 	# of interesting thing. In that case, we can't rely on it having identical
-	# behaviour to inline_assert.
+	# behaviour to Type::Tiny::inline_assert.
 	#
-	my $assert_return_sub = $self->can('assert_return');
+	$self->{_overrides_assert_return} = ($self->can('assert_return') != \&assert_return)
+		unless exists $self->{_overrides_assert_return};
 	
-	if ($assert_return_sub == \&assert_return) {
-		if (exists(&Sub::Quote::quote_sub)) {
-			# Use `=` instead of `||=` because we want to overwrite non-Sub::Quote
-			# coderef if possible.
-			$self->{_overload_coderef} = $self->can_be_inlined
-				? Sub::Quote::quote_sub($self->inline_assert('$_[0]'))
-				: Sub::Quote::quote_sub($self->inline_assert('$_[0]', '$type'), { '$type' => \$self });
-			++ $self->{_sub_quoted};
-		}
-		else {
-			require Eval::TypeTiny;
-			$self->{_overload_coderef} ||= $self->can_be_inlined
-				? Eval::TypeTiny::eval_closure(
-					source      => sprintf('sub { %s; $_[0] }', $self->inline_assert('$_[0]')),
-					description => sprintf("compiled assertion 'assert_%s'", $self),
-				)
-				: Eval::TypeTiny::eval_closure(
-					source      => sprintf('sub { %s; $_[0] }', $self->inline_assert('$_[0]', '$type')),
-					description => sprintf("compiled assertion 'assert_%s'", $self),
-					environment => { '$type' => \$self },
-				);
-		}
-	}
-	
-	else
-	{
+	if ($self->{_overrides_assert_return}) {
 		$self->{_overload_coderef} ||= do {
 			Scalar::Util::weaken(my $weak = $self);
 			sub { $weak->assert_return(@_) };
 		};
+		++ $self->{_overload_coderef_no_rebuild};
 	}
-	
+	elsif (exists(&Sub::Quote::quote_sub)) {
+		# Use `=` instead of `||=` because we want to overwrite non-Sub::Quote
+		# coderef if possible.
+		$self->{_overload_coderef} = $self->can_be_inlined
+			? Sub::Quote::quote_sub(
+				sprintf('%s; $_[0]', $self->inline_assert('$_[0]')),
+			)
+			: Sub::Quote::quote_sub(
+				sprintf('%s; $_[0]', $self->inline_assert('$_[0]', '$type')),
+				{ '$type' => \$self },
+			);
+		++ $self->{_overload_coderef_no_rebuild};
+	}
+	else {
+		require Eval::TypeTiny;
+		$self->{_overload_coderef} ||= $self->can_be_inlined
+			? Eval::TypeTiny::eval_closure(
+				source      => sprintf('sub { %s; $_[0] }', $self->inline_assert('$_[0]')),
+				description => sprintf("compiled assertion 'assert_%s'", $self),
+			)
+			: Eval::TypeTiny::eval_closure(
+				source      => sprintf('sub { %s; $_[0] }', $self->inline_assert('$_[0]', '$type')),
+				description => sprintf("compiled assertion 'assert_%s'", $self),
+				environment => { '$type' => \$self },
+			);
+	}
+		
 	$self->{_overload_coderef};
 }
 
