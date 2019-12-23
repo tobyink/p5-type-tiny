@@ -176,10 +176,10 @@ sub _overload_coderef
 		# coderef if possible.
 		$self->{_overload_coderef} = $self->can_be_inlined
 			? Sub::Quote::quote_sub(
-				sprintf('%s; $_[0]', $self->inline_assert('$_[0]')),
+				$self->inline_assert('$_[0]'),
 			)
 			: Sub::Quote::quote_sub(
-				sprintf('%s; $_[0]', $self->inline_assert('$_[0]', '$type')),
+				$self->inline_assert('$_[0]', '$type'),
 				{ '$type' => \$self },
 			);
 		++ $self->{_overload_coderef_no_rebuild};
@@ -188,11 +188,11 @@ sub _overload_coderef
 		require Eval::TypeTiny;
 		$self->{_overload_coderef} ||= $self->can_be_inlined
 			? Eval::TypeTiny::eval_closure(
-				source      => sprintf('sub { %s; $_[0] }', $self->inline_assert('$_[0]')),
+				source      => sprintf('sub { %s }', $self->inline_assert('$_[0]', undef, no_wrapper => 1)),
 				description => sprintf("compiled assertion 'assert_%s'", $self),
 			)
 			: Eval::TypeTiny::eval_closure(
-				source      => sprintf('sub { %s; $_[0] }', $self->inline_assert('$_[0]', '$type')),
+				source      => sprintf('sub { %s }', $self->inline_assert('$_[0]', '$type', no_wrapper => 1)),
 				description => sprintf("compiled assertion 'assert_%s'", $self),
 				environment => { '$type' => \$self },
 			);
@@ -856,7 +856,7 @@ sub inline_assert
 {
 	require B;
 	my $self = shift;
-	my ($varname, $typevarname, @extras) = @_;
+	my ($varname, $typevarname, %extras) = @_;
 	
 	my $inline_check;
 	if ($self->can_be_inlined) {
@@ -869,15 +869,16 @@ sub inline_assert
 		_croak 'Cannot inline type constraint check for "%s"', $self;
 	}
 	
+	my $do_wrapper = !delete $extras{no_wrapper};
+	
 	my $inline_throw;
 	if ($typevarname) {
-		require B;
 		$inline_throw = sprintf(
 			'Type::Tiny::_failed_check(%s, %s, %s, %s)',
 			$typevarname,
 			B::perlstring("$self"),
 			$varname,
-			join(',', map B::perlstring($_), @extras),
+			join(',', map +(B::perlstring($_) => B::perlstring($extras{$_})), sort keys %extras),
 		);
 	}
 	else {
@@ -886,11 +887,13 @@ sub inline_assert
 			$self->{uniq},
 			B::perlstring("$self"),
 			$varname,
-			join(',', map B::perlstring($_), @extras),
+			join(',', map +(B::perlstring($_) => B::perlstring($extras{$_})), sort keys %extras),
 		);
 	}
 	
-	qq[do { no warnings "void"; $inline_check or $inline_throw };]
+	$do_wrapper
+		? qq[do { no warnings "void"; $inline_check or $inline_throw; $varname };]
+		: qq[     no warnings "void"; $inline_check or $inline_throw; $varname   ]
 }
 
 sub _failed_check {
