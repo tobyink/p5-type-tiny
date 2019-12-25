@@ -301,7 +301,7 @@ string of code generated.
     name       => 'HashRef',
     parent     => $Ref,
     constraint => 'ref($_) eq "HASH"',
-    inline     => sub {
+    inlined    => sub {
       my $varname = pop;
       sprintf 'ref(%s) eq "HASH"', $varname;
     },
@@ -324,7 +324,7 @@ string in its place. So an inlieing coderef for even numbers might be:
     name       => 'EvenNumber',
     parent     => Types::Standard::Int,
     constraint => sub { $_ % 2 == 0 },
-    inline     => sub {
+    inlined    => sub {
       my $varname = pop;
       return (undef, "$varname % 2 == 0");
     },
