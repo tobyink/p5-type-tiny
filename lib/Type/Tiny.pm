@@ -151,7 +151,7 @@ __PACKAGE__->_install_overloads(
 #
 sub _overload_coderef
 {
-	my $self = shift;	
+	my $self = shift;
 	
 	# Bypass generating a coderef if we've already got the best possible one.
 	#
