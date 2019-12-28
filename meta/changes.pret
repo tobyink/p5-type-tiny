@@ -3459,3 +3459,21 @@
 			label "Repackage as stable.";
 		]
 	].
+
+`Type-Tiny 1.008001 cpan:TOBYINK`
+	issued  2019-12-28;
+	changeset [
+		dcs:versus `Type-Tiny 1.008000 cpan:TOBYINK`;
+		item [
+			a dcs:Change;
+			label "Use improved inline_assert when building the coderef for &{$type} overloading.";
+		];
+		item [
+			a dcs:Change;
+			label "Types::TypeTiny now better mocks Type::Library, offering is_* and assert_* functions for export.";
+		];
+		item [
+			a dcs:Change;
+			label "Types::TypeTiny honours $Type::Tiny::AvoidCallbacks.";
+		]
+	].
