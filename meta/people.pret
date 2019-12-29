@@ -165,6 +165,10 @@ cpan:LSBUCHALA
 	:page <https://github.com/lucasbuchala>;
 	:name "Lucas Buchala".
 
+cpan:HAUKEX
+	:page <https://github.com/haukex>;
+	:name "Hauke D".
+
 # We bundle some files made by these dudes...
 
 cpan:RJBS
