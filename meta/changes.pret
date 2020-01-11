@@ -3477,3 +3477,24 @@
 			label "Types::TypeTiny honours $Type::Tiny::AvoidCallbacks.";
 		]
 	].
+
+`Type-Tiny 1.008002 cpan:TOBYINK`
+	issued  2020-01-11;
+	changeset [
+		dcs:versus `Type-Tiny 1.008001 cpan:TOBYINK`;
+		item [
+			a dcs:Documentation;
+			label "Fix typos.";
+			dcs:blame cpan:HAUKEX;
+		];
+		item [
+			a dcs:Change;
+			label "Type::Tiny didn't accept string constraints for parameterizable type constraints; this was not a documented restriction and didn't seem to serve any purpose, so the restriction has been lifted.";
+			seealso <https://rt.cpan.org/Ticket/Display.html?id=131238>;
+		];
+		item [
+			a dcs:Bugfix;
+			label "Fix bareword errors if certain Type::Tiny subclasses were loaded prior to Type::Tiny.";
+			dcs:fixes RT#131401;
+		]
+	].
