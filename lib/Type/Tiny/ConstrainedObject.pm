@@ -13,7 +13,7 @@ $Type::Tiny::ConstrainedObject::VERSION =~ tr/_//d;
 
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
-require Type::Tiny;
+use Type::Tiny ();
 our @ISA = 'Type::Tiny';
 
 my %errlabel = (

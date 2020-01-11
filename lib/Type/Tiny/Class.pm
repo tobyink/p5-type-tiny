@@ -19,7 +19,7 @@ use Scalar::Util qw< blessed >;
 
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
-require Type::Tiny::ConstrainedObject;
+use Type::Tiny::ConstrainedObject ();
 our @ISA = 'Type::Tiny::ConstrainedObject';
 sub _short_name { 'Class' }
 
