@@ -947,9 +947,9 @@ sub is_parameterized
 	sub ____make_key {
 		join ',', map {
 			Types::TypeTiny::TypeTiny->check($_) ? sprintf('$Type::Tiny::ALL_TYPES{%d}', $_->{uniq}) :
-			ref() eq 'ARRAY'                     ? do { $seen{$_}++ ? '____CANNOT_KEY____' : sprintf('[%s]', ____make_key(@$_)) } :
-			ref() eq 'HASH'                      ? do { $seen{$_}++ ? '____CANNOT_KEY____' : sprintf('{%s}', ____make_key(%$_)) } :
-			ref() eq 'SCALAR' || ref() eq 'REF'  ? do { $seen{$_}++ ? '____CANNOT_KEY____' : sprintf('do { my $x = %s; \\$x }', ____make_key($$_)) } :
+			ref() eq 'ARRAY'                     ? do { $seen{$_}++ ? '____CANNOT_KEY____' : sprintf('[%s]',   ____make_key(@$_)) } :
+			ref() eq 'HASH'                      ? do { $seen{$_}++ ? '____CANNOT_KEY____' : sprintf('{%s}',   ____make_key(%$_)) } :
+			ref() eq 'SCALAR' || ref() eq 'REF'  ? do { $seen{$_}++ ? '____CANNOT_KEY____' : sprintf('\\(%s)', ____make_key($$_)) } :
 			!defined()                           ? 'undef' :
 			!ref()                               ? do { require B; B::perlstring($_) } :
 			'____CANNOT_KEY____';
