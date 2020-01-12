@@ -946,7 +946,7 @@ sub is_parameterized
 	my %seen;
 	sub ____make_key {
 		join ',', map {
-			Types::TypeTiny::TypeTiny->check($_) ? sprintf('$Type::Tiny::ALL_TYPES{%d}', $_->{uniq}) :
+			Types::TypeTiny::TypeTiny->check($_) ? sprintf('$Type::Tiny::ALL_TYPES{%d}', defined($_->{uniq}) ? $_->{uniq} : '____CANNOT_KEY____') :
 			ref() eq 'ARRAY'                     ? do { $seen{$_}++ ? '____CANNOT_KEY____' : sprintf('[%s]',   ____make_key(@$_)) } :
 			ref() eq 'HASH'                      ? do { $seen{$_}++ ? '____CANNOT_KEY____' : sprintf('{%s}',   ____make_key(%$_)) } :
 			ref() eq 'SCALAR' || ref() eq 'REF'  ? do { $seen{$_}++ ? '____CANNOT_KEY____' : sprintf('\\(%s)', ____make_key($$_)) } :
