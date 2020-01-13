@@ -168,12 +168,34 @@ sub simple_lookup
 	my ($tc) = @_;
 	$tc =~ s/(^\s+|\s+$)//g;
 	
-	if (exists $self->{$tc})
-	{
+	if (exists $self->{$tc}) {
 		return $self->{$tc};
+	}
+	elsif ($self->has_parent) {
+		return $self->get_parent->simple_lookup(@_);
 	}
 	
 	return;
+}
+
+sub set_parent {
+	my $self = shift;
+	$self->{'~~parent'} = ref($_[0]) ? $_[0] : (ref($self)||$self)->for_class($_[0]);
+	$self;
+}
+
+sub clear_parent {
+	my $self = shift;
+	delete $self->{'~~parent'};
+	$self;
+}
+
+sub has_parent {
+	!!ref(shift->{'~~parent'});
+}
+
+sub get_parent {
+	shift->{'~~parent'};
 }
 
 sub foreign_lookup
@@ -471,6 +493,11 @@ Convenience methods for creating certain common type constraints.
 Overloaded to call C<lookup>.
 
    $registry->Str;  # like $registry->lookup("Str")
+
+=item C<get_parent>, C<< set_parent($reg) >>, C<< clear_parent >>, C<< has_parent >>
+
+Advanced stuff. Allows a registry to have a "parent" registry which it
+inherits type constraints from.
 
 =back
 
