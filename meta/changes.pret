@@ -3498,3 +3498,17 @@
 			dcs:fixes RT#131401;
 		]
 	].
+
+`Type-Tiny 1.008003 cpan:TOBYINK`
+	issued  2020-01-13;
+	changeset [
+		dcs:versus `Type-Tiny 1.008002 cpan:TOBYINK`;
+		item [
+			a dcs:Packaging;
+			label "Makefile.PL will now bail out on cperl if AUTOMATED_TESTING environment variable is set to true.";
+		];
+		item [
+			a dcs:Addition;
+			label "Type::Registry can now have a parent registry.";
+		]
+	].
