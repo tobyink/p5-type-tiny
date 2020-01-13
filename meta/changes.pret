@@ -3508,6 +3508,10 @@
 			label "Makefile.PL will now bail out on cperl if AUTOMATED_TESTING environment variable is set to true.";
 		];
 		item [
+			a dcs:Documentation;
+			label "Update copyright dates to 2020.";
+		];
+		item [
 			a dcs:Addition;
 			label "Type::Registry can now have a parent registry.";
 		]
