@@ -94,6 +94,7 @@ m`Type::Registry Type-Tiny`
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Registry/methods.t Type-Tiny`; :purpose "Checks various newish Type::Registry method calls." ];
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Registry/moosextypes.t Type-Tiny`; :purpose "Checks Type::Registry works with MooseX::Types." ];
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Registry/mousextypes.t Type-Tiny`; :purpose "Checks Type::Registry works with MouseX::Types." ];
+	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Registry/parent.t Type-Tiny`; :purpose "Check the Type::Registrys can have parents." ];
 	.
 m`Type::Tiny Type-Tiny`
 	:unit_test [ a :UnitTest; :test_script f`t/20-unit/Type-Tiny/arithmetic.t Type-Tiny`; :purpose "Tests overloading of bitwise operators and numeric comparison operators for Type::Tiny." ];
@@ -292,4 +293,7 @@ RT#129729
 	.
 RT#130823
 	:regression_test [ a :RegressionTest; :test_script f`t/40-regression/rt130823.t Type-Tiny`; :purpose "Check for memory cycles."];
+	.
+RT#131401
+	:regression_test [ a :RegressionTest; :test_script f`t/40-regression/rt131401.t Type-Tiny`; :purpose "Make sure that Type::Tiny::Class loads Type::Tiny early enough for bareword constants to be okay."];
 	.
