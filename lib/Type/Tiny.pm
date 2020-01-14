@@ -1597,7 +1597,7 @@ a coercion.)
 
 =item C<< my_methods >>
 
-Experimenal hashref of additional methods that can be called on the type
+Experimental hashref of additional methods that can be called on the type
 constraint object.
 
 =back
