@@ -847,7 +847,7 @@ sub inline_check
 			unless $self->has_parent;
 		$r[0] = $self->parent->inline_check(@_);
 	}
-	my $r = join " && " => map { /[;{}]/ && !/\Ado \{.+\}\z/ ? "do { $_ }" : "($_)" } @r;
+	my $r = join " && " => map { /[;{}]/ && !/\Ado \{.+\}\z/ ? "do { package Type::Tiny; $_ }" : "($_)" } @r;
 	return @r==1 ? $r : "($r)";
 }
 
@@ -891,8 +891,8 @@ sub inline_assert
 	}
 	
 	$do_wrapper
-		? qq[do { no warnings "void"; $inline_check or $inline_throw; $varname };]
-		: qq[     no warnings "void"; $inline_check or $inline_throw; $varname   ]
+		? qq[do { no warnings "void"; package Type::Tiny; $inline_check or $inline_throw; $varname };]
+		: qq[     no warnings "void"; package Type::Tiny; $inline_check or $inline_throw; $varname   ]
 }
 
 sub _failed_check {
