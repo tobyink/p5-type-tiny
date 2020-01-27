@@ -74,8 +74,8 @@ sub __inline_generator
 		
 		"$p and do { "
 		.  "my \$ok = 1; "
-		.  "for my \$i (CORE::values \%{$v}) { "
-		.    "(\$ok = 0, CORE::last) unless $param_check "
+		.  "for my \$i (values \%{$v}) { "
+		.    "(\$ok = 0, last) unless $param_check "
 		.  "}; "
 		.  "\$ok "
 		."}"
@@ -115,8 +115,8 @@ sub __coercion_generator
 		$C->add_type_coercions($parent => Types::Standard::Stringable {
 			my @code;
 			push @code, 'do { my ($orig, $return_orig, %new) = ($_, 0);';
-			push @code,    'for (CORE::keys %$orig) {';
-			push @code, sprintf('$return_orig++ && CORE::last unless (%s);', $coercable_item->inline_check('$orig->{$_}'));
+			push @code,    'for (keys %$orig) {';
+			push @code, sprintf('$return_orig++ && last unless (%s);', $coercable_item->inline_check('$orig->{$_}'));
 			push @code, sprintf('$new{$_} = (%s);', $param->coercion->inline_coercion('$orig->{$_}'));
 			push @code,    '}';
 			push @code,    '$return_orig ? $orig : \\%new';

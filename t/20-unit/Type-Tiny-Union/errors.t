@@ -61,12 +61,12 @@ is_deeply(
 		'"Int|ArrayRef[Int]" requires that the value pass "ArrayRef[Int]" or "Int"',
 		'Value "3.14159" did not pass type constraint "Int"',
 		'    Value "3.14159" did not pass type constraint "Int"',
-		'    "Int" is defined as: (do { my $tmp = $_; CORE::defined($tmp) and !CORE::ref($tmp) and $tmp =~ /\\A-?[0-9]+\\z/ })',
+		'    "Int" is defined as: (do { my $tmp = $_; defined($tmp) and !ref($tmp) and $tmp =~ /\\A-?[0-9]+\\z/ })',
 		'Value "3.14159" did not pass type constraint "ArrayRef[Int]"',
 		'    "ArrayRef[Int]" is a subtype of "ArrayRef"',
 		'    "ArrayRef" is a subtype of "Ref"',
 		'    Value "3.14159" did not pass type constraint "Ref"',
-		'    "Ref" is defined as: (!!CORE::ref($_))',
+		'    "Ref" is defined as: (!!ref($_))',
 	],
 ) or diag explain($e->explain);
 

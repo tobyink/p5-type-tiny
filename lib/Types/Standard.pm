@@ -29,17 +29,17 @@ my $is_class_loaded;
 
 BEGIN {
 	$is_class_loaded = q{sub {
-		return !!0 if CORE::ref $_[0];
+		return !!0 if ref $_[0];
 		return !!0 if not $_[0];
-		return !!0 if CORE::ref(do { my $tmpstr = $_[0]; \$tmpstr }) ne 'SCALAR';
+		return !!0 if ref(do { my $tmpstr = $_[0]; \$tmpstr }) ne 'SCALAR';
 		my $stash = do { no strict 'refs'; \%{"$_[0]\::"} };
-		return !!1 if CORE::exists $stash->{'ISA'};
-		return !!1 if CORE::exists $stash->{'VERSION'};
-		foreach my $globref (CORE::values %$stash) {
+		return !!1 if exists $stash->{'ISA'};
+		return !!1 if exists $stash->{'VERSION'};
+		foreach my $globref (values %$stash) {
 			return !!1
-				if CORE::ref \$globref eq 'GLOB'
+				if ref \$globref eq 'GLOB'
 					? *{$globref}{CODE}
-					: CORE::ref $globref; # const or sub ref
+					: ref $globref; # const or sub ref
 		}
 		return !!0;
 	}};
@@ -192,8 +192,8 @@ my $_item = $meta->$add_core_type({
 my $_bool = $meta->$add_core_type({
 	name       => "Bool",
 	parent     => $_item,
-	constraint => sub {  !CORE::ref $_    and (!CORE::defined $_    or $_    eq q() or $_    eq '0' or $_    eq '1')  },
-	inlined    => sub { "!CORE::ref $_[1] and (!CORE::defined $_[1] or $_[1] eq q() or $_[1] eq '0' or $_[1] eq '1')" },
+	constraint => sub {  !ref $_    and (!defined $_    or $_    eq q() or $_    eq '0' or $_    eq '1')  },
+	inlined    => sub { "!ref $_[1] and (!defined $_[1] or $_[1] eq q() or $_[1] eq '0' or $_[1] eq '1')" },
 });
 
 $_bool->coercion->add_type_coercions($_any, q{!!$_});
@@ -202,14 +202,14 @@ my $_undef = $meta->$add_core_type({
 	name       => "Undef",
 	parent     => $_item,
 	constraint => sub { !defined $_ },
-	inlined    => sub { "!CORE::defined($_[1])" },
+	inlined    => sub { "!defined($_[1])" },
 });
 
 my $_def = $meta->$add_core_type({
 	name       => "Defined",
 	parent     => $_item,
 	constraint => sub { defined $_ },
-	inlined    => sub { "CORE::defined($_[1])" },
+	inlined    => sub { "defined($_[1])" },
 	complementary_type => $_undef,
 });
 
@@ -220,7 +220,7 @@ my $_val = $meta->$add_core_type({
 	name       => "Value",
 	parent     => $_def,
 	constraint => sub { not ref $_ },
-	inlined    => sub { "CORE::defined($_[1]) and not CORE::ref($_[1])" },
+	inlined    => sub { "defined($_[1]) and not ref($_[1])" },
 });
 
 my $_str = $meta->$add_core_type({
@@ -228,7 +228,7 @@ my $_str = $meta->$add_core_type({
 	parent     => $_val,
 	constraint => sub { ref(\$_) eq 'SCALAR' or ref(\(my $val = $_)) eq 'SCALAR' },
 	inlined    => sub {
-		"CORE::defined($_[1]) and do { CORE::ref(\\$_[1]) eq 'SCALAR' or CORE::ref(\\(my \$val = $_[1])) eq 'SCALAR' }"
+		"defined($_[1]) and do { ref(\\$_[1]) eq 'SCALAR' or ref(\\(my \$val = $_[1])) eq 'SCALAR' }"
 	},
 });
 
@@ -236,7 +236,7 @@ my $_laxnum = $meta->add_type({
 	name       => "LaxNum",
 	parent     => $_str,
 	constraint => sub { looks_like_number $_ },
-	inlined    => sub { "CORE::defined($_[1]) && !CORE::ref($_[1]) && Scalar::Util::looks_like_number($_[1])" },
+	inlined    => sub { "defined($_[1]) && !ref($_[1]) && Scalar::Util::looks_like_number($_[1])" },
 });
 
 my $_strictnum = $meta->add_type({
@@ -274,7 +274,7 @@ $meta->$add_core_type({
 	name       => "Int",
 	parent     => $_num,
 	constraint => sub { /\A-?[0-9]+\z/ },
-	inlined    => sub { "do { my \$tmp = $_[1]; CORE::defined(\$tmp) and !CORE::ref(\$tmp) and \$tmp =~ /\\A-?[0-9]+\\z/ }" },
+	inlined    => sub { "do { my \$tmp = $_[1]; defined(\$tmp) and !ref(\$tmp) and \$tmp =~ /\\A-?[0-9]+\\z/ }" },
 });
 
 my $_classn = $meta->add_type({
@@ -303,7 +303,7 @@ my $_ref = $meta->$add_core_type({
 	name       => "Ref",
 	parent     => $_def,
 	constraint => sub { ref $_ },
-	inlined    => sub { "!!CORE::ref($_[1])" },
+	inlined    => sub { "!!ref($_[1])" },
 	constraint_generator => sub
 	{
 		return $meta->get_type('Ref') unless @_;
@@ -322,7 +322,7 @@ my $_ref = $meta->$add_core_type({
 		my $reftype = shift;
 		return sub {
 			my $v = $_[1];
-			"CORE::ref($v) and Scalar::Util::reftype($v) eq q($reftype)";
+			"ref($v) and Scalar::Util::reftype($v) eq q($reftype)";
 		};
 	},
 	deep_explanation => sub {
@@ -345,7 +345,7 @@ $meta->$add_core_type({
 	inlined    => sub {
 		_HAS_REFUTILXS && !$Type::Tiny::AvoidCallbacks
 			? "Ref::Util::XS::is_plain_coderef($_[1])"
-			: "CORE::ref($_[1]) eq 'CODE'"
+			: "ref($_[1]) eq 'CODE'"
 	},
 });
 
@@ -353,7 +353,7 @@ my $_regexp = $meta->$add_core_type({
 	name       => "RegexpRef",
 	parent     => $_ref,
 	constraint => sub { ref($_) && !!re::is_regexp($_) or blessed($_) && $_->isa('Regexp') },
-	inlined    => sub { my $v = $_[1]; "CORE::ref($v) && !!re::is_regexp($v) or Scalar::Util::blessed($v) && $v\->isa('Regexp')" },
+	inlined    => sub { my $v = $_[1]; "ref($v) && !!re::is_regexp($v) or Scalar::Util::blessed($v) && $v\->isa('Regexp')" },
 });
 
 $meta->$add_core_type({
@@ -363,7 +363,7 @@ $meta->$add_core_type({
 	inlined    => sub {
 		_HAS_REFUTILXS && !$Type::Tiny::AvoidCallbacks
 			? "Ref::Util::XS::is_plain_globref($_[1])"
-			: "CORE::ref($_[1]) eq 'GLOB'"
+			: "ref($_[1]) eq 'GLOB'"
 	},
 });
 
@@ -375,7 +375,7 @@ $meta->$add_core_type({
 		or (blessed($_) && $_->isa("IO::Handle"))
 	},
 	inlined    => sub {
-		"(CORE::ref($_[1]) && Scalar::Util::openhandle($_[1])) ".
+		"(ref($_[1]) && Scalar::Util::openhandle($_[1])) ".
 		"or (Scalar::Util::blessed($_[1]) && $_[1]\->isa(\"IO::Handle\"))"
 	},
 });
@@ -387,7 +387,7 @@ my $_arr = $meta->$add_core_type({
 	inlined    => sub {
 		_HAS_REFUTILXS && !$Type::Tiny::AvoidCallbacks
 			? "Ref::Util::XS::is_plain_arrayref($_[1])"
-			: "CORE::ref($_[1]) eq 'ARRAY'"
+			: "ref($_[1]) eq 'ARRAY'"
 	},
 	constraint_generator => LazyLoad(ArrayRef => 'constraint_generator'),
 	inline_generator     => LazyLoad(ArrayRef => 'inline_generator'),
@@ -402,7 +402,7 @@ my $_hash = $meta->$add_core_type({
 	inlined    => sub {
 		_HAS_REFUTILXS && !$Type::Tiny::AvoidCallbacks
 			? "Ref::Util::XS::is_plain_hashref($_[1])"
-			: "CORE::ref($_[1]) eq 'HASH'"
+			: "ref($_[1]) eq 'HASH'"
 	},
 	constraint_generator => LazyLoad(HashRef => 'constraint_generator'),
 	inline_generator     => LazyLoad(HashRef => 'inline_generator'),
@@ -418,7 +418,7 @@ $meta->$add_core_type({
 	name       => "ScalarRef",
 	parent     => $_ref,
 	constraint => sub { ref $_ eq "SCALAR" or ref $_ eq "REF" },
-	inlined    => sub { "CORE::ref($_[1]) eq 'SCALAR' or CORE::ref($_[1]) eq 'REF'" },
+	inlined    => sub { "ref($_[1]) eq 'SCALAR' or ref($_[1]) eq 'REF'" },
 	constraint_generator => LazyLoad(ScalarRef => 'constraint_generator'),
 	inline_generator     => LazyLoad(ScalarRef => 'inline_generator'),
 	deep_explanation     => LazyLoad(ScalarRef => 'deep_explanation'),
@@ -489,7 +489,7 @@ $meta->$add_core_type({
 			my $v = $_[1];
 			return "$xsubname\($v\)" if $xsubname && !$Type::Tiny::AvoidCallbacks;
 			my $param_check = $param->inline_check($v);
-			"!CORE::defined($v) or $param_check";
+			"!defined($v) or $param_check";
 		};
 	},
 	deep_explanation => sub {
@@ -680,7 +680,7 @@ $meta->add_type({
 		my $Str_check = Str()->inline_check('$inner->[0]');
 		my @code = 'do { my $ok = 1; ';
 		push @code,   sprintf('for my $inner (@{%s}) { no warnings; ', $var);
-		push @code,   sprintf('($ok=0) && CORE::last unless CORE::ref($inner) eq q(ARRAY) && @$inner == 2 && (%s); ', $Str_check);
+		push @code,   sprintf('($ok=0) && last unless ref($inner) eq q(ARRAY) && @$inner == 2 && (%s); ', $Str_check);
 		push @code,   '} ';
 		push @code, '$ok }';
 		return (undef, join(q( ), @code));
@@ -696,7 +696,7 @@ $meta->add_type({
 	inlined    => sub {
 		my ($self, $var) = @_;
 		$self->parent->inline_check($var)
-		. " and !!CORE::tied(Scalar::Util::reftype($var) eq 'HASH' ? \%{$var} : Scalar::Util::reftype($var) eq 'ARRAY' ? \@{$var} : Scalar::Util::reftype($var) =~ /^(SCALAR|REF)\$/ ? \${$var} : undef)"
+		. " and !!tied(Scalar::Util::reftype($var) eq 'HASH' ? \%{$var} : Scalar::Util::reftype($var) eq 'ARRAY' ? \@{$var} : Scalar::Util::reftype($var) =~ /^(SCALAR|REF)\$/ ? \${$var} : undef)"
 	},
 	name_generator => sub
 	{
@@ -806,7 +806,7 @@ $meta->add_coercion({
 			or _croak("Parameter to Join[`a] expected to be a string; got $sep");
 		require B;
 		$sep = B::perlstring($sep);
-		return (ArrayRef(), qq{ CORE::join($sep, \@\$_) });
+		return (ArrayRef(), qq{ join($sep, \@\$_) });
 	},
 });
 
@@ -819,7 +819,7 @@ $meta->add_coercion({
 			or _croak("Parameter to Split[`a] expected to be a regular expresssion; got $re");
 		my $regexp_string = "$re";
 		$regexp_string =~ s/\\\//\\\\\//g; # toothpicks
-		return (Str(), qq{ [CORE::split /$regexp_string/, \$_] });
+		return (Str(), qq{ [split /$regexp_string/, \$_] });
 	},
 });
 

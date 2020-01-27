@@ -39,7 +39,7 @@ $meta->add_type(
 	name       => SimpleStr,
 	parent     => Str,
 	constraint => sub { length($_) <= 255 and not /\n/ },
-	inlined    => sub { undef, qq(CORE::length($_) <= 255), qq($_ !~ /\\n/) },
+	inlined    => sub { undef, qq(length($_) <= 255), qq($_ !~ /\\n/) },
 	message    => sub { "Must be a single line of no more than 255 chars" },
 );
 
@@ -47,7 +47,7 @@ $meta->add_type(
 	name       => NonEmptySimpleStr,
 	parent     => SimpleStr,
 	constraint => sub { length($_) > 0 },
-	inlined    => sub { undef, qq(CORE::length($_) > 0) },
+	inlined    => sub { undef, qq(length($_) > 0) },
 	message    => sub { "Must be a non-empty single line of no more than 255 chars" },
 );
 
@@ -70,7 +70,7 @@ $meta->add_type(
 	name       => Password,
 	parent     => NonEmptySimpleStr,
 	constraint => sub { length($_) > 3 },
-	inlined    => sub { SimpleStr->inline_check($_), qq(CORE::length($_) > 3) },
+	inlined    => sub { SimpleStr->inline_check($_), qq(length($_) > 3) },
 	message    => sub { "Must be between 4 and 255 chars" },
 );
 
@@ -78,7 +78,7 @@ $meta->add_type(
 	name       => StrongPassword,
 	parent     => Password,
 	constraint => sub { length($_) > 7 and /[^a-zA-Z]/ },
-	inlined    => sub { SimpleStr()->inline_check($_), qq(CORE::length($_) > 7), qq($_ =~ /[^a-zA-Z]/) },
+	inlined    => sub { SimpleStr()->inline_check($_), qq(length($_) > 7), qq($_ =~ /[^a-zA-Z]/) },
 	message    => sub { "Must be between 8 and 255 chars, and contain a non-alpha char" },
 );
 
@@ -174,8 +174,8 @@ $meta->add_type(
 		return sub {
 			my $v = $_[1];
 			my @code = (undef); # parent constraint
-			push @code, "CORE::length($v) >= $min";
-			push @code, "CORE::length($v) <= $max" if defined $max;
+			push @code, "length($v) >= $min";
+			push @code, "length($v) <= $max" if defined $max;
 			return @code;
 		};
 	},

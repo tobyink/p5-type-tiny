@@ -54,7 +54,7 @@ sub __inline_generator
 		require B;
 		my $var = $_[1];
 		sprintf(
-			"%s and do { my \$TIED = CORE::tied(Scalar::Util::reftype($var) eq 'HASH' ? \%{$var} : Scalar::Util::reftype($var) eq 'ARRAY' ? \@{$var} : Scalar::Util::reftype($var) =~ /^(SCALAR|REF)\$/ ? \${$var} : undef); %s }",
+			"%s and do { my \$TIED = tied(Scalar::Util::reftype($var) eq 'HASH' ? \%{$var} : Scalar::Util::reftype($var) eq 'ARRAY' ? \@{$var} : Scalar::Util::reftype($var) =~ /^(SCALAR|REF)\$/ ? \${$var} : undef); %s }",
 			Types::Standard::Ref()->inline_check($var),
 			$param->inline_check('$TIED')
 		);

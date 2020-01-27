@@ -186,9 +186,9 @@ for my $base (qw/Num Int/) {
 				);
 			}
 			push @whines, sprintf(
-				"%s is %d",
+				"length(%s) is %d",
 				$varname,
-				$value,
+				length($value),
 			);
 			return \@whines;
 		},

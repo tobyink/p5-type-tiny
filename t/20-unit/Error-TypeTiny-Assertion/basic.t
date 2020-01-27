@@ -73,7 +73,7 @@ is_deeply(
 		'"'.$supernum.'" is a subtype of "Str"',
 		'"Str" is a subtype of "Value"',
 		'Reference [] did not pass type constraint "Value"',
-		'"Value" is defined as: (CORE::defined($_) and not CORE::ref($_))',
+		'"Value" is defined as: (defined($_) and not ref($_))',
 	],
 	'$e->explain is as expected',
 );
@@ -88,7 +88,7 @@ is_deeply(
 		'"'.$supernum.'" is a subtype of "Str"',
 		'"Str" is a subtype of "Value"',
 		'Reference [3] did not pass type constraint "Value" (in $_->[2])',
-		'"Value" is defined as: (CORE::defined($_) and not CORE::ref($_))',
+		'"Value" is defined as: (defined($_) and not ref($_))',
 	],
 	'ArrayRef[Int] deep explanation, given [1, 2, [3]]',
 );
@@ -126,7 +126,7 @@ is_deeply(
 		'"'.$supernum.'" is a subtype of "Str"',
 		'"Str" is a subtype of "Value"',
 		'Reference [] did not pass type constraint "Value" (in $_->{"c"})',
-		'"Value" is defined as: (CORE::defined($_) and not CORE::ref($_))',
+		'"Value" is defined as: (defined($_) and not ref($_))',
 	],
 	'HashRef[Maybe[Int]] deep explanation, given {a => undef, b => 42, c => []}',
 );
@@ -162,7 +162,7 @@ is_deeply(
 		'"ArrayRef[Str]" is a subtype of "ArrayRef"',
 		'"ArrayRef" is a subtype of "Ref"',
 		'Value "2" did not pass type constraint "Ref" (in $_->{"b"})',
-		'"Ref" is defined as: (!!CORE::ref($_))',
+		'"Ref" is defined as: (!!ref($_))',
 	],
 	'$dict deep explanation, given {a => 1, b => 2}',
 );
@@ -180,7 +180,7 @@ TODO: {
 			'Reference {1 => "1.1","2.2" => "2.3","3.3" => "3.4"} did not pass type constraint "Map[Int,Num]"',
 			'"Map[Int,Num]" constrains each key in the hash with "Int"',
 			'Value "2.2" did not pass type constraint "Int" (in key $_->{"2.2"})',
-			'"Int" is defined as: (do { my $tmp = $_; CORE::defined($tmp) and !CORE::ref($tmp) and $tmp =~ /\A-?[0-9]+\z/ })',
+			'"Int" is defined as: (do { my $tmp = $_; defined($tmp) and !ref($tmp) and $tmp =~ /\A-?[0-9]+\z/ })',
 		],
 		'Map[Int,Num] deep explanation, given {1=>1.1,2.2=>2.3,3.3=>3.4}',
 	);
@@ -212,7 +212,7 @@ TODO: {
 			'"'.$supernum.'" is a subtype of "Str"',
 			'"Str" is a subtype of "Value"',
 			'Reference [] did not pass type constraint "Value" (in $slurpy->{"x_baz"})',
-			'"Value" is defined as: (CORE::defined($_) and not CORE::ref($_))'
+			'"Value" is defined as: (defined($_) and not ref($_))'
 		],
 		"$dict2 explanation, given {foo => [], x_bar => 1, x_baz => []}",
 	) or diag explain($e->explain);
@@ -250,7 +250,7 @@ is_deeply(
 		'"CycleTuple[Int,ArrayRef]" constrains value at index 1 of array with "ArrayRef"',
 		'"ArrayRef" is a subtype of "Ref"',
 		'Value "Foo" did not pass type constraint "Ref" (in $_->[1])',
-		'"Ref" is defined as: (!!CORE::ref($_))',
+		'"Ref" is defined as: (!!ref($_))',
 	],
 	'$CTuple explanation, given [1,"Foo"]',
 );
@@ -270,7 +270,7 @@ TODO: {
 			'"Tuple" is a subtype of "ArrayRef"',
 			'"ArrayRef" is a subtype of "Ref"',
 			'Value "1" did not pass type constraint "Ref"',
-			'"Ref" is defined as: (!!CORE::ref($_))',
+			'"Ref" is defined as: (!!ref($_))',
 		],
 		'$SlurpyThing explanation, given 1',
 	);
@@ -284,7 +284,7 @@ TODO: {
 			'"'.$supernum.'" is a subtype of "Str"',
 			'"Str" is a subtype of "Value"',
 			'Reference [] did not pass type constraint "Value" (in $_->[0])',
-			'"Value" is defined as: (CORE::defined($_) and not CORE::ref($_))',
+			'"Value" is defined as: (defined($_) and not ref($_))',
 		],
 		'$SlurpyThing explanation, given [[]]',
 	);
@@ -298,7 +298,7 @@ TODO: {
 			'"Map[Str,ArrayRef]" constrains each value in the hash with "ArrayRef"',
 			'"ArrayRef" is a subtype of "Ref"',
 			'Value "Hello" did not pass type constraint "Ref" (in $SLURPY->{"yeah"})',
-			'"Ref" is defined as: (!!CORE::ref($_))',
+			'"Ref" is defined as: (!!ref($_))',
 		],
 		'$SlurpyThing explanation, given [1.1, yeah => "Hello"]',
 	);
@@ -312,7 +312,7 @@ is_deeply(
 		'Reference \\"bar" did not pass type constraint "ScalarRef[Undef]"',
 		'"ScalarRef[Undef]" constrains the referenced scalar value with "Undef"',
 		'Value "bar" did not pass type constraint "Undef" (in ${$_})',
-		'"Undef" is defined as: (!CORE::defined($_))',
+		'"Undef" is defined as: (!defined($_))',
 	],
 	'$UndefRef explanantion, given \"bar"',
 );
@@ -322,7 +322,7 @@ is_deeply(
 	[
 		'"ScalarRef[Undef]" is a subtype of "ScalarRef"',
 		'Reference [] did not pass type constraint "ScalarRef"',
-		'"ScalarRef" is defined as: (CORE::ref($_) eq \'SCALAR\' or CORE::ref($_) eq \'REF\')',
+		'"ScalarRef" is defined as: (ref($_) eq \'SCALAR\' or ref($_) eq \'REF\')',
 	],
 	'$UndefRef explanantion, given []',
 );

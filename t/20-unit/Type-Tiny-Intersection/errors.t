@@ -60,7 +60,7 @@ is_deeply(
 	[
 		'"Int&Int" requires that the value pass "Int" and "Int"',
 		'Value "3.14159" did not pass type constraint "Int"',
-		'"Int" is defined as: (do { my $tmp = $_; CORE::defined($tmp) and !CORE::ref($tmp) and $tmp =~ /\\A-?[0-9]+\\z/ })',
+		'"Int" is defined as: (do { my $tmp = $_; defined($tmp) and !ref($tmp) and $tmp =~ /\\A-?[0-9]+\\z/ })',
 	],
 ) or diag explain($e->explain);
 
