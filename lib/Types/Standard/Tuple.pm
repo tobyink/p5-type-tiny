@@ -293,7 +293,7 @@ sub __coercion_generator
 					? sprintf('$tail = %s;', $slurpy->coercion->inline_coercion('$tail'))
 					: q();
 				push @code, sprintf(
-					'(%s) ? push(@new, %s$tail) : ($return_orig++);',
+					'(%s) ? CORE::push(@new, %s$tail) : ($return_orig++);',
 					$slurpy->inline_check('$tail'),
 					($slurpy_is_hashref ? '%' : '@'),
 				);

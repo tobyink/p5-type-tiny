@@ -125,22 +125,22 @@ sub __inline_generator
 			Types::Standard::HashRef->inline_check($h),
 			( $slurpy_is_any ? ()
 			: $slurpy_is_map ? do {
-				'(not grep {'
+				'(not CORE::grep {'
 				."my \$v = ($h)->{\$_};"
 				.sprintf(
 					'not((/\\A(?:%s)\\z/) or ((%s) and (%s)))',
 					$regexp,
 					$slurpy_is_map->[0]->inline_check('$_'),
 					$slurpy_is_map->[1]->inline_check('$v'),
-				) ."} keys \%{$h})"
+				) ."} CORE::keys \%{$h})"
 			}
 			: $slurpy ? do {
 				'do {'
-				. "my \$slurpy_tmp = +{ map /\\A(?:$regexp)\\z/ ? () : (\$_ => ($h)->{\$_}), keys \%{$h} };"
+				. "my \$slurpy_tmp = +{ CORE::map /\\A(?:$regexp)\\z/ ? () : (\$_ => ($h)->{\$_}), CORE::keys \%{$h} };"
 				. $slurpy->inline_check('$slurpy_tmp')
 				. '}'
 			}
-			: "not(grep !/\\A(?:$regexp)\\z/, keys \%{$h})" ),
+			: "not(CORE::grep !/\\A(?:$regexp)\\z/, CORE::keys \%{$h})" ),
 			( map {
 				my $k = B::perlstring($_);
 				$constraints{$_}->is_strictly_a_type_of( $_optional )
@@ -244,20 +244,20 @@ sub __coercion_generator
 			push @code,       "$label: {";
 			if ($slurpy)
 			{
-				push @code, sprintf('my $slurped = +{ map +($_=~$%s::KEYCHECK[%d])?():($_=>$orig->{$_}), keys %%$orig };', __PACKAGE__, $keycheck_counter);
+				push @code, sprintf('my $slurped = +{ CORE::map +($_=~$%s::KEYCHECK[%d])?():($_=>$orig->{$_}), CORE::keys %%$orig };', __PACKAGE__, $keycheck_counter);
 				if ($slurpy->has_coercion)
 				{
 					push @code, sprintf('my $coerced = %s;', $slurpy->coercion->inline_coercion('$slurped'));
-					push @code, sprintf('((%s)&&(%s))?(%%new=%%$coerced):(($return_orig = 1), last %s);', $_hash->inline_check('$coerced'), $slurpy->inline_check('$coerced'), $label);
+					push @code, sprintf('((%s)&&(%s))?(%%new=%%$coerced):(($return_orig = 1), CORE::last %s);', $_hash->inline_check('$coerced'), $slurpy->inline_check('$coerced'), $label);
 				}
 				else
 				{
-					push @code, sprintf('(%s)?(%%new=%%$slurped):(($return_orig = 1), last %s);', $slurpy->inline_check('$slurped'), $label);
+					push @code, sprintf('(%s)?(%%new=%%$slurped):(($return_orig = 1), CORE::last %s);', $slurpy->inline_check('$slurped'), $label);
 				}
 			}
 			else
 			{
-				push @code, sprintf('($_ =~ $%s::KEYCHECK[%d])||(($return_orig = 1), last %s) for sort keys %%$orig;', __PACKAGE__, $keycheck_counter, $label);
+				push @code, sprintf('($_ =~ $%s::KEYCHECK[%d])||(($return_orig = 1), CORE::last %s) for CORE::sort CORE::keys %%$orig;', __PACKAGE__, $keycheck_counter, $label);
 			}
 			for my $k (keys %dict)
 			{
@@ -267,7 +267,7 @@ sub __coercion_generator
 				my $K = B::perlstring($k);
 				
 				push @code, sprintf(
-					'if (exists $orig->{%s}) { $tmp = %s; (%s) ? ($new{%s}=$tmp) : (($return_orig=1), last %s) }',
+					'if (CORE::exists $orig->{%s}) { $tmp = %s; (%s) ? ($new{%s}=$tmp) : (($return_orig=1), CORE::last %s) }',
 					$K,
 					$ct_coerce
 						? $ct->coercion->inline_coercion("\$orig->{$K}")

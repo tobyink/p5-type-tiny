@@ -78,7 +78,7 @@ sub __inline_generator
 			$count,
 		);
 		push @checks, sprintf(
-			'do { my $cyclecount%d = 0; my $cycleok%d = 1; while ($cyclecount%d < $#{%s}) { my $cycletmp%d = [@{%s}[$cyclecount%d .. $cyclecount%d+%d]]; unless (%s) { $cycleok%d = 0; last; }; $cyclecount%d += %d; }; $cycleok%d; }',
+			'do { my $cyclecount%d = 0; my $cycleok%d = 1; while ($cyclecount%d < $#{%s}) { my $cycletmp%d = [@{%s}[$cyclecount%d .. $cyclecount%d+%d]]; unless (%s) { $cycleok%d = 0; CORE::last; }; $cyclecount%d += %d; }; $cycleok%d; }',
 			$cycleuniq,
 			$cycleuniq,
 			$cycleuniq,
@@ -153,7 +153,7 @@ sub __coercion_generator
 			my @code;
 			push @code, 'do { my ($orig, $return_orig, $tmp, @new) = ($_, 0);';
 			push @code,       "$label: {";
-			push @code,       sprintf('(($return_orig = 1), last %s) if scalar(@$orig) %% %d != 0;', $label, scalar @tuple);
+			push @code,       sprintf('(($return_orig = 1), CORE::last %s) if CORE::scalar(@$orig) %% %d != 0;', $label, scalar @tuple);
 			push @code,         sprintf('my $%s = 0; while ($%s < @$orig) {', $label2, $label2);
 			for my $i (0 .. $#tuple)
 			{
@@ -161,7 +161,7 @@ sub __coercion_generator
 				my $ct_coerce   = $ct->has_coercion;
 				
 				push @code, sprintf(
-					'do { $tmp = %s; (%s) ? ($new[$%s + %d]=$tmp) : (($return_orig=1), last %s) };',
+					'do { $tmp = %s; (%s) ? ($new[$%s + %d]=$tmp) : (($return_orig=1), CORE::last %s) };',
 					$ct_coerce
 						? $ct->coercion->inline_coercion("\$orig->[\$$label2 + $i]")
 						: "\$orig->[\$$label2 + $i]",

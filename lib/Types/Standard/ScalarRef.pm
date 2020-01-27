@@ -41,7 +41,7 @@ sub __inline_generator
 	return sub {
 		my $v = $_[1];
 		my $param_check = $param->inline_check("\${$v}");
-		"(ref($v) eq 'SCALAR' or ref($v) eq 'REF') and $param_check";
+		"(CORE::ref($v) eq 'SCALAR' or CORE::ref($v) eq 'REF') and $param_check";
 	};
 }
 
@@ -77,7 +77,7 @@ sub __coercion_generator
 			my @code;
 			push @code, 'do { my ($orig, $return_orig, $new) = ($_, 0);';
 			push @code,    'for ($$orig) {';
-			push @code, sprintf('++$return_orig && last unless (%s);', $coercable_item->inline_check('$_'));
+			push @code, sprintf('++$return_orig && CORE::last unless (%s);', $coercable_item->inline_check('$_'));
 			push @code, sprintf('$new = (%s);', $param->coercion->inline_coercion('$_'));
 			push @code,    '}';
 			push @code,    '$return_orig ? $orig : \\$new';

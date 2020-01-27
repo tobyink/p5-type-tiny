@@ -91,7 +91,7 @@ sub __inline_generator
 				Carp::carp("Cannot serialize regexp without callbacks; serializing using callbacks");
 			}
 			sprintf
-				"!ref($v) and do { my \$m = [$v =~ %s]; %s }",
+				"!CORE::ref($v) and do { my \$m = [$v =~ %s]; %s }",
 				$serialized_re,
 				$checker->inline_check('$m'),
 			;
@@ -102,12 +102,12 @@ sub __inline_generator
 		my $regexp_string = "$regexp";
 		if ($regexp_string =~ /\A\(\?\^u?:\\A(\.+)\)\z/) {
 			my $length = length $1;
-			return sub { "!ref($_) and length($_)>=$length" };
+			return sub { "!CORE::ref($_) and length($_)>=$length" };
 		}
 		
 		if ($regexp_string =~ /\A\(\?\^u?:\\A(\.+)\\z\)\z/) {
 			my $length = length $1;
-			return sub { "!ref($_) and length($_)==$length" };
+			return sub { "!CORE::ref($_) and length($_)==$length" };
 		}
 		
 		return sub
@@ -117,7 +117,7 @@ sub __inline_generator
 				require Carp;
 				Carp::carp("Cannot serialize regexp without callbacks; serializing using callbacks");
 			}
-			"!ref($v) and $v =~ $serialized_re";
+			"!CORE::ref($v) and $v =~ $serialized_re";
 		};
 	}
 }
