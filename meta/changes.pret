@@ -3516,3 +3516,17 @@
 			label "Type::Registry can now have a parent registry.";
 		]
 	].
+
+`Type-Tiny 1.008004 cpan:TOBYINK`
+	issued  2020-01-29;
+	changeset [
+		dcs:versus `Type-Tiny 1.008003 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix;
+			label "to_TypeTiny will now cowardly refuse to inline Moose types if they have anything in their inline environment.";
+		];
+		item [
+			a dcs:Bugfix;
+			label "When possible, inject `package Type::Tiny` in generated inline code that has an appropriate lexical scope to insert it into. This will (mostly) avoid inline code mistakenly using overridden versions of CORE:: functions.";
+		];
+	].
