@@ -43,7 +43,7 @@ package Foo {
 	use MooX::TypeTiny;
 	use Types::Standard qw(HashRef Str);
 	has _data => (
-		is	=> 'ro',
+		is       => 'ro',
 		isa      => HashRef[Str],
 		required => 1,
 		init_arg => 'data',
