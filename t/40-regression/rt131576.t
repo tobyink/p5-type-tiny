@@ -33,7 +33,7 @@ use Test::Warnings;
 {
 	package Local::Dummy1;
 	use Test::Requires 'Moo';
-	use Test::Requires 'MooX::TypeTiny';    
+	use Test::Requires 'MooX::TypeTiny';
 }
 
 BEGIN { $ENV{PERL_ONLY} = 1 };   # no XS
