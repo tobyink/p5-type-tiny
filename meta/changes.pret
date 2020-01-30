@@ -3530,3 +3530,13 @@
 			label "When possible, inject `package Type::Tiny` in generated inline code that has an appropriate lexical scope to insert it into. This will (mostly) avoid inline code mistakenly using overridden versions of CORE:: functions.";
 		];
 	].
+
+`Type-Tiny 1.008005 cpan:TOBYINK`
+	issued  2020-01-30;
+	changeset [
+		dcs:versus `Type-Tiny 1.008004 cpan:TOBYINK`;
+		item [
+			a dcs:Tests;
+			label "Remove some Perl 5.012+ syntax from test suite.";
+		];
+	].
