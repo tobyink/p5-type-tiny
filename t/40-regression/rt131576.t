@@ -4,8 +4,8 @@
 
 =head1 PURPOSE
 
-Test that inlined type checks use "CORE::" prefixes to avoid issuing
-warnings when compiled in packages that override built-ins.
+Test that inlined type checks don't generate issuing warning when compiled
+in packages that override built-ins.
 
 =head1 SEE ALSO
 
@@ -38,7 +38,8 @@ use Test::Warnings;
 
 BEGIN { $ENV{PERL_ONLY} = 1 };   # no XS
 
-package Foo {
+{
+	package Foo;
 	use Moo;
 	use MooX::TypeTiny;
 	use Types::Standard qw(HashRef Str);
