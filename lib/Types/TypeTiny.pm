@@ -268,31 +268,22 @@ sub _TypeTinyFromMoose
 		return $ts if $ts->{_is_core};
 	}
 	
-	my %opts;
-	$opts{display_name} = $t->name;
-	$opts{constraint}   = $t->constraint;
-	$opts{parent}       = to_TypeTiny($t->parent)              if $t->has_parent;
-	$opts{inlined}      = sub { shift; $t->_inline_check(@_) } if $t->can("can_be_inlined") && $t->can_be_inlined;
-	$opts{message}      = sub { $t->get_message($_) }          if $t->has_message;
-	$opts{moose_type}   = $t;
+	my ($tt_class, $tt_opts) = 
+		$t->can('parameterize')                          ? _TypeTinyFromMoose_parameterizable($t) :
+		$t->isa('Moose::Meta::TypeConstraint::Enum')     ? _TypeTinyFromMoose_enum($t) :
+		$t->isa('Moose::Meta::TypeConstraint::Class')    ? _TypeTinyFromMoose_class($t) :
+		$t->isa('Moose::Meta::TypeConstraint::Role')     ? _TypeTinyFromMoose_role($t) :
+		$t->isa('Moose::Meta::TypeConstraint::Union')    ? _TypeTinyFromMoose_union($t) :
+		$t->isa('Moose::Meta::TypeConstraint::DuckType') ? _TypeTinyFromMoose_ducktype($t) :
+		_TypeTinyFromMoose_baseclass($t);
 	
-	if ($t->can('parameterize')) {
-		$opts{constraint_generator} = sub {
-			# convert args into Moose native types; not strictly necessary
-			my @args    = map { TypeTiny->check($_) ? $_->moose_type : $_ } @_;
-			my $paramd  = $t->parameterize(@args);
-			_TypeTinyFromMoose($paramd);
-		};
-	}
+	# Standard stuff to do with all type constraints from Moose,
+	# regardless of variety.
+	$tt_opts->{moose_type}   = $t;
+	$tt_opts->{display_name} = $t->name;
+	$tt_opts->{message}      = sub { $t->get_message($_) } if $t->has_message;
 	
-	# Cowardly refuse to inline types that need to close over stuff
-	if ($opts{inlined}) {
-		my %env = %{ $t->inline_environment || {} };
-		delete($opts{inlined}) if keys %env;
-	}
-	
-	require Type::Tiny;
-	my $new = 'Type::Tiny'->new(%opts);
+	my $new = $tt_class->new(%$tt_opts);
 	$ttt_cache{ refaddr($t) } = $new;
 	weaken($ttt_cache{ refaddr($t) });
 	
@@ -305,6 +296,71 @@ sub _TypeTinyFromMoose
 	} if $t->has_coercion;
 		
 	return $new;
+}
+
+sub _TypeTinyFromMoose_baseclass
+{
+	my $t = shift;
+	my %opts;
+	$opts{parent}       = to_TypeTiny($t->parent)              if $t->has_parent;
+	$opts{constraint}   = $t->constraint;
+	$opts{inlined}      = sub { shift; $t->_inline_check(@_) } if $t->can("can_be_inlined") && $t->can_be_inlined;
+	
+	# Cowardly refuse to inline types that need to close over stuff
+	if ($opts{inlined}) {
+		my %env = %{ $t->inline_environment || {} };
+		delete($opts{inlined}) if keys %env;
+	}
+	
+	require Type::Tiny;
+	return 'Type::Tiny' => \%opts;
+}
+
+sub _TypeTinyFromMoose_union
+{
+	my $t = shift;
+	require Type::Tiny::Union;
+	return 'Type::Tiny::Union' => { type_constraints => [ map _TypeTinyFromMoose($_), @{$t->type_constraints} ] };
+}
+
+sub _TypeTinyFromMoose_enum
+{
+	my $t = shift;
+	require Type::Tiny::Enum;
+	return 'Type::Tiny::Enum' => { values => [@{ $t->values }] };
+}
+
+sub _TypeTinyFromMoose_class
+{
+	my $t = shift;
+	require Type::Tiny::Class;
+	return 'Type::Tiny::Class' => { class => $t->class };
+}
+
+sub _TypeTinyFromMoose_role
+{
+	my $t = shift;
+	require Type::Tiny::Role;
+	return 'Type::Tiny::Role' => { role => $t->role };
+}
+
+sub _TypeTinyFromMoose_ducktype
+{
+	my $t = shift;
+	require Type::Tiny::Duck;
+	return 'Type::Tiny::Duck' => { methods => [@{ $t->methods }] };
+}
+
+sub _TypeTinyFromMoose_parameterizable
+{
+	my $t = shift;
+	my ($class, $opts) = _TypeTinyFromMoose_baseclass($t);
+	$opts->{constraint_generator} = sub {
+		# convert args into Moose native types; not strictly necessary
+		my @args = map { TypeTiny->check($_) ? $_->moose_type : $_ } @_;
+		_TypeTinyFromMoose( $t->parameterize(@args) );
+	};
+	return ($class, $opts);
 }
 
 sub _TypeTinyFromValidationClass
@@ -419,8 +475,7 @@ sub _TypeTinyFromMouse
 		$opts{constraint_generator} = sub {
 			# convert args into Moose native types; not strictly necessary
 			my @args    = map { TypeTiny->check($_) ? $_->mouse_type : $_ } @_;
-			my $paramd  = $t->parameterize(@args);
-			_TypeTinyFromMouse($paramd);
+			_TypeTinyFromMouse( $t->parameterize(@args) );
 		};
 	}
 
