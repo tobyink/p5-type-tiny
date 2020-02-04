@@ -38,6 +38,7 @@ use lib qw( ./lib ./t/lib ../inc ./inc );
 use Test::More;
 use Test::TypeTiny -all;
 use Types::TypeTiny -all;
+use Types::Standard qw(Int);
 use Moose::Util::TypeConstraints qw(find_type_constraint);
 
 ok(TypeTiny->has_coercion, "TypeTiny->has_coercion");
@@ -67,6 +68,155 @@ subtest "Coercion from Moose type constraint object" => sub
 #		$orig->get_message(3.3),
 #		'... and provides proper message',
 #	);
+};
+
+my %moose_ptype_opts = (
+	name    => 'ArrayOrHashRef',
+	parent  => find_type_constraint('Ref'),
+	constraint => sub {
+		my $value = @_ ? pop : $_;
+		ref($value) eq 'HASH' or ref($value) eq 'ARRAY';
+	},
+	constraint_generator => sub {
+		my $param = shift;
+		return sub {
+			my $value = @_ ? pop : $_;
+			if (ref($value) eq 'ARRAY') {
+				($param->check($_) or return) for @$value;
+				return 1;
+			}
+			elsif (ref($value) eq 'HASH') {
+				($param->check($_) or return) for values %$value;
+				return 1;
+			}
+			return;
+		};
+	},
+);
+
+my $ptype_tests = sub {
+	my $moose = Moose::Meta::TypeConstraint::Parameterizable->new(%moose_ptype_opts);
+	
+	# wow, the Moose API is stupid; need to do this
+	Moose::Util::TypeConstraints::register_type_constraint($moose);
+	Moose::Util::TypeConstraints::add_parameterizable_type($moose);
+	
+	note "Moose native type, no parameters";
+	ok( $moose->check([]) );
+	ok( $moose->check({}) );
+	ok( $moose->check([1..10]) );
+	ok( $moose->check({foo => 1, bar => 2}) );
+	ok( $moose->check(['hello world']) );
+	ok( ! $moose->check(\1) );
+	ok( ! $moose->check(42) );
+	
+	note "Moose native type, parameterized with Moose type";
+	my $moose_with_moose = $moose->parameterize( find_type_constraint('Int') );
+	ok( $moose_with_moose->check([]) );
+	ok( $moose_with_moose->check({}) );
+	ok( $moose_with_moose->check([1..10]) );
+	ok( $moose_with_moose->check({foo => 1, bar => 2}) );
+	ok( ! $moose_with_moose->check(['hello world']) );
+	ok( ! $moose_with_moose->check(\1) );
+	ok( ! $moose_with_moose->check(42) );
+	
+	note "Moose native type, parameterized with TT type";
+	my $moose_with_tt = $moose->parameterize( Int );
+	ok( $moose_with_tt->check([]) );
+	ok( $moose_with_tt->check({}) );
+	ok( $moose_with_tt->check([1..10]) );
+	ok( $moose_with_tt->check({foo => 1, bar => 2}) );
+	ok( ! $moose_with_tt->check(['hello world']) );
+	ok( ! $moose_with_tt->check(\1) );
+	ok( ! $moose_with_tt->check(42) );
+	
+	note 'TT type, no parameters';
+	my $tt    = Types::TypeTiny::to_TypeTiny($moose);
+	isa_ok($tt, 'Type::Tiny');
+	is($tt->display_name, $moose_ptype_opts{name});
+	should_pass([], $tt);
+	should_pass({}, $tt);
+	should_pass([1..10], $tt);
+	should_pass({foo => 1, bar => 2}, $tt);	
+	should_pass(['hello world'], $tt);
+	should_fail(\1, $tt);
+	should_fail(42, $tt);
+	
+	note 'TT type, parameterized with Moose type';
+	my $tt_with_moose = $tt->of( find_type_constraint('Int') );
+	should_pass([], $tt_with_moose);
+	should_pass({}, $tt_with_moose);
+	should_pass([1..10], $tt_with_moose);
+	should_pass({foo => 1, bar => 2}, $tt_with_moose);	
+	should_fail(['hello world'], $tt_with_moose);
+	should_fail(\1, $tt_with_moose);
+	should_fail(42, $tt_with_moose);
+
+	note 'TT type, parameterized with TT type';
+	my $tt_with_tt = $tt->of( Int );
+	should_pass([], $tt_with_tt);
+	should_pass({}, $tt_with_tt);
+	should_pass([1..10], $tt_with_tt);
+	should_pass({foo => 1, bar => 2}, $tt_with_tt);	
+	should_fail(['hello world'], $tt_with_tt);
+	should_fail(\1, $tt_with_tt);
+	should_fail(42, $tt_with_tt);
+	
+	return (
+		$moose,
+		$moose_with_moose,
+		$moose_with_tt,
+		$tt,
+		$tt_with_moose,
+		$tt_with_tt,
+	);
+};
+
+subtest "Coercion from Moose parameterizable type constraint object" => sub {
+	$ptype_tests->();
+};
+
+# Moose cannot handle two parameterizable types sharing a name
+$moose_ptype_opts{name} .= '2';
+
+$moose_ptype_opts{inlined} = sub {
+	my $var = pop;
+	sprintf('ref(%s) =~ /^(HASH|ARRAY)$/', $var);
+};
+
+$moose_ptype_opts{inline_generator} = sub {
+	my ($base, $param, $var) = @_;
+	
+	my $code = sprintf qq{do{
+		if (ref($var) eq 'ARRAY') {
+			my \$okay = 1;
+			(%s or ((\$okay=0), last)) for \@{$var};
+			\$okay;
+		}
+		elsif (ref($var) eq 'HASH') {
+			my \$okay = 1;
+			(%s or ((\$okay=0), last)) for values %%{$var};
+			\$okay;
+		}
+		else {
+			0;
+		}
+	}}, ($param->_inline_check('$_')) x 2;
+	
+	$code;
+};
+
+subtest "Coercion from Moose parameterizable type constraint object with inlining" => sub
+{
+	my @types = $ptype_tests->();
+	
+	note 'check everything can be inlined';
+	for my $type (@types) {
+		ok( $type->can_be_inlined );
+		ok( length($type->_inline_check('$xxx')) );
+	}
+	
+	note( $types[-1]->inline_check('$VALUE') );
 };
 
 subtest "Coercion from Mouse type constraint object" => sub

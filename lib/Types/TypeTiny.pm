@@ -268,7 +268,9 @@ sub _TypeTinyFromMoose
 		return $ts if $ts->{_is_core};
 	}
 	
-	my ($tt_class, $tt_opts) = _TypeTinyFromMoose_baseclass($t);
+	my ($tt_class, $tt_opts) = 
+		$t->can('parameterize')             ? _TypeTinyFromMoose_parameterizable($t) :
+		_TypeTinyFromMoose_baseclass($t);
 	my $new = $tt_class->new(%$tt_opts);
 	$ttt_cache{ refaddr($t) } = $new;
 	weaken($ttt_cache{ refaddr($t) });
@@ -295,15 +297,6 @@ sub _TypeTinyFromMoose_baseclass
 	$opts{message}      = sub { $t->get_message($_) }          if $t->has_message;
 	$opts{moose_type}   = $t;
 	
-	if ($t->can('parameterize')) {
-		$opts{constraint_generator} = sub {
-			# convert args into Moose native types; not strictly necessary
-			my @args    = map { TypeTiny->check($_) ? $_->moose_type : $_ } @_;
-			my $paramd  = $t->parameterize(@args);
-			_TypeTinyFromMoose($paramd);
-		};
-	}
-	
 	# Cowardly refuse to inline types that need to close over stuff
 	if ($opts{inlined}) {
 		my %env = %{ $t->inline_environment || {} };
@@ -312,6 +305,21 @@ sub _TypeTinyFromMoose_baseclass
 	
 	require Type::Tiny;
 	return 'Type::Tiny' => \%opts;
+}
+
+sub _TypeTinyFromMoose_parameterizable
+{
+	my $t = shift;
+	my ($class, $opts) = _TypeTinyFromMoose_baseclass($t);
+	
+	$opts->{constraint_generator} = sub {
+		# convert args into Moose native types; not strictly necessary
+		my @args    = map { TypeTiny->check($_) ? $_->moose_type : $_ } @_;
+		my $paramd  = $t->parameterize(@args);
+		_TypeTinyFromMoose($paramd);
+	};
+	
+	return ($class, $opts);
 }
 
 sub _TypeTinyFromValidationClass
