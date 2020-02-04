@@ -219,6 +219,67 @@ subtest "Coercion from Moose parameterizable type constraint object with inlinin
 	note( $types[-1]->inline_check('$VALUE') );
 };
 
+subtest "Coercion from Moose enum type constraint" => sub {
+	my $moose = Moose::Util::TypeConstraints::enum(Foo => [qw/ foo bar baz /]);
+	ok(   $moose->check("foo") );
+	ok( ! $moose->check("quux") );
+	ok( ! $moose->check(\1) );
+	ok( ! $moose->check(undef) );
+	
+	my $tt    = Types::TypeTiny::to_TypeTiny($moose);
+	ok(   $tt->check("foo") );
+	ok( ! $tt->check("quux") );
+	ok( ! $tt->check(\1) );
+	ok( ! $tt->check(undef) );
+	
+	isa_ok($tt, 'Type::Tiny::Enum');
+	is_deeply($tt->values, $moose->values);
+	ok $tt->can_be_inlined;
+	note( $tt->inline_check('$STR') );
+};
+
+subtest "Coercion from Moose class type constraint" => sub {
+	my $moose = Moose::Util::TypeConstraints::class_type(FooObj => { class => 'MyApp::Foo' });
+	my $tt    = Types::TypeTiny::to_TypeTiny($moose);
+	isa_ok($tt, 'Type::Tiny::Class');
+	is($tt->class, $moose->class);
+	ok $tt->can_be_inlined;
+	note( $tt->inline_check('$OBJECT') );
+};
+
+subtest "Coercion from Moose role type constraint" => sub {
+	my $moose = Moose::Util::TypeConstraints::role_type(DoesFoo => { role => 'MyApp::Foo' });
+	my $tt    = Types::TypeTiny::to_TypeTiny($moose);
+	isa_ok($tt, 'Type::Tiny::Role');
+	is($tt->role, $moose->role);
+	ok $tt->can_be_inlined;
+	note( $tt->inline_check('$OBJECT') );
+};
+
+subtest "Coercion from Moose duck type constraint" => sub {
+	my $moose = Moose::Util::TypeConstraints::duck_type(FooInterface => [qw/foo bar baz/]);
+	my $tt    = Types::TypeTiny::to_TypeTiny($moose);
+	isa_ok($tt, 'Type::Tiny::Duck');
+	is_deeply([ sort @{$tt->methods} ], [ sort @{$moose->methods} ]);
+	ok $tt->can_be_inlined;
+	note( $tt->inline_check('$OBJECT') );
+};
+
+subtest "Coercion from Moose union type constraint" => sub {
+	my $moose = Moose::Util::TypeConstraints::union(
+		'ContainerThang',
+		[ find_type_constraint('ArrayRef'), find_type_constraint('HashRef'), ]
+	);
+	my $tt    = Types::TypeTiny::to_TypeTiny($moose);
+	is($tt->display_name, 'ContainerThang');
+	isa_ok($tt, 'Type::Tiny::Union');
+	ok($tt->[0] == Types::Standard::ArrayRef);
+	ok($tt->[1] == Types::Standard::HashRef);
+	ok $tt->can_be_inlined;
+	note( $tt->inline_check('$REF') );
+};
+
+
 subtest "Coercion from Mouse type constraint object" => sub
 {
 	my $orig = Mouse::Util::TypeConstraints::find_type_constraint("Int");
