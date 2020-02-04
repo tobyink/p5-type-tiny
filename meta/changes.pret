@@ -3540,3 +3540,17 @@
 			label "Remove some Perl 5.012+ syntax from test suite.";
 		];
 	].
+
+`Type-Tiny 1.009_000 cpan:TOBYINK`
+	issued  2020-02-04;
+	changeset [
+		dcs:versus `Type-Tiny 1.008005 cpan:TOBYINK`;
+		item [
+			a dcs:Change;
+			label "Subclasses of Moose::Meta::TypeConstraint are now converted to the appropriate subclasses of Type::Tiny by Types::TypeTiny::to_TypeTiny, instead of always being converted to the base class. This improves inlining amongst other things.";
+		];
+		item [
+			a dcs:Change;
+			label "When types are declared by Type::Library's -declare import parameter, the temporary subs installed can now generate placeholder type constraints which allow the types to be used in recursive type definitions.";
+		];
+	].
