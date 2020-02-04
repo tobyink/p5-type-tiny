@@ -137,7 +137,7 @@ my $ptype_tests = sub {
 	should_pass([], $tt);
 	should_pass({}, $tt);
 	should_pass([1..10], $tt);
-	should_pass({foo => 1, bar => 2}, $tt);	
+	should_pass({foo => 1, bar => 2}, $tt);
 	should_pass(['hello world'], $tt);
 	should_fail(\1, $tt);
 	should_fail(42, $tt);
@@ -147,7 +147,7 @@ my $ptype_tests = sub {
 	should_pass([], $tt_with_moose);
 	should_pass({}, $tt_with_moose);
 	should_pass([1..10], $tt_with_moose);
-	should_pass({foo => 1, bar => 2}, $tt_with_moose);	
+	should_pass({foo => 1, bar => 2}, $tt_with_moose);
 	should_fail(['hello world'], $tt_with_moose);
 	should_fail(\1, $tt_with_moose);
 	should_fail(42, $tt_with_moose);
@@ -157,7 +157,7 @@ my $ptype_tests = sub {
 	should_pass([], $tt_with_tt);
 	should_pass({}, $tt_with_tt);
 	should_pass([1..10], $tt_with_tt);
-	should_pass({foo => 1, bar => 2}, $tt_with_tt);	
+	should_pass({foo => 1, bar => 2}, $tt_with_tt);
 	should_fail(['hello world'], $tt_with_tt);
 	should_fail(\1, $tt_with_tt);
 	should_fail(42, $tt_with_tt);
