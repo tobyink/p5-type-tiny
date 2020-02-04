@@ -239,13 +239,17 @@ sub _exporter_fail
 		{
 			my $params; $params = shift if ref($_[0]) eq "ARRAY";
 			my $type = $into->get_type($name);
-			unless ($type)
+			my $t;
+			
+			if ($type) {
+				my $t = $params ? $type->parameterize(@$params) : $type;
+			}
+			else
 			{
 				_croak "Cannot parameterize a non-existant type" if $params;
-				$type = $name;
+				$t = Type::Tiny::_DeclaredType->new(library => $into, name => $name);
 			}
 			
-			my $t = $params ? $type->parameterize(@$params) : $type;
 			@_ && wantarray ? return($t, @_) : return $t;
 		};
 		
@@ -259,6 +263,27 @@ sub _exporter_fail
 	}
 	
 	return $class->SUPER::_exporter_fail(@_);
+}
+
+{
+	package Type::Tiny::_DeclaredType;
+	our @ISA = 'Type::Tiny';
+	sub new {
+		my $class = shift;
+		my %opts  = @_==1 ? %{+shift} : @_;
+		my $library = delete $opts{library};
+		my $name    = delete $opts{name};
+		$opts{display_name} = $name;
+		$opts{constraint} = sub {
+			my $val = @_ ? pop : $_;
+			$library->get_type($name)->check($val);
+		};
+		$opts{inlined} = sub {
+			my $val = @_ ? pop : $_;
+			sprintf('%s::is_%s(%s)', $library, $name, $val);
+		};
+		$class->SUPER::new(%opts);
+	}
 }
 
 sub meta
