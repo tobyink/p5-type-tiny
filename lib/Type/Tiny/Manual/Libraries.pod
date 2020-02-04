@@ -334,6 +334,27 @@ Even if you provide a coderef as a string, an inlining coderef has the
 potential to generate more efficient code, so you should consider
 providing one.
 
+=head2 Pre-Declaring Types
+
+  use Type::Library -base,
+    -declare => qw( Foo Bar Baz );
+
+This declares types B<Foo>, B<Bar>, and B<Baz> at compile time so they can
+safely be used as barewords in your type library.
+
+This also allows recursively defined types to (mostly) work!
+
+  use Type::Library -base,
+    -declare => qw( NumericArrayRef );
+  use Types::Standard qw( Num ArrayRef );
+  
+  __PACKAGE__->add_type(
+    name     => NumericArrayRef,
+    parent   => ArrayRef->of( Num | NumericArrayRef ),
+  );
+
+(Support for recursive type definitions added in Type::Library 1.009_000.)
+
 =head2 Parameterizable Types
 
 This is probably the most "meta" concept that is going to be covered.

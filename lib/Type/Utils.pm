@@ -179,7 +179,7 @@ sub inline_as (&;@)
 
 sub class_type
 {
-	my $name = ref($_[0]) ? undef : shift;
+	my $name = ref($_[0]) eq 'HASH' ? undef : shift;
 	my %opts = %{ shift or {} };
 	
 	if (defined $name)
@@ -198,7 +198,7 @@ sub class_type
 
 sub role_type
 {
-	my $name = ref($_[0]) ? undef : shift;
+	my $name = ref($_[0]) eq 'HASH' ? undef : shift;
 	my %opts = %{ shift or {} };
 	
 	if (defined $name)
@@ -217,7 +217,7 @@ sub role_type
 
 sub duck_type
 {
-	my $name    = ref($_[0]) ? undef : shift;
+	my $name    = ref($_[0]) eq 'ARRAY' ? undef : shift;
 	my @methods = @{ shift or [] };
 	
 	my %opts;
@@ -232,7 +232,7 @@ sub duck_type
 
 sub enum
 {
-	my $name   = ref($_[0]) ? undef : shift;
+	my $name   = ref($_[0]) eq 'ARRAY' ? undef : shift;
 	my @values = @{ shift or [] };
 	
 	my %opts;
@@ -247,7 +247,7 @@ sub enum
 
 sub union
 {
-	my $name = ref($_[0]) ? undef : shift;
+	my $name = ref($_[0]) eq 'ARRAY' ? undef : shift;
 	my @tcs  = @{ shift or [] };
 	
 	my %opts;
@@ -262,7 +262,7 @@ sub union
 
 sub intersection
 {
-	my $name = ref($_[0]) ? undef : shift;
+	my $name = ref($_[0]) eq 'ARRAY' ? undef : shift;
 	my @tcs  = @{ shift or [] };
 	
 	my %opts;
@@ -279,6 +279,11 @@ sub declare_coercion
 {
 	my %opts;
 	$opts{name} = shift if !ref($_[0]);
+	
+	# I don't like this; it is a hack
+	if (ref($_[0]) eq 'Type::Tiny::_DeclaredType') {
+		$opts{name} = '' . shift;
+	}
 	
 	while (HashLike->check($_[0]) and not TypeTiny->check($_[0]))
 	{

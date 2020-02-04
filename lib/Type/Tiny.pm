@@ -211,6 +211,10 @@ sub new
 	my $class  = shift;
 	my %params = (@_==1) ? %{$_[0]} : @_;
 	
+	for (qw/ name display_name library /) {
+		$params{$_} = $params{$_}.'' if defined $params{$_};
+	}
+	
 	if (exists $params{parent}) {
 		$params{parent} = ref($params{parent}) =~ /^Type::Tiny\b/
 			? $params{parent}
