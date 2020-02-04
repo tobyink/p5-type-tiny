@@ -268,7 +268,7 @@ sub _TypeTinyFromMoose
 		return $ts if $ts->{_is_core};
 	}
 	
-	my ($tt_class, $tt_opts) = 
+	my ($tt_class, $tt_opts) =
 		$t->can('parameterize')                          ? _TypeTinyFromMoose_parameterizable($t) :
 		$t->isa('Moose::Meta::TypeConstraint::Enum')     ? _TypeTinyFromMoose_enum($t) :
 		$t->isa('Moose::Meta::TypeConstraint::Class')    ? _TypeTinyFromMoose_class($t) :
