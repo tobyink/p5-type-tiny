@@ -268,6 +268,25 @@ sub _TypeTinyFromMoose
 		return $ts if $ts->{_is_core};
 	}
 	
+	my ($tt_class, $tt_opts) = _TypeTinyFromMoose_baseclass($t);
+	my $new = $tt_class->new(%$tt_opts);
+	$ttt_cache{ refaddr($t) } = $new;
+	weaken($ttt_cache{ refaddr($t) });
+	
+	$new->{coercion} = do {
+		require Type::Coercion::FromMoose;
+		'Type::Coercion::FromMoose'->new(
+			type_constraint => $new,
+			moose_coercion  => $t->coercion,
+		);
+	} if $t->has_coercion;
+		
+	return $new;
+}
+
+sub _TypeTinyFromMoose_baseclass
+{
+	my $t = shift;
 	my %opts;
 	$opts{display_name} = $t->name;
 	$opts{constraint}   = $t->constraint;
@@ -292,19 +311,7 @@ sub _TypeTinyFromMoose
 	}
 	
 	require Type::Tiny;
-	my $new = 'Type::Tiny'->new(%opts);
-	$ttt_cache{ refaddr($t) } = $new;
-	weaken($ttt_cache{ refaddr($t) });
-	
-	$new->{coercion} = do {
-		require Type::Coercion::FromMoose;
-		'Type::Coercion::FromMoose'->new(
-			type_constraint => $new,
-			moose_coercion  => $t->coercion,
-		);
-	} if $t->has_coercion;
-		
-	return $new;
+	return 'Type::Tiny' => \%opts;
 }
 
 sub _TypeTinyFromValidationClass
