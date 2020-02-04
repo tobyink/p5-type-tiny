@@ -350,7 +350,7 @@ This also allows recursively defined types to (mostly) work!
   
   __PACKAGE__->add_type(
     name     => NumericArrayRef,
-    parent   => ArrayRef->of( Int | NumericArrayRef ),
+    parent   => ArrayRef->of( Num | NumericArrayRef ),
   );
 
 (Support for recursive type definitions added in Type::Library 1.009_000.)
