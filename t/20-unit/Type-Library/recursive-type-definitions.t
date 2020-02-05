@@ -62,4 +62,36 @@ ok( ! MyHashRef->check( \1 ) );
 use B::Deparse;
 note( B::Deparse->new->coderef2text( \&MyTypes::is_MyHashRef ) );
 
+BEGIN {
+	package MyTypes2;
+	
+	use Type::Library -base, -declare => qw( StringArray StringHash StringContainer );
+	use Types::Standard -types;
+	
+	__PACKAGE__->add_type(
+		name    => StringArray,
+		parent  => ArrayRef[ Str | StringArray | StringHash ],
+	);
+	
+	__PACKAGE__->add_type(
+		name    => StringHash,
+		parent  => HashRef[ Str | StringArray | StringHash ],
+	);
+	
+	__PACKAGE__->add_type(
+		name    => StringContainer,
+		parent  => StringHash | StringArray,
+	);
+	
+	$INC{'MyTypes2.pm'} = __FILE__; # stop `use` from complaining
+};
+
+use MyTypes2 -types;
+
+ok(   StringContainer->check({ foo => [], bar => ['a', 'b', { c => 'd' }], baz => 'e' }) );
+ok( ! StringContainer->check({ foo => [], bar => ['a', 'b', { c => \42 }], baz => 'e' }) );
+
+use B::Deparse;
+note( B::Deparse->new->coderef2text( \&MyTypes2::is_StringContainer ) );
+
 done_testing;
