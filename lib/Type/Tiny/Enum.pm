@@ -68,7 +68,8 @@ sub _build_display_name
 	{
 		my $self = shift;
 		
-		my $regexp  = join "|", map quotemeta, @{$self->unique_values};
+		my $regexp  = join "|", map quotemeta, sort {length $b <=> length $a || $a cmp $b } @{$self->unique_values};
+		$regexp = '(?!)' unless @{$self->unique_values};
 		return $cached{$regexp} if $cached{$regexp};
 		my $coderef = ($cached{$regexp} = sub { defined and m{\A(?:$regexp)\z} });
 		Scalar::Util::weaken($cached{$regexp});
@@ -81,12 +82,28 @@ sub _build_display_name
 	sub _build_compiled_check
 	{
 		my $self = shift;
-		my $regexp  = join "|", map quotemeta, @{$self->unique_values};
+		my $regexp  = join "|", map quotemeta, sort {length $b <=> length $a || $a cmp $b } @{$self->unique_values};
+		$regexp = '(?!)' unless @{$self->unique_values};
 		return $cached{$regexp} if $cached{$regexp};
 		my $coderef = ($cached{$regexp} = $self->SUPER::_build_compiled_check(@_));
 		Scalar::Util::weaken($cached{$regexp});
 		return $coderef;
 	}
+}
+
+sub as_regexp
+{
+	my $self = shift;
+	
+	my $flags = @_ ? $_[0] : '';
+	if (defined $flags and $flags =~ /^[i]+$/) {
+		_croak("Unknown regexp flags: '$flags'; only 'i' currently accepted; stopped");
+	}
+	
+	my $regexp  = join "|", map quotemeta, sort {length $b <=> length $a || $a cmp $b } @{$self->unique_values};
+	$regexp = '(?!)' unless @{$self->unique_values};
+	
+	$flags ? qr/\A(?:$regexp)\z/i : qr/\A(?:$regexp)\z/;
 }
 
 sub can_be_inlined
@@ -242,6 +259,33 @@ constructor.
 
 The list of C<values> but sorted and with duplicates removed. This cannot
 be passed to the constructor.
+
+=back
+
+=head2 Methods
+
+=over
+
+=item C<as_regexp>
+
+Returns the enum as a regexp which strings can be checked against. If you're
+checking I<< a lot >> of strings, then using this regexp might be faster than
+checking each string against 
+
+  my $enum  = Type::Tiny::Enum->new(...);
+  my $check = $enum->compiled_check;
+  my $re    = $enum->as_regexp;
+  
+  # fast
+  my @valid_tokens = grep $enum->check($_), @all_tokens;
+  
+  # faster
+  my @valid_tokens = grep $check->($_), @all_tokens;
+  
+  # fastest
+  my @valid_tokens = grep /$re/, @all_tokens;
+
+You can get a case-insensitive regexp using C<< $enum->as_regexp('i') >>.
 
 =back
 
