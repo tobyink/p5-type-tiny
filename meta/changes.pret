@@ -3554,3 +3554,21 @@
 			label "When types are declared by Type::Library's -declare import parameter, the temporary subs installed can now generate placeholder type constraints which allow the types to be used in recursive type definitions.";
 		];
 	].
+
+`Type-Tiny 1.009_001 cpan:TOBYINK`
+	issued  2020-02-06;
+	changeset [
+		dcs:versus `Type-Tiny 1.009_000 cpan:TOBYINK`;
+		item [
+			a dcs:Tests;
+			label "More tests for recursively defined type constraints.";
+		];
+		item [
+			a dcs:Addition;
+			label "Type::Tiny::Enum now has an `as_regexp` method.";
+		];
+		item [
+			a dcs:Change;
+			label "In some edge cases, the regexps used by Type::Tiny::Enum will now be slightly faster.";
+		];
+	].
