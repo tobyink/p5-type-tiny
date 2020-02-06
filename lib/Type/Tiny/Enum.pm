@@ -96,7 +96,7 @@ sub as_regexp
 	my $self = shift;
 	
 	my $flags = @_ ? $_[0] : '';
-	if (defined $flags and $flags =~ /^[i]+$/) {
+	unless (defined $flags and $flags =~ /^[i]*$/) {
 		_croak("Unknown regexp flags: '$flags'; only 'i' currently accepted; stopped");
 	}
 	

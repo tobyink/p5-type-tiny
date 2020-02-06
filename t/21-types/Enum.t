@@ -108,6 +108,10 @@ while (@tests) {
 	}
 }
 
+#
+# Parameterize with some strings.
+#
+
 my $enum1 = Enum[qw/ foo bar bar baz /];
 should_pass('foo', $enum1);
 should_pass('bar', $enum1);
@@ -116,6 +120,26 @@ should_fail('bat', $enum1);
 is_deeply($enum1->values, [qw/ foo bar bar baz /]);
 is_deeply($enum1->unique_values, [qw/ bar baz foo /]);
 is_deeply([@$enum1], [qw/ foo bar bar baz /]);
+
+#
+# Regexp.
+#
+
+my $re = $enum1->as_regexp;
+ok('foo' =~ $re);
+ok('bar' =~ $re);
+ok('baz' =~ $re);
+ok('FOO' !~ $re);
+ok('xyz' !~ $re);
+ok('foo bar baz' !~ $re);
+
+my $re_i = $enum1->as_regexp('i'); # case-insensitive
+ok('foo' =~ $re_i);
+ok('bar' =~ $re_i);
+ok('baz' =~ $re_i);
+ok('FOO' =~ $re_i);
+ok('xyz' !~ $re_i);
+ok('foo bar baz' !~ $re_i);
 
 #
 # Enum allows you to pass objects overloading stringification when
