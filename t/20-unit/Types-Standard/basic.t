@@ -155,7 +155,7 @@ like(
 
 like(
 	exception { Ref[{}] },
-	qr{^Parameter to Ref\[\`a\] expected to be string; got HASH},
+	qr{^Parameter to Ref\[\`a\] expected to be a Perl ref type; got HASH},
 	qq{Ref[{}] is not a valid type constraint},
 );
 
