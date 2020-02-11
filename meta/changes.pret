@@ -3594,3 +3594,19 @@
 			label "Mention MooX::Pression.";
 		];
 	].
+
+`Type-Tiny 1.009_003 cpan:TOBYINK`
+	issued  2020-02-11;
+	changeset [
+		dcs:versus `Type-Tiny 1.009_002 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix;
+			label "Fix importing multiple type libraries into a type registry at once.";
+			dcs:fixes RT#131744;
+		];
+		item [
+			a dcs:Documentation;
+			label "Fix typo in documentation of `my_methods`.";
+			dcs:blame cpan:BOOK;
+		];
+	].
