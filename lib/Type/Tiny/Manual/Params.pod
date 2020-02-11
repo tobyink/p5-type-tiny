@@ -137,6 +137,35 @@ Don't you wish your subs could look like this?
 Well; here are a few solutions for sub signatures that work with
 L<Type::Tiny>...
 
+=head3 MooX::Pression
+
+L<MooX::Pression> is a Perl OO syntax toolkit with Type::Tiny support
+baked in throughout.
+
+  package MyApp {
+    use MooX::Pression;
+    
+    class Person {
+      has name ( type => Str );
+      
+      method rename (Str $new_name) {
+        printf("%s will now be called %s\n", $self->name, $new_name);
+        $self->name($new_name);
+      }
+      
+      coerce from Str via {
+        $class->new(name => $_)
+      }
+    }
+    
+    class Company {
+      has owner ( isa => 'Person' );
+    }
+  }
+  
+  my $acme = MyApp->new_company(owner => "Robert");
+  $acme->owner->rename("Bob");
+
 =head3 Kavorka
 
 L<Kavorka> is a sub signatures implementation written to natively use
