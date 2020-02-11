@@ -1007,7 +1007,7 @@ I<< not allowed as defaults >>.
 
 Alternatively, you may provide a coderef to generate a default value:
 
- state $check = named(
+ state $check = compile(
    Int,
    Int, { default => sub { 6 * 111 } },
    Int, { default => sub { 9 * 111 } },
