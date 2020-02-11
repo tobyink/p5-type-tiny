@@ -3586,6 +3586,10 @@
 			label "Parameterized `Ref` type constraint in Types::Standard now checks its parameter is a known Perl ref type.";
 		];
 		item [
+			a dcs:Change;
+			label "Type::Params on Perl older than 5.10 now uses its own B::perlstring implementation to quote strings instead of using B::cstring.";
+		];
+		item [
 			a dcs:Documentation;
 			label "Mention MooX::Pression.";
 		];
