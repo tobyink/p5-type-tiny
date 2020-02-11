@@ -109,6 +109,7 @@ sub _mkdefault
 sub _deal_with_head_and_tail {
 	my $options = shift;
 	$options->{arg_fudge_factor} = 0;
+	$options->{arg_fudge_factor_head} = 0;
 	my @lines;
 	my %env;
 	
@@ -119,7 +120,8 @@ sub _deal_with_head_and_tail {
 			if !ref $options->{$position};
 			
 		my $count = @{ $options->{$position} };
-		$options->{arg_fudge_factor} += $count;
+		$options->{arg_fudge_factor}      += $count;
+		$options->{arg_fudge_factor_head} += $count if $position eq 'head';
 		
 		push @lines => (
 			$position eq 'head'
@@ -374,7 +376,7 @@ sub compile
 				$constraint->{uniq},
 				$QUOTE->($constraint),
 				$varname,
-				$is_slurpy ? 'q{$SLURPY}' : sprintf('q{$_[%d]}', $arg+$options{arg_fudge_factor}),
+				$is_slurpy ? 'q{$SLURPY}' : sprintf('q{$_[%d]}', $arg+$options{arg_fudge_factor_head}),
 			);
 		}
 		else
@@ -388,7 +390,7 @@ sub compile
 				$constraint->{uniq},
 				$QUOTE->($constraint),
 				$varname,
-				$is_slurpy ? 'q{$SLURPY}' : sprintf('q{$_[%d]}', $arg+$options{arg_fudge_factor}),
+				$is_slurpy ? 'q{$SLURPY}' : sprintf('q{$_[%d]}', $arg+$options{arg_fudge_factor_head}),
 			);
 		}
 		
@@ -396,12 +398,14 @@ sub compile
 			push @code, sprintf 'push @R, %s;', $varname;
 		}
 	}
-		
+	
+	my $thang = 'scalar(@_)';
+	
 	if ($min_args == $max_args and not $saw_slurpy)
 	{
 		$code[1] = sprintf(
-			'"Error::TypeTiny::WrongNumberOfParameters"->throw(got => scalar(@_)+%d, minimum => %d, maximum => %d) if @_ != %d;',
-			$options{arg_fudge_factor},
+			'"Error::TypeTiny::WrongNumberOfParameters"->throw(got => %s, minimum => %d, maximum => %d) if @_ != %d;',
+			$thang,
 			$min_args + $options{arg_fudge_factor},
 			$max_args + $options{arg_fudge_factor},
 			$min_args + $options{arg_fudge_factor},
@@ -410,8 +414,8 @@ sub compile
 	elsif ($min_args < $max_args and not $saw_slurpy)
 	{
 		$code[1] = sprintf(
-			'"Error::TypeTiny::WrongNumberOfParameters"->throw(got => scalar(@_)+%d, minimum => %d, maximum => %d) if @_ < %d || @_ > %d;',
-			$options{arg_fudge_factor},
+			'"Error::TypeTiny::WrongNumberOfParameters"->throw(got => %s, minimum => %d, maximum => %d) if @_ < %d || @_ > %d;',
+			$thang,
 			$min_args + $options{arg_fudge_factor},
 			$max_args + $options{arg_fudge_factor},
 			$min_args + $options{arg_fudge_factor},
@@ -421,8 +425,8 @@ sub compile
 	elsif ($min_args and $saw_slurpy)
 	{
 		$code[1] = sprintf(
-			'"Error::TypeTiny::WrongNumberOfParameters"->throw(got => scalar(@_)+%d, minimum => %d) if @_ < %d;',
-			$options{arg_fudge_factor},
+			'"Error::TypeTiny::WrongNumberOfParameters"->throw(got => %s, minimum => %d) if @_ < %d;',
+			$thang,
 			$min_args + $options{arg_fudge_factor},
 			$min_args + $options{arg_fudge_factor},
 		);

@@ -36,7 +36,7 @@ use Test::More;
 use Test::Fatal;
 
 use Type::Params qw(compile);
-use Types::Standard qw(Num);
+use Types::Standard -types, 'slurpy';
 
 my $check;
 sub nth_root
@@ -76,6 +76,72 @@ is_deeply(
 	my $e = exception { nth_root(1, 2, 3) };
 	like($e, qr{^Wrong number of parameters; got 3; expected 2}, '(1)');
 }
+
+my $fooble_check;
+sub fooble {
+	$fooble_check = compile(
+		{
+			head => [ ArrayRef, CodeRef ],
+			tail => [ HashRef, ScalarRef, Int->plus_coercions(Num, q{int $_}) ],
+		},
+		Num,
+		slurpy ArrayRef[Int],
+	);
+	$fooble_check->(@_);
+}
+
+my $random_code = sub {};
+
+is_deeply(
+	[ fooble( [1], $random_code, 1.1, 1, 2, 3, 4, { foo=>1 }, \42, 1.2 ) ],
+	[ [1], $random_code, 1.1, [1, 2, 3, 4], { foo=>1 }, \42, 1 ],
+	'head and tail work',
+);
+
+like(
+	exception { fooble() },
+	qr/got 0; expected at least 6/,
+);
+
+like(
+	exception { fooble([]) },
+	qr/got 1; expected at least 6/,
+);
+
+like(
+	exception { fooble( undef, $random_code, 1.1, 1, 2, 3, 4, { foo=>1 }, \42, 1.2 ) },
+	qr/^Undef did not pass type constraint "ArrayRef" \(in \$_\[0\]\)/,
+);
+
+like(
+	exception { fooble( [1], undef, 1.1, 1, 2, 3, 4, { foo=>1 }, \42, 1.2 ) },
+	qr/^Undef did not pass type constraint "CodeRef" \(in \$_\[1\]\)/,
+);
+
+like(
+	exception { fooble( [1], $random_code, undef, 1, 2, 3, 4, { foo=>1 }, \42, 1.2 ) },
+	qr/^Undef did not pass type constraint "Num" \(in \$_\[2\]\)/,
+);
+
+like(
+	exception { fooble( [1], $random_code, 1.1, 1, 2, 3, 4, undef, \42, 1.2 ) },
+	qr/^Undef did not pass type constraint "HashRef" \(in \$_\[-3\]\)/,
+);
+
+like(
+	exception { fooble( [1], $random_code, 1.1, 1, 2, 3, 4, { foo=>1 }, undef, 1.2 ) },
+	qr/^Undef did not pass type constraint "ScalarRef" \(in \$_\[-2\]\)/,
+);
+
+like(
+	exception { fooble( [1], $random_code, 1.1, 1, 2, 3, 4, { foo=>1 }, \42, undef ) },
+	qr/Undef did not pass type constraint "Int" \(in \$_\[-1\]\)/,
+);
+
+like(
+	exception { fooble( [1], $random_code, 1.1, 1, undef, 3, 4, { foo=>1 }, \42, 1.2 ) },
+	qr/did not pass type constraint/,
+);
 
 done_testing;
 
