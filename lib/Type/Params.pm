@@ -106,36 +106,145 @@ sub _mkdefault
 	$default;
 }
 
+sub _deal_with_head_and_tail {
+	my $options = shift;
+	$options->{arg_fudge_factor} = 0;
+	my @lines;
+	my %env;
+	
+	for my $position (qw/ head tail /) {
+		next unless defined $options->{$position};
+		
+		$options->{$position} = [ (Types::Standard::Any) x (0+ $options->{$position}) ]
+			if !ref $options->{$position};
+			
+		my $count = @{ $options->{$position} };
+		$options->{arg_fudge_factor} += $count;
+		
+		push @lines => (
+			$position eq 'head'
+				? "\@head = splice(\@_, 0, $count);"
+				: "\@tail = splice(\@_, -$count);",
+		);
+		
+		for my $i (0 .. $count-1) {
+			my $constraint = $options->{$position}[$i];
+			$constraint = $options->{$position}[$i] = Types::Standard::Any
+				if !ref $constraint && $constraint eq 1;
+			Types::TypeTiny::TypeTiny->assert_valid($constraint);
+			
+			my $is_optional = 0;
+			$is_optional += grep $_->{uniq} == Optional->{uniq}, $constraint->parents;
+			Error::TypeTiny::croak("The $position may not contain optional parameters") if $is_optional;
+			
+			my $varname     = sprintf('$%s[%d]', $position, $i);
+			my $display_var = $position eq 'head'
+				? sprintf('$_[%d]', $i)
+				: sprintf('$_[%d]', $i-$count);
+			
+			if ($constraint->has_coercion and $constraint->coercion->can_be_inlined)
+			{
+				push @lines, sprintf(
+					'%s = do { %s };',
+					$varname,
+					$constraint->coercion->inline_coercion($varname),
+				);
+			}
+			elsif ($constraint->has_coercion)
+			{
+				$env{'@coerce_'.$position}[$i] = $constraint->coercion->compiled_coercion;
+				push @lines, sprintf(
+					'%s = $coerce_%s[%d]->(%s);',
+					$varname,
+					$position,
+					$i,
+					$varname,
+				);
+			}
+			
+			undef $Type::Tiny::ALL_TYPES{ $constraint->{uniq} };
+			$Type::Tiny::ALL_TYPES{ $constraint->{uniq} } = $constraint;
+			
+			if ($constraint == Types::Standard::Any)
+			{
+				# don't really need to check!
+			}
+			elsif ($constraint->can_be_inlined)
+			{
+				push @lines, sprintf(
+					'(%s) or Type::Tiny::_failed_check(%d, %s, %s, varname => %s);',
+					$constraint->inline_check($varname),
+					$constraint->{uniq},
+					$QUOTE->($constraint),
+					$varname,
+					$QUOTE->($display_var),
+				);
+			}
+			else
+			{
+				$env{'@check_'.$position}[$i] = $constraint->compiled_check;
+				push @lines, sprintf(
+					'%s or Type::Tiny::_failed_check(%d, %s, %s, varname => %s);',
+					sprintf(sprintf '$check_%s[%d]->(%s)', $position, $i, $varname),
+					$constraint->{uniq},
+					$QUOTE->($constraint),
+					$varname,
+					$QUOTE->($display_var),
+				);
+			}
+		}
+	}
+	
+	if (@lines) {
+		unshift @lines => sprintf(
+			'"Error::TypeTiny::WrongNumberOfParameters"->throw("Not enough parameters to satisfy required head and tail of parameter list") if @_ < %d;',
+			$options->{arg_fudge_factor},
+		);
+		unshift @lines, 'my (@head, @tail);';
+	}
+	
+	\%env, @lines;
+}
+
 sub compile
 {
 	my (@code, %env);
+	
 	push @code, '#placeholder', '#placeholder';  # @code[0,1]
 	
 	my %options;
 	while (ref($_[0]) eq "HASH" && !$_[0]{slurpy}) {
 		%options = (%options, %{+shift});
 	}
+	
 	my $arg        = -1;
 	my $saw_slurpy = 0;
 	my $min_args   = 0;
 	my $max_args   = 0;
 	my $saw_opt    = 0;
 	
-	my $return_default_list = !!1;
+	my $return_list = '@_';
 	$code[0] = 'my (%tmp, $tmp);';
 	PARAM: for my $param (@_) {
 		if (HashRef->check($param)) {
 			$code[0] = 'my (@R, %tmp, $tmp, $dtmp);';
-			$return_default_list = !!0;
+			$return_list = '@R';
 			last PARAM;
 		}
 		elsif (not Bool->check($param)) {
 			if ($param->has_coercion) {
 				$code[0] = 'my (@R, %tmp, $tmp, $dtmp);';
-				$return_default_list = !!0;
+				$return_list = '@R';
 				last PARAM;
 			}
 		}
+	}
+	
+	my ($extra_env, @extra_lines) = _deal_with_head_and_tail(\%options);
+	if (@extra_lines) {
+		push @code, @extra_lines;
+		%env = (%$extra_env, %env);
+		$return_list = '(@head, @R, @tail)';
 	}
 	
 	my @default_indices;
@@ -214,7 +323,7 @@ sub compile
 			{
 				push @code, sprintf(
 					'return %s if $#_ < %d;',
-					$return_default_list ? '@_' : '@R',
+					$return_list,
 					$arg,
 				);
 				$saw_opt++;
@@ -265,7 +374,7 @@ sub compile
 				$constraint->{uniq},
 				$QUOTE->($constraint),
 				$varname,
-				$is_slurpy ? 'q{$SLURPY}' : sprintf('q{$_[%d]}', $arg),
+				$is_slurpy ? 'q{$SLURPY}' : sprintf('q{$_[%d]}', $arg+$options{arg_fudge_factor}),
 			);
 		}
 		else
@@ -279,11 +388,11 @@ sub compile
 				$constraint->{uniq},
 				$QUOTE->($constraint),
 				$varname,
-				$is_slurpy ? 'q{$SLURPY}' : sprintf('q{$_[%d]}', $arg),
+				$is_slurpy ? 'q{$SLURPY}' : sprintf('q{$_[%d]}', $arg+$options{arg_fudge_factor}),
 			);
 		}
 		
-		unless ($return_default_list) {
+		unless ($return_list eq '@_') {
 			push @code, sprintf 'push @R, %s;', $varname;
 		}
 	}
@@ -291,37 +400,35 @@ sub compile
 	if ($min_args == $max_args and not $saw_slurpy)
 	{
 		$code[1] = sprintf(
-			'"Error::TypeTiny::WrongNumberOfParameters"->throw(got => scalar(@_), minimum => %d, maximum => %d) if @_ != %d;',
-			$min_args,
-			$max_args,
-			$min_args,
+			'"Error::TypeTiny::WrongNumberOfParameters"->throw(got => scalar(@_)+%d, minimum => %d, maximum => %d) if @_ != %d;',
+			$options{arg_fudge_factor},
+			$min_args + $options{arg_fudge_factor},
+			$max_args + $options{arg_fudge_factor},
+			$min_args + $options{arg_fudge_factor},
 		);
 	}
 	elsif ($min_args < $max_args and not $saw_slurpy)
 	{
 		$code[1] = sprintf(
-			'"Error::TypeTiny::WrongNumberOfParameters"->throw(got => scalar(@_), minimum => %d, maximum => %d) if @_ < %d || @_ > %d;',
-			$min_args,
-			$max_args,
-			$min_args,
-			$max_args,
+			'"Error::TypeTiny::WrongNumberOfParameters"->throw(got => scalar(@_)+%d, minimum => %d, maximum => %d) if @_ < %d || @_ > %d;',
+			$options{arg_fudge_factor},
+			$min_args + $options{arg_fudge_factor},
+			$max_args + $options{arg_fudge_factor},
+			$min_args + $options{arg_fudge_factor},
+			$max_args + $options{arg_fudge_factor},
 		);
 	}
 	elsif ($min_args and $saw_slurpy)
 	{
 		$code[1] = sprintf(
-			'"Error::TypeTiny::WrongNumberOfParameters"->throw(got => scalar(@_), minimum => %d) if @_ < %d;',
-			$min_args,
-			$min_args,
+			'"Error::TypeTiny::WrongNumberOfParameters"->throw(got => scalar(@_)+%d, minimum => %d) if @_ < %d;',
+			$options{arg_fudge_factor},
+			$min_args + $options{arg_fudge_factor},
+			$min_args + $options{arg_fudge_factor},
 		);
 	}
 	
-	if ($return_default_list) {
-		push @code, '@_;';
-	}
-	else {
-		push @code, '@R;';
-	}
+	push @code, $return_list;
 	
 	my $source  = "sub { no warnings; ".join("\n", @code)." };";
 	
@@ -334,8 +441,8 @@ sub compile
 	);
 	
 	return {
-		min_args    => $min_args,
-		max_args    => $saw_slurpy ? undef : $max_args,
+		min_args    => $options{arg_fudge_factor}+($min_args||0),
+		max_args    => $saw_slurpy ? undef : $options{arg_fudge_factor}+($max_args||0),
 		closure     => $closure,
 		source      => $source,
 		environment => \%env,
@@ -348,7 +455,7 @@ sub compile_named
 {
 	my (@code, %env);
 	
-	@code = 'my (%R, %tmp, $tmp);';
+	push @code, 'my (%R, %tmp, $tmp);';
 	push @code, '#placeholder';   # $code[1]
 	
 	my %options;
@@ -357,7 +464,13 @@ sub compile_named
 	}
 	my $arg = -1;
 	my $had_slurpy;
-	
+
+	my ($extra_env, @extra_lines) = _deal_with_head_and_tail(\%options);
+	if (@extra_lines) {
+		push @code, @extra_lines;
+		%env = (%$extra_env, %env);
+	}
+
 	push @code, 'my %in = ((@_==1) && ref($_[0]) eq "HASH") ? %{$_[0]} : (@_ % 2) ? "Error::TypeTiny::WrongNumberOfParameters"->throw(message => "Odd number of elements in hash") : @_;';
 	my @names;
 	
@@ -512,6 +625,13 @@ sub compile_named
 		push @code, '\\%R;';
 	}
 	
+	if ($options{head} || $options{tail}) {
+		$code[-1] = 'my @R = ' . $code[-1];
+		push @code, 'unshift @R, @head;' if $options{head};
+		push @code, 'push @R, @tail;' if $options{tail};
+		push @code, '@R;';
+	}
+	
 	my $source  = "sub { no warnings; ".join("\n", @code)." };";
 	return $source if $options{want_source};
 	
@@ -521,9 +641,15 @@ sub compile_named
 		environment => \%env,
 	);
 	
+	my $max_args = undef;
+	if (!$had_slurpy) {
+		$max_args = 2 * ($arg+1);
+		$max_args += $options{arg_fudge_factor};
+	}
+	
 	return {
-		min_args    => undef,  # always going to be 1 or 0
-		max_args    => undef,  # should be possible to figure out if no slurpy param
+		min_args    => $options{arg_fudge_factor},
+		max_args    => $max_args,
 		closure     => $closure,
 		source      => $source,
 		environment => \%env,
@@ -909,6 +1035,60 @@ options are:
 
 =over
 
+=item C<< head >> B<< Int|ArrayRef[TypeTiny] >>
+
+Parameters to shift off C<< @_ >> before doing the main type check.
+These parameters may also be checked, and cannot be optional or slurpy.
+They may not have defaults.
+
+  my $check = compile(
+    { head => [ Int, Int ] },
+    Str,
+    Str,
+  );
+  
+  # ... is basically the same as...
+  
+  my $check = compile(
+    Int,
+    Int,
+    Str,
+    Str,
+  );
+
+A number may be given if you do not care to check types:
+
+  my $check = compile(
+    { head => 2 },
+    Str,
+    Str,
+  );
+  
+  # ... is basically the same as...
+  
+  my $check = compile(
+    Any,
+    Any,
+    Str,
+    Str,
+  );
+
+This is mostly useless for C<compile>, but can be useful for
+C<compile_named> and C<compile_named_oo>.
+
+=item C<< tail >> B<< Int|ArrayRef[TypeTiny] >>
+
+Similar to C<head>, but pops parameters off the end of C<< @_ >> instead.
+This is actually useful for C<compile> because it allows you to sneak in
+some required parameters I<after> a slurpy or optional parameter.
+
+  my $check = compile(
+    { tail => [ CodeRef ] },
+    slurpy ArrayRef[Str],
+  );
+  
+  my ($strings, $coderef) = $check->("foo", "bar", sub { ... });
+
 =item C<< want_source >> B<< Bool >>
 
 Instead of returning a coderef, return Perl source code string. Handy
@@ -1198,6 +1378,36 @@ B<< Optional[Any] >> and B<< Any >>.
 Slurpy parameters are supported as you'd expect.
 
 B<< slurpy Any >> is treated as B<< slurpy HashRef >>.
+
+The C<head> and C<tail> options are supported. This allows for a
+mixture of positional and named arguments, as long as the positional
+arguments are non-optional and at the head and tail of C<< @_ >>.
+
+  my $check = compile(
+    { head => [ Int, Int ], tail => [ CodeRef ] },
+    foo => Str,
+    bar => Str,
+    baz => Str,
+  );
+  
+  my ($int1, $int2, $args, $coderef)
+    = $check->( 666, 999, foo=>'x', bar=>'y', baz=>'z', sub {...} );
+  
+  say $args->{bar};  # 'y'
+
+This can be combined with C<named_to_list>:
+
+  my $check = compile(
+    { head => [ Int, Int ], tail => [ CodeRef ], named_to_list => 1 },
+    foo => Str,
+    bar => Str,
+    baz => Str,
+  );
+  
+  my ($int1, $int2, $foo, $bar, $baz, $coderef)
+    = $check->( 666, 999, foo=>'x', bar=>'y', baz=>'z', sub {...} );
+  
+  say $bar;  # 'y'
 
 =head3 C<< validate_named(\@_, @spec) >>
 

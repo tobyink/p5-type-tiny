@@ -112,6 +112,20 @@ This can be faked using positional parameters and a slurpy dictionary.
  @_ = (42, foo => 21, bar  => 10.5);   # not ok
  @_ = (42, foo => 21, quux => 84);     # not ok
 
+From Type::Params 1.009_002, C<head> and C<tail> options are accepted, which
+provide another option for mixed named and positional arguments:
+
+ state $check = compile_named(
+   { head => [ Int ] },
+   foo => Int,
+   bar => Optional[Int],
+   baz => Optional[Int],
+   ],
+ );
+
+The C<head> is shifted off C<< @_ >> before C<< @_ >> is considered as a hash.
+The C<tail> is popped off C<< @_ >> before C<< @_ >> is considered as a hash.
+
 =head2 Proper Signatures
 
 Don't you wish your subs could look like this?
