@@ -35,9 +35,7 @@ sub english_list {
 	goto \&Type::Utils::english_list;
 }
 
-my $QUOTE = ($^V < 5.010 && exists(&B::cstring))
-	? \&B::cstring
-	: \&B::perlstring;   # is buggy on Perl 5.8
+my $QUOTE = \&B::perlstring;
 
 {
 	my $Invocant;
