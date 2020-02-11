@@ -3572,3 +3572,21 @@
 			label "In some edge cases, the regexps used by Type::Tiny::Enum will now be slightly faster.";
 		];
 	].
+
+`Type-Tiny 1.009_002 cpan:TOBYINK`
+	issued  2020-02-11;
+	changeset [
+		dcs:versus `Type-Tiny 1.009_001 cpan:TOBYINK`;
+		item [
+			a dcs:Addition;
+			label "Type::Params now supports `head` and `tail` options for `compile`, `compile_named`, and `compile_named_oo`.";
+		];
+		item [
+			a dcs:Change;
+			label "Parameterized `Ref` type constraint in Types::Standard now checks its parameter is a known Perl ref type.";
+		];
+		item [
+			a dcs:Documentation;
+			label "Mention MooX::Pression.";
+		];
+	].
