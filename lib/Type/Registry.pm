@@ -65,7 +65,7 @@ sub add_types
 	my $opts = mkopt(\@_);
 	for my $opt (@$opts)
 	{
-		my ($library, $types) = @_;
+		my ($library, $types) = @$opt;
 		$library =~ s/^-/Types::/;
 		
 		{

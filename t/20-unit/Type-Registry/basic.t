@@ -133,4 +133,9 @@ is(
 	'DWIM - complex type',
 );
 
+my $reg = Type::Registry->new;
+$reg->add_types(qw/ -Common::Numeric -Common::String /);
+ok exists $reg->{'NonEmptyStr'};
+ok exists $reg->{'PositiveInt'};
+
 done_testing;
