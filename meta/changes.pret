@@ -3610,3 +3610,18 @@
 			dcs:blame cpan:BOOK;
 		];
 	].
+
+`Type-Tiny 1.010000 cpan:TOBYINK`
+	issued  2020-02-19;
+	changeset [
+		dcs:versus `Type-Tiny 1.009_003 cpan:TOBYINK`;
+		item [
+			a dcs:Documentation;
+			label "Correct documentation of slurpy with compile_named.";
+			dcs:fixes RT#131720;
+		];
+		item [
+			a dcs:Packaging;
+			label "Package as stable.";
+		];
+	].
