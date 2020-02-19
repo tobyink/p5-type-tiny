@@ -137,13 +137,13 @@ Don't you wish your subs could look like this?
 Well; here are a few solutions for sub signatures that work with
 L<Type::Tiny>...
 
-=head3 MooX::Pression
+=head3 Zydeco
 
-L<MooX::Pression> is a Perl OO syntax toolkit with Type::Tiny support
-baked in throughout.
+L<Zydeco> is a Perl OO syntax toolkit with Type::Tiny support baked in
+throughout.
 
   package MyApp {
-    use MooX::Pression;
+    use Zydeco;
     
     class Person {
       has name ( type => Str );
@@ -159,7 +159,7 @@ baked in throughout.
     }
     
     class Company {
-      has owner ( isa => 'Person' );
+      has owner ( type => 'Person' );
     }
   }
   
