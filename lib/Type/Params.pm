@@ -1301,11 +1301,11 @@ parameter:
 
  state $check = compile_named(
    \%general_opts,
-   foo => $type_for_foo, \%opts_for_foo,
-   bar => $type_for_bar, \%opts_for_bar,
-   baz => $type_for_baz, \%opts_for_baz,
+   foo   => $type_for_foo, \%opts_for_foo,
+   bar   => $type_for_bar, \%opts_for_bar,
+   baz   => $type_for_baz, \%opts_for_baz,
    ...,
-   slurpy($slurpy_type),
+   extra => slurpy($slurpy_type),
  );
 
 The C<< $check >> coderef will return a hashref.
@@ -1377,7 +1377,17 @@ B<< Optional[Any] >> and B<< Any >>.
  state $check = compile_named(foo => 1, bar => 0, baz => 0);
  my $args = $check->(@_);  # $args->{bar} and $args->{baz} are optional
 
-Slurpy parameters are supported as you'd expect.
+Slurpy parameters are slurped into a nested hashref.
+
+  my $check = compile(
+    foo    => Str,
+    bar    => Optional[Str],
+    extra  => slurpy HashRef[Str],
+  );
+  my $args = $check->(foo => "aaa", quux => "bbb");
+  
+  print $args->{foo}, "\n";             # aaa
+  print $args->{extra}{quux}, "\n";     # bbb
 
 B<< slurpy Any >> is treated as B<< slurpy HashRef >>.
 
