@@ -94,6 +94,23 @@ least Moose 2.0000 is recommended. If using Type::Tiny with L<Mouse>,
 then at least Mouse 1.00 is recommended. Type::Tiny is mostly
 untested against older versions of these packages.
 
+=head3 Type::Tiny and cperl
+
+L<cperl|http://perl11.org/cperl/> is an extended version of Perl with
+various incompatible changes from the official Perl 5 releases.
+
+As of Type::Tiny 1.010001, cperl is a supported platform for Type::Tiny with
+some caveats. At the time of writing, Moose will not install on the latest
+cperl releases, so using Type::Tiny with Moose on cperl is untested. Moo can
+be forced to install, and Type::Tiny is verified to work with Moo on cperl.
+cperl not only enables a new warnings category called "shadow" (which is good;
+they're potentially useful) but switches on shadow warnings by default (which
+is annoying). Type::Tiny does not (and likely will never) attempt to work
+around these warnings. If the warnings bother you, you should be able to catch
+them using C<< $SIG{__WARN__} >>. Certain features of L<Eval::TypeTiny> are
+broken under cperl, but they're not thought to have any practical effect on
+Type::Tiny or its other bundled modules.
+
 =head1 NEXT STEPS
 
 Here's your next step:

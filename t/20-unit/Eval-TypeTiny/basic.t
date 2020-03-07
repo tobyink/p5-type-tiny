@@ -100,7 +100,11 @@ my $closure2 = eval_closure(
 $closure2->();
 is($external, 42, 'closing over variables really really really works!');
 
-{
+if ("$^V" =~ /c$/) {
+	diag "cperl: skipping variable destruction test";
+}
+
+else {
 	my $destroyed = 0;
 	{
 		package MyIndicator;

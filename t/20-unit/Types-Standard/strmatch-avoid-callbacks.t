@@ -24,6 +24,12 @@ use strict;
 use warnings;
 use lib qw( . ./t ../inc ./inc );
 use Test::More;
+
+BEGIN {
+	plan skip_all => "cperl's `shadow` warnings catgeory breaks this test; skipping"
+		if "$^V" =~ /c$/;
+};
+
 use Test::Requires '5.018';
 use Test::Requires 'Test::Warnings';
 

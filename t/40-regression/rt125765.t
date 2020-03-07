@@ -31,6 +31,11 @@ use Test::More;
 use Test::Fatal;
 use Types::Standard qw(Dict Tuple Any);
 
+BEGIN {
+	plan skip_all => "cperl's `shadow` warnings catgeory breaks this test; skipping"
+		if "$^V" =~ /c$/;
+};
+
 my @warnings;
 $SIG{__WARN__} = sub { push @warnings, $_[0]; };
 

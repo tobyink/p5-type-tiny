@@ -59,8 +59,8 @@ ok( ! MyHashRef->check( \%bad3 ) );
 ok( ! MyHashRef->check( undef ) );
 ok( ! MyHashRef->check( \1 ) );
 
-use B::Deparse;
-note( B::Deparse->new->coderef2text( \&MyTypes::is_MyHashRef ) );
+#use B::Deparse;
+#note( B::Deparse->new->coderef2text( \&MyTypes::is_MyHashRef ) );
 
 BEGIN {
 	package MyTypes2;
@@ -91,7 +91,7 @@ use MyTypes2 -types;
 ok(   StringContainer->check({ foo => [], bar => ['a', 'b', { c => 'd' }], baz => 'e' }) );
 ok( ! StringContainer->check({ foo => [], bar => ['a', 'b', { c => \42 }], baz => 'e' }) );
 
-use B::Deparse;
-note( B::Deparse->new->coderef2text( \&MyTypes2::is_StringContainer ) );
+#use B::Deparse;
+#note( B::Deparse->new->coderef2text( \&MyTypes2::is_StringContainer ) );
 
 done_testing;

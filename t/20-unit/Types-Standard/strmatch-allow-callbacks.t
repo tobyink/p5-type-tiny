@@ -28,7 +28,7 @@ use Test::Requires '5.018';
 
 use Types::Standard 'StrMatch';
 
-BEGIN { eval q{ use Test::Warnings } };
+BEGIN { eval q{ use Test::Warnings } unless "$^V" =~ /c$/ };
 
 $Type::Tiny::AvoidCallbacks = 0;
 

@@ -26,6 +26,10 @@ use Test::More;
 use Test::TypeTiny qw( -all );
 use Test::Fatal;
 
+BEGIN {
+	plan skip_all => "https://github.com/perl11/cperl/issues/409" if "$^V" =~ /c$/;
+};
+
 use Types::Common::Numeric -all;
 
 should_fail($_, IntRange[10,15]) for -19 .. +9;
