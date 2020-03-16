@@ -22,3 +22,6 @@
  - Lots more test cases. (Now almost 14,000 test cases total!)
  - wrap_methods/wrap_subs in Type::Params.
 
+2020-02-19 Type-Tiny version 1.010000 released!
+
+ - Recursive definition of type constraints.
