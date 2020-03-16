@@ -3625,3 +3625,17 @@
 			label "Package as stable.";
 		];
 	].
+
+`Type-Tiny 1.010001 cpan:TOBYINK`
+	issued  2020-03-16;
+	changeset [
+		dcs:versus `Type-Tiny 1.010000 cpan:TOBYINK`;
+		item [
+			a dcs:Documentation;
+			label "MooX::Pression mentions in documentation now refer to Zydeco.";
+		];
+		item [
+			a dcs:Tests;
+			label "Test suite passes in cperl, albeit with warnings.";
+		];
+	].
