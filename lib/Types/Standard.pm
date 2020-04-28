@@ -235,8 +235,12 @@ my $_str = $meta->$add_core_type({
 my $_laxnum = $meta->add_type({
 	name       => "LaxNum",
 	parent     => $_str,
-	constraint => sub { looks_like_number $_ },
-	inlined    => sub { "defined($_[1]) && !ref($_[1]) && Scalar::Util::looks_like_number($_[1])" },
+	constraint => sub { looks_like_number($_) and ref(\$_) ne 'GLOB' },
+	inlined    => sub {
+		'Scalar::Util'->VERSION('1.18') # RT 132426
+			? "defined($_[1]) && !ref($_[1]) && Scalar::Util::looks_like_number($_[1])"
+			: "defined($_[1]) && !ref($_[1]) && Scalar::Util::looks_like_number($_[1]) && ref(\\($_[1])) ne 'GLOB'"
+	},
 });
 
 my $_strictnum = $meta->add_type({
