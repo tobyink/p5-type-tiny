@@ -92,8 +92,8 @@ sub _mksub
 			q{
 				sub (%s) {
 					if (ref($_[0]) eq 'Type::Tiny::_HalfOp') {
-						my $ho = shift;
-						return ($ho->complete($type), @_);
+						my $complete_type = shift->complete($type);
+						@_ && wantarray ? return($complete_type, @_) : return $complete_type;
 					}
 					my $params; $params = shift if ref($_[0]) eq q(ARRAY);
 					my $t = $params ? $type->parameterize(@$params) : $type;
