@@ -3639,3 +3639,23 @@
 			label "Test suite passes in cperl, albeit with warnings.";
 		];
 	].
+
+`Type-Tiny 1.010002 cpan:TOBYINK`
+	issued  2020-05-01;
+	label   "Mayday";
+	changeset [
+		dcs:versus `Type-Tiny 1.010001 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix;
+			label "Better bareword handling on Perl < 5.14.";
+			dcs:fixes RT#132455;
+			dcs:blame cpan:HAARG;
+			dcs:thanks cpan:ETHER;
+		];
+		item [
+			a dcs:Bugfix;
+			label "If Scalar::Util was below 1.18, the LaxNum type from Types::Standard would accept blobs as being numbers. This is now fixed.";
+			dcs:fixes RT#132426;
+			dcs:thanks cpan:HAARG;
+		];
+	].
