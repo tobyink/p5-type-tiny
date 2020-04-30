@@ -29,8 +29,6 @@ use Types::Standard -all;
 
 my $union = eval { Dict[ welp => HashRef[Int]|Undef, guff => ArrayRef[Int] ] };
 
-warn $union;
-
 SKIP: {
 	ok $union or skip 'broken type', 6;
 	ok $union->check({welp => {blorp => 1}, guff => [2]});
