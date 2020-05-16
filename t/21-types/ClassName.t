@@ -152,5 +152,26 @@ if (eval q{ package Local::Role::MouseRole; use Mouse::Role; 1 }) {
 	should_pass('Local::Role::MouseRole', ClassName);
 }
 
+#
+# ClassName accepts any package with $VERSION defined.
+#
+
+if (eval q{ package Local::Random::Package::One; our $VERSION = 1; 1 }) {
+	should_pass('Local::Random::Package::One', ClassName);
+}
+
+#
+# ClassName accepts any package with @ISA.
+#
+
+if (eval q{ package Local::Random::Package::Two; our @ISA = qw(Local::Random::Package::One); 1 }) {
+	should_pass('Local::Random::Package::Two', ClassName);
+}
+
+if (eval q{ package Local::Random::Package::Three; our @ISA; 1 }) {
+	# ... but an empty @ISA doesn't count.
+	should_fail('Local::Random::Package::Three', ClassName);
+}
+
 done_testing;
 
