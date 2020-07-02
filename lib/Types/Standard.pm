@@ -999,6 +999,9 @@ B<< Int >>
 An integer; that is a string of digits 0 to 9, optionally prefixed with a
 hyphen-minus character.
 
+Expect inconsistent results for dualvars, and numbers too high (or negative
+numbers too low) for Perl to safely represent as an integer.
+
 =item *
 
 B<< ClassName >>
