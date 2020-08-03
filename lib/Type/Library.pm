@@ -245,7 +245,7 @@ sub _exporter_fail
 			my $t;
 			
 			if ($type) {
-				my $t = $params ? $type->parameterize(@$params) : $type;
+				$t = $params ? $type->parameterize(@$params) : $type;
 			}
 			else
 			{
