@@ -3659,3 +3659,28 @@
 			dcs:thanks cpan:HAARG;
 		];
 	].
+
+`Type-Tiny 1.010003 cpan:TOBYINK`
+	issued  2020-08-08;
+	label   "The Crazy 88";
+	changeset [
+		dcs:versus `Type-Tiny 1.010002 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix;
+			label "ClassName type constraint should treat empty @ISA as if no @ISA were defined, like Type::Tiny::XS.";
+			dcs:fixes RT#132583;
+			dcs:thanks cpan:SNEZ;
+		];
+		item [
+			a dcs:Bugfix;
+			label "Fix for Type::Tiny->can called as a class method.";
+			seealso <https://github.com/tobyink/p5-type-tiny/pull/57>;
+			dcs:thanks cpan:MHOWARD;
+		];
+		item [
+			a dcs:Bugfix;
+			label "Fix predeclared types in Type::Library.";
+			seealso <https://github.com/tobyink/p5-type-tiny/pull/58>;
+			dcs:thanks cpan:MHOWARD;
+		];
+	].

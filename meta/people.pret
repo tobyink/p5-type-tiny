@@ -169,6 +169,13 @@ cpan:HAUKEX
 	:page <https://github.com/haukex>;
 	:name "Hauke D".
 
+cpan:SNEZ
+	:name "Szymon Nieznański".
+
+cpan:MHOWARD
+	:name "Meredith Howard";
+	:page <https://github.com/merrilymeredith>.
+
 # We bundle some files made by these dudes...
 
 cpan:RJBS
