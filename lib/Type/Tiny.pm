@@ -1300,11 +1300,11 @@ sub can
 			my $method = $self->_lookup_my_method($1);
 			return $method if $method;
 		}
-	}
-
-	if ($self->{is_object} && $object_methods{$_[0]}) {
-		require Type::Tiny::ConstrainedObject;
-		return Type::Tiny::ConstrainedObject->can($_[0]);
+		if ($self->{is_object} && $object_methods{$_[0]})
+		{
+			require Type::Tiny::ConstrainedObject;
+			return Type::Tiny::ConstrainedObject->can($_[0]);
+		}
 	}
 	
 	return;
@@ -1328,13 +1328,13 @@ sub AUTOLOAD
 			my $method = $self->_lookup_my_method($1);
 			return &$method($self, @_) if $method;
 		}
-	}
-	
-	if ($self->{is_object} && $object_methods{$m}) {
-		require Type::Tiny::ConstrainedObject;
-		unshift @_, $self;
-		no strict 'refs';
-		goto \&{"Type::Tiny::ConstrainedObject::$m"};
+		if ($self->{is_object} && $object_methods{$m})
+		{
+			require Type::Tiny::ConstrainedObject;
+			unshift @_, $self;
+			no strict 'refs';
+			goto \&{"Type::Tiny::ConstrainedObject::$m"};
+		}
 	}
 	
 	_croak q[Can't locate object method "%s" via package "%s"], $m, ref($self)||$self;

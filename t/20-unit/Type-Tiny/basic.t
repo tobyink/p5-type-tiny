@@ -29,6 +29,12 @@ use Test::TypeTiny;
 
 use Type::Tiny;
 
+ok("Type::Tiny"->can('new'), 'Type::Tiny can works for valid methods');
+ok(
+	!"Type::Tiny"->can('will_never_be_a_method'),
+	'Type::Tiny can works for invalid methods'
+);
+
 my $Any = "Type::Tiny"->new(name => "Any");
 ok(!$Any->is_anon, "Any is not anon");
 is($Any->name, "Any", "Any is called Any");
