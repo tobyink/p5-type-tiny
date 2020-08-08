@@ -3683,4 +3683,9 @@
 			seealso <https://github.com/tobyink/p5-type-tiny/pull/58>;
 			dcs:thanks cpan:MHOWARD;
 		];
+		item [
+			a dcs:Documentation;
+			label "Document some edge cases for Types::Standard Int.";
+			seealso <https://rt.cpan.org/Ticket/Display.html?id=132754>;
+		];
 	].
