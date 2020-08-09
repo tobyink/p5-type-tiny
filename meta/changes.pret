@@ -3675,13 +3675,13 @@
 			a dcs:Bugfix;
 			label "Fix for Type::Tiny->can called as a class method.";
 			seealso <https://github.com/tobyink/p5-type-tiny/pull/57>;
-			dcs:thanks cpan:MHOWARD;
+			dcs:blame cpan:MHOWARD;
 		];
 		item [
 			a dcs:Bugfix;
 			label "Fix predeclared types in Type::Library.";
 			seealso <https://github.com/tobyink/p5-type-tiny/pull/58>;
-			dcs:thanks cpan:MHOWARD;
+			dcs:blame cpan:MHOWARD;
 		];
 		item [
 			a dcs:Documentation;
