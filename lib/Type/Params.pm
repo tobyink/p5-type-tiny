@@ -628,7 +628,7 @@ sub compile_named
 	}
 	
 	if ($options{head} || $options{tail}) {
-		$code[-1] = 'my @R = ' . $code[-1];
+		$code[-1] = 'my @R = ' . $code[-1] . ';';
 		push @code, 'unshift @R, @head;' if $options{head};
 		push @code, 'push @R, @tail;' if $options{tail};
 		push @code, '@R;';
