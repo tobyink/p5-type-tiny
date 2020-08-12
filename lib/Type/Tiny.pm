@@ -2204,7 +2204,7 @@ L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
 
 =head1 SEE ALSO
 
-L<The Type::Tiny homepage|http://typetiny.toby.ink/>.
+L<The Type::Tiny homepage|https://typetiny.toby.ink/>.
 
 L<Type::Tiny::Manual>, L<Type::API>.
 
