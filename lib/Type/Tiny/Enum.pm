@@ -70,12 +70,16 @@ sub _build_display_name
 		my $unique_values = shift;
 
 		return undef unless Type::Tiny::_USE_XS;
+		
+		return undef if @$unique_values > 50; # RT 121957
+		
 		$new_xs = eval { Type::Tiny::XS->VERSION("0.020"); 1 } ? 1 : 0
 			unless defined $new_xs;
 		if ($new_xs) {
 			require B;
 			return sprintf("Enum[%s]", join(",", map B::perlstring($_), @$unique_values));
-		} else {
+		}
+		else {
 			# We can't encode anything other than straight word-chars or it'll break
 			# Type::Parser.
 			return undef if grep /\W/, @$unique_values;
