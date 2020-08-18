@@ -40,10 +40,10 @@ sub new
 	undef $tmp{$_} for @{$opts{values}};
 	$opts{unique_values}  = [sort keys %tmp];
 	
-	if (Type::Tiny::_USE_XS and not grep /-/, @{$opts{unique_values}})
+	my $xs_encoding = _xs_encoding($opts{unique_values});
+	if (defined $xs_encoding)
 	{
-		my $enum = join ",", @{$opts{unique_values}};
-		my $xsub = Type::Tiny::XS::get_coderef_for("Enum[$enum]");
+		my $xsub = Type::Tiny::XS::get_coderef_for($xs_encoding);
 		$opts{compiled_type_constraint} = $xsub if $xsub;
 	}
 	
@@ -60,6 +60,28 @@ sub _build_display_name
 {
 	my $self = shift;
 	sprintf("Enum[%s]", join q[,], @{$self->unique_values});
+}
+
+{
+	my $new_xs;
+
+	sub _xs_encoding
+	{
+		my $unique_values = shift;
+
+		return undef unless Type::Tiny::_USE_XS;
+		$new_xs = eval { Type::Tiny::XS->VERSION("0.020"); 1 } ? 1 : 0
+			unless defined $new_xs;
+		if ($new_xs) {
+			require B;
+			return sprintf("Enum[%s]", join(",", map B::perlstring($_), @$unique_values));
+		} else {
+			# We can't encode anything other than straight word-chars or it'll break
+			# Type::Parser.
+			return undef if grep /\W/, @$unique_values;
+			return sprintf("Enum[%s]", join(",", @$unique_values));
+		}
+	}
 }
 
 {
@@ -115,10 +137,10 @@ sub inline_check
 {
 	my $self = shift;
 	
-	if (Type::Tiny::_USE_XS and not grep /-/, @{$self->unique_values})
+	my $xs_encoding = _xs_encoding($self->unique_values);
+	if (defined $xs_encoding)
 	{
-		my $enum = join ",", @{$self->unique_values};
-		my $xsub = Type::Tiny::XS::get_subname_for("Enum[$enum]");
+		my $xsub = Type::Tiny::XS::get_subname_for($xs_encoding);
 		return "$xsub\($_[0]\)" if $xsub;
 	}
 	
