@@ -176,6 +176,12 @@ cpan:MHOWARD
 	:name "Meredith Howard";
 	:page <https://github.com/merrilymeredith>.
 
+cpan:AERUDER
+	:name "Andrew Ruder".
+
+cpan:SPATOCS
+	:name "Sandor Patocs".
+
 # We bundle some files made by these dudes...
 
 cpan:RJBS

@@ -3689,3 +3689,34 @@
 			seealso <https://rt.cpan.org/Ticket/Display.html?id=132754>;
 		];
 	].
+
+`Type-Tiny 1.010004 cpan:TOBYINK`
+	issued  2020-08-18;
+	changeset [
+		dcs:versus `Type-Tiny 1.010003 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix;
+			label "Workaround RT#121957 by avoiding attempting to XSify Enum type constraints with more than 50 possible strings.";
+			dcs:fixes RT#121957;
+			dcs:thanks cpan:DJERIUS;
+		];
+		item [
+			a dcs:Bugfix;
+			label "Fix XSifying Enum[] where the strings contain certain non-word characters.";
+			seealso <https://github.com/tobyink/p5-type-tiny-xs/pull/12>;
+			seealso <https://github.com/tobyink/p5-type-tiny/pull/59>;
+			dcs:blame cpan:AERUDER;
+		];
+		item [
+			a dcs:Documentation;
+			label "Link to HTTPS version of Type::Tiny web page.";
+		];
+		item [
+			a dcs:Bugfix;
+			label "Type::Params compile_named using both the head and named_to_list options would cause compilation error.";
+			dcs:fixes RT#132419;
+			dcs:thanks cpan:HAUKEX;
+			dcs:blame cpan:SPATOCS;
+		];
+	].
+
