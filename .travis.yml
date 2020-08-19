@@ -2,7 +2,7 @@ language: perl
 matrix:
   include:
     # Coverage report
-    - perl: "5.30"
+    - perl: "5.32"
       env: COVERAGE=1 EXTENDED_TESTING=1
       install:
         - cpanm Exporter::Tiny
@@ -35,7 +35,7 @@ matrix:
         - cpanm -n Type::Tie
         - cpan-install --toolchain
         - cpan-install --deps
-    - perl: "5.30"
+    - perl: "5.32"
       env: PERL_TYPE_TINY_XS=0 EXTENDED_TESTING=1
       install:
         - cpanm Exporter::Tiny
@@ -78,6 +78,8 @@ matrix:
       env: PERL_TYPE_TINY_XS=0
     - perl: "5.30"
       env: PERL_TYPE_TINY_XS=0
+    - perl: "5.32"
+      env: PERL_TYPE_TINY_XS=0
     - perl: "5.10"
       env: PERL_TYPE_TINY_XS=1
       dist: trusty
@@ -109,10 +111,12 @@ matrix:
       env: PERL_TYPE_TINY_XS=1
     - perl: "5.30"
       env: PERL_TYPE_TINY_XS=1
+    - perl: "5.32"
+      env: PERL_TYPE_TINY_XS=1
     # Strict Num
-    - perl: "5.30"
+    - perl: "5.32"
       env: PERL_TYPES_STANDARD_STRICTNUM=1 PERL_TYPE_TINY_XS=0 EXTENDED_TESTING=1
-    - perl: "5.30"
+    - perl: "5.32"
       env: PERL_TYPES_STANDARD_STRICTNUM=1 PERL_TYPE_TINY_XS=1 EXTENDED_TESTING=1
     # Older Moose/Moo
     - perl: "5.20"
@@ -131,10 +135,10 @@ matrix:
     - perl: "5.8.9-thr"
       env: PERL_TYPE_TINY_XS=0
       dist: trusty
-    - perl: "5.20.0-thr"
+    - perl: "5.32.0-thr"
       env: PERL_TYPE_TINY_XS=0
       dist: trusty
-    - perl: "5.20.0-thr"
+    - perl: "5.32.0-thr"
       env: PERL_TYPE_TINY_XS=1
       dist: trusty
     # Archaic Perls
