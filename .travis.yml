@@ -135,10 +135,10 @@ matrix:
     - perl: "5.8.9-thr"
       env: PERL_TYPE_TINY_XS=0
       dist: trusty
-    - perl: "5.32.0-thr"
+    - perl: "5.30.0-thr"
       env: PERL_TYPE_TINY_XS=0
       dist: trusty
-    - perl: "5.32.0-thr"
+    - perl: "5.30.0-thr"
       env: PERL_TYPE_TINY_XS=1
       dist: trusty
     # Archaic Perls
