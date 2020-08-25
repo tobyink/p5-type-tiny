@@ -79,7 +79,7 @@ sub _build_inlined
 			? qq{ Scalar::Util::blessed($var) and not do { my \$tmp = $var; grep(!\$tmp->can(\$_), qw/@methods/) } }
 			: qq{ Scalar::Util::blessed($var) and not grep(!$var->can(\$_), qw/@methods/) };
 		
-		return qq{do { use Scalar::Util (); $code }}
+		return qq{do { package Type::Tiny; use Scalar::Util (); $code }}
 			if $Type::Tiny::AvoidCallbacks;
 		return "$xsub\($var\)"
 			if $xsub;
