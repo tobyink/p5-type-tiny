@@ -124,6 +124,7 @@ my $maybe_load_modules = sub {
 			$code,
 		);
 	}
+	$code;
 };
 
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
