@@ -62,11 +62,11 @@ sub _build_inlined
 	my $self = shift;
 	my @methods = @{$self->methods};
 	
+	my $xsub;
 	if (Type::Tiny::_USE_XS)
 	{
 		my $methods = join ",", sort(@{$self->methods});
-		my $xsub    = Type::Tiny::XS::get_subname_for("HasMethods[$methods]");
-		return sub { my $var = $_[1]; "$xsub\($var\)" } if $xsub;
+		$xsub = Type::Tiny::XS::get_subname_for("HasMethods[$methods]");
 	}
 	
 	sub {
@@ -75,9 +75,15 @@ sub _build_inlined
 		# If $var is $_ or $_->{foo} or $foo{$_} or somesuch, then we
 		# can't use it within the grep expression, so we need to save
 		# it into a temporary variable ($tmp).
-		($var =~ /\$_/)
+		my $code = ($var =~ /\$_/)
 			? qq{ Scalar::Util::blessed($var) and not do { my \$tmp = $var; grep(!\$tmp->can(\$_), qw/@methods/) } }
 			: qq{ Scalar::Util::blessed($var) and not grep(!$var->can(\$_), qw/@methods/) };
+		
+		return qq{do { use Scalar::Util (); $code }}
+			if $Type::Tiny::AvoidCallbacks;
+		return "$xsub\($var\)"
+			if $xsub;
+		$code;
 	};
 }
 

@@ -48,7 +48,9 @@ sub _build_inlined
 	my $role = $self->role;
 	sub {
 		my $var = $_[1];
-		qq{Scalar::Util::blessed($var) and do { my \$method = $var->can('DOES')||$var->can('isa'); $var->\$method(q[$role]) }};
+		my $code = qq{Scalar::Util::blessed($var) and do { my \$method = $var->can('DOES')||$var->can('isa'); $var->\$method(q[$role]) }};
+		return qq{do { use Scalar::Util (); $code }} if $Type::Tiny::AvoidCallbacks;
+		$code;
 	};
 }
 
