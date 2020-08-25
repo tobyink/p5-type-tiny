@@ -141,17 +141,20 @@ sub inline_check
 {
 	my $self = shift;
 	
-	my $xs_encoding = _xs_encoding($self->unique_values);
-	if (defined $xs_encoding)
-	{
-		my $xsub = Type::Tiny::XS::get_subname_for($xs_encoding);
-		return "$xsub\($_[0]\)" if $xsub;
+	my $xsub;
+	if ( my $xs_encoding = _xs_encoding($self->unique_values) ) {
+		$xsub = Type::Tiny::XS::get_subname_for($xs_encoding);
+		return "$xsub\($_[0]\)" if $xsub && !$Type::Tiny::AvoidCallbacks;
 	}
 	
 	my $regexp = join "|", map quotemeta, @{$self->unique_values};
-	$_[0] eq '$_'
+	my $code = $_[0] eq '$_'
 		? "(defined and !ref and m{\\A(?:$regexp)\\z})"
 		: "(defined($_[0]) and !ref($_[0]) and $_[0] =~ m{\\A(?:$regexp)\\z})";
+
+	return "do { package Type::Tiny; $code }"
+		if $Type::Tiny::AvoidCallbacks;
+	return $code;
 }
 
 sub _instantiate_moose_type
