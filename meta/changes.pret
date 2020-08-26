@@ -3720,3 +3720,13 @@
 		];
 	].
 
+`Type-Tiny 1.010005 cpan:TOBYINK`
+	issued  2020-08-26;
+	changeset [
+		dcs:versus `Type-Tiny 1.010004 cpan:TOBYINK`;
+		item [
+			a dcs:Change;
+			label "Improvements to $AvoidCallbacks support for Type::Tiny::{Class,Role,Duck,Enum,Union,Intersection}, and LaxNum, Ref, RegexpRef, FileHandle, Object, Overload, and Tied types from Types::Standard.";
+		];
+	].
+
