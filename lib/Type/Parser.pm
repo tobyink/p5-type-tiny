@@ -167,6 +167,7 @@ Evaluate: {
 	
 	sub _simplify
 	{
+		no warnings 'recursion';
 		my $type = shift;
 		my $op   = shift;
 		
