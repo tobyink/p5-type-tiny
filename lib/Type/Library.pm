@@ -285,6 +285,10 @@ sub _exporter_fail
 			my $val = @_ ? pop : $_;
 			sprintf('%s::is_%s(%s)', $library, $name, $val);
 		};
+		$opts{_build_coercion} = sub {
+			my $realtype = $library->get_type($name);
+			$_[0] = $realtype->coercion if $realtype;
+		};
 		$class->SUPER::new(%opts);
 	}
 }
