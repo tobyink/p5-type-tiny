@@ -3730,3 +3730,19 @@
 		];
 	].
 
+`Type-Tiny 1.010006 cpan:TOBYINK`
+	issued  2020-09-04;
+	changeset [
+		dcs:versus `Type-Tiny 1.010005 cpan:TOBYINK`;
+		item [
+			a dcs:Change;
+			label "Better handling of coercions for pre-declared types in Type::Library. The type objects created before the type was properly defined will now lazily attempt to find coercions from the properly defined type once it becomes available.";
+		];
+		item [
+			a dcs:Bugfix;
+			label "Eliminate recusion warnings when Type::Parser needs to parse complex types.";
+			dcs:fixes RT#121957;
+			dcs:thanks cpan:DJERIUS;
+		];
+	].
+
