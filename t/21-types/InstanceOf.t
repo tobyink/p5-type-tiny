@@ -127,6 +127,22 @@ should_fail( bless([], 'Foo'),       InstanceOf['Foo::Bar'] );
 should_pass( bless([], 'Foo'),       InstanceOf['Foo']      );
 
 #
+# Foo::Baz claims to be a Foo.
+#
+
+{
+	package Foo::Baz;
+	sub isa {
+		return 1 if $_[1] eq 'Foo';
+		shift->SUPER::isa(@_);
+	}
+}
+should_pass( bless([], 'Foo::Baz'),  InstanceOf['Foo::Baz'] );
+should_pass( bless([], 'Foo::Baz'),  InstanceOf['Foo']      );
+should_fail( bless([], 'Foo'),       InstanceOf['Foo::Baz'] );
+should_pass( bless([], 'Foo'),       InstanceOf['Foo']      );
+
+#
 # Parameterized InstanceOf with two parameters returns
 # a Type::Tiny::Union of two Type::Tiny::Class objects.
 #
