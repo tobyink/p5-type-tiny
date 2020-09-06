@@ -94,8 +94,7 @@ sub _build_display_name
 	{
 		my $self = shift;
 		
-		my $regexp  = join "|", map quotemeta, sort {length $b <=> length $a || $a cmp $b } @{$self->unique_values};
-		$regexp = '(?!)' unless @{$self->unique_values};
+		my $regexp = $self->_regexp;
 		return $cached{$regexp} if $cached{$regexp};
 		my $coderef = ($cached{$regexp} = sub { defined and m{\A(?:$regexp)\z} });
 		Scalar::Util::weaken($cached{$regexp});
@@ -108,13 +107,22 @@ sub _build_display_name
 	sub _build_compiled_check
 	{
 		my $self = shift;
-		my $regexp  = join "|", map quotemeta, sort {length $b <=> length $a || $a cmp $b } @{$self->unique_values};
-		$regexp = '(?!)' unless @{$self->unique_values};
+		my $regexp  = $self->_regexp;
 		return $cached{$regexp} if $cached{$regexp};
 		my $coderef = ($cached{$regexp} = $self->SUPER::_build_compiled_check(@_));
 		Scalar::Util::weaken($cached{$regexp});
 		return $coderef;
 	}
+}
+
+sub _regexp
+{
+	my $vals = shift->unique_values;
+	return '(?!)' unless @$vals;
+	# return join "|", map quotemeta, sort {length $b <=> length $a or $a cmp $b } @$vals;
+	my $trie = 'Type::Tiny::Enum::_Trie'->new;
+	$trie->add($_) for @$vals;
+	$trie->_regexp;
 }
 
 sub as_regexp
@@ -126,9 +134,7 @@ sub as_regexp
 		_croak("Unknown regexp flags: '$flags'; only 'i' currently accepted; stopped");
 	}
 	
-	my $regexp  = join "|", map quotemeta, sort {length $b <=> length $a || $a cmp $b } @{$self->unique_values};
-	$regexp = '(?!)' unless @{$self->unique_values};
-	
+	my $regexp = $self->_regexp;
 	$flags ? qr/\A(?:$regexp)\z/i : qr/\A(?:$regexp)\z/;
 }
 
@@ -147,7 +153,7 @@ sub inline_check
 		return "$xsub\($_[0]\)" if $xsub && !$Type::Tiny::AvoidCallbacks;
 	}
 	
-	my $regexp = join "|", map quotemeta, @{$self->unique_values};
+	my $regexp = $self->_regexp;
 	my $code = $_[0] eq '$_'
 		? "(defined and !ref and m{\\A(?:$regexp)\\z})"
 		: "(defined($_[0]) and !ref($_[0]) and $_[0] =~ m{\\A(?:$regexp)\\z})";
@@ -235,6 +241,45 @@ push @Type::Tiny::CMP, sub {
 	
 	return Type::Tiny::CMP_UNKNOWN;
 };
+
+package # stolen from Regexp::Trie
+	Type::Tiny::Enum::_Trie;
+sub new { bless {} => shift }
+sub add {
+	my $self = shift;
+	my $str  = shift;
+	my $ref  = $self;
+	for my $char (split //, $str){
+		$ref->{$char} ||= {};
+		$ref = $ref->{$char};
+	}
+	$ref->{''} = 1; # { '' => 1 } as terminator
+	$self;
+}
+sub _regexp {
+	my $self = shift;
+	return if $self->{''} and scalar keys %$self == 1; # terminator
+	my (@alt, @cc);
+	my $q = 0;
+	for my $char (sort keys %$self){
+		my $qchar = quotemeta $char;
+		if (ref $self->{$char}){
+			if (defined (my $recurse = _regexp($self->{$char}))){
+				push @alt, $qchar . $recurse;
+			}else{
+				push @cc, $qchar;
+			}
+		}else{
+			$q = 1;
+		}
+	}
+	my $cconly = !@alt;
+	@cc and push @alt, @cc == 1 ? $cc[0] : '['. join('', @cc). ']';
+	my $result = @alt == 1 ? $alt[0] : '(?:' . join('|', @alt) . ')';
+	$q and $result = $cconly ? "$result?" : "(?:$result)?";
+	return $result;
+}
+sub regexp { shift->_regexp }
 
 1;
 
