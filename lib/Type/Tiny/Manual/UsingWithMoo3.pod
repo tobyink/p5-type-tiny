@@ -160,6 +160,15 @@ consistent type checking, and might even be faster. (Type::Tiny can
 be pretty fast; it is sometimes able to export these functions as
 XS subs.)
 
+If checking type constraints like C<is_ArrayRef> or C<is_InstanceOf>,
+there's no way to give a parameter. C<< is_ArrayRef[Int]($value) >>
+doesn't work, and neither does C<< is_ArrayRef(Int, $value) >> nor
+C<< is_ArrayRef($value, Int) >>. For some types like C<is_InstanceOf>,
+this makes them fairly useless; without being able to give a class
+name, it just acts the same as C<< is_Object >>. See 
+L</Exporting Parameterized Types> for a solution. Also, check out
+L<isa>.
+
 =head3 C<< assert_* >>
 
 While C<< is_Int($value) >> returns a boolean, C<< assert_Int($value) >>
