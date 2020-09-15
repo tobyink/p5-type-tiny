@@ -3746,3 +3746,18 @@
 		];
 	].
 
+`Type-Tiny 1.011_000 cpan:TOBYINK`
+	issued  2020-09-15;
+	changeset [
+		dcs:versus `Type-Tiny 1.010006 cpan:TOBYINK`;
+		item [
+			a dcs:Documentation;
+			label "Describe deficiencies of is_* functions for parameterized types.";
+			dcs:fixes RT#132918;
+		];
+		item [
+			a dcs:Change;
+			label "Type::Tiny::Enum now generates faster regexps to validate enums. (Code stolen from Regexp::Trie.)";
+		];
+	].
+
