@@ -6,6 +6,10 @@
 
 Checks Type::Tiny::Enum's sorter.
 
+=head1 REQUIREMENTS
+
+Requires Perl 5.8 because earlier versions of Perl didn't have stable sort.
+
 =head1 AUTHOR
 
 Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
@@ -22,6 +26,7 @@ the same terms as the Perl 5 programming language system itself.
 use strict;
 use warnings;
 use Test::More;
+use Test::Requires '5.008';
 use Test::Fatal;
 
 use Type::Tiny::Enum;
