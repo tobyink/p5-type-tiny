@@ -1312,7 +1312,7 @@ sub can
 				$self->{'_util'}{$util} ||= $self->_build_util($util);
 				return sub { my $s = shift; $s->{'_util'}{$util}(@_) };
 			}
- 		}
+		}
 	}
 	
 	return;
@@ -1347,7 +1347,7 @@ sub AUTOLOAD
 			if ( $m eq $util ) {
 				return ( $self->{'_util'}{$util} ||= $self->_build_util($util) )->( @_ );
 			}
- 		}
+		}
 	}
 	
 	_croak q[Can't locate object method "%s" via package "%s"], $m, ref($self)||$self;
