@@ -3761,3 +3761,12 @@
 		];
 	].
 
+`Type-Tiny 1.011_001 cpan:TOBYINK`
+	issued  2020-09-21;
+	changeset [
+		dcs:versus `Type-Tiny 1.011_000 cpan:TOBYINK`;
+		item [
+			a dcs:Addition;
+			label "Add new list processing functions to Type::Tiny.";
+		];
+	].
