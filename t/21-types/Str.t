@@ -108,5 +108,17 @@ while (@tests) {
 	}
 }
 
+#
+# String sorting
+#
+
+is_deeply(
+	[ Str->sort( 11, 2, 1 ) ],
+	[ 1, 11, 2 ],
+	'String sorting',
+);
+
+# this also works with subtypes, like NonEmptyStr, etc.
+
 done_testing;
 

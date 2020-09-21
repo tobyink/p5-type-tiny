@@ -55,6 +55,12 @@ is_deeply(
 	'$Rounded->map with uncoercible values',
 );
 
+like(
+	exception { Any->sort(qw/ 1 2 3/) },
+	qr/No sorter/i,
+	'Any->sort',
+);
+
 is_deeply(
 	[ Int->sort(qw/ 11 2 1 /) ],
 	[ qw/ 1 2 11 / ],

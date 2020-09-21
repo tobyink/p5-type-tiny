@@ -108,5 +108,17 @@ while (@tests) {
 	}
 }
 
+#
+# Numeric sorting
+#
+
+is_deeply(
+	[ StrictNum->sort( 11, 2, 1 ) ],
+	[ 1, 2, 11 ],
+	'Numeric sorting',
+);
+
+# this also works with subtypes, like Int, PositiveInt, etc.
+
 done_testing;
 

@@ -165,5 +165,15 @@ is_deeply($enum2->values, [qw/ foo bar bar baz /]);
 is_deeply($enum2->unique_values, [qw/ bar baz foo /]);
 is_deeply([@$enum2], [qw/ foo bar bar baz /]);
 
+#
+# Enum-wise sorting
+#
+
+is_deeply(
+	[ $enum1->sort( 'baz', 'foo' ) ],
+	[ 'foo', 'baz' ],
+	'"foo" comes before "baz" because they were listed in that order when $enum1 was defined',
+);
+
 done_testing;
 
