@@ -3769,4 +3769,8 @@
 			a dcs:Addition;
 			label "Add new list processing functions to Type::Tiny.";
 		];
+		item [
+			a dcs:Documentation;
+			label "Update the NEWS file.";
+		];
 	].
