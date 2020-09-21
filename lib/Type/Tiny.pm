@@ -1395,7 +1395,7 @@ sub _build_util {
 		}
 		elsif ( $func eq 'assert_any' ) {
 			my $qname = B::perlstring( $self->name );
-			return eval "sub { for (\@_) { return \@_ if ($inline) }; Type::Tiny::_failed_check(\$type, $qname, \$_[-1]); }";
+			return eval "sub { for (\@_) { return \@_ if ($inline) }; Type::Tiny::_failed_check(\$type, $qname, \@_ ? \$_[-1] : undef); }";
 		}
 		elsif ( $func eq 'all' ) {
 			return eval "sub { for (\@_) { return !!0 unless ($inline) }; !!1; }";
