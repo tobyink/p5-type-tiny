@@ -25,3 +25,7 @@
 2020-02-19 Type-Tiny version 1.010000 released!
 
  - Recursive definition of type constraints.
+
+2020-XX-XX Type-Tiny version 1.012000 released!
+
+ - List processing methods (grep, map, etc)
