@@ -2154,7 +2154,7 @@ Returns true if any of the list match the type.
 
 Returns true if all of the list match the type.
 
-  if ( Int->any(@numbers) ) {
+  if ( Int->all(@numbers) ) {
     say "they were all integers";
   }
 
