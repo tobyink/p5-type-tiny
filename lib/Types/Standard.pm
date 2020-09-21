@@ -243,6 +243,7 @@ my $_str = $meta->$add_core_type({
 	inlined    => sub {
 		"defined($_[1]) and do { ref(\\$_[1]) eq 'SCALAR' or ref(\\(my \$val = $_[1])) eq 'SCALAR' }"
 	},
+	sorter     => sub { $_[0] cmp $_[1] }
 });
 
 my $_laxnum = $meta->add_type({
@@ -257,6 +258,7 @@ my $_laxnum = $meta->add_type({
 				: "defined($_[1]) && !ref($_[1]) && Scalar::Util::looks_like_number($_[1]) && ref(\\($_[1])) ne 'GLOB'"
 		);
 	},
+	sorter     => sub { $_[0] <=> $_[1] }
 });
 
 my $_strictnum = $meta->add_type({
@@ -283,6 +285,7 @@ my $_strictnum = $meta->add_type({
 			(?:[Ee](?:[+-]?[0-9]+))?          # matches E1 or e1 or e-1 or e+1 etc
 		\z/x ); '
 	},
+	sorter     => sub { $_[0] cmp $_[1] }
 });
 
 my $_num = $meta->add_type({
