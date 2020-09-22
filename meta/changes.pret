@@ -3774,3 +3774,13 @@
 			label "Update the NEWS file.";
 		];
 	].
+
+`Type-Tiny 1.011_002 cpan:TOBYINK`
+	issued  2020-09-22;
+	changeset [
+		dcs:versus `Type-Tiny 1.011_001 cpan:TOBYINK`;
+		item [
+			a dcs:Addition;
+			label "Type::Utils now exports an `is` function but it needs to be requested explicitly.";
+		];
+	].
