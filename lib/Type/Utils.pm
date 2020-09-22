@@ -35,8 +35,8 @@ our @EXPORT_OK = (
 	"is",
 );
 our %EXPORT_TAGS = (
-	default => \@EXPORT,
-	all     => \@EXPORT_OK,
+	default => [ @EXPORT ],
+	all     => [ @EXPORT_OK ],
 );
 pop @{$EXPORT_TAGS{all}};  # remove 'is'
 
@@ -621,15 +621,17 @@ sub dwim_type
 }
 
 my %is_cache;
+my %is_cache_coderef;
 sub is
 {
 	my ($type, $value) = @_;
+	my $caller = caller;
+	my $uniq = blessed($type) ? $type->{uniq} : $type; 
 	if (!blessed $type) {
-		my $orig   = $type;
-		my $caller = caller;
-		$type = $is_cache{$caller}{$type} || eval { dwim_type($type, for => $caller) };
+		my $orig = $type;
+		$type = $is_cache{$caller}{$uniq} || eval { dwim_type($type, for => $caller) };
 		if (blessed $type) {
-			$is_cache{$caller}{$type} ||= $type;
+			$is_cache{$caller}{$uniq} ||= $type;
 		}
 		else {
 			my $thing = Type::Tiny::_dd($orig);
@@ -639,7 +641,8 @@ sub is
 			return undef;
 		}
 	}
-	0+!! $type->check($value);
+
+	0+!! ( $is_cache_coderef{$caller}{$uniq} ||= $type->compiled_check )->($value);
 }
 
 sub english_list
