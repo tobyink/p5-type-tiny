@@ -117,12 +117,8 @@ sub _build_display_name
 
 sub _regexp
 {
-	my $vals = shift->unique_values;
-	return '(?!)' unless @$vals;
-	# return join "|", map quotemeta, sort {length $b <=> length $a or $a cmp $b } @$vals;
-	my $trie = 'Type::Tiny::Enum::_Trie'->new;
-	$trie->add($_) for @$vals;
-	$trie->_regexp;
+	my $self = shift;
+	$self->{_regexp} ||= 'Type::Tiny::Enum::_Trie'->handle($self->unique_values);
 }
 
 sub as_regexp
@@ -303,7 +299,15 @@ sub _regexp {
 	$q and $result = $cconly ? "$result?" : "(?:$result)?";
 	return $result;
 }
-sub regexp { shift->_regexp }
+sub handle {
+	my $class = shift;
+	my ($vals) = @_;
+	return '(?!)' unless @$vals;
+	my $self = $class->new;
+	$self->add($_) for @$vals;
+	$self->_regexp;
+}
+
 
 1;
 
