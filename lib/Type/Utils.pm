@@ -626,7 +626,7 @@ sub is
 {
 	my ($type, $value) = @_;
 	my $caller = caller;
-	my $uniq = blessed($type) ? $type->{uniq} : $type; 
+	my $uniq = blessed($type) ? $type->{uniq} : $type;
 	if (!blessed $type) {
 		my $orig = $type;
 		$type = $is_cache{$caller}{$uniq} || eval { dwim_type($type, for => $caller) };
