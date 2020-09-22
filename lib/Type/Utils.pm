@@ -30,9 +30,15 @@ our @EXPORT_OK = (
 		extends type subtype
 		match_on_type compile_match_on_type
 		dwim_type english_list
-		classifier is
+		classifier
 	>,
+	"is",
 );
+our %EXPORT_TAGS = (
+	default => \@EXPORT,
+	all     => \@EXPORT_OK,
+);
+pop @{$EXPORT_TAGS{all}};  # remove 'is'
 
 require Exporter::Tiny;
 our @ISA = 'Exporter::Tiny';
@@ -1101,6 +1107,10 @@ Shortcut for C<< $type->check($value) >> but also if $type is a string,
 will look it up via C<dwim_type>.
 
 This function is not exported by default.
+This function is not even exported by C<< use Type::Utils -all >>.
+You must request it explicitly.
+
+  use Type::Utils "is";
 
 Beware using this in test scripts because it has the same name as a function
 exported by L<Test::More>. Note that you can rename this function if
