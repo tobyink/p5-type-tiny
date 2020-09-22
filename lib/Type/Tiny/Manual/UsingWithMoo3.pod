@@ -169,6 +169,15 @@ name, it just acts the same as C<< is_Object >>. See
 L</Exporting Parameterized Types> for a solution. Also, check out
 L<isa>.
 
+There also exists a generic C<is> function.
+
+  use Types::Standard qw( ArrayRef Int );
+  use Type::Utils qw( is );
+  
+  if ( is ArrayRef[Int], \@numbers ) {
+    ...;
+  }
+
 =head3 C<< assert_* >>
 
 While C<< is_Int($value) >> returns a boolean, C<< assert_Int($value) >>
@@ -269,6 +278,14 @@ still has no idea, then it will assume dwim_type("Foo") means
 dwim_type("InstanceOf['Foo']").
 
 It just does a big old bunch of guessing.
+
+The C<is> function will use C<dwim_type> if you pass it a string as a type.
+
+  use Type::Utils qw( is );
+  
+  if ( is "ArrayRef[Int]", \@numbers ) {
+    ...;
+  }
 
 =head1 NEXT STEPS
 

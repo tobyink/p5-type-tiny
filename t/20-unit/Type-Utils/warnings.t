@@ -33,7 +33,7 @@ use Test::Requires { 'Test::Warnings' => 0.005 }; #warnings added in this versio
 use Test::Warnings qw( :no_end_test warnings );
 
 use Type::Library -base, -declare => qw/WholeNumber/;
-use Type::Utils -all;
+use Type::Utils qw/ -all !is /;
 use Types::Standard qw/Int/;
 
 my @warnings = warnings {

@@ -30,7 +30,7 @@ use Test::More;
 
 use Type::Library -base, -declare => qw[ ArrayRefFromAny ];
 use Types::Standard -all;
-use Type::Utils -all;
+use Type::Utils qw( -all !is );
 
 declare_coercion ArrayRefFromAny,
 	to_type ArrayRef,

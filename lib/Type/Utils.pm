@@ -30,7 +30,7 @@ our @EXPORT_OK = (
 		extends type subtype
 		match_on_type compile_match_on_type
 		dwim_type english_list
-		classifier
+		classifier is
 	>,
 );
 
@@ -614,6 +614,28 @@ sub dwim_type
 	$type;
 }
 
+my %is_cache;
+sub is
+{
+	my ($type, $value) = @_;
+	if (!blessed $type) {
+		my $orig   = $type;
+		my $caller = caller;
+		$type = $is_cache{$caller}{$type} || eval { dwim_type($type, for => $caller) };
+		if (blessed $type) {
+			$is_cache{$caller}{$type} ||= $type;
+		}
+		else {
+			my $thing = Type::Tiny::_dd($orig);
+			substr($thing, 0, 1) = lc substr($thing, 0, 1);
+			require Carp;
+			Carp::carp("Expected type, but got $thing; returning false");
+			return undef;
+		}
+	}
+	0+!! $type->check($value);
+}
+
 sub english_list
 {
 	my $conjunction = ref($_[0]) eq 'SCALAR' ? ${+shift} : 'and';
@@ -1072,6 +1094,19 @@ if the type constraint string is syntactically malformed), preferring to
 return undef.
 
 This function is not exported by default.
+
+=item C<< is($type, $value) >>
+
+Shortcut for C<< $type->check($value) >> but also if $type is a string,
+will look it up via C<dwim_type>.
+
+This function is not exported by default.
+
+Beware using this in test scripts because it has the same name as a function
+exported by L<Test::More>. Note that you can rename this function if
+C<is> will cause conflicts:
+
+   use Type::Utils "is" => { -as => "isntnt" };
 
 =item C<< english_list(\$conjunction, @items) >>
 
