@@ -38,6 +38,14 @@ is(exception { NumericCode->inline_check(q/$xyz/) }, undef, "Inlining NumericCod
 ok(NumericCode->has_coercion, "NumericCode has a coercion");
 ok(!NumericCode->is_parameterizable, "NumericCode isn't parameterizable");
 
+#
+# The @tests array is a list of triples:
+#
+# 1. Expected result - pass, fail, or xxxx (undefined).
+# 2. A description of the value being tested.
+# 3. The value being tested.
+#
+
 my @tests = (
 	fail => 'undef'                    => undef,
 	fail => 'false'                    => !!0,

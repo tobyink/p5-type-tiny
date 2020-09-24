@@ -38,6 +38,14 @@ is(exception { HasMethods->inline_check(q/$xyz/) }, undef, "Inlining HasMethods 
 ok(!HasMethods->has_coercion, "HasMethods doesn't have a coercion");
 ok(HasMethods->is_parameterizable, "HasMethods is parameterizable");
 
+#
+# The @tests array is a list of triples:
+#
+# 1. Expected result - pass, fail, or xxxx (undefined).
+# 2. A description of the value being tested.
+# 3. The value being tested.
+#
+
 my @tests = (
 	fail => 'undef'                    => undef,
 	fail => 'false'                    => !!0,

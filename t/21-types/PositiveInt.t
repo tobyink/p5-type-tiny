@@ -38,6 +38,14 @@ is(exception { PositiveInt->inline_check(q/$xyz/) }, undef, "Inlining PositiveIn
 ok(!PositiveInt->has_coercion, "PositiveInt doesn't have a coercion");
 ok(!PositiveInt->is_parameterizable, "PositiveInt isn't parameterizable");
 
+#
+# The @tests array is a list of triples:
+#
+# 1. Expected result - pass, fail, or xxxx (undefined).
+# 2. A description of the value being tested.
+# 3. The value being tested.
+#
+
 my @tests = (
 	fail => 'undef'                    => undef,
 	fail => 'false'                    => !!0,

@@ -38,6 +38,14 @@ is(exception { Map->inline_check(q/$xyz/) }, undef, "Inlining Map doesn't throw 
 ok(!Map->has_coercion, "Map doesn't have a coercion");
 ok(Map->is_parameterizable, "Map is parameterizable");
 
+#
+# The @tests array is a list of triples:
+#
+# 1. Expected result - pass, fail, or xxxx (undefined).
+# 2. A description of the value being tested.
+# 3. The value being tested.
+#
+
 my @tests = (
 	fail => 'undef'                    => undef,
 	fail => 'false'                    => !!0,

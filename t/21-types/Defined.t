@@ -38,6 +38,14 @@ is(exception { Defined->inline_check(q/$xyz/) }, undef, "Inlining Defined doesn'
 ok(!Defined->has_coercion, "Defined doesn't have a coercion");
 ok(!Defined->is_parameterizable, "Defined isn't parameterizable");
 
+#
+# The @tests array is a list of triples:
+#
+# 1. Expected result - pass, fail, or xxxx (undefined).
+# 2. A description of the value being tested.
+# 3. The value being tested.
+#
+
 my @tests = (
 	fail => 'undef'                    => undef,
 	pass => 'false'                    => !!0,

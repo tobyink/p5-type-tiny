@@ -38,6 +38,14 @@ is(exception { FileHandle->inline_check(q/$xyz/) }, undef, "Inlining FileHandle 
 ok(!FileHandle->has_coercion, "FileHandle doesn't have a coercion");
 ok(!FileHandle->is_parameterizable, "FileHandle isn't parameterizable");
 
+#
+# The @tests array is a list of triples:
+#
+# 1. Expected result - pass, fail, or xxxx (undefined).
+# 2. A description of the value being tested.
+# 3. The value being tested.
+#
+
 my @tests = (
 	fail => 'undef'                    => undef,
 	fail => 'false'                    => !!0,

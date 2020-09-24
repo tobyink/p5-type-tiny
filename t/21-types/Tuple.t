@@ -38,6 +38,14 @@ is(exception { Tuple->inline_check(q/$xyz/) }, undef, "Inlining Tuple doesn't th
 ok(!Tuple->has_coercion, "Tuple doesn't have a coercion");
 ok(Tuple->is_parameterizable, "Tuple is parameterizable");
 
+#
+# The @tests array is a list of triples:
+#
+# 1. Expected result - pass, fail, or xxxx (undefined).
+# 2. A description of the value being tested.
+# 3. The value being tested.
+#
+
 my @tests = (
 	fail => 'undef'                    => undef,
 	fail => 'false'                    => !!0,

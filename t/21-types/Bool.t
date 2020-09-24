@@ -38,6 +38,14 @@ is(exception { Bool->inline_check(q/$xyz/) }, undef, "Inlining Bool doesn't thro
 ok(Bool->has_coercion, "Bool has a coercion");
 ok(!Bool->is_parameterizable, "Bool isn't parameterizable");
 
+#
+# The @tests array is a list of triples:
+#
+# 1. Expected result - pass, fail, or xxxx (undefined).
+# 2. A description of the value being tested.
+# 3. The value being tested.
+#
+
 my @tests = (
 	pass => 'undef'                    => undef,
 	pass => 'false'                    => !!0,

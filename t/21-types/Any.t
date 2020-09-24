@@ -39,6 +39,14 @@ ok(!Any->has_coercion, "Any doesn't have a coercion");
 ok(!Any->is_parameterizable, "Any isn't parameterizable");
 
 my @none_tests =
+#
+# The @tests array is a list of triples:
+#
+# 1. Expected result - pass, fail, or xxxx (undefined).
+# 2. A description of the value being tested.
+# 3. The value being tested.
+#
+
 my @tests = (
 	pass => 'undef'                    => undef,
 	pass => 'false'                    => !!0,

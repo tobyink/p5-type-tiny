@@ -38,6 +38,14 @@ is(exception { CodeLike->inline_check(q/$xyz/) }, undef, "Inlining CodeLike does
 ok(!CodeLike->has_coercion, "CodeLike doesn't have a coercion");
 ok(!CodeLike->is_parameterizable, "CodeLike isn't parameterizable");
 
+#
+# The @tests array is a list of triples:
+#
+# 1. Expected result - pass, fail, or xxxx (undefined).
+# 2. A description of the value being tested.
+# 3. The value being tested.
+#
+
 my @tests = (
 	fail => 'undef'                    => undef,
 	fail => 'false'                    => !!0,

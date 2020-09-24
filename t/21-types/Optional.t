@@ -38,6 +38,14 @@ is(exception { Optional->inline_check(q/$xyz/) }, undef, "Inlining Optional does
 ok(!Optional->has_coercion, "Optional doesn't have a coercion");
 ok(Optional->is_parameterizable, "Optional is parameterizable");
 
+#
+# The @tests array is a list of triples:
+#
+# 1. Expected result - pass, fail, or xxxx (undefined).
+# 2. A description of the value being tested.
+# 3. The value being tested.
+#
+
 my @tests = (
 	pass => 'undef'                    => undef,
 	pass => 'false'                    => !!0,
