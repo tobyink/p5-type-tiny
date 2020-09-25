@@ -145,137 +145,121 @@ sub _get_check_overload_sub {
 
 sub StringLike ()
 {
+	return $cache{StringLike} if $cache{StringLike};
 	require Type::Tiny;
+	my %common = (
+		name       => "StringLike",
+		library    => __PACKAGE__,
+		constraint => sub {    defined($_   ) && !ref($_   ) or Scalar::Util::blessed($_   ) && Types::TypeTiny::_check_overload($_   , q[""])  },
+		inlined    => sub { qq/defined($_[1]) && !ref($_[1]) or Scalar::Util::blessed($_[1]) && ${\ +_get_check_overload_sub() }($_[1], q[""])/ },
+	);
 	if ( __XS ) {
 		my $xsub     = Type::Tiny::XS::get_coderef_for('StringLike');
 		my $xsubname = Type::Tiny::XS::get_subname_for('StringLike');
-		$cache{StringLike} ||= "Type::Tiny"->new(
-			name       => "StringLike",
+		$cache{StringLike} = "Type::Tiny"->new(
+			%common,
 			constraint => $xsub,
 			inlined    => sub {
 				$Type::Tiny::AvoidCallbacks
 					? qq/defined($_[1]) && !ref($_[1]) or Scalar::Util::blessed($_[1]) && ${\ +_get_check_overload_sub() }($_[1], q[""])/
 					: qq/$xsubname($_[1])/
 			},
-			library    => __PACKAGE__,
 		);
 	}
 	else {
-		$cache{StringLike} ||= "Type::Tiny"->new(
-			name       => "StringLike",
-			constraint => sub {    defined($_   ) && !ref($_   ) or Scalar::Util::blessed($_   ) && Types::TypeTiny::_check_overload($_   , q[""])  },
-			inlined    => sub { qq/defined($_[1]) && !ref($_[1]) or Scalar::Util::blessed($_[1]) && ${\ +_get_check_overload_sub() }($_[1], q[""])/ },
-			library    => __PACKAGE__,
-		);
+		$cache{StringLike} = "Type::Tiny"->new(%common);
 	}
 }
 
 sub HashLike ()
 {
+	return $cache{HashLike} if $cache{HashLike};
 	require Type::Tiny;
+	my %common = (
+		name       => "HashLike",
+		library    => __PACKAGE__,
+		constraint => sub {    ref($_   ) eq q[HASH] or Scalar::Util::blessed($_   ) && Types::TypeTiny::_check_overload($_   , q[%{}])  },
+		inlined    => sub { qq/ref($_[1]) eq q[HASH] or Scalar::Util::blessed($_[1]) && ${\ +_get_check_overload_sub() }($_[1], q[\%{}])/ },
+	);
 	if ( __XS ) {
 		my $xsub     = Type::Tiny::XS::get_coderef_for('HashLike');
 		my $xsubname = Type::Tiny::XS::get_subname_for('HashLike');
-		$cache{HashLike} ||= "Type::Tiny"->new(
-			name       => "HashLike",
+		$cache{HashLike} = "Type::Tiny"->new(
+			%common,
 			constraint => $xsub,
 			inlined    => sub {
 				$Type::Tiny::AvoidCallbacks
 					? qq/ref($_[1]) eq q[HASH] or Scalar::Util::blessed($_[1]) && ${\ +_get_check_overload_sub() }($_[1], q[\%{}])/
 					: qq/$xsubname($_[1])/
 			},
-			library    => __PACKAGE__,
 		);
 	}
 	else {
-		$cache{HashLike} ||= "Type::Tiny"->new(
-			name       => "HashLike",
-			constraint => sub {    ref($_   ) eq q[HASH] or Scalar::Util::blessed($_   ) && Types::TypeTiny::_check_overload($_   , q[%{}])  },
-			inlined    => sub { qq/ref($_[1]) eq q[HASH] or Scalar::Util::blessed($_[1]) && ${\ +_get_check_overload_sub() }($_[1], q[\%{}])/ },
-			library    => __PACKAGE__,
-		);
+		$cache{HashLike} = "Type::Tiny"->new(%common);
 	}
 }
 
 sub ArrayLike ()
 {
+	return $cache{ArrayLike} if $cache{ArrayLike};
 	require Type::Tiny;
+	my %common = (
+		name       => "ArrayLike",
+		library    => __PACKAGE__,
+		constraint => sub {    ref($_   ) eq q[ARRAY] or Scalar::Util::blessed($_   ) && Types::TypeTiny::_check_overload($_   , q[@{}])  },
+		inlined    => sub { qq/ref($_[1]) eq q[ARRAY] or Scalar::Util::blessed($_[1]) && ${\ +_get_check_overload_sub() }($_[1], q[\@{}])/ },
+	);
 	if ( __XS ) {
 		my $xsub     = Type::Tiny::XS::get_coderef_for('ArrayLike');
 		my $xsubname = Type::Tiny::XS::get_subname_for('ArrayLike');
-		$cache{ArrayLike} ||= "Type::Tiny"->new(
-			name       => "ArrayLike",
+		$cache{ArrayLike} = "Type::Tiny"->new(
+			%common,
 			constraint => $xsub,
 			inlined    => sub {
 				$Type::Tiny::AvoidCallbacks
 					? qq/ref($_[1]) eq q[ARRAY] or Scalar::Util::blessed($_[1]) && ${\ +_get_check_overload_sub() }($_[1], q[\@{}])/
 					: qq/$xsubname($_[1])/
 			},
-			library    => __PACKAGE__,
 		);
 	}
 	else {
-		$cache{ArrayLike} ||= "Type::Tiny"->new(
-			name       => "ArrayLike",
-			constraint => sub {    ref($_   ) eq q[ARRAY] or Scalar::Util::blessed($_   ) && Types::TypeTiny::_check_overload($_   , q[@{}])  },
-			inlined    => sub { qq/ref($_[1]) eq q[ARRAY] or Scalar::Util::blessed($_[1]) && ${\ +_get_check_overload_sub() }($_[1], q[\@{}])/ },
-			library    => __PACKAGE__,
-		);
+		$cache{ArrayLike} = "Type::Tiny"->new(%common);
 	}
 }
 
 sub CodeLike ()
 {
+	return $cache{CodeLike} if $cache{CodeLike};
 	require Type::Tiny;
+	my %common = (
+		name       => "CodeLike",
+		constraint => sub {    ref($_   ) eq q[CODE] or Scalar::Util::blessed($_   ) && Types::TypeTiny::_check_overload($_   , q[&{}])  },
+		inlined    => sub { qq/ref($_[1]) eq q[CODE] or Scalar::Util::blessed($_[1]) && ${\ +_get_check_overload_sub() }($_[1], q[\&{}])/ },
+		library    => __PACKAGE__,
+	);
 	if ( __XS ) {
 		my $xsub     = Type::Tiny::XS::get_coderef_for('CodeLike');
 		my $xsubname = Type::Tiny::XS::get_subname_for('CodeLike');
-		$cache{CodeLike} ||= "Type::Tiny"->new(
-			name       => "CodeLike",
+		$cache{CodeLike} = "Type::Tiny"->new(
+			%common,
 			constraint => $xsub,
 			inlined    => sub {
 				$Type::Tiny::AvoidCallbacks
 					? qq/ref($_[1]) eq q[CODE] or Scalar::Util::blessed($_[1]) && ${\ +_get_check_overload_sub() }($_[1], q[\&{}])/
 					: qq/$xsubname($_[1])/
 			},
-			library    => __PACKAGE__,
 		);
 	}
 	else {
-		$cache{CodeLike} ||= "Type::Tiny"->new(
-			name       => "CodeLike",
-			constraint => sub {    ref($_   ) eq q[CODE] or Scalar::Util::blessed($_   ) && Types::TypeTiny::_check_overload($_   , q[&{}])  },
-			inlined    => sub { qq/ref($_[1]) eq q[CODE] or Scalar::Util::blessed($_[1]) && ${\ +_get_check_overload_sub() }($_[1], q[\&{}])/ },
-			library    => __PACKAGE__,
-		);
+		$cache{CodeLike} = "Type::Tiny"->new(%common);
 	}
 }
 
 sub TypeTiny ()
 {
+	return $cache{TypeTiny} if $cache{TypeTiny};
 	require Type::Tiny;
-	if ( 0 and __XS ) {  # causes fails in 03-leak.t
-		my $xsub     = Type::Tiny::XS::get_coderef_for('InstanceOf[Type::Tiny]');
-		my $xsubname = Type::Tiny::XS::get_subname_for('InstanceOf[Type::Tiny]');
-		$cache{TypeTiny} ||= "Type::Tiny"->new(
-			name       => "TypeTiny",
-			constraint => $xsub,
-			inlined    => sub {
-				my $var = $_[1];
-				$Type::Tiny::AvoidCallbacks
-					? "Scalar::Util::blessed($var) && $var\->isa(q[Type::Tiny])"
-					: qq/$xsubname($var)/
-			},
-			library    => __PACKAGE__,
-			_build_coercion => sub {
-				my $c = shift;
-				$c->add_type_coercions(_ForeignTypeConstraint(), \&to_TypeTiny);
-				$c->freeze;
-			},
-		);
-	}
-	else {
-		$cache{TypeTiny} ||= "Type::Tiny"->new(
+	my %common = (
 			name       => "TypeTiny",
 			constraint => sub {  Scalar::Util::blessed($_   ) && $_   ->isa(q[Type::Tiny])  },
 			inlined    => sub { my $var = $_[1]; "Scalar::Util::blessed($var) && $var\->isa(q[Type::Tiny])" },
@@ -285,14 +269,31 @@ sub TypeTiny ()
 				$c->add_type_coercions(_ForeignTypeConstraint(), \&to_TypeTiny);
 				$c->freeze;
 			},
+	);
+	if ( 0 and __XS ) {  # causes fails in 03-leak.t
+		my $xsub     = Type::Tiny::XS::get_coderef_for('InstanceOf[Type::Tiny]');
+		my $xsubname = Type::Tiny::XS::get_subname_for('InstanceOf[Type::Tiny]');
+		$cache{TypeTiny} = "Type::Tiny"->new(
+			%common,
+			constraint => $xsub,
+			inlined    => sub {
+				my $var = $_[1];
+				$Type::Tiny::AvoidCallbacks
+					? "Scalar::Util::blessed($var) && $var\->isa(q[Type::Tiny])"
+					: qq/$xsubname($var)/
+			},
 		);
+	}
+	else {
+		$cache{TypeTiny} = "Type::Tiny"->new(%common);
 	}
 }
 
 sub _ForeignTypeConstraint ()
 {
+	return $cache{_ForeignTypeConstraint} if $cache{_ForeignTypeConstraint};
 	require Type::Tiny;
-	$cache{_ForeignTypeConstraint} ||= "Type::Tiny"->new(
+	$cache{_ForeignTypeConstraint} = "Type::Tiny"->new(
 		name       => "_ForeignTypeConstraint",
 		constraint => \&_is_ForeignTypeConstraint,
 		inlined    => sub { qq/ref($_[1]) && do { require Types::TypeTiny; Types::TypeTiny::_is_ForeignTypeConstraint($_[1]) }/ },
