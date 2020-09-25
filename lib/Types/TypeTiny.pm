@@ -746,32 +746,50 @@ designed for use within Type::Tiny, may be more generally useful.
 
 =over
 
-=item C<< StringLike >>
+=item *
+
+B<< StringLike >>
 
 Accepts strings and objects overloading stringification.
 
-=item C<< HashLike >>
+=item *
+
+B<< HashLike[`a] >>
 
 Accepts hashrefs and objects overloading hashification.
 
-=item C<< ArrayLike >>
+Since Types::TypeTiny 1.012, may be parameterized with another type
+constraint like B<< HashLike[Int] >>.
+
+=item *
+
+B<< ArrayLike[`a] >>
 
 Accepts arrayrefs and objects overloading arrayfication.
 
-=item C<< CodeLike >>
+Since Types::TypeTiny 1.012, may be parameterized with another type
+constraint like B<< ArrayLike[Int] >>.
+
+=item *
+
+B<< CodeLike >>
 
 Accepts coderefs and objects overloading codification.
 
-=item C<< TypeTiny >>
+=item *
+
+B<< TypeTiny >>
 
 Accepts blessed L<Type::Tiny> objects.
 
-=item C<< _ForeignTypeConstraint >>
+=item *
+
+B<< _ForeignTypeConstraint >>
 
 Any reference which to_TypeTiny recognizes as something that can be coerced
 to a Type::Tiny object.
 
-Yeah, the underscore is included.
+Yes, the underscore is included.
 
 =back
 
