@@ -11,7 +11,7 @@ $VERSION =~ tr/_//d;
 use Scalar::Util qw< blessed refaddr weaken >;
 
 BEGIN {
-	*__XS = eval { require Type::Tiny::XS; 'Type::Tiny::XS'->VERSION('0.022') }
+	*__XS = eval { require Type::Tiny::XS; 'Type::Tiny::XS'->VERSION('0.022'); 1 }
 		? sub () { !!1 }
 		: sub () { !!0 };
 };
