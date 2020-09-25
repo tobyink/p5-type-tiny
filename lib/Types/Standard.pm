@@ -253,7 +253,7 @@ my $_laxnum = $meta->add_type({
 	inlined    => sub {
 		$maybe_load_modules->(
 			qw/ Scalar::Util /,
-			'Scalar::Util'->VERSION('1.18') # RT 132426
+			'Scalar::Util'->VERSION ge '1.18' # RT 132426
 				? "defined($_[1]) && !ref($_[1]) && Scalar::Util::looks_like_number($_[1])"
 				: "defined($_[1]) && !ref($_[1]) && Scalar::Util::looks_like_number($_[1]) && ref(\\($_[1])) ne 'GLOB'"
 		);
