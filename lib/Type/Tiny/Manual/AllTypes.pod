@@ -25,7 +25,7 @@ Anything. Absolutely anything.
 
 =item *
 
-B<< ArrayLike >> in L<Types::TypeTiny>
+B<< ArrayLike >> I<< [parameterizable] >> in L<Types::TypeTiny>
 
 Arrayrefs and objects overloading arrayfication.
 
@@ -103,7 +103,7 @@ Globrefs
 
 =item *
 
-B<< HashLike >> in L<Types::TypeTiny>
+B<< HashLike >> I<< [parameterizable] >> in L<Types::TypeTiny>
 
 Hashrefs and objects overloading hashrefification.
 
