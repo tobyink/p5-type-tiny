@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '1.011_002';
+our $VERSION   = '1.011_003';
 
 $VERSION =~ tr/_//d;
 
@@ -354,15 +354,15 @@ sub TypeTiny ()
 	return $cache{TypeTiny} if $cache{TypeTiny};
 	require Type::Tiny;
 	my %common = (
-			name       => "TypeTiny",
-			constraint => sub {  Scalar::Util::blessed($_   ) && $_   ->isa(q[Type::Tiny])  },
-			inlined    => sub { my $var = $_[1]; "Scalar::Util::blessed($var) && $var\->isa(q[Type::Tiny])" },
-			library    => __PACKAGE__,
-			_build_coercion => sub {
-				my $c = shift;
-				$c->add_type_coercions(_ForeignTypeConstraint(), \&to_TypeTiny);
-				$c->freeze;
-			},
+		name       => "TypeTiny",
+		constraint => sub {  Scalar::Util::blessed($_   ) && $_   ->isa(q[Type::Tiny])  },
+		inlined    => sub { my $var = $_[1]; "Scalar::Util::blessed($var) && $var\->isa(q[Type::Tiny])" },
+		library    => __PACKAGE__,
+		_build_coercion => sub {
+			my $c = shift;
+			$c->add_type_coercions(_ForeignTypeConstraint(), \&to_TypeTiny);
+			$c->freeze;
+		},
 	);
 	if ( 0 and __XS ) {  # causes fails in 03-leak.t
 		my $xsub     = Type::Tiny::XS::get_coderef_for('InstanceOf[Type::Tiny]');
