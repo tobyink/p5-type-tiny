@@ -1,3 +1,5 @@
+# HARNESS-NO-PRELOAD
+
 =pod
 
 =encoding utf-8
