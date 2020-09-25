@@ -171,15 +171,58 @@ sub StringLike ()
 	}
 }
 
-sub HashLike ()
+sub HashLike (;@)
 {
-	return $cache{HashLike} if $cache{HashLike};
+	return $cache{HashLike} if $cache{HashLike} && !@_;
 	require Type::Tiny;
 	my %common = (
 		name       => "HashLike",
 		library    => __PACKAGE__,
 		constraint => sub {    ref($_   ) eq q[HASH] or Scalar::Util::blessed($_   ) && Types::TypeTiny::_check_overload($_   , q[%{}])  },
 		inlined    => sub { qq/ref($_[1]) eq q[HASH] or Scalar::Util::blessed($_[1]) && ${\ +_get_check_overload_sub() }($_[1], q[\%{}])/ },
+		constraint_generator => sub {
+			my $param = TypeTiny()->assert_coerce( shift );
+			my $check = $param->compiled_check;
+			sub {
+				my %hash = %$_;
+				for my $key (sort keys %hash) {
+					$check->($hash{$key}) or return 0;
+				}
+				return 1;
+			};
+		},
+		inline_generator => sub {
+			my $param = TypeTiny()->assert_coerce( shift );
+			return unless $param->can_be_inlined;
+			sub {
+				my $var  = pop;
+				my $code = sprintf(
+					'do { my $ok=1; my %%h = %%{%s}; for my $k (sort keys %%h) { ($ok=0,next) unless (%s) }; $ok }',
+					$var,
+					$param->inline_check('$h{$k}'),
+				);
+				return (undef, $code);
+			};
+		},
+		coercion_generator => sub {
+			my ($parent, $child, $param) = @_;
+			return unless $param->has_coercion;
+			my $coercible = $param->coercion->_source_type_union->compiled_check;
+			my $C = "Type::Coercion"->new(type_constraint => $child);
+			$C->add_type_coercions(
+				$parent => sub {
+					my $origref = @_ ? $_[0] : $_;
+					my %orig    = %$origref;
+					my %new;
+					for my $k (sort keys %orig) {
+						return $origref unless $coercible->($orig{$k});
+						$new{$k} = $param->coerce($orig{$k});
+					}
+					\%new;
+				},
+			);
+			return $C;
+		},
 	);
 	if ( __XS ) {
 		my $xsub     = Type::Tiny::XS::get_coderef_for('HashLike');
@@ -197,17 +240,62 @@ sub HashLike ()
 	else {
 		$cache{HashLike} = "Type::Tiny"->new(%common);
 	}
+	
+	@_ ? $cache{HashLike}->parameterize(@{$_[0]}) : $cache{HashLike};
 }
 
-sub ArrayLike ()
+sub ArrayLike (;@)
 {
-	return $cache{ArrayLike} if $cache{ArrayLike};
+	return $cache{ArrayLike} if $cache{ArrayLike} && !@_;
 	require Type::Tiny;
 	my %common = (
 		name       => "ArrayLike",
 		library    => __PACKAGE__,
 		constraint => sub {    ref($_   ) eq q[ARRAY] or Scalar::Util::blessed($_   ) && Types::TypeTiny::_check_overload($_   , q[@{}])  },
 		inlined    => sub { qq/ref($_[1]) eq q[ARRAY] or Scalar::Util::blessed($_[1]) && ${\ +_get_check_overload_sub() }($_[1], q[\@{}])/ },
+		constraint_generator => sub {
+			my $param = TypeTiny()->assert_coerce( shift );
+			my $check = $param->compiled_check;
+			sub {
+				my @arr = @$_;
+				for my $val (@arr) {
+					$check->($val) or return 0;
+				}
+				return 1;
+			};
+		},
+		inline_generator => sub {
+			my $param = TypeTiny()->assert_coerce( shift );
+			return unless $param->can_be_inlined;
+			sub {
+				my $var  = pop;
+				my $code = sprintf(
+					'do { my $ok=1; for my $v (@{%s}) { ($ok=0,next) unless (%s) }; $ok }',
+					$var,
+					$param->inline_check('$v'),
+				);
+				return (undef, $code);
+			};
+		},
+		coercion_generator => sub {
+			my ($parent, $child, $param) = @_;
+			return unless $param->has_coercion;
+			my $coercible = $param->coercion->_source_type_union->compiled_check;
+			my $C = "Type::Coercion"->new(type_constraint => $child);
+			$C->add_type_coercions(
+				$parent => sub {
+					my $origref = @_ ? $_[0] : $_;
+					my @orig    = @$origref;
+					my @new;
+					for my $v (@orig) {
+						return $origref unless $coercible->($v);
+						push @new, $param->coerce($v);
+					}
+					\@new;
+				},
+			);
+			return $C;
+		},
 	);
 	if ( __XS ) {
 		my $xsub     = Type::Tiny::XS::get_coderef_for('ArrayLike');
@@ -225,6 +313,12 @@ sub ArrayLike ()
 	else {
 		$cache{ArrayLike} = "Type::Tiny"->new(%common);
 	}
+	
+	@_ ? $cache{ArrayLike}->parameterize(@{$_[0]}) : $cache{ArrayLike};
+}
+
+if ( $] ge '5.014' ) {
+	&Scalar::Util::set_prototype($_, ';$') for \&HashLike, \&ArrayLike;
 }
 
 sub CodeLike ()

@@ -36,7 +36,7 @@ ok(!HashLike->is_anon, 'HashLike is not anonymous');
 ok(HashLike->can_be_inlined, 'HashLike can be inlined');
 is(exception { HashLike->inline_check(q/$xyz/) }, undef, "Inlining HashLike doesn't throw an exception");
 ok(!HashLike->has_coercion, "HashLike doesn't have a coercion");
-ok(!HashLike->is_parameterizable, "HashLike isn't parameterizable");
+ok(HashLike->is_parameterizable, "HashLike is parameterizable");
 
 #
 # The @tests array is a list of triples:
@@ -115,6 +115,66 @@ while (@tests) {
 		fail("expected '$expect'?!");
 	}
 }
+
+#
+# Parameterizable
+#
+
+use Types::Standard ();
+
+my $HashOfInt = HashLike[ Types::Standard::Int() ];
+
+ok( $HashOfInt->can_be_inlined );
+
+should_pass(
+	{ foo => 1, bar => 2 },
+	$HashOfInt,
+);
+
+should_pass(
+	bless([{ foo => 1, bar => 2 }], 'Local::OL::Hash'),
+	$HashOfInt,
+);
+
+should_fail(
+	{ foo => 1, bar => undef },
+	$HashOfInt,
+);
+
+should_fail(
+	bless([{ foo => 1, bar => undef }], 'Local::OL::Hash'),
+	$HashOfInt,
+);
+
+my $HashOfRounded = HashLike[
+	Types::Standard::Int()->plus_coercions(
+		Types::Standard::Num(), => q{ int($_) },
+	)
+];
+
+is_deeply(
+	$HashOfRounded->coerce({ foo => 1, bar => 2.1 }),
+	{ foo => 1, bar => 2 },
+);
+
+# Note that because of coercion, the object overloading %{}
+# is now a plain old hashref.
+is_deeply(
+	$HashOfRounded->coerce(bless([{ foo => 1, bar => 2.1 }], 'Local::OL::Hash')),
+	{ foo => 1, bar => 2 },
+);
+
+is_deeply(
+	$HashOfRounded->coerce({ foo => undef, bar => 2.1 }),
+	{ foo => undef, bar => 2.1 },  # cannot be coerced, so returned unchanged
+);
+
+# can't use is_deeply because object doesn't overload eq
+# but the idea is because the coercion fails, the original
+# object gets returned unchanged
+ok(
+	Scalar::Util::blessed( $HashOfRounded->coerce(bless([{ foo => undef, bar => 2.1 }], 'Local::OL::Hash')) ),
+);
 
 done_testing;
 

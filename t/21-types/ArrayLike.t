@@ -36,7 +36,7 @@ ok(!ArrayLike->is_anon, 'ArrayLike is not anonymous');
 ok(ArrayLike->can_be_inlined, 'ArrayLike can be inlined');
 is(exception { ArrayLike->inline_check(q/$xyz/) }, undef, "Inlining ArrayLike doesn't throw an exception");
 ok(!ArrayLike->has_coercion, "ArrayLike doesn't have a coercion");
-ok(!ArrayLike->is_parameterizable, "ArrayLike isn't parameterizable");
+ok(ArrayLike->is_parameterizable, "ArrayLike is parameterizable");
 
 #
 # The @tests array is a list of triples:
@@ -115,6 +115,66 @@ while (@tests) {
 		fail("expected '$expect'?!");
 	}
 }
+
+#
+# Parameterizable
+#
+
+use Types::Standard ();
+
+my $ArrayOfInt = ArrayLike[ Types::Standard::Int() ];
+
+ok( $ArrayOfInt->can_be_inlined );
+
+should_pass(
+	[1,2,3],
+	$ArrayOfInt,
+);
+
+should_pass(
+	bless({ array=>[1,2,3] }, 'Local::OL::Array'),
+	$ArrayOfInt,
+);
+
+should_fail(
+	[undef,2,3],
+	$ArrayOfInt,
+);
+
+should_fail(
+	bless({ array=>[undef,2,3] }, 'Local::OL::Array'),
+	$ArrayOfInt,
+);
+
+my $ArrayOfRounded = ArrayLike[
+	Types::Standard::Int()->plus_coercions(
+		Types::Standard::Num(), => q{ int($_) },
+	)
+];
+
+is_deeply(
+	$ArrayOfRounded->coerce([1.1, 2, 3]),
+	[1,2,3],
+);
+
+# Note that because of coercion, the object overloading @{}
+# is now a plain old arrayref.
+is_deeply(
+	$ArrayOfRounded->coerce(bless({ array=>[1.1,2,3] }, 'Local::OL::Array')),
+	[1,2,3],
+);
+
+is_deeply(
+	$ArrayOfRounded->coerce([1.1, undef, 3]),
+	[1.1,undef,3],  # cannot be coerced, so returned unchanged
+);
+
+# can't use is_deeply because object doesn't overload eq
+# but the idea is because the coercion fails, the original
+# object gets returned unchanged
+ok(
+	Scalar::Util::blessed( $ArrayOfRounded->coerce(bless({ array=>[1.1,undef,3] }, 'Local::OL::Array')) ),
+);
 
 done_testing;
 
