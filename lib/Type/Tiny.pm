@@ -372,9 +372,13 @@ sub _dd
 		local $Data::Dumper::Terse    = 1;
 		local $Data::Dumper::Sortkeys = 1;
 		local $Data::Dumper::Maxdepth = 2;
-		my $str = Data::Dumper::Dumper($value);
-		$str = substr($str, 0, $N - 12).'...'.substr($str, -1, 1)
-			if length($str) >= $N;
+		my $str;
+		eval {
+			$str = Data::Dumper::Dumper($value);
+			$str = substr($str, 0, $N - 12).'...'.substr($str, -1, 1)
+				if length($str) >= $N;
+			1;
+		} or do { $str = 'which cannot be dumped' };
 		"Reference $str";
 	}
 }
