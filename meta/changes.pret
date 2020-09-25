@@ -3789,10 +3789,9 @@
 	issued  2020-09-25;
 	changeset [
 		dcs:versus `Type-Tiny 1.011_002 cpan:TOBYINK`;
-		item [
-			a dcs:Addition;
-			label "Type::Tiny::Enum better caches regexps.";
-			label "ArrayLike, HashLike, CodeLike, and StringLike type constraints can use XS if Type::Tiny::XS 0.022 is installed.";
-			label "ArrayLike and HashLike are now parameterizable, though the implementation for the parameterized version is in pure Perl, not XS.";
-		];
+		item "Type::Tiny::Enum better caches regexps."^^Change;
+		item "ArrayLike, HashLike, CodeLike, and StringLike type constraints can use XS if Type::Tiny::XS 0.022 is installed."^^Update;
+		item "ArrayLike and HashLike are now parameterizable, though the implementation for the parameterized version is in pure Perl, not XS."^^Change;
+		item "Types::Standard would sometimes complain about very old versions of Scalar::Util."^^Bugfix;
+		item "Old versions of Data::Dumper would sometimes die when dumping certain overloaded objects. Type::Tiny::_dd() now catches this in an eval {}."^^Bugfix;
 	].
