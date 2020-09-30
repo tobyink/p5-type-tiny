@@ -55,6 +55,15 @@ Though I'm unlikely to bundle many more type libraries in this distribution,
 uploading your own type libraries to CPAN will strengthen the Type::Tiny
 ecosystem.
 
+=head2 Donate
+
+If you or your organization uses Type::Tiny and you wish to contribute
+financially, you should be able to find links to donate on the Type::Tiny
+website at L<https://typetiny.toby.ink/>.
+
+Please note that I am not suggesting that you must do this in order for me
+to continue working on Type::Tiny and related modules.
+
 =head1 NEXT STEPS
 
 You've reached the end of the manual!
