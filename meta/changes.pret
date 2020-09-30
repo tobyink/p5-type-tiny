@@ -3804,3 +3804,11 @@
 		item "Make test suite work better with App::Yath."^^Tests;
 		item "Make predeclared type constraints work better for Zydeco."^^Bugfix;
 	].
+
+`Type-Tiny 1.011_005 cpan:TOBYINK`
+	issued  2020-09-30;
+	changeset [
+		dcs:versus `Type-Tiny 1.011_004 cpan:TOBYINK`;
+		item "Type::Library import now supports -extends and -utils flags."^^Addition;
+		item "Type::Library -base import flag now marks the caller package as loaded in %INC."^^Change;
+	].
