@@ -3795,3 +3795,12 @@
 		item "Types::Standard would sometimes complain about very old versions of Scalar::Util."^^Bugfix;
 		item "Old versions of Data::Dumper would sometimes die when dumping certain overloaded objects. Type::Tiny::_dd() now catches this in an eval {}."^^Bugfix;
 	].
+
+`Type-Tiny 1.011_004 cpan:TOBYINK`
+	issued  2020-09-30;
+	changeset [
+		dcs:versus `Type-Tiny 1.011_003 cpan:TOBYINK`;
+		item "Document that ArrayLike and HashLike are now parameterizable."^^Documentation;
+		item "Make test suite work better with App::Yath."^^Tests;
+		item "Make predeclared type constraints work better for Zydeco."^^Bugfix;
+	].
