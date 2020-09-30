@@ -43,10 +43,27 @@ sub _exporter_validate_opts
 {
 	my $class = shift;
 	
-	no strict "refs";
-	my $into  = $_[0]{into};
-	push @{"$into\::ISA"}, $class if $_[0]{base};
+	my $into = $_[0]{into};
 	
+	if ( $_[0]{base} || $_[0]{extends} and !ref $into ) {
+		no strict "refs";
+		push @{"$into\::ISA"}, $class;
+		( my $file = $into ) =~ s{::}{/}g;
+		$INC{"$file.pm"} ||= __FILE__;
+	}
+	
+	if ( $_[0]{utils} ) {
+		require Type::Utils;
+		'Type::Utils'->import({ into => $into }, '-default');
+	}
+	
+	if ( $_[0]{extends} and !ref $into ) {
+		require Type::Utils;
+		my $wrapper = eval "sub { package $into; &Type::Utils::extends; }";
+		my @libs = @{ ref($_[0]{extends}) ? $_[0]{extends} : ($_[0]{extends} ? [$_[0]{extends}] : []) };
+		$wrapper->(@libs);
+	}
+
 	return $class->SUPER::_exporter_validate_opts(@_);
 }
 

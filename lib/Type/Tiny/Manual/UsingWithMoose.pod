@@ -95,6 +95,15 @@ declaring types in Type::Library-based type libraries.
 
 Personally I prefer the more object-oriented way to declare types though.
 
+Since Type::Library 1.012, a shortcut has been available for importing
+Type::Library and Type::Utils at the same time:
+
+  package MyType {
+    use Type::Library -base, -utils;
+    
+    ...;
+  }
+
 In Moose you might also declare types like this within classes and roles too.
 Unlike Moose, Type::Tiny doesn't keep types in a single global flat namespace,
 so this doesn't work quite the same with Type::Utils. It still creates the

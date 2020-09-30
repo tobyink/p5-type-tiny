@@ -77,6 +77,13 @@ L<Type::Library>.
     ...; # your type definitions go here
   }
 
+The C<< -base >> flag is just a shortcut for:
+
+  package MyTypes {
+    use Type::Library;
+    our @ISA = 'Type::Library';
+  }
+
 You can add types like this:
 
   package MyTypes {
@@ -216,6 +223,17 @@ My::Types and are also available there.
 C<extends> can be passed a list of libraries; you can inherit from multiple
 existing libraries. It can also recognize and import types from
 L<MooseX::Types>, L<MouseX::Types>, and L<Specio::Exporter> libraries.
+
+Since Type::Library 1.012, there has been a shortcut for C<< extends >>.
+
+  package My::Types {
+    use Type::Library -extends => [ 'Types::Standard' ];
+    
+    # define your own types here
+  }
+
+The C<< -extends >> flag takes an arrayref of type libraries to extend.
+It automatically implies C<< -base >> so you don't need to use both.
 
 =head2 Custom Error Messages
 
