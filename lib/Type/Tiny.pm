@@ -1008,11 +1008,15 @@ sub is_parameterized
 			
 			$P = $self->create_child_type(%options);
 			
-			my $coercion;
-			$coercion = $self->coercion_generator->($self, $P, @_)
-				if $self->has_coercion_generator;
-			$P->coercion->add_type_coercions( @{$coercion->type_coercion_map} )
-				if $coercion;
+			if ( $self->has_coercion_generator ) {
+				my @args = @_;
+				$P->{_build_coercion} = sub {
+					my $coercion = shift;
+					my $built    = $self->coercion_generator->($self, $P, @args);
+					$coercion->add_type_coercions( @{$built->type_coercion_map} ) if $built;
+					$coercion->freeze;
+				};
+			}
 		}
 		
 		if (defined $key)
@@ -1021,7 +1025,7 @@ sub is_parameterized
 			Scalar::Util::weaken($param_cache{$key});
 		}
 		
-		$P->coercion->freeze;
+		$P->coercion->freeze unless $self->has_coercion_generator;
 		
 		return $P;
 	}
