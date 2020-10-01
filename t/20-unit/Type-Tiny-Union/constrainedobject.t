@@ -80,4 +80,12 @@ ok($new->[0] == $class_type->with_attribute_values(foo => '%_<5'));
 ok($new->[1] == $role_type->with_attribute_values(foo => '%_<5'));
 ok($new->[2] == $duck_type->with_attribute_values(foo => '%_<5'));
 
+my $object = 'Local::Class'->new( as_string => 'OBJ', as_number => 1.2 );
+
+ok   $intersect->stringifies_to(Enum['OBJ'])->check($object);
+ok ! $intersect->stringifies_to(Enum['XXX'])->check($object);
+
+ok   $intersect->numifies_to(Num)->check($object);
+ok ! $intersect->numifies_to(Int)->check($object);
+
 done_testing();
