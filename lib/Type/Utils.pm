@@ -624,12 +624,23 @@ my %is_cache;
 my %is_cache_coderef;
 sub is
 {
+	require Types::TypeTiny;
+	no warnings 'uninitialized';
+	
 	my ($type, $value) = @_;
 	my $caller = caller;
-	my $uniq = blessed($type) ? $type->{uniq} : $type;
-	if (!blessed $type) {
+	
+	my $uniq = Types::TypeTiny::is_TypeTiny($type) ? $type->{uniq} : "$type";
+	
+	if (not Types::TypeTiny::is_TypeTiny $type) {
 		my $orig = $type;
-		$type = $is_cache{$caller}{$uniq} || eval { dwim_type($type, for => $caller) };
+		
+		$type = $is_cache{$caller}{$uniq} || do {
+			Types::TypeTiny::is_StringLike($type)
+				? eval { dwim_type("$type", for => $caller) }
+				: undef;
+		};
+		
 		if (blessed $type) {
 			$is_cache{$caller}{$uniq} ||= $type;
 		}
