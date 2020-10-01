@@ -87,9 +87,9 @@ sub should_pass
 	
 	my @codes;
 	if ( $can_inline ) {
-		push @codes, eval sprintf('[ q(inlined), sub { my $VAR = shift; %s } ]', $type->inline_check('$VAR'));
+		push @codes, eval sprintf('no warnings; [ q(inlined), sub { my $VAR = shift; %s } ]', $type->inline_check('$VAR'));
 		local $Type::Tiny::AvoidCallbacks = 1;
-		push @codes, eval sprintf('[ q(inlined avoiding callbacks), sub { my $VAR = shift; %s } ]', $type->inline_check('$VAR'));
+		push @codes, eval sprintf('no warnings; [ q(inlined avoiding callbacks), sub { my $VAR = shift; %s } ]', $type->inline_check('$VAR'));
 	}
 	
 	my $test = "Test::Builder"->new->child(
@@ -124,9 +124,9 @@ sub should_fail
 	
 	my @codes;
 	if ( $can_inline ) {
-		push @codes, eval sprintf('[ q(inlined), sub { my $VAR = shift; %s } ]', $type->inline_check('$VAR'));
+		push @codes, eval sprintf('no warnings; [ q(inlined), sub { my $VAR = shift; %s } ]', $type->inline_check('$VAR'));
 		local $Type::Tiny::AvoidCallbacks = 1;
-		push @codes, eval sprintf('[ q(inlined avoiding callbacks), sub { my $VAR = shift; %s } ]', $type->inline_check('$VAR'));
+		push @codes, eval sprintf('no warnings; [ q(inlined avoiding callbacks), sub { my $VAR = shift; %s } ]', $type->inline_check('$VAR'));
 	}
 	
 	my $test = "Test::Builder"->new->child(
