@@ -4,7 +4,7 @@
 
 =head1 PURPOSE
 
-Checks Type::Registry refcount stuff.
+Checks Type::Tiny refcount stuff.
 
 =head1 AUTHOR
 
@@ -25,19 +25,30 @@ use warnings;
 use Test::More;
 use Test::Requires 'Devel::Refcount';
 use Devel::Refcount 'refcount';
-use Types::Standard qw( Int );
+use Test::TypeTiny;
+use Type::Tiny;
 use Type::Registry;
 
-my $orig_count = refcount( Int );
+my $ref = [];
+my $orig_count = refcount( $ref );
 note "COUNT: $orig_count";
 
 {
-	my $reg = Type::Registry->new;
-	$reg->add_types(qw/ -Standard /);
+	my $type = 'Type::Tiny'->new(
+		name       => 'AnswerToLifeTheUniverseAndEverything',
+		constraint => sub { $_ eq 42 },
+		inlined    => sub { my $var = pop; "$var eq 42" },
+		dummy_attr => $ref,
+	);
 	
-	is refcount( Int ), 1 + $orig_count;
+	is refcount( $ref ), 1 + $orig_count;
+	
+	should_fail( 41, $type );
+	should_pass( 42, $type );
+	
+	is refcount( $ref ), 1 + $orig_count;
 }
 
-is refcount( Int ), $orig_count;
+is refcount( $ref ), $orig_count;
 
 done_testing;
