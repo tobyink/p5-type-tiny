@@ -83,4 +83,31 @@ ok !is_HashRef([]);
 ok !is_HashRef(sub {});
 ok !is_HashRef(1);
 
+BEGIN {
+	package My::Types::Two;
+	use Type::Library 1.011005
+		-utils,
+		-extends => [ 'Types::Standard' ],
+		-declare => 'JSONCapable';
+	
+	declare JSONCapable,
+		as Undef
+		|  ScalarRef[ Enum[ 0..1 ] ]
+		|  Num
+		|  Str
+		|  ArrayRef[ JSONCapable ]
+		|  HashRef[ JSONCapable ]
+		;
+}
+
+use My::Types::Two 'is_JSONCapable';
+
+my $var = {
+	foo => 1,
+	bar => [ \0, "baz", [] ],
+};
+
+ok is_JSONCapable $var;
+
 done_testing;
+
