@@ -1,5 +1,7 @@
+os: linux
+dist: xenial
 language: perl
-matrix:
+jobs:
   include:
     # Coverage report
     - perl: "5.32"
