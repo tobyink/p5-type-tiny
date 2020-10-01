@@ -50,4 +50,14 @@ my $type = $reg->lookup('List[Integer]');
 should_pass([1,2,3], $type);
 should_fail([1,2,3.1], $type);
 
+$reg->clear_parent;
+
+ok ! $reg->get_parent;
+
+my $e = exception {
+	$reg->lookup('List[Integer]');
+};
+
+like( $e, qr/Integer is not a known type constraint/, 'after clearing parent, do not know parent registry types' );
+
 done_testing;
