@@ -3812,3 +3812,18 @@
 		item "Type::Library import now supports -extends and -utils flags."^^Addition;
 		item "Type::Library -base import flag now marks the caller package as loaded in %INC."^^Change;
 	].
+
+`Type-Tiny 1.011_006 cpan:TOBYINK`
+	issued  2020-10-02;
+	changeset [
+		dcs:versus `Type-Tiny 1.011_005 cpan:TOBYINK`;
+		item "Improved test coverage for Type::Library."^^Tests;
+		item "Improved test coverage for Type::Params."^^Tests;
+		item "Improved test coverage for Type::Registry."^^Tests;
+		item "Improved test coverage for Type::Tiny::Union."^^Tests;
+		item "Include JSONCapaable type example."^^Documentation;
+		item "Improved tests for Type::Utils::is()."^^Tests;
+		item "Test::TypeTiny's should_pass and should_fail exercise type constraints in even more ways in EXTENDED_TESTING mode."^^Change;
+		item "Various tests for garbage collection using Devel::Refcount."^^Tests;
+		item "Type::Params now exports an ArgsObject type constraint."^^Addition;
+	].
