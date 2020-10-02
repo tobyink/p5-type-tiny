@@ -28,7 +28,7 @@ require Exporter::Tiny;
 our @ISA = 'Exporter::Tiny';
 
 our @EXPORT    = qw( compile compile_named );
-our @EXPORT_OK = qw( multisig validate validate_named compile_named_oo Invocant wrap_subs wrap_methods );
+our @EXPORT_OK = qw( multisig validate validate_named compile_named_oo Invocant wrap_subs wrap_methods ArgsObject );
 
 sub english_list {
 	require Type::Utils;
@@ -51,6 +51,40 @@ my $QUOTE = \&B::perlstring;
 				],
 			);
 		};
+	}
+	
+	my $ArgsObject;
+	sub ArgsObject (;@) {
+		$ArgsObject ||= do {
+			require Types::Standard;
+			'Type::Tiny'->new(
+				name       => 'ArgsObject',
+				parent     => Types::Standard::Object(),
+				constraint => q{ ref($_) =~ qr/^Type::Params::OO::/ },
+				constraint_generator => sub {
+					my $param = Types::Standard::assert_Str(shift);
+					sub { defined($_->{'~~caller'}) and $_->{'~~caller'} eq $param };
+				},
+				inline_generator => sub {
+					my $param = shift;
+					sub {
+						my $var = pop;
+						return (
+							Types::Standard::Object()->inline_check($var),
+							sprintf(q{ ref(%s) =~ qr/^Type::Params::OO::/ }, $var),
+							sprintf(q{ do { use Scalar::Util (); Scalar::Util::reftype(%s) eq 'HASH' } }, $var),
+							sprintf(q{ defined((%s)->{'~~caller'}) && ((%s)->{'~~caller'} eq %s) }, $var, $var, $QUOTE->($param)),
+						);
+					};
+				},
+			);
+		};
+		
+		@_ ? $ArgsObject->parameterize(@{$_[0]}) : $ArgsObject;
+	}
+	
+	if ( $] ge '5.014' ) {
+		&Scalar::Util::set_prototype($_, ';$') for \&ArgsObject;
 	}
 }
 
@@ -247,6 +281,8 @@ sub compile
 		$return_list = '(@head, @R, @tail)';
 	}
 	
+	my $for = $options{subname}||[caller(1+($options{caller_level}||0))]->[3] || '__ANON__';
+	
 	my @default_indices;
 	my @default_values;
 		
@@ -359,7 +395,7 @@ sub compile
 			);
 			$varname = '$tmp'.($is_optional ? '{x}' : '');
 		}
-
+		
 		# unweaken the constraint in the cache
 		undef $Type::Tiny::ALL_TYPES{ $constraint->{uniq} };
 		$Type::Tiny::ALL_TYPES{ $constraint->{uniq} } = $constraint;
@@ -438,7 +474,7 @@ sub compile
 	
 	my $closure = eval_closure(
 		source      => $source,
-		description => $options{description}||sprintf("parameter validation for '%s'", $options{subname}||[caller(1+($options{caller_level}||0))]->[3] || '__ANON__'),
+		description => $options{description}||sprintf("parameter validation for '%s'", $for),
 		environment => \%env,
 	);
 	
@@ -472,7 +508,9 @@ sub compile_named
 		push @code, @extra_lines;
 		%env = (%$extra_env, %env);
 	}
-
+	
+	my $for = $options{subname}||[caller(1+($options{caller_level}||0))]->[3] || '__ANON__';
+	
 	push @code, 'my %in = ((@_==1) && ref($_[0]) eq "HASH") ? %{$_[0]} : (@_ % 2) ? "Error::TypeTiny::WrongNumberOfParameters"->throw(message => "Odd number of elements in hash") : @_;';
 	my @names;
 	
@@ -615,6 +653,9 @@ sub compile_named
 		push @code, sprintf('@R{%s}', join ",", map $QUOTE->($_), @order);
 	}
 	elsif ($options{bless}) {
+		if ($options{oo_trace}) {
+			push @code, sprintf('$R{%s} = %s;', $QUOTE->('~~caller'), $QUOTE->($for));
+		}
 		push @code, sprintf('bless \\%%R, %s;', $QUOTE->($options{bless}));
 	}
 	elsif (ArrayRef->check($options{class})) {
@@ -639,7 +680,7 @@ sub compile_named
 	
 	my $closure = eval_closure(
 		source      => $source,
-		description => $options{description}||sprintf("parameter validation for '%s'", $options{subname}||[caller(1+($options{caller_level}||0))]->[3] || '__ANON__'),
+		description => $options{description}||sprintf("parameter validation for '%s'", $for),
 		environment => \%env,
 	);
 	
@@ -721,7 +762,7 @@ sub compile_named_oo
 	while (ref($_[0]) eq "HASH" && !$_[0]{slurpy}) {
 		%options = (%options, %{+shift});
 	}
-	my @rest       = @_;
+	my @rest = @_;
 	
 	my %attribs;
 	while (@_) {
@@ -755,7 +796,8 @@ sub compile_named_oo
 	
 	$klasses{$kls} ||= _mkklass(\%attribs);
 	
-	compile_named({ %options, bless => $klasses{$kls} }, @rest);
+	@_ = ({ oo_trace => 1, %options, bless => $klasses{$kls} }, @rest);
+	goto \&compile_named;
 }
 
 # Would be faster to inline this into validate and validate_named, but
@@ -1667,6 +1709,41 @@ constraint which accepts classnames I<and> blessed objects.
    
    return $arr->[ $ix ];
  }
+
+=head3 B<ArgsObject>
+
+Type::Params exports a parameterizable type constraint B<ArgsObject>.
+It accepts the kinds of objects returned by C<compile_named_oo> checks.
+
+  package Foo {
+    use Moo;
+    use Type::Params 'ArgsObject';
+    
+    has args => (
+      is  => 'ro',
+      isa => ArgsObject['Bar::bar'],
+    );
+  }
+  
+  package Bar {
+    use Types::Standard -types;
+    use Type::Params 'compile_named_oo';
+    
+    sub bar {
+      state $check = compile_named_oo(
+        xxx => Int,
+        yyy => ArrayRef,
+      );
+      my $args = &$check;
+      
+      return 'Foo'->new( args => $args );
+    }
+  }
+  
+  Bar::bar( xxx => 42, yyy => [] );
+
+The parameter "Bar::bar" refers to the caller when the check is compiled,
+rather than when the parameters are checked.
 
 =head1 ENVIRONMENT
 

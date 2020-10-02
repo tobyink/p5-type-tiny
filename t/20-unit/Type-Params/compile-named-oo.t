@@ -141,4 +141,18 @@ like($details->{source}, qr/fooble/, 'want_details');
 	is_deeply($r[3], ["foo"]);
 }
 
+{
+	package Local::Foo;
+	my $c;
+	sub bar {
+		$c ||= ::compile_named_oo( foo => ::Int );
+		return $c->(@_);
+	}
+}
+
+my $args = Local::Foo::bar( foo => 42 );
+ok Type::Params::ArgsObject->check($args), 'ArgsObject';
+ok Type::Params::ArgsObject->of('Local::Foo::bar')->check($args), 'ArgsObject["Local::Foo::bar"]';
+note explain($args);
+
 done_testing;
