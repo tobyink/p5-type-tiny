@@ -4,15 +4,6 @@
    changes in development releases, see the "Changes" file instead.
 =======================================================================
 
-2019-11-12 Type-Tiny version 1.006000 released!
-
- - Improved is_subtype_of/is_supertype_of support.
- - ArrayRef array length parameter.
- - Eval::TypeTiny's API is now considered to be stable.
- - Slurpy HashRefs passed to coderefs returned by Type::Params can now
-   be true hashrefs.
- - More import options for Type::Library
-
 2019-12-11 Type-Tiny version 1.008000 released!
 
  - Type::Tiny has a website. <http://typetiny.toby.ink/>
@@ -31,3 +22,4 @@
  - List processing methods (grep, map, etc).
  - Type::Utils::is().
  - Improvements to Types::TypeTiny.
+ - Type::Params now provides an ArgsObject type.
