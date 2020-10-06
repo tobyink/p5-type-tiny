@@ -49,14 +49,15 @@ type check will be conducted by Type::Tiny::XS.
 
 The parameterized C<InstanceOf>, C<HasMethods>, and C<Enum> type
 constraints will be accelerated. So will L<Type::Tiny::Class>,
-L<Type::Tiny::Duck>, and L<Type::Tiny::Enum> objects. (But enums will
-only be accelerated if the list of allowed string values consist
-entirely of word characters and hyphens - that is:
-C<< not grep /[^\w-]/, @values >>.)
+L<Type::Tiny::Duck>, and L<Type::Tiny::Enum> objects.
 
 The C<PositiveInt> and C<PositiveOrZeroInt> type constraints from
 L<Types::Common::Numeric> will be accelerated, as will the
 C<NonEmptyStr> type constraint from L<Types::Common::String>.
+
+The C<StringLike>, C<CodeLike>, C<HashLike>, and C<ArrayLike> types
+from L<Types::TypeTiny> will be accelerated, but parameterized
+C<HashLike> and C<ArrayLike> will not.
 
 L<Type::Tiny::Union> and L<Type::Tiny::Intersection> will also be
 accelerated if their constituent type constraints are.
