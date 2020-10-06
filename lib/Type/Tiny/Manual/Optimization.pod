@@ -28,36 +28,36 @@ L<Ref::Util::XS> installed.
 =head3 Types that can be accelerated by Type::Tiny::XS
 
 The following simple type constraints from L<Types::Standard> will
-be accelerated by Type::Tiny::XS: C<Any>, C<ArrayRef>, C<Bool>,
-C<ClassName>, C<CodeRef>, C<Defined>, C<FileHandle>, C<GlobRef>,
-C<HashRef>, C<Int>, C<Item>, C<Object>, C<Map>, C<Ref>, C<ScalarRef>,
-C<Str>, C<Tuple>, C<Undef>, and C<Value>. (Note that C<Num> and
-C<RegexpRef> are I<not> on that list.)
+be accelerated by Type::Tiny::XS: B<Any>, B<ArrayRef>, B<Bool>,
+B<ClassName>, B<CodeRef>, B<Defined>, B<FileHandle>, B<GlobRef>,
+B<HashRef>, B<Int>, B<Item>, B<Object>, B<Map>, B<Ref>, B<ScalarRef>,
+B<Str>, B<Tuple>, B<Undef>, and B<Value>. (Note that B<Num> and
+B<RegexpRef> are I<not> on that list.)
 
-The parameterized form of C<Ref> cannot be accelerated.
+The parameterized form of B<Ref> cannot be accelerated.
 
-The parameterized forms of C<ArrayRef>, C<HashRef>, and C<Map> can be
+The parameterized forms of B<ArrayRef>, B<HashRef>, and B<Map> can be
 accelerated only if their parameters are.
 
-The parameterized form of C<Tuple> can be accelerated if its
-parameters are, it has no C<Optional> components, and it does not use
+The parameterized form of B<Tuple> can be accelerated if its
+parameters are, it has no B<Optional> components, and it does not use
 C<slurpy>.
 
 Certain type constraints may benefit partially from Type::Tiny::XS.
-For example, C<RoleName> inherits from C<ClassName>, so part of the
+For example, B<RoleName> inherits from B<ClassName>, so part of the
 type check will be conducted by Type::Tiny::XS.
 
-The parameterized C<InstanceOf>, C<HasMethods>, and C<Enum> type
+The parameterized B<InstanceOf>, B<HasMethods>, and B<Enum> type
 constraints will be accelerated. So will L<Type::Tiny::Class>,
 L<Type::Tiny::Duck>, and L<Type::Tiny::Enum> objects.
 
-The C<PositiveInt> and C<PositiveOrZeroInt> type constraints from
+The B<PositiveInt> and B<PositiveOrZeroInt> type constraints from
 L<Types::Common::Numeric> will be accelerated, as will the
-C<NonEmptyStr> type constraint from L<Types::Common::String>.
+B<NonEmptyStr> type constraint from L<Types::Common::String>.
 
-The C<StringLike>, C<CodeLike>, C<HashLike>, and C<ArrayLike> types
+The B<StringLike>, B<CodeLike>, B<HashLike>, and B<ArrayLike> types
 from L<Types::TypeTiny> will be accelerated, but parameterized
-C<HashLike> and C<ArrayLike> will not.
+B<HashLike> and B<ArrayLike> will not.
 
 L<Type::Tiny::Union> and L<Type::Tiny::Intersection> will also be
 accelerated if their constituent type constraints are.
@@ -65,22 +65,22 @@ accelerated if their constituent type constraints are.
 =head3 Types that can be accelerated by Mouse
 
 The following simple type constraints from L<Types::Standard> will
-be accelerated by Type::Tiny::XS: C<Any>, C<ArrayRef>, C<Bool>,
-C<ClassName>, C<CodeRef>, C<Defined>, C<FileHandle>, C<GlobRef>,
-C<HashRef>, C<Ref>, C<ScalarRef>, C<Str>, C<Undef>, and C<Value>.
-(Note that C<Item>, C<Num>, C<Int>, C<Object>, and C<RegexpRef>
+be accelerated by Type::Tiny::XS: B<Any>, B<ArrayRef>, B<Bool>,
+B<ClassName>, B<CodeRef>, B<Defined>, B<FileHandle>, B<GlobRef>,
+B<HashRef>, B<Ref>, B<ScalarRef>, B<Str>, B<Undef>, and B<Value>.
+(Note that B<Item>, B<Num>, B<Int>, B<Object>, and B<RegexpRef>
 are I<not> on that list.)
 
-The parameterized form of C<Ref> cannot be accelerated.
+The parameterized form of B<Ref> cannot be accelerated.
 
-The parameterized forms of C<ArrayRef> and C<HashRef> can be
+The parameterized forms of B<ArrayRef> and B<HashRef> can be
 accelerated only if their parameters are.
 
 Certain type constraints may benefit partially from Mouse. For
-example, C<RoleName> inherits from C<ClassName>, so part of the
+example, B<RoleName> inherits from B<ClassName>, so part of the
 type check will be conducted by Mouse.
 
-The parameterized C<InstanceOf> and C<HasMethods> type constraints
+The parameterized B<InstanceOf> and B<HasMethods> type constraints
 will be accelerated. So will L<Type::Tiny::Class> and
 L<Type::Tiny::Duck> objects.
 
@@ -188,14 +188,14 @@ given as a string of Perl code.
 
 =head2 Common Sense
 
-The C<< HashRef[ArrayRef] >> type constraint can probably be checked
-faster than C<< HashRef[ArrayRef[Num]] >>. If you find yourself using
+The B<< HashRef[ArrayRef] >> type constraint can probably be checked
+faster than B<< HashRef[ArrayRef[Num]] >>. If you find yourself using
 very complex and slow type constraints, you should consider switching
 to simpler and faster ones. (Though this means you have to place a
 little more trust in your caller to not supply you with bad data.)
 
-(A counter-intuitive exception to this: even though C<Int> is more
-restrictive than C<Num>, in most circumstances C<Int> checks will run
+(A counter-intuitive exception to this: even though B<Int> is more
+restrictive than B<Num>, in most circumstances B<Int> checks will run
 faster.)
 
 =head2 Devel::StrictMode
