@@ -3827,3 +3827,10 @@
 		item "Various tests for garbage collection using Devel::Refcount."^^Tests;
 		item "Type::Params now exports an ArgsObject type constraint."^^Addition;
 	].
+
+`Type-Tiny 1.011_007 cpan:TOBYINK`
+	issued  2020-10-06;
+	changeset [
+		dcs:versus `Type-Tiny 1.011_006 cpan:TOBYINK`;
+		item "ArgsObject inlining was closing over a coderef in a way that didn't work on archaic versions of Perl. Resolve by calling the coderef outside the closure."^^Bugfix;
+	].
