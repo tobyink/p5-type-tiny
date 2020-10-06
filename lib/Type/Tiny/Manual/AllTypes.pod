@@ -141,7 +141,7 @@ An integer within a particular numeric range.
 
 B<< Item >> in L<Types::Standard>
 
-Any single item; effectively the same as Any.
+Any single item; effectively the same as B<Any>.
 
 =item *
 
@@ -213,7 +213,7 @@ A string with more than 0 characters.
 
 B<< Num >> in L<Types::Standard>
 
-The same as LaxNum or StrictNum depending on environment.
+The same as B<LaxNum> or B<StrictNum> depending on environment.
 
 =item *
 
@@ -237,7 +237,7 @@ A blessed object.
 
 B<< Optional >> I<< [parameterizable] >> in L<Types::Standard>
 
-Used in conjunction with Dict, Tuple, or CycleTuple.
+Used in conjunction with B<Dict>, B<Tuple>, or B<CycleTuple>.
 
 =item *
 
