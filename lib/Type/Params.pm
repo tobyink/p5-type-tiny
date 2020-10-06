@@ -66,14 +66,15 @@ my $QUOTE = \&B::perlstring;
 					sub { defined($_->{'~~caller'}) and $_->{'~~caller'} eq $param };
 				},
 				inline_generator => sub {
-					my $param = shift;
+					my $param  = shift;
+					my $quoted = $QUOTE->($param);
 					sub {
 						my $var = pop;
 						return (
 							Types::Standard::Object()->inline_check($var),
 							sprintf(q{ ref(%s) =~ qr/^Type::Params::OO::/ }, $var),
 							sprintf(q{ do { use Scalar::Util (); Scalar::Util::reftype(%s) eq 'HASH' } }, $var),
-							sprintf(q{ defined((%s)->{'~~caller'}) && ((%s)->{'~~caller'} eq %s) }, $var, $var, $QUOTE->($param)),
+							sprintf(q{ defined((%s)->{'~~caller'}) && ((%s)->{'~~caller'} eq %s) }, $var, $var, $quoted),
 						);
 					};
 				},
