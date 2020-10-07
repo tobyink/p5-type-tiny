@@ -198,6 +198,16 @@ L<Type::Params> for some strange reason:
     return $x + $y;
   }
 
+You can also use a generic C<assert> function.
+
+  use Type::Utils qw( assert );
+  
+  sub add_numbers {
+    my $x = assert Num, shift;
+    my $y = assert Num, shift;
+    return $x + $y;
+  }
+
 =head3 C<< to_* >>
 
 This is a shortcut for coercion:

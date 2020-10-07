@@ -30,7 +30,7 @@ our @EXPORT_OK = (
 		extends type subtype
 		match_on_type compile_match_on_type
 		dwim_type english_list
-		classifier
+		classifier assert
 	>,
 	"is",
 );
@@ -620,9 +620,8 @@ sub dwim_type
 	$type;
 }
 
-my %is_cache;
-my %is_cache_coderef;
-sub is
+my $TEMPLATE = <<'SUBTEMPLATE';
+sub SUBNAME
 {
 	require Types::TypeTiny;
 	no warnings 'uninitialized';
@@ -648,12 +647,33 @@ sub is
 			my $thing = Type::Tiny::_dd($orig);
 			substr($thing, 0, 1) = lc substr($thing, 0, 1);
 			require Carp;
-			Carp::carp("Expected type, but got $thing; returning false");
-			return undef;
+			FAILURE
 		}
 	}
+	
+	my $check = ( $is_cache_coderef{$caller}{$uniq} ||= $type->compiled_check );
+	
+	BODY
+}
+SUBTEMPLATE
 
-	0+!! ( $is_cache_coderef{$caller}{$uniq} ||= $type->compiled_check )->($value);
+my %is_cache;
+my %is_cache_coderef;
+
+{
+	my $code = $TEMPLATE;
+	$code =~ s/SUBNAME/is/g;
+	$code =~ s/FAILURE/Carp::carp("Expected type, but got \$thing; returning false"); return undef;/g;
+	$code =~ s/BODY/0+!! \$check->(\$value)/;
+	eval $code;
+}
+
+{
+	my $code = $TEMPLATE;
+	$code =~ s/SUBNAME/assert/g;
+	$code =~ s/FAILURE/Carp::croak("Expected type, but got \$thing; stopping"); return undef;/g;
+	$code =~ s/BODY/\$check->(\$value) ? \$value : \$type->_failed_check("\$type", \$value)/;
+	eval $code;
 }
 
 sub english_list
@@ -1131,6 +1151,14 @@ exported by L<Test::More>. Note that you can rename this function if
 C<is> will cause conflicts:
 
    use Type::Utils "is" => { -as => "isntnt" };
+
+=item C<< assert($type, $value) >>
+
+Like C<is> but instead of returning a boolean, returns C<< $value >> and
+dies if the value fails the type check.
+
+This function is not exported by default, but it is exported by
+C<< use Type::Utils -all >>.
 
 =item C<< english_list(\$conjunction, @items) >>
 

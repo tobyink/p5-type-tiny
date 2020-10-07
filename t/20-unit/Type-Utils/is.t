@@ -25,8 +25,9 @@ use warnings;
 use Test::More;
 use Test::Requires { 'Test::Warnings' => 0.005 };
 use Test::Warnings ':all';
+use Test::Fatal;
 
-use Type::Utils "is" => { -as => "isntnt" };
+use Type::Utils "is" => { -as => "isntnt" }, "assert";
 use Types::Standard "Str";
 
 ok ! isntnt(Str, undef);
@@ -53,5 +54,9 @@ like(
 	qr/Expected type, but got reference \[/,
 	'warning from is([], $value)'
 );
+
+is assert(Str, 'foo'), 'foo';
+like exception { assert(Str, []) }, qr/did not pass type constraint/;
+like exception { assert('*', []) }, qr/Expected type, but got value/;
 
 done_testing;
