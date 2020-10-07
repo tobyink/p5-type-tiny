@@ -1317,7 +1317,8 @@ sub can
 		}
 		for my $util ( qw/ grep map sort rsort first any all assert_any assert_all / ) {
 			if ( $_[0] eq $util ) {
-				$self->{'_util'}{$util} ||= $self->_build_util($util);
+				$self->{'_util'}{$util} ||= eval { $self->_build_util($util) };
+				return unless $self->{'_util'}{$util};
 				return sub { my $s = shift; $s->{'_util'}{$util}(@_) };
 			}
 		}

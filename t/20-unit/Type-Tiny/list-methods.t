@@ -26,6 +26,13 @@ use Test::Fatal;
 
 use Types::Standard -types;
 
+my $Rounded2 = Int->plus_coercions( Num, 'int($_)' );
+can_ok( $Rounded2, $_ )
+	for qw( grep map sort rsort first any all assert_any assert_all );
+can_ok( Int, $_ )
+	for qw( grep     sort rsort first any all assert_any assert_all );
+ok ! Int->can('map');
+
 is_deeply(
 	[ Int->grep(qw/ yeah 1 1.5 hello world 2 /, [], qw/ 3 4 5 /, '' ) ],
 	[ qw/ 1 2 3 4 5 / ],
