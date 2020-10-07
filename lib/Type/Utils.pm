@@ -30,7 +30,7 @@ our @EXPORT_OK = (
 		extends type subtype
 		match_on_type compile_match_on_type
 		dwim_type english_list
-		classifier assert to
+		classifier assert
 	>,
 	"is",
 );
