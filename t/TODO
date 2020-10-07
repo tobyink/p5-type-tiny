@@ -1,1 +1,13 @@
-- full module coverage (according to not-covered.pl)
+* Type::Params
+	- head and tail types which cannot be inlined
+
+* Type::Tiny::Enum
+	- mark pre-TT-XS-0.020 code as uncoverable
+	- test exception from as_regexp for unknown flags
+
+* Type::Tiny::Intersection
+	- test stringifies_to
+	- test numifies_to
+
+* Types::Standard
+	- check CycleTuple exception for arrayrefs of wrong length, deep explanation

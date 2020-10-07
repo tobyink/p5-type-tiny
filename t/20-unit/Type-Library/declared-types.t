@@ -30,8 +30,10 @@ BEGIN {
 	use Type::Library -base, -declare => 'MyHashRef';
 	use Types::Standard -types;
 	
-	my $tmp = MyHashRef;
-	sub get_tmp { $tmp }
+	my $tmp     = MyHashRef;
+	my $coderef = \&MyHashRef;
+	sub get_tmp     { $tmp     }
+	sub get_coderef { $coderef }
 	
 	__PACKAGE__->add_type(
 		name    => MyHashRef,
@@ -42,6 +44,10 @@ BEGIN {
 should_pass( { foo => 1, bar => { quux => 2   } }, MyTypes->get_tmp );
 should_fail( { foo => 1, bar => { quux => 2.1 } }, MyTypes->get_tmp );
 
+should_pass( { foo => 1, bar => { quux => 2   } }, MyTypes->get_coderef->() );
+should_fail( { foo => 1, bar => { quux => 2.1 } }, MyTypes->get_coderef->() );
+
 note( MyTypes->get_tmp->inline_check(q/$xyz/) );
+note( MyTypes->get_coderef->()->inline_check(q/$xyz/) );
 
 done_testing;
