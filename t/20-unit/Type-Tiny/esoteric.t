@@ -137,4 +137,10 @@ ok  exception { $child->( 6 ) }, 'overridden assert_return works (failing value)
 ok !exception { $child->( 7 ) }, 'overridden assert_return works (passing value)';
 is( $child->counter, 2, 'overridden assert_return is used by &{} overload' );
 
+is_deeply(
+	eval( '[' . Int->____make_key( [1..4], { quux => \"abc" }, undef ) . ']' ),
+	[ Int, [1..4], { quux => \"abc" }, undef ],
+	'$type->____make_key'
+);
+
 done_testing;
