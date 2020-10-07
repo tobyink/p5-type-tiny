@@ -82,6 +82,11 @@ ok(
 	'$type->__is_parameterized',
 );
 
+ok(
+	(ArrayRef[Int])->has_parameterized_from && !Int->has_parameterized_from,
+	'$type->has_parameterized_from',
+);
+
 my $Int = Int->create_child_type;
 $Int->_add_type_coercions(Num, q[int($_)]);
 is(
