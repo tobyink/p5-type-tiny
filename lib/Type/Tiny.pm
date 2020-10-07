@@ -1413,9 +1413,6 @@ sub _build_util {
 			my $qname = B::perlstring( $self->name );
 			return eval "sub { my \$idx = 0; for (\@_) { Type::Tiny::_failed_check(\$type, $qname, \$_, varname => sprintf('\$_[%d]', \$idx)) unless ($inline); ++\$idx }; \@_; }";
 		}
-		elsif ( $func eq 'all' ) {
-			return eval "sub { for (\@_) { return !!0 unless ($inline) }; !!1; }";
-		}
 	}
 
 	if ( $func eq 'map' ) {
