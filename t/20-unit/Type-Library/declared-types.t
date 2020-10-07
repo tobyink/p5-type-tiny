@@ -47,6 +47,8 @@ should_fail( { foo => 1, bar => { quux => 2.1 } }, MyTypes->get_tmp );
 should_pass( { foo => 1, bar => { quux => 2   } }, MyTypes->get_coderef->() );
 should_fail( { foo => 1, bar => { quux => 2.1 } }, MyTypes->get_coderef->() );
 
+isnt( MyTypes->get_coderef, \&MyTypes::MyHashRef, 'coderef got redefined' );
+
 note( MyTypes->get_tmp->inline_check(q/$xyz/) );
 note( MyTypes->get_coderef->()->inline_check(q/$xyz/) );
 
