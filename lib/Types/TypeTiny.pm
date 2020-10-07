@@ -364,23 +364,23 @@ sub TypeTiny ()
 			$c->freeze;
 		},
 	);
-	if ( 0 and __XS ) {  # causes fails in 03-leak.t
-		my $xsub     = Type::Tiny::XS::get_coderef_for('InstanceOf[Type::Tiny]');
-		my $xsubname = Type::Tiny::XS::get_subname_for('InstanceOf[Type::Tiny]');
-		$cache{TypeTiny} = "Type::Tiny"->new(
-			%common,
-			constraint => $xsub,
-			inlined    => sub {
-				my $var = $_[1];
-				( $Type::Tiny::AvoidCallbacks or not $xsubname )
-					? "Scalar::Util::blessed($var) && $var\->isa(q[Type::Tiny])"
-					: qq/$xsubname($var)/
-			},
-		);
-	}
-	else {
-		$cache{TypeTiny} = "Type::Tiny"->new(%common);
-	}
+#	if ( 0 and __XS ) {  # causes fails in 03-leak.t
+#		my $xsub     = Type::Tiny::XS::get_coderef_for('InstanceOf[Type::Tiny]');
+#		my $xsubname = Type::Tiny::XS::get_subname_for('InstanceOf[Type::Tiny]');
+#		$cache{TypeTiny} = "Type::Tiny"->new(
+#			%common,
+#			constraint => $xsub,
+#			inlined    => sub {
+#				my $var = $_[1];
+#				( $Type::Tiny::AvoidCallbacks or not $xsubname )
+#					? "Scalar::Util::blessed($var) && $var\->isa(q[Type::Tiny])"
+#					: qq/$xsubname($var)/
+#			},
+#		);
+#	}
+#	else {
+	$cache{TypeTiny} = "Type::Tiny"->new(%common);
+#	}
 }
 
 sub _ForeignTypeConstraint ()
