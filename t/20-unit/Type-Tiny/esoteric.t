@@ -113,4 +113,28 @@ ok(
 	'$type->_unite',
 );
 
+{
+	
+	package Type::Tiny::Subclass;
+	our @ISA = qw( Type::Tiny );
+	sub assert_return {
+		my ( $self ) = ( shift );
+		++( $self->{ __PACKAGE__ . '::count' } ||= 0 );
+		$self->SUPER::assert_return( @_ );
+	}
+	sub counter {
+		my ( $self ) = ( shift );
+		$self->{ __PACKAGE__ . '::count' };
+	}
+}
+
+my $child = 'Type::Tiny::Subclass'->new(
+	parent     => Int,
+	constraint => sub { $_ % 3 },
+);
+
+ok  exception { $child->( 6 ) }, 'overridden assert_return works (failing value)';
+ok !exception { $child->( 7 ) }, 'overridden assert_return works (passing value)';
+is( $child->counter, 2, 'overridden assert_return is used by &{} overload' );
+
 done_testing;
