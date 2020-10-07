@@ -3834,3 +3834,15 @@
 		dcs:versus `Type-Tiny 1.011_006 cpan:TOBYINK`;
 		item "ArgsObject inlining was closing over a coderef in a way that didn't work on archaic versions of Perl. Resolve by calling the coderef outside the closure."^^Bugfix;
 	].
+
+`Type-Tiny 1.011_008 cpan:TOBYINK`
+	issued  2020-10-07;
+	changeset [
+		dcs:versus `Type-Tiny 1.011_007 cpan:TOBYINK`;
+		item "Some minor tidyups and updates to Type::Tiny::Manual."^^Documentation;
+		item "Type::Utils::assert() function."^^Addition;
+		item "Test that $type->() works with subclasses that override the assert_return method."^^Tests;
+		item "Write tests for some internal undocumented methods."^^Tests;
+		item "Test integration with Type::Nano as an example of a generic non-Type::Tiny type constraint class."^^Tests;
+		item "Better tests for the placeholder type constraints created by Type::Library -declare flag."^^Tests;
+	].
