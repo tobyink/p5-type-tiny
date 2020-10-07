@@ -68,4 +68,24 @@ should_fail(
 	$t1,
 );
 
+{
+	package Type::Nano::PlusCoerce;
+	our @ISA = 'Type::Nano';
+	sub has_coercion { exists shift->{coercion} }
+	sub coercion     {        shift->{coercion} }
+	sub coerce       { local $_ = pop; shift->coercion->($_) }
+}
+
+my $Rounded = 'Type::Nano::PlusCoerce'->new(
+	name       => 'Rounded',
+	parent     => Type::Nano::Int,
+	constraint => sub { 1 },
+	coercion   => sub { int $_ },
+);
+
+my $RoundedTT = to_TypeTiny( $Rounded );
+
+ok $RoundedTT->has_coercion, 'Type::Nano::PlusCoerce->has_coercion';
+is $RoundedTT->coerce(4.1), 4, 'Type::Nano::PlusCoerce->coerce';
+
 done_testing;
