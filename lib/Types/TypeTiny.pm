@@ -145,7 +145,7 @@ sub _get_check_overload_sub {
 
 sub StringLike ()
 {
-	return $cache{StringLike} if $cache{StringLike};
+	return $cache{StringLike} if defined $cache{StringLike};
 	require Type::Tiny;
 	my %common = (
 		name       => "StringLike",
@@ -160,7 +160,7 @@ sub StringLike ()
 			%common,
 			constraint => $xsub,
 			inlined    => sub {
-				$Type::Tiny::AvoidCallbacks
+				( $Type::Tiny::AvoidCallbacks or not $xsubname )
 					? qq/defined($_[1]) && !ref($_[1]) or Scalar::Util::blessed($_[1]) && ${\ +_get_check_overload_sub() }($_[1], q[""])/
 					: qq/$xsubname($_[1])/
 			},
@@ -173,7 +173,7 @@ sub StringLike ()
 
 sub HashLike (;@)
 {
-	return $cache{HashLike} if $cache{HashLike} && !@_;
+	return $cache{HashLike} if defined($cache{HashLike}) && !@_;
 	require Type::Tiny;
 	my %common = (
 		name       => "HashLike",
@@ -231,7 +231,7 @@ sub HashLike (;@)
 			%common,
 			constraint => $xsub,
 			inlined    => sub {
-				$Type::Tiny::AvoidCallbacks
+				( $Type::Tiny::AvoidCallbacks or not $xsubname )
 					? qq/ref($_[1]) eq q[HASH] or Scalar::Util::blessed($_[1]) && ${\ +_get_check_overload_sub() }($_[1], q[\%{}])/
 					: qq/$xsubname($_[1])/
 			},
@@ -246,7 +246,7 @@ sub HashLike (;@)
 
 sub ArrayLike (;@)
 {
-	return $cache{ArrayLike} if $cache{ArrayLike} && !@_;
+	return $cache{ArrayLike} if defined($cache{ArrayLike}) && !@_;
 	require Type::Tiny;
 	my %common = (
 		name       => "ArrayLike",
@@ -304,7 +304,7 @@ sub ArrayLike (;@)
 			%common,
 			constraint => $xsub,
 			inlined    => sub {
-				$Type::Tiny::AvoidCallbacks
+				( $Type::Tiny::AvoidCallbacks or not $xsubname )
 					? qq/ref($_[1]) eq q[ARRAY] or Scalar::Util::blessed($_[1]) && ${\ +_get_check_overload_sub() }($_[1], q[\@{}])/
 					: qq/$xsubname($_[1])/
 			},
@@ -338,7 +338,7 @@ sub CodeLike ()
 			%common,
 			constraint => $xsub,
 			inlined    => sub {
-				$Type::Tiny::AvoidCallbacks
+				( $Type::Tiny::AvoidCallbacks or not $xsubname )
 					? qq/ref($_[1]) eq q[CODE] or Scalar::Util::blessed($_[1]) && ${\ +_get_check_overload_sub() }($_[1], q[\&{}])/
 					: qq/$xsubname($_[1])/
 			},
@@ -351,7 +351,7 @@ sub CodeLike ()
 
 sub TypeTiny ()
 {
-	return $cache{TypeTiny} if $cache{TypeTiny};
+	return $cache{TypeTiny} if defined $cache{TypeTiny};
 	require Type::Tiny;
 	my %common = (
 		name       => "TypeTiny",
@@ -372,7 +372,7 @@ sub TypeTiny ()
 			constraint => $xsub,
 			inlined    => sub {
 				my $var = $_[1];
-				$Type::Tiny::AvoidCallbacks
+				( $Type::Tiny::AvoidCallbacks or not $xsubname )
 					? "Scalar::Util::blessed($var) && $var\->isa(q[Type::Tiny])"
 					: qq/$xsubname($var)/
 			},
@@ -385,7 +385,7 @@ sub TypeTiny ()
 
 sub _ForeignTypeConstraint ()
 {
-	return $cache{_ForeignTypeConstraint} if $cache{_ForeignTypeConstraint};
+	return $cache{_ForeignTypeConstraint} if defined $cache{_ForeignTypeConstraint};
 	require Type::Tiny;
 	$cache{_ForeignTypeConstraint} = "Type::Tiny"->new(
 		name       => "_ForeignTypeConstraint",
