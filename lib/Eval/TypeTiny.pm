@@ -36,10 +36,11 @@ BEGIN {
 	
 	my $implementation;
 	sub ALIAS_IMPLEMENTATION () {
-		$implementation ||= do {
-			do   { $] ge '5.022'           } ? IMPLEMENTATION_NATIVE :
-			eval { require Devel::LexAlias } ? IMPLEMENTATION_DEVEL_LEXALIAS :
-			eval { require PadWalker       } ? IMPLEMENTATION_PADWALKER      : IMPLEMENTATION_TIE
+		# uncoverable subroutine
+		$implementation ||= do {                                                                  # uncoverable statement
+			do   { $] ge '5.022'           } ? IMPLEMENTATION_NATIVE :                             # uncoverable statement
+			eval { require Devel::LexAlias } ? IMPLEMENTATION_DEVEL_LEXALIAS :                     # uncoverable statement
+			eval { require PadWalker       } ? IMPLEMENTATION_PADWALKER      : IMPLEMENTATION_TIE  # uncoverable statement
 		};
 	}
 	
