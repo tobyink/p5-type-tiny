@@ -101,6 +101,12 @@ is(
 	'$type->_as_string',
 );
 
+like(
+	Int->_stringify_no_magic,
+	qr/^Type::Tiny=HASH\(0x[0-9a-f]+\)$/i,
+	'$type->_stringify_no_magic',
+);
+
 is(
 	$Int->_compiled_type_coercion->(6.2),
 	6,

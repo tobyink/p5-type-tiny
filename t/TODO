@@ -13,11 +13,7 @@
 	- check CycleTuple exception for arrayrefs of wrong length, deep explanation
 
 * Type::Tiny
-	- test _stringify_no_magic method
 	- test can() can find Types::Standard::Object->with_attribute_values
-	- test grep, first, any, all, assert_any, assert_all with non-inlineable types
-	- test sort and rsort with ARRAY sorters
-	- _built_util("badmethod") should throw exception
 
 * Type::Coercion
 	- test _stringify_no_magic method
