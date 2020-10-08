@@ -61,5 +61,26 @@ note( $matchfoo->inline_check('$STRING') );
 	);
 }
 
+#
+# Including this mostly for the benefit of Devel::Cover...
+#
+
+my $matchfoo2 = StrMatch[ qr/f(?{ ++$xxx })(oo)/, Types::Standard::Enum['oo'] ];
+warnings {
+	should_pass('foo', $matchfoo);
+	should_fail('bar', $matchfoo);
+};
+
+{
+	local $Type::Tiny::AvoidCallbacks = 1;
+	my $w = warning { $matchfoo2->inline_check('$STRING') };
+	
+	like(
+		$w,
+		qr/serializing using callbacks/,
+		'The inlining needed to use a callback!',
+	);
+}
+
 done_testing;
 
