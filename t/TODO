@@ -2,9 +2,6 @@
 	- test stringifies_to
 	- test numifies_to
 
-* Types::Standard
-	- check CycleTuple exception for arrayrefs of wrong length, deep explanation
-
 * Type::Coercion
 	- test _stringify_no_magic method
 

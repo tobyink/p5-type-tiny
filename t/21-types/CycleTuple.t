@@ -133,6 +133,16 @@ should_pass([ 1,{},qr// => 2,{},qr// => 3,{},qr// => 4,{},qr// ], $type1);
 should_fail([ 1,{},qr// => 2,{},qr// => 3,{},qr// => 4,{}      ], $type1); # fails because missing slot
 should_fail([ 1,{},qr// => 2,{},qr// => 3,{},qr// => 4,{},[]   ], $type1); # fails because bad value in slot
 
+#
+# Explanations
+#
+
+my $explanation = join "\n", @{ $type1->validate_explain([1], '$VAL') };
+like($explanation, qr/expects a multiple of 3 values in the array/);
+like($explanation, qr/1 values? found/);
+
+my $explanation2 = join "\n", @{ $type1->validate_explain([1,undef,qr//], '$VAL') };
+like($explanation2, qr/constrains value at index 1 of array with "HashRef"/);
 
 #
 # Empty arrayref
