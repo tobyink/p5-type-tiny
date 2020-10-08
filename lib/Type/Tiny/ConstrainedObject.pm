@@ -49,7 +49,7 @@ sub parent
 
 sub _short_name
 {
-	die "implement this";
+	die "subclasses must implement this"; # uncoverable statement
 }
 
 my $i = 0;
