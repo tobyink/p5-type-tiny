@@ -149,6 +149,12 @@ ok('FOO' =~ $re_i);
 ok('xyz' !~ $re_i);
 ok('foo bar baz' !~ $re_i);
 
+like(
+	exception { $enum1->as_regexp('42') },
+	qr/Unknown regexp flags/,
+	'Unknown flags passed to as_regexp'
+);
+
 #
 # Enum allows you to pass objects overloading stringification when
 # creating the type, but rejects blessed objects (even overloaded)

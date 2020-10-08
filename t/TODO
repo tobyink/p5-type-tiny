@@ -1,9 +1,6 @@
 * Type::Params
 	- head and tail types which cannot be inlined
 
-* Type::Tiny::Enum
-	- test exception from as_regexp for unknown flags
-
 * Type::Tiny::Intersection
 	- test stringifies_to
 	- test numifies_to
