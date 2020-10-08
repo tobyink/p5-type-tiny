@@ -162,6 +162,12 @@ should_pass({ foo => 99, jjj => '2.2' }, $gazetteer2);
 should_fail({ jjj => '2.2' }, $gazetteer2);
 should_fail({ foo => 99, jjjj => '2.2' }, $gazetteer2);
 
+# Slurped thing will always be a hashref (even if an empty one)
+# so cannot be a Num!
+my $weird = Dict[ foo => Int, slurpy Num ];
+should_fail( { foo => 1 }, $weird );
+should_fail( {          }, $weird );
+
 subtest slurpy_coderef_thing => sub
 {
 	my $allow_extras = 1;
@@ -270,6 +276,7 @@ subtest my_hashref_allows_key => sub
 	ok(!(Dict[bar=>Int, slurpy Map[Int,Int]])->create_child_type->my_hashref_allows_key(undef), 'A child of Dict[bar=>Int,slurpy Map[Int,Int]] disallows key undef');
 	ok(!(Dict[bar=>Int, slurpy Map[Int,Int]])->create_child_type->my_hashref_allows_key([]), 'A child of Dict[bar=>Int,slurpy Map[Int,Int]] disallows key []');
 	ok((Dict[bar=>Int, slurpy Map[Int,Int]])->create_child_type->my_hashref_allows_key('42'), 'A child of Dict[bar=>Int,slurpy Map[Int,Int]] allows key "42"');
+	ok(!(Dict[slurpy Int])->my_hashref_allows_key('foo'), 'Dict[slurpy Int] disallows key "foo"');
 };
 
 # This could probably be expanded...
@@ -282,6 +289,7 @@ subtest my_hashref_allows_value => sub
 	ok((Dict[bar=>Int, slurpy Map[Int,Int]])->create_child_type->my_hashref_allows_value(bar => 42), 'A child of Dict[bar=>Int,slurpy Map[Int,Int]] allows key "bar" with value 42');
 	ok((Dict[bar=>Int, slurpy Map[Int,Int]])->create_child_type->my_hashref_allows_value(21, 42), 'A child of Dict[bar=>Int,slurpy Map[Int,Int]] allows key "21" with value 42');
 	ok(!(Dict[bar=>Int, slurpy Map[Int,Int]])->create_child_type->my_hashref_allows_value(baz => 42), 'A child of Dict[bar=>Int,slurpy Map[Int,Int]] disallows key "baz" with value 42');
+	ok(!(Dict[slurpy Int])->my_hashref_allows_value(foo => 42), 'Dict[slurpy Int] disallows key "foo" with value 42');
 };
 
 subtest "Invalid parameters" => sub {
