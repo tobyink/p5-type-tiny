@@ -64,7 +64,12 @@ sub _build_display_name
 
 {
 	my $new_xs;
-
+	
+	#
+	# Note the fallback code for older Type::Tiny::XS cannot be tested as
+	# part of the coverage tests because they use the latest Type::Tiny::XS.
+	#
+	
 	sub _xs_encoding
 	{
 		my $unique_values = shift;
@@ -79,12 +84,10 @@ sub _build_display_name
 			require B;
 			return sprintf("Enum[%s]", join(",", map B::perlstring($_), @$unique_values));
 		}
-		else {
-			# We can't encode anything other than straight word-chars or it'll break
-			# Type::Parser.
-			return undef if grep /\W/, @$unique_values;
-			return sprintf("Enum[%s]", join(",", @$unique_values));
-		}
+		else {                                                       # uncoverable statement
+			return undef if grep /\W/, @$unique_values;               # uncoverable statement
+			return sprintf("Enum[%s]", join(",", @$unique_values));   # uncoverable statement
+		}                                                            # uncoverable statement
 	}
 }
 
