@@ -294,7 +294,7 @@ sub AUTOLOAD
 # Prevent AUTOLOAD being called for DESTROY!
 sub DESTROY
 {
-	return;
+	return; # uncoverable statement
 }
 
 DELAYED: {
