@@ -91,4 +91,25 @@ ok($new2->[2] == ArrayRef);
 ok($new2->[3] == $role_type);
 ok($new2->[4] == $duck_type);
 
+my $new3 = ((Int) & $class_type & (ArrayRef) & $role_type & $duck_type)
+	->stringifies_to( Enum['abc','xyz'] );
+ok($new3->[0] == Int);
+ok($new3->[1] == $class_type->stringifies_to( Enum['abc','xyz'] ));
+ok($new3->[2] == ArrayRef);
+ok($new3->[3] == $role_type);
+ok($new3->[4] == $duck_type);
+
+my $new4 = ((Int) & $class_type & (ArrayRef) & $role_type & $duck_type)
+	->numifies_to( Enum[1..4] );
+ok($new4->[0] == Int);
+ok($new4->[1] == $class_type->numifies_to( Enum[1..4] ));
+ok($new4->[2] == ArrayRef);
+ok($new4->[3] == $role_type);
+ok($new4->[4] == $duck_type);
+
+my $working = ( (Ref['HASH']) & ($class_type) )->numifies_to(Enum[42]);
+ok $working->can_be_inlined;
+should_pass( 'Local::Class'->new( as_number => 42 ), $working );
+should_fail( 'Local::Class'->new( as_number => 41 ), $working );
+
 done_testing();

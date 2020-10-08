@@ -1,7 +1,3 @@
-* Type::Tiny::Intersection
-	- test stringifies_to
-	- test numifies_to
-
 * Type::Coercion
 	- test _stringify_no_magic method
 
