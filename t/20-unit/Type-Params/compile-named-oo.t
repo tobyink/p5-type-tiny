@@ -166,7 +166,7 @@ like($details->{source}, qr/fooble/, 'want_details');
 	is($r[1]->bazz, undef);
 	ok(!$r[1]->haz);
 	is_deeply($r[2], [1,2,3]);
-	is_deeply($r[3], ["foo"])sub{
+	is_deeply($r[3], ["foo"]);
 }
 
 {
