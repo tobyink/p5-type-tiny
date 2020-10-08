@@ -165,5 +165,34 @@ should_pass($fb->[1], InstanceOf['Type::Tiny::Class']);
 should_pass( bless([], 'Foo'), $fb );
 should_pass( bless([], 'Bar'), $fb );
 
+#
+# with_attribute_values
+#
+
+{
+	package Local::Person;
+	sub new {
+		my $class = shift;
+		my %args  = (@_==1) ? %{$_[0]} : @_;
+		bless \%args, $class;
+	}
+	sub name   { shift->{name}   }
+	sub gender { shift->{gender} }
+}
+
+my $Person = InstanceOf['Local::Person'];
+
+my $Man = $Person->with_attribute_values(
+	gender => Types::Standard::Enum['m']
+);
+
+my $alice = 'Local::Person'->new( name => 'Alice', gender => 'f' );
+my $bob   = 'Local::Person'->new( name => 'Bob',   gender => 'm' );
+
+should_pass($alice, $Person);
+should_pass($bob,   $Person);
+should_fail($alice, $Man);
+should_pass($bob,   $Man);
+
 done_testing;
 

@@ -12,9 +12,6 @@
 * Types::Standard
 	- check CycleTuple exception for arrayrefs of wrong length, deep explanation
 
-* Type::Tiny
-	- test can() can find Types::Standard::Object->with_attribute_values
-
 * Type::Coercion
 	- test _stringify_no_magic method
 

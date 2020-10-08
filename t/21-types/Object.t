@@ -116,5 +116,32 @@ while (@tests) {
 	}
 }
 
+#
+# with_attribute_values
+#
+
+{
+	package Local::Person;
+	sub new {
+		my $class = shift;
+		my %args  = (@_==1) ? %{$_[0]} : @_;
+		bless \%args, $class;
+	}
+	sub name   { shift->{name}   }
+	sub gender { shift->{gender} }
+}
+
+my $Man = Object->with_attribute_values(
+	gender => Types::Standard::Enum['m']
+);
+
+my $alice = 'Local::Person'->new( name => 'Alice', gender => 'f' );
+my $bob   = 'Local::Person'->new( name => 'Bob',   gender => 'm' );
+
+should_pass($alice, Object);
+should_pass($bob,   Object);
+should_fail($alice, $Man);
+should_pass($bob,   $Man);
+
 done_testing;
 
