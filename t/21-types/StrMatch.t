@@ -6,6 +6,10 @@
 
 Basic tests for B<StrMatch> from L<Types::Standard>.
 
+=head1 SEE ALSO
+
+StrMatch-more.t
+
 =head1 AUTHOR
 
 Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
@@ -25,8 +29,6 @@ use Test::More;
 use Test::Fatal;
 use Test::TypeTiny;
 use Types::Standard qw( StrMatch );
-use Test::Requires { 'Test::Warnings' => 0.005 };
-use Test::Warnings ':all';
 
 isa_ok(StrMatch, 'Type::Tiny', 'StrMatch');
 is(StrMatch->name, 'StrMatch', 'StrMatch has correct name');
@@ -209,38 +211,6 @@ should_pass('-1.6 cm', $metric_distance);
 should_fail('xyz km', $metric_distance);
 should_fail('7 miles', $metric_distance);
 should_fail('7 km   ', $metric_distance);
-
-#
-# This is a regexp containing embeeded Perl code.
-# It's interesting because it cannot easily be inlined.
-#
-
-my $xxx = 0;
-my $matchfoo = StrMatch[ qr/f(?{ ++$xxx })oo/ ];
-
-# Wrap this in a warnings block because it will generate warnings under
-# EXTENDED_TESTING! The warnings will be tested later.
-warnings {
-	should_pass('foo', $matchfoo);
-	should_fail('bar', $matchfoo);
-};
-
-ok($xxx > 0, 'Embedded code executed');
-note('$xxx is ' . $xxx);
-
-ok($matchfoo->can_be_inlined, 'It can still be inlined!');
-note( $matchfoo->inline_check('$STRING') );
-
-{
-	local $Type::Tiny::AvoidCallbacks = 1;
-	my $w = warning { $matchfoo->inline_check('$STRING') };
-	
-	like(
-		$w,
-		qr/serializing using callbacks/,
-		'The inlining needed to use a callback!',
-	);
-}
 
 done_testing;
 
