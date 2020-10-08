@@ -116,7 +116,7 @@ like($details->{source}, qr/fooble/, 'want_details');
 {
 	my $coderef3 = compile_named_oo(
 		{
-			head         => [ Int->where('1')->plus_coercions( Num->where('1'), sub {int $_} ) ],
+			head         => [ Int->where('1')->plus_coercions( Num->where('1'), q{int $_} ) ],
 			tail         => [ ArrayRef->where('1'), ArrayRef ],
 			want_details => 1,
 		},
@@ -139,6 +139,34 @@ like($details->{source}, qr/fooble/, 'want_details');
 	ok(!$r[1]->haz);
 	is_deeply($r[2], [1,2,3]);
 	is_deeply($r[3], ["foo"]);
+}
+
+{
+	my $coderef3 = compile_named_oo(
+		{
+			head         => [ Int->where(sub{1})->plus_coercions( Num->where(sub{1}), sub {int $_} ) ],
+			tail         => [ ArrayRef->where(sub{1}), ArrayRef ],
+			want_details => 1,
+		},
+		bar    => Optional[ArrayRef],
+		baz    => Optional[CodeRef], { getter => 'bazz', predicate => 'haz' },
+		foo    => Num,
+	);
+
+	note($coderef3->{source});
+
+	is($coderef3->{max_args}, 9);
+	ok($coderef3->{min_args} >= 3);
+
+	my @r = $coderef3->{closure}->(1.1, foo => 1.2, bar => [], [1,2,3], ["foo"]);
+
+	is($r[0], 1);
+	is($r[1]->foo, 1.2);
+	is_deeply($r[1]->bar, []);
+	is($r[1]->bazz, undef);
+	ok(!$r[1]->haz);
+	is_deeply($r[2], [1,2,3]);
+	is_deeply($r[3], ["foo"])sub{
 }
 
 {

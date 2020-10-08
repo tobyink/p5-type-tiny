@@ -1,6 +1,3 @@
-* Type::Params
-	- head and tail types which cannot be inlined
-
 * Type::Tiny::Intersection
 	- test stringifies_to
 	- test numifies_to
