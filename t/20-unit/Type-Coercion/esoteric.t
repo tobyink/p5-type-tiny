@@ -56,4 +56,8 @@ is($type->coerce(3.1), 3, '$type->coercion->add_type_coercions(TYPE, STR)');
 is($type->coerce([]), 666, '$type->coercion->_compiled_type_coercion(OBJECT)');
 is($type->coerce(undef), 999, '$type->coercion->_compiled_type_coercion(CODE)');
 
+my $J = Types::Standard::Join;
+is("$J", 'Join');
+like($J->_stringify_no_magic, qr/^Type::Coercion=HASH\(0x[0-9a-f]+\)$/i);
+
 done_testing;
