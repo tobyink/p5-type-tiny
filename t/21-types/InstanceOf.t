@@ -182,6 +182,8 @@ should_pass( bless([], 'Bar'), $fb );
 
 my $Person = InstanceOf['Local::Person'];
 
+ok( $Person->can('with_attribute_values') );
+
 my $Man = $Person->with_attribute_values(
 	gender => Types::Standard::Enum['m']
 );

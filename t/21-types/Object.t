@@ -131,6 +131,8 @@ while (@tests) {
 	sub gender { shift->{gender} }
 }
 
+ok( Object->can('with_attribute_values') );
+
 my $Man = Object->with_attribute_values(
 	gender => Types::Standard::Enum['m']
 );
