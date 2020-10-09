@@ -159,8 +159,8 @@ sub StringLike ()
 		my $inlined  = $common{inlined};
 		$cache{StringLike} = "Type::Tiny"->new(
 			%common,
-			constraint => $xsub,
-			inlined    => sub {
+			compiled_type_constraint => $xsub,
+			inlined => sub {
 				( $Type::Tiny::AvoidCallbacks or not $xsubname ) ? goto($inlined) : qq/$xsubname($_[1])/
 			},
 		);
@@ -229,8 +229,8 @@ sub HashLike (;@)
 		my $inlined  = $common{inlined};
 		$cache{HashLike} = "Type::Tiny"->new(
 			%common,
-			constraint => $xsub,
-			inlined    => sub {
+			compiled_type_constraint => $xsub,
+			inlined => sub {
 				( $Type::Tiny::AvoidCallbacks or not $xsubname ) ? goto($inlined) : qq/$xsubname($_[1])/
 			},
 		);
@@ -301,8 +301,8 @@ sub ArrayLike (;@)
 		my $inlined  = $common{inlined};
 		$cache{ArrayLike} = "Type::Tiny"->new(
 			%common,
-			constraint => $xsub,
-			inlined    => sub {
+			compiled_type_constraint => $xsub,
+			inlined => sub {
 				( $Type::Tiny::AvoidCallbacks or not $xsubname ) ? goto($inlined) : qq/$xsubname($_[1])/
 			},
 		);
@@ -334,8 +334,8 @@ sub CodeLike ()
 		my $inlined  = $common{inlined};
 		$cache{CodeLike} = "Type::Tiny"->new(
 			%common,
-			constraint => $xsub,
-			inlined    => sub {
+			compiled_type_constraint => $xsub,
+			inlined => sub {
 				( $Type::Tiny::AvoidCallbacks or not $xsubname ) ? goto($inlined) : qq/$xsubname($_[1])/
 			},
 		);
