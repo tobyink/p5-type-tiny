@@ -48,12 +48,12 @@ sub import
 	return $class->$next($opts, @_);              # uncoverable statement
 }
 
-for (__PACKAGE__->type_names) {
-	eval qq{
-		sub is_$_     { $_()->check(shift) }
-		sub assert_$_ { $_()->assert_return(shift) }
-	};
-}
+for (__PACKAGE__->type_names) {                      # uncoverable statement
+	eval qq{                                          # uncoverable statement
+		sub is_$_     { $_()->check(shift) }           # uncoverable statement
+		sub assert_$_ { $_()->assert_return(shift) }   # uncoverable statement
+	};                                                # uncoverable statement
+}                                                    # uncoverable statement
 
 sub meta
 {
