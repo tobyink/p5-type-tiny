@@ -3846,3 +3846,16 @@
 		item "Test integration with Type::Nano as an example of a generic non-Type::Tiny type constraint class."^^Tests;
 		item "Better tests for the placeholder type constraints created by Type::Library -declare flag."^^Tests;
 	].
+
+
+`Type-Tiny 1.011_009 cpan:TOBYINK`
+	issued  2020-10-09;
+	changeset [
+		dcs:versus `Type-Tiny 1.011_008 cpan:TOBYINK`;
+		item "Improve test coverage by adding tests for various esoteric parts of the distribution and edge cases."^^Tests;
+		item "Add tests for _ForeignTypeConstraint."^^Tests;
+		item "Add _ForeignTypeConstraint to AllTypes.pod."^^Documentation;
+		item "Refactoring of Types::TypeTiny."^^Change;
+		item "Where various parts of Type::Tiny internally use type constraints to check values, prefer is_* and assert_* functions over method calls."^^Change;
+		item "More efficient use of Type::Tiny::XS by Types::TypeTiny."^^Change;
+	].

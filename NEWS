@@ -20,6 +20,6 @@
 2020-XX-XX Type-Tiny version 1.012000 released!
 
  - List processing methods (grep, map, etc).
- - Type::Utils::is().
+ - Type::Utils::is() and Type::Utils::assert().
  - Improvements to Types::TypeTiny.
  - Type::Params now provides an ArgsObject type.
