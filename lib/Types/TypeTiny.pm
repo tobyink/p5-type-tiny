@@ -179,7 +179,7 @@ sub StringLike ()
 			compiled_type_constraint => $xsub,
 			inlined => sub {
 				# uncoverable subroutine
-				( $Type::Tiny::AvoidCallbacks or not $xsubname ) ? goto($inlined) : qq/$xsubname($_[1])/
+				( $Type::Tiny::AvoidCallbacks or not $xsubname ) ? goto($inlined) : qq/$xsubname($_[1])/ # uncoverable statement
 			},
 		);
 		_reinstall_subs $cache{StringLike};
@@ -251,7 +251,7 @@ sub HashLike (;@)
 			compiled_type_constraint => $xsub,
 			inlined => sub {
 				# uncoverable subroutine
-				( $Type::Tiny::AvoidCallbacks or not $xsubname ) ? goto($inlined) : qq/$xsubname($_[1])/
+				( $Type::Tiny::AvoidCallbacks or not $xsubname ) ? goto($inlined) : qq/$xsubname($_[1])/ # uncoverable statement
 			},
 		);
 		_reinstall_subs $cache{HashLike};
@@ -325,7 +325,7 @@ sub ArrayLike (;@)
 			compiled_type_constraint => $xsub,
 			inlined => sub {
 				# uncoverable subroutine
-				( $Type::Tiny::AvoidCallbacks or not $xsubname ) ? goto($inlined) : qq/$xsubname($_[1])/
+				( $Type::Tiny::AvoidCallbacks or not $xsubname ) ? goto($inlined) : qq/$xsubname($_[1])/ # uncoverable statement
 			},
 		);
 		_reinstall_subs $cache{ArrayLike};
@@ -360,7 +360,7 @@ sub CodeLike ()
 			compiled_type_constraint => $xsub,
 			inlined => sub {
 				# uncoverable subroutine
-				( $Type::Tiny::AvoidCallbacks or not $xsubname ) ? goto($inlined) : qq/$xsubname($_[1])/
+				( $Type::Tiny::AvoidCallbacks or not $xsubname ) ? goto($inlined) : qq/$xsubname($_[1])/ # uncoverable statement
 			},
 		);
 		_reinstall_subs $cache{CodeLike};
@@ -394,7 +394,7 @@ sub TypeTiny ()
 			compiled_type_constraint => $xsub,
 			inlined    => sub {
 				# uncoverable subroutine
-				( $Type::Tiny::AvoidCallbacks or not $xsubname ) ? goto($inlined) : qq/$xsubname($_[1])/
+				( $Type::Tiny::AvoidCallbacks or not $xsubname ) ? goto($inlined) : qq/$xsubname($_[1])/ # uncoverable statement
 			},
 		);
 		_reinstall_subs $cache{TypeTiny};
