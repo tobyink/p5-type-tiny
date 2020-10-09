@@ -13,8 +13,8 @@ $Type::Library::VERSION =~ tr/_//d;
 
 use Eval::TypeTiny qw< eval_closure >;
 use Scalar::Util qw< blessed refaddr >;
-use Type::Tiny;
-use Types::TypeTiny qw< TypeTiny to_TypeTiny >;
+use Type::Tiny ();
+use Types::TypeTiny ();
 
 require Exporter::Tiny;
 our @ISA = 'Exporter::Tiny';
@@ -325,8 +325,8 @@ sub add_type
 	
 	my $type =
 		ref($_[0]) =~ /^Type::Tiny\b/  ? $_[0] :
-		blessed($_[0])                 ? to_TypeTiny($_[0]) :
-		ref($_[0]) eq q(HASH)          ? "Type::Tiny"->new(library => $class, %{$_[0]}) :
+		blessed($_[0])                 ? Types::TypeTiny::to_TypeTiny($_[0]) :
+		ref($_[0]) eq q(HASH)          ? 'Type::Tiny'->new(library => $class, %{$_[0]}) :
 		"Type::Tiny"->new(library => $class, @_);
 	my $name = $type->{name};
 	

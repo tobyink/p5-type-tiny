@@ -26,9 +26,9 @@ sub __constraint_generator
 	return $meta->get_type('Map') unless @_;
 	
 	my ($keys, $values) = @_;
-	Types::TypeTiny::TypeTiny->check($keys)
+	Types::TypeTiny::is_TypeTiny($keys)
 		or _croak("First parameter to Map[`k,`v] expected to be a type constraint; got $keys");
-	Types::TypeTiny::TypeTiny->check($values)
+	Types::TypeTiny::is_TypeTiny($values)
 		or _croak("Second parameter to Map[`k,`v] expected to be a type constraint; got $values");
 	
 	my @xsub;
@@ -180,7 +180,7 @@ sub __hashref_allows_key {
 	my $self = shift;
 	my ($key) = @_;
 	
-	return Types::Standard::Str()->check($key) if $self==Types::Standard::Map();
+	return Types::Standard::is_Str($key) if $self==Types::Standard::Map();
 	
 	my $map = $self->find_parent(sub { $_->has_parent && $_->parent==Types::Standard::Map() });
 	my ($kcheck, $vcheck) = @{ $map->parameters };

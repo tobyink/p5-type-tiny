@@ -24,9 +24,9 @@ sub __constraint_generator
 	return Types::Standard->meta->get_type('Tied') unless @_;
 	
 	my $param = Types::TypeTiny::to_TypeTiny(shift);
-	unless (Types::TypeTiny::TypeTiny->check($param))
+	unless (Types::TypeTiny::is_TypeTiny($param))
 	{
-		Types::TypeTiny::StringLike->check($param)
+		Types::TypeTiny::is_StringLike($param)
 			or _croak("Parameter to Tied[`a] expected to be a class name; got $param");
 		require Type::Tiny::Class;
 		$param = "Type::Tiny::Class"->new(class => "$param");
@@ -41,9 +41,9 @@ sub __constraint_generator
 sub __inline_generator
 {
 	my $param = Types::TypeTiny::to_TypeTiny(shift);
-	unless (Types::TypeTiny::TypeTiny->check($param))
+	unless (Types::TypeTiny::is_TypeTiny($param))
 	{
-		Types::TypeTiny::StringLike->check($param)
+		Types::TypeTiny::is_StringLike($param)
 			or _croak("Parameter to Tied[`a] expected to be a class name; got $param");
 		require Type::Tiny::Class;
 		$param = "Type::Tiny::Class"->new(class => "$param");

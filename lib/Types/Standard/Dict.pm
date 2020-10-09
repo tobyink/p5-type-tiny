@@ -43,7 +43,7 @@ sub __constraint_generator
 	
 	if ($slurpy)
 	{
-		Types::TypeTiny::TypeTiny->check($slurpy)
+		Types::TypeTiny::is_TypeTiny($slurpy)
 			or _croak("Slurpy parameter to Dict[...] expected to be a type constraint; got $slurpy");
 		
 		$shash->{slurpy} = $slurpy;  # store canonicalized slurpy
@@ -52,9 +52,9 @@ sub __constraint_generator
 	while (my ($k, $v) = $iterator->())
 	{
 		$constraints{$k} = $v;
-		Types::TypeTiny::TypeTiny->check($v)
+		Types::TypeTiny::is_TypeTiny($v)
 			or _croak("Parameter for Dict[...] with key '$k' expected to be a type constraint; got $v");
-		Types::TypeTiny::StringLike->check($k)
+		Types::TypeTiny::is_StringLike($k)
 			or _croak("Key for Dict[...] expected to be string; got $k");
 		push @keys, $k;
 		$is_optional{$k} = !!$constraints{$k}->is_strictly_a_type_of($_optional);
@@ -358,7 +358,7 @@ sub __hashref_allows_key
 	my $self = shift;
 	my ($key) = @_;
 	
-	return Types::Standard::Str()->check($key) if $self==Types::Standard::Dict();
+	return Types::Standard::is_Str($key) if $self==Types::Standard::Dict();
 	
 	my $dict = $self->find_parent(sub { $_->has_parent && $_->parent==Types::Standard::Dict() });
 	my %params;
@@ -378,7 +378,7 @@ sub __hashref_allows_key
 		if exists($params{$key});
 	return !!0
 		if !$slurpy;
-	return Types::Standard::Str()->check($key)
+	return Types::Standard::is_Str($key)
 		if $slurpy==Types::Standard::Any() || $slurpy==Types::Standard::Item() || $slurpy==Types::Standard::Defined() || $slurpy==Types::Standard::Ref();
 	return $slurpy->my_hashref_allows_key($key)
 		if $slurpy->is_a_type_of(Types::Standard::HashRef());

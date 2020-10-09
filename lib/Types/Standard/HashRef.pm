@@ -24,7 +24,7 @@ sub __constraint_generator
 	return Types::Standard::HashRef unless @_;
 	
 	my $param = shift;
-	Types::TypeTiny::TypeTiny->check($param)
+	Types::TypeTiny::is_TypeTiny($param)
 		or _croak("Parameter to HashRef[`a] expected to be a type constraint; got $param");
 	
 	my $param_compiled_check = $param->compiled_check;
@@ -145,7 +145,7 @@ sub __coercion_generator
 
 sub __hashref_allows_key {
 	my $self = shift;
-	Types::Standard::Str()->check($_[0]);
+	Types::Standard::is_Str($_[0]);
 }
 
 sub __hashref_allows_value {
@@ -158,7 +158,7 @@ sub __hashref_allows_value {
 	my $href  = $self->find_parent(sub { $_->has_parent && $_->parent==Types::Standard::HashRef() });
 	my $param = $href->type_parameter;
 	
-	Types::Standard::Str()->check($key) and $param->check($value);
+	Types::Standard::is_Str($key) and $param->check($value);
 }
 
 1;

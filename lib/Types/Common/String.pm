@@ -157,7 +157,7 @@ $meta->add_type(
 		return $meta->get_type('StrLength') unless @_;
 		
 		my ($min, $max) = @_;
-		Types::Standard::Int->check($_)
+		Types::Standard::is_Int($_)
 			|| Types::Standard::_croak("Parameters for StrLength[`min, `max] expected to be integers; got $_")
 			for @_;
 		

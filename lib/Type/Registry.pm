@@ -14,7 +14,7 @@ $Type::Registry::VERSION =~ tr/_//d;
 use Exporter::Tiny qw( mkopt );
 use Scalar::Util qw( refaddr );
 use Type::Parser qw( eval_type );
-use Types::TypeTiny qw( CodeLike ArrayLike to_TypeTiny );
+use Types::TypeTiny ();
 
 our @ISA = 'Exporter::Tiny';
 our @EXPORT_OK = qw(t);
@@ -78,7 +78,7 @@ sub add_types
 		if ($library->isa("Type::Library") or $library eq 'Types::TypeTiny')
 		{
 			$types ||= [qw/-types/];
-			ArrayLike->check($types)
+			Types::TypeTiny::is_ArrayLike($types)
 				or _croak("Expected arrayref following '%s'; got %s", $library, $types);
 			
 			$library->import({into => \%hash}, @$types);
@@ -87,14 +87,14 @@ sub add_types
 		elsif ($library->isa("MooseX::Types::Base"))
 		{
 			$types ||= [];
-			ArrayLike->check($types) && (@$types == 0)
+			Types::TypeTiny::is_ArrayLike($types) && (@$types == 0)
 				or _croak("Library '%s' is a MooseX::Types type constraint library. No import options currently supported", $library);
 			
 			require Moose::Util::TypeConstraints;
 			my $moosextypes = $library->type_storage;
 			for my $name (sort keys %$moosextypes)
 			{
-				my $tt = to_TypeTiny(
+				my $tt = Types::TypeTiny::to_TypeTiny(
 					Moose::Util::TypeConstraints::find_type_constraint($moosextypes->{$name})
 				);
 				$hash{$name} = $tt;
@@ -103,14 +103,14 @@ sub add_types
 		elsif ($library->isa("MouseX::Types::Base"))
 		{
 			$types ||= [];
-			ArrayLike->check($types) && (@$types == 0)
+			Types::TypeTiny::is_ArrayLike($types) && (@$types == 0)
 				or _croak("Library '%s' is a MouseX::Types type constraint library. No import options currently supported", $library);
 			
 			require Mouse::Util::TypeConstraints;
 			my $moosextypes = $library->type_storage;
 			for my $name (sort keys %$moosextypes)
 			{
-				my $tt = to_TypeTiny(
+				my $tt = Types::TypeTiny::to_TypeTiny(
 					Mouse::Util::TypeConstraints::find_type_constraint($moosextypes->{$name})
 				);
 				$hash{$name} = $tt;
@@ -136,7 +136,7 @@ sub add_type
 {
 	my $self = shift;
 	my ($type, $name) = @_;
-	$type = to_TypeTiny($type);
+	$type = Types::TypeTiny::to_TypeTiny($type);
 	$name ||= do {
 		$type->is_anon
 			and _croak("Expected named type constraint; got anonymous type constraint");
@@ -219,7 +219,7 @@ sub foreign_lookup
 		my $type = Moose::Util::TypeConstraints::find_type_constraint(
 			$library->get_type($typename)
 		) or return;
-		return to_TypeTiny($type);
+		return Types::TypeTiny::to_TypeTiny($type);
 	}
 	
 	if ( $library->isa('MouseX::Types::Base') )
@@ -227,13 +227,13 @@ sub foreign_lookup
 		require Mouse::Util::TypeConstraints;
 		my $sub  = $library->can($typename) or return;
 		my $type = Mouse::Util::TypeConstraints::find_type_constraint($sub->()) or return;
-		return to_TypeTiny($type);
+		return Types::TypeTiny::to_TypeTiny($type);
 	}
 	
 	if ( $library->can("get_type") )
 	{
 		my $type = $library->get_type($typename);
-		return to_TypeTiny($type);
+		return Types::TypeTiny::to_TypeTiny($type);
 	}
 	
 	return;

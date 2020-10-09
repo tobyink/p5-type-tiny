@@ -117,11 +117,11 @@ sub plus_constructors
 	while (@_)
 	{
 		my $source = shift;
-		Types::TypeTiny::TypeTiny->check($source)
+		Types::TypeTiny::is_TypeTiny($source)
 			or _croak "Expected type constraint; got $source";
 		
 		my $constructor = shift;
-		Types::TypeTiny::StringLike->check($constructor)
+		Types::TypeTiny::is_StringLike($constructor)
 			or _croak "Expected string; got $constructor";
 		
 		push @r, $source, sprintf('%s->%s($_)', $class, $constructor);

@@ -49,13 +49,13 @@ sub __constraint_generator
 	
 	my ($regexp, $checker) = @_;
 	
-	Types::Standard::RegexpRef->check($regexp)
+	Types::Standard::is_RegexpRef($regexp)
 		or _croak("First parameter to StrMatch[`a] expected to be a Regexp; got $regexp");
 	
 	if (@_ > 1)
 	{
 		$checker = Types::TypeTiny::to_TypeTiny($checker);
-		Types::TypeTiny::TypeTiny->check($checker)
+		Types::TypeTiny::is_TypeTiny($checker)
 			or _croak("Second parameter to StrMatch[`a] expected to be a type constraint; got $checker")
 	}
 	

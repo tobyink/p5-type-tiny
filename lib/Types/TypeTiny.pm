@@ -373,23 +373,22 @@ sub TypeTiny ()
 			$c->freeze;
 		},
 	);
-#	if ( 0 and __XS ) {  # causes fails in 03-leak.t
-#		my $xsub     = Type::Tiny::XS::get_coderef_for('InstanceOf[Type::Tiny]');
-#		my $xsubname = Type::Tiny::XS::get_subname_for('InstanceOf[Type::Tiny]');
-#		$cache{TypeTiny} = "Type::Tiny"->new(
-#			%common,
-#			constraint => $xsub,
-#			inlined    => sub {
-#				my $var = $_[1];
-#				( $Type::Tiny::AvoidCallbacks or not $xsubname )
-#					? "Scalar::Util::blessed($var) && $var\->isa(q[Type::Tiny])"
-#					: qq/$xsubname($var)/
-#			},
-#		);
-#	}
-#	else {
-	$cache{TypeTiny} = "Type::Tiny"->new(%common);
-#	}
+	if ( 0 and __XS ) {  # causes fails in 03-leak.t
+		my $xsub     = Type::Tiny::XS::get_coderef_for('InstanceOf[Type::Tiny]');
+		my $xsubname = Type::Tiny::XS::get_subname_for('InstanceOf[Type::Tiny]');
+		my $inlined  = $common{inlined};
+		$cache{TypeTiny} = "Type::Tiny"->new(
+			%common,
+			compiled_type_constraint => $xsub,
+			inlined    => sub {
+				( $Type::Tiny::AvoidCallbacks or not $xsubname ) ? goto($inlined) : qq/$xsubname($_[1])/
+			},
+		);
+		_reinstall_subs $cache{TypeTiny};
+	}
+	else {
+		$cache{TypeTiny} = "Type::Tiny"->new(%common);
+	}
 }
 
 sub _ForeignTypeConstraint ()
@@ -553,7 +552,7 @@ sub _TypeTinyFromMoose_parameterizable
 	my ($class, $opts) = _TypeTinyFromMoose_baseclass($t);
 	$opts->{constraint_generator} = sub {
 		# convert args into Moose native types; not strictly necessary
-		my @args = map { TypeTiny->check($_) ? $_->moose_type : $_ } @_;
+		my @args = map { is_TypeTiny($_) ? $_->moose_type : $_ } @_;
 		_TypeTinyFromMoose( $t->parameterize(@args) );
 	};
 	return ($class, $opts);
@@ -670,7 +669,7 @@ sub _TypeTinyFromMouse
 	if ($t->{'constraint_generator'}) {
 		$opts{constraint_generator} = sub {
 			# convert args into Moose native types; not strictly necessary
-			my @args    = map { TypeTiny->check($_) ? $_->mouse_type : $_ } @_;
+			my @args    = map { is_TypeTiny($_) ? $_->mouse_type : $_ } @_;
 			_TypeTinyFromMouse( $t->parameterize(@args) );
 		};
 	}

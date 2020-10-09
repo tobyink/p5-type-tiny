@@ -956,7 +956,7 @@ sub is_parameterized
 	my %seen;
 	sub ____make_key {
 		join ',', map {
-			Types::TypeTiny::TypeTiny->check($_) ? sprintf('$Type::Tiny::ALL_TYPES{%d}', defined($_->{uniq}) ? $_->{uniq} : '____CANNOT_KEY____') :
+			Types::TypeTiny::is_TypeTiny($_)     ? sprintf('$Type::Tiny::ALL_TYPES{%d}', defined($_->{uniq}) ? $_->{uniq} : '____CANNOT_KEY____') :
 			ref() eq 'ARRAY'                     ? do { $seen{$_}++ ? '____CANNOT_KEY____' : sprintf('[%s]',   ____make_key(@$_)) } :
 			ref() eq 'HASH'                      ? do { $seen{$_}++ ? '____CANNOT_KEY____' : sprintf('{%s}',   ____make_key(%$_)) } :
 			ref() eq 'SCALAR' || ref() eq 'REF'  ? do { $seen{$_}++ ? '____CANNOT_KEY____' : sprintf('\\(%s)', ____make_key($$_)) } :
@@ -988,7 +988,7 @@ sub is_parameterized
 		
 		my ($constraint, $compiled) = $self->constraint_generator->(@_);
 		
-		if (Types::TypeTiny::TypeTiny->check($constraint))
+		if (Types::TypeTiny::is_TypeTiny($constraint))
 		{
 			$P = $constraint;
 		}
@@ -1202,7 +1202,7 @@ sub minus_coercions
 	my $self = shift;
 	
 	my $new = $self->_clone;
-	my @not = grep Types::TypeTiny::TypeTiny->check($_), $self->_process_coercion_list($new, @_);
+	my @not = grep Types::TypeTiny::is_TypeTiny($_), $self->_process_coercion_list($new, @_);
 	
 	my @keep;
 	my $c = $self->coercion->type_coercion_map;

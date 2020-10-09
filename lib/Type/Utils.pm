@@ -16,7 +16,7 @@ sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 use Scalar::Util qw< blessed >;
 use Type::Library;
 use Type::Tiny;
-use Types::TypeTiny qw< TypeTiny to_TypeTiny HashLike StringLike CodeLike >;
+use Types::TypeTiny qw< TypeTiny is_TypeTiny to_TypeTiny HashLike StringLike >;
 
 our @EXPORT = qw<
 	declare as where message inline_as
@@ -131,7 +131,7 @@ sub declare
 	{
 		$opts{parent} = to_TypeTiny($opts{parent});
 		
-		unless (TypeTiny->check($opts{parent}))
+		unless (is_TypeTiny($opts{parent}))
 		{
 			$caller->isa("Type::Library")
 				or _croak("Parent type cannot be a %s", ref($opts{parent})||'non-reference scalar');
@@ -291,7 +291,7 @@ sub declare_coercion
 		$opts{name} = '' . shift;
 	}
 	
-	while (HashLike->check($_[0]) and not TypeTiny->check($_[0]))
+	while (Types::TypeTiny::is_HashLike($_[0]) and not is_TypeTiny($_[0]))
 	{
 		%opts = (%opts, %{+shift});
 	}
@@ -353,7 +353,7 @@ sub from (@)
 sub to_type (@)
 {
 	my $type = shift;
-	unless (TypeTiny->check($type))
+	unless (is_TypeTiny($type))
 	{
 		caller->isa("Type::Library")
 			or _croak "Target type cannot be a string";
@@ -382,10 +382,10 @@ sub match_on_type
 		else
 		{
 			(my($type), $code) = splice(@_, 0, 2);
-			TypeTiny->($type)->check($value) or next;
+			Types::TypeTiny::assert_TypeTiny($type)->check($value) or next;
 		}
 		
-		if (StringLike->check($code))
+		if (Types::TypeTiny::is_StringLike($code))
 		{
 			local $_ = $value;
 			if (wantarray) {
@@ -404,7 +404,7 @@ sub match_on_type
 		}
 		else
 		{
-			CodeLike->($code);
+			Types::TypeTiny::assert_CodeLike($code);
 			local $_ = $value;
 			return $code->($value);
 		}
@@ -432,7 +432,7 @@ sub compile_match_on_type
 		else
 		{
 			($type, $code) = splice(@_, 0, 2);
-			TypeTiny->($type);
+			Types::TypeTiny::assert_TypeTiny($type);
 		}
 		
 		if ($type->can_be_inlined)
@@ -447,13 +447,13 @@ sub compile_match_on_type
 		
 		$els = 'els';
 		
-		if (StringLike->check($code))
+		if (Types::TypeTiny::is_StringLike($code))
 		{
 			push @code, sprintf('  { %s }', $code);
 		}
 		else
 		{
-			CodeLike->($code);
+			Types::TypeTiny::assert_CodeLike($code);
 			push @actions, $code;
 			push @code, sprintf('  { $actions[%d]->(@_) }', $#actions);
 		}

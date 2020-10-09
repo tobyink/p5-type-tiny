@@ -28,14 +28,14 @@ sub __constraint_generator
 	if (exists $constraints[-1] and ref $constraints[-1] eq "HASH")
 	{
 		$slurpy = Types::TypeTiny::to_TypeTiny($constraints[-1]{slurpy});
-		Types::TypeTiny::TypeTiny->check($slurpy)
+		Types::TypeTiny::is_TypeTiny($slurpy)
 			or _croak("Slurpy parameter to Tuple[...] expected to be a type constraint; got $slurpy");
 		pop(@constraints)->{slurpy} = $slurpy;  # keep canonicalized version around
 	}
 	
 	for (@constraints)
 	{
-		Types::TypeTiny::TypeTiny->check($_)
+		Types::TypeTiny::is_TypeTiny($_)
 			or _croak("Parameters to Tuple[...] expected to be type constraints; got $_");
 	}
 	

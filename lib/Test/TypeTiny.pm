@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More qw();
 use Scalar::Util qw(blessed);
-use Types::TypeTiny qw(to_TypeTiny);
+use Types::TypeTiny ();
 use Type::Tiny ();
 
 require Exporter::Tiny;
@@ -74,7 +74,7 @@ sub should_pass
 	my ($value, $type, $message) = @_;
 	
 	local $Test::Builder::Level = $Test::Builder::Level + 1;
-	$type = to_TypeTiny($type) unless blessed($type) && $type->can("check");
+	$type = Types::TypeTiny::to_TypeTiny($type) unless blessed($type) && $type->can("check");
 	
 	my $strictures = $type->can("_strict_check");
 	my $compiled   = $type->can("compiled_check");
@@ -109,7 +109,7 @@ sub should_pass
 sub should_fail
 {
 	my ($value, $type, $message) = @_;
-	$type = to_TypeTiny($type) unless blessed($type) && $type->can("check");
+	$type = Types::TypeTiny::to_TypeTiny($type) unless blessed($type) && $type->can("check");
 	
 	local $Test::Builder::Level = $Test::Builder::Level + 1;
 	
@@ -148,7 +148,7 @@ SLOW
 sub should_pass
 {
 	my ($value, $type, $message) = @_;
-	$type = to_TypeTiny($type) unless blessed($type) && $type->can("check");
+	$type = Types::TypeTiny::to_TypeTiny($type) unless blessed($type) && $type->can("check");
 	@_ = (
 		!!$type->check($value),
 		$message || _mk_message("%s passes type constraint $type", $value),
@@ -159,7 +159,7 @@ sub should_pass
 sub should_fail
 {
 	my ($value, $type, $message) = @_;
-	$type = to_TypeTiny($type) unless blessed($type) && $type->can("check");
+	$type = Types::TypeTiny::to_TypeTiny($type) unless blessed($type) && $type->can("check");
 	@_ = (
 		!$type->check($value),
 		$message || _mk_message("%s fails type constraint $type", $value),

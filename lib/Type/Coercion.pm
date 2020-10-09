@@ -116,8 +116,8 @@ sub add
 	my $class = shift;
 	my ($x, $y, $swap) = @_;
 	
-	Types::TypeTiny::TypeTiny->check($x) and return $x->plus_fallback_coercions($y);
-	Types::TypeTiny::TypeTiny->check($y) and return $y->plus_coercions($x);
+	Types::TypeTiny::is_TypeTiny($x) and return $x->plus_fallback_coercions($y);
+	Types::TypeTiny::is_TypeTiny($y) and return $y->plus_coercions($x);
 	
 	_croak "Attempt to add $class to something that is not a $class"
 		unless blessed($x) && blessed($y) && $x->isa($class) && $y->isa($class);
@@ -243,9 +243,9 @@ sub add_type_coercions
 		{
 			my $coercion = shift @args;
 			_croak "Types must be blessed Type::Tiny objects"
-				unless Types::TypeTiny::TypeTiny->check($type);
+				unless Types::TypeTiny::is_TypeTiny($type);
 			_croak "Coercions must be code references or strings"
-				unless Types::TypeTiny::StringLike->check($coercion) || Types::TypeTiny::CodeLike->check($coercion);
+				unless Types::TypeTiny::is_StringLike($coercion) || Types::TypeTiny::is_CodeLike($coercion);
 			push @{$self->type_coercion_map}, $type, $coercion;
 		}
 	}
@@ -292,7 +292,7 @@ sub _build_compiled_coercion
 		push @sub,
 			!defined($codes[$i])
 				? sprintf('  { return $_[0] }') :
-			Types::TypeTiny::StringLike->check($codes[$i])
+			Types::TypeTiny::is_StringLike($codes[$i])
 				? sprintf('  { local $_ = $_[0]; return scalar(%s); }', $codes[$i]) :
 			sprintf('  { local $_ = $_[0]; return scalar($codes[%d]->(@_)) }', $i);
 	}
@@ -324,7 +324,7 @@ sub can_be_inlined
 	{
 		my ($type, $converter) = splice(@mishmash, 0, 2);
 		return unless $type->can_be_inlined;
-		return unless Types::TypeTiny::StringLike->check($converter);
+		return unless Types::TypeTiny::is_StringLike($converter);
 	}
 	return !!1;
 }
@@ -415,7 +415,7 @@ sub _codelike_type_coercion_map
 		
 		push @new, $modifier ? $type->$modifier : $type;
 		
-		if (Types::TypeTiny::CodeLike->check($converter))
+		if (Types::TypeTiny::is_CodeLike($converter))
 		{
 			push @new, $converter;
 		}
@@ -538,7 +538,7 @@ sub _compiled_type_coercion
 		{
 			$self->add_type_coercions(@{$thing->type_coercion_map});
 		}
-		elsif (Types::TypeTiny::CodeLike->check($thing))
+		elsif (Types::TypeTiny::is_CodeLike($thing))
 		{
 			require Types::Standard;
 			$self->add_type_coercions(Types::Standard::Any(), $thing);

@@ -23,7 +23,7 @@ sub __constraint_generator
 	return Types::Standard::ScalarRef unless @_;
 	
 	my $param = shift;
-	Types::TypeTiny::TypeTiny->check($param)
+	Types::TypeTiny::is_TypeTiny($param)
 		or _croak("Parameter to ScalarRef[`a] expected to be a type constraint; got $param");
 	
 	return sub

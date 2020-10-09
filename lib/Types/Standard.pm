@@ -480,7 +480,7 @@ $meta->$add_core_type({
 		return $meta->get_type('Maybe') unless @_;
 		
 		my $param = Types::TypeTiny::to_TypeTiny(shift);
-		Types::TypeTiny::TypeTiny->check($param)
+		Types::TypeTiny::is_TypeTiny($param)
 			or _croak("Parameter to Maybe[`a] expected to be a type constraint; got $param");
 		
 		my $param_compiled_check = $param->compiled_check;
@@ -566,7 +566,7 @@ my $_Optional = $meta->add_type({
 		return $meta->get_type('Optional') unless @_;
 		
 		my $param = Types::TypeTiny::to_TypeTiny(shift);
-		Types::TypeTiny::TypeTiny->check($param)
+		Types::TypeTiny::is_TypeTiny($param)
 			or _croak("Parameter to Optional[`a] expected to be a type constraint; got $param");
 		
 		sub { $param->check($_[0]) }
@@ -668,7 +668,7 @@ $meta->add_type({
 		return $meta->get_type('Overload') unless @_;
 		
 		my @operations = map {
-			Types::TypeTiny::StringLike->check($_)
+			Types::TypeTiny::is_StringLike($_)
 				? "$_"
 				: _croak("Parameters to Overload[`a] expected to be a strings; got $_");
 		} @_;
@@ -746,9 +746,9 @@ $meta->add_type({
 	{
 		my $self  = shift;
 		my $param = Types::TypeTiny::to_TypeTiny(shift);
-		unless (Types::TypeTiny::TypeTiny->check($param))
+		unless (Types::TypeTiny::is_TypeTiny($param))
 		{
-			Types::TypeTiny::StringLike->check($param)
+			Types::TypeTiny::is_StringLike($param)
 				or _croak("Parameter to Tied[`a] expected to be a class name; got $param");
 			require B;
 			return sprintf("%s[%s]", $self, B::perlstring($param));
@@ -766,7 +766,7 @@ $meta->add_type({
 		return $meta->get_type('InstanceOf') unless @_;
 		require Type::Tiny::Class;
 		my @classes = map {
-			Types::TypeTiny::TypeTiny->check($_)
+			Types::TypeTiny::is_TypeTiny($_)
 				? $_
 				: "Type::Tiny::Class"->new(class => $_, display_name => sprintf('InstanceOf[%s]', B::perlstring($_)))
 		} @_;
@@ -789,7 +789,7 @@ $meta->add_type({
 		require B;
 		require Type::Tiny::Role;
 		my @roles = map {
-			Types::TypeTiny::TypeTiny->check($_)
+			Types::TypeTiny::is_TypeTiny($_)
 				? $_
 				: "Type::Tiny::Role"->new(role => $_, display_name => sprintf('ConsumerOf[%s]', B::perlstring($_)))
 		} @_;
@@ -846,7 +846,7 @@ $meta->add_coercion({
 	type_constraint    => $_str,
 	coercion_generator => sub {
 		my ($self, $target, $sep) = @_;
-		Types::TypeTiny::StringLike->check($sep)
+		Types::TypeTiny::is_StringLike($sep)
 			or _croak("Parameter to Join[`a] expected to be a string; got $sep");
 		require B;
 		$sep = B::perlstring($sep);
