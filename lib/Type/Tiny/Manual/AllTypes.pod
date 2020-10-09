@@ -91,6 +91,12 @@ A string from an allowed set of strings.
 
 =item *
 
+B<< _ForeignTypeConstraint >> in L<Types::TypeTiny>
+
+A coderef or an object which Type::Tiny knows how to convert into a Type::Tiny instance. (Yes, the name of this type starts with an underscore.)
+
+=item *
+
 B<< FileHandle >> in L<Types::Standard>
 
 A reference where Scalar::Util::openhandle returns true, or a blessed object in the IO::Handle class.
