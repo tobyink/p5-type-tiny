@@ -45,6 +45,7 @@ sub import
 	my $class = shift;                            # uncoverable statement
 	my $opts  = { ref($_[0]) ? %{+shift} : () };  # uncoverable statement
 	$opts->{into} ||= scalar(caller);             # uncoverable statement
+	_mkall();                                     # uncoverable statement
 	return $class->$next($opts, @_);              # uncoverable statement
 }
 
@@ -56,13 +57,20 @@ for (__PACKAGE__->type_names) {                      # uncoverable statement
 }                                                    # uncoverable statement
 
 sub _reinstall_subs {
-	my $type = shift;
-	no strict 'refs';
-	no warnings 'redefine';
-	*{'is_'     . $type->name} = $type->compiled_check;
-	*{'assert_' . $type->name} = \&$type;
-	$type;
-}
+	# uncoverable subroutine
+	my $type = shift;                                    # uncoverable statement
+	no strict 'refs';                                    # uncoverable statement
+	no warnings 'redefine';                              # uncoverable statement
+	*{'is_'     . $type->name} = $type->compiled_check;  # uncoverable statement
+	*{'assert_' . $type->name} = \&$type;                # uncoverable statement
+	$type;                                               # uncoverable statement
+}                                                       # uncoverable statement
+
+sub _mkall {
+	# uncoverable subroutine
+	return unless $INC{'Type/Tiny.pm'};                    # uncoverable statement
+	__PACKAGE__->get_type($_) for __PACKAGE__->type_names; # uncoverable statement
+}                                                         # uncoverable statement
 
 sub meta
 {
