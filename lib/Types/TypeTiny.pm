@@ -55,6 +55,15 @@ for (__PACKAGE__->type_names) {                      # uncoverable statement
 	};                                                # uncoverable statement
 }                                                    # uncoverable statement
 
+sub _reinstall_subs {
+	my $type = shift;
+	no strict 'refs';
+	no warnings 'redefine';
+	*{'is_'     . $type->name} = $type->compiled_check;
+	*{'assert_' . $type->name} = \&$type;
+	$type;
+}
+
 sub meta
 {
 	return $_[0];
@@ -164,6 +173,7 @@ sub StringLike ()
 				( $Type::Tiny::AvoidCallbacks or not $xsubname ) ? goto($inlined) : qq/$xsubname($_[1])/
 			},
 		);
+		_reinstall_subs $cache{StringLike};
 	}
 	else {
 		$cache{StringLike} = "Type::Tiny"->new(%common);
@@ -234,6 +244,7 @@ sub HashLike (;@)
 				( $Type::Tiny::AvoidCallbacks or not $xsubname ) ? goto($inlined) : qq/$xsubname($_[1])/
 			},
 		);
+		_reinstall_subs $cache{HashLike};
 	}
 	else {
 		$cache{HashLike} = "Type::Tiny"->new(%common);
@@ -306,6 +317,7 @@ sub ArrayLike (;@)
 				( $Type::Tiny::AvoidCallbacks or not $xsubname ) ? goto($inlined) : qq/$xsubname($_[1])/
 			},
 		);
+		_reinstall_subs $cache{ArrayLike};
 	}
 	else {
 		$cache{ArrayLike} = "Type::Tiny"->new(%common);
@@ -339,6 +351,7 @@ sub CodeLike ()
 				( $Type::Tiny::AvoidCallbacks or not $xsubname ) ? goto($inlined) : qq/$xsubname($_[1])/
 			},
 		);
+		_reinstall_subs $cache{CodeLike};
 	}
 	else {
 		$cache{CodeLike} = "Type::Tiny"->new(%common);
