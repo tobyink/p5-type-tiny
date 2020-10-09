@@ -28,8 +28,8 @@ sub __constraint_generator
 		or _croak("Parameter to ArrayRef[`a] expected to be a type constraint; got $param");
 	
 	my ($min, $max) = (0, -1);
-	$min = Types::Standard::Int->assert_return(shift) if @_;
-	$max = Types::Standard::Int->assert_return(shift) if @_;
+	$min = Types::Standard::assert_Int(shift) if @_;
+	$max = Types::Standard::assert_Int(shift) if @_;
 	
 	my $param_compiled_check = $param->compiled_check;
 	my $xsub;
