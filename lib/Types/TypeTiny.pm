@@ -156,13 +156,12 @@ sub StringLike ()
 	if ( __XS ) {
 		my $xsub     = Type::Tiny::XS::get_coderef_for('StringLike');
 		my $xsubname = Type::Tiny::XS::get_subname_for('StringLike');
+		my $inlined  = $common{inlined};
 		$cache{StringLike} = "Type::Tiny"->new(
 			%common,
 			constraint => $xsub,
 			inlined    => sub {
-				( $Type::Tiny::AvoidCallbacks or not $xsubname )
-					? qq/defined($_[1]) && !ref($_[1]) or Scalar::Util::blessed($_[1]) && ${\ +_get_check_overload_sub() }($_[1], q[""])/
-					: qq/$xsubname($_[1])/
+				( $Type::Tiny::AvoidCallbacks or not $xsubname ) ? goto($inlined) : qq/$xsubname($_[1])/
 			},
 		);
 	}
@@ -227,13 +226,12 @@ sub HashLike (;@)
 	if ( __XS ) {
 		my $xsub     = Type::Tiny::XS::get_coderef_for('HashLike');
 		my $xsubname = Type::Tiny::XS::get_subname_for('HashLike');
+		my $inlined  = $common{inlined};
 		$cache{HashLike} = "Type::Tiny"->new(
 			%common,
 			constraint => $xsub,
 			inlined    => sub {
-				( $Type::Tiny::AvoidCallbacks or not $xsubname )
-					? qq/ref($_[1]) eq q[HASH] or Scalar::Util::blessed($_[1]) && ${\ +_get_check_overload_sub() }($_[1], q[\%{}])/
-					: qq/$xsubname($_[1])/
+				( $Type::Tiny::AvoidCallbacks or not $xsubname ) ? goto($inlined) : qq/$xsubname($_[1])/
 			},
 		);
 	}
@@ -300,13 +298,12 @@ sub ArrayLike (;@)
 	if ( __XS ) {
 		my $xsub     = Type::Tiny::XS::get_coderef_for('ArrayLike');
 		my $xsubname = Type::Tiny::XS::get_subname_for('ArrayLike');
+		my $inlined  = $common{inlined};
 		$cache{ArrayLike} = "Type::Tiny"->new(
 			%common,
 			constraint => $xsub,
 			inlined    => sub {
-				( $Type::Tiny::AvoidCallbacks or not $xsubname )
-					? qq/ref($_[1]) eq q[ARRAY] or Scalar::Util::blessed($_[1]) && ${\ +_get_check_overload_sub() }($_[1], q[\@{}])/
-					: qq/$xsubname($_[1])/
+				( $Type::Tiny::AvoidCallbacks or not $xsubname ) ? goto($inlined) : qq/$xsubname($_[1])/
 			},
 		);
 	}
@@ -334,13 +331,12 @@ sub CodeLike ()
 	if ( __XS ) {
 		my $xsub     = Type::Tiny::XS::get_coderef_for('CodeLike');
 		my $xsubname = Type::Tiny::XS::get_subname_for('CodeLike');
+		my $inlined  = $common{inlined};
 		$cache{CodeLike} = "Type::Tiny"->new(
 			%common,
 			constraint => $xsub,
 			inlined    => sub {
-				( $Type::Tiny::AvoidCallbacks or not $xsubname )
-					? qq/ref($_[1]) eq q[CODE] or Scalar::Util::blessed($_[1]) && ${\ +_get_check_overload_sub() }($_[1], q[\&{}])/
-					: qq/$xsubname($_[1])/
+				( $Type::Tiny::AvoidCallbacks or not $xsubname ) ? goto($inlined) : qq/$xsubname($_[1])/
 			},
 		);
 	}
