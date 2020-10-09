@@ -178,6 +178,7 @@ sub StringLike ()
 			%common,
 			compiled_type_constraint => $xsub,
 			inlined => sub {
+				# uncoverable subroutine
 				( $Type::Tiny::AvoidCallbacks or not $xsubname ) ? goto($inlined) : qq/$xsubname($_[1])/
 			},
 		);
@@ -249,6 +250,7 @@ sub HashLike (;@)
 			%common,
 			compiled_type_constraint => $xsub,
 			inlined => sub {
+				# uncoverable subroutine
 				( $Type::Tiny::AvoidCallbacks or not $xsubname ) ? goto($inlined) : qq/$xsubname($_[1])/
 			},
 		);
@@ -322,6 +324,7 @@ sub ArrayLike (;@)
 			%common,
 			compiled_type_constraint => $xsub,
 			inlined => sub {
+				# uncoverable subroutine
 				( $Type::Tiny::AvoidCallbacks or not $xsubname ) ? goto($inlined) : qq/$xsubname($_[1])/
 			},
 		);
@@ -356,6 +359,7 @@ sub CodeLike ()
 			%common,
 			compiled_type_constraint => $xsub,
 			inlined => sub {
+				# uncoverable subroutine
 				( $Type::Tiny::AvoidCallbacks or not $xsubname ) ? goto($inlined) : qq/$xsubname($_[1])/
 			},
 		);
@@ -389,6 +393,7 @@ sub TypeTiny ()
 			%common,
 			compiled_type_constraint => $xsub,
 			inlined    => sub {
+				# uncoverable subroutine
 				( $Type::Tiny::AvoidCallbacks or not $xsubname ) ? goto($inlined) : qq/$xsubname($_[1])/
 			},
 		);
