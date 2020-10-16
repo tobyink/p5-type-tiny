@@ -260,9 +260,11 @@ sub closest_match {
 	
 	return $given if $self->check($given);
 
-	$canon ||= $] lt '5.016'
-		? sub { ( my $var = lc($_[0]) ) =~ s/(^\s+)|(\s+$)//g; $var }
-		: eval q< sub { ( my $var = CORE::fc($_[0]) ) =~ s/(^\s+)|(\s+$)//gr; } >;
+	$canon ||= eval(
+		$] lt '5.016'
+			? q< sub { ( my $var = lc($_[0]) ) =~ s/(^\s+)|(\s+$)//g; $var } >
+			: q< sub { CORE::fc($_[0]) =~ s/(^\s+)|(\s+$)//gr; } >
+	);
 	
 	$self->{_lookups} ||= do {
 		my %lookups;
