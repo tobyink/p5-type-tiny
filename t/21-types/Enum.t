@@ -189,5 +189,39 @@ is_deeply(
 	'"foo" comes before "baz" because they were listed in that order when $enum1 was defined',
 );
 
+#
+# Auto coercion
+#
+
+my $enum3 = Enum[ \1, qw( FOO BAR BAZ ) ];
+is $enum3->coerce('FOO'), 'FOO';
+is $enum3->coerce('foo'), 'FOO';
+is $enum3->coerce('f'),   'FOO';
+is $enum3->coerce('ba'),  'BAR';
+is $enum3->coerce('baz'), 'BAZ';
+is $enum3->coerce(0),     'FOO';
+is $enum3->coerce(1),     'BAR';
+is $enum3->coerce(2),     'BAZ';
+is $enum3->coerce(-1),    'BAZ';
+is $enum3->coerce('XYZ'), 'XYZ';
+is_deeply $enum3->coerce([123]), [123];
+
+#
+# Manual coercion
+#
+
+my $enum4 = Enum[
+	[
+		Types::Standard::ArrayRef() => sub { 'FOO' },
+		Types::Standard::HashRef()  => sub { 'BAR' },
+		Types::Standard::Str()      => sub { 'BAZ' },
+	],
+	qw( FOO BAR BAZ )
+];
+
+is $enum4->coerce([]), 'FOO';
+is $enum4->coerce({}), 'BAR';
+is $enum4->coerce(''), 'BAZ';
+
 done_testing;
 

@@ -822,11 +822,20 @@ $meta->add_type({
 	parent     => $_str,
 	constraint_generator => sub {
 		return $meta->get_type('Enum') unless @_;
+		my $coercion;
+		if ( ref($_[0]) and ref($_[0]) eq 'SCALAR' ) {
+			$coercion = ${ +shift };
+		}
+		elsif ( ref($_[0]) && ! blessed($_[0])
+		or      blessed($_[0]) && $_[0]->isa('Type::Coercion') ) {
+			$coercion = shift;
+		}
 		require B;
 		require Type::Tiny::Enum;
 		return "Type::Tiny::Enum"->new(
 			values       => \@_,
 			display_name => sprintf('Enum[%s]', join q[,], map B::perlstring($_), @_),
+			$coercion ? ( coercion => $coercion ) : (),
 		);
 	},
 });
@@ -1382,7 +1391,21 @@ B<< Enum[`a] >>
 
 As per MooX::Types::MooseLike::Base:
 
-   has size => (is => "ro", isa => Enum[qw( S M L XL XXL )]);
+   has size => (
+      is     => "ro",
+      isa    => Enum[qw( S M L XL XXL )],
+   );
+
+You can enable coercion by passing C<< \1 >> before the list of values.
+
+   has size => (
+      is     => "ro",
+      isa    => Enum[ \1, qw( S M L XL XXL ) ],
+      coerce => 1,
+   );
+
+This will use the C<closest_match> method in L<Type::Tiny::Enum> to
+coerce closely matching strings.
 
 =item *
 

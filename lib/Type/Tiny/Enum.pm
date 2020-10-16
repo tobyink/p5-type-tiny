@@ -41,10 +41,22 @@ sub new
 	$opts{unique_values}  = [sort keys %tmp];
 	
 	my $xs_encoding = _xs_encoding($opts{unique_values});
-	if (defined $xs_encoding)
-	{
+	if (defined $xs_encoding) {
 		my $xsub = Type::Tiny::XS::get_coderef_for($xs_encoding);
 		$opts{compiled_type_constraint} = $xsub if $xsub;
+	}
+	
+	if ( defined $opts{coercion} and !ref $opts{coercion} and 1 eq $opts{coercion} ) {
+		delete $opts{coercion};
+		$opts{_build_coercion} = sub {
+			require Types::Standard;
+			my $c = shift;
+			my $t = $c->type_constraint;
+			$c->add_type_coercions(
+				Types::Standard::Str(),
+				sub { $t->closest_match( @_ ? $_[0] : $_ ) }
+			);
+		};
 	}
 	
 	return $proto->SUPER::new(%opts);
@@ -238,6 +250,53 @@ sub sorter {
 	];
 }
 
+my $canon;
+sub closest_match {
+	require Types::Standard;
+	
+	my ( $self, $given ) = ( shift, @_ );
+
+	return unless Types::Standard::is_Str $given;
+	
+	return $given if $self->check($given);
+
+	$canon ||= $] lt '5.016'
+		? sub { ( my $var = lc($_[0]) ) =~ s/(^\s+)|(\s+$)//g; $var }
+		: eval q< sub { ( my $var = CORE::fc($_[0]) ) =~ s/(^\s+)|(\s+$)//gr; } >;
+	
+	$self->{_lookups} ||= do {
+		my %lookups;
+		for ( @{ $self->values } ) {
+			my $key = $canon->($_);
+			next if exists $lookups{$key};
+			$lookups{$key} = $_;
+		}
+		\%lookups;
+	};
+	
+	my $cgiven = $canon->( $given );
+	return $self->{_lookups}{$cgiven}
+		if $self->{_lookups}{$cgiven};
+	
+	my $best;
+	VALUE: for my $possible ( @{ $self->values } ) {
+		my $stem = substr( $possible, 0, length $cgiven );
+		if ( $cgiven eq $canon->( $stem ) ) {
+			if ( defined($best) and length($best) >= length($possible) ) {
+				next VALUE;
+			}
+			$best = $possible;
+		}
+	}
+	
+	return $best if defined $best;
+	
+	return $self->values->[$given]
+		if Types::Standard::is_Int $given;
+	
+	return $given;
+}
+
 push @Type::Tiny::CMP, sub {
 	my $A = shift->find_constraining_type;
 	my $B = shift->find_constraining_type;
@@ -365,6 +424,11 @@ constructor.
 The list of C<values> but sorted and with duplicates removed. This cannot
 be passed to the constructor.
 
+=item C<coercion>
+
+If C<< coercion => 1 >> is passed to the constructor, the type will have a
+coercion using the C<closest_match> method.
+
 =back
 
 =head2 Methods
@@ -391,6 +455,29 @@ checking each string against
   my @valid_tokens = grep /$re/, @all_tokens;
 
 You can get a case-insensitive regexp using C<< $enum->as_regexp('i') >>.
+
+=item C<closet_match>
+
+Returns the closest match in the enum for a string.
+
+  my $enum = Type::Tiny::Enum->new(
+    value => [ qw( foo bar baz quux ) ],
+  );
+  
+  say $enum->closest_match("FO");   # ==> foo
+
+It will try to find an exact match first, fall back to a case-insensitive
+match, if it still can't find one, will try to find a head substring match,
+and finally, if given an integer, will use that as an index.
+
+  my $enum = Type::Tiny::Enum->new(
+    value => [ qw( foo bar baz quux ) ],
+  );
+  
+  say $enum->closest_match(  0 );  # ==> foo
+  say $enum->closest_match(  1 );  # ==> bar
+  say $enum->closest_match(  2 );  # ==> baz
+  say $enum->closest_match( -1 );  # ==> quux
 
 =back
 
