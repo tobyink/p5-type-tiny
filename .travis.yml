@@ -141,13 +141,11 @@ before_install:
 install:
   - cpan-install --toolchain
   - cpan-install --deps
-  - cpanm "Exporter::Tiny"
-  - '[ -n "$MOOSE_RELEASE" ] && cpan-install "$MOOSE_RELEASE" || echo "MOOSE_RELEASE is not set"'
-  - '[ -n "$MXT_RELEASE" ]   && cpan-install "$MXT_RELEASE"   || echo "MXT_RELEASE is not set"'
-  - '[ -n "$EC_RELEASE" ]    && cpan-install "$EC_RELEASE"    || echo "EC_RELEASE is not set"'
-  - '[ -n "$MOO_RELEASE" ]   && cpan-install "$MOO_RELEASE"   || echo "MOO_RELEASE is not set"'
-  - '[ -n "$COVERAGE" ]      && cpan-install --coverage       || echo "COVERAGE is not set"'
-  - '[ -n "$COVERAGE" ]      && cpanm -n Devel::Cover Devel::Cover::Report::Codecov || echo "COVERAGE is not set"'
+  - '[ -n "$COVERAGE" ]      && cpan-install --coverage && cpanm -n Devel::Cover Devel::Cover::Report::Codecov || echo "COVERAGE is not set"'
+  - '[ -n "$MOOSE_RELEASE" ] && cpanm -n --reinstall "$MOOSE_RELEASE"                                          || echo "MOOSE_RELEASE is not set"'
+  - '[ -n "$MXT_RELEASE" ]   && cpanm -n --reinstall "$MXT_RELEASE"                                            || echo "MXT_RELEASE is not set"'
+  - '[ -n "$EC_RELEASE" ]    && cpanm -n --reinstall "$EC_RELEASE"                                             || echo "EC_RELEASE is not set"'
+  - '[ -n "$MOO_RELEASE" ]   && cpanm -n --reinstall "$MOO_RELEASE"                                            || echo "MOO_RELEASE is not set"'
 before_script:
   - coverage-setup
   - '[ -n "$COVERAGE" ] && cover -delete || echo "COVERAGE is not set"'
