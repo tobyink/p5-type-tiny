@@ -83,4 +83,12 @@ TODO: {
 	);
 };
 
+my $tt_Rounded = Types::TypeTiny::to_TypeTiny( $Rounded );
+
+is( $tt_Rounded->coercion->moose_coercion, $Rounded->coercion );
+
+delete $tt_Rounded->coercion->{moose_coercion};
+
+is( $tt_Rounded->coercion->moose_coercion, $Rounded->coercion );
+
 done_testing;
