@@ -6,17 +6,6 @@ jobs:
     # Coverage report
     - perl: "5.32"
       env: COVERAGE=1 EXTENDED_TESTING=1
-      install:
-        - cpanm Exporter::Tiny
-        - cpanm -n Test::Requires Test::Fatal Test::LeakTrace Test::Tester Test::Warnings
-        - cpanm -n indirect multidimensional bareword::filehandles strictures Devel::Refcount
-        - cpanm -n Moo Moose Mouse MooseX::Types::Common MouseX::Types::Common
-        - cpanm -n match::simple MooseX::Getopt Class::InsideOut Object::Accessor
-        - cpanm -n Type::Tie Return::Type Validation::Class::Simple Class::XSAccessor PadWalker Devel::LexAlias
-        - cpan-install --toolchain
-        - cpan-install --deps
-        - cpan-install --coverage
-        - cpanm -n Devel::Cover Devel::Cover::Report::Codecov
       script:
         - export PERL_TYPE_TINY_XS=0
         - export PERL_TYPE_PARAMS_XS=0
@@ -28,26 +17,8 @@ jobs:
     - perl: "5.8.9"
       env: PERL_TYPE_TINY_XS=0 EXTENDED_TESTING=1
       dist: trusty
-      install:
-        - cpanm Exporter::Tiny
-        - cpanm -n Test::Requires Test::Fatal Test::LeakTrace Devel::Refcount
-        - cpanm -n indirect multidimensional bareword::filehandles strictures
-        - cpanm -n Moo Moose Mouse MooseX::Types::Common MouseX::Types::Common
-        - cpanm -n match::simple MooseX::Getopt Class::InsideOut Object::Accessor
-        - cpanm -n Type::Tie Return::Type
-        - cpan-install --toolchain
-        - cpan-install --deps
     - perl: "5.32"
       env: PERL_TYPE_TINY_XS=0 EXTENDED_TESTING=1
-      install:
-        - cpanm Exporter::Tiny
-        - cpanm -n Test::Requires Test::Fatal Test::LeakTrace
-        - cpanm -n indirect multidimensional bareword::filehandles strictures
-        - cpanm -n Moo Moose Mouse MooseX::Types::Common MouseX::Types::Common
-        - cpanm -n match::simple MooseX::Getopt Class::InsideOut Object::Accessor
-        - cpanm -n Type::Tie Return::Type Validation::Class::Simple 
-        - cpan-install --toolchain
-        - cpan-install --deps
     # Standard testing for modern and vaguely modern Perls
     - perl: "5.10"
       env: PERL_TYPE_TINY_XS=0
@@ -174,6 +145,8 @@ install:
   - '[ -n "$MXT_RELEASE" ]   && cpan-install "$MXT_RELEASE"   || echo "MXT_RELEASE is not set"'
   - '[ -n "$EC_RELEASE" ]    && cpan-install "$EC_RELEASE"    || echo "EC_RELEASE is not set"'
   - '[ -n "$MOO_RELEASE" ]   && cpan-install "$MOO_RELEASE"   || echo "MOO_RELEASE is not set"'
+  - '[ -n "$COVERAGE" ]      && cpan-install --coverage       || echo "COVERAGE is not set"'
+  - '[ -n "$COVERAGE" ]      && cpanm -n Devel::Cover Devel::Cover::Report::Codecov || echo "COVERAGE is not set"'
 before_script:
   - coverage-setup
   - '[ -n "$COVERAGE" ] && cover -delete || echo "COVERAGE is not set"'
