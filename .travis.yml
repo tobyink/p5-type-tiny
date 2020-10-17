@@ -12,7 +12,7 @@ jobs:
         - cpanm -n indirect multidimensional bareword::filehandles strictures Devel::Refcount
         - cpanm -n Moo Moose Mouse MooseX::Types::Common MouseX::Types::Common
         - cpanm -n match::simple MooseX::Getopt Class::InsideOut Object::Accessor
-        - cpanm -n Type::Tie Validation::Class::Simple Class::XSAccessor PadWalker Devel::LexAlias
+        - cpanm -n Type::Tie Return::Type Validation::Class::Simple Class::XSAccessor PadWalker Devel::LexAlias
         - cpan-install --toolchain
         - cpan-install --deps
         - cpan-install --coverage
@@ -34,7 +34,7 @@ jobs:
         - cpanm -n indirect multidimensional bareword::filehandles strictures
         - cpanm -n Moo Moose Mouse MooseX::Types::Common MouseX::Types::Common
         - cpanm -n match::simple MooseX::Getopt Class::InsideOut Object::Accessor
-        - cpanm -n Type::Tie
+        - cpanm -n Type::Tie Return::Type
         - cpan-install --toolchain
         - cpan-install --deps
     - perl: "5.32"
@@ -45,7 +45,7 @@ jobs:
         - cpanm -n indirect multidimensional bareword::filehandles strictures
         - cpanm -n Moo Moose Mouse MooseX::Types::Common MouseX::Types::Common
         - cpanm -n match::simple MooseX::Getopt Class::InsideOut Object::Accessor
-        - cpanm -n Type::Tie Validation::Class::Simple 
+        - cpanm -n Type::Tie Return::Type Validation::Class::Simple 
         - cpan-install --toolchain
         - cpan-install --deps
     # Standard testing for modern and vaguely modern Perls
