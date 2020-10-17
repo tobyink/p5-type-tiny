@@ -102,6 +102,7 @@ __END__
 
 perl
 Exporter::Tiny
+Return::Type
 Type::Tie
 Type::Tiny::XS
 
@@ -113,7 +114,7 @@ Devel::LexAlias/PadWalker
 Devel::StackTrace
 
 Class::Tiny
-Moo
+Moo/MooX::TypeTiny
 Moose/MooseX::Types
 Mouse/MouseX::Types
 
