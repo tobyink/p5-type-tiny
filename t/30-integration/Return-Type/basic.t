@@ -36,7 +36,7 @@ BEGIN {
 		if exists $INC{"App/ForkProve.pm"};
 };
 
-use Test::Requires { 'Return::Type' => '0.004' };
+use Test::Requires { 'Return::Type' => '0.007' };
 use Types::Standard qw( HashRef Int );
 use Test::Fatal;
 
