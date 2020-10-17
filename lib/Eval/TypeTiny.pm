@@ -28,7 +28,7 @@ BEGIN {
 	}
 }
 
-BEGIN {
+{
 	sub IMPLEMENTATION_DEVEL_LEXALIAS   () { 'Devel::LexAlias' }
 	sub IMPLEMENTATION_PADWALKER        () { 'PadWalker' }
 	sub IMPLEMENTATION_TIE              () { 'tie' }
@@ -50,7 +50,7 @@ BEGIN {
 }
 
 BEGIN {
-	*_EXTENDED_TESTING = ($ENV{EXTENDED_TESTING}) ? sub(){!!1} : sub(){!!0};
+	*_EXTENDED_TESTING = $ENV{EXTENDED_TESTING} ? sub(){!!1} : sub(){!!0};
 };
 
 our $AUTHORITY = 'cpan:TOBYINK';
