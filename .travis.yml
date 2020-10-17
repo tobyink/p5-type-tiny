@@ -141,6 +141,7 @@ before_install:
 install:
   - cpan-install --toolchain
   - cpan-install --deps
+  - cpanm "Exporter::Tiny"
   - '[ -n "$MOOSE_RELEASE" ] && cpan-install "$MOOSE_RELEASE" || echo "MOOSE_RELEASE is not set"'
   - '[ -n "$MXT_RELEASE" ]   && cpan-install "$MXT_RELEASE"   || echo "MXT_RELEASE is not set"'
   - '[ -n "$EC_RELEASE" ]    && cpan-install "$EC_RELEASE"    || echo "EC_RELEASE is not set"'
