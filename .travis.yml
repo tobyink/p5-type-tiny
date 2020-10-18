@@ -16,15 +16,8 @@ jobs:
     # Minimal install
     - perl: "5.18"
       env: PERL_TYPE_TINY_XS=1 MINIMAL_INSTALL=1 REBUILD_PERL=1 SPLIT_BUILD=1
-    # Extended testing
-    - perl: "5.8.9"
-      env: PERL_TYPE_TINY_XS=0 EXTENDED_TESTING=1
       dist: trusty
-    - perl: "5.32"
-      env: PERL_TYPE_TINY_XS=1 EXTENDED_TESTING=1
-    - perl: "5.32"
-      env: PERL_TYPE_TINY_XS=1 EXTENDED_TESTING=1 PERL_TYPES_STANDARD_STRICTNUM=1 
-    # Standard testing
+      # Standard testing
     - perl: "5.6.1"
       env: PERL_TYPE_TINY_XS=0 
       dist: trusty
@@ -41,6 +34,9 @@ jobs:
       dist: trusty
     - perl: "5.8.9-thr"
       env: PERL_TYPE_TINY_XS=0
+      dist: trusty
+    - perl: "5.8.9"
+      env: PERL_TYPE_TINY_XS=0 EXTENDED_TESTING=1
       dist: trusty
     - perl: "5.10"
       env: PERL_TYPE_TINY_XS=1
@@ -80,6 +76,8 @@ jobs:
       env: PERL_TYPE_TINY_XS=1
     - perl: "5.32"
       env: PERL_TYPE_TINY_XS=1
+    - perl: "5.32"
+      env: PERL_TYPE_TINY_XS=1 EXTENDED_TESTING=1
     - perl: "dev"
       env: PERL_TYPE_TINY_XS=1
     - perl: "blead"
@@ -115,7 +113,9 @@ before_script:
   - '[ -n "$COVERAGE" ] && cover -delete || echo "COVERAGE is not set"'
 script:
   - 'prove -r -Ilib -Iinc $(test-dirs)'
-  - '[ "$PERL_TYPE_TINY_XS" -eq "1" ] && PERL_TYPE_TINY_XS=0 prove -r -Ilib -Iinc $(test-dirs) || echo "no second run"'
+  - 'PERL_TYPES_STANDARD_STRICTNUM=1 prove -r -Ilib -Iinc $(test-dirs)'
+  - '[ "$PERL_TYPE_TINY_XS" -eq "1" ] && PERL_TYPE_TINY_XS=0 prove -r -Ilib -Iinc $(test-dirs) || echo "ok"'
+  - '[ "$PERL_TYPE_TINY_XS" -eq "1" ] && PERL_TYPE_TINY_XS=0 PERL_TYPES_STANDARD_STRICTNUM=1 prove -r -Ilib -Iinc $(test-dirs) || echo "ok"'
 after_success:
   - '[ -n "$COVERAGE" ] && cover -select_re "^lib/" -report codecov || echo "COVERAGE is not set"'
   - coverage-report -select_re '^lib/'
