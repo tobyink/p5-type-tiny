@@ -3865,3 +3865,13 @@
 		dcs:versus `Type-Tiny 1.011_009 cpan:TOBYINK`;
 		item "Simple useful coercions from Str for Type::Tiny::Enum (and Types::Standard::Enum)."^^Change;
 	].
+
+`Type-Tiny 1.011_011 cpan:TOBYINK`
+	issued  2020-10-16;
+	changeset [
+		dcs:versus `Type-Tiny 1.011_010 cpan:TOBYINK`;
+		item "If the EXTENDED_TESTING environment variable is true, Perl 5.8.9 or above is being used, and either Type::Tiny's version contains '_' or testing is running on Travis CI, then Makefile.PL will add extra testing dependencies."^^Packaging;
+		item "More tests for Type::Coercion::FromMoose."^^Tests;
+		item "Remove unnecessary BEGIN block in Eval::TypeTiny."^^Change;
+		item "Bugs in old versions of Return::Type prevent integration tests from passing on Perl 5.8.x; those tests now require Return::Type 0.007 or above."^^Tests;
+	].
