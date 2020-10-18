@@ -64,7 +64,7 @@ sub travis_banner
 	diag( ' ' );
 	diag( '# ' x 36 );
 	diag( ' ' );
-	diag( "  PERL:     $^V" );
+	diag( "  PERL:     $]" );
 	diag( "  XS:       " . ( exists($ENV{PERL_TYPE_TINY_XS}) && !$ENV{PERL_TYPE_TINY_XS} ? 'PP' : 'XS' ) );
 	diag( "  NUMBERS:  " . ( $ENV{PERL_TYPES_STANDARD_STRICTNUM} ? 'strict' : 'loose' ) );
 	diag( "  TESTING:  " . ( $ENV{EXTENDED_TESTING} ? 'extended' : 'normal' ) );
