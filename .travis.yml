@@ -15,7 +15,7 @@ jobs:
         - prove -r -Ilib -Iinc $(test-dirs)
     # Minimal install
     - perl: "5.18"
-      env: PERL_TYPE_TINY_XS=0 MINIMAL_INSTALL=1 REBUILD_PERL=1
+      env: PERL_TYPE_TINY_XS=0 MINIMAL_INSTALL=1 REBUILD_PERL=1 SPLIT_BUILD=1
     # Extended testing
     - perl: "5.8.9"
       env: PERL_TYPE_TINY_XS=0 EXTENDED_TESTING=1
