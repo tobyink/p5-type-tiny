@@ -4,10 +4,9 @@ $meta->{prereqs}{runtime}{requires}{'Text::Balanced'} = '1.95'  if $] < 5.007003
 $meta->{prereqs}{runtime}{requires}{'Exporter'}       = '5.57'  if $] < 5.009001;
 
 my $extended_testing = 0;
-if ( $ENV{EXTENDED_TESTING} ) {
+if ( $ENV{EXTENDED_TESTING} and $] ge '5.008009' ) {
 	++$extended_testing if $meta->{version};
 	++$extended_testing if $ENV{TRAVIS};
-	$extended_testing = 0 if $] lt '5.008009';
 }
 
 if ( $extended_testing ) {
@@ -46,7 +45,7 @@ if ( $extended_testing ) {
 	}
 }
 
-if ($ENV{AUTOMATED_TESTING} and "$^V" =~ /c$/) {
-	print "cperl unsupported\n";
+if ( $ENV{AUTOMATED_TESTING} and "$^V" =~ /c$/ ) {
+	print "cperl unsupported by test suite (the vast majority of the distribution should still work)\n";
 	exit(0);
 }
