@@ -160,9 +160,9 @@ script:
 after_success:
   - '[ -n "$COVERAGE" ] && cover -select_re "^lib/" -report codecov || echo "COVERAGE is not set"'
   - coverage-report -select_re '^lib/'
-cache:
-  directories:
-    - "~/perl5"
+#cache:
+#  directories:
+#    - "~/perl5"
 notifications:
   irc:
     channels:
