@@ -145,6 +145,7 @@ before_install:
 install:
   - cpan-install --toolchain
   - perl Makefile.PL
+  - cpanm -n --showdeps .
   - cpanm -n --installdeps .
   - '[ -n "$COVERAGE" ]      && cpan-install --coverage && cpanm -n Devel::Cover Devel::Cover::Report::Codecov || echo "COVERAGE is not set"'
   - '[ -n "$MOOSE_RELEASE" ] && cpanm -n --reinstall "$MOOSE_RELEASE"                                          || echo "MOOSE_RELEASE is not set"'
