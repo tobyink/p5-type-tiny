@@ -59,21 +59,21 @@ sub diag_env
 	return diag sprintf('  $%-40s   %s', $var, exists $ENV{$var} ? B::perlstring($ENV{$var}) : "undef");
 }
 
-sub travis_banner
+sub banner
 {
 	diag( ' ' );
 	diag( '# ' x 36 );
 	diag( ' ' );
 	diag( "  PERL:     $]" );
-	diag( "  XS:       " . ( exists($ENV{PERL_TYPE_TINY_XS}) && !$ENV{PERL_TYPE_TINY_XS} ? 'PP' : 'XS' ) );
+	diag( "  XS:       " . ( exists($ENV{PERL_TYPE_TINY_XS}) && !$ENV{PERL_TYPE_TINY_XS} ? 'PP' : 'maybe XS' ) );
 	diag( "  NUMBERS:  " . ( $ENV{PERL_TYPES_STANDARD_STRICTNUM} ? 'strict' : 'loose' ) );
 	diag( "  TESTING:  " . ( $ENV{EXTENDED_TESTING} ? 'extended' : 'normal' ) );
-	diag( "  COVERAGE: " . ( $ENV{COVERAGE} ? 'coverage report' : 'standard report' ) );
+	diag( "  COVERAGE: " . ( $ENV{COVERAGE} ? 'coverage report' : 'not checking coverage' ) ) if $ENV{TRAVIS};
 	diag( ' ' );
 	diag( '# ' x 36 );
 }
 
-travis_banner if $ENV{TRAVIS};
+banner();
 
 while (<DATA>)
 {
@@ -101,7 +101,7 @@ while (<DATA>)
 }
 
 require Types::Standard;
-diag("");
+diag( ' ' );
 diag(
 	!Types::Standard::Str()->_has_xsub
 		? ">>>> Type::Tiny is not using XS"
@@ -109,14 +109,15 @@ diag(
 			? ">>>> Type::Tiny is using Type::Tiny::XS"
 			: ">>>> Type::Tiny is using Mouse::XS"
 );
-diag("");
+diag( ' ' );
+diag( '# ' x 36 );
+diag( ' ' );
 
 ok 1;
 done_testing;
 
 __END__
 
-perl
 Exporter::Tiny
 Return::Type
 Type::Tie
