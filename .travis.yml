@@ -114,7 +114,7 @@ before_script:
   - '[ -n "$COVERAGE" ] && cover -delete || echo "COVERAGE is not set"'
 script:
   - 'prove -r -Ilib -Iinc $(test-dirs)'
-  - '[ "$PERL_TYPE_TINY_XS" -eq "1" ] && PERL_TYPE_TINY_XS=0 prove -r -Ilib -Iinc $(test-dirs)'
+  - '[ "$PERL_TYPE_TINY_XS" -eq "1" ] && PERL_TYPE_TINY_XS=0 prove -r -Ilib -Iinc $(test-dirs) || echo "no second run"'
 after_success:
   - '[ -n "$COVERAGE" ] && cover -select_re "^lib/" -report codecov || echo "COVERAGE is not set"'
   - coverage-report -select_re '^lib/'
