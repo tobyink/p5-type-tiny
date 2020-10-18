@@ -72,6 +72,7 @@ jobs:
     - perl: "5.26"
       env: PERL_TYPE_TINY_XS=1
       dist: trusty
+    - perl: "5.28"
       env: PERL_TYPE_TINY_XS=1
     - perl: "5.30"
       env: PERL_TYPE_TINY_XS=1
