@@ -5,9 +5,9 @@ $meta->{prereqs}{runtime}{requires}{'Exporter'}       = '5.57'  if $] < 5.009001
 
 my $extended_testing = 0;
 if ( $ENV{EXTENDED_TESTING} ) {
-	$meta->{version} =~ /_/ and ++$extended_testing;
-	$ENV{TRAVIS} and ++$extended_testing;
-	$] ge '5.008009' and $extended_testing = 0;
+	++$extended_testing if $meta->{version};
+	++$extended_testing if $ENV{TRAVIS};
+	$extended_testing = 0 if $] lt '5.008009';
 }
 
 if ( $extended_testing ) {
