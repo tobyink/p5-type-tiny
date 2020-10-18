@@ -68,6 +68,7 @@ sub travis_banner
 	diag( "  XS:       " . ( exists($ENV{PERL_TYPE_TINY_XS}) && !$ENV{PERL_TYPE_TINY_XS} ? 'PP' : 'XS' ) );
 	diag( "  NUMBERS:  " . ( $ENV{PERL_TYPES_STANDARD_STRICTNUM} ? 'strict' : 'loose' ) );
 	diag( "  TESTING:  " . ( $ENV{EXTENDED_TESTING} ? 'extended' : 'normal' ) );
+	diag( "  COVERAGE: " . ( $ENV{COVERAGE} ? 'coverage report' : 'standard report' ) );
 	diag( ' ' );
 	diag( '# ' x 36 );
 }
