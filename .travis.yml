@@ -15,17 +15,13 @@ jobs:
         - prove -r -Ilib -Iinc $(test-dirs)
     # Minimal install
     - perl: "5.18"
-      env: PERL_TYPE_TINY_XS=0 MINIMAL_INSTALL=1 REBUILD_PERL=1 SPLIT_BUILD=1
+      env: PERL_TYPE_TINY_XS=1 MINIMAL_INSTALL=1 REBUILD_PERL=1 SPLIT_BUILD=1
     # Extended testing
     - perl: "5.8.9"
       env: PERL_TYPE_TINY_XS=0 EXTENDED_TESTING=1
       dist: trusty
     - perl: "5.32"
-      env: PERL_TYPE_TINY_XS=0 EXTENDED_TESTING=1
-    - perl: "5.32"
       env: PERL_TYPE_TINY_XS=1 EXTENDED_TESTING=1
-    - perl: "5.32"
-      env: PERL_TYPE_TINY_XS=0 EXTENDED_TESTING=1 PERL_TYPES_STANDARD_STRICTNUM=1 
     - perl: "5.32"
       env: PERL_TYPE_TINY_XS=1 EXTENDED_TESTING=1 PERL_TYPES_STANDARD_STRICTNUM=1 
     # Standard testing
@@ -47,81 +43,44 @@ jobs:
       env: PERL_TYPE_TINY_XS=0
       dist: trusty
     - perl: "5.10"
-      env: PERL_TYPE_TINY_XS=0
-      dist: trusty
-    - perl: "5.10"
       env: PERL_TYPE_TINY_XS=1
-      dist: trusty
-    - perl: "5.12"
-      env: PERL_TYPE_TINY_XS=0
       dist: trusty
     - perl: "5.12"
       env: PERL_TYPE_TINY_XS=1
       dist: trusty
     - perl: "5.14"
-      env: PERL_TYPE_TINY_XS=0
-      dist: trusty
-    - perl: "5.14"
       env: PERL_TYPE_TINY_XS=1
-      dist: trusty
-    - perl: "5.16"
-      env: PERL_TYPE_TINY_XS=0
       dist: trusty
     - perl: "5.16"
       env: PERL_TYPE_TINY_XS=1
       dist: trusty
     - perl: "5.18"
-      env: PERL_TYPE_TINY_XS=0
-      dist: trusty
-    - perl: "5.18"
       env: PERL_TYPE_TINY_XS=1
       dist: trusty
-    - perl: "5.20"
-      env: PERL_TYPE_TINY_XS=0
+    - perl: "5.18-thr"
+      env: PERL_TYPE_TINY_XS=1
       dist: trusty
     - perl: "5.20"
       env: PERL_TYPE_TINY_XS=1
       dist: trusty
     - perl: "5.22"
-      env: PERL_TYPE_TINY_XS=0
-      dist: trusty
-    - perl: "5.22"
       env: PERL_TYPE_TINY_XS=1
-      dist: trusty
-    - perl: "5.24"
-      env: PERL_TYPE_TINY_XS=0
       dist: trusty
     - perl: "5.24"
       env: PERL_TYPE_TINY_XS=1
       dist: trusty
     - perl: "5.26"
-      env: PERL_TYPE_TINY_XS=0
-      dist: trusty
-    - perl: "5.26"
       env: PERL_TYPE_TINY_XS=1
       dist: trusty
-    - perl: "5.28"
-      env: PERL_TYPE_TINY_XS=0
-    - perl: "5.28"
       env: PERL_TYPE_TINY_XS=1
-    - perl: "5.30"
-      env: PERL_TYPE_TINY_XS=0
     - perl: "5.30"
       env: PERL_TYPE_TINY_XS=1
     - perl: "5.30-thr"
-      env: PERL_TYPE_TINY_XS=0
-    - perl: "5.30-thr"
       env: PERL_TYPE_TINY_XS=1
-    - perl: "5.32"
-      env: PERL_TYPE_TINY_XS=0
     - perl: "5.32"
       env: PERL_TYPE_TINY_XS=1
     - perl: "dev"
-      env: PERL_TYPE_TINY_XS=0
-    - perl: "dev"
       env: PERL_TYPE_TINY_XS=1
-    - perl: "blead"
-      env: PERL_TYPE_TINY_XS=0
     - perl: "blead"
       env: PERL_TYPE_TINY_XS=1
     # Older Moose/Moo
@@ -144,9 +103,7 @@ before_install:
   - eval $(curl https://travis-perl.github.io/init) --auto
 install:
   - cpan-install --toolchain
-  - perl Makefile.PL
-  - cpanm -n --showdeps .
-  - cpanm -n --installdeps .
+  - cpan-install --deps
   - '[ -n "$COVERAGE" ]      && cpan-install --coverage && cpanm -n Devel::Cover Devel::Cover::Report::Codecov || echo "COVERAGE is not set"'
   - '[ -n "$MOOSE_RELEASE" ] && cpanm -n --reinstall "$MOOSE_RELEASE"                                          || echo "MOOSE_RELEASE is not set"'
   - '[ -n "$MXT_RELEASE" ]   && cpanm -n --reinstall "$MXT_RELEASE"                                            || echo "MXT_RELEASE is not set"'
@@ -156,7 +113,8 @@ before_script:
   - coverage-setup
   - '[ -n "$COVERAGE" ] && cover -delete || echo "COVERAGE is not set"'
 script:
-  - prove -r -Ilib -Iinc $(test-dirs)
+  - 'prove -r -Ilib -Iinc $(test-dirs)'
+  - '[ "$PERL_TYPE_TINY_XS" -eq "1" ] && PERL_TYPE_TINY_XS=0 prove -r -Ilib -Iinc $(test-dirs)'
 after_success:
   - '[ -n "$COVERAGE" ] && cover -select_re "^lib/" -report codecov || echo "COVERAGE is not set"'
   - coverage-report -select_re '^lib/'
