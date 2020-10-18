@@ -9,6 +9,10 @@ if ( $ENV{EXTENDED_TESTING} and $] ge '5.008009' ) {
 	++$extended_testing if $ENV{TRAVIS};
 }
 
+if ( $ENV{MINIMAL_TESTING} ) {
+	$extended_testing = 0;
+}
+
 if ( $extended_testing ) {
 	$meta->{prereqs}{test}{requires}{'Moose'} = '2.0600';
 	$meta->{prereqs}{test}{requires}{$_} = '0'

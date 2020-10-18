@@ -15,6 +15,7 @@ jobs:
         - prove -r -Ilib -Iinc $(test-dirs)
     # Minimal install
     - perl: "5.18"
+      env: MINIMAL_TESTING=1 
       install:
       - cpan-install "Exporter::Tiny"
     # Extended testing
