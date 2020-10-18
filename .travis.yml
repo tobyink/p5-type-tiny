@@ -144,7 +144,8 @@ before_install:
   - eval $(curl https://travis-perl.github.io/init) --auto
 install:
   - cpan-install --toolchain
-  - cpan-install --deps
+  - perl Makefile.PL
+  - cpanm -n .
   - '[ -n "$COVERAGE" ]      && cpan-install --coverage && cpanm -n Devel::Cover Devel::Cover::Report::Codecov || echo "COVERAGE is not set"'
   - '[ -n "$MOOSE_RELEASE" ] && cpanm -n --reinstall "$MOOSE_RELEASE"                                          || echo "MOOSE_RELEASE is not set"'
   - '[ -n "$MXT_RELEASE" ]   && cpanm -n --reinstall "$MXT_RELEASE"                                            || echo "MXT_RELEASE is not set"'
