@@ -13,106 +13,23 @@ jobs:
         - export PERL_TYPE_TINY_XS=1
         - export PERL_TYPE_PARAMS_XS=1
         - prove -r -Ilib -Iinc $(test-dirs)
-    # Extended testing on both a Modern and older Perl
+    # Minimal install
+    - perl: "5.18"
+      install:
+      - cpan-install "Exporter::Tiny"
+    # Extended testing
     - perl: "5.8.9"
       env: PERL_TYPE_TINY_XS=0 EXTENDED_TESTING=1
       dist: trusty
     - perl: "5.32"
       env: PERL_TYPE_TINY_XS=0 EXTENDED_TESTING=1
-    # Standard testing for modern and vaguely modern Perls
-    - perl: "5.10"
-      env: PERL_TYPE_TINY_XS=0
-      dist: trusty
-    - perl: "5.12"
-      env: PERL_TYPE_TINY_XS=0
-      dist: trusty
-    - perl: "5.14"
-      env: PERL_TYPE_TINY_XS=0
-      dist: trusty
-    - perl: "5.16"
-      env: PERL_TYPE_TINY_XS=0
-      dist: trusty
-    - perl: "5.18"
-      env: PERL_TYPE_TINY_XS=0
-      dist: trusty
-    - perl: "5.20"
-      env: PERL_TYPE_TINY_XS=0
-      dist: trusty
-    - perl: "5.22"
-      env: PERL_TYPE_TINY_XS=0
-      dist: trusty
-    - perl: "5.24"
-      env: PERL_TYPE_TINY_XS=0
-      dist: trusty
-    - perl: "5.26"
-      env: PERL_TYPE_TINY_XS=0
-      dist: trusty
-    - perl: "5.28"
-      env: PERL_TYPE_TINY_XS=0
-    - perl: "5.30"
-      env: PERL_TYPE_TINY_XS=0
     - perl: "5.32"
-      env: PERL_TYPE_TINY_XS=0
-    - perl: "5.10"
-      env: PERL_TYPE_TINY_XS=1
-      dist: trusty
-    - perl: "5.12"
-      env: PERL_TYPE_TINY_XS=1
-      dist: trusty
-    - perl: "5.14"
-      env: PERL_TYPE_TINY_XS=1
-      dist: trusty
-    - perl: "5.16"
-      env: PERL_TYPE_TINY_XS=1
-      dist: trusty
-    - perl: "5.18"
-      env: PERL_TYPE_TINY_XS=1
-      dist: trusty
-    - perl: "5.20"
-      env: PERL_TYPE_TINY_XS=1
-      dist: trusty
-    - perl: "5.22"
-      env: PERL_TYPE_TINY_XS=1
-      dist: trusty
-    - perl: "5.24"
-      env: PERL_TYPE_TINY_XS=1
-      dist: trusty
-    - perl: "5.26"
-      env: PERL_TYPE_TINY_XS=1
-      dist: trusty
-    - perl: "5.28"
-      env: PERL_TYPE_TINY_XS=1
-    - perl: "5.30"
-      env: PERL_TYPE_TINY_XS=1
+      env: PERL_TYPE_TINY_XS=1 EXTENDED_TESTING=1
     - perl: "5.32"
-      env: PERL_TYPE_TINY_XS=1
-    # Strict Num
+      env: PERL_TYPE_TINY_XS=0 EXTENDED_TESTING=1 PERL_TYPES_STANDARD_STRICTNUM=1 
     - perl: "5.32"
-      env: PERL_TYPES_STANDARD_STRICTNUM=1 PERL_TYPE_TINY_XS=0 EXTENDED_TESTING=1
-    - perl: "5.32"
-      env: PERL_TYPES_STANDARD_STRICTNUM=1 PERL_TYPE_TINY_XS=1 EXTENDED_TESTING=1
-    # Older Moose/Moo
-    - perl: "5.20"
-      env: MOO_RELEASE=HAARG/Moo-1.004006.tar.gz
-      dist: trusty
-    - perl: "5.18"
-      env: MOO_RELEASE=MSTROUT/Moo-1.003001.tar.gz
-      dist: trusty
-    - perl: "5.16"
-      env: MOOSE_RELEASE=DOY/Moose-2.0604.tar.gz MXT_RELEASE=DROLSKY/MooseX-Types-0.31.tar.gz MOO_RELEASE=MSTROUT/Moo-1.000008.tar.gz
-      dist: trusty
-    - perl: "5.12"
-      env: MOOSE_RELEASE=FLORA/Moose-2.0007.tar.gz MXT_RELEASE=FLORA/MooseX-Types-0.24.tar.gz EC_RELEASE="https://cpan.metacpan.org/authors/id/D/DO/DOY/Eval-Closure-0.06.tar.gz"
-      dist: trusty
-    # Threaded Perls
-    - perl: "5.8.9-thr"
-      env: PERL_TYPE_TINY_XS=0
-      dist: trusty
-    - perl: "5.30-thr"
-      env: PERL_TYPE_TINY_XS=0
-    - perl: "5.30-thr"
-      env: PERL_TYPE_TINY_XS=1
-    # Archaic Perls
+      env: PERL_TYPE_TINY_XS=1 EXTENDED_TESTING=1 PERL_TYPES_STANDARD_STRICTNUM=1 
+    # Standard testing
     - perl: "5.6.1"
       env: PERL_TYPE_TINY_XS=0 
       dist: trusty
@@ -124,7 +41,82 @@ jobs:
     - perl: "5.8.1"
       env: PERL_TYPE_TINY_XS=0
       dist: trusty
-    # Cutting edge
+    - perl: "5.8.9"
+      env: PERL_TYPE_TINY_XS=0
+      dist: trusty
+    - perl: "5.8.9-thr"
+      env: PERL_TYPE_TINY_XS=0
+      dist: trusty
+    - perl: "5.10"
+      env: PERL_TYPE_TINY_XS=0
+      dist: trusty
+    - perl: "5.10"
+      env: PERL_TYPE_TINY_XS=1
+      dist: trusty
+    - perl: "5.12"
+      env: PERL_TYPE_TINY_XS=0
+      dist: trusty
+    - perl: "5.12"
+      env: PERL_TYPE_TINY_XS=1
+      dist: trusty
+    - perl: "5.14"
+      env: PERL_TYPE_TINY_XS=0
+      dist: trusty
+    - perl: "5.14"
+      env: PERL_TYPE_TINY_XS=1
+      dist: trusty
+    - perl: "5.16"
+      env: PERL_TYPE_TINY_XS=0
+      dist: trusty
+    - perl: "5.16"
+      env: PERL_TYPE_TINY_XS=1
+      dist: trusty
+    - perl: "5.18"
+      env: PERL_TYPE_TINY_XS=0
+      dist: trusty
+    - perl: "5.18"
+      env: PERL_TYPE_TINY_XS=1
+      dist: trusty
+    - perl: "5.20"
+      env: PERL_TYPE_TINY_XS=0
+      dist: trusty
+    - perl: "5.20"
+      env: PERL_TYPE_TINY_XS=1
+      dist: trusty
+    - perl: "5.22"
+      env: PERL_TYPE_TINY_XS=0
+      dist: trusty
+    - perl: "5.22"
+      env: PERL_TYPE_TINY_XS=1
+      dist: trusty
+    - perl: "5.24"
+      env: PERL_TYPE_TINY_XS=0
+      dist: trusty
+    - perl: "5.24"
+      env: PERL_TYPE_TINY_XS=1
+      dist: trusty
+    - perl: "5.26"
+      env: PERL_TYPE_TINY_XS=0
+      dist: trusty
+    - perl: "5.26"
+      env: PERL_TYPE_TINY_XS=1
+      dist: trusty
+    - perl: "5.28"
+      env: PERL_TYPE_TINY_XS=0
+    - perl: "5.28"
+      env: PERL_TYPE_TINY_XS=1
+    - perl: "5.30"
+      env: PERL_TYPE_TINY_XS=0
+    - perl: "5.30"
+      env: PERL_TYPE_TINY_XS=1
+    - perl: "5.30-thr"
+      env: PERL_TYPE_TINY_XS=0
+    - perl: "5.30-thr"
+      env: PERL_TYPE_TINY_XS=1
+    - perl: "5.32"
+      env: PERL_TYPE_TINY_XS=0
+    - perl: "5.32"
+      env: PERL_TYPE_TINY_XS=1
     - perl: "dev"
       env: PERL_TYPE_TINY_XS=0
     - perl: "dev"
@@ -133,6 +125,19 @@ jobs:
       env: PERL_TYPE_TINY_XS=0
     - perl: "blead"
       env: PERL_TYPE_TINY_XS=1
+    # Older Moose/Moo
+    - perl: "5.12"
+      env: MOOSE_RELEASE=FLORA/Moose-2.0007.tar.gz MXT_RELEASE=FLORA/MooseX-Types-0.24.tar.gz EC_RELEASE="https://cpan.metacpan.org/authors/id/D/DO/DOY/Eval-Closure-0.06.tar.gz"
+      dist: trusty
+    - perl: "5.16"
+      env: MOOSE_RELEASE=DOY/Moose-2.0604.tar.gz MXT_RELEASE=DROLSKY/MooseX-Types-0.31.tar.gz MOO_RELEASE=MSTROUT/Moo-1.000008.tar.gz
+      dist: trusty
+    - perl: "5.18"
+      env: MOO_RELEASE=MSTROUT/Moo-1.003001.tar.gz
+      dist: trusty
+    - perl: "5.20"
+      env: MOO_RELEASE=HAARG/Moo-1.004006.tar.gz
+      dist: trusty
   allow_failures:
     - perl: "blead"
 before_install:
