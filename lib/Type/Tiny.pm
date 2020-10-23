@@ -2406,7 +2406,7 @@ L<Mouse::Meta::TypeConstraint>.
 L<Type::Params>.
 
 L<Type::Tiny on GitHub|https://github.com/tobyink/p5-type-tiny>,
-L<Type::Tiny on Travis-CI|https://travis-ci.org/tobyink/p5-type-tiny>,
+L<Type::Tiny on Travis-CI|https://travis-ci.com/tobyink/p5-type-tiny>,
 L<Type::Tiny on AppVeyor|https://ci.appveyor.com/project/tobyink/p5-type-tiny>,
 L<Type::Tiny on Codecov|https://codecov.io/gh/tobyink/p5-type-tiny>,
 L<Type::Tiny on Coveralls|https://coveralls.io/github/tobyink/p5-type-tiny>.
