@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Types::Standard::Tuple::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::Tuple::VERSION   = '1.011_011';
+	$Types::Standard::Tuple::VERSION   = '1.012000';
 }
 
 $Types::Standard::Tuple::VERSION =~ tr/_//d;

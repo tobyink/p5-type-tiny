@@ -3821,7 +3821,7 @@
 		item "Improved test coverage for Type::Params."^^Tests;
 		item "Improved test coverage for Type::Registry."^^Tests;
 		item "Improved test coverage for Type::Tiny::Union."^^Tests;
-		item "Include JSONCapaable type example."^^Documentation;
+		item "Include JSONCapable type example."^^Documentation;
 		item "Improved tests for Type::Utils::is()."^^Tests;
 		item "Test::TypeTiny's should_pass and should_fail exercise type constraints in even more ways in EXTENDED_TESTING mode."^^Change;
 		item "Various tests for garbage collection using Devel::Refcount."^^Tests;
@@ -3874,4 +3874,11 @@
 		item "More tests for Type::Coercion::FromMoose."^^Tests;
 		item "Remove unnecessary BEGIN block in Eval::TypeTiny."^^Change;
 		item "Bugs in old versions of Return::Type prevent integration tests from passing on Perl 5.8.x; those tests now require Return::Type 0.007 or above."^^Tests;
+	].
+
+`Type-Tiny 1.012000 cpan:TOBYINK`
+	issued  2020-10-28;
+	changeset [
+		dcs:versus `Type-Tiny 1.011_011 cpan:TOBYINK`;
+		item "Update NEWS file."^^Documentation;
 	].
