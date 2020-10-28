@@ -10,6 +10,10 @@ f`Changes`
 	dc:license <http://dev.perl.org/licenses/>;
 	dc:rightsHolder cpan:TOBYINK.
 
+f`INSTALL`
+	dc:license <http://dev.perl.org/licenses/>;
+	dc:rightsHolder cpan:TOBYINK.
+
 f`LICENSE`
 	dc:license <http://dev.perl.org/licenses/>;
 	dc:rightsHolder cpan:TOBYINK.
@@ -70,6 +74,10 @@ f`examples/datetime-coercions.pl`
 	dc:license <http://dev.perl.org/licenses/>;
 	dc:rightsHolder cpan:TOBYINK.
 
+f`examples/jsoncapable.pl`
+	dc:license <http://dev.perl.org/licenses/>;
+	dc:rightsHolder cpan:TOBYINK.
+
 f`meta/changes.pret`
 	dc:license <http://dev.perl.org/licenses/>;
 	dc:rightsHolder cpan:TOBYINK.
@@ -90,6 +98,18 @@ f`meta/rights.pret`
 	dc:license <http://dev.perl.org/licenses/>;
 	dc:rightsHolder cpan:TOBYINK.
 
+f`t/README`
+	dc:license <http://dev.perl.org/licenses/>;
+	dc:rightsHolder cpan:TOBYINK.
+
+f`t/not-covered.pl`
+	dc:license <http://dev.perl.org/licenses/>;
+	dc:rightsHolder cpan:TOBYINK.
+
+f`t/mk-test-manifest.pl`
+	dc:license <http://dev.perl.org/licenses/>;
+	dc:rightsHolder cpan:TOBYINK.
+
 f`inc/Test/Fatal.pm`
 	dc:license <http://dev.perl.org/licenses/>;
 	dc:rightsHolder cpan:RJBS.
@@ -101,6 +121,18 @@ f`inc/Test/Requires.pm`
 f`inc/Try/Tiny.pm`
 	dc:license <http://dev.perl.org/licenses/>;
 	dc:rightsHolder cpan:NUFFIN.
+
+f`inc/archaic/Test/Builder/Module.pm`
+	dc:license <http://dev.perl.org/licenses/>;
+	dc:rightsHolder cpan:CHROMATIC.
+
+f`inc/archaic/Test/Builder/Tester.pm`
+	dc:license <http://dev.perl.org/licenses/>;
+	dc:rightsHolder cpan:RCLAMP.
+
+f`inc/archaic/Test/Builder/Tester/Color.pm`
+	dc:license <http://dev.perl.org/licenses/>;
+	dc:rightsHolder cpan:MARKF.
 
 f`MANIFEST.SKIP`
 	dc:license <http://dev.perl.org/licenses/>;
