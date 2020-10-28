@@ -5,7 +5,7 @@
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 
 <http://purl.org/NET/cpan-uri/dist/Type-Tiny/project>
-	dbug:issue           <http://purl.org/NET/cpan-uri/rt/ticket/100014>, <http://purl.org/NET/cpan-uri/rt/ticket/100780>, <http://purl.org/NET/cpan-uri/rt/ticket/101582>, <http://purl.org/NET/cpan-uri/rt/ticket/101639>, <http://purl.org/NET/cpan-uri/rt/ticket/102457>, <http://purl.org/NET/cpan-uri/rt/ticket/102638>, <http://purl.org/NET/cpan-uri/rt/ticket/102639>, <http://purl.org/NET/cpan-uri/rt/ticket/102748>, <http://purl.org/NET/cpan-uri/rt/ticket/102864>, <http://purl.org/NET/cpan-uri/rt/ticket/104154>, <http://purl.org/NET/cpan-uri/rt/ticket/104848>, <http://purl.org/NET/cpan-uri/rt/ticket/105022>, <http://purl.org/NET/cpan-uri/rt/ticket/105034>, <http://purl.org/NET/cpan-uri/rt/ticket/105299>, <http://purl.org/NET/cpan-uri/rt/ticket/105505>, <http://purl.org/NET/cpan-uri/rt/ticket/105561>, <http://purl.org/NET/cpan-uri/rt/ticket/109940>, <http://purl.org/NET/cpan-uri/rt/ticket/114386>, <http://purl.org/NET/cpan-uri/rt/ticket/114915>, <http://purl.org/NET/cpan-uri/rt/ticket/117838>, <http://purl.org/NET/cpan-uri/rt/ticket/120226>, <http://purl.org/NET/cpan-uri/rt/ticket/121478>, <http://purl.org/NET/cpan-uri/rt/ticket/121529>, <http://purl.org/NET/cpan-uri/rt/ticket/121762>, <http://purl.org/NET/cpan-uri/rt/ticket/121763>, <http://purl.org/NET/cpan-uri/rt/ticket/121764>, <http://purl.org/NET/cpan-uri/rt/ticket/121840>, <http://purl.org/NET/cpan-uri/rt/ticket/121841>, <http://purl.org/NET/cpan-uri/rt/ticket/121981>, <http://purl.org/NET/cpan-uri/rt/ticket/122054>, <http://purl.org/NET/cpan-uri/rt/ticket/122305>, <http://purl.org/NET/cpan-uri/rt/ticket/122931>, <http://purl.org/NET/cpan-uri/rt/ticket/123041>, <http://purl.org/NET/cpan-uri/rt/ticket/123243>, <http://purl.org/NET/cpan-uri/rt/ticket/123408>, <http://purl.org/NET/cpan-uri/rt/ticket/124067>, <http://purl.org/NET/cpan-uri/rt/ticket/124121>, <http://purl.org/NET/cpan-uri/rt/ticket/124728>, <http://purl.org/NET/cpan-uri/rt/ticket/125132>, <http://purl.org/NET/cpan-uri/rt/ticket/125765>, <http://purl.org/NET/cpan-uri/rt/ticket/125839>, <http://purl.org/NET/cpan-uri/rt/ticket/125942>, <http://purl.org/NET/cpan-uri/rt/ticket/125948>, <http://purl.org/NET/cpan-uri/rt/ticket/127005>, <http://purl.org/NET/cpan-uri/rt/ticket/127090>, <http://purl.org/NET/cpan-uri/rt/ticket/127327>, <http://purl.org/NET/cpan-uri/rt/ticket/127504>, <http://purl.org/NET/cpan-uri/rt/ticket/127635>, <http://purl.org/NET/cpan-uri/rt/ticket/127986>, <http://purl.org/NET/cpan-uri/rt/ticket/128039>, <http://purl.org/NET/cpan-uri/rt/ticket/128046>, <http://purl.org/NET/cpan-uri/rt/ticket/128337>, <http://purl.org/NET/cpan-uri/rt/ticket/128493>, <http://purl.org/NET/cpan-uri/rt/ticket/128867>, <http://purl.org/NET/cpan-uri/rt/ticket/129650>, <http://purl.org/NET/cpan-uri/rt/ticket/129729>, <http://purl.org/NET/cpan-uri/rt/ticket/130353>, <http://purl.org/NET/cpan-uri/rt/ticket/130411>, <http://purl.org/NET/cpan-uri/rt/ticket/130823>, <http://purl.org/NET/cpan-uri/rt/ticket/131011>, <http://purl.org/NET/cpan-uri/rt/ticket/131032>, <http://purl.org/NET/cpan-uri/rt/ticket/131172>, <http://purl.org/NET/cpan-uri/rt/ticket/131238>, <http://purl.org/NET/cpan-uri/rt/ticket/131243>, <http://purl.org/NET/cpan-uri/rt/ticket/131401>, <http://purl.org/NET/cpan-uri/rt/ticket/85054>, <http://purl.org/NET/cpan-uri/rt/ticket/85149>, <http://purl.org/NET/cpan-uri/rt/ticket/85720>, <http://purl.org/NET/cpan-uri/rt/ticket/85732>, <http://purl.org/NET/cpan-uri/rt/ticket/85895>, <http://purl.org/NET/cpan-uri/rt/ticket/85911>, <http://purl.org/NET/cpan-uri/rt/ticket/86004>, <http://purl.org/NET/cpan-uri/rt/ticket/86172>, <http://purl.org/NET/cpan-uri/rt/ticket/86233>, <http://purl.org/NET/cpan-uri/rt/ticket/86239>, <http://purl.org/NET/cpan-uri/rt/ticket/86383>, <http://purl.org/NET/cpan-uri/rt/ticket/86813>, <http://purl.org/NET/cpan-uri/rt/ticket/86891>, <http://purl.org/NET/cpan-uri/rt/ticket/86892>, <http://purl.org/NET/cpan-uri/rt/ticket/86893>, <http://purl.org/NET/cpan-uri/rt/ticket/87264>, <http://purl.org/NET/cpan-uri/rt/ticket/87366>, <http://purl.org/NET/cpan-uri/rt/ticket/87443>, <http://purl.org/NET/cpan-uri/rt/ticket/87846>, <http://purl.org/NET/cpan-uri/rt/ticket/87999>, <http://purl.org/NET/cpan-uri/rt/ticket/88064>, <http://purl.org/NET/cpan-uri/rt/ticket/88277>, <http://purl.org/NET/cpan-uri/rt/ticket/88291>, <http://purl.org/NET/cpan-uri/rt/ticket/88452>, <http://purl.org/NET/cpan-uri/rt/ticket/88648>, <http://purl.org/NET/cpan-uri/rt/ticket/88655>, <http://purl.org/NET/cpan-uri/rt/ticket/88798>, <http://purl.org/NET/cpan-uri/rt/ticket/88951>, <http://purl.org/NET/cpan-uri/rt/ticket/89073>, <http://purl.org/NET/cpan-uri/rt/ticket/89234>, <http://purl.org/NET/cpan-uri/rt/ticket/89251>, <http://purl.org/NET/cpan-uri/rt/ticket/89279>, <http://purl.org/NET/cpan-uri/rt/ticket/89280>, <http://purl.org/NET/cpan-uri/rt/ticket/89317>, <http://purl.org/NET/cpan-uri/rt/ticket/89352>, <http://purl.org/NET/cpan-uri/rt/ticket/89691>, <http://purl.org/NET/cpan-uri/rt/ticket/89696>, <http://purl.org/NET/cpan-uri/rt/ticket/89936>, <http://purl.org/NET/cpan-uri/rt/ticket/90096>, <http://purl.org/NET/cpan-uri/rt/ticket/90865>, <http://purl.org/NET/cpan-uri/rt/ticket/90867>, <http://purl.org/NET/cpan-uri/rt/ticket/91153>, <http://purl.org/NET/cpan-uri/rt/ticket/91468>, <http://purl.org/NET/cpan-uri/rt/ticket/91802>, <http://purl.org/NET/cpan-uri/rt/ticket/92571>, <http://purl.org/NET/cpan-uri/rt/ticket/92591>, <http://purl.org/NET/cpan-uri/rt/ticket/93345>, <http://purl.org/NET/cpan-uri/rt/ticket/94196>, <http://purl.org/NET/cpan-uri/rt/ticket/94286>, <http://purl.org/NET/cpan-uri/rt/ticket/96379>, <http://purl.org/NET/cpan-uri/rt/ticket/96545>, <http://purl.org/NET/cpan-uri/rt/ticket/97516>, <http://purl.org/NET/cpan-uri/rt/ticket/97684>, <http://purl.org/NET/cpan-uri/rt/ticket/97840>, <http://purl.org/NET/cpan-uri/rt/ticket/98113>, <http://purl.org/NET/cpan-uri/rt/ticket/98159>, <http://purl.org/NET/cpan-uri/rt/ticket/98362>, <http://purl.org/NET/cpan-uri/rt/ticket/98458>, <http://purl.org/NET/cpan-uri/rt/ticket/99312>, <http://purl.org/NET/cpan-uri/rt/ticket/99889>.
+	dbug:issue           <http://purl.org/NET/cpan-uri/rt/ticket/100014>, <http://purl.org/NET/cpan-uri/rt/ticket/100780>, <http://purl.org/NET/cpan-uri/rt/ticket/101582>, <http://purl.org/NET/cpan-uri/rt/ticket/101639>, <http://purl.org/NET/cpan-uri/rt/ticket/102457>, <http://purl.org/NET/cpan-uri/rt/ticket/102638>, <http://purl.org/NET/cpan-uri/rt/ticket/102639>, <http://purl.org/NET/cpan-uri/rt/ticket/102748>, <http://purl.org/NET/cpan-uri/rt/ticket/102864>, <http://purl.org/NET/cpan-uri/rt/ticket/104154>, <http://purl.org/NET/cpan-uri/rt/ticket/104848>, <http://purl.org/NET/cpan-uri/rt/ticket/105022>, <http://purl.org/NET/cpan-uri/rt/ticket/105034>, <http://purl.org/NET/cpan-uri/rt/ticket/105299>, <http://purl.org/NET/cpan-uri/rt/ticket/105505>, <http://purl.org/NET/cpan-uri/rt/ticket/105561>, <http://purl.org/NET/cpan-uri/rt/ticket/109940>, <http://purl.org/NET/cpan-uri/rt/ticket/114386>, <http://purl.org/NET/cpan-uri/rt/ticket/114915>, <http://purl.org/NET/cpan-uri/rt/ticket/117838>, <http://purl.org/NET/cpan-uri/rt/ticket/120226>, <http://purl.org/NET/cpan-uri/rt/ticket/121478>, <http://purl.org/NET/cpan-uri/rt/ticket/121529>, <http://purl.org/NET/cpan-uri/rt/ticket/121762>, <http://purl.org/NET/cpan-uri/rt/ticket/121763>, <http://purl.org/NET/cpan-uri/rt/ticket/121764>, <http://purl.org/NET/cpan-uri/rt/ticket/121840>, <http://purl.org/NET/cpan-uri/rt/ticket/121841>, <http://purl.org/NET/cpan-uri/rt/ticket/121981>, <http://purl.org/NET/cpan-uri/rt/ticket/122054>, <http://purl.org/NET/cpan-uri/rt/ticket/122305>, <http://purl.org/NET/cpan-uri/rt/ticket/122931>, <http://purl.org/NET/cpan-uri/rt/ticket/123041>, <http://purl.org/NET/cpan-uri/rt/ticket/123243>, <http://purl.org/NET/cpan-uri/rt/ticket/123408>, <http://purl.org/NET/cpan-uri/rt/ticket/124067>, <http://purl.org/NET/cpan-uri/rt/ticket/124121>, <http://purl.org/NET/cpan-uri/rt/ticket/124728>, <http://purl.org/NET/cpan-uri/rt/ticket/125132>, <http://purl.org/NET/cpan-uri/rt/ticket/125765>, <http://purl.org/NET/cpan-uri/rt/ticket/125839>, <http://purl.org/NET/cpan-uri/rt/ticket/125942>, <http://purl.org/NET/cpan-uri/rt/ticket/125948>, <http://purl.org/NET/cpan-uri/rt/ticket/127005>, <http://purl.org/NET/cpan-uri/rt/ticket/127090>, <http://purl.org/NET/cpan-uri/rt/ticket/127327>, <http://purl.org/NET/cpan-uri/rt/ticket/127504>, <http://purl.org/NET/cpan-uri/rt/ticket/127635>, <http://purl.org/NET/cpan-uri/rt/ticket/127986>, <http://purl.org/NET/cpan-uri/rt/ticket/128039>, <http://purl.org/NET/cpan-uri/rt/ticket/128046>, <http://purl.org/NET/cpan-uri/rt/ticket/128337>, <http://purl.org/NET/cpan-uri/rt/ticket/128493>, <http://purl.org/NET/cpan-uri/rt/ticket/128867>, <http://purl.org/NET/cpan-uri/rt/ticket/129650>, <http://purl.org/NET/cpan-uri/rt/ticket/129729>, <http://purl.org/NET/cpan-uri/rt/ticket/130353>, <http://purl.org/NET/cpan-uri/rt/ticket/130411>, <http://purl.org/NET/cpan-uri/rt/ticket/130823>, <http://purl.org/NET/cpan-uri/rt/ticket/131011>, <http://purl.org/NET/cpan-uri/rt/ticket/131032>, <http://purl.org/NET/cpan-uri/rt/ticket/131172>, <http://purl.org/NET/cpan-uri/rt/ticket/131238>, <http://purl.org/NET/cpan-uri/rt/ticket/131243>, <http://purl.org/NET/cpan-uri/rt/ticket/131401>, <http://purl.org/NET/cpan-uri/rt/ticket/131559>, <http://purl.org/NET/cpan-uri/rt/ticket/131666>, <http://purl.org/NET/cpan-uri/rt/ticket/131720>, <http://purl.org/NET/cpan-uri/rt/ticket/131744>, <http://purl.org/NET/cpan-uri/rt/ticket/131756>, <http://purl.org/NET/cpan-uri/rt/ticket/132392>, <http://purl.org/NET/cpan-uri/rt/ticket/132419>, <http://purl.org/NET/cpan-uri/rt/ticket/132426>, <http://purl.org/NET/cpan-uri/rt/ticket/132455>, <http://purl.org/NET/cpan-uri/rt/ticket/132539>, <http://purl.org/NET/cpan-uri/rt/ticket/132583>, <http://purl.org/NET/cpan-uri/rt/ticket/132733>, <http://purl.org/NET/cpan-uri/rt/ticket/132754>, <http://purl.org/NET/cpan-uri/rt/ticket/132918>, <http://purl.org/NET/cpan-uri/rt/ticket/133036>, <http://purl.org/NET/cpan-uri/rt/ticket/85054>, <http://purl.org/NET/cpan-uri/rt/ticket/85149>, <http://purl.org/NET/cpan-uri/rt/ticket/85720>, <http://purl.org/NET/cpan-uri/rt/ticket/85732>, <http://purl.org/NET/cpan-uri/rt/ticket/85895>, <http://purl.org/NET/cpan-uri/rt/ticket/85911>, <http://purl.org/NET/cpan-uri/rt/ticket/86004>, <http://purl.org/NET/cpan-uri/rt/ticket/86172>, <http://purl.org/NET/cpan-uri/rt/ticket/86233>, <http://purl.org/NET/cpan-uri/rt/ticket/86239>, <http://purl.org/NET/cpan-uri/rt/ticket/86383>, <http://purl.org/NET/cpan-uri/rt/ticket/86813>, <http://purl.org/NET/cpan-uri/rt/ticket/86891>, <http://purl.org/NET/cpan-uri/rt/ticket/86892>, <http://purl.org/NET/cpan-uri/rt/ticket/86893>, <http://purl.org/NET/cpan-uri/rt/ticket/87264>, <http://purl.org/NET/cpan-uri/rt/ticket/87366>, <http://purl.org/NET/cpan-uri/rt/ticket/87443>, <http://purl.org/NET/cpan-uri/rt/ticket/87846>, <http://purl.org/NET/cpan-uri/rt/ticket/87999>, <http://purl.org/NET/cpan-uri/rt/ticket/88064>, <http://purl.org/NET/cpan-uri/rt/ticket/88277>, <http://purl.org/NET/cpan-uri/rt/ticket/88291>, <http://purl.org/NET/cpan-uri/rt/ticket/88452>, <http://purl.org/NET/cpan-uri/rt/ticket/88648>, <http://purl.org/NET/cpan-uri/rt/ticket/88655>, <http://purl.org/NET/cpan-uri/rt/ticket/88798>, <http://purl.org/NET/cpan-uri/rt/ticket/88951>, <http://purl.org/NET/cpan-uri/rt/ticket/89073>, <http://purl.org/NET/cpan-uri/rt/ticket/89234>, <http://purl.org/NET/cpan-uri/rt/ticket/89251>, <http://purl.org/NET/cpan-uri/rt/ticket/89279>, <http://purl.org/NET/cpan-uri/rt/ticket/89280>, <http://purl.org/NET/cpan-uri/rt/ticket/89317>, <http://purl.org/NET/cpan-uri/rt/ticket/89352>, <http://purl.org/NET/cpan-uri/rt/ticket/89691>, <http://purl.org/NET/cpan-uri/rt/ticket/89696>, <http://purl.org/NET/cpan-uri/rt/ticket/89936>, <http://purl.org/NET/cpan-uri/rt/ticket/90096>, <http://purl.org/NET/cpan-uri/rt/ticket/90865>, <http://purl.org/NET/cpan-uri/rt/ticket/90867>, <http://purl.org/NET/cpan-uri/rt/ticket/91153>, <http://purl.org/NET/cpan-uri/rt/ticket/91468>, <http://purl.org/NET/cpan-uri/rt/ticket/91802>, <http://purl.org/NET/cpan-uri/rt/ticket/92571>, <http://purl.org/NET/cpan-uri/rt/ticket/92591>, <http://purl.org/NET/cpan-uri/rt/ticket/93345>, <http://purl.org/NET/cpan-uri/rt/ticket/94196>, <http://purl.org/NET/cpan-uri/rt/ticket/94286>, <http://purl.org/NET/cpan-uri/rt/ticket/96379>, <http://purl.org/NET/cpan-uri/rt/ticket/96545>, <http://purl.org/NET/cpan-uri/rt/ticket/97516>, <http://purl.org/NET/cpan-uri/rt/ticket/97684>, <http://purl.org/NET/cpan-uri/rt/ticket/97840>, <http://purl.org/NET/cpan-uri/rt/ticket/98113>, <http://purl.org/NET/cpan-uri/rt/ticket/98159>, <http://purl.org/NET/cpan-uri/rt/ticket/98362>, <http://purl.org/NET/cpan-uri/rt/ticket/98458>, <http://purl.org/NET/cpan-uri/rt/ticket/99312>, <http://purl.org/NET/cpan-uri/rt/ticket/99889>.
 
 <http://purl.org/NET/cpan-uri/person/ANDK>
 	a                    foaf:Agent;
@@ -91,6 +91,10 @@
 	a                    foaf:Agent;
 	foaf:mbox_sha1sum    "01353d2d1cc7cb31f847fdc07ff0dee7024b34c9".
 
+<http://purl.org/NET/cpan-uri/person/SHERRARDB>
+	a                    foaf:Agent;
+	foaf:mbox_sha1sum    "838ce7bd78e69a1fac0a1e0f8f55bad9c324099a".
+
 <http://purl.org/NET/cpan-uri/person/SJM>
 	a                    foaf:Agent;
 	foaf:mbox_sha1sum    "f30f17582ef9f59c6d0070b7624ea8062ef3f1ce".
@@ -102,6 +106,10 @@
 <http://purl.org/NET/cpan-uri/person/SLOYD>
 	a                    foaf:Agent;
 	foaf:mbox_sha1sum    "01f1833f79d2ed448399911d7c175c2602ae168a".
+
+<http://purl.org/NET/cpan-uri/person/SNEZ>
+	a                    foaf:Agent;
+	foaf:mbox_sha1sum    "2076415c777cb97057ba1791ca3601b678516c2d".
 
 <http://purl.org/NET/cpan-uri/person/SPICEMAN>
 	a                    foaf:Agent;
@@ -118,6 +126,10 @@
 <http://purl.org/NET/cpan-uri/person/TIMB>
 	a                    foaf:Agent;
 	foaf:mbox_sha1sum    "5c4419a9f32d74564c6fa40f2d8b57489b8b5233".
+
+<http://purl.org/NET/cpan-uri/person/VEESH>
+	a                    foaf:Agent;
+	foaf:mbox_sha1sum    "f669927e9fa39d8be66e29728ec5ed3c0392499b".
 
 <http://purl.org/NET/cpan-uri/person/WATERKIP>
 	a                    foaf:Agent;
@@ -769,6 +781,150 @@
 	dc:created           "2020-01-09T11:33:49Z"^^xsd:dateTime;
 	dc:reporter          <http://purl.org/NET/cpan-uri/person/WATERKIP>.
 
+<http://purl.org/NET/cpan-uri/rt/ticket/131559>
+	a                    dbug:Issue;
+	rdfs:label           "compilation error for function signatures with Moose enum TypeConstraints";
+	dbug:id              "131559";
+	dbug:page            <https://rt.cpan.org/Public/Bug/Display.html?id=131559>;
+	dbug:status          <http://purl.org/NET/cpan-uri/rt/status/resolved>;
+	dc:created           "2020-01-25T02:48:39Z"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/SHERRARDB>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/131666>
+	a                    dbug:Issue;
+	rdfs:label           "Question: recursive container types";
+	dbug:id              "131666";
+	dbug:page            <https://rt.cpan.org/Public/Bug/Display.html?id=131666>;
+	dbug:status          <http://purl.org/NET/cpan-uri/rt/status/resolved>;
+	dc:created           "2020-02-04T13:54:22Z"^^xsd:dateTime;
+	dc:reporter          _:B7.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/131720>
+	a                    dbug:Issue;
+	rdfs:label           "slurpy parameters don't work with Type::Params::compile_named";
+	dbug:id              "131720";
+	dbug:page            <https://rt.cpan.org/Public/Bug/Display.html?id=131720>;
+	dbug:status          <http://purl.org/NET/cpan-uri/rt/status/resolved>;
+	dc:created           "2020-02-09T22:22:35Z"^^xsd:dateTime;
+	dc:reporter          _:B5.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/131744>
+	a                    dbug:Issue;
+	rdfs:label           "Possible bug/typo in Type::Registry";
+	dbug:id              "131744";
+	dbug:page            <https://rt.cpan.org/Public/Bug/Display.html?id=131744>;
+	dbug:status          <http://purl.org/NET/cpan-uri/rt/status/resolved>;
+	dc:created           "2020-02-11T19:44:18Z"^^xsd:dateTime;
+	dc:reporter          _:B7.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/131756>
+	a                    dbug:Issue;
+	rdfs:label           "Types::Common::String reporting deeper problems";
+	dbug:id              "131756";
+	dbug:page            <https://rt.cpan.org/Public/Bug/Display.html?id=131756>;
+	dbug:status          <http://purl.org/NET/cpan-uri/rt/status/open>;
+	dc:created           "2020-02-12T10:08:34Z"^^xsd:dateTime;
+	dc:reporter          [
+		a foaf:Agent;
+		foaf:mbox_sha1sum "15f6c4899c89e04ddaa123236f977fed488cd65f";
+	].
+
+<http://purl.org/NET/cpan-uri/rt/ticket/132392>
+	a                    dbug:Issue;
+	rdfs:label           "Inherited coercions have too high priority";
+	dbug:id              "132392";
+	dbug:page            <https://rt.cpan.org/Public/Bug/Display.html?id=132392>;
+	dbug:status          <http://purl.org/NET/cpan-uri/rt/status/stalled>;
+	dc:created           "2020-04-21T10:33:23+01:00"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/VEESH>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/132419>
+	a                    dbug:Issue;
+	rdfs:label           "Documentation issue and/or bug with compile_named+head+named_to_list?";
+	dbug:id              "132419";
+	dbug:page            <https://rt.cpan.org/Public/Bug/Display.html?id=132419>;
+	dbug:status          <http://purl.org/NET/cpan-uri/rt/status/resolved>;
+	dc:created           "2020-04-24T21:57:56+01:00"^^xsd:dateTime;
+	dc:reporter          _:B6.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/132426>
+	a                    dbug:Issue;
+	rdfs:label           "Undeclared dependency on Scalar::Util 1.18";
+	dbug:id              "132426";
+	dbug:page            <https://rt.cpan.org/Public/Bug/Display.html?id=132426>;
+	dbug:status          <http://purl.org/NET/cpan-uri/rt/status/resolved>;
+	dc:created           "2020-04-26T16:53:10+01:00"^^xsd:dateTime;
+	dc:reporter          _:B2.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/132455>
+	a                    dbug:Issue;
+	rdfs:label           "interesting parsing differences with parameterized types on 5.10";
+	dbug:id              "132455";
+	dbug:page            <https://rt.cpan.org/Public/Bug/Display.html?id=132455>;
+	dbug:status          <http://purl.org/NET/cpan-uri/rt/status/resolved>;
+	dc:created           "2020-04-30T03:47:27+01:00"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/ETHER>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/132539>
+	a                    dbug:Issue;
+	rdfs:label           "StrMatch[] warns \"Use of uninitialized value $_ in pattern match (m//)\" and fails to validate properly";
+	dbug:id              "132539";
+	dbug:page            <https://rt.cpan.org/Public/Bug/Display.html?id=132539>;
+	dbug:status          <http://purl.org/NET/cpan-uri/rt/status/rejected>;
+	dc:created           "2020-05-10T14:41:56+01:00"^^xsd:dateTime;
+	dc:reporter          [
+		a foaf:Agent;
+		foaf:mbox_sha1sum "f1984aa5bbf5d56cc6a413820b658db2c0698c06";
+	].
+
+<http://purl.org/NET/cpan-uri/rt/ticket/132583>
+	a                    dbug:Issue;
+	rdfs:label           "ClassName constraint for a package with empty ISA is inconsistent with Type::Tiny";
+	dbug:id              "132583";
+	dbug:page            <https://rt.cpan.org/Public/Bug/Display.html?id=132583>;
+	dbug:status          <http://purl.org/NET/cpan-uri/rt/status/resolved>;
+	dc:created           "2020-05-14T17:03:53+01:00"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/SNEZ>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/132733>
+	a                    dbug:Issue;
+	rdfs:label           "Bool constraint permitting invalid values";
+	dbug:id              "132733";
+	dbug:page            <https://rt.cpan.org/Public/Bug/Display.html?id=132733>;
+	dbug:status          <http://purl.org/NET/cpan-uri/rt/status/rejected>;
+	dc:created           "2020-05-29T05:36:49+01:00"^^xsd:dateTime;
+	dc:reporter          _:B4.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/132754>
+	a                    dbug:Issue;
+	rdfs:label           "Large integers do not pass Int";
+	dbug:id              "132754";
+	dbug:page            <https://rt.cpan.org/Public/Bug/Display.html?id=132754>;
+	dbug:status          <http://purl.org/NET/cpan-uri/rt/status/resolved>;
+	dc:created           "2020-06-01T15:52:51+01:00"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/SNEZ>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/132918>
+	a                    dbug:Issue;
+	rdfs:label           "Unable to use provided is_InstanceOf";
+	dbug:id              "132918";
+	dbug:page            <https://rt.cpan.org/Public/Bug/Display.html?id=132918>;
+	dbug:status          <http://purl.org/NET/cpan-uri/rt/status/patched>;
+	dc:created           "2020-07-01T08:31:12+01:00"^^xsd:dateTime;
+	dc:reporter          [
+		a foaf:Agent;
+		foaf:mbox_sha1sum "dd3c5714b913833a3f2caadba99f08e7885c91bb";
+	].
+
+<http://purl.org/NET/cpan-uri/rt/ticket/133036>
+	a                    dbug:Issue;
+	rdfs:label           "allow specifing a class name for Type::Params::compile_named_oo";
+	dbug:id              "133036";
+	dbug:page            <https://rt.cpan.org/Public/Bug/Display.html?id=133036>;
+	dbug:status          <http://purl.org/NET/cpan-uri/rt/status/patched>;
+	dc:created           "2020-07-22T15:24:26+01:00"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/DJERIUS>.
+
 <http://purl.org/NET/cpan-uri/rt/ticket/85054>
 	a                    dbug:Issue;
 	rdfs:label           "Confusing error message if required slurpy Dict not present in parameter list";
@@ -785,7 +941,7 @@
 	dbug:page            <https://rt.cpan.org/Public/Bug/Display.html?id=85149>;
 	dbug:status          <http://purl.org/NET/cpan-uri/rt/status/resolved>;
 	dc:created           "2013-05-09T04:52:37+01:00"^^xsd:dateTime;
-	dc:reporter          _:B7.
+	dc:reporter          _:B8.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/85720>
 	a                    dbug:Issue;
@@ -842,7 +998,7 @@
 	dbug:page            <https://rt.cpan.org/Public/Bug/Display.html?id=86172>;
 	dbug:status          <http://purl.org/NET/cpan-uri/rt/status/resolved>;
 	dc:created           "2013-06-15T22:30:28+01:00"^^xsd:dateTime;
-	dc:reporter          _:B8.
+	dc:reporter          _:B9.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/86233>
 	a                    dbug:Issue;
@@ -869,7 +1025,7 @@
 	dbug:page            <https://rt.cpan.org/Public/Bug/Display.html?id=86383>;
 	dbug:status          <http://purl.org/NET/cpan-uri/rt/status/resolved>;
 	dc:created           "2013-06-24T14:48:37+01:00"^^xsd:dateTime;
-	dc:reporter          _:B8.
+	dc:reporter          _:B9.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/86813>
 	a                    dbug:Issue;
@@ -926,7 +1082,7 @@
 	dbug:page            <https://rt.cpan.org/Public/Bug/Display.html?id=87366>;
 	dbug:status          <http://purl.org/NET/cpan-uri/rt/status/resolved>;
 	dc:created           "2013-07-26T23:18:08+01:00"^^xsd:dateTime;
-	dc:reporter          _:B7.
+	dc:reporter          _:B8.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/87443>
 	a                    dbug:Issue;
@@ -1034,7 +1190,7 @@
 	dbug:page            <https://rt.cpan.org/Public/Bug/Display.html?id=89073>;
 	dbug:status          <http://purl.org/NET/cpan-uri/rt/status/rejected>;
 	dc:created           "2013-09-30T17:42:42+01:00"^^xsd:dateTime;
-	dc:reporter          _:B7.
+	dc:reporter          _:B8.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/89234>
 	a                    dbug:Issue;
@@ -1097,7 +1253,7 @@
 	dbug:page            <https://rt.cpan.org/Public/Bug/Display.html?id=89691>;
 	dbug:status          <http://purl.org/NET/cpan-uri/rt/status/rejected>;
 	dc:created           "2013-10-22T11:42:15+01:00"^^xsd:dateTime;
-	dc:reporter          _:B9.
+	dc:reporter          _:B10.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/89696>
 	a                    dbug:Issue;
@@ -1106,7 +1262,7 @@
 	dbug:page            <https://rt.cpan.org/Public/Bug/Display.html?id=89696>;
 	dbug:status          <http://purl.org/NET/cpan-uri/rt/status/resolved>;
 	dc:created           "2013-10-22T13:22:36+01:00"^^xsd:dateTime;
-	dc:reporter          _:B9.
+	dc:reporter          _:B10.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/89936>
 	a                    dbug:Issue;
@@ -1175,7 +1331,7 @@
 	dbug:page            <https://rt.cpan.org/Public/Bug/Display.html?id=91802>;
 	dbug:status          <http://purl.org/NET/cpan-uri/rt/status/rejected>;
 	dc:created           "2014-01-02T19:49:31Z"^^xsd:dateTime;
-	dc:reporter          _:B9.
+	dc:reporter          _:B10.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/92571>
 	a                    dbug:Issue;
@@ -1238,7 +1394,7 @@
 	dbug:page            <https://rt.cpan.org/Public/Bug/Display.html?id=96545>;
 	dbug:status          <http://purl.org/NET/cpan-uri/rt/status/resolved>;
 	dc:created           "2014-06-19T04:42:06+01:00"^^xsd:dateTime;
-	dc:reporter          _:B7.
+	dc:reporter          _:B8.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/97516>
 	a                    dbug:Issue;
@@ -1274,7 +1430,7 @@
 	dbug:page            <https://rt.cpan.org/Public/Bug/Display.html?id=98113>;
 	dbug:status          <http://purl.org/NET/cpan-uri/rt/status/resolved>;
 	dc:created           "2014-08-17T18:41:34+01:00"^^xsd:dateTime;
-	dc:reporter          _:B8.
+	dc:reporter          _:B9.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/98159>
 	a                    dbug:Issue;
@@ -1283,7 +1439,7 @@
 	dbug:page            <https://rt.cpan.org/Public/Bug/Display.html?id=98159>;
 	dbug:status          <http://purl.org/NET/cpan-uri/rt/status/resolved>;
 	dc:created           "2014-08-18T23:18:09+01:00"^^xsd:dateTime;
-	dc:reporter          _:B8.
+	dc:reporter          _:B9.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/98362>
 	a                    dbug:Issue;
@@ -1324,11 +1480,11 @@
 	dc:created           "2014-10-29T15:03:49Z"^^xsd:dateTime;
 	dc:reporter          <http://purl.org/NET/cpan-uri/person/CAZADOR>.
 
-_:B7
+_:B8
 	a                    foaf:Agent;
 	foaf:mbox_sha1sum    "fb673bc745f8b8bc65c33bc4700155dcba13dd5d".
 
-_:B8
+_:B9
 	a                    foaf:Agent;
 	foaf:mbox_sha1sum    "773c118edc593a4272b888498829f9ef4fb0a55c".
 
@@ -1340,7 +1496,7 @@ _:B2
 	a                    foaf:Agent;
 	foaf:mbox_sha1sum    "b07d8ccbdad5ade6520ad7d8b42c5b0784604ff8".
 
-_:B9
+_:B10
 	a                    foaf:Agent;
 	foaf:mbox_sha1sum    "11285309b4bb0908c954155cfa81c1027c7a146e".
 
@@ -1359,4 +1515,8 @@ _:B5
 _:B6
 	a                    foaf:Agent;
 	foaf:mbox_sha1sum    "150605fca571df9cd4d0d5e8e505d0b9b726bdbf".
+
+_:B7
+	a                    foaf:Agent;
+	foaf:mbox_sha1sum    "d57f722ec7bbb556e6c80158266dd5d21d6a6a13".
 
