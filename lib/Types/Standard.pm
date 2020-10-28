@@ -96,7 +96,6 @@ my $add_core_type = sub {
 	
 	$typedef->{compiled_type_constraint} = $xsub if $xsub;
 	
-	#### TODO
 	my $orig_inlined = $typedef->{inlined};
 	if (defined($xsubname) and (
 		# These should be faster than their normal inlined

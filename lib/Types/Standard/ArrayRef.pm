@@ -125,8 +125,8 @@ sub __deep_explanation
 	my ($type, $value, $varname) = @_;
 	my $param = $type->parameters->[0];
 	my ($min, $max) = (0, -1);
-	$min = $type->parameters->[1] if @{$type->parameters} > 1;  # TODO
-	$max = $type->parameters->[2] if @{$type->parameters} > 2;  # TODO
+	$min = $type->parameters->[1] if @{$type->parameters} > 1;
+	$max = $type->parameters->[2] if @{$type->parameters} > 2;
 	
 	if ($min != 0 and @$value < $min) {
 		return [
@@ -156,7 +156,7 @@ sub __deep_explanation
 	return;  # uncoverable statement
 }
 
-# TODO: min and max???
+# XXX: min and max need to be handled by coercion?
 sub __coercion_generator
 {
 	my ($parent, $child, $param) = @_;
