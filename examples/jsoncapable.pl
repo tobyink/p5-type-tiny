@@ -4,7 +4,7 @@ use feature 'say';
 
 BEGIN {
 	package My::Types;
-	use Type::Library 1.011005
+	use Type::Library 1.012
 		-utils,
 		-extends => [ 'Types::Standard' ],
 		-declare => 'JSONCapable';
