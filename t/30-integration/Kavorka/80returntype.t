@@ -30,12 +30,12 @@ BEGIN {
 	or $ENV{EXTENDED_TESTING}
 	or $ENV{AUTHOR_TESTING}
 	or $ENV{RELEASE_TESTING}
-	or plan skip_all => 'EXTENDED_TESTING'
+	or plan skip_all => 'EXTENDED_TESTING';
+	eval {
+		local $SIG{__WARN__} = sub {};
+		require Kavorka; 'Kavorka'->import; 1;
+	} or plan skip_all => 'requires Kavorka';
 };
-
-use Test::Requires "Kavorka";
-
-
 
 note "simple type constraint";
 
