@@ -104,28 +104,30 @@ sub _mksub {
 	my ( $type, $post_method ) = @_;
 	$post_method ||= q();
 	
+	#<<<
 	my $source = $type->is_parameterizable
 		? sprintf(
-		q{
-			sub (%s) {
-				if (ref($_[0]) eq 'Type::Tiny::_HalfOp') {
-					my $complete_type = shift->complete($type);
-					@_ && wantarray ? return($complete_type, @_) : return $complete_type;
+			q{
+				sub (%s) {
+					if (ref($_[0]) eq 'Type::Tiny::_HalfOp') {
+						my $complete_type = shift->complete($type);
+						@_ && wantarray ? return($complete_type, @_) : return $complete_type;
+					}
+					my $params; $params = shift if ref($_[0]) eq q(ARRAY);
+					my $t = $params ? $type->parameterize(@$params) : $type;
+					@_ && wantarray ? return($t%s, @_) : return $t%s;
 				}
-				my $params; $params = shift if ref($_[0]) eq q(ARRAY);
-				my $t = $params ? $type->parameterize(@$params) : $type;
-				@_ && wantarray ? return($t%s, @_) : return $t%s;
-			}
-		},
-		NICE_PROTOTYPES ? q(;$) : q(;@),
-		$post_method,
-		$post_method,
+			},
+			NICE_PROTOTYPES ? q(;$) : q(;@),
+			$post_method,
+			$post_method,
 		)
 		: sprintf(
-		q{ sub () { $type%s if $] } },
-		$post_method,
+			q{ sub () { $type%s if $] } },
+			$post_method,
 		);
-		
+	#>>>
+	
 	return _subname(
 		$type->qualified_name,
 		eval_closure(
