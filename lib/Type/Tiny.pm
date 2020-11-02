@@ -25,20 +25,17 @@ sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
 sub _swap { $_[2] ? @_[ 1, 0 ] : @_[ 0, 1 ] }
 
-BEGIN {    # uncoverable statement
-	( $] < 5.010001 )                                              # uncoverable statement
-		? eval q{ sub SUPPORT_SMARTMATCH () { !!0 } }     # uncoverable statement
-		: eval q{ sub SUPPORT_SMARTMATCH () { !!1 } };    # uncoverable statement
-	( $] >= 5.014 )                                                # uncoverable statement
-		? eval q{ sub _FIXED_PRECEDENCE () { !!1 } }      # uncoverable statement
-		: eval q{ sub _FIXED_PRECEDENCE () { !!0 } };     # uncoverable statement
-};    # uncoverable statement
-
 BEGIN {
-	my $try_xs =       # uncoverable statement
-		exists( $ENV{PERL_TYPE_TINY_XS} ) ? !!$ENV{PERL_TYPE_TINY_XS} :   # uncoverable statement
-		exists( $ENV{PERL_ONLY} )         ? !$ENV{PERL_ONLY} :            # uncoverable statement
-		1;                                                                # uncoverable statement
+	my $support_smartmatch = 0 + !!( $] >= 5.010001 );
+	eval qq{ sub SUPPORT_SMARTMATCH () { !! $support_smartmatch } };
+	
+	my $fixed_precedence = 0 + !!( $] >= 5.014 );
+	eval qq{ sub _FIXED_PRECEDENCE () { !! $fixed_precedence } };
+	
+	my $try_xs =
+		exists( $ENV{PERL_TYPE_TINY_XS} ) ? !!$ENV{PERL_TYPE_TINY_XS} :
+		exists( $ENV{PERL_ONLY} )         ? !$ENV{PERL_ONLY} :
+		1;
 		
 	my $use_xs = 0;
 	$try_xs and eval {
@@ -59,8 +56,6 @@ BEGIN {
 } #/ BEGIN
 
 {
-	my $nil = sub { };
-	
 	sub _install_overloads {
 		no strict 'refs';
 		no warnings 'redefine', 'once';
@@ -71,7 +66,7 @@ BEGIN {
 			push @_, fallback => 1;       # uncoverable statement
 			goto \&overload::OVERLOAD;    # uncoverable statement
 		}
-		;                                 # uncoverable statement
+		
 		my $class = shift;
 		*{ $class . '::((' } = sub { };
 		*{ $class . '::()' } = sub { };
