@@ -131,8 +131,8 @@ sub add_type {
 	$type = Types::TypeTiny::to_TypeTiny( $type );
 	$name ||= do {
 		$type->is_anon
-			and _croak(
-			"Expected named type constraint; got anonymous type constraint" );
+			and
+			_croak( "Expected named type constraint; got anonymous type constraint" );
 		$type->name;
 	};
 	

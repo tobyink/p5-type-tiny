@@ -553,8 +553,7 @@ sub compile_named {
 		my $default;
 		
 		Types::Standard::is_Str( $name )
-			or Error::TypeTiny::croak(
-			"Expected parameter name as string, got $name" );
+			or Error::TypeTiny::croak( "Expected parameter name as string, got $name" );
 			
 		my $param_options = {};
 		$param_options = shift @_
@@ -874,11 +873,9 @@ sub _mk_key {
 			my %h = %$_;
 			sprintf( '{%s}', _mk_key( map { ; $_ => $h{$_} } sort keys %h ) );
 			}
-			: Types::TypeTiny::is_TypeTiny( $_ )
-			? sprintf( 'TYPE=%s', $_->{uniq} )
-			: Types::Standard::is_Ref( $_ )
-			? sprintf( 'REF=%s', refaddr( $_ ) )
-			: Types::Standard::is_Undef( $_ ) ? sprintf( 'UNDEF' )
+			: Types::TypeTiny::is_TypeTiny( $_ ) ? sprintf( 'TYPE=%s', $_->{uniq} )
+			: Types::Standard::is_Ref( $_ )      ? sprintf( 'REF=%s', refaddr( $_ ) )
+			: Types::Standard::is_Undef( $_ )    ? sprintf( 'UNDEF' )
 			: $QUOTE->( $_ )
 	} @_;
 } #/ sub _mk_key
@@ -925,10 +922,9 @@ sub multisig {
 	}
 	
 	my @multi = map {
-		Types::TypeTiny::is_CodeLike( $_ ) ? { closure => $_ }
-			: Types::TypeTiny::is_ArrayLike( $_ )
-			? compile( { want_details => 1 }, @$_ )
-			: $_;
+		Types::TypeTiny::is_CodeLike( $_ )       ? { closure => $_ }
+			: Types::TypeTiny::is_ArrayLike( $_ ) ? compile( { want_details => 1 }, @$_ )
+			:                                       $_;
 	} @_;
 	
 	my @code = 'sub { my $r; ';
@@ -999,7 +995,7 @@ sub _wrap_subs {
 			: sprintf( '%s::%s', $opts->{caller}, $name );
 		my $orig = do {
 			no strict 'refs';
-			exists &$fullname               ? \&$fullname
+			exists &$fullname     ? \&$fullname
 				: $opts->{use_can} ? ( $opts->{caller}->can( $name ) || sub { } )
 				: sub { }
 		};

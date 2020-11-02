@@ -764,8 +764,7 @@ $meta->add_type(
 			my @operations = map {
 				Types::TypeTiny::is_StringLike( $_ )
 					? "$_"
-					: _croak(
-					"Parameters to Overload[`a] expected to be a strings; got $_" );
+					: _croak( "Parameters to Overload[`a] expected to be a strings; got $_" );
 			} @_;
 			
 			require overload;
@@ -857,8 +856,7 @@ $meta->add_type(
 			my $param = Types::TypeTiny::to_TypeTiny( shift );
 			unless ( Types::TypeTiny::is_TypeTiny( $param ) ) {
 				Types::TypeTiny::is_StringLike( $param )
-					or _croak(
-					"Parameter to Tied[`a] expected to be a class name; got $param" );
+					or _croak( "Parameter to Tied[`a] expected to be a class name; got $param" );
 				require B;
 				return sprintf( "%s[%s]", $self, B::perlstring( $param ) );
 			}
@@ -937,9 +935,8 @@ $meta->add_type(
 			require Type::Tiny::Duck;
 			return "Type::Tiny::Duck"->new(
 				methods      => \@_,
-				display_name => sprintf(
-					'HasMethods[%s]', join q[,], map B::perlstring( $_ ), @_
-				),
+				display_name =>
+					sprintf( 'HasMethods[%s]', join q[,], map B::perlstring( $_ ), @_ ),
 			);
 		},
 	}
@@ -990,8 +987,7 @@ $meta->add_coercion(
 		coercion_generator => sub {
 			my ( $self, $target, $sep ) = @_;
 			Types::TypeTiny::is_StringLike( $sep )
-				or _croak(
-				"Parameter to Join[`a] expected to be a string; got $sep" );
+				or _croak( "Parameter to Join[`a] expected to be a string; got $sep" );
 			require B;
 			$sep = B::perlstring( $sep );
 			return ( ArrayRef(), qq{ join($sep, \@\$_) } );

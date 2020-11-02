@@ -276,8 +276,7 @@ sub new {
 	
 		# First try a fast ASCII-only expression, but fall back to Unicode
 		$params{name} =~ /^_{0,2}[A-Z][A-Za-z0-9_]+$/sm
-			or eval
-			q( use 5.008; $params{name} =~ /^_{0,2}\p{Lu}[\p{L}0-9_]+$/sm )
+			or eval q( use 5.008; $params{name} =~ /^_{0,2}\p{Lu}[\p{L}0-9_]+$/sm )
 			or _croak '"%s" is not a valid type name', $params{name};
 	}
 	
@@ -393,7 +392,7 @@ sub _dd {
 	
 	require B;
 	
-	!defined $value            ? 'Undef'
+	!defined $value  ? 'Undef'
 		: !ref $value ? sprintf( 'Value %s', B::perlstring( $value ) )
 		: do {
 		my $N = 0+ ( defined( $DD ) ? $DD : 72 );
@@ -592,16 +591,14 @@ push @CMP, sub {
 	my $A_stem = $A->find_constraining_type;
 	my $B_stem = $B->find_constraining_type;
 	return CMP_EQUIVALENT
-		if Scalar::Util::refaddr( $A_stem ) ==
-		Scalar::Util::refaddr( $B_stem );
+		if Scalar::Util::refaddr( $A_stem ) == Scalar::Util::refaddr( $B_stem );
 	return CMP_EQUIVALENT
 		if Scalar::Util::refaddr( $A_stem->compiled_check ) ==
 		Scalar::Util::refaddr( $B_stem->compiled_check );
 		
 	if ( $A_stem->can_be_inlined and $B_stem->can_be_inlined ) {
 		return 0
-			if $A_stem->inline_check( '$WOLFIE' ) eq
-			$B_stem->inline_check( '$WOLFIE' );
+			if $A_stem->inline_check( '$WOLFIE' ) eq $B_stem->inline_check( '$WOLFIE' );
 	}
 	
 	A_IS_SUBTYPE: {
@@ -609,15 +606,13 @@ push @CMP, sub {
 		while ( $A_prime->has_parent ) {
 			$A_prime = $A_prime->parent;
 			return CMP_SUBTYPE
-				if Scalar::Util::refaddr( $A_prime ) ==
-				Scalar::Util::refaddr( $B_stem );
+				if Scalar::Util::refaddr( $A_prime ) == Scalar::Util::refaddr( $B_stem );
 			return CMP_SUBTYPE
 				if Scalar::Util::refaddr( $A_prime->compiled_check ) ==
 				Scalar::Util::refaddr( $B_stem->compiled_check );
 			if ( $A_prime->can_be_inlined and $B_stem->can_be_inlined ) {
 				return CMP_SUBTYPE
-					if $A_prime->inline_check( '$WOLFIE' ) eq
-					$B_stem->inline_check( '$WOLFIE' );
+					if $A_prime->inline_check( '$WOLFIE' ) eq $B_stem->inline_check( '$WOLFIE' );
 			}
 		} #/ while ( $A_prime->has_parent)
 	} #/ A_IS_SUBTYPE:
@@ -627,15 +622,13 @@ push @CMP, sub {
 		while ( $B_prime->has_parent ) {
 			$B_prime = $B_prime->parent;
 			return CMP_SUPERTYPE
-				if Scalar::Util::refaddr( $B_prime ) ==
-				Scalar::Util::refaddr( $A_stem );
+				if Scalar::Util::refaddr( $B_prime ) == Scalar::Util::refaddr( $A_stem );
 			return CMP_SUPERTYPE
 				if Scalar::Util::refaddr( $B_prime->compiled_check ) ==
 				Scalar::Util::refaddr( $A_stem->compiled_check );
 			if ( $A_stem->can_be_inlined and $B_prime->can_be_inlined ) {
 				return CMP_SUPERTYPE
-					if $B_prime->inline_check( '$WOLFIE' ) eq
-					$A_stem->inline_check( '$WOLFIE' );
+					if $B_prime->inline_check( '$WOLFIE' ) eq $A_stem->inline_check( '$WOLFIE' );
 			}
 		} #/ while ( $B_prime->has_parent)
 	} #/ B_IS_SUBTYPE:
@@ -771,8 +764,8 @@ sub validate {
 	my $self = shift;
 	
 	return undef
-		if ( $self->{compiled_type_constraint} ||=
-		$self->_build_compiled_check )->( @_ );
+		if ( $self->{compiled_type_constraint} ||= $self->_build_compiled_check )
+		->( @_ );
 		
 	local $_ = $_[0];
 	return $self->get_message( @_ );
@@ -837,8 +830,8 @@ sub assert_valid {
 	my $self = shift;
 	
 	return !!1
-		if ( $self->{compiled_type_constraint} ||=
-		$self->_build_compiled_check )->( @_ );
+		if ( $self->{compiled_type_constraint} ||= $self->_build_compiled_check )
+		->( @_ );
 		
 	local $_ = $_[0];
 	$self->_failed_check( "$self", $_ );
@@ -848,8 +841,8 @@ sub assert_return {
 	my $self = shift;
 	
 	return $_[0]
-		if ( $self->{compiled_type_constraint} ||=
-		$self->_build_compiled_check )->( @_ );
+		if ( $self->{compiled_type_constraint} ||= $self->_build_compiled_check )
+		->( @_ );
 		
 	local $_ = $_[0];
 	$self->_failed_check( "$self", $_ );
@@ -957,9 +950,8 @@ sub _failed_check {
 	}
 	else {
 		$exception_class->throw(
-			message => sprintf(
-				'%s did not pass type constraint "%s"', _dd( $value ), $name
-			),
+			message =>
+				sprintf( '%s did not pass type constraint "%s"', _dd( $value ), $name ),
 			value => $value,
 			%attrs,
 		);
@@ -1386,8 +1378,7 @@ sub DOES {
 	
 	return !!1
 		if ref( $self )
-		&& $_[0] =~
-		m{^ Type::API::Constraint (?: ::Coercible | ::Inlinable )? $}x;
+		&& $_[0] =~ m{^ Type::API::Constraint (?: ::Coercible | ::Inlinable )? $}x;
 	return !!1 if !ref( $self ) && $_[0] eq 'Type::API::Constraint::Constructor';
 	
 	"UNIVERSAL"->can( "DOES" ) ? $self->SUPER::DOES( @_ ) : $self->isa( @_ );

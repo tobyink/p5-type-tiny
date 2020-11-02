@@ -108,8 +108,7 @@ sub eval_closure {
 		for my $k ( sort keys %{ $args{environment} } ) {
 			next
 				if $k =~ /^\$/
-				&& Scalar::Util::reftype( $args{environment}{$k} ) =~
-				/^(SCALAR|REF)$/;
+				&& Scalar::Util::reftype( $args{environment}{$k} ) =~ /^(SCALAR|REF)$/;
 			next
 				if $k =~ /^\@/
 				&& Scalar::Util::reftype( $args{environment}{$k} ) eq q(ARRAY);

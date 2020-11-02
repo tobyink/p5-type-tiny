@@ -31,8 +31,8 @@ sub new {
 	_croak "Need to supply class name" unless exists $opts{class};
 	
 	if ( Type::Tiny::_USE_XS ) {
-		my $xsub = Type::Tiny::XS::get_coderef_for(
-			"InstanceOf[" . $opts{class} . "]" );
+		my $xsub =
+			Type::Tiny::XS::get_coderef_for( "InstanceOf[" . $opts{class} . "]" );
 		$opts{compiled_type_constraint} = $xsub if $xsub;
 	}
 	elsif ( Type::Tiny::_USE_MOUSE ) {

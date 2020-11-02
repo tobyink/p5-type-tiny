@@ -67,8 +67,7 @@ sub new {
 	
 		# First try a fast ASCII-only expression, but fall back to Unicode
 		$self->name =~ /^_{0,2}[A-Z][A-Za-z0-9_]+$/sm
-			or eval
-			q( use 5.008; $self->name =~ /^_{0,2}\p{Lu}[\p{L}0-9_]+$/sm )
+			or eval q( use 5.008; $self->name =~ /^_{0,2}\p{Lu}[\p{L}0-9_]+$/sm )
 			or _croak '"%s" is not a valid coercion name', $self->name;
 	}
 	
@@ -286,7 +285,7 @@ sub _build_compiled_coercion {
 	for my $i ( 0 .. $#types ) {
 		push @sub,
 			$types[$i]->can_be_inlined
-			? sprintf( 'if (%s)', $types[$i]->inline_check( '$_[0]' ) )
+			? sprintf( 'if (%s)',                $types[$i]->inline_check( '$_[0]' ) )
 			: sprintf( 'if ($checks[%d]->(@_))', $i );
 		push @sub,
 			!defined( $codes[$i] )
@@ -295,8 +294,7 @@ sub _build_compiled_coercion {
 			'  { local $_ = $_[0]; return scalar(%s); }',
 			$codes[$i]
 			)
-			: sprintf(
-			'  { local $_ = $_[0]; return scalar($codes[%d]->(@_)) }', $i );
+			: sprintf( '  { local $_ = $_[0]; return scalar($codes[%d]->(@_)) }', $i );
 	} #/ for my $i ( 0 .. $#types)
 	
 	push @sub, 'return $_[0];';
@@ -442,9 +440,8 @@ sub parameterize {
 	
 	return ref( $self )->new(
 		type_constraint   => $self->type_constraint,
-		type_coercion_map => [
-			$self->coercion_generator->( $self, $self->type_constraint, @_ )
-		],
+		type_coercion_map =>
+			[ $self->coercion_generator->( $self, $self->type_constraint, @_ ) ],
 		parameters         => \@_,
 		frozen             => 1,
 		parameterized_from => $self,

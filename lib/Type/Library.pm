@@ -143,11 +143,9 @@ sub _exporter_permitted_regexp {
 	
 	my $inherited = $class->SUPER::_exporter_permitted_regexp( @_ );
 	my $types     = join "|", map quotemeta,
-		sort { length( $b ) <=> length( $a ) or $a cmp $b }
-		$class->type_names;
+		sort { length( $b ) <=> length( $a ) or $a cmp $b } $class->type_names;
 	my $coercions = join "|", map quotemeta,
-		sort { length( $b ) <=> length( $a ) or $a cmp $b }
-		$class->coercion_names;
+		sort { length( $b ) <=> length( $a ) or $a cmp $b } $class->coercion_names;
 		
 	qr{^(?:
 		$inherited
@@ -319,7 +317,7 @@ sub add_type {
 	
 	my $type =
 		ref( $_[0] ) =~ /^Type::Tiny\b/ ? $_[0]
-		: blessed( $_[0] ) ? Types::TypeTiny::to_TypeTiny( $_[0] )
+		: blessed( $_[0] )              ? Types::TypeTiny::to_TypeTiny( $_[0] )
 		: ref( $_[0] ) eq q(HASH)
 		? 'Type::Tiny'->new( library => $class, %{ $_[0] } )
 		: "Type::Tiny"->new( library => $class, @_ );

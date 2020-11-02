@@ -487,7 +487,7 @@ sub to_TypeTiny {
 			if $class->isa( "Validation::Class::Simple" );
 		return _TypeTinyFromValidationClass( $t ) if $class->isa( "Validation::Class" );
 		return _TypeTinyFromGeneric( $t )
-			if $t->can( "check" ) && $t->can( "get_message" );                # i.e. Type::API::Constraint
+			if $t->can( "check" ) && $t->can( "get_message" );                          # i.e. Type::API::Constraint
 	} #/ if ( my $class = blessed...)
 	
 	return _TypeTinyFromCodeRef( $t ) if $ref eq q(CODE);
@@ -508,21 +508,17 @@ sub _TypeTinyFromMoose {
 		return $ts if $ts->{_is_core};
 	}
 	
+	#<<<
 	my ( $tt_class, $tt_opts ) =
-		$t->can( 'parameterize' )
-		? _TypeTinyFromMoose_parameterizable( $t )
-		: $t->isa( 'Moose::Meta::TypeConstraint::Enum' )
-		? _TypeTinyFromMoose_enum( $t )
-		: $t->isa( 'Moose::Meta::TypeConstraint::Class' )
-		? _TypeTinyFromMoose_class( $t )
-		: $t->isa( 'Moose::Meta::TypeConstraint::Role' )
-		? _TypeTinyFromMoose_role( $t )
-		: $t->isa( 'Moose::Meta::TypeConstraint::Union' )
-		? _TypeTinyFromMoose_union( $t )
-		: $t->isa( 'Moose::Meta::TypeConstraint::DuckType' )
-		? _TypeTinyFromMoose_ducktype( $t )
-		: _TypeTinyFromMoose_baseclass( $t );
-		
+		$t->can( 'parameterize' )                          ? _TypeTinyFromMoose_parameterizable( $t ) :
+		$t->isa( 'Moose::Meta::TypeConstraint::Enum' )     ? _TypeTinyFromMoose_enum( $t ) :
+		$t->isa( 'Moose::Meta::TypeConstraint::Class' )    ? _TypeTinyFromMoose_class( $t ) :
+		$t->isa( 'Moose::Meta::TypeConstraint::Role' )     ? _TypeTinyFromMoose_role( $t ) :
+		$t->isa( 'Moose::Meta::TypeConstraint::Union' )    ? _TypeTinyFromMoose_union( $t ) :
+		$t->isa( 'Moose::Meta::TypeConstraint::DuckType' ) ? _TypeTinyFromMoose_ducktype( $t ) :
+		_TypeTinyFromMoose_baseclass( $t );
+	#>>>
+	
 	# Standard stuff to do with all type constraints from Moose,
 	# regardless of variety.
 	$tt_opts->{moose_type}   = $t;

@@ -59,8 +59,8 @@ sub extends {
 			require Moose::Util::TypeConstraints;
 			my $types = $lib->type_storage;
 			for my $name ( sort keys %$types ) {
-				my $moose = Moose::Util::TypeConstraints::find_type_constraint(
-					$types->{$name} );
+				my $moose =
+					Moose::Util::TypeConstraints::find_type_constraint( $types->{$name} );
 				my $tt = Types::TypeTiny::to_TypeTiny( $moose );
 				my $c  = $moose->has_coercion && @{ $moose->coercion->type_coercion_map || [] };
 				$caller->add_type(
@@ -74,8 +74,8 @@ sub extends {
 			require Mouse::Util::TypeConstraints;
 			my $types = $lib->type_storage;
 			for my $name ( sort keys %$types ) {
-				my $mouse = Mouse::Util::TypeConstraints::find_type_constraint(
-					$types->{$name} );
+				my $mouse =
+					Mouse::Util::TypeConstraints::find_type_constraint( $types->{$name} );
 				my $tt = Types::TypeTiny::to_TypeTiny( $mouse );
 				$caller->add_type(
 					$tt->create_child_type(
@@ -284,11 +284,10 @@ sub declare_coercion {
 		$meta->add_coercion( $c ) unless $c->is_anon;
 		while ( @_ ) {
 			push @C,
-				map { ref( $_ ) ? to_TypeTiny( $_ ) : $meta->get_type( $_ ) || $_ }
-				shift;
+				map { ref( $_ ) ? to_TypeTiny( $_ ) : $meta->get_type( $_ ) || $_ } shift;
 			push @C, shift;
 		}
-	} #/ if ( $caller->isa( "Type::Library"...))
+	}
 	else {
 		@C = @_;
 	}
@@ -302,13 +301,11 @@ sub coerce {
 	if ( ( scalar caller )->isa( "Type::Library" ) ) {
 		my $meta = ( scalar caller )->meta;
 		my ( $type ) =
-			map { ref( $_ ) ? to_TypeTiny( $_ ) : $meta->get_type( $_ ) || $_ }
-			shift;
+			map { ref( $_ ) ? to_TypeTiny( $_ ) : $meta->get_type( $_ ) || $_ } shift;
 		my @opts;
 		while ( @_ ) {
 			push @opts,
-				map { ref( $_ ) ? to_TypeTiny( $_ ) : $meta->get_type( $_ ) || $_ }
-				shift;
+				map { ref( $_ ) ? to_TypeTiny( $_ ) : $meta->get_type( $_ ) || $_ } shift;
 			push @opts, shift;
 		}
 		return $type->coercion->add_type_coercions( @opts );

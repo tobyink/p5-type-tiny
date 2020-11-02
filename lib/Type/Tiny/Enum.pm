@@ -38,9 +38,7 @@ sub new {
 	no warnings 'uninitialized';
 	$opts{values} = [
 		map "$_",
-		@{
-			ref $opts{values} eq 'ARRAY' ? $opts{values} : [ $opts{values} ]
-		}
+		@{ ref $opts{values} eq 'ARRAY' ? $opts{values} : [ $opts{values} ] }
 	];
 	
 	my %tmp;

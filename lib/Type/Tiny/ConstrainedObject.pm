@@ -86,9 +86,8 @@ my $_where_expressions = sub {
 	
 		# cannot inline
 		my $sub = Eval::TypeTiny::eval_closure(
-			source => sprintf(
-				'sub ($) { local $_ = shift; %s }', join( q( and ), @codes )
-			),
+			source =>
+				sprintf( 'sub ($) { local $_ = shift; %s }', join( q( and ), @codes ) ),
 			description => sprintf( '%s for %s', $name, $self->name ),
 			environment => \%env,
 		);

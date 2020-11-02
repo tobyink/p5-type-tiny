@@ -148,12 +148,10 @@ for my $base ( qw/Num Int/ ) {
 				);
 			!defined( $min_excl )
 				or Bool->check( $min_excl )
-				or
-				_croak( "${base}Range minexcl must be a boolean; got $min_excl" );
+				or _croak( "${base}Range minexcl must be a boolean; got $min_excl" );
 			!defined( $max_excl )
 				or Bool->check( $max_excl )
-				or
-				_croak( "${base}Range maxexcl must be a boolean; got $max_excl" );
+				or _croak( "${base}Range maxexcl must be a boolean; got $max_excl" );
 				
 			# this is complicated so defer to the inline generator
 			eval sprintf(

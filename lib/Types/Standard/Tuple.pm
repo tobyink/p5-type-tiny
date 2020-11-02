@@ -35,8 +35,8 @@ sub __constraint_generator {
 	
 	for ( @constraints ) {
 		Types::TypeTiny::is_TypeTiny( $_ )
-			or _croak(
-			"Parameters to Tuple[...] expected to be type constraints; got $_" );
+			or
+			_croak( "Parameters to Tuple[...] expected to be type constraints; got $_" );
 	}
 	
 	# By god, the Type::Tiny::XS API is currently horrible
@@ -144,9 +144,8 @@ sub __inline_generator {
 				(
 					$slurpy_any ? '!!1'
 					: (
-						$slurpy ? sprintf(
-							$tmpl, $v, $#constraints + 1, $v, $slurpy->inline_check( '$tmp' )
-							)
+						$slurpy
+						? sprintf( $tmpl, $v, $#constraints + 1, $v, $slurpy->inline_check( '$tmp' ) )
 						: sprintf( "\@{$v} <= %d", scalar @constraints )
 					)
 				),
@@ -195,9 +194,8 @@ sub __deep_explanation {
 				$constraints[$i]
 			),
 			@{
-				$constraints[$i]->validate_explain(
-					$value->[$i], sprintf( '%s->[%s]', $varname, $i )
-				)
+				$constraints[$i]
+					->validate_explain( $value->[$i], sprintf( '%s->[%s]', $varname, $i ) )
 			},
 		];
 	} #/ for my $i ( 0 .. $#constraints)
