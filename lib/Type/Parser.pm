@@ -419,7 +419,7 @@ Evaluate: {
 		if ( $self->{remaining} =~ /\A\s*[q'"]/sm ) {
 			require Text::Balanced;
 			if ( my $quotelike = Text::Balanced::extract_quotelike( $self->{remaining} ) ) {
-				return bless( [ Type::Parser::QUOTELIKE, $quotelike ], "Type::Parser::Token" ),;
+				return bless( [ Type::Parser::QUOTELIKE, $quotelike ], "Type::Parser::Token" );
 			}
 		}
 		
@@ -428,14 +428,14 @@ Evaluate: {
 			substr( $self->{remaining}, 0, length $spelling ) = "";
 			
 			if ( $spelling =~ /::$/sm ) {
-				return bless( [ Type::Parser::CLASS, $spelling ], "Type::Parser::Token" ),;
+				return bless( [ Type::Parser::CLASS, $spelling ], "Type::Parser::Token" );
 			}
 			elsif ( looks_like_number( $spelling ) ) {
-				return bless( [ Type::Parser::STRING, $spelling ], "Type::Parser::Token" ),;
+				return bless( [ Type::Parser::STRING, $spelling ], "Type::Parser::Token" );
 			}
 			elsif ( $self->{remaining} =~ /^\s*=>/sm )    # peek ahead
 			{
-				return bless( [ Type::Parser::STRING, $spelling ], "Type::Parser::Token" ),;
+				return bless( [ Type::Parser::STRING, $spelling ], "Type::Parser::Token" );
 			}
 			elsif ( $spelling eq "slurpy" ) {
 				return $punctuation{$spelling};
