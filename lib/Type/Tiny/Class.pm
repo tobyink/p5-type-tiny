@@ -99,8 +99,7 @@ sub _instantiate_moose_type {
 	delete $opts{constraint};
 	delete $opts{inlined};
 	require Moose::Meta::TypeConstraint::Class;
-	return
-		"Moose::Meta::TypeConstraint::Class"
+	return "Moose::Meta::TypeConstraint::Class"
 		->new( %opts, class => $self->class );
 } #/ sub _instantiate_moose_type
 

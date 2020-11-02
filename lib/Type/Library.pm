@@ -61,12 +61,13 @@ sub _exporter_validate_opts {
 	if ( $_[0]{extends} and !ref $into ) {
 		require Type::Utils;
 		my $wrapper = eval "sub { package $into; &Type::Utils::extends; }";
-		my @libs =
-			@{ ref( $_[0]{extends} )
+		my @libs    = @{
+			ref( $_[0]{extends} )
 			? $_[0]{extends}
-			: ( $_[0]{extends} ? [ $_[0]{extends} ] : [] ) };
+			: ( $_[0]{extends} ? [ $_[0]{extends} ] : [] )
+		};
 		$wrapper->( @libs );
-	}
+	} #/ if ( $_[0]{extends} and...)
 	
 	return $class->SUPER::_exporter_validate_opts( @_ );
 } #/ sub _exporter_validate_opts
@@ -106,16 +107,16 @@ sub _mksub {
 	my $source = $type->is_parameterizable
 		? sprintf(
 		q{
-				sub (%s) {
-					if (ref($_[0]) eq 'Type::Tiny::_HalfOp') {
-						my $complete_type = shift->complete($type);
-						@_ && wantarray ? return($complete_type, @_) : return $complete_type;
-					}
-					my $params; $params = shift if ref($_[0]) eq q(ARRAY);
-					my $t = $params ? $type->parameterize(@$params) : $type;
-					@_ && wantarray ? return($t%s, @_) : return $t%s;
+			sub (%s) {
+				if (ref($_[0]) eq 'Type::Tiny::_HalfOp') {
+					my $complete_type = shift->complete($type);
+					@_ && wantarray ? return($complete_type, @_) : return $complete_type;
 				}
-			},
+				my $params; $params = shift if ref($_[0]) eq q(ARRAY);
+				my $t = $params ? $type->parameterize(@$params) : $type;
+				@_ && wantarray ? return($t%s, @_) : return $t%s;
+			}
+		},
 		NICE_PROTOTYPES ? q(;$) : q(;@),
 		$post_method,
 		$post_method,

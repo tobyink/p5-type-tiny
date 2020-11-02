@@ -122,8 +122,10 @@ sub declare {
 		
 		unless ( is_TypeTiny( $opts{parent} ) ) {
 			$caller->isa( "Type::Library" )
-				or _croak( "Parent type cannot be a %s",
-				ref( $opts{parent} ) || 'non-reference scalar' );
+				or _croak(
+				"Parent type cannot be a %s",
+				ref( $opts{parent} ) || 'non-reference scalar'
+				);
 			$opts{parent} = $caller->meta->get_type( $opts{parent} )
 				or _croak( "Could not find parent type" );
 		}

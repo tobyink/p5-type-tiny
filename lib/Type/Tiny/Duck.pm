@@ -95,8 +95,7 @@ sub _instantiate_moose_type {
 	delete $opts{inlined};
 	
 	require Moose::Meta::TypeConstraint::DuckType;
-	return
-		"Moose::Meta::TypeConstraint::DuckType"
+	return "Moose::Meta::TypeConstraint::DuckType"
 		->new( %opts, methods => $self->methods );
 } #/ sub _instantiate_moose_type
 

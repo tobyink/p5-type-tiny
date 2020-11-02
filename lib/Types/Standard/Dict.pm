@@ -148,10 +148,14 @@ sub __inline_generator {
 			map {
 				my $k = B::perlstring( $_ );
 				$constraints{$_}->is_strictly_a_type_of( $_optional )
-					? sprintf( '(!exists %s->{%s} or %s)', $h, $k,
-					$constraints{$_}->inline_check( "$h\->{$k}" ) )
-					: ( "exists($h\->{$k})",
-					$constraints{$_}->inline_check( "$h\->{$k}" ) )
+					? sprintf(
+					'(!exists %s->{%s} or %s)', $h, $k,
+					$constraints{$_}->inline_check( "$h\->{$k}" )
+					)
+					: (
+					"exists($h\->{$k})",
+					$constraints{$_}->inline_check( "$h\->{$k}" )
+					)
 			} @keys
 			),
 			;
@@ -187,12 +191,15 @@ sub __deep_explanation {
 			
 		return [
 			sprintf(
-				'"%s" constrains value at key %s of hash with "%s"', $type,
-				B::perlstring( $k ), $constraints{$k}
+				'"%s" constrains value at key %s of hash with "%s"',
+				$type,
+				B::perlstring( $k ),
+				$constraints{$k},
 			),
 			@{
 				$constraints{$k}->validate_explain(
-					$value->{$k}, sprintf( '%s->{%s}', $varname, B::perlstring( $k ) )
+					$value->{$k},
+					sprintf( '%s->{%s}', $varname, B::perlstring( $k ) ),
 				)
 			},
 		];
@@ -267,28 +274,35 @@ sub __coercion_generator {
 					push @code,
 						sprintf(
 						'my $slurped = +{ map +($_=~$%s::KEYCHECK[%d])?():($_=>$orig->{$_}), keys %%$orig };',
-						__PACKAGE__, $keycheck_counter );
+						__PACKAGE__, $keycheck_counter
+						);
 					if ( $slurpy->has_coercion ) {
 						push @code,
-							sprintf( 'my $coerced = %s;',
-							$slurpy->coercion->inline_coercion( '$slurped' ) );
+							sprintf(
+							'my $coerced = %s;',
+							$slurpy->coercion->inline_coercion( '$slurped' )
+							);
 						push @code,
 							sprintf(
 							'((%s)&&(%s))?(%%new=%%$coerced):(($return_orig = 1), last %s);',
 							$_hash->inline_check( '$coerced' ), $slurpy->inline_check( '$coerced' ),
-							$label );
+							$label
+							);
 					} #/ if ( $slurpy->has_coercion)
 					else {
 						push @code,
-							sprintf( '(%s)?(%%new=%%$slurped):(($return_orig = 1), last %s);',
-							$slurpy->inline_check( '$slurped' ), $label );
+							sprintf(
+							'(%s)?(%%new=%%$slurped):(($return_orig = 1), last %s);',
+							$slurpy->inline_check( '$slurped' ), $label
+							);
 					}
 				} #/ if ( $slurpy )
 				else {
 					push @code,
 						sprintf(
 						'($_ =~ $%s::KEYCHECK[%d])||(($return_orig = 1), last %s) for sort keys %%$orig;',
-						__PACKAGE__, $keycheck_counter, $label );
+						__PACKAGE__, $keycheck_counter, $label
+						);
 				}
 				for my $k ( keys %dict ) {
 					my $ct          = $dict{$k};

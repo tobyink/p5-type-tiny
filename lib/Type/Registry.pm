@@ -71,18 +71,21 @@ sub add_types {
 		if ( $library->isa( "Type::Library" ) or $library eq 'Types::TypeTiny' ) {
 			$types ||= [qw/-types/];
 			Types::TypeTiny::is_ArrayLike( $types )
-				or _croak( "Expected arrayref following '%s'; got %s", $library,
-				$types );
+				or _croak(
+				"Expected arrayref following '%s'; got %s", $library,
+				$types
+				);
 				
 			$library->import( { into => \%hash }, @$types );
 			$hash{$_} = &{ $hash{$_} }() for keys %hash;
-		}
+		} #/ if ( $library->isa( "Type::Library"...))
 		elsif ( $library->isa( "MooseX::Types::Base" ) ) {
 			$types ||= [];
 			Types::TypeTiny::is_ArrayLike( $types ) && ( @$types == 0 )
 				or _croak(
 				"Library '%s' is a MooseX::Types type constraint library. No import options currently supported",
-				$library );
+				$library
+				);
 				
 			require Moose::Util::TypeConstraints;
 			my $moosextypes = $library->type_storage;
@@ -97,7 +100,8 @@ sub add_types {
 			Types::TypeTiny::is_ArrayLike( $types ) && ( @$types == 0 )
 				or _croak(
 				"Library '%s' is a MouseX::Types type constraint library. No import options currently supported",
-				$library );
+				$library
+				);
 				
 			require Mouse::Util::TypeConstraints;
 			my $moosextypes = $library->type_storage;
@@ -269,9 +273,11 @@ sub AUTOLOAD {
 	my ( $method ) = ( our $AUTOLOAD =~ /(\w+)$/ );
 	my $type       = $self->simple_lookup( $method );
 	return $type if $type;
-	_croak( q[Can't locate object method "%s" via package "%s"], $method,
-		ref( $self ) );
-}
+	_croak(
+		q[Can't locate object method "%s" via package "%s"], $method,
+		ref( $self )
+	);
+} #/ sub AUTOLOAD
 
 # Prevent AUTOLOAD being called for DESTROY!
 sub DESTROY {

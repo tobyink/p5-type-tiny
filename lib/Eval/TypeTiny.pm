@@ -121,8 +121,10 @@ sub eval_closure {
 				&& Scalar::Util::reftype( $args{environment}{$k} ) eq q(CODE);
 				
 			require Error::TypeTiny;
-			Error::TypeTiny::croak( "Expected a variable name and ref; got %s => %s", $k,
-				$args{environment}{$k} );
+			Error::TypeTiny::croak(
+				"Expected a variable name and ref; got %s => %s", $k,
+				$args{environment}{$k}
+			);
 		} #/ for my $k ( sort keys %...)
 	} #/ if ( _EXTENDED_TESTING)
 	
@@ -223,6 +225,7 @@ sub _make_lexical_assignment {
 
 {
 	my $tie;
+	
 	sub _manufacture_ties {
 		$tie ||= eval <<'FALLBACK'; } }
 no warnings qw(void once uninitialized numeric);

@@ -76,8 +76,10 @@ sub new {
 } #/ sub new
 
 sub _stringify_no_magic {
-	sprintf( '%s=%s(0x%08x)', blessed( $_[0] ), Scalar::Util::reftype( $_[0] ),
-		Scalar::Util::refaddr( $_[0] ) );
+	sprintf(
+		'%s=%s(0x%08x)', blessed( $_[0] ), Scalar::Util::reftype( $_[0] ),
+		Scalar::Util::refaddr( $_[0] )
+	);
 }
 
 sub name         { $_[0]{name} }
@@ -287,10 +289,12 @@ sub _build_compiled_coercion {
 			? sprintf( 'if (%s)', $types[$i]->inline_check( '$_[0]' ) )
 			: sprintf( 'if ($checks[%d]->(@_))', $i );
 		push @sub,
-			!defined( $codes[$i] ) ? sprintf( '  { return $_[0] }' )
-			: Types::TypeTiny::is_StringLike( $codes[$i] )
-			? sprintf( '  { local $_ = $_[0]; return scalar(%s); }',
-			$codes[$i] )
+			!defined( $codes[$i] )
+			? sprintf( '  { return $_[0] }' )
+			: Types::TypeTiny::is_StringLike( $codes[$i] ) ? sprintf(
+			'  { local $_ = $_[0]; return scalar(%s); }',
+			$codes[$i]
+			)
 			: sprintf(
 			'  { local $_ = $_[0]; return scalar($codes[%d]->(@_)) }', $i );
 	} #/ for my $i ( 0 .. $#types)
@@ -367,9 +371,10 @@ sub inline_coercion {
 		push @sub,
 			( defined( $codes[$i] ) && ( $varname eq '$_' ) )
 			? sprintf( 'scalar(do { %s }) :', $codes[$i] )
-			: defined( $codes[$i] )
-			? sprintf( 'scalar(do { local $_ = %s; %s }) :', $varname,
-			$codes[$i] )
+			: defined( $codes[$i] ) ? sprintf(
+			'scalar(do { local $_ = %s; %s }) :', $varname,
+			$codes[$i]
+			)
 			: sprintf( '%s :', $varname );
 	} #/ for my $i ( 0 .. $#types)
 	

@@ -56,8 +56,10 @@ sub new {
 		} @constraints;
 		
 		if ( @known == @constraints ) {
-			my $xsub = Type::Tiny::XS::get_coderef_for( sprintf "AnyOf[%s]",
-				join( ',', @known ) );
+			my $xsub = Type::Tiny::XS::get_coderef_for(
+				sprintf "AnyOf[%s]",
+				join( ',', @known )
+			);
 			$opts{compiled_type_constraint} = $xsub if $xsub;
 		}
 	} #/ if ( Type::Tiny::_USE_XS)
@@ -110,8 +112,10 @@ sub inline_check {
 		} @constraints;
 		
 		if ( @known == @constraints ) {
-			$self->{xs_sub} = Type::Tiny::XS::get_subname_for( sprintf "AnyOf[%s]",
-				join( ',', @known ) );
+			$self->{xs_sub} = Type::Tiny::XS::get_subname_for(
+				sprintf "AnyOf[%s]",
+				join( ',', @known )
+			);
 		}
 	} #/ if ( Type::Tiny::_USE_XS...)
 	
@@ -134,8 +138,7 @@ sub _instantiate_moose_type {
 	my @tc = map $_->moose_type, @{ $self->type_constraints };
 	
 	require Moose::Meta::TypeConstraint::Union;
-	return
-		"Moose::Meta::TypeConstraint::Union"
+	return "Moose::Meta::TypeConstraint::Union"
 		->new( %opts, type_constraints => \@tc );
 } #/ sub _instantiate_moose_type
 

@@ -26,16 +26,16 @@ sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 sub _swap { $_[2] ? @_[ 1, 0 ] : @_[ 0, 1 ] }
 
 BEGIN {
-	my $support_smartmatch = 0 + !!( $] >= 5.010001 );
+	my $support_smartmatch = 0+ !!( $] >= 5.010001 );
 	eval qq{ sub SUPPORT_SMARTMATCH () { !! $support_smartmatch } };
 	
-	my $fixed_precedence = 0 + !!( $] >= 5.014 );
+	my $fixed_precedence = 0+ !!( $] >= 5.014 );
 	eval qq{ sub _FIXED_PRECEDENCE () { !! $fixed_precedence } };
 	
 	my $try_xs =
-		exists( $ENV{PERL_TYPE_TINY_XS} ) ? !!$ENV{PERL_TYPE_TINY_XS} :
-		exists( $ENV{PERL_ONLY} )         ? !$ENV{PERL_ONLY} :
-		1;
+		exists( $ENV{PERL_TYPE_TINY_XS} ) ? !!$ENV{PERL_TYPE_TINY_XS}
+		: exists( $ENV{PERL_ONLY} )       ? !$ENV{PERL_ONLY}
+		:                                   1;
 		
 	my $use_xs = 0;
 	$try_xs and eval {
@@ -56,6 +56,7 @@ BEGIN {
 } #/ BEGIN
 
 {
+
 	sub _install_overloads {
 		no strict 'refs';
 		no warnings 'redefine', 'once';
@@ -376,8 +377,10 @@ sub _clone {
 }
 
 sub _stringify_no_magic {
-	sprintf( '%s=%s(0x%08x)', blessed( $_[0] ), Scalar::Util::reftype( $_[0] ),
-		Scalar::Util::refaddr( $_[0] ) );
+	sprintf(
+		'%s=%s(0x%08x)', blessed( $_[0] ), Scalar::Util::reftype( $_[0] ),
+		Scalar::Util::refaddr( $_[0] )
+	);
 }
 
 our $DD;
@@ -784,8 +787,10 @@ sub validate_explain {
 	
 	if ( $self->has_parent ) {
 		my $parent = $self->parent->validate_explain( $value, $varname );
-		return [ sprintf( '"%s" is a subtype of "%s"', $self, $self->parent ),
-			@$parent ]
+		return [
+			sprintf( '"%s" is a subtype of "%s"', $self, $self->parent ),
+			@$parent
+			]
 			if $parent;
 	}
 	
@@ -800,8 +805,10 @@ sub validate_explain {
 		return [ $message, @$deep ] if $deep;
 	}
 	
-	return [ $message,
-		sprintf( '"%s" is defined as: %s', $self, $self->_perlcode ) ];
+	return [
+		$message,
+		sprintf( '"%s" is defined as: %s', $self, $self->_perlcode )
+	];
 } #/ sub validate_explain
 
 my $b;
@@ -875,7 +882,9 @@ sub inline_check {
 		$r[0] = $self->parent->inline_check( @_ );
 	}
 	my $r = join " && " => map {
-		/[;{}]/ && !/\Ado \{.+\}\z/ ? "do { package Type::Tiny; $_ }" : "($_)"
+		/[;{}]/ && !/\Ado \{.+\}\z/
+			? "do { package Type::Tiny; $_ }"
+			: "($_)"
 	} @r;
 	return @r == 1 ? $r : "($r)";
 } #/ sub inline_check
@@ -981,8 +990,10 @@ sub is_parameterized {
 	sub ____make_key {
 		join ',', map {
 			Types::TypeTiny::is_TypeTiny( $_ )
-				? sprintf( '$Type::Tiny::ALL_TYPES{%d}',
-				defined( $_->{uniq} ) ? $_->{uniq} : '____CANNOT_KEY____' )
+				? sprintf(
+				'$Type::Tiny::ALL_TYPES{%d}',
+				defined( $_->{uniq} ) ? $_->{uniq} : '____CANNOT_KEY____'
+				)
 				: ref() eq 'ARRAY' ? do {
 				$seen{$_}++ ? '____CANNOT_KEY____' : sprintf( '[%s]', ____make_key( @$_ ) );
 				}
@@ -1297,9 +1308,11 @@ sub _lookup_my_method {
 	return;
 } #/ sub _lookup_my_method
 
-my %object_methods = ( with_attribute_values => 1, stringifies_to => 1,
-	numifies_to => 1 );
-	
+my %object_methods = (
+	with_attribute_values => 1, stringifies_to => 1,
+	numifies_to           => 1
+);
+
 sub can {
 	my $self = shift;
 	

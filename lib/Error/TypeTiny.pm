@@ -124,9 +124,12 @@ sub to_string {
 	my $c = $e->context;
 	my $m = $e->message;
 	
-	$m =~ /\n\z/s     ? $m
-		: $c ? sprintf( "%s at %s line %s.\n", $m, $c->{file} || 'file?',
-		$c->{line} || 'NaN' )
+	$m =~ /\n\z/s
+		? $m
+		: $c ? sprintf(
+		"%s at %s line %s.\n", $m, $c->{file} || 'file?',
+		$c->{line} || 'NaN'
+		)
 		: sprintf( "%s\n", $m );
 } #/ sub to_string
 

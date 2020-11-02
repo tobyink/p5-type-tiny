@@ -81,8 +81,10 @@ Evaluate: {
 		}
 		
 		if ( $node->{type} eq "intersect" ) {
-			return $reg->make_intersection( map _eval_type( $_, $reg ),
-				@{ $node->{intersect} } );
+			return $reg->make_intersection(
+				map _eval_type( $_, $reg ),
+				@{ $node->{intersect} }
+			);
 		}
 		
 		if ( $node->{type} eq "slurpy" ) {
@@ -168,8 +170,9 @@ Evaluate: {
 } #/ Evaluate:
 
 {
+
 	package Type::Parser::AstBuilder;
-		
+	
 	sub new {
 		my $class = shift;
 		bless {@_}, $class;
@@ -250,8 +253,10 @@ Evaluate: {
 			return { type => "primary", token => $tokens->eat };
 		}
 		
-		Type::Parser::_croak( "Unexpected token in primary type expression; got '%s'",
-			$tokens->peek( 0 )->spelling );
+		Type::Parser::_croak(
+			"Unexpected token in primary type expression; got '%s'",
+			$tokens->peek( 0 )->spelling
+		);
 	} #/ sub _parse_primary
 	
 	sub _parse_expression_1 {
@@ -308,14 +313,16 @@ Evaluate: {
 }
 
 {
+
 	package Type::Parser::Token;
 	sub type     { $_[0][0] }
 	sub spelling { $_[0][1] }
 }
 
 {
+
 	package Type::Parser::TokenStream;
-		
+	
 	use Scalar::Util qw(looks_like_number);
 	
 	sub new {

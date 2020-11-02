@@ -110,11 +110,15 @@ sub __coercion_generator {
 				push @code, 'do { my ($orig, $return_orig, %new) = ($_, 0);';
 				push @code, 'for (keys %$orig) {';
 				push @code,
-					sprintf( '$return_orig++ && last unless (%s);',
-					$coercable_item->inline_check( '$orig->{$_}' ) );
+					sprintf(
+					'$return_orig++ && last unless (%s);',
+					$coercable_item->inline_check( '$orig->{$_}' )
+					);
 				push @code,
-					sprintf( '$new{$_} = (%s);',
-					$param->coercion->inline_coercion( '$orig->{$_}' ) );
+					sprintf(
+					'$new{$_} = (%s);',
+					$param->coercion->inline_coercion( '$orig->{$_}' )
+					);
 				push @code, '}';
 				push @code, '$return_orig ? $orig : \\%new';
 				push @code, '}';

@@ -56,8 +56,10 @@ sub new {
 		} @constraints;
 		
 		if ( @known == @constraints ) {
-			my $xsub = Type::Tiny::XS::get_coderef_for( sprintf "AllOf[%s]",
-				join( ',', @known ) );
+			my $xsub = Type::Tiny::XS::get_coderef_for(
+				sprintf "AllOf[%s]",
+				join( ',', @known )
+			);
 			$opts{compiled_type_constraint} = $xsub if $xsub;
 		}
 	} #/ if ( Type::Tiny::_USE_XS)
@@ -102,8 +104,10 @@ sub inline_check {
 		} @constraints;
 		
 		if ( @known == @constraints ) {
-			$self->{xs_sub} = Type::Tiny::XS::get_subname_for( sprintf "AllOf[%s]",
-				join( ',', @known ) );
+			$self->{xs_sub} = Type::Tiny::XS::get_subname_for(
+				sprintf "AllOf[%s]",
+				join( ',', @known )
+			);
 		}
 	} #/ if ( Type::Tiny::_USE_XS...)
 	
@@ -160,9 +164,10 @@ my $_delegate = sub {
 			last;
 		}
 	}
-	_croak( 'Could not apply method %s to any type within the intersection',
-		$method )
-		unless $found;
+	_croak(
+		'Could not apply method %s to any type within the intersection',
+		$method
+	) unless $found;
 	ref( $self )->new( type_constraints => \@types );
 };
 

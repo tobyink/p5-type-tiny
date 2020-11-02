@@ -136,12 +136,16 @@ for my $base ( qw/Num Int/ ) {
 			my ( $min, $max, $min_excl, $max_excl ) = @_;
 			!defined( $min )
 				or $base_obj->check( $min )
-				or _croak( "${base}Range min must be a %s; got %s", lc( $base ),
-				$min );
+				or _croak(
+				"${base}Range min must be a %s; got %s", lc( $base ),
+				$min
+				);
 			!defined( $max )
 				or $base_obj->check( $max )
-				or _croak( "${base}Range max must be a %s; got %s", lc( $base ),
-				$max );
+				or _croak(
+				"${base}Range max must be a %s; got %s", lc( $base ),
+				$max
+				);
 			!defined( $min_excl )
 				or Bool->check( $min_excl )
 				or

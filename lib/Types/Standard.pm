@@ -200,7 +200,10 @@ my $meta = __PACKAGE__->meta;
 no warnings;
 
 BEGIN {
-	*STRICTNUM = $ENV{PERL_TYPES_STANDARD_STRICTNUM} ? sub() { !!1 } : sub() { !!0 }
+	*STRICTNUM =
+		$ENV{PERL_TYPES_STANDARD_STRICTNUM}
+		? sub() { !!1 }
+		: sub() { !!0 }
 }
 
 my $_any = $meta->$add_core_type(
@@ -305,11 +308,11 @@ my $_strictnum = $meta->add_type(
 			( $val =~ /\A[+-]?[0-9]+\z/ )
 				|| (
 				$val =~ /\A(?:[+-]?)                #matches optional +- in the beginning
-		(?=[0-9]|\.[0-9])                     #matches previous +- only if there is something like 3 or .3
-		[0-9]*                                #matches 0-9 zero or more times
-		(?:\.[0-9]+)?                         #matches optional .89 or nothing
-		(?:[Ee](?:[+-]?[0-9]+))?              #matches E1 or e1 or e-1 or e+1 etc
-		\z/x
+					(?=[0-9]|\.[0-9])                #matches previous +- only if there is something like 3 or .3
+					[0-9]*                           #matches 0-9 zero or more times
+					(?:\.[0-9]+)?                    #matches optional .89 or nothing
+					(?:[Ee](?:[+-]?[0-9]+))?         #matches E1 or e1 or e-1 or e+1 etc
+					\z/x
 				);
 		},
 		inlined => sub {
@@ -542,8 +545,10 @@ my $_obj = $meta->$add_core_type(
 		inlined    => sub {
 			_HAS_REFUTILXS && !$Type::Tiny::AvoidCallbacks
 				? "Ref::Util::XS::is_blessed_ref($_[1])"
-				: $maybe_load_modules->( 'Scalar::Util',
-				"Scalar::Util::blessed($_[1])" );
+				: $maybe_load_modules->(
+				'Scalar::Util',
+				"Scalar::Util::blessed($_[1])"
+				);
 		},
 		is_object => 1,
 	}
@@ -687,8 +692,10 @@ $meta->$add_core_type(
 		parent         => $_arr,
 		name_generator => sub {
 			my ( $s, @a ) = @_;
-			sprintf( '%s[%s]', $s, join q[,],
-				map { ref( $_ ) eq "HASH" ? sprintf( "slurpy %s", $_->{slurpy} ) : $_ } @a );
+			sprintf(
+				'%s[%s]', $s, join q[,],
+				map { ref( $_ ) eq "HASH" ? sprintf( "slurpy %s", $_->{slurpy} ) : $_ } @a
+			);
 		},
 		constraint_generator => LazyLoad( Tuple => 'constraint_generator' ),
 		inline_generator     => LazyLoad( Tuple => 'inline_generator' ),
@@ -720,9 +727,11 @@ $meta->add_type(
 			my ( $s, @p ) = @_;
 			my $l = ref( $p[-1] ) eq q(HASH) ? pop( @p )->{slurpy} : undef;
 			my %a = @p;
-			sprintf( '%s[%s%s]', $s,
+			sprintf(
+				'%s[%s%s]', $s,
 				join( q[,], map sprintf( "%s=>%s", $_, $a{$_} ), sort keys %a ),
-				$l ? ",slurpy $l" : '' );
+				$l ? ",slurpy $l" : ''
+			);
 		},
 		constraint_generator => LazyLoad( Dict => 'constraint_generator' ),
 		inline_generator     => LazyLoad( Dict => 'inline_generator' ),
@@ -814,7 +823,8 @@ $meta->add_type(
 			push @code,
 				sprintf(
 				'($ok=0) && last unless ref($inner) eq q(ARRAY) && @$inner == 2 && (%s); ',
-				$Str_check );
+				$Str_check
+				);
 			push @code, '} ';
 			push @code, '$ok }';
 			return ( undef, join( q( ), @code ) );
@@ -827,11 +837,12 @@ $meta->add_type(
 		name       => "Tied",
 		parent     => $_ref,
 		constraint => sub {
-			!!
-				tied( Scalar::Util::reftype( $_ ) eq 'HASH' ? %{$_}
+			!!tied(
+				Scalar::Util::reftype( $_ ) eq 'HASH'             ? %{$_}
 				: Scalar::Util::reftype( $_ ) eq 'ARRAY'          ? @{$_}
 				: Scalar::Util::reftype( $_ ) =~ /^(SCALAR|REF)$/ ? ${$_}
-				:                                                   undef );
+				:                                                   undef
+			);
 		},
 		inlined => sub {
 			my ( $self, $var ) = @_;
@@ -868,8 +879,10 @@ $meta->add_type(
 			my @classes = map {
 				Types::TypeTiny::is_TypeTiny( $_ )
 					? $_
-					: "Type::Tiny::Class"->new( class => $_,
-					display_name => sprintf( 'InstanceOf[%s]', B::perlstring( $_ ) ) )
+					: "Type::Tiny::Class"->new(
+					class        => $_,
+					display_name => sprintf( 'InstanceOf[%s]', B::perlstring( $_ ) )
+					)
 			} @_;
 			return $classes[0] if @classes == 1;
 			
@@ -896,8 +909,10 @@ $meta->add_type(
 			my @roles = map {
 				Types::TypeTiny::is_TypeTiny( $_ )
 					? $_
-					: "Type::Tiny::Role"->new( role => $_,
-					display_name => sprintf( 'ConsumerOf[%s]', B::perlstring( $_ ) ) )
+					: "Type::Tiny::Role"->new(
+					role         => $_,
+					display_name => sprintf( 'ConsumerOf[%s]', B::perlstring( $_ ) )
+					)
 			} @_;
 			return $roles[0] if @roles == 1;
 			

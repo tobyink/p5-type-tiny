@@ -100,9 +100,10 @@ sub _build_display_name {
 			unless defined $new_xs;
 		if ( $new_xs ) {
 			require B;
-			return
-				sprintf( "Enum[%s]",
-				join( ",", map B::perlstring( $_ ), @$unique_values ) );
+			return sprintf(
+				"Enum[%s]",
+				join( ",", map B::perlstring( $_ ), @$unique_values )
+			);
 		}
 		else {                                   # uncoverable statement
 			return undef if grep /\W/, @$unique_values;                    # uncoverable statement
@@ -187,8 +188,7 @@ sub _instantiate_moose_type {
 	delete $opts{constraint};
 	delete $opts{inlined};
 	require Moose::Meta::TypeConstraint::Enum;
-	return
-		"Moose::Meta::TypeConstraint::Enum"
+	return "Moose::Meta::TypeConstraint::Enum"
 		->new( %opts, values => $self->values );
 } #/ sub _instantiate_moose_type
 

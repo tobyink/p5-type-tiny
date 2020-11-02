@@ -696,13 +696,17 @@ sub compile_named {
 	}
 	elsif ( Types::Standard::is_ArrayRef( $options{class} ) ) {
 		push @code,
-			sprintf( '(%s)->%s(\\%%R);', $QUOTE->( $options{class}[0] ),
-			$options{class}[1] || 'new' );
+			sprintf(
+			'(%s)->%s(\\%%R);', $QUOTE->( $options{class}[0] ),
+			$options{class}[1] || 'new'
+			);
 	}
 	elsif ( $options{class} ) {
 		push @code,
-			sprintf( '(%s)->%s(\\%%R);', $QUOTE->( $options{class} ),
-			$options{constructor} || 'new' );
+			sprintf(
+			'(%s)->%s(\\%%R);', $QUOTE->( $options{class} ),
+			$options{constructor} || 'new'
+			);
 	}
 	else {
 		push @code, '\\%R;';
@@ -833,9 +837,11 @@ sub compile_named_oo {
 			
 		my $predicate =
 			exists( $opts->{predicate} )
-			? ( $opts->{predicate} eq '1' ? "has_$getter"
+			? (
+			$opts->{predicate} eq '1'   ? "has_$getter"
 			: $opts->{predicate} eq '0' ? undef
-			:                             $opts->{predicate} )
+			:                             $opts->{predicate}
+			)
 			: ( $is_optional ? "has_$getter" : undef );
 			
 		$attribs{$name} = {
@@ -846,8 +852,10 @@ sub compile_named_oo {
 	} #/ while ( @_ )
 	
 	my $kls = join '//',
-		map sprintf( '%s*%s*%s', $attribs{$_}{slot}, $attribs{$_}{getter},
-		$attribs{$_}{predicate} || '0' ),
+		map sprintf(
+		'%s*%s*%s', $attribs{$_}{slot}, $attribs{$_}{getter},
+		$attribs{$_}{predicate} || '0'
+		),
 		sort keys %attribs;
 		
 	$klasses{$kls} ||= _mkklass( \%attribs );
@@ -906,8 +914,10 @@ sub validate_named {
 sub multisig {
 	my %options = ( ref( $_[0] ) eq "HASH" && !$_[0]{slurpy} ) ? %{ +shift } : ();
 	$options{message}     ||= "Parameter validation failed";
-	$options{description} ||= sprintf( "parameter validation for '%s'",
-		[ caller( 1 + ( $options{caller_level} || 0 ) ) ]->[3] || '__ANON__' );
+	$options{description} ||= sprintf(
+		"parameter validation for '%s'",
+		[ caller( 1 + ( $options{caller_level} || 0 ) ) ]->[3] || '__ANON__'
+	);
 	for my $key ( qw[ message description ] ) {
 		Types::TypeTiny::is_StringLike( $options{$key} )
 			or Error::TypeTiny::croak(
@@ -935,15 +945,19 @@ sub multisig {
 		}
 		push @code, sprintf( 'if (%s){', join( ' and ', @cond ) ) if @cond;
 		push @code,
-			sprintf( 'eval { $r = [ $multi[%d]{closure}->(@_) ]; %s };', $i,
-			$flag );
+			sprintf(
+			'eval { $r = [ $multi[%d]{closure}->(@_) ]; %s };', $i,
+			$flag
+			);
 		push @code, 'return(@$r) if $r;';
 		push @code, '}' if @cond;
 	} #/ for my $i ( 0 .. $#multi)
 	
 	push @code,
-		sprintf( '"Error::TypeTiny"->throw(message => "%s");',
-		quotemeta( "$options{message}" ) );
+		sprintf(
+		'"Error::TypeTiny"->throw(message => "%s");',
+		quotemeta( "$options{message}" )
+		);
 	push @code, '}';
 	
 	eval_closure(

@@ -162,7 +162,8 @@ sub __coercion_generator {
 				push @code,
 					sprintf(
 					'(($return_orig = 1), last %s) if scalar(@$orig) %% %d != 0;', $label,
-					scalar @tuple );
+					scalar @tuple
+					);
 				push @code, sprintf( 'my $%s = 0; while ($%s < @$orig) {', $label2, $label2 );
 				for my $i ( 0 .. $#tuple ) {
 					my $ct        = $tuple[$i];

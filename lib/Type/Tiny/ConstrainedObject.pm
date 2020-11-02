@@ -69,8 +69,10 @@ my $_where_expressions = sub {
 				: Types::TypeTiny::to_TypeTiny( $constraint );
 			if ( $type->can_be_inlined ) {
 				push @codes,
-					sprintf( 'do { my $tmp = %s; %s }', $expr,
-					$type->inline_check( '$tmp' ) );
+					sprintf(
+					'do { my $tmp = %s; %s }', $expr,
+					$type->inline_check( '$tmp' )
+					);
 			}
 			else {
 				++$i;

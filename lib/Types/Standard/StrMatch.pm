@@ -37,8 +37,10 @@ my $serialize_regexp = sub {
 	unless ( defined $serialized ) {
 		my $key = sprintf( '%s|%s', ref( $re ), $re );
 		$expressions{$key} = $re;
-		$serialized = sprintf( '$Types::Standard::StrMatch::expressions{%s}',
-			B::perlstring( $key ) );
+		$serialized = sprintf(
+			'$Types::Standard::StrMatch::expressions{%s}',
+			B::perlstring( $key )
+		);
 	}
 	
 	return $serialized;

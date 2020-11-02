@@ -50,8 +50,8 @@ sub __constraint_generator {
 		} @constraints;
 		
 		if ( @known == @constraints ) {
-			my $xsub = Type::Tiny::XS::get_coderef_for( sprintf "Tuple[%s]",
-				join( ',', @known ) );
+			my $xsub = Type::Tiny::XS::get_coderef_for(
+				sprintf( "Tuple[%s]", join( ',', @known ) ) );
 			push @xsub, $xsub if $xsub;
 		}
 	} #/ if ( Type::Tiny::_USE_XS...)
@@ -111,8 +111,8 @@ sub __inline_generator {
 		} @constraints;
 		
 		if ( @known == @constraints ) {
-			$xsubname = Type::Tiny::XS::get_subname_for( sprintf "Tuple[%s]",
-				join( ',', @known ) );
+			$xsubname = Type::Tiny::XS::get_subname_for(
+				sprintf( "Tuple[%s]", join( ',', @known ) ) );
 		}
 	} #/ if ( Type::Tiny::_USE_XS...)
 	
@@ -255,9 +255,10 @@ sub __coercion_generator {
 				push @code, 'do { my ($orig, $return_orig, $tmp, @new) = ($_, 0);';
 				push @code, "$label: {";
 				push @code,
-					sprintf( '(($return_orig = 1), last %s) if @$orig > %d;', $label,
-					scalar @tuple )
-					unless $slurpy;
+					sprintf(
+					'(($return_orig = 1), last %s) if @$orig > %d;', $label,
+					scalar @tuple
+					) unless $slurpy;
 				for my $i ( 0 .. $#tuple ) {
 					my $ct          = $tuple[$i];
 					my $ct_coerce   = $ct->has_coercion;
@@ -287,8 +288,10 @@ sub __coercion_generator {
 					);
 					push @code,
 						$slurpy->has_coercion
-						? sprintf( '$tail = %s;',
-						$slurpy->coercion->inline_coercion( '$tail' ) )
+						? sprintf(
+						'$tail = %s;',
+						$slurpy->coercion->inline_coercion( '$tail' )
+						)
 						: q();
 					push @code, sprintf(
 						'(%s) ? push(@new, %s$tail) : ($return_orig++);',

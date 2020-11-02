@@ -565,9 +565,9 @@ sub _TypeTinyFromMoose_baseclass {
 
 sub _TypeTinyFromMoose_union {
 	my $t = shift;
+	my @mapped = map _TypeTinyFromMoose( $_ ), @{ $t->type_constraints };
 	require Type::Tiny::Union;
-	return 'Type::Tiny::Union' => { type_constraints =>
-			[ map _TypeTinyFromMoose( $_ ), @{ $t->type_constraints } ] };
+	return 'Type::Tiny::Union' => { type_constraints => \@mapped };
 }
 
 sub _TypeTinyFromMoose_enum {
