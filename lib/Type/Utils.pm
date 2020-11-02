@@ -31,165 +31,145 @@ our @EXPORT_OK = (
 		match_on_type compile_match_on_type
 		dwim_type english_list
 		classifier assert
-	>,
+		>,
 	"is",
 );
 our %EXPORT_TAGS = (
-	default => [ @EXPORT ],
-	all     => [ @EXPORT_OK ],
+	default => [@EXPORT],
+	all     => [@EXPORT_OK],
 );
-pop @{$EXPORT_TAGS{all}};  # remove 'is'
+pop @{ $EXPORT_TAGS{all} };    # remove 'is'
 
 require Exporter::Tiny;
 our @ISA = 'Exporter::Tiny';
 
-sub extends
-{
-	_croak "Not a type library" unless caller->isa("Type::Library");
+sub extends {
+	_croak "Not a type library" unless caller->isa( "Type::Library" );
 	my $caller = caller->meta;
 	
-	foreach my $lib (@_)
-	{
+	foreach my $lib ( @_ ) {
 		eval "use $lib; 1" or _croak "Could not load library '$lib': $@";
 		
-		if ($lib->isa("Type::Library") or $lib eq 'Types::TypeTiny')
-		{
-			$caller->add_type( $lib->get_type($_) )
-				for sort $lib->meta->type_names;
-			$caller->add_coercion( $lib->get_coercion($_) )
+		if ( $lib->isa( "Type::Library" ) or $lib eq 'Types::TypeTiny' ) {
+			$caller->add_type( $lib->get_type( $_ ) ) for sort $lib->meta->type_names;
+			$caller->add_coercion( $lib->get_coercion( $_ ) )
 				for sort $lib->meta->coercion_names;
 		}
-		elsif ($lib->isa('MooseX::Types::Base'))
-		{
+		elsif ( $lib->isa( 'MooseX::Types::Base' ) ) {
 			require Moose::Util::TypeConstraints;
 			my $types = $lib->type_storage;
-			for my $name (sort keys %$types)
-			{
-				my $moose = Moose::Util::TypeConstraints::find_type_constraint($types->{$name});
-				my $tt    = Types::TypeTiny::to_TypeTiny($moose);
-				my $c     = $moose->has_coercion && @{ $moose->coercion->type_coercion_map || [] };
+			for my $name ( sort keys %$types ) {
+				my $moose = Moose::Util::TypeConstraints::find_type_constraint(
+					$types->{$name} );
+				my $tt = Types::TypeTiny::to_TypeTiny( $moose );
+				my $c  = $moose->has_coercion && @{ $moose->coercion->type_coercion_map || [] };
 				$caller->add_type(
-					$tt->create_child_type(library => $caller, name => $name, coercion => $c ? 1 : 0)
+					$tt->create_child_type(
+						library => $caller, name => $name, coercion => $c ? 1 : 0
+					)
 				);
-			}
-		}
-		elsif ($lib->isa('MouseX::Types::Base'))
-		{
+			} #/ for my $name ( sort keys...)
+		} #/ elsif ( $lib->isa( 'MooseX::Types::Base'...))
+		elsif ( $lib->isa( 'MouseX::Types::Base' ) ) {
 			require Mouse::Util::TypeConstraints;
 			my $types = $lib->type_storage;
-			for my $name (sort keys %$types)
-			{
-				my $mouse = Mouse::Util::TypeConstraints::find_type_constraint($types->{$name});
-				my $tt    = Types::TypeTiny::to_TypeTiny($mouse);
+			for my $name ( sort keys %$types ) {
+				my $mouse = Mouse::Util::TypeConstraints::find_type_constraint(
+					$types->{$name} );
+				my $tt = Types::TypeTiny::to_TypeTiny( $mouse );
 				$caller->add_type(
-					$tt->create_child_type(library => $caller, name => $name, coercion => $mouse->has_coercion ? 1 : 0)
+					$tt->create_child_type(
+						library => $caller, name => $name, coercion => $mouse->has_coercion ? 1 : 0
+					)
 				);
-			}
-		}
-		elsif ($lib->isa('Specio::Exporter'))
-		{
+			} #/ for my $name ( sort keys...)
+		} #/ elsif ( $lib->isa( 'MouseX::Types::Base'...))
+		elsif ( $lib->isa( 'Specio::Exporter' ) ) {
 			my $types = $lib->Specio::Registry::exportable_types_for_package;
-			for my $name (sort keys %$types)
-			{
+			for my $name ( sort keys %$types ) {
 				my $specio = $types->{$name};
-				my $tt     = Types::TypeTiny::to_TypeTiny($specio);
+				my $tt     = Types::TypeTiny::to_TypeTiny( $specio );
 				$caller->add_type(
-					$tt->create_child_type(library => $caller, name => $name)
-				);
+					$tt->create_child_type( library => $caller, name => $name ) );
 			}
 		}
-		else
-		{
-			_croak("'$lib' is not a type constraint library");
+		else {
+			_croak( "'$lib' is not a type constraint library" );
 		}
-	}
-}
+	} #/ foreach my $lib ( @_ )
+} #/ sub extends
 
-sub declare
-{
+sub declare {
 	my %opts;
-	if (@_ % 2 == 0)
-	{
+	if ( @_ % 2 == 0 ) {
 		%opts = @_;
-		if (@_==2 and $_[0]=~ /^_*[A-Z]/ and $_[1] =~ /^[0-9]+$/)
-		{
+		if ( @_ == 2 and $_[0] =~ /^_*[A-Z]/ and $_[1] =~ /^[0-9]+$/ ) {
 			require Carp;
-			Carp::carp("Possible missing comma after 'declare $_[0]'");
+			Carp::carp( "Possible missing comma after 'declare $_[0]'" );
 		}
 	}
-	else
-	{
-		(my($name), %opts) = @_;
+	else {
+		( my ( $name ), %opts ) = @_;
 		_croak "Cannot provide two names for type" if exists $opts{name};
 		$opts{name} = $name;
 	}
 	
-	my $caller = caller($opts{_caller_level} || 0);
+	my $caller = caller( $opts{_caller_level} || 0 );
 	$opts{library} = $caller;
 	
-	if (defined $opts{parent})
-	{
-		$opts{parent} = to_TypeTiny($opts{parent});
+	if ( defined $opts{parent} ) {
+		$opts{parent} = to_TypeTiny( $opts{parent} );
 		
-		unless (is_TypeTiny($opts{parent}))
-		{
-			$caller->isa("Type::Library")
-				or _croak("Parent type cannot be a %s", ref($opts{parent})||'non-reference scalar');
-			$opts{parent} = $caller->meta->get_type($opts{parent})
-				or _croak("Could not find parent type");
+		unless ( is_TypeTiny( $opts{parent} ) ) {
+			$caller->isa( "Type::Library" )
+				or _croak( "Parent type cannot be a %s",
+				ref( $opts{parent} ) || 'non-reference scalar' );
+			$opts{parent} = $caller->meta->get_type( $opts{parent} )
+				or _croak( "Could not find parent type" );
 		}
-	}
+	} #/ if ( defined $opts{parent...})
 	
 	my $type;
-	if (defined $opts{parent})
-	{
-		$type = delete($opts{parent})->create_child_type(%opts);
+	if ( defined $opts{parent} ) {
+		$type = delete( $opts{parent} )->create_child_type( %opts );
 	}
-	else
-	{
-		my $bless = delete($opts{bless}) || "Type::Tiny";
+	else {
+		my $bless = delete( $opts{bless} ) || "Type::Tiny";
 		eval "require $bless";
-		$type = $bless->new(%opts);
+		$type = $bless->new( %opts );
 	}
 	
-	if ($caller->isa("Type::Library"))
-	{
-		$caller->meta->add_type($type) unless $type->is_anon;
+	if ( $caller->isa( "Type::Library" ) ) {
+		$caller->meta->add_type( $type ) unless $type->is_anon;
 	}
 	
 	return $type;
-}
+} #/ sub declare
 
 *subtype = \&declare;
-*type = \&declare;
+*type    = \&declare;
 
-sub as (@)
-{
+sub as (@) {
 	parent => @_;
 }
 
-sub where (&;@)
-{
+sub where (&;@) {
 	constraint => @_;
 }
 
-sub message (&;@)
-{
+sub message (&;@) {
 	message => @_;
 }
 
-sub inline_as (&;@)
-{
+sub inline_as (&;@) {
 	inlined => @_;
 }
 
-sub class_type
-{
-	my $name = ref($_[0]) eq 'HASH' ? undef : shift;
+sub class_type {
+	my $name = ref( $_[0] ) eq 'HASH' ? undef : shift;
 	my %opts = %{ shift or {} };
 	
-	if (defined $name)
-	{
+	if ( defined $name ) {
 		$opts{name}  = $name unless exists $opts{name};
 		$opts{class} = $name unless exists $opts{class};
 		
@@ -199,16 +179,14 @@ sub class_type
 	$opts{bless} = "Type::Tiny::Class";
 	
 	{ no warnings "numeric"; $opts{_caller_level}++ }
-	declare(%opts);
-}
+	declare( %opts );
+} #/ sub class_type
 
-sub role_type
-{
-	my $name = ref($_[0]) eq 'HASH' ? undef : shift;
+sub role_type {
+	my $name = ref( $_[0] ) eq 'HASH' ? undef : shift;
 	my %opts = %{ shift or {} };
 	
-	if (defined $name)
-	{
+	if ( defined $name ) {
 		$opts{name} = $name unless exists $opts{name};
 		$opts{role} = $name unless exists $opts{role};
 		
@@ -218,182 +196,167 @@ sub role_type
 	$opts{bless} = "Type::Tiny::Role";
 	
 	{ no warnings "numeric"; $opts{_caller_level}++ }
-	declare(%opts);
-}
+	declare( %opts );
+} #/ sub role_type
 
-sub duck_type
-{
-	my $name    = ref($_[0]) eq 'ARRAY' ? undef : shift;
+sub duck_type {
+	my $name    = ref( $_[0] ) eq 'ARRAY' ? undef : shift;
 	my @methods = @{ shift or [] };
 	
 	my %opts;
-	$opts{name} = $name if defined $name;
+	$opts{name}    = $name if defined $name;
 	$opts{methods} = \@methods;
 	
 	$opts{bless} = "Type::Tiny::Duck";
 	
 	{ no warnings "numeric"; $opts{_caller_level}++ }
-	declare(%opts);
-}
+	declare( %opts );
+} #/ sub duck_type
 
-sub enum
-{
-	my $name   = ref($_[0]) eq 'ARRAY' ? undef : shift;
+sub enum {
+	my $name   = ref( $_[0] ) eq 'ARRAY' ? undef : shift;
 	my @values = @{ shift or [] };
 	
 	my %opts;
-	$opts{name} = $name if defined $name;
+	$opts{name}   = $name if defined $name;
 	$opts{values} = \@values;
 	
 	$opts{bless} = "Type::Tiny::Enum";
 	
 	{ no warnings "numeric"; $opts{_caller_level}++ }
-	declare(%opts);
-}
+	declare( %opts );
+} #/ sub enum
 
-sub union
-{
-	my $name = ref($_[0]) eq 'ARRAY' ? undef : shift;
+sub union {
+	my $name = ref( $_[0] ) eq 'ARRAY' ? undef : shift;
 	my @tcs  = @{ shift or [] };
 	
 	my %opts;
-	$opts{name} = $name if defined $name;
+	$opts{name}             = $name if defined $name;
 	$opts{type_constraints} = \@tcs;
 	
 	$opts{bless} = "Type::Tiny::Union";
 	
 	{ no warnings "numeric"; $opts{_caller_level}++ }
-	declare(%opts);
-}
+	declare( %opts );
+} #/ sub union
 
-sub intersection
-{
-	my $name = ref($_[0]) eq 'ARRAY' ? undef : shift;
+sub intersection {
+	my $name = ref( $_[0] ) eq 'ARRAY' ? undef : shift;
 	my @tcs  = @{ shift or [] };
 	
 	my %opts;
-	$opts{name} = $name if defined $name;
+	$opts{name}             = $name if defined $name;
 	$opts{type_constraints} = \@tcs;
 	
 	$opts{bless} = "Type::Tiny::Intersection";
 	
 	{ no warnings "numeric"; $opts{_caller_level}++ }
-	declare(%opts);
-}
+	declare( %opts );
+} #/ sub intersection
 
-sub declare_coercion
-{
+sub declare_coercion {
 	my %opts;
-	$opts{name} = shift if !ref($_[0]);
+	$opts{name} = shift if !ref( $_[0] );
 	
 	# I don't like this; it is a hack
-	if (ref($_[0]) eq 'Type::Tiny::_DeclaredType') {
+	if ( ref( $_[0] ) eq 'Type::Tiny::_DeclaredType' ) {
 		$opts{name} = '' . shift;
 	}
 	
-	while (Types::TypeTiny::is_HashLike($_[0]) and not is_TypeTiny($_[0]))
-	{
-		%opts = (%opts, %{+shift});
+	while ( Types::TypeTiny::is_HashLike( $_[0] ) and not is_TypeTiny( $_[0] ) ) {
+		%opts = ( %opts, %{ +shift } );
 	}
 	
-	my $caller = caller($opts{_caller_level} || 0);
+	my $caller = caller( $opts{_caller_level} || 0 );
 	$opts{library} = $caller;
 	
-	my $bless = delete($opts{bless}) || "Type::Coercion";
+	my $bless = delete( $opts{bless} ) || "Type::Coercion";
 	eval "require $bless";
-	my $c = $bless->new(%opts);
+	my $c = $bless->new( %opts );
 	
 	my @C;
 	
-	if ($caller->isa("Type::Library"))
-	{
+	if ( $caller->isa( "Type::Library" ) ) {
 		my $meta = $caller->meta;
-		$meta->add_coercion($c) unless $c->is_anon;
-		while (@_)
-		{
-			push @C, map { ref($_) ? to_TypeTiny($_) : $meta->get_type($_)||$_ } shift;
+		$meta->add_coercion( $c ) unless $c->is_anon;
+		while ( @_ ) {
+			push @C,
+				map { ref( $_ ) ? to_TypeTiny( $_ ) : $meta->get_type( $_ ) || $_ }
+				shift;
 			push @C, shift;
 		}
-	}
-	else
-	{
+	} #/ if ( $caller->isa( "Type::Library"...))
+	else {
 		@C = @_;
 	}
 	
-	$c->add_type_coercions(@C);
+	$c->add_type_coercions( @C );
 	
 	return $c->freeze;
-}
+} #/ sub declare_coercion
 
-sub coerce
-{
-	if ((scalar caller)->isa("Type::Library"))
-	{
-		my $meta = (scalar caller)->meta;
-		my ($type) = map { ref($_) ? to_TypeTiny($_) : $meta->get_type($_)||$_ } shift;
+sub coerce {
+	if ( ( scalar caller )->isa( "Type::Library" ) ) {
+		my $meta = ( scalar caller )->meta;
+		my ( $type ) =
+			map { ref( $_ ) ? to_TypeTiny( $_ ) : $meta->get_type( $_ ) || $_ }
+			shift;
 		my @opts;
-		while (@_)
-		{
-			push @opts, map { ref($_) ? to_TypeTiny($_) : $meta->get_type($_)||$_ } shift;
+		while ( @_ ) {
+			push @opts,
+				map { ref( $_ ) ? to_TypeTiny( $_ ) : $meta->get_type( $_ ) || $_ }
+				shift;
 			push @opts, shift;
 		}
-		return $type->coercion->add_type_coercions(@opts);
-	}
+		return $type->coercion->add_type_coercions( @opts );
+	} #/ if ( ( scalar caller )...)
 	
-	my ($type, @opts) = @_;
-	$type = to_TypeTiny($type);
-	return $type->coercion->add_type_coercions(@opts);
-}
+	my ( $type, @opts ) = @_;
+	$type = to_TypeTiny( $type );
+	return $type->coercion->add_type_coercions( @opts );
+} #/ sub coerce
 
-sub from (@)
-{
+sub from (@) {
 	return @_;
 }
 
-sub to_type (@)
-{
+sub to_type (@) {
 	my $type = shift;
-	unless (is_TypeTiny($type))
-	{
-		caller->isa("Type::Library")
+	unless ( is_TypeTiny( $type ) ) {
+		caller->isa( "Type::Library" )
 			or _croak "Target type cannot be a string";
-		$type = caller->meta->get_type($type)
+		$type = caller->meta->get_type( $type )
 			or _croak "Could not find target type";
 	}
 	return +{ type_constraint => $type }, @_;
-}
+} #/ sub to_type (@)
 
-sub via (&;@)
-{
+sub via (&;@) {
 	return @_;
 }
 
-sub match_on_type
-{
+sub match_on_type {
 	my $value = shift;
 	
-	while (@_)
-	{
+	while ( @_ ) {
 		my $code;
-		if (@_ == 1)
-		{
+		if ( @_ == 1 ) {
 			$code = shift;
 		}
-		else
-		{
-			(my($type), $code) = splice(@_, 0, 2);
-			Types::TypeTiny::assert_TypeTiny($type)->check($value) or next;
+		else {
+			( my ( $type ), $code ) = splice( @_, 0, 2 );
+			Types::TypeTiny::assert_TypeTiny( $type )->check( $value ) or next;
 		}
 		
-		if (Types::TypeTiny::is_StringLike($code))
-		{
+		if ( Types::TypeTiny::is_StringLike( $code ) ) {
 			local $_ = $value;
-			if (wantarray) {
+			if ( wantarray ) {
 				my @r = eval "$code";
 				die $@ if $@;
 				return @r;
 			}
-			if (defined wantarray) {
+			if ( defined wantarray ) {
 				my $r = eval "$code";
 				die $@ if $@;
 				return $r;
@@ -401,67 +364,59 @@ sub match_on_type
 			eval "$code";
 			die $@ if $@;
 			return;
-		}
-		else
-		{
-			Types::TypeTiny::assert_CodeLike($code);
+		} #/ if ( Types::TypeTiny::is_StringLike...)
+		else {
+			Types::TypeTiny::assert_CodeLike( $code );
 			local $_ = $value;
-			return $code->($value);
+			return $code->( $value );
 		}
-	}
+	} #/ while ( @_ )
 	
-	_croak("No cases matched for %s", Type::Tiny::_dd($value));
-}
+	_croak( "No cases matched for %s", Type::Tiny::_dd( $value ) );
+} #/ sub match_on_type
 
-sub compile_match_on_type
-{
+sub compile_match_on_type {
 	my @code = 'sub { local $_ = $_[0]; ';
 	my @checks;
 	my @actions;
 	
 	my $els = '';
 	
-	while (@_)
-	{
-		my ($type, $code);
-		if (@_ == 1)
-		{
+	while ( @_ ) {
+		my ( $type, $code );
+		if ( @_ == 1 ) {
 			require Types::Standard;
-			($type, $code) = (Types::Standard::Any(), shift);
+			( $type, $code ) = ( Types::Standard::Any(), shift );
 		}
-		else
-		{
-			($type, $code) = splice(@_, 0, 2);
-			Types::TypeTiny::assert_TypeTiny($type);
+		else {
+			( $type, $code ) = splice( @_, 0, 2 );
+			Types::TypeTiny::assert_TypeTiny( $type );
 		}
 		
-		if ($type->can_be_inlined)
-		{
-			push @code, sprintf('%sif (%s)', $els, $type->inline_check('$_'));
+		if ( $type->can_be_inlined ) {
+			push @code, sprintf( '%sif (%s)', $els, $type->inline_check( '$_' ) );
 		}
-		else
-		{
+		else {
 			push @checks, $type;
-			push @code, sprintf('%sif ($checks[%d]->check($_))', $els, $#checks);
+			push @code,   sprintf( '%sif ($checks[%d]->check($_))', $els, $#checks );
 		}
 		
 		$els = 'els';
 		
-		if (Types::TypeTiny::is_StringLike($code))
-		{
-			push @code, sprintf('  { %s }', $code);
+		if ( Types::TypeTiny::is_StringLike( $code ) ) {
+			push @code, sprintf( '  { %s }', $code );
 		}
-		else
-		{
-			Types::TypeTiny::assert_CodeLike($code);
+		else {
+			Types::TypeTiny::assert_CodeLike( $code );
 			push @actions, $code;
-			push @code, sprintf('  { $actions[%d]->(@_) }', $#actions);
+			push @code,    sprintf( '  { $actions[%d]->(@_) }', $#actions );
 		}
-	}
+	} #/ while ( @_ )
 	
-	push @code, 'else', '  { Type::Utils::_croak("No cases matched for %s", Type::Tiny::_dd($_[0])) }';
-	
-	push @code, '}';  # /sub
+	push @code, 'else',
+		'  { Type::Utils::_croak("No cases matched for %s", Type::Tiny::_dd($_[0])) }';
+		
+	push @code, '}';    # /sub
 	
 	require Eval::TypeTiny;
 	return Eval::TypeTiny::eval_closure(
@@ -471,131 +426,120 @@ sub compile_match_on_type
 			'@checks'  => \@checks,
 		},
 	);
-}
+} #/ sub compile_match_on_type
 
-sub classifier
-{
+sub classifier {
 	my $i;
 	compile_match_on_type(
 		+(
 			map {
 				my $type = $_->[0];
 				$type => sub { $type };
-			}
-			sort { $b->[1] <=> $a->[1] or $a->[2] <=> $b->[2] }
-			map [$_, scalar(my @parents = $_->parents), ++$i],
+				}
+				sort { $b->[1] <=> $a->[1] or $a->[2] <=> $b->[2] }
+				map [ $_, scalar( my @parents = $_->parents ), ++$i ],
 			@_
 		),
 		q[ undef ],
 	);
-}
+} #/ sub classifier
 
 {
-	package #hide
-	Type::Registry::DWIM;
-	
+	package    #hide
+		Type::Registry::DWIM;
+		
 	our @ISA = qw(Type::Registry);
 	
-	sub foreign_lookup
-	{
+	sub foreign_lookup {
 		my $self = shift;
-		my $r = $self->SUPER::foreign_lookup(@_);
+		my $r    = $self->SUPER::foreign_lookup( @_ );
 		return $r if $r;
 		
-		if (my $assume = $self->{"~~assume"}
-		and $_[0] =~ /[A-Z_a-z][0-9A-Z_a-z]*(?:::[0-9A-Z_a-z]+)*/)
+		if ( my $assume = $self->{"~~assume"}
+			and $_[0] =~ /[A-Z_a-z][0-9A-Z_a-z]*(?:::[0-9A-Z_a-z]+)*/ )
 		{
-			my @methods = ref($assume) ? @$assume : $assume;
+			my @methods = ref( $assume ) ? @$assume : $assume;
 			
-			for my $method (@methods)
-			{
-				$r = $self->$method(@_);
+			for my $method ( @methods ) {
+				$r = $self->$method( @_ );
 				return $r if $r;
 			}
-		}
+		} #/ if ( my $assume = $self...)
 		
 		return;
-	}
+	} #/ sub foreign_lookup
 	
-	sub lookup_via_moose
-	{
+	sub lookup_via_moose {
 		my $self = shift;
 		
-		if ($INC{'Moose.pm'})
-		{
+		if ( $INC{'Moose.pm'} ) {
 			require Moose::Util::TypeConstraints;
 			require Types::TypeTiny;
-			my $r = Moose::Util::TypeConstraints::find_type_constraint($_[0]);
-			return Types::TypeTiny::to_TypeTiny($r) if defined $r;
+			my $r = Moose::Util::TypeConstraints::find_type_constraint( $_[0] );
+			return Types::TypeTiny::to_TypeTiny( $r ) if defined $r;
 		}
 		
 		return;
-	}
+	} #/ sub lookup_via_moose
 	
-	sub lookup_via_mouse
-	{
+	sub lookup_via_mouse {
 		my $self = shift;
 		
-		if ($INC{'Mouse.pm'})
-		{
+		if ( $INC{'Mouse.pm'} ) {
 			require Mouse::Util::TypeConstraints;
 			require Types::TypeTiny;
-			my $r = Mouse::Util::TypeConstraints::find_type_constraint($_[0]);
-			return Types::TypeTiny::to_TypeTiny($r) if defined $r;
+			my $r = Mouse::Util::TypeConstraints::find_type_constraint( $_[0] );
+			return Types::TypeTiny::to_TypeTiny( $r ) if defined $r;
 		}
 		
 		return;
-	}
+	} #/ sub lookup_via_mouse
 	
-	sub simple_lookup
-	{
+	sub simple_lookup {
 		my $self = shift;
 		my $r;
 		
 		# If the lookup is chained to a class, then the class' own
 		# type registry gets first refusal.
 		#
-		if (defined $self->{"~~chained"})
-		{
-			my $chained = "Type::Registry"->for_class($self->{"~~chained"});
-			$r = eval { $chained->simple_lookup(@_) } unless $self == $chained;
+		if ( defined $self->{"~~chained"} ) {
+			my $chained = "Type::Registry"->for_class( $self->{"~~chained"} );
+			$r = eval { $chained->simple_lookup( @_ ) } unless $self == $chained;
 			return $r if defined $r;
 		}
 		
 		# Fall back to types in Types::Standard.
 		require Types::Standard;
-		return 'Types::Standard'->get_type($_[0]) if 'Types::Standard'->has_type($_[0]);
-		
+		return 'Types::Standard'->get_type( $_[0] )
+			if 'Types::Standard'->has_type( $_[0] );
+			
 		# Only continue any further if we've been called from Type::Parser.
 		return unless $_[1];
 		
 		my $meta;
-		if (defined $self->{"~~chained"})
-		{
-			$meta ||= Moose::Util::find_meta($self->{"~~chained"}) if $INC{'Moose.pm'};
-			$meta ||= Mouse::Util::find_meta($self->{"~~chained"}) if $INC{'Mouse.pm'};
+		if ( defined $self->{"~~chained"} ) {
+			$meta ||= Moose::Util::find_meta( $self->{"~~chained"} ) if $INC{'Moose.pm'};
+			$meta ||= Mouse::Util::find_meta( $self->{"~~chained"} ) if $INC{'Mouse.pm'};
 		}
 		
-		if ($meta and $meta->isa('Class::MOP::Module'))
-		{
-			$r = $self->lookup_via_moose(@_);
+		if ( $meta and $meta->isa( 'Class::MOP::Module' ) ) {
+			$r = $self->lookup_via_moose( @_ );
 			return $r if $r;
 		}
 		
-		elsif ($meta and $meta->isa('Mouse::Meta::Module'))
-		{
-			$r = $self->lookup_via_mouse(@_);
+		elsif ( $meta and $meta->isa( 'Mouse::Meta::Module' ) ) {
+			$r = $self->lookup_via_mouse( @_ );
 			return $r if $r;
 		}
 		
-		return $self->foreign_lookup(@_);
-	}
+		return $self->foreign_lookup( @_ );
+	} #/ sub simple_lookup
 }
 
 our $dwimmer;
-sub dwim_type
-{
-	my ($string, %opts) = @_;
+
+sub dwim_type {
+	my ( $string, %opts ) = @_;
 	$opts{for} = caller unless defined $opts{for};
 	
 	$dwimmer ||= do {
@@ -611,14 +555,13 @@ sub dwim_type
 	
 	local $@ = undef;
 	my $type;
-	unless (eval { $type = $dwimmer->lookup($string); 1 })
-	{
+	unless ( eval { $type = $dwimmer->lookup( $string ); 1 } ) {
 		my $e = $@;
-		die($e) unless $e =~ /not a known type constraint/;
+		die( $e ) unless $e =~ /not a known type constraint/;
 	}
 	
 	$type;
-}
+} #/ sub dwim_type
 
 my $TEMPLATE = <<'SUBTEMPLATE';
 sub SUBNAME
@@ -663,7 +606,8 @@ my %is_cache_coderef;
 {
 	my $code = $TEMPLATE;
 	$code =~ s/SUBNAME/is/g;
-	$code =~ s/FAILURE/Carp::carp("Expected type, but got \$thing; returning false"); return undef;/g;
+	$code =~
+		s/FAILURE/Carp::carp("Expected type, but got \$thing; returning false"); return undef;/g;
 	$code =~ s/BODY/0+!! \$check->(\$value)/;
 	eval $code;
 }
@@ -671,22 +615,23 @@ my %is_cache_coderef;
 {
 	my $code = $TEMPLATE;
 	$code =~ s/SUBNAME/assert/g;
-	$code =~ s/FAILURE/Carp::croak("Expected type, but got \$thing; stopping"); return undef;/g;
-	$code =~ s/BODY/\$check->(\$value) ? \$value : \$type->_failed_check("\$type", \$value)/;
+	$code =~
+		s/FAILURE/Carp::croak("Expected type, but got \$thing; stopping"); return undef;/g;
+	$code =~
+		s/BODY/\$check->(\$value) ? \$value : \$type->_failed_check("\$type", \$value)/;
 	eval $code;
 }
 
-sub english_list
-{
-	my $conjunction = ref($_[0]) eq 'SCALAR' ? ${+shift} : 'and';
-	my @items = sort @_;
+sub english_list {
+	my $conjunction = ref( $_[0] ) eq 'SCALAR' ? ${ +shift } : 'and';
+	my @items       = sort @_;
 	
-	return $items[0] if @items == 1;
+	return $items[0]                          if @items == 1;
 	return "$items[0] $conjunction $items[1]" if @items == 2;
 	
 	my $tail = pop @items;
-	join(', ', @items, "$conjunction $tail");
-}
+	join( ', ', @items, "$conjunction $tail" );
+} #/ sub english_list
 
 1;
 
@@ -1215,4 +1160,3 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-

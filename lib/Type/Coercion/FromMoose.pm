@@ -19,54 +19,49 @@ sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 require Type::Coercion;
 our @ISA = 'Type::Coercion';
 
-sub type_coercion_map
-{
+sub type_coercion_map {
 	my $self = shift;
 	
 	my @from;
-	if ($self->type_constraint)
-	{
+	if ( $self->type_constraint ) {
 		my $moose = $self->type_constraint->{moose_type};
-		@from = @{ $moose->coercion->type_coercion_map } if $moose && $moose->has_coercion;
+		@from = @{ $moose->coercion->type_coercion_map }
+			if $moose && $moose->has_coercion;
 	}
-	else
-	{
-		_croak "The type constraint attached to this coercion has been garbage collected... PANIC";
+	else {
+		_croak
+			"The type constraint attached to this coercion has been garbage collected... PANIC";
 	}
 	
 	my @return;
-	while (@from)
-	{
-		my ($type, $code) = splice(@from, 0, 2);
-		$type = Moose::Util::TypeConstraints::find_type_constraint($type)
+	while ( @from ) {
+		my ( $type, $code ) = splice( @from, 0, 2 );
+		$type = Moose::Util::TypeConstraints::find_type_constraint( $type )
 			unless ref $type;
-		push @return, Types::TypeTiny::to_TypeTiny($type), $code;
+		push @return, Types::TypeTiny::to_TypeTiny( $type ), $code;
 	}
 	
 	return \@return;
-}
+} #/ sub type_coercion_map
 
-sub add_type_coercions
-{
+sub add_type_coercions {
 	my $self = shift;
-	_croak "Adding coercions to Type::Coercion::FromMoose not currently supported" if @_;
+	_croak "Adding coercions to Type::Coercion::FromMoose not currently supported"
+		if @_;
 }
 
-sub _build_moose_coercion
-{
+sub _build_moose_coercion {
 	my $self = shift;
 	
-	if ($self->type_constraint)
-	{
+	if ( $self->type_constraint ) {
 		my $moose = $self->type_constraint->{moose_type};
 		return $moose->coercion if $moose && $moose->has_coercion;
 	}
 	
-	$self->SUPER::_build_moose_coercion(@_);
-}
+	$self->SUPER::_build_moose_coercion( @_ );
+} #/ sub _build_moose_coercion
 
-sub can_be_inlined
-{
+sub can_be_inlined {
 	0;
 }
 
@@ -124,4 +119,3 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-

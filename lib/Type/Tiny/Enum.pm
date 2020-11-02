@@ -20,33 +20,41 @@ __PACKAGE__->_install_overloads(
 	q[@{}] => sub { shift->values },
 );
 
-sub new
-{
+sub new {
 	my $proto = shift;
 	
-	my %opts = (@_==1) ? %{$_[0]} : @_;
-	_croak "Enum type constraints cannot have a parent constraint passed to the constructor" if exists $opts{parent};
-	_croak "Enum type constraints cannot have a constraint coderef passed to the constructor" if exists $opts{constraint};
-	_croak "Enum type constraints cannot have a inlining coderef passed to the constructor" if exists $opts{inlined};
+	my %opts = ( @_ == 1 ) ? %{ $_[0] } : @_;
+	_croak
+		"Enum type constraints cannot have a parent constraint passed to the constructor"
+		if exists $opts{parent};
+	_croak
+		"Enum type constraints cannot have a constraint coderef passed to the constructor"
+		if exists $opts{constraint};
+	_croak
+		"Enum type constraints cannot have a inlining coderef passed to the constructor"
+		if exists $opts{inlined};
 	_croak "Need to supply list of values" unless exists $opts{values};
 	
 	no warnings 'uninitialized';
 	$opts{values} = [
 		map "$_",
-		@{ ref $opts{values} eq 'ARRAY' ? $opts{values} : [$opts{values}] }
+		@{
+			ref $opts{values} eq 'ARRAY' ? $opts{values} : [ $opts{values} ]
+		}
 	];
 	
 	my %tmp;
-	undef $tmp{$_} for @{$opts{values}};
-	$opts{unique_values}  = [sort keys %tmp];
+	undef $tmp{$_} for @{ $opts{values} };
+	$opts{unique_values} = [ sort keys %tmp ];
 	
-	my $xs_encoding = _xs_encoding($opts{unique_values});
-	if (defined $xs_encoding) {
-		my $xsub = Type::Tiny::XS::get_coderef_for($xs_encoding);
+	my $xs_encoding = _xs_encoding( $opts{unique_values} );
+	if ( defined $xs_encoding ) {
+		my $xsub = Type::Tiny::XS::get_coderef_for( $xs_encoding );
 		$opts{compiled_type_constraint} = $xsub if $xsub;
 	}
 	
-	if ( defined $opts{coercion} and !ref $opts{coercion} and 1 eq $opts{coercion} ) {
+	if ( defined $opts{coercion} and !ref $opts{coercion} and 1 eq $opts{coercion} )
+	{
 		delete $opts{coercion};
 		$opts{_build_coercion} = sub {
 			require Types::Standard;
@@ -57,10 +65,10 @@ sub new
 				sub { $t->closest_match( @_ ? $_[0] : $_ ) }
 			);
 		};
-	}
+	} #/ if ( defined $opts{coercion...})
 	
-	return $proto->SUPER::new(%opts);
-}
+	return $proto->SUPER::new( %opts );
+} #/ sub new
 
 sub values        { $_[0]{values} }
 sub unique_values { $_[0]{unique_values} }
@@ -68,10 +76,9 @@ sub constraint    { $_[0]{constraint} ||= $_[0]->_build_constraint }
 
 sub _is_null_constraint { 0 }
 
-sub _build_display_name
-{
+sub _build_display_name {
 	my $self = shift;
-	sprintf("Enum[%s]", join q[,], @{$self->unique_values});
+	sprintf( "Enum[%s]", join q[,], @{ $self->unique_values } );
 }
 
 {
@@ -82,149 +89,147 @@ sub _build_display_name
 	# part of the coverage tests because they use the latest Type::Tiny::XS.
 	#
 	
-	sub _xs_encoding
-	{
+	sub _xs_encoding {
 		my $unique_values = shift;
-
+		
 		return undef unless Type::Tiny::_USE_XS;
 		
-		return undef if @$unique_values > 50; # RT 121957
+		return undef if @$unique_values > 50;    # RT 121957
 		
-		$new_xs = eval { Type::Tiny::XS->VERSION("0.020"); 1 } ? 1 : 0
+		$new_xs = eval { Type::Tiny::XS->VERSION( "0.020" ); 1 } ? 1 : 0
 			unless defined $new_xs;
-		if ($new_xs) {
+		if ( $new_xs ) {
 			require B;
-			return sprintf("Enum[%s]", join(",", map B::perlstring($_), @$unique_values));
+			return
+				sprintf( "Enum[%s]",
+				join( ",", map B::perlstring( $_ ), @$unique_values ) );
 		}
-		else {                                                       # uncoverable statement
-			return undef if grep /\W/, @$unique_values;               # uncoverable statement
-			return sprintf("Enum[%s]", join(",", @$unique_values));   # uncoverable statement
-		}                                                            # uncoverable statement
-	}
+		else {                                   # uncoverable statement
+			return undef if grep /\W/, @$unique_values;                    # uncoverable statement
+			return sprintf( "Enum[%s]", join( ",", @$unique_values ) );    # uncoverable statement
+		}    # uncoverable statement
+	} #/ sub _xs_encoding
 }
 
 {
 	my %cached;
-	sub _build_constraint
-	{
+	
+	sub _build_constraint {
 		my $self = shift;
 		
 		my $regexp = $self->_regexp;
 		return $cached{$regexp} if $cached{$regexp};
-		my $coderef = ($cached{$regexp} = sub { defined and m{\A(?:$regexp)\z} });
-		Scalar::Util::weaken($cached{$regexp});
+		my $coderef = ( $cached{$regexp} = sub { defined and m{\A(?:$regexp)\z} } );
+		Scalar::Util::weaken( $cached{$regexp} );
 		return $coderef;
 	}
 }
 
 {
 	my %cached;
-	sub _build_compiled_check
-	{
-		my $self = shift;
-		my $regexp  = $self->_regexp;
+	
+	sub _build_compiled_check {
+		my $self   = shift;
+		my $regexp = $self->_regexp;
 		return $cached{$regexp} if $cached{$regexp};
-		my $coderef = ($cached{$regexp} = $self->SUPER::_build_compiled_check(@_));
-		Scalar::Util::weaken($cached{$regexp});
+		my $coderef = ( $cached{$regexp} = $self->SUPER::_build_compiled_check( @_ ) );
+		Scalar::Util::weaken( $cached{$regexp} );
 		return $coderef;
 	}
 }
 
-sub _regexp
-{
+sub _regexp {
 	my $self = shift;
-	$self->{_regexp} ||= 'Type::Tiny::Enum::_Trie'->handle($self->unique_values);
+	$self->{_regexp} ||= 'Type::Tiny::Enum::_Trie'->handle( $self->unique_values );
 }
 
-sub as_regexp
-{
+sub as_regexp {
 	my $self = shift;
 	
 	my $flags = @_ ? $_[0] : '';
-	unless (defined $flags and $flags =~ /^[i]*$/) {
-		_croak("Unknown regexp flags: '$flags'; only 'i' currently accepted; stopped");
+	unless ( defined $flags and $flags =~ /^[i]*$/ ) {
+		_croak(
+			"Unknown regexp flags: '$flags'; only 'i' currently accepted; stopped" );
 	}
 	
 	my $regexp = $self->_regexp;
 	$flags ? qr/\A(?:$regexp)\z/i : qr/\A(?:$regexp)\z/;
-}
+} #/ sub as_regexp
 
-sub can_be_inlined
-{
+sub can_be_inlined {
 	!!1;
 }
 
-sub inline_check
-{
+sub inline_check {
 	my $self = shift;
 	
 	my $xsub;
-	if ( my $xs_encoding = _xs_encoding($self->unique_values) ) {
-		$xsub = Type::Tiny::XS::get_subname_for($xs_encoding);
+	if ( my $xs_encoding = _xs_encoding( $self->unique_values ) ) {
+		$xsub = Type::Tiny::XS::get_subname_for( $xs_encoding );
 		return "$xsub\($_[0]\)" if $xsub && !$Type::Tiny::AvoidCallbacks;
 	}
 	
 	my $regexp = $self->_regexp;
-	my $code = $_[0] eq '$_'
+	my $code =
+		$_[0] eq '$_'
 		? "(defined and !ref and m{\\A(?:$regexp)\\z})"
 		: "(defined($_[0]) and !ref($_[0]) and $_[0] =~ m{\\A(?:$regexp)\\z})";
-
+		
 	return "do { package Type::Tiny; $code }"
 		if $Type::Tiny::AvoidCallbacks;
 	return $code;
-}
+} #/ sub inline_check
 
-sub _instantiate_moose_type
-{
+sub _instantiate_moose_type {
 	my $self = shift;
 	my %opts = @_;
 	delete $opts{parent};
 	delete $opts{constraint};
 	delete $opts{inlined};
 	require Moose::Meta::TypeConstraint::Enum;
-	return "Moose::Meta::TypeConstraint::Enum"->new(%opts, values => $self->values);
-}
+	return
+		"Moose::Meta::TypeConstraint::Enum"
+		->new( %opts, values => $self->values );
+} #/ sub _instantiate_moose_type
 
-sub has_parent
-{
+sub has_parent {
 	!!1;
 }
 
-sub parent
-{
+sub parent {
 	require Types::Standard;
 	Types::Standard::Str();
 }
 
-sub validate_explain
-{
+sub validate_explain {
 	my $self = shift;
-	my ($value, $varname) = @_;
+	my ( $value, $varname ) = @_;
 	$varname = '$_' unless defined $varname;
 	
-	return undef if $self->check($value);
+	return undef if $self->check( $value );
 	
 	require Type::Utils;
-	!defined($value) ? [
+	!defined( $value )
+		? [
 		sprintf(
 			'"%s" requires that the value is defined',
 			$self,
 		),
-	] :
-	@$self < 13 ? [
+		]
+		: @$self < 13 ? [
 		sprintf(
 			'"%s" requires that the value is equal to %s',
 			$self,
-			Type::Utils::english_list(\"or", map B::perlstring($_), @$self),
+			Type::Utils::english_list( \"or", map B::perlstring( $_ ), @$self ),
 		),
-	] :
-	[
+		]
+		: [
 		sprintf(
 			'"%s" requires that the value is one of an enumerated list of strings',
 			$self,
 		),
-	];
-}
+		];
+} #/ sub validate_explain
 
 sub has_sorter {
 	!!1;
@@ -234,42 +239,43 @@ sub _enum_order_hash {
 	my $self = shift;
 	my %hash;
 	my $i = 0;
-	for my $value (@{ $self->values }) {
+	for my $value ( @{ $self->values } ) {
 		next if exists $hash{$value};
 		$hash{$value} = $i++;
 	}
 	return %hash;
-}
+} #/ sub _enum_order_hash
 
 sub sorter {
 	my $self = shift;
 	my %hash = $self->_enum_order_hash;
 	return [
 		sub { $_[0] <=> $_[1] },
-		sub { exists($hash{$_[0]}) ? $hash{$_[0]} : 2_100_000_000 },
+		sub { exists( $hash{ $_[0] } ) ? $hash{ $_[0] } : 2_100_000_000 },
 	];
 }
 
 my $canon;
+
 sub closest_match {
 	require Types::Standard;
 	
 	my ( $self, $given ) = ( shift, @_ );
-
+	
 	return unless Types::Standard::is_Str $given;
 	
-	return $given if $self->check($given);
-
+	return $given if $self->check( $given );
+	
 	$canon ||= eval(
 		$] lt '5.016'
-			? q< sub { ( my $var = lc($_[0]) ) =~ s/(^\s+)|(\s+$)//g; $var } >
-			: q< sub { CORE::fc($_[0]) =~ s/(^\s+)|(\s+$)//gr; } >
+		? q< sub { ( my $var = lc($_[0]) ) =~ s/(^\s+)|(\s+$)//g; $var } >
+		: q< sub { CORE::fc($_[0]) =~ s/(^\s+)|(\s+$)//gr; } >
 	);
 	
 	$self->{_lookups} ||= do {
 		my %lookups;
 		for ( @{ $self->values } ) {
-			my $key = $canon->($_);
+			my $key = $canon->( $_ );
 			next if exists $lookups{$key};
 			$lookups{$key} = $_;
 		}
@@ -279,12 +285,12 @@ sub closest_match {
 	my $cgiven = $canon->( $given );
 	return $self->{_lookups}{$cgiven}
 		if $self->{_lookups}{$cgiven};
-	
+		
 	my $best;
 	VALUE: for my $possible ( @{ $self->values } ) {
 		my $stem = substr( $possible, 0, length $cgiven );
 		if ( $cgiven eq $canon->( $stem ) ) {
-			if ( defined($best) and length($best) >= length($possible) ) {
+			if ( defined( $best ) and length( $best ) >= length( $possible ) ) {
 				next VALUE;
 			}
 			$best = $possible;
@@ -295,83 +301,88 @@ sub closest_match {
 	
 	return $self->values->[$given]
 		if Types::Standard::is_Int $given;
-	
+		
 	return $given;
-}
+} #/ sub closest_match
 
 push @Type::Tiny::CMP, sub {
 	my $A = shift->find_constraining_type;
 	my $B = shift->find_constraining_type;
-	return Type::Tiny::CMP_UNKNOWN unless $A->isa(__PACKAGE__) && $B->isa(__PACKAGE__);
-	
+	return Type::Tiny::CMP_UNKNOWN
+		unless $A->isa( __PACKAGE__ ) && $B->isa( __PACKAGE__ );
+		
 	my %seen;
-	for my $word (@{$A->unique_values}) {
+	for my $word ( @{ $A->unique_values } ) {
 		$seen{$word} += 1;
 	}
-	for my $word (@{$B->unique_values}) {
+	for my $word ( @{ $B->unique_values } ) {
 		$seen{$word} += 2;
 	}
 	
-	my $values = join('', CORE::values %seen);
-	if ($values =~ /^3*$/) {
+	my $values = join( '', CORE::values %seen );
+	if ( $values =~ /^3*$/ ) {
 		return Type::Tiny::CMP_EQUIVALENT;
 	}
-	elsif ($values !~ /2/) {
+	elsif ( $values !~ /2/ ) {
 		return Type::Tiny::CMP_SUPERTYPE;
 	}
-	elsif ($values !~ /1/) {
+	elsif ( $values !~ /1/ ) {
 		return Type::Tiny::CMP_SUBTYPE;
 	}
 	
 	return Type::Tiny::CMP_UNKNOWN;
 };
 
-package # stolen from Regexp::Trie
+package    # stolen from Regexp::Trie
 	Type::Tiny::Enum::_Trie;
 sub new { bless {} => shift }
+
 sub add {
 	my $self = shift;
 	my $str  = shift;
 	my $ref  = $self;
-	for my $char (split //, $str){
+	for my $char ( split //, $str ) {
 		$ref->{$char} ||= {};
 		$ref = $ref->{$char};
 	}
-	$ref->{''} = 1; # { '' => 1 } as terminator
+	$ref->{''} = 1;    # { '' => 1 } as terminator
 	$self;
-}
+} #/ sub add
+
 sub _regexp {
 	my $self = shift;
-	return if $self->{''} and scalar keys %$self == 1; # terminator
-	my (@alt, @cc);
+	return if $self->{''} and scalar keys %$self == 1;    # terminator
+	my ( @alt, @cc );
 	my $q = 0;
-	for my $char (sort keys %$self){
+	for my $char ( sort keys %$self ) {
 		my $qchar = quotemeta $char;
-		if (ref $self->{$char}){
-			if (defined (my $recurse = _regexp($self->{$char}))){
+		if ( ref $self->{$char} ) {
+			if ( defined( my $recurse = _regexp( $self->{$char} ) ) ) {
 				push @alt, $qchar . $recurse;
-			}else{
+			}
+			else {
 				push @cc, $qchar;
 			}
-		}else{
+		}
+		else {
 			$q = 1;
 		}
-	}
+	} #/ for my $char ( sort keys...)
 	my $cconly = !@alt;
-	@cc and push @alt, @cc == 1 ? $cc[0] : '['. join('', @cc). ']';
-	my $result = @alt == 1 ? $alt[0] : '(?:' . join('|', @alt) . ')';
+	@cc and push @alt, @cc == 1 ? $cc[0] : '[' . join( '', @cc ) . ']';
+	my $result = @alt == 1 ? $alt[0] : '(?:' . join( '|', @alt ) . ')';
 	$q and $result = $cconly ? "$result?" : "(?:$result)?";
 	return $result;
-}
+} #/ sub _regexp
+
 sub handle {
 	my $class = shift;
-	my ($vals) = @_;
+	my ( $vals ) = @_;
 	return '(?!)' unless @$vals;
 	my $self = $class->new;
-	$self->add($_) for @$vals;
+	$self->add( $_ ) for @$vals;
 	$self->_regexp;
 }
-
 
 1;
 
@@ -522,4 +533,3 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-

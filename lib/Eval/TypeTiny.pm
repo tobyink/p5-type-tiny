@@ -7,42 +7,50 @@ sub _clean_eval {
 	local $SIG{__DIE__};
 	my $r = eval $_[0];
 	my $e = $@;
-	return ($r, $e);
+	return ( $r, $e );
 }
 
 use warnings;
 
 BEGIN {
-	*HAS_LEXICAL_SUBS = ($] >= 5.018) ? sub(){!!1} : sub(){!!0};
-};
+	*HAS_LEXICAL_SUBS = ( $] >= 5.018 ) ? sub() { !!1 } : sub() { !!0 };
+}
 
 {
 	# this is unused now and will be removed in a future version of Eval::TypeTiny
 	my $hlv;
+	
 	sub HAS_LEXICAL_VARS () {
-		$hlv = !! eval {
+		$hlv = !!eval {
 			require Devel::LexAlias;
-			exists(&Devel::LexAlias::lexalias);
+			exists( &Devel::LexAlias::lexalias );
 		} unless defined $hlv;
 		$hlv;
 	}
 }
 
 {
-	sub IMPLEMENTATION_DEVEL_LEXALIAS   () { 'Devel::LexAlias' }
-	sub IMPLEMENTATION_PADWALKER        () { 'PadWalker' }
-	sub IMPLEMENTATION_TIE              () { 'tie' }
-	sub IMPLEMENTATION_NATIVE           () { 'perl' }
+	sub IMPLEMENTATION_DEVEL_LEXALIAS () { 'Devel::LexAlias' }
+	sub IMPLEMENTATION_PADWALKER ()      { 'PadWalker' }
+	sub IMPLEMENTATION_TIE ()            { 'tie' }
+	sub IMPLEMENTATION_NATIVE ()         { 'perl' }
 	
 	my $implementation;
+	
 	sub ALIAS_IMPLEMENTATION () {
+	
 		# uncoverable subroutine
-		$implementation ||= do {                                                                  # uncoverable statement
-			do   { $] ge '5.022'           } ? IMPLEMENTATION_NATIVE :                             # uncoverable statement
-			eval { require Devel::LexAlias } ? IMPLEMENTATION_DEVEL_LEXALIAS :                     # uncoverable statement
-			eval { require PadWalker       } ? IMPLEMENTATION_PADWALKER      : IMPLEMENTATION_TIE  # uncoverable statement
+		$implementation ||= do {    # uncoverable statement
+			do { $] ge '5.022' }
+				? IMPLEMENTATION_NATIVE :    # uncoverable statement
+				eval { require Devel::LexAlias }
+				? IMPLEMENTATION_DEVEL_LEXALIAS
+				:                            # uncoverable statement
+				eval { require PadWalker }
+				? IMPLEMENTATION_PADWALKER
+				: IMPLEMENTATION_TIE         # uncoverable statement
 		};
-	}
+	} #/ sub ALIAS_IMPLEMENTATION
 	
 	sub _force_implementation {
 		$implementation = shift;
@@ -50,8 +58,8 @@ BEGIN {
 }
 
 BEGIN {
-	*_EXTENDED_TESTING = $ENV{EXTENDED_TESTING} ? sub(){!!1} : sub(){!!0};
-};
+	*_EXTENDED_TESTING = $ENV{EXTENDED_TESTING} ? sub() { !!1 } : sub() { !!0 };
+}
 
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '1.012000';
@@ -67,114 +75,134 @@ $VERSION =~ tr/_//d;
 # See Types::TypeTiny for an explanation of this import method.
 #
 sub import {
+
 	# uncoverable subroutine
-	no warnings "redefine";                       # uncoverable statement
-	our @ISA = qw( Exporter::Tiny );              # uncoverable statement
-	require Exporter::Tiny;                       # uncoverable statement
-	my $next = \&Exporter::Tiny::import;          # uncoverable statement
-	*import = $next;                              # uncoverable statement
-	my $class = shift;                            # uncoverable statement
-	my $opts  = { ref($_[0]) ? %{+shift} : () };  # uncoverable statement
-	$opts->{into} ||= scalar(caller);             # uncoverable statement
-	return $class->$next($opts, @_);              # uncoverable statement
-}
+	no warnings "redefine";                             # uncoverable statement
+	our @ISA = qw( Exporter::Tiny );                    # uncoverable statement
+	require Exporter::Tiny;                             # uncoverable statement
+	my $next = \&Exporter::Tiny::import;                # uncoverable statement
+	*import = $next;                                    # uncoverable statement
+	my $class = shift;                                  # uncoverable statement
+	my $opts  = { ref( $_[0] ) ? %{ +shift } : () };    # uncoverable statement
+	$opts->{into} ||= scalar( caller );                 # uncoverable statement
+	return $class->$next( $opts, @_ );                  # uncoverable statement
+} #/ sub import
 
 sub eval_closure {
-	my (%args) = @_;
-	my $src    = ref $args{source} eq "ARRAY" ? join("\n", @{$args{source}}) : $args{source};
-	
-	$args{alias}  = 0 unless defined $args{alias};
-	$args{line}   = 1 unless defined $args{line};
-	$args{description} =~ s/[^\w .:-\[\]\(\)\{\}\']//g if defined $args{description};
-	$src = qq{#line $args{line} "$args{description}"\n$src} if defined $args{description} && !($^P & 0x10);
+	my ( %args ) = @_;
+	my $src =
+		ref $args{source} eq "ARRAY"
+		? join( "\n", @{ $args{source} } )
+		: $args{source};
+		
+	$args{alias} = 0 unless defined $args{alias};
+	$args{line}  = 1 unless defined $args{line};
+	$args{description} =~ s/[^\w .:-\[\]\(\)\{\}\']//g
+		if defined $args{description};
+	$src = qq{#line $args{line} "$args{description}"\n$src}
+		if defined $args{description} && !( $^P & 0x10 );
 	$args{environment} ||= {};
-
-	if (_EXTENDED_TESTING) {
-		require Scalar::Util;
-		for my $k (sort keys %{$args{environment}}) {
-			next if $k =~ /^\$/ && Scalar::Util::reftype($args{environment}{$k}) =~ /^(SCALAR|REF)$/;
-			next if $k =~ /^\@/ && Scalar::Util::reftype($args{environment}{$k}) eq q(ARRAY);
-			next if $k =~ /^\%/ && Scalar::Util::reftype($args{environment}{$k}) eq q(HASH);
-			next if $k =~ /^\&/ && Scalar::Util::reftype($args{environment}{$k}) eq q(CODE);
-			
-			require Error::TypeTiny;
-			Error::TypeTiny::croak("Expected a variable name and ref; got %s => %s", $k, $args{environment}{$k});
-		}
-	}
 	
-	my $sandpkg   = 'Eval::TypeTiny::Sandbox';
-	my $alias     = exists($args{alias}) ? $args{alias} : 0;
-	my @keys      = sort keys %{$args{environment}};
-	my $i         = 0;
-	my $source    = join "\n" => (
+	if ( _EXTENDED_TESTING ) {
+		require Scalar::Util;
+		for my $k ( sort keys %{ $args{environment} } ) {
+			next
+				if $k =~ /^\$/
+				&& Scalar::Util::reftype( $args{environment}{$k} ) =~
+				/^(SCALAR|REF)$/;
+			next
+				if $k =~ /^\@/
+				&& Scalar::Util::reftype( $args{environment}{$k} ) eq q(ARRAY);
+			next
+				if $k =~ /^\%/
+				&& Scalar::Util::reftype( $args{environment}{$k} ) eq q(HASH);
+			next
+				if $k =~ /^\&/
+				&& Scalar::Util::reftype( $args{environment}{$k} ) eq q(CODE);
+				
+			require Error::TypeTiny;
+			Error::TypeTiny::croak( "Expected a variable name and ref; got %s => %s", $k,
+				$args{environment}{$k} );
+		} #/ for my $k ( sort keys %...)
+	} #/ if ( _EXTENDED_TESTING)
+	
+	my $sandpkg = 'Eval::TypeTiny::Sandbox';
+	my $alias   = exists( $args{alias} ) ? $args{alias} : 0;
+	my @keys    = sort keys %{ $args{environment} };
+	my $i       = 0;
+	my $source  = join "\n" => (
 		"package $sandpkg;",
 		"sub {",
-		map(_make_lexical_assignment($_, $i++, $alias), @keys),
+		map( _make_lexical_assignment( $_, $i++, $alias ), @keys ),
 		$src,
 		"}",
 	);
 	
-	if ($alias and ALIAS_IMPLEMENTATION eq IMPLEMENTATION_TIE) {
+	if ( $alias and ALIAS_IMPLEMENTATION eq IMPLEMENTATION_TIE ) {
 		_manufacture_ties();
 	}
 	
-	my ($compiler, $e) = _clean_eval($source);
-	if ($e) {
+	my ( $compiler, $e ) = _clean_eval( $source );
+	if ( $e ) {
 		chomp $e;
 		require Error::TypeTiny::Compilation;
 		"Error::TypeTiny::Compilation"->throw(
-			code        => (ref $args{source} eq "ARRAY" ? join("\n", @{$args{source}}) : $args{source}),
+			code => (
+				ref $args{source} eq "ARRAY" ? join( "\n", @{ $args{source} } ) : $args{source}
+			),
 			errstr      => $e,
 			environment => $args{environment},
 		);
+	} #/ if ( $e )
+	
+	my $code = $compiler->( @{ $args{environment} }{@keys} );
+	undef( $compiler );
+	
+	if ( $alias and ALIAS_IMPLEMENTATION eq IMPLEMENTATION_DEVEL_LEXALIAS ) {
+		require Devel::LexAlias;
+		Devel::LexAlias::lexalias( $code, $_ => $args{environment}{$_} )
+			for grep !/^\&/, @keys;
 	}
 	
-	my $code = $compiler->(@{$args{environment}}{@keys});
-	undef($compiler);
-
-	if ($alias and ALIAS_IMPLEMENTATION eq IMPLEMENTATION_DEVEL_LEXALIAS) {
-		require Devel::LexAlias;
-		Devel::LexAlias::lexalias($code, $_ => $args{environment}{$_}) for grep !/^\&/, @keys;
-	}
-
-	if ($alias and ALIAS_IMPLEMENTATION eq IMPLEMENTATION_PADWALKER) {
+	if ( $alias and ALIAS_IMPLEMENTATION eq IMPLEMENTATION_PADWALKER ) {
 		require PadWalker;
-		my %env = map +($_ => $args{environment}{$_}), grep !/^\&/, @keys;
-		PadWalker::set_closed_over($code, \%env);
+		my %env = map +( $_ => $args{environment}{$_} ), grep !/^\&/, @keys;
+		PadWalker::set_closed_over( $code, \%env );
 	}
-
+	
 	return $code;
-}
+} #/ sub eval_closure
 
 my $tmp;
+
 sub _make_lexical_assignment {
-	my ($key, $index, $alias) = @_;
-	my $name = substr($key, 1);
+	my ( $key, $index, $alias ) = @_;
+	my $name = substr( $key, 1 );
 	
-	if (HAS_LEXICAL_SUBS and $key =~ /^\&/) {
+	if ( HAS_LEXICAL_SUBS and $key =~ /^\&/ ) {
 		$tmp++;
-		my $tmpname = '$__LEXICAL_SUB__'.$tmp;
+		my $tmpname = '$__LEXICAL_SUB__' . $tmp;
 		return
-			"no warnings 'experimental::lexical_subs';".
-			"use feature 'lexical_subs';".
-			"my $tmpname = \$_[$index];".
-			"my sub $name { goto $tmpname };";
+			"no warnings 'experimental::lexical_subs';"
+			. "use feature 'lexical_subs';"
+			. "my $tmpname = \$_[$index];"
+			. "my sub $name { goto $tmpname };";
 	}
 	
-	if (!$alias) {
-		my $sigil = substr($key, 0, 1);
+	if ( !$alias ) {
+		my $sigil = substr( $key, 0, 1 );
 		return "my $key = $sigil\{ \$_[$index] };";
 	}
-	elsif (ALIAS_IMPLEMENTATION eq IMPLEMENTATION_NATIVE) {
+	elsif ( ALIAS_IMPLEMENTATION eq IMPLEMENTATION_NATIVE ) {
 		return
-			"no warnings 'experimental::refaliasing';".
-			"use feature 'refaliasing';".
-			"my $key; \\$key = \$_[$index];"
+			"no warnings 'experimental::refaliasing';"
+			. "use feature 'refaliasing';"
+			. "my $key; \\$key = \$_[$index];";
 	}
-	elsif (ALIAS_IMPLEMENTATION eq IMPLEMENTATION_DEVEL_LEXALIAS) {
+	elsif ( ALIAS_IMPLEMENTATION eq IMPLEMENTATION_DEVEL_LEXALIAS ) {
 		return "my $key;";
 	}
-	elsif (ALIAS_IMPLEMENTATION eq IMPLEMENTATION_PADWALKER) {
+	elsif ( ALIAS_IMPLEMENTATION eq IMPLEMENTATION_PADWALKER ) {
 		return "my $key;";
 	}
 	else {
@@ -182,7 +210,7 @@ sub _make_lexical_assignment {
 			'@' => 'Eval::TypeTiny::_TieArray',
 			'%' => 'Eval::TypeTiny::_TieHash',
 			'$' => 'Eval::TypeTiny::_TieScalar',
-		}->{ substr($key, 0, 1) };
+		}->{ substr( $key, 0, 1 ) };
 		
 		return sprintf(
 			'tie(my(%s), "%s", $_[%d]);',
@@ -190,10 +218,13 @@ sub _make_lexical_assignment {
 			$tieclass,
 			$index,
 		);
-	}
-}
+	} #/ else [ if ( !$alias ) ]
+} #/ sub _make_lexical_assignment
 
-{ my $tie; sub _manufacture_ties { $tie ||= eval <<'FALLBACK'; } }
+{
+	my $tie;
+	sub _manufacture_ties {
+		$tie ||= eval <<'FALLBACK'; } }
 no warnings qw(void once uninitialized numeric);
 use Type::Tiny ();
 
@@ -416,4 +447,3 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-

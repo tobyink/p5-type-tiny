@@ -13,11 +13,10 @@ $VERSION =~ tr/_//d;
 
 eval 'require re';
 
-unless (exists &re::is_regexp)
-{
+unless ( exists &re::is_regexp ) {
 	require B;
 	*re::is_regexp = sub {
-		eval { B::svref_2object($_[0])->MAGIC->TYPE eq 'r' };
+		eval { B::svref_2object( $_[0] )->MAGIC->TYPE eq 'r' };
 	};
 }
 
@@ -71,4 +70,3 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-

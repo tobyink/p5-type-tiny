@@ -23,63 +23,73 @@ my %cache;
 
 sub new {
 	my $proto = shift;
-	my %opts = (@_==1) ? %{$_[0]} : @_;
+	my %opts  = ( @_ == 1 ) ? %{ $_[0] } : @_;
 	_croak "Need to supply role name" unless exists $opts{role};
-	return $proto->SUPER::new(%opts);
+	return $proto->SUPER::new( %opts );
 }
 
-sub role        { $_[0]{role} }
-sub inlined     { $_[0]{inlined} ||= $_[0]->_build_inlined }
+sub role    { $_[0]{role} }
+sub inlined { $_[0]{inlined} ||= $_[0]->_build_inlined }
 
 sub has_inlined { !!1 }
 
 sub _is_null_constraint { 0 }
 
-sub _build_constraint
-{
+sub _build_constraint {
 	my $self = shift;
 	my $role = $self->role;
-	return sub { blessed($_) and do { my $method = $_->can('DOES')||$_->can('isa'); $_->$method($role) } };
-}
+	return sub {
+		blessed( $_ ) and do {
+			my $method = $_->can( 'DOES' ) || $_->can( 'isa' );
+			$_->$method( $role );
+		}
+	};
+} #/ sub _build_constraint
 
-sub _build_inlined
-{
+sub _build_inlined {
 	my $self = shift;
 	my $role = $self->role;
 	sub {
 		my $var = $_[1];
-		my $code = qq{Scalar::Util::blessed($var) and do { my \$method = $var->can('DOES')||$var->can('isa'); $var->\$method(q[$role]) }};
+		my $code =
+			qq{Scalar::Util::blessed($var) and do { my \$method = $var->can('DOES')||$var->can('isa'); $var->\$method(q[$role]) }};
 		return qq{do { use Scalar::Util (); $code }} if $Type::Tiny::AvoidCallbacks;
 		$code;
 	};
-}
+} #/ sub _build_inlined
 
-sub _build_default_message
-{
+sub _build_default_message {
 	my $self = shift;
-	my $c = $self->role;
-	return sub { sprintf '%s did not pass type constraint (not DOES %s)', Type::Tiny::_dd($_[0]), $c } if $self->is_anon;
+	my $c    = $self->role;
+	return sub {
+		sprintf '%s did not pass type constraint (not DOES %s)',
+			Type::Tiny::_dd( $_[0] ), $c;
+		}
+		if $self->is_anon;
 	my $name = "$self";
-	return sub { sprintf '%s did not pass type constraint "%s" (not DOES %s)', Type::Tiny::_dd($_[0]), $name, $c };
-}
+	return sub {
+		sprintf '%s did not pass type constraint "%s" (not DOES %s)',
+			Type::Tiny::_dd( $_[0] ), $name, $c;
+	};
+} #/ sub _build_default_message
 
-sub validate_explain
-{
+sub validate_explain {
 	my $self = shift;
-	my ($value, $varname) = @_;
+	my ( $value, $varname ) = @_;
 	$varname = '$_' unless defined $varname;
 	
-	return undef if $self->check($value);
-	return ["Not a blessed reference"] unless blessed($value);
-	return ["Reference provides no DOES method to check roles"] unless $value->can('DOES');
-	
-	my $display_var = $varname eq q{$_} ? '' : sprintf(' (in %s)', $varname);
+	return undef if $self->check( $value );
+	return ["Not a blessed reference"] unless blessed( $value );
+	return ["Reference provides no DOES method to check roles"]
+		unless $value->can( 'DOES' );
+		
+	my $display_var = $varname eq q{$_} ? '' : sprintf( ' (in %s)', $varname );
 	
 	return [
-		sprintf('"%s" requires that the reference does %s', $self, $self->role),
-		sprintf("The reference%s doesn't %s", $display_var, $self->role),
+		sprintf( '"%s" requires that the reference does %s', $self, $self->role ),
+		sprintf( "The reference%s doesn't %s", $display_var,        $self->role ),
 	];
-}
+} #/ sub validate_explain
 
 1;
 
@@ -181,4 +191,3 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-

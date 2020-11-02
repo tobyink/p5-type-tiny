@@ -20,156 +20,162 @@ sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 require Type::Tiny;
 
 __PACKAGE__->Type::Tiny::_install_overloads(
-	q("")      => sub { caller =~ m{^(Moo::HandleMoose|Sub::Quote)} ? $_[0]->_stringify_no_magic : $_[0]->display_name },
-	q(bool)    => sub { 1 },
-	q(&{})     => "_overload_coderef",
+	q("") => sub {
+		caller =~ m{^(Moo::HandleMoose|Sub::Quote)}
+			? $_[0]->_stringify_no_magic
+			: $_[0]->display_name;
+	},
+	q(bool) => sub { 1 },
+	q(&{})  => "_overload_coderef",
 );
 
 __PACKAGE__->Type::Tiny::_install_overloads(
-	q(~~)    => sub { $_[0]->has_coercion_for_value($_[1]) },
+	q(~~) => sub { $_[0]->has_coercion_for_value( $_[1] ) },
 ) if Type::Tiny::SUPPORT_SMARTMATCH();
 
-sub _overload_coderef
-{
+sub _overload_coderef {
 	my $self = shift;
 	
-	if ("Sub::Quote"->can("quote_sub") && $self->can_be_inlined)
-	{
-		$self->{_overload_coderef} = Sub::Quote::quote_sub($self->inline_coercion('$_[0]'))
+	if ( "Sub::Quote"->can( "quote_sub" ) && $self->can_be_inlined ) {
+		$self->{_overload_coderef} =
+			Sub::Quote::quote_sub( $self->inline_coercion( '$_[0]' ) )
 			if !$self->{_overload_coderef} || !$self->{_sub_quoted}++;
 	}
-	else
-	{
-		Scalar::Util::weaken(my $weak = $self);
-		$self->{_overload_coderef} ||= sub { $weak->coerce(@_) };
+	else {
+		Scalar::Util::weaken( my $weak = $self );
+		$self->{_overload_coderef} ||= sub { $weak->coerce( @_ ) };
 	}
 	
 	$self->{_overload_coderef};
-}
+} #/ sub _overload_coderef
 
-sub new
-{
+sub new {
 	my $class  = shift;
-	my %params = (@_==1) ? %{$_[0]} : @_;
+	my %params = ( @_ == 1 ) ? %{ $_[0] } : @_;
 	
-	$params{name} = '__ANON__' unless exists($params{name});
-	my $C = delete($params{type_coercion_map}) || [];
-	my $F = delete($params{frozen});
+	$params{name} = '__ANON__' unless exists( $params{name} );
+	my $C = delete( $params{type_coercion_map} ) || [];
+	my $F = delete( $params{frozen} );
 	
 	my $self = bless \%params, $class;
-	$self->add_type_coercions(@$C) if @$C;
+	$self->add_type_coercions( @$C ) if @$C;
 	$self->_preserve_type_constraint;
-	Scalar::Util::weaken($self->{type_constraint}); # break ref cycle
+	Scalar::Util::weaken( $self->{type_constraint} );    # break ref cycle
 	$self->{frozen} = $F if $F;
 	
-	unless ($self->is_anon)
-	{
+	unless ( $self->is_anon ) {
+	
 		# First try a fast ASCII-only expression, but fall back to Unicode
 		$self->name =~ /^_{0,2}[A-Z][A-Za-z0-9_]+$/sm
-			or eval q( use 5.008; $self->name =~ /^_{0,2}\p{Lu}[\p{L}0-9_]+$/sm )
+			or eval
+			q( use 5.008; $self->name =~ /^_{0,2}\p{Lu}[\p{L}0-9_]+$/sm )
 			or _croak '"%s" is not a valid coercion name', $self->name;
 	}
 	
 	return $self;
-}
+} #/ sub new
 
 sub _stringify_no_magic {
-	sprintf('%s=%s(0x%08x)', blessed($_[0]), Scalar::Util::reftype($_[0]), Scalar::Util::refaddr($_[0]));
+	sprintf( '%s=%s(0x%08x)', blessed( $_[0] ), Scalar::Util::reftype( $_[0] ),
+		Scalar::Util::refaddr( $_[0] ) );
 }
 
-sub name                   { $_[0]{name} }
-sub display_name           { $_[0]{display_name}      ||= $_[0]->_build_display_name }
-sub library                { $_[0]{library} }
-sub type_constraint        { $_[0]{type_constraint}   ||= $_[0]->_maybe_restore_type_constraint }
-sub type_coercion_map      { $_[0]{type_coercion_map} ||= [] }
-sub moose_coercion         { $_[0]{moose_coercion}    ||= $_[0]->_build_moose_coercion }
-sub compiled_coercion      { $_[0]{compiled_coercion} ||= $_[0]->_build_compiled_coercion }
-sub frozen                 { $_[0]{frozen}            ||= 0 }
-sub coercion_generator     { $_[0]{coercion_generator} }
-sub parameters             { $_[0]{parameters} }
-sub parameterized_from     { $_[0]{parameterized_from} }
+sub name         { $_[0]{name} }
+sub display_name { $_[0]{display_name} ||= $_[0]->_build_display_name }
+sub library      { $_[0]{library} }
+
+sub type_constraint {
+	$_[0]{type_constraint} ||= $_[0]->_maybe_restore_type_constraint;
+}
+sub type_coercion_map { $_[0]{type_coercion_map} ||= [] }
+sub moose_coercion { $_[0]{moose_coercion} ||= $_[0]->_build_moose_coercion }
+
+sub compiled_coercion {
+	$_[0]{compiled_coercion} ||= $_[0]->_build_compiled_coercion;
+}
+sub frozen             { $_[0]{frozen} ||= 0 }
+sub coercion_generator { $_[0]{coercion_generator} }
+sub parameters         { $_[0]{parameters} }
+sub parameterized_from { $_[0]{parameterized_from} }
 
 sub has_library            { exists $_[0]{library} }
-sub has_type_constraint    { defined $_[0]->type_constraint } # sic
+sub has_type_constraint    { defined $_[0]->type_constraint }     # sic
 sub has_coercion_generator { exists $_[0]{coercion_generator} }
 sub has_parameters         { exists $_[0]{parameters} }
 
-sub _preserve_type_constraint
-{
+sub _preserve_type_constraint {
 	my $self = shift;
-	$self->{_compiled_type_constraint_check} = $self->{type_constraint}->compiled_check
+	$self->{_compiled_type_constraint_check} =
+		$self->{type_constraint}->compiled_check
 		if $self->{type_constraint};
 }
 
-sub _maybe_restore_type_constraint
-{
+sub _maybe_restore_type_constraint {
 	my $self = shift;
-	if ( my $check = $self->{_compiled_type_constraint_check} )
-	{
-		return Type::Tiny->new(constraint => $check);
+	if ( my $check = $self->{_compiled_type_constraint_check} ) {
+		return Type::Tiny->new( constraint => $check );
 	}
-	return; # uncoverable statement
+	return;    # uncoverable statement
 }
 
-sub add
-{
+sub add {
 	my $class = shift;
-	my ($x, $y, $swap) = @_;
+	my ( $x, $y, $swap ) = @_;
 	
-	Types::TypeTiny::is_TypeTiny($x) and return $x->plus_fallback_coercions($y);
-	Types::TypeTiny::is_TypeTiny($y) and return $y->plus_coercions($x);
+	Types::TypeTiny::is_TypeTiny( $x ) and return $x->plus_fallback_coercions( $y );
+	Types::TypeTiny::is_TypeTiny( $y ) and return $y->plus_coercions( $x );
 	
 	_croak "Attempt to add $class to something that is not a $class"
-		unless blessed($x) && blessed($y) && $x->isa($class) && $y->isa($class);
-	
-	($y, $x) = ($x, $y) if $swap;
+		unless blessed( $x )
+		&& blessed( $y )
+		&& $x->isa( $class )
+		&& $y->isa( $class );
+		
+	( $y, $x ) = ( $x, $y ) if $swap;
 	
 	my %opts;
-	if ($x->has_type_constraint and $y->has_type_constraint and $x->type_constraint == $y->type_constraint)
+	if ( $x->has_type_constraint
+		and $y->has_type_constraint
+		and $x->type_constraint == $y->type_constraint )
 	{
 		$opts{type_constraint} = $x->type_constraint;
 	}
-	elsif ($x->has_type_constraint and $y->has_type_constraint)
-	{
-#		require Type::Tiny::Union;
-#		$opts{type_constraint} = "Type::Tiny::Union"->new(
-#			type_constraints => [ $x->type_constraint, $y->type_constraint ],
-#		);
+	elsif ( $x->has_type_constraint and $y->has_type_constraint ) {
+	
+		#		require Type::Tiny::Union;
+		#		$opts{type_constraint} = "Type::Tiny::Union"->new(
+		#			type_constraints => [ $x->type_constraint, $y->type_constraint ],
+		#		);
 	}
 	$opts{display_name} ||= "$x+$y";
 	delete $opts{display_name} if $opts{display_name} eq '__ANON__+__ANON__';
 	
-	my $new = $class->new(%opts);
-	$new->add_type_coercions( @{$x->type_coercion_map} );
-	$new->add_type_coercions( @{$y->type_coercion_map} );
+	my $new = $class->new( %opts );
+	$new->add_type_coercions( @{ $x->type_coercion_map } );
+	$new->add_type_coercions( @{ $y->type_coercion_map } );
 	return $new;
-}
+} #/ sub add
 
-sub _build_display_name
-{
+sub _build_display_name {
 	shift->name;
 }
 
-sub qualified_name
-{
+sub qualified_name {
 	my $self = shift;
 	
-	if ($self->has_library and not $self->is_anon)
-	{
-		return sprintf("%s::%s", $self->library, $self->name);
+	if ( $self->has_library and not $self->is_anon ) {
+		return sprintf( "%s::%s", $self->library, $self->name );
 	}
 	
 	return $self->name;
 }
 
-sub is_anon
-{
+sub is_anon {
 	my $self = shift;
 	$self->name eq "__ANON__";
 }
 
-sub _clear_compiled_coercion
-{
+sub _clear_compiled_coercion {
 	delete $_[0]{_overload_coderef};
 	delete $_[0]{compiled_coercion};
 }
@@ -177,140 +183,131 @@ sub _clear_compiled_coercion
 sub freeze                    { $_[0]{frozen} = 1; $_[0] }
 sub i_really_want_to_unfreeze { $_[0]{frozen} = 0; $_[0] }
 
-sub coerce
-{
+sub coerce {
 	my $self = shift;
-	return $self->compiled_coercion->(@_);
+	return $self->compiled_coercion->( @_ );
 }
 
-sub assert_coerce
-{
+sub assert_coerce {
 	my $self = shift;
-	my $r = $self->coerce(@_);
-	$self->type_constraint->assert_valid($r)
+	my $r    = $self->coerce( @_ );
+	$self->type_constraint->assert_valid( $r )
 		if $self->has_type_constraint;
 	return $r;
 }
 
-sub has_coercion_for_type
-{
+sub has_coercion_for_type {
 	my $self = shift;
-	my $type = Types::TypeTiny::to_TypeTiny($_[0]);
+	my $type = Types::TypeTiny::to_TypeTiny( $_[0] );
 	
 	return "0 but true"
-		if $self->has_type_constraint && $type->is_a_type_of($self->type_constraint);
-	
+		if $self->has_type_constraint
+		&& $type->is_a_type_of( $self->type_constraint );
+		
 	my $c = $self->type_coercion_map;
-	for (my $i = 0; $i <= $#$c; $i += 2)
-	{
-		return !!1 if $type->is_a_type_of($c->[$i]);
+	for ( my $i = 0 ; $i <= $#$c ; $i += 2 ) {
+		return !!1 if $type->is_a_type_of( $c->[$i] );
 	}
 	return;
-}
+} #/ sub has_coercion_for_type
 
-sub has_coercion_for_value
-{
+sub has_coercion_for_value {
 	my $self = shift;
 	local $_ = $_[0];
 	
 	return "0 but true"
-		if $self->has_type_constraint && $self->type_constraint->check(@_);
-	
+		if $self->has_type_constraint
+		&& $self->type_constraint->check( @_ );
+		
 	my $c = $self->type_coercion_map;
-	for (my $i = 0; $i <= $#$c; $i += 2)
-	{
-		return !!1 if $c->[$i]->check(@_);
+	for ( my $i = 0 ; $i <= $#$c ; $i += 2 ) {
+		return !!1 if $c->[$i]->check( @_ );
 	}
 	return;
-}
+} #/ sub has_coercion_for_value
 
-sub add_type_coercions
-{
+sub add_type_coercions {
 	my $self = shift;
 	my @args = @_;
 	
-	_croak "Attempt to add coercion code to a Type::Coercion which has been frozen" if $self->frozen;
-	
-	while (@args)
-	{
-		my $type = Types::TypeTiny::to_TypeTiny(shift @args);
+	_croak "Attempt to add coercion code to a Type::Coercion which has been frozen"
+		if $self->frozen;
 		
-		if (blessed $type and my $method = $type->can('type_coercion_map'))
-		{
-			push @{$self->type_coercion_map}, @{$method->($type)};
+	while ( @args ) {
+		my $type = Types::TypeTiny::to_TypeTiny( shift @args );
+		
+		if ( blessed $type and my $method = $type->can( 'type_coercion_map' ) ) {
+			push @{ $self->type_coercion_map }, @{ $method->( $type ) };
 		}
-		else
-		{
+		else {
 			my $coercion = shift @args;
 			_croak "Types must be blessed Type::Tiny objects"
-				unless Types::TypeTiny::is_TypeTiny($type);
+				unless Types::TypeTiny::is_TypeTiny( $type );
 			_croak "Coercions must be code references or strings"
-				unless Types::TypeTiny::is_StringLike($coercion) || Types::TypeTiny::is_CodeLike($coercion);
-			push @{$self->type_coercion_map}, $type, $coercion;
+				unless Types::TypeTiny::is_StringLike( $coercion )
+				|| Types::TypeTiny::is_CodeLike( $coercion );
+			push @{ $self->type_coercion_map }, $type, $coercion;
 		}
-	}
+	} #/ while ( @args )
 	
 	$self->_clear_compiled_coercion;
 	return $self;
-}
+} #/ sub add_type_coercions
 
-sub _build_compiled_coercion
-{
+sub _build_compiled_coercion {
 	my $self = shift;
 	
-	my @mishmash = @{$self->type_coercion_map};
-	return sub { $_[0] } unless @mishmash;
-
-	if ($self->can_be_inlined)
-	{
+	my @mishmash = @{ $self->type_coercion_map };
+	return sub { $_[0] }
+		unless @mishmash;
+		
+	if ( $self->can_be_inlined ) {
 		return Eval::TypeTiny::eval_closure(
-			source      => sprintf('sub ($) { %s }', $self->inline_coercion('$_[0]')),
-			description => sprintf("compiled coercion '%s'", $self),
+			source      => sprintf( 'sub ($) { %s }', $self->inline_coercion( '$_[0]' ) ),
+			description => sprintf( "compiled coercion '%s'", $self ),
 		);
 	}
-
+	
 	# These arrays will be closed over.
-	my (@types, @codes);
-	while (@mishmash)
-	{
+	my ( @types, @codes );
+	while ( @mishmash ) {
 		push @types, shift @mishmash;
 		push @codes, shift @mishmash;
 	}
-	if ($self->has_type_constraint)
-	{
+	if ( $self->has_type_constraint ) {
 		unshift @types, $self->type_constraint;
 		unshift @codes, undef;
 	}
 	
 	my @sub;
 	
-	for my $i (0..$#types)
-	{
+	for my $i ( 0 .. $#types ) {
 		push @sub,
-			$types[$i]->can_be_inlined ? sprintf('if (%s)', $types[$i]->inline_check('$_[0]')) :
-			sprintf('if ($checks[%d]->(@_))', $i);
+			$types[$i]->can_be_inlined
+			? sprintf( 'if (%s)', $types[$i]->inline_check( '$_[0]' ) )
+			: sprintf( 'if ($checks[%d]->(@_))', $i );
 		push @sub,
-			!defined($codes[$i])
-				? sprintf('  { return $_[0] }') :
-			Types::TypeTiny::is_StringLike($codes[$i])
-				? sprintf('  { local $_ = $_[0]; return scalar(%s); }', $codes[$i]) :
-			sprintf('  { local $_ = $_[0]; return scalar($codes[%d]->(@_)) }', $i);
-	}
+			!defined( $codes[$i] ) ? sprintf( '  { return $_[0] }' )
+			: Types::TypeTiny::is_StringLike( $codes[$i] )
+			? sprintf( '  { local $_ = $_[0]; return scalar(%s); }',
+			$codes[$i] )
+			: sprintf(
+			'  { local $_ = $_[0]; return scalar($codes[%d]->(@_)) }', $i );
+	} #/ for my $i ( 0 .. $#types)
 	
 	push @sub, 'return $_[0];';
 	
 	return Eval::TypeTiny::eval_closure(
-		source      => sprintf('sub ($) { %s }', join qq[\n], @sub),
-		description => sprintf("compiled coercion '%s'", $self),
+		source      => sprintf( 'sub ($) { %s }', join qq[\n], @sub ),
+		description => sprintf( "compiled coercion '%s'", $self ),
 		environment => {
 			'@checks' => [ map $_->compiled_check, @types ],
 			'@codes'  => \@codes,
 		},
 	);
-}
+} #/ sub _build_compiled_coercion
 
-sub can_be_inlined
-{
+sub can_be_inlined {
 	my $self = shift;
 	
 	return unless $self->frozen;
@@ -318,237 +315,226 @@ sub can_be_inlined
 	return
 		if $self->has_type_constraint
 		&& !$self->type_constraint->can_be_inlined;
-	
-	my @mishmash = @{$self->type_coercion_map};
-	while (@mishmash)
-	{
-		my ($type, $converter) = splice(@mishmash, 0, 2);
+		
+	my @mishmash = @{ $self->type_coercion_map };
+	while ( @mishmash ) {
+		my ( $type, $converter ) = splice( @mishmash, 0, 2 );
 		return unless $type->can_be_inlined;
-		return unless Types::TypeTiny::is_StringLike($converter);
+		return unless Types::TypeTiny::is_StringLike( $converter );
 	}
 	return !!1;
-}
+} #/ sub can_be_inlined
 
-sub _source_type_union
-{
+sub _source_type_union {
 	my $self = shift;
 	
 	my @r;
 	push @r, $self->type_constraint if $self->has_type_constraint;
 	
-	my @mishmash = @{$self->type_coercion_map};
-	while (@mishmash)
-	{
-		my ($type) = splice(@mishmash, 0, 2);
+	my @mishmash = @{ $self->type_coercion_map };
+	while ( @mishmash ) {
+		my ( $type ) = splice( @mishmash, 0, 2 );
 		push @r, $type;
 	}
 	
 	require Type::Tiny::Union;
-	return "Type::Tiny::Union"->new(type_constraints => \@r, tmp => 1);
-}
+	return "Type::Tiny::Union"->new( type_constraints => \@r, tmp => 1 );
+} #/ sub _source_type_union
 
-sub inline_coercion
-{
-	my $self = shift;
+sub inline_coercion {
+	my $self    = shift;
 	my $varname = $_[0];
 	
 	_croak "This coercion cannot be inlined" unless $self->can_be_inlined;
 	
-	my @mishmash = @{$self->type_coercion_map};
+	my @mishmash = @{ $self->type_coercion_map };
 	return "($varname)" unless @mishmash;
 	
-	my (@types, @codes);
-	while (@mishmash)
-	{
+	my ( @types, @codes );
+	while ( @mishmash ) {
 		push @types, shift @mishmash;
 		push @codes, shift @mishmash;
 	}
-	if ($self->has_type_constraint)
-	{
+	if ( $self->has_type_constraint ) {
 		unshift @types, $self->type_constraint;
 		unshift @codes, undef;
 	}
 	
 	my @sub;
 	
-	for my $i (0..$#types)
-	{
-		push @sub, sprintf('(%s) ?', $types[$i]->inline_check($varname));
+	for my $i ( 0 .. $#types ) {
+		push @sub, sprintf( '(%s) ?', $types[$i]->inline_check( $varname ) );
 		push @sub,
-			(defined($codes[$i]) && ($varname eq '$_'))
-				? sprintf('scalar(do { %s }) :', $codes[$i]) :
-			defined($codes[$i])
-				? sprintf('scalar(do { local $_ = %s; %s }) :', $varname, $codes[$i]) :
-			sprintf('%s :', $varname);
-	}
+			( defined( $codes[$i] ) && ( $varname eq '$_' ) )
+			? sprintf( 'scalar(do { %s }) :', $codes[$i] )
+			: defined( $codes[$i] )
+			? sprintf( 'scalar(do { local $_ = %s; %s }) :', $varname,
+			$codes[$i] )
+			: sprintf( '%s :', $varname );
+	} #/ for my $i ( 0 .. $#types)
 	
 	push @sub, "$varname";
 	
 	"@sub";
-}
+} #/ sub inline_coercion
 
-sub _build_moose_coercion
-{
+sub _build_moose_coercion {
 	my $self = shift;
 	
 	my %options = ();
-	$options{type_coercion_map} = [ $self->freeze->_codelike_type_coercion_map('moose_type') ];
-	$options{type_constraint}   = $self->type_constraint if $self->has_type_constraint;
-	
+	$options{type_coercion_map} =
+		[ $self->freeze->_codelike_type_coercion_map( 'moose_type' ) ];
+	$options{type_constraint} = $self->type_constraint
+		if $self->has_type_constraint;
+		
 	require Moose::Meta::TypeCoercion;
-	my $r = "Moose::Meta::TypeCoercion"->new(%options);
+	my $r = "Moose::Meta::TypeCoercion"->new( %options );
 	
 	return $r;
-}
+} #/ sub _build_moose_coercion
 
-sub _codelike_type_coercion_map
-{
-	my $self = shift;
+sub _codelike_type_coercion_map {
+	my $self     = shift;
 	my $modifier = $_[0];
 	
 	my @orig = @{ $self->type_coercion_map };
 	my @new;
 	
-	while (@orig)
-	{
-		my ($type, $converter) = splice(@orig, 0, 2);
+	while ( @orig ) {
+		my ( $type, $converter ) = splice( @orig, 0, 2 );
 		
 		push @new, $modifier ? $type->$modifier : $type;
 		
-		if (Types::TypeTiny::is_CodeLike($converter))
-		{
+		if ( Types::TypeTiny::is_CodeLike( $converter ) ) {
 			push @new, $converter;
 		}
-		else
-		{
+		else {
 			push @new, Eval::TypeTiny::eval_closure(
-				source      => sprintf('sub { local $_ = $_[0]; %s }', $converter),
-				description => sprintf("temporary compiled converter from '%s'", $type),
+				source      => sprintf( 'sub { local $_ = $_[0]; %s }',           $converter ),
+				description => sprintf( "temporary compiled converter from '%s'", $type ),
 			);
 		}
-	}
+	} #/ while ( @orig )
 	
 	return @new;
-}
+} #/ sub _codelike_type_coercion_map
 
-sub is_parameterizable
-{
+sub is_parameterizable {
 	shift->has_coercion_generator;
 }
 
-sub is_parameterized
-{
+sub is_parameterized {
 	shift->has_parameters;
 }
 
-sub parameterize
-{
+sub parameterize {
 	my $self = shift;
 	return $self unless @_;
 	$self->is_parameterizable
 		or _croak "Constraint '%s' does not accept parameters", "$self";
+		
+	@_ = map Types::TypeTiny::to_TypeTiny( $_ ), @_;
 	
-	@_ = map Types::TypeTiny::to_TypeTiny($_), @_;
-	
-	return ref($self)->new(
-		type_constraint    => $self->type_constraint,
-		type_coercion_map  => [ $self->coercion_generator->($self, $self->type_constraint, @_) ],
+	return ref( $self )->new(
+		type_constraint   => $self->type_constraint,
+		type_coercion_map => [
+			$self->coercion_generator->( $self, $self->type_constraint, @_ )
+		],
 		parameters         => \@_,
 		frozen             => 1,
 		parameterized_from => $self,
 	);
-}
+} #/ sub parameterize
 
-sub _reparameterize
-{
+sub _reparameterize {
 	my $self = shift;
-	my ($target_type) = @_;
+	my ( $target_type ) = @_;
 	
 	$self->is_parameterized or return $self;
 	my $parent = $self->parameterized_from;
 	
-	return ref($self)->new(
-		type_constraint    => $target_type,
-		type_coercion_map  => [ $parent->coercion_generator->($parent, $target_type, @{$self->parameters}) ],
+	return ref( $self )->new(
+		type_constraint   => $target_type,
+		type_coercion_map => [
+			$parent->coercion_generator->( $parent, $target_type, @{ $self->parameters } )
+		],
 		parameters         => \@_,
 		frozen             => 1,
 		parameterized_from => $parent,
 	);
-}
+} #/ sub _reparameterize
 
-sub isa
-{
+sub isa {
 	my $self = shift;
 	
-	if ($INC{"Moose.pm"} and blessed($self) and $_[0] eq 'Moose::Meta::TypeCoercion')
+	if ( $INC{"Moose.pm"}
+		and blessed( $self )
+		and $_[0] eq 'Moose::Meta::TypeCoercion' )
 	{
 		return !!1;
 	}
 	
-	if ($INC{"Moose.pm"}
-	and blessed($self)
-	and $_[0] =~ /^(Class::MOP|MooseX?)::/)
+	if ( $INC{"Moose.pm"}
+		and blessed( $self )
+		and $_[0] =~ /^(Class::MOP|MooseX?)::/ )
 	{
-		my $r = $self->moose_coercion->isa(@_);
+		my $r = $self->moose_coercion->isa( @_ );
 		return $r if $r;
 	}
 	
-	$self->SUPER::isa(@_);
-}
+	$self->SUPER::isa( @_ );
+} #/ sub isa
 
-sub can
-{
+sub can {
 	my $self = shift;
 	
-	my $can = $self->SUPER::can(@_);
+	my $can = $self->SUPER::can( @_ );
 	return $can if $can;
 	
-	if ($INC{"Moose.pm"}
-	and blessed($self)
-	and my $method = $self->moose_coercion->can(@_))
+	if ( $INC{"Moose.pm"}
+		and blessed( $self )
+		and my $method = $self->moose_coercion->can( @_ ) )
 	{
-		return sub { $method->(shift->moose_coercion, @_) };
+		return sub { $method->( shift->moose_coercion, @_ ) };
 	}
 	
 	return;
-}
+} #/ sub can
 
-sub AUTOLOAD
-{
+sub AUTOLOAD {
 	my $self = shift;
-	my ($m) = (our $AUTOLOAD =~ /::(\w+)$/);
+	my ( $m ) = ( our $AUTOLOAD =~ /::(\w+)$/ );
 	return if $m eq 'DESTROY';
 	
-	if ($INC{"Moose.pm"} and blessed($self) and my $method = $self->moose_coercion->can($m))
+	if ( $INC{"Moose.pm"}
+		and blessed( $self )
+		and my $method = $self->moose_coercion->can( $m ) )
 	{
-		return $method->($self->moose_coercion, @_);
+		return $method->( $self->moose_coercion, @_ );
 	}
 	
-	_croak q[Can't locate object method "%s" via package "%s"], $m, ref($self)||$self;
-}
+	_croak q[Can't locate object method "%s" via package "%s"], $m,
+		ref( $self ) || $self;
+} #/ sub AUTOLOAD
 
 # Private Moose method, but Moo uses this...
-sub _compiled_type_coercion
-{
+sub _compiled_type_coercion {
 	my $self = shift;
-	if (@_)
-	{
+	if ( @_ ) {
 		my $thing = $_[0];
-		if (blessed($thing) and $thing->isa("Type::Coercion"))
-		{
-			$self->add_type_coercions(@{$thing->type_coercion_map});
+		if ( blessed( $thing ) and $thing->isa( "Type::Coercion" ) ) {
+			$self->add_type_coercions( @{ $thing->type_coercion_map } );
 		}
-		elsif (Types::TypeTiny::is_CodeLike($thing))
-		{
+		elsif ( Types::TypeTiny::is_CodeLike( $thing ) ) {
 			require Types::Standard;
-			$self->add_type_coercions(Types::Standard::Any(), $thing);
+			$self->add_type_coercions( Types::Standard::Any(), $thing );
 		}
-	}
+	} #/ if ( @_ )
 	$self->compiled_coercion;
-}
+} #/ sub _compiled_type_coercion
 
 *compile_type_coercion = \&compiled_coercion;
-sub meta { _croak("Not really a Moose::Meta::TypeCoercion. Sorry!") }
+sub meta { _croak( "Not really a Moose::Meta::TypeCoercion. Sorry!" ) }
 
 1;
 
@@ -946,5 +932,3 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-
-

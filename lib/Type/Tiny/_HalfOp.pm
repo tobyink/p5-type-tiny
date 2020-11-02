@@ -12,7 +12,7 @@ BEGIN {
 $Type::Tiny::_HalfOp::VERSION =~ tr/_//d;
 
 sub new {
-	my ($class, $op, $param, $type) = @_;
+	my ( $class, $op, $param, $type ) = @_;
 	bless {
 		op    => $op,
 		param => $param,
@@ -22,10 +22,10 @@ sub new {
 
 sub complete {
 	require overload;
-	my ($self, $type) = @_;
-	my $complete_type = $type->parameterize(@{$self->{param}});
-	my $method = overload::Method($complete_type, $self->{op});
-	$complete_type->$method($self->{type});
+	my ( $self, $type ) = @_;
+	my $complete_type = $type->parameterize( @{ $self->{param} } );
+	my $method        = overload::Method( $complete_type, $self->{op} );
+	$complete_type->$method( $self->{type} );
 }
 
 1;
@@ -91,4 +91,3 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-

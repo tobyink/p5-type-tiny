@@ -20,220 +20,213 @@ use Type::Tiny ();
 our @ISA = 'Type::Tiny';
 
 __PACKAGE__->_install_overloads(
-	q[@{}] => sub { $_[0]{type_constraints} ||= [] }
-);
-
+	q[@{}] => sub { $_[0]{type_constraints} ||= [] } );
+	
 sub new {
 	my $proto = shift;
 	
-	my %opts = (@_==1) ? %{$_[0]} : @_;
-	_croak "Union type constraints cannot have a parent constraint passed to the constructor" if exists $opts{parent};
-	_croak "Union type constraints cannot have a constraint coderef passed to the constructor" if exists $opts{constraint};
-	_croak "Union type constraints cannot have a inlining coderef passed to the constructor" if exists $opts{inlined};
-	_croak "Need to supply list of type constraints" unless exists $opts{type_constraints};
-	
+	my %opts = ( @_ == 1 ) ? %{ $_[0] } : @_;
+	_croak
+		"Union type constraints cannot have a parent constraint passed to the constructor"
+		if exists $opts{parent};
+	_croak
+		"Union type constraints cannot have a constraint coderef passed to the constructor"
+		if exists $opts{constraint};
+	_croak
+		"Union type constraints cannot have a inlining coderef passed to the constructor"
+		if exists $opts{inlined};
+	_croak "Need to supply list of type constraints"
+		unless exists $opts{type_constraints};
+		
 	$opts{type_constraints} = [
-		map { $_->isa(__PACKAGE__) ? @$_ : $_ }
-		map Types::TypeTiny::to_TypeTiny($_),
-		@{ ref $opts{type_constraints} eq "ARRAY" ? $opts{type_constraints} : [$opts{type_constraints}] }
+		map { $_->isa( __PACKAGE__ ) ? @$_ : $_ }
+			map Types::TypeTiny::to_TypeTiny( $_ ),
+		@{
+			ref $opts{type_constraints} eq "ARRAY"
+			? $opts{type_constraints}
+			: [ $opts{type_constraints} ]
+		}
 	];
 	
-	if (Type::Tiny::_USE_XS)
-	{
-		my @constraints = @{$opts{type_constraints}};
-		my @known = map {
-			my $known = Type::Tiny::XS::is_known($_->compiled_check);
-			defined($known) ? $known : ();
+	if ( Type::Tiny::_USE_XS ) {
+		my @constraints = @{ $opts{type_constraints} };
+		my @known       = map {
+			my $known = Type::Tiny::XS::is_known( $_->compiled_check );
+			defined( $known ) ? $known : ();
 		} @constraints;
 		
-		if (@known == @constraints)
-		{
-			my $xsub = Type::Tiny::XS::get_coderef_for(
-				sprintf "AnyOf[%s]", join(',', @known)
-			);
+		if ( @known == @constraints ) {
+			my $xsub = Type::Tiny::XS::get_coderef_for( sprintf "AnyOf[%s]",
+				join( ',', @known ) );
 			$opts{compiled_type_constraint} = $xsub if $xsub;
 		}
-	}
-
-	my $self = $proto->SUPER::new(%opts);
+	} #/ if ( Type::Tiny::_USE_XS)
+	
+	my $self = $proto->SUPER::new( %opts );
 	$self->coercion if grep $_->has_coercion, @$self;
 	return $self;
-}
+} #/ sub new
 
 sub type_constraints { $_[0]{type_constraints} }
 sub constraint       { $_[0]{constraint} ||= $_[0]->_build_constraint }
 
 sub _is_null_constraint { 0 }
 
-sub _build_display_name
-{
+sub _build_display_name {
 	my $self = shift;
 	join q[|], @$self;
 }
 
-sub _build_coercion
-{
+sub _build_coercion {
 	require Type::Coercion::Union;
 	my $self = shift;
-	return "Type::Coercion::Union"->new(type_constraint => $self);
+	return "Type::Coercion::Union"->new( type_constraint => $self );
 }
 
-sub _build_constraint
-{
-	my @checks = map $_->compiled_check, @{+shift};
-	return sub
-	{
+sub _build_constraint {
+	my @checks = map $_->compiled_check, @{ +shift };
+	return sub {
 		my $val = $_;
-		$_->($val) && return !!1 for @checks;
+		$_->( $val ) && return !!1 for @checks;
 		return;
 	}
 }
 
-sub can_be_inlined
-{
+sub can_be_inlined {
 	my $self = shift;
 	not grep !$_->can_be_inlined, @$self;
 }
 
-sub inline_check
-{
+sub inline_check {
 	my $self = shift;
 	
-	if (Type::Tiny::_USE_XS and !exists $self->{xs_sub})
-	{
+	if ( Type::Tiny::_USE_XS and !exists $self->{xs_sub} ) {
 		$self->{xs_sub} = undef;
 		
-		my @constraints = @{$self->type_constraints};
-		my @known = map {
-			my $known = Type::Tiny::XS::is_known($_->compiled_check);
-			defined($known) ? $known : ();
+		my @constraints = @{ $self->type_constraints };
+		my @known       = map {
+			my $known = Type::Tiny::XS::is_known( $_->compiled_check );
+			defined( $known ) ? $known : ();
 		} @constraints;
 		
-		if (@known == @constraints)
-		{
-			$self->{xs_sub} = Type::Tiny::XS::get_subname_for(
-				sprintf "AnyOf[%s]", join(',', @known)
-			);
+		if ( @known == @constraints ) {
+			$self->{xs_sub} = Type::Tiny::XS::get_subname_for( sprintf "AnyOf[%s]",
+				join( ',', @known ) );
 		}
-	}
+	} #/ if ( Type::Tiny::_USE_XS...)
 	
-	my $code = sprintf '(%s)', join " or ", map $_->inline_check($_[0]), @$self;
+	my $code = sprintf '(%s)', join " or ", map $_->inline_check( $_[0] ), @$self;
 	
 	return "do { package Type::Tiny; $code }"
 		if $Type::Tiny::AvoidCallbacks;
 	return "$self->{xs_sub}\($_[0]\)"
 		if $self->{xs_sub};
 	return $code;
-}
+} #/ sub inline_check
 
-sub _instantiate_moose_type
-{
+sub _instantiate_moose_type {
 	my $self = shift;
 	my %opts = @_;
 	delete $opts{parent};
 	delete $opts{constraint};
 	delete $opts{inlined};
 	
-	my @tc = map $_->moose_type, @{$self->type_constraints};
+	my @tc = map $_->moose_type, @{ $self->type_constraints };
 	
 	require Moose::Meta::TypeConstraint::Union;
-	return "Moose::Meta::TypeConstraint::Union"->new(%opts, type_constraints => \@tc);
+	return
+		"Moose::Meta::TypeConstraint::Union"
+		->new( %opts, type_constraints => \@tc );
+} #/ sub _instantiate_moose_type
+
+sub has_parent {
+	defined( shift->parent );
 }
 
-sub has_parent
-{
-	defined(shift->parent);
-}
-
-sub parent
-{
+sub parent {
 	$_[0]{parent} ||= $_[0]->_build_parent;
 }
 
-sub _build_parent
-{
+sub _build_parent {
 	my $self = shift;
-	my ($first, @rest) = @$self;
+	my ( $first, @rest ) = @$self;
 	
-	for my $parent ($first, $first->parents)
-	{
-		return $parent unless grep !$_->is_a_type_of($parent), @rest;
+	for my $parent ( $first, $first->parents ) {
+		return $parent unless grep !$_->is_a_type_of( $parent ), @rest;
 	}
 	
 	return;
-}
+} #/ sub _build_parent
 
-sub find_type_for
-{
-	my @types = @{+shift};
-	for my $type (@types)
-	{
-		return $type if $type->check(@_);
+sub find_type_for {
+	my @types = @{ +shift };
+	for my $type ( @types ) {
+		return $type if $type->check( @_ );
 	}
 	return;
 }
 
-sub validate_explain
-{
+sub validate_explain {
 	my $self = shift;
-	my ($value, $varname) = @_;
+	my ( $value, $varname ) = @_;
 	$varname = '$_' unless defined $varname;
 	
-	return undef if $self->check($value);
+	return undef if $self->check( $value );
 	
 	require Type::Utils;
 	return [
 		sprintf(
 			'"%s" requires that the value pass %s',
 			$self,
-			Type::Utils::english_list(\"or", map qq["$_"], @$self),
+			Type::Utils::english_list( \"or", map qq["$_"], @$self ),
 		),
 		map {
-			$_->get_message($value),
-			map("    $_", @{ $_->validate_explain($value) || []}),
+			$_->get_message( $value ),
+				map( "    $_", @{ $_->validate_explain( $value ) || [] } ),
 		} @$self
 	];
-}
+} #/ sub validate_explain
 
 my $_delegate = sub {
-	my ($self, $method) = (shift, shift);
+	my ( $self, $method ) = ( shift, shift );
 	my @types = @{ $self->type_constraints };
 	
-	my @unsupported = grep !$_->can($method), @types;
-	_croak('Could not apply method %s to all types within the union', $method) if @unsupported;
-	
-	ref($self)->new(type_constraints => [ map $_->$method(@_), @types ]);
+	my @unsupported = grep !$_->can( $method ), @types;
+	_croak( 'Could not apply method %s to all types within the union', $method )
+		if @unsupported;
+		
+	ref( $self )->new( type_constraints => [ map $_->$method( @_ ), @types ] );
 };
 
 sub stringifies_to {
 	my $self = shift;
-	$self->$_delegate(stringifies_to => @_);
+	$self->$_delegate( stringifies_to => @_ );
 }
 
 sub numifies_to {
 	my $self = shift;
-	$self->$_delegate(numifies_to => @_);
+	$self->$_delegate( numifies_to => @_ );
 }
 
 sub with_attribute_values {
 	my $self = shift;
-	$self->$_delegate(with_attribute_values => @_);
+	$self->$_delegate( with_attribute_values => @_ );
 }
 
 push @Type::Tiny::CMP, sub {
 	my $A = shift->find_constraining_type;
 	my $B = shift->find_constraining_type;
 	
-	if ($A->isa(__PACKAGE__) and $B->isa(__PACKAGE__)) {
+	if ( $A->isa( __PACKAGE__ ) and $B->isa( __PACKAGE__ ) ) {
 		my @A_constraints = @{ $A->type_constraints };
 		my @B_constraints = @{ $B->type_constraints };
 		
 		# If everything in @A_constraints is equal to something in @B_constraints and vice versa, then $A equiv to $B
 		EQUALITY: {
 			my $everything_in_a_is_equal = 1;
-			OUTER: for my $A_child (@A_constraints) {
-				INNER: for my $B_child (@B_constraints) {
-					if ($A_child->equals($B_child)) {
+			OUTER: for my $A_child ( @A_constraints ) {
+				INNER: for my $B_child ( @B_constraints ) {
+					if ( $A_child->equals( $B_child ) ) {
 						next OUTER;
 					}
 				}
@@ -242,9 +235,9 @@ push @Type::Tiny::CMP, sub {
 			}
 			
 			my $everything_in_b_is_equal = 1;
-			OUTER: for my $B_child (@B_constraints) {
-				INNER: for my $A_child (@A_constraints) {
-					if ($B_child->equals($A_child)) {
+			OUTER: for my $B_child ( @B_constraints ) {
+				INNER: for my $A_child ( @A_constraints ) {
+					if ( $B_child->equals( $A_child ) ) {
 						next OUTER;
 					}
 				}
@@ -254,86 +247,86 @@ push @Type::Tiny::CMP, sub {
 			
 			return Type::Tiny::CMP_EQUIVALENT
 				if $everything_in_a_is_equal && $everything_in_b_is_equal;
-		}
+		} #/ EQUALITY:
 		
 		# If everything in @A_constraints is a subtype of something in @B_constraints, then $A is subtype of $B
 		SUBTYPE: {
-			OUTER: for my $A_child (@A_constraints) {
+			OUTER: for my $A_child ( @A_constraints ) {
 				my $a_child_is_subtype_of_something = 0;
-				INNER: for my $B_child (@B_constraints) {
-					if ($A_child->is_a_type_of($B_child)) {
+				INNER: for my $B_child ( @B_constraints ) {
+					if ( $A_child->is_a_type_of( $B_child ) ) {
 						++$a_child_is_subtype_of_something;
 						last INNER;
 					}
 				}
-				if (not $a_child_is_subtype_of_something) {
+				if ( not $a_child_is_subtype_of_something ) {
 					last SUBTYPE;
 				}
-			}
+			} #/ OUTER: for my $A_child ( @A_constraints)
 			return Type::Tiny::CMP_SUBTYPE;
-		}
+		} #/ SUBTYPE:
 		
 		# If everything in @B_constraints is a subtype of something in @A_constraints, then $A is supertype of $B
 		SUPERTYPE: {
-			OUTER: for my $B_child (@B_constraints) {
+			OUTER: for my $B_child ( @B_constraints ) {
 				my $b_child_is_subtype_of_something = 0;
-				INNER: for my $A_child (@A_constraints) {
-					if ($B_child->is_a_type_of($A_child)) {
+				INNER: for my $A_child ( @A_constraints ) {
+					if ( $B_child->is_a_type_of( $A_child ) ) {
 						++$b_child_is_subtype_of_something;
 						last INNER;
 					}
 				}
-				if (not $b_child_is_subtype_of_something) {
+				if ( not $b_child_is_subtype_of_something ) {
 					last SUPERTYPE;
 				}
-			}
+			} #/ OUTER: for my $B_child ( @B_constraints)
 			return Type::Tiny::CMP_SUPERTYPE;
-		}
-	}
+		} #/ SUPERTYPE:
+	} #/ if ( $A->isa( __PACKAGE__...))
 	
 	# I think it might be possible to merge this into the first bit by treating $B as union[$B].
 	# Test cases first though.
-	if ($A->isa(__PACKAGE__)) {
+	if ( $A->isa( __PACKAGE__ ) ) {
 		my @A_constraints = @{ $A->type_constraints };
-		if (@A_constraints == 1) {
-			my $result = Type::Tiny::cmp($A_constraints[0], $B);
+		if ( @A_constraints == 1 ) {
+			my $result = Type::Tiny::cmp( $A_constraints[0], $B );
 			return $result unless $result eq Type::Tiny::CMP_UNKNOWN;
 		}
 		my $subtype = 1;
-		for my $child (@A_constraints) {
-			if ($B->is_a_type_of($child)) {
+		for my $child ( @A_constraints ) {
+			if ( $B->is_a_type_of( $child ) ) {
 				return Type::Tiny::CMP_SUPERTYPE;
 			}
-			if ($subtype and not $B->is_supertype_of($child)) {
+			if ( $subtype and not $B->is_supertype_of( $child ) ) {
 				$subtype = 0;
 			}
 		}
-		if ($subtype) {
+		if ( $subtype ) {
 			return Type::Tiny::CMP_SUBTYPE;
 		}
-	}
-
+	} #/ if ( $A->isa( __PACKAGE__...))
+	
 	# I think it might be possible to merge this into the first bit by treating $A as union[$A].
 	# Test cases first though.
-	if ($B->isa(__PACKAGE__)) {
+	if ( $B->isa( __PACKAGE__ ) ) {
 		my @B_constraints = @{ $B->type_constraints };
-		if (@B_constraints == 1) {
-			my $result = Type::Tiny::cmp($A, $B_constraints[0]);
+		if ( @B_constraints == 1 ) {
+			my $result = Type::Tiny::cmp( $A, $B_constraints[0] );
 			return $result unless $result eq Type::Tiny::CMP_UNKNOWN;
 		}
 		my $supertype = 1;
-		for my $child (@B_constraints) {
-			if ($A->is_a_type_of($child)) {
+		for my $child ( @B_constraints ) {
+			if ( $A->is_a_type_of( $child ) ) {
 				return Type::Tiny::CMP_SUBTYPE;
 			}
-			if ($supertype and not $A->is_supertype_of($child)) {
+			if ( $supertype and not $A->is_supertype_of( $child ) ) {
 				$supertype = 0;
 			}
 		}
-		if ($supertype) {
+		if ( $supertype ) {
 			return Type::Tiny::CMP_SUPERTYPE;
 		}
-	}
+	} #/ if ( $B->isa( __PACKAGE__...))
 	
 	return Type::Tiny::CMP_UNKNOWN;
 };
@@ -457,4 +450,3 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-

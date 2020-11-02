@@ -19,73 +19,67 @@ sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 require Type::Coercion;
 our @ISA = 'Type::Coercion';
 
-sub _preserve_type_constraint
-{
+sub _preserve_type_constraint {
 	my $self = shift;
 	$self->{_union_of} = $self->{type_constraint}->type_constraints
 		if $self->{type_constraint};
 }
 
-sub _maybe_restore_type_constraint
-{
+sub _maybe_restore_type_constraint {
 	my $self = shift;
-	if ( my $union = $self->{_union_of} )
-	{
-		return Type::Tiny::Union->new(type_constraints => $union);
+	if ( my $union = $self->{_union_of} ) {
+		return Type::Tiny::Union->new( type_constraints => $union );
 	}
-	return; # uncoverable statement
+	return;    # uncoverable statement
 }
 
-sub type_coercion_map
-{
+sub type_coercion_map {
 	my $self = shift;
 	
-	Types::TypeTiny::assert_TypeTiny(my $type = $self->type_constraint);
-	$type->isa('Type::Tiny::Union')
-		or _croak "Type::Coercion::Union must be used in conjunction with Type::Tiny::Union";
-	
+	Types::TypeTiny::assert_TypeTiny( my $type = $self->type_constraint );
+	$type->isa( 'Type::Tiny::Union' )
+		or _croak
+		"Type::Coercion::Union must be used in conjunction with Type::Tiny::Union";
+		
 	my @c;
-	for my $tc (@$type)
-	{
+	for my $tc ( @$type ) {
 		next unless $tc->has_coercion;
-		push @c, @{$tc->coercion->type_coercion_map};
+		push @c, @{ $tc->coercion->type_coercion_map };
 	}
 	return \@c;
-}
+} #/ sub type_coercion_map
 
-sub add_type_coercions
-{
+sub add_type_coercions {
 	my $self = shift;
-	_croak "Adding coercions to Type::Coercion::Union not currently supported" if @_;
+	_croak "Adding coercions to Type::Coercion::Union not currently supported"
+		if @_;
 }
 
-sub _build_moose_coercion
-{
+sub _build_moose_coercion {
 	my $self = shift;
 	
 	my %options = ();
-	$options{type_constraint} = $self->type_constraint if $self->has_type_constraint;
-	
+	$options{type_constraint} = $self->type_constraint
+		if $self->has_type_constraint;
+		
 	require Moose::Meta::TypeCoercion::Union;
-	my $r = "Moose::Meta::TypeCoercion::Union"->new(%options);
+	my $r = "Moose::Meta::TypeCoercion::Union"->new( %options );
 	
 	return $r;
-}
+} #/ sub _build_moose_coercion
 
-sub can_be_inlined
-{
+sub can_be_inlined {
 	my $self = shift;
 	
-	Types::TypeTiny::assert_TypeTiny(my $type = $self->type_constraint);
+	Types::TypeTiny::assert_TypeTiny( my $type = $self->type_constraint );
 	
-	for my $tc (@$type)
-	{
-		next unless $tc->has_coercion;
+	for my $tc ( @$type ) {
+		next       unless $tc->has_coercion;
 		return !!0 unless $tc->coercion->can_be_inlined;
 	}
 	
 	!!1;
-}
+} #/ sub can_be_inlined
 
 1;
 
@@ -138,4 +132,3 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-

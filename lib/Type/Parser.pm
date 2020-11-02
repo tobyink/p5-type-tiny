@@ -11,21 +11,21 @@ our $VERSION   = '1.012000';
 $VERSION =~ tr/_//d;
 
 # Token types
-# 
-sub TYPE      () { "TYPE" };
-sub QUOTELIKE () { "QUOTELIKE" };
-sub STRING    () { "STRING" };
-sub CLASS     () { "CLASS" };
-sub L_BRACKET () { "L_BRACKET" };
-sub R_BRACKET () { "R_BRACKET" };
-sub COMMA     () { "COMMA" };
-sub SLURPY    () { "SLURPY" };
-sub UNION     () { "UNION" };
-sub INTERSECT () { "INTERSECT" };
-sub NOT       () { "NOT" };
-sub L_PAREN   () { "L_PAREN" };
-sub R_PAREN   () { "R_PAREN" };
-sub MYSTERY   () { "MYSTERY" };
+#
+sub TYPE ()      { "TYPE" }
+sub QUOTELIKE () { "QUOTELIKE" }
+sub STRING ()    { "STRING" }
+sub CLASS ()     { "CLASS" }
+sub L_BRACKET () { "L_BRACKET" }
+sub R_BRACKET () { "R_BRACKET" }
+sub COMMA ()     { "COMMA" }
+sub SLURPY ()    { "SLURPY" }
+sub UNION ()     { "UNION" }
+sub INTERSECT () { "INTERSECT" }
+sub NOT ()       { "NOT" }
+sub L_PAREN ()   { "L_PAREN" }
+sub R_PAREN ()   { "R_PAREN" }
+sub MYSTERY ()   { "MYSTERY" }
 
 our @EXPORT_OK = qw( eval_type _std_eval parse extract_type );
 
@@ -33,269 +33,246 @@ require Exporter::Tiny;
 our @ISA = 'Exporter::Tiny';
 
 Evaluate: {
-	
-	sub parse
-	{
-		my $str = $_[0];
-		my $parser = "Type::Parser::AstBuilder"->new(input => $str);
+
+	sub parse {
+		my $str    = $_[0];
+		my $parser = "Type::Parser::AstBuilder"->new( input => $str );
 		$parser->build;
-		wantarray ? ($parser->ast, $parser->remainder) : $parser->ast;
+		wantarray ? ( $parser->ast, $parser->remainder ) : $parser->ast;
 	}
 	
-	sub extract_type
-	{
-		my ($str, $reg) = @_;
-		my ($parsed, $tail) = parse($str);
-		wantarray ? (_eval_type($parsed, $reg), $tail) : _eval_type($parsed, $reg);
+	sub extract_type {
+		my ( $str,    $reg )  = @_;
+		my ( $parsed, $tail ) = parse( $str );
+		wantarray
+			? ( _eval_type( $parsed, $reg ), $tail )
+			: _eval_type( $parsed, $reg );
 	}
 	
-	sub eval_type
-	{
-		my ($str, $reg) = @_;
-		my ($parsed, $tail) = parse($str);
-		_croak("Unexpected tail on type expression: $tail") if $tail =~ /\S/sm;
-		return _eval_type($parsed, $reg);
+	sub eval_type {
+		my ( $str,    $reg )  = @_;
+		my ( $parsed, $tail ) = parse( $str );
+		_croak( "Unexpected tail on type expression: $tail" ) if $tail =~ /\S/sm;
+		return _eval_type( $parsed, $reg );
 	}
 	
 	my $std;
-	sub _std_eval
-	{
+	
+	sub _std_eval {
 		require Type::Registry;
-		unless ($std)
-		{
+		unless ( $std ) {
 			$std = "Type::Registry"->new;
-			$std->add_types(-Standard);
+			$std->add_types( -Standard );
 		}
-		eval_type($_[0], $std);
+		eval_type( $_[0], $std );
 	}
 	
-	sub _eval_type
-	{
-		my ($node, $reg) = @_;
+	sub _eval_type {
+		my ( $node, $reg ) = @_;
 		
-		$node = _simplify_expression($node);
+		$node = _simplify_expression( $node );
 		
-		if ($node->{type} eq "list")
-		{
-			return map _eval_type($_, $reg), @{$node->{list}};
+		if ( $node->{type} eq "list" ) {
+			return map _eval_type( $_, $reg ), @{ $node->{list} };
 		}
 		
-		if ($node->{type} eq "union")
-		{
-			return $reg->make_union(
-				map _eval_type($_, $reg), @{$node->{union}}
-			);
+		if ( $node->{type} eq "union" ) {
+			return $reg->make_union( map _eval_type( $_, $reg ), @{ $node->{union} } );
 		}
 		
-		if ($node->{type} eq "intersect")
-		{
-			return $reg->make_intersection(
-				map _eval_type($_, $reg), @{$node->{intersect}}
-			);
+		if ( $node->{type} eq "intersect" ) {
+			return $reg->make_intersection( map _eval_type( $_, $reg ),
+				@{ $node->{intersect} } );
 		}
 		
-		if ($node->{type} eq "slurpy")
-		{
-			return +{ slurpy => _eval_type($node->{of}, $reg) };
+		if ( $node->{type} eq "slurpy" ) {
+			return +{ slurpy => _eval_type( $node->{of}, $reg ) };
 		}
 		
-		if ($node->{type} eq "complement")
-		{
-			return _eval_type($node->{of}, $reg)->complementary_type;
+		if ( $node->{type} eq "complement" ) {
+			return _eval_type( $node->{of}, $reg )->complementary_type;
 		}
 		
-		if ($node->{type} eq "parameterized")
-		{
-			my $base = _eval_type($node->{base}, $reg);
+		if ( $node->{type} eq "parameterized" ) {
+			my $base = _eval_type( $node->{base}, $reg );
 			
 			return $base unless $base->is_parameterizable || $node->{params};
-			return $base->parameterize($node->{params} ? _eval_type($node->{params}, $reg) : ());
+			return $base->parameterize(
+				$node->{params} ? _eval_type( $node->{params}, $reg ) : () );
 		}
 		
-		if ($node->{type} eq "primary" and $node->{token}->type eq CLASS)
-		{
+		if ( $node->{type} eq "primary" and $node->{token}->type eq CLASS ) {
 			my $class = substr(
 				$node->{token}->spelling,
 				0,
-				length($node->{token}->spelling) - 2
+				length( $node->{token}->spelling ) - 2
 			);
-			return $reg->make_class_type($class);
+			return $reg->make_class_type( $class );
 		}
 		
-		if ($node->{type} eq "primary" and $node->{token}->type eq QUOTELIKE)
-		{
-			return eval($node->{token}->spelling); #ARGH
+		if ( $node->{type} eq "primary" and $node->{token}->type eq QUOTELIKE ) {
+			return eval( $node->{token}->spelling );    #ARGH
 		}
 		
-		if ($node->{type} eq "primary" and $node->{token}->type eq STRING)
-		{
+		if ( $node->{type} eq "primary" and $node->{token}->type eq STRING ) {
 			return $node->{token}->spelling;
 		}
 		
-		if ($node->{type} eq "primary" and $node->{token}->type eq TYPE)
-		{
+		if ( $node->{type} eq "primary" and $node->{token}->type eq TYPE ) {
 			my $t = $node->{token}->spelling;
-			my $r = ($t =~ /^(.+)::(\w+)$/)
-				? $reg->foreign_lookup($t, 1)
-				: $reg->simple_lookup($t, 1);
-			$r or _croak("%s is not a known type constraint", $node->{token}->spelling);
+			my $r =
+				( $t =~ /^(.+)::(\w+)$/ )
+				? $reg->foreign_lookup( $t, 1 )
+				: $reg->simple_lookup( $t, 1 );
+			$r or _croak( "%s is not a known type constraint", $node->{token}->spelling );
 			return $r;
 		}
-	}
+	} #/ sub _eval_type
 	
-	sub _simplify_expression
-	{
+	sub _simplify_expression {
 		my $expr = shift;
 		
-		if ($expr->{type} eq "expression" and $expr->{op}[0] eq COMMA)
-		{
-			return _simplify("list", COMMA, $expr);
+		if ( $expr->{type} eq "expression" and $expr->{op}[0] eq COMMA ) {
+			return _simplify( "list", COMMA, $expr );
 		}
 		
-		if ($expr->{type} eq "expression" and $expr->{op}[0] eq UNION)
-		{
-			return _simplify("union", UNION, $expr);
+		if ( $expr->{type} eq "expression" and $expr->{op}[0] eq UNION ) {
+			return _simplify( "union", UNION, $expr );
 		}
 		
-		if ($expr->{type} eq "expression" and $expr->{op}[0] eq INTERSECT)
-		{
-			return _simplify("intersect", INTERSECT, $expr);
+		if ( $expr->{type} eq "expression" and $expr->{op}[0] eq INTERSECT ) {
+			return _simplify( "intersect", INTERSECT, $expr );
 		}
 		
 		return $expr;
-	}
+	} #/ sub _simplify_expression
 	
-	sub _simplify
-	{
+	sub _simplify {
 		no warnings 'recursion';
 		my $type = shift;
 		my $op   = shift;
 		
 		my @list;
-		for my $expr ($_[0]{lhs}, $_[0]{rhs})
-		{
-			if ($expr->{type} eq "expression" and $expr->{op}[0] eq $op)
-			{
-				my $simple = _simplify($type, $op, $expr);
+		for my $expr ( $_[0]{lhs}, $_[0]{rhs} ) {
+			if ( $expr->{type} eq "expression" and $expr->{op}[0] eq $op ) {
+				my $simple = _simplify( $type, $op, $expr );
 				push @list, @{ $simple->{$type} };
 			}
-			else
-			{
+			else {
 				push @list, $expr;
 			}
 		}
 		
 		return { type => $type, $type => \@list };
-	}
-}
+	} #/ sub _simplify
+} #/ Evaluate:
 
 {
-	package # hide from CPAN
-	Type::Parser::AstBuilder;
-	
-	sub new
-	{
+	package    # hide from CPAN
+		Type::Parser::AstBuilder;
+		
+	sub new {
 		my $class = shift;
-		bless { @_ }, $class;
+		bless {@_}, $class;
 	}
 	
 	our %precedence = (
-#		Type::Parser::COMMA()     , 1 ,
-		Type::Parser::UNION()     , 2 ,
-		Type::Parser::INTERSECT() , 3 ,
-		Type::Parser::NOT()       , 4 ,
+	
+		#		Type::Parser::COMMA()     , 1 ,
+		Type::Parser::UNION(),     2,
+		Type::Parser::INTERSECT(), 3,
+		Type::Parser::NOT(),       4,
 	);
 	
-	sub _parse_primary
-	{
+	sub _parse_primary {
 		my $self   = shift;
 		my $tokens = $self->{tokens};
 		
 		$tokens->assert_not_empty;
 		
-		if ($tokens->peek(0)->type eq Type::Parser::NOT)
-		{
-			$tokens->eat(Type::Parser::NOT);
+		if ( $tokens->peek( 0 )->type eq Type::Parser::NOT ) {
+			$tokens->eat( Type::Parser::NOT );
 			$tokens->assert_not_empty;
 			return {
-				type  => "complement",
-				of    => $self->_parse_primary,
+				type => "complement",
+				of   => $self->_parse_primary,
 			};
 		}
 		
-		if ($tokens->peek(0)->type eq Type::Parser::SLURPY)
-		{
-			$tokens->eat(Type::Parser::SLURPY);
+		if ( $tokens->peek( 0 )->type eq Type::Parser::SLURPY ) {
+			$tokens->eat( Type::Parser::SLURPY );
 			$tokens->assert_not_empty;
 			return {
-				type  => "slurpy",
-				of    => $self->_parse_primary,
+				type => "slurpy",
+				of   => $self->_parse_primary,
 			};
 		}
 		
-		if ($tokens->peek(0)->type eq Type::Parser::L_PAREN)
-		{
-			$tokens->eat(Type::Parser::L_PAREN);
+		if ( $tokens->peek( 0 )->type eq Type::Parser::L_PAREN ) {
+			$tokens->eat( Type::Parser::L_PAREN );
 			my $r = $self->_parse_expression;
-			$tokens->eat(Type::Parser::R_PAREN);
+			$tokens->eat( Type::Parser::R_PAREN );
 			return $r;
 		}
 		
-		if ($tokens->peek(1)
-		and $tokens->peek(0)->type eq Type::Parser::TYPE
-		and $tokens->peek(1)->type eq Type::Parser::L_BRACKET)
+		if ( $tokens->peek( 1 )
+			and $tokens->peek( 0 )->type eq Type::Parser::TYPE
+			and $tokens->peek( 1 )->type eq Type::Parser::L_BRACKET )
 		{
-			my $base = { type  => "primary", token => $tokens->eat(Type::Parser::TYPE) };
-			$tokens->eat(Type::Parser::L_BRACKET);
+			my $base = { type => "primary", token => $tokens->eat( Type::Parser::TYPE ) };
+			$tokens->eat( Type::Parser::L_BRACKET );
 			$tokens->assert_not_empty;
 			
 			local $precedence{ Type::Parser::COMMA() } = 1;
 			
 			my $params = undef;
-			if ($tokens->peek(0)->type eq Type::Parser::R_BRACKET)
-			{
-				$tokens->eat(Type::Parser::R_BRACKET);
+			if ( $tokens->peek( 0 )->type eq Type::Parser::R_BRACKET ) {
+				$tokens->eat( Type::Parser::R_BRACKET );
 			}
-			else
-			{
+			else {
 				$params = $self->_parse_expression;
-				$params = { type => "list", list => [$params] } unless $params->{type} eq "list";
-				$tokens->eat(Type::Parser::R_BRACKET);
+				$params = { type => "list", list => [$params] }
+					unless $params->{type} eq "list";
+				$tokens->eat( Type::Parser::R_BRACKET );
 			}
 			return {
 				type   => "parameterized",
 				base   => $base,
 				params => $params,
 			};
-		}
+		} #/ if ( $tokens->peek( 1 ...))
 		
-		my $type = $tokens->peek(0)->type;
-		if ($type eq Type::Parser::TYPE
-		or  $type eq Type::Parser::QUOTELIKE
-		or  $type eq Type::Parser::STRING
-		or  $type eq Type::Parser::CLASS)
+		my $type = $tokens->peek( 0 )->type;
+		if ( $type eq Type::Parser::TYPE
+			or $type eq Type::Parser::QUOTELIKE
+			or $type eq Type::Parser::STRING
+			or $type eq Type::Parser::CLASS )
 		{
-			return { type  => "primary", token => $tokens->eat };
+			return { type => "primary", token => $tokens->eat };
 		}
 		
-		Type::Parser::_croak("Unexpected token in primary type expression; got '%s'", $tokens->peek(0)->spelling);
-	}
+		Type::Parser::_croak( "Unexpected token in primary type expression; got '%s'",
+			$tokens->peek( 0 )->spelling );
+	} #/ sub _parse_primary
 	
-	sub _parse_expression_1
-	{
+	sub _parse_expression_1 {
 		my $self   = shift;
 		my $tokens = $self->{tokens};
 		
-		my ($lhs, $min_p) = @_;
-		while (!$tokens->empty and defined($precedence{$tokens->peek(0)->type}) and $precedence{$tokens->peek(0)->type} >= $min_p)
+		my ( $lhs, $min_p ) = @_;
+		while ( !$tokens->empty
+			and defined( $precedence{ $tokens->peek( 0 )->type } )
+			and $precedence{ $tokens->peek( 0 )->type } >= $min_p )
 		{
 			my $op  = $tokens->eat;
 			my $rhs = $self->_parse_primary;
 			
-			while (!$tokens->empty and defined($precedence{$tokens->peek(0)->type}) and $precedence{$tokens->peek(0)->type} > $precedence{$op->type})
+			while ( !$tokens->empty
+				and defined( $precedence{ $tokens->peek( 0 )->type } )
+				and $precedence{ $tokens->peek( 0 )->type } > $precedence{ $op->type } )
 			{
-				my $lookahead = $tokens->peek(0);
-				$rhs = $self->_parse_expression_1($rhs, $precedence{$lookahead->type});
+				my $lookahead = $tokens->peek( 0 );
+				$rhs = $self->_parse_expression_1( $rhs, $precedence{ $lookahead->type } );
 			}
 			
 			$lhs = {
@@ -304,196 +281,173 @@ Evaluate: {
 				lhs  => $lhs,
 				rhs  => $rhs,
 			};
-		}
+		} #/ while ( !$tokens->empty and...)
 		return $lhs;
-	}
+	} #/ sub _parse_expression_1
 	
-	sub _parse_expression
-	{
+	sub _parse_expression {
 		my $self   = shift;
 		my $tokens = $self->{tokens};
 		
-		return $self->_parse_expression_1($self->_parse_primary, 0);
+		return $self->_parse_expression_1( $self->_parse_primary, 0 );
 	}
 	
-	sub build
-	{
+	sub build {
 		my $self = shift;
-		$self->{tokens} = "Type::Parser::TokenStream"->new(remaining => $self->{input});
-		$self->{ast}    = $self->_parse_expression;
+		$self->{tokens} =
+			"Type::Parser::TokenStream"->new( remaining => $self->{input} );
+		$self->{ast} = $self->_parse_expression;
 	}
 	
-	sub ast
-	{
+	sub ast {
 		$_[0]{ast};
 	}
 	
-	sub remainder
-	{
+	sub remainder {
 		$_[0]{tokens}->remainder;
 	}
 }
 
 {
-	package # hide from CPAN
-	Type::Parser::Token;
+	package    # hide from CPAN
+		Type::Parser::Token;
 	sub type     { $_[0][0] }
 	sub spelling { $_[0][1] }
 }
 
 {
-	package # hide from CPAN
-	Type::Parser::TokenStream;
-	
+	package    # hide from CPAN
+		Type::Parser::TokenStream;
+		
 	use Scalar::Util qw(looks_like_number);
 	
-	sub new
-	{
+	sub new {
 		my $class = shift;
 		bless { stack => [], done => [], @_ }, $class;
 	}
 	
-	sub peek
-	{
+	sub peek {
 		my $self  = shift;
 		my $ahead = $_[0];
 		
-		while ($self->_stack_size <= $ahead and length $self->{remaining})
-		{
+		while ( $self->_stack_size <= $ahead and length $self->{remaining} ) {
 			$self->_stack_extend;
 		}
 		
 		my @tokens = grep ref, @{ $self->{stack} };
 		return $tokens[$ahead];
-	}
+	} #/ sub peek
 	
-	sub empty
-	{
+	sub empty {
 		my $self = shift;
-		not $self->peek(0);
+		not $self->peek( 0 );
 	}
 	
-	sub eat
-	{
+	sub eat {
 		my $self = shift;
 		$self->_stack_extend unless $self->_stack_size;
 		my $r;
-		while (defined(my $item = shift @{$self->{stack}}))
-		{
+		while ( defined( my $item = shift @{ $self->{stack} } ) ) {
 			push @{ $self->{done} }, $item;
-			if (ref $item)
-			{
+			if ( ref $item ) {
 				$r = $item;
 				last;
 			}
 		}
 		
-		if (@_ and $_[0] ne $r->type)
-		{
-			unshift @{$self->{stack}}, pop @{$self->{done}};        # uncoverable statement
-			Type::Parser::_croak("Expected $_[0]; got ".$r->type);  # uncoverable statement
+		if ( @_ and $_[0] ne $r->type ) {
+			unshift @{ $self->{stack} }, pop @{ $self->{done} };          # uncoverable statement
+			Type::Parser::_croak( "Expected $_[0]; got " . $r->type );    # uncoverable statement
 		}
 		
 		return $r;
-	}
+	} #/ sub eat
 	
-	sub assert_not_empty
-	{
+	sub assert_not_empty {
 		my $self = shift;
-		Type::Parser::_croak("Expected token; got empty string") if $self->empty;
+		Type::Parser::_croak( "Expected token; got empty string" ) if $self->empty;
 	}
 	
-	sub _stack_size
-	{
+	sub _stack_size {
 		my $self = shift;
 		scalar grep ref, @{ $self->{stack} };
 	}
 	
-	sub _stack_extend
-	{
+	sub _stack_extend {
 		my $self = shift;
 		push @{ $self->{stack} }, $self->_read_token;
-		my ($space) = ($self->{remaining} =~ m/^([\s\n\r]*)/sm);
+		my ( $space ) = ( $self->{remaining} =~ m/^([\s\n\r]*)/sm );
 		return unless length $space;
 		push @{ $self->{stack} }, $space;
-		substr($self->{remaining}, 0, length $space) = "";
+		substr( $self->{remaining}, 0, length $space ) = "";
 	}
 	
-	sub remainder
-	{
+	sub remainder {
 		my $self = shift;
 		return join "",
-			map { ref($_) ? $_->spelling : $_ }
-			(@{$self->{stack}}, $self->{remaining})
+			map { ref( $_ ) ? $_->spelling : $_ }
+			( @{ $self->{stack} }, $self->{remaining} );
 	}
 	
 	my %punctuation = (
-		'['       => bless([ Type::Parser::L_BRACKET, "[" ], "Type::Parser::Token"),
-		']'       => bless([ Type::Parser::R_BRACKET, "]" ], "Type::Parser::Token"),
-		'('       => bless([ Type::Parser::L_PAREN,   "[" ], "Type::Parser::Token"),
-		')'       => bless([ Type::Parser::R_PAREN,   "]" ], "Type::Parser::Token"),
-		','       => bless([ Type::Parser::COMMA,     "," ], "Type::Parser::Token"),
-		'=>'      => bless([ Type::Parser::COMMA,     "=>" ], "Type::Parser::Token"),
-		'slurpy'  => bless([ Type::Parser::SLURPY,    "slurpy" ], "Type::Parser::Token"),
-		'|'       => bless([ Type::Parser::UNION,     "|" ], "Type::Parser::Token"),
-		'&'       => bless([ Type::Parser::INTERSECT, "&" ], "Type::Parser::Token"),
-		'~'       => bless([ Type::Parser::NOT,       "~" ], "Type::Parser::Token"),
+		'['      => bless( [ Type::Parser::L_BRACKET, "[" ],   "Type::Parser::Token" ),
+		']'      => bless( [ Type::Parser::R_BRACKET, "]" ],   "Type::Parser::Token" ),
+		'('      => bless( [ Type::Parser::L_PAREN,   "[" ],   "Type::Parser::Token" ),
+		')'      => bless( [ Type::Parser::R_PAREN,   "]" ],   "Type::Parser::Token" ),
+		','      => bless( [ Type::Parser::COMMA,     "," ],   "Type::Parser::Token" ),
+		'=>'     => bless( [ Type::Parser::COMMA,     "=>" ],  "Type::Parser::Token" ),
+		'slurpy' => bless( [ Type::Parser::SLURPY, "slurpy" ], "Type::Parser::Token" ),
+		'|'      => bless( [ Type::Parser::UNION,  "|" ],      "Type::Parser::Token" ),
+		'&'      => bless( [ Type::Parser::INTERSECT, "&" ],   "Type::Parser::Token" ),
+		'~'      => bless( [ Type::Parser::NOT,       "~" ],   "Type::Parser::Token" ),
 	);
 	
-	sub _read_token
-	{
+	sub _read_token {
 		my $self = shift;
 		
 		return if $self->{remaining} eq "";
 		
 		# Punctuation
-		# 
+		#
 		
-		if ($self->{remaining} =~ /^( => | [()\]\[|&~,] )/xsm)
-		{
+		if ( $self->{remaining} =~ /^( => | [()\]\[|&~,] )/xsm ) {
 			my $spelling = $1;
-			substr($self->{remaining}, 0, length $spelling) = "";
+			substr( $self->{remaining}, 0, length $spelling ) = "";
 			return $punctuation{$spelling};
 		}
 		
-		if ($self->{remaining} =~ /\A\s*[q'"]/sm)
-		{
+		if ( $self->{remaining} =~ /\A\s*[q'"]/sm ) {
 			require Text::Balanced;
-			if (my $quotelike = Text::Balanced::extract_quotelike($self->{remaining}))
-			{
-				return bless([ Type::Parser::QUOTELIKE, $quotelike ], "Type::Parser::Token"),;
+			if ( my $quotelike = Text::Balanced::extract_quotelike( $self->{remaining} ) ) {
+				return bless( [ Type::Parser::QUOTELIKE, $quotelike ], "Type::Parser::Token" ),;
 			}
 		}
 		
-		if ($self->{remaining} =~ /^([+-]?[\w:.+]+)/sm)
-		{
+		if ( $self->{remaining} =~ /^([+-]?[\w:.+]+)/sm ) {
 			my $spelling = $1;
-			substr($self->{remaining}, 0, length $spelling) = "";
+			substr( $self->{remaining}, 0, length $spelling ) = "";
 			
-			if ($spelling =~ /::$/sm)
-			{
-				return bless([ Type::Parser::CLASS, $spelling ], "Type::Parser::Token"),;
+			if ( $spelling =~ /::$/sm ) {
+				return bless( [ Type::Parser::CLASS, $spelling ], "Type::Parser::Token" ),;
 			}
-			elsif (looks_like_number($spelling))
-			{
-				return bless([ Type::Parser::STRING, $spelling ], "Type::Parser::Token"),;
+			elsif ( looks_like_number( $spelling ) ) {
+				return bless( [ Type::Parser::STRING, $spelling ], "Type::Parser::Token" ),;
 			}
-			elsif ($self->{remaining} =~ /^\s*=>/sm) # peek ahead
+			elsif ( $self->{remaining} =~ /^\s*=>/sm )    # peek ahead
 			{
-				return bless([ Type::Parser::STRING, $spelling ], "Type::Parser::Token"),;
+				return bless( [ Type::Parser::STRING, $spelling ], "Type::Parser::Token" ),;
 			}
-			elsif ($spelling eq "slurpy")
-			{
+			elsif ( $spelling eq "slurpy" ) {
 				return $punctuation{$spelling};
 			}
 			
-			return bless([ Type::Parser::TYPE, $spelling ], "Type::Parser::Token");
-		}
+			return bless( [ Type::Parser::TYPE, $spelling ], "Type::Parser::Token" );
+		} #/ if ( $self->{remaining...})
 		
 		my $rest = $self->{remaining};
 		$self->{remaining} = "";
-		return bless([ Type::Parser::MYSTERY, $rest ], "Type::Parser::Token");
-	}
+		return bless( [ Type::Parser::MYSTERY, $rest ], "Type::Parser::Token" );
+	} #/ sub _read_token
 }
 
 1;
@@ -623,4 +577,3 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-

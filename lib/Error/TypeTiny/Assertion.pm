@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 BEGIN {
-	if ($] < 5.008) { require Devel::TypeTiny::Perl56Compat };
+	if ( $] < 5.008 ) { require Devel::TypeTiny::Perl56Compat }
 }
 
 BEGIN {
@@ -18,20 +18,19 @@ $Error::TypeTiny::Assertion::VERSION =~ tr/_//d;
 require Error::TypeTiny;
 our @ISA = 'Error::TypeTiny';
 
-sub type               { $_[0]{type} };
-sub value              { $_[0]{value} };
-sub varname            { $_[0]{varname} ||= '$_' };
-sub attribute_step     { $_[0]{attribute_step} };
-sub attribute_name     { $_[0]{attribute_name} };
+sub type           { $_[0]{type} }
+sub value          { $_[0]{value} }
+sub varname        { $_[0]{varname} ||= '$_' }
+sub attribute_step { $_[0]{attribute_step} }
+sub attribute_name { $_[0]{attribute_name} }
 
-sub has_type           { defined $_[0]{type} }; # sic
-sub has_attribute_step { exists $_[0]{attribute_step} };
-sub has_attribute_name { exists $_[0]{attribute_name} };
+sub has_type           { defined $_[0]{type} };           # sic
+sub has_attribute_step { exists $_[0]{attribute_step} }
+sub has_attribute_name { exists $_[0]{attribute_name} }
 
-sub new
-{
+sub new {
 	my $class = shift;
-	my $self  = $class->SUPER::new(@_);
+	my $self  = $class->SUPER::new( @_ );
 	
 	# Supported but undocumented parameter is `mgaca`.
 	# This indicates whether Error::TypeTiny::Assertion
@@ -43,67 +42,65 @@ sub new
 	# $Method::Generate::Accessor::CurrentAttribute hashref.
 	#
 	
-	if (ref $Method::Generate::Accessor::CurrentAttribute
-	and $self->{mgaca} || !exists $self->{mgaca})
+	if ( ref $Method::Generate::Accessor::CurrentAttribute
+		and $self->{mgaca} || !exists $self->{mgaca} )
 	{
 		require B;
 		my %d = %{$Method::Generate::Accessor::CurrentAttribute};
 		$self->{attribute_name} = $d{name} if defined $d{name};
 		$self->{attribute_step} = $d{step} if defined $d{step};
 		
-		if (defined $d{init_arg})
-		{
-			$self->{varname} = sprintf('$args->{%s}', B::perlstring($d{init_arg}));
+		if ( defined $d{init_arg} ) {
+			$self->{varname} = sprintf( '$args->{%s}', B::perlstring( $d{init_arg} ) );
 		}
-		elsif (defined $d{name})
-		{
-			$self->{varname} = sprintf('$self->{%s}', B::perlstring($d{name}));
+		elsif ( defined $d{name} ) {
+			$self->{varname} = sprintf( '$self->{%s}', B::perlstring( $d{name} ) );
 		}
-	}
+	} #/ if ( ref $Method::Generate::Accessor::CurrentAttribute...)
 	
 	return $self;
-}
+} #/ sub new
 
-sub message
-{
+sub message {
 	my $e = shift;
 	$e->varname eq '$_'
 		? $e->SUPER::message
-		: sprintf('%s (in %s)', $e->SUPER::message, $e->varname);
+		: sprintf( '%s (in %s)', $e->SUPER::message, $e->varname );
 }
 
-sub _build_message
-{
+sub _build_message {
 	my $e = shift;
 	$e->has_type
-		? sprintf('%s did not pass type constraint "%s"', Type::Tiny::_dd($e->value), $e->type)
-		: sprintf('%s did not pass type constraint', Type::Tiny::_dd($e->value))
+		? sprintf( '%s did not pass type constraint "%s"',
+		Type::Tiny::_dd( $e->value ), $e->type )
+		: sprintf( '%s did not pass type constraint',
+		Type::Tiny::_dd( $e->value ) );
 }
 
-*to_string = sub
-{
-	my $e = shift;
+*to_string = sub {
+	my $e   = shift;
 	my $msg = $e->message;
 	
 	my $c = $e->context;
-	$msg .= sprintf(" at %s line %s", $c->{file}||'file?', $c->{line}||'NaN') if $c;
-	
+	$msg .= sprintf( " at %s line %s", $c->{file} || 'file?', $c->{line} || 'NaN' )
+		if $c;
+		
 	my $explain = $e->explain;
 	return "$msg\n" unless @{ $explain || [] };
 	
 	$msg .= "\n";
-	for my $line (@$explain) {
+	for my $line ( @$explain ) {
 		$msg .= "    $line\n";
 	}
 	
 	return $msg;
-} if $] >= 5.008;
-
-sub explain
-{
+	}
+	if $] >= 5.008;
+	
+sub explain {
 	my $e = shift;
 	return undef unless $e->has_type;
-	$e->type->validate_explain($e->value, $e->varname);
+	$e->type->validate_explain( $e->value, $e->varname );
 }
 
 1;
@@ -210,4 +207,3 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-

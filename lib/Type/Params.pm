@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 BEGIN {
-	if ($] < 5.008) { require Devel::TypeTiny::Perl56Compat };
+	if ( $] < 5.008 ) { require Devel::TypeTiny::Perl56Compat }
 }
 
 BEGIN {
@@ -27,9 +27,10 @@ use Types::TypeTiny ();
 require Exporter::Tiny;
 our @ISA = 'Exporter::Tiny';
 
-our @EXPORT    = qw( compile compile_named );
-our @EXPORT_OK = qw( multisig validate validate_named compile_named_oo Invocant wrap_subs wrap_methods ArgsObject );
-
+our @EXPORT = qw( compile compile_named );
+our @EXPORT_OK =
+	qw( multisig validate validate_named compile_named_oo Invocant wrap_subs wrap_methods ArgsObject );
+	
 sub english_list {
 	require Type::Utils;
 	goto \&Type::Utils::english_list;
@@ -39,6 +40,7 @@ my $QUOTE = \&B::perlstring;
 
 {
 	my $Invocant;
+	
 	sub Invocant () {
 		$Invocant ||= do {
 			require Type::Tiny::Union;
@@ -51,105 +53,112 @@ my $QUOTE = \&B::perlstring;
 				],
 			);
 		};
-	}
+	} #/ sub Invocant
 	
 	my $ArgsObject;
+	
 	sub ArgsObject (;@) {
 		$ArgsObject ||= do {
 			require Types::Standard;
 			'Type::Tiny'->new(
-				name       => 'ArgsObject',
-				parent     => Types::Standard::Object(),
-				constraint => q{ ref($_) =~ qr/^Type::Params::OO::/ },
+				name                 => 'ArgsObject',
+				parent               => Types::Standard::Object(),
+				constraint           => q{ ref($_) =~ qr/^Type::Params::OO::/ },
 				constraint_generator => sub {
-					my $param = Types::Standard::assert_Str(shift);
-					sub { defined($_->{'~~caller'}) and $_->{'~~caller'} eq $param };
+					my $param = Types::Standard::assert_Str( shift );
+					sub { defined( $_->{'~~caller'} ) and $_->{'~~caller'} eq $param };
 				},
 				inline_generator => sub {
 					my $param  = shift;
-					my $quoted = $QUOTE->($param);
+					my $quoted = $QUOTE->( $param );
 					sub {
 						my $var = pop;
 						return (
-							Types::Standard::Object()->inline_check($var),
-							sprintf(q{ ref(%s) =~ qr/^Type::Params::OO::/ }, $var),
-							sprintf(q{ do { use Scalar::Util (); Scalar::Util::reftype(%s) eq 'HASH' } }, $var),
-							sprintf(q{ defined((%s)->{'~~caller'}) && ((%s)->{'~~caller'} eq %s) }, $var, $var, $quoted),
+							Types::Standard::Object()->inline_check( $var ),
+							sprintf( q{ ref(%s) =~ qr/^Type::Params::OO::/ }, $var ),
+							sprintf(
+								q{ do { use Scalar::Util (); Scalar::Util::reftype(%s) eq 'HASH' } }, $var
+							),
+							sprintf(
+								q{ defined((%s)->{'~~caller'}) && ((%s)->{'~~caller'} eq %s) }, $var, $var,
+								$quoted
+							),
 						);
 					};
 				},
 			);
 		};
 		
-		@_ ? $ArgsObject->parameterize(@{$_[0]}) : $ArgsObject;
-	}
+		@_ ? $ArgsObject->parameterize( @{ $_[0] } ) : $ArgsObject;
+	} #/ sub ArgsObject (;@)
 	
 	if ( $] ge '5.014' ) {
-		&Scalar::Util::set_prototype($_, ';$') for \&ArgsObject;
+		&Scalar::Util::set_prototype( $_, ';$' ) for \&ArgsObject;
 	}
 }
 
-sub _mkslurpy
-{
-	my ($name, $type, $tc, $i) = @_;
+sub _mkslurpy {
+	my ( $name, $type, $tc, $i ) = @_;
 	$name = 'local $_' if $name eq '$_';
 	
 	$type eq '@'
 		? sprintf(
-			'%s = [ @_[%d..$#_] ];',
-			$name,
-			$i,
+		'%s = [ @_[%d..$#_] ];',
+		$name,
+		$i,
 		)
 		: sprintf(
-			'%s = (@_==%d and ref $_[%d] eq "HASH") ? +{ %%{$_[%d]} } : (($#_-%d)%%2)==0 ? "Error::TypeTiny::WrongNumberOfParameters"->throw(message => sprintf("Odd number of elements in %%s", %s)) : +{ @_[%d..$#_] };',
-			$name,
-			$i + 1,
-			$i,
-			$i,
-			$i,
-			$QUOTE->("$tc"),
-			$i,
+		'%s = (@_==%d and ref $_[%d] eq "HASH") ? +{ %%{$_[%d]} } : (($#_-%d)%%2)==0 ? "Error::TypeTiny::WrongNumberOfParameters"->throw(message => sprintf("Odd number of elements in %%s", %s)) : +{ @_[%d..$#_] };',
+		$name,
+		$i + 1,
+		$i,
+		$i,
+		$i,
+		$QUOTE->( "$tc" ),
+		$i,
 		);
-}
+} #/ sub _mkslurpy
 
-sub _mkdefault
-{
+sub _mkdefault {
 	my $param_options = shift;
 	my $default;
 	
-	if (exists $param_options->{default}) {
+	if ( exists $param_options->{default} ) {
 		$default = $param_options->{default};
-		if (Types::Standard::is_ArrayRef($default) and not @$default) {
+		if ( Types::Standard::is_ArrayRef( $default ) and not @$default ) {
 			$default = '[]';
 		}
-		elsif (Types::Standard::is_HashRef($default) and not %$default) {
+		elsif ( Types::Standard::is_HashRef( $default ) and not %$default ) {
 			$default = '{}';
 		}
-		elsif (Types::Standard::is_Str($default)) {
-			$default = $QUOTE->($default);
+		elsif ( Types::Standard::is_Str( $default ) ) {
+			$default = $QUOTE->( $default );
 		}
-		elsif (Types::Standard::is_Undef($default)) {
+		elsif ( Types::Standard::is_Undef( $default ) ) {
 			$default = 'undef';
 		}
-		elsif (not Types::TypeTiny::is_CodeLike($default)) {
-			Error::TypeTiny::croak("Default expected to be string, coderef, undef, or reference to an empty hash or array");
+		elsif ( not Types::TypeTiny::is_CodeLike( $default ) ) {
+			Error::TypeTiny::croak(
+				"Default expected to be string, coderef, undef, or reference to an empty hash or array"
+			);
 		}
-	}
-
+	} #/ if ( exists $param_options...)
+	
 	$default;
-}
+} #/ sub _mkdefault
 
 sub _deal_with_head_and_tail {
 	my $options = shift;
-	$options->{arg_fudge_factor} = 0;
+	$options->{arg_fudge_factor}      = 0;
 	$options->{arg_fudge_factor_head} = 0;
 	my @lines;
 	my %env;
 	
-	for my $position (qw/ head tail /) {
+	for my $position ( qw/ head tail / ) {
 		next unless defined $options->{$position};
 		
-		$options->{$position} = [ (Types::Standard::Any) x (0+ $options->{$position}) ]
+		$options->{$position} =
+			[ ( Types::Standard::Any ) x ( 0+ $options->{$position} ) ]
 			if !ref $options->{$position};
 			
 		my $count = @{ $options->{$position} };
@@ -158,36 +167,37 @@ sub _deal_with_head_and_tail {
 		
 		push @lines => (
 			$position eq 'head'
-				? "\@head = splice(\@_, 0, $count);"
-				: "\@tail = splice(\@_, -$count);",
+			? "\@head = splice(\@_, 0, $count);"
+			: "\@tail = splice(\@_, -$count);",
 		);
 		
-		for my $i (0 .. $count-1) {
+		for my $i ( 0 .. $count - 1 ) {
 			my $constraint = $options->{$position}[$i];
 			$constraint = $options->{$position}[$i] = Types::Standard::Any
 				if !ref $constraint && $constraint eq 1;
-			Types::TypeTiny::assert_TypeTiny($constraint);
+			Types::TypeTiny::assert_TypeTiny( $constraint );
 			
 			my $is_optional = 0;
-			$is_optional += grep $_->{uniq} == Types::Standard::Optional->{uniq}, $constraint->parents;
-			Error::TypeTiny::croak("The $position may not contain optional parameters") if $is_optional;
-			
-			my $varname     = sprintf('$%s[%d]', $position, $i);
-			my $display_var = $position eq 'head'
-				? sprintf('$_[%d]', $i)
-				: sprintf('$_[%d]', $i-$count);
-			
-			if ($constraint->has_coercion and $constraint->coercion->can_be_inlined)
-			{
+			$is_optional += grep $_->{uniq} == Types::Standard::Optional->{uniq},
+				$constraint->parents;
+			Error::TypeTiny::croak( "The $position may not contain optional parameters" )
+				if $is_optional;
+				
+			my $varname = sprintf( '$%s[%d]', $position, $i );
+			my $display_var =
+				$position eq 'head'
+				? sprintf( '$_[%d]', $i )
+				: sprintf( '$_[%d]', $i - $count );
+				
+			if ( $constraint->has_coercion and $constraint->coercion->can_be_inlined ) {
 				push @lines, sprintf(
 					'%s = do { %s };',
 					$varname,
-					$constraint->coercion->inline_coercion($varname),
+					$constraint->coercion->inline_coercion( $varname ),
 				);
 			}
-			elsif ($constraint->has_coercion)
-			{
-				$env{'@coerce_'.$position}[$i] = $constraint->coercion->compiled_coercion;
+			elsif ( $constraint->has_coercion ) {
+				$env{ '@coerce_' . $position }[$i] = $constraint->coercion->compiled_coercion;
 				push @lines, sprintf(
 					'%s = $coerce_%s[%d]->(%s);',
 					$varname,
@@ -195,42 +205,40 @@ sub _deal_with_head_and_tail {
 					$i,
 					$varname,
 				);
-			}
+			} #/ elsif ( $constraint->has_coercion)
 			
 			undef $Type::Tiny::ALL_TYPES{ $constraint->{uniq} };
 			$Type::Tiny::ALL_TYPES{ $constraint->{uniq} } = $constraint;
 			
-			if ($constraint == Types::Standard::Any)
-			{
+			if ( $constraint == Types::Standard::Any ) {
+			
 				# don't really need to check!
 			}
-			elsif ($constraint->can_be_inlined)
-			{
+			elsif ( $constraint->can_be_inlined ) {
 				push @lines, sprintf(
 					'(%s) or Type::Tiny::_failed_check(%d, %s, %s, varname => %s);',
-					$constraint->inline_check($varname),
+					$constraint->inline_check( $varname ),
 					$constraint->{uniq},
-					$QUOTE->($constraint),
+					$QUOTE->( $constraint ),
 					$varname,
-					$QUOTE->($display_var),
+					$QUOTE->( $display_var ),
 				);
-			}
-			else
-			{
-				$env{'@check_'.$position}[$i] = $constraint->compiled_check;
+			} #/ elsif ( $constraint->can_be_inlined)
+			else {
+				$env{ '@check_' . $position }[$i] = $constraint->compiled_check;
 				push @lines, sprintf(
 					'%s or Type::Tiny::_failed_check(%d, %s, %s, varname => %s);',
-					sprintf(sprintf '$check_%s[%d]->(%s)', $position, $i, $varname),
+					sprintf( sprintf '$check_%s[%d]->(%s)', $position, $i, $varname ),
 					$constraint->{uniq},
-					$QUOTE->($constraint),
+					$QUOTE->( $constraint ),
 					$varname,
-					$QUOTE->($display_var),
+					$QUOTE->( $display_var ),
 				);
-			}
-		}
-	}
+			} #/ else [ if ( $constraint == Types::Standard::Any)]
+		} #/ for my $i ( 0 .. $count...)
+	} #/ for my $position ( qw/ head tail /)
 	
-	if (@lines) {
+	if ( @lines ) {
 		unshift @lines => sprintf(
 			'"Error::TypeTiny::WrongNumberOfParameters"->throw("Not enough parameters to satisfy required head and tail of parameter list") if @_ < %d;',
 			$options->{arg_fudge_factor},
@@ -239,17 +247,16 @@ sub _deal_with_head_and_tail {
 	}
 	
 	\%env, @lines;
-}
+} #/ sub _deal_with_head_and_tail
 
-sub compile
-{
-	my (@code, %env);
+sub compile {
+	my ( @code, %env );
 	
-	push @code, '#placeholder', '#placeholder';  # @code[0,1]
+	push @code, '#placeholder', '#placeholder';    # @code[0,1]
 	
 	my %options;
-	while (ref($_[0]) eq "HASH" && !$_[0]{slurpy}) {
-		%options = (%options, %{+shift});
+	while ( ref( $_[0] ) eq "HASH" && !$_[0]{slurpy} ) {
+		%options = ( %options, %{ +shift } );
 	}
 	
 	my $arg        = -1;
@@ -260,35 +267,37 @@ sub compile
 	
 	my $return_list = '@_';
 	$code[0] = 'my (%tmp, $tmp);';
-	PARAM: for my $param (@_) {
-		if (Types::Standard::is_HashRef($param)) {
+	PARAM: for my $param ( @_ ) {
+		if ( Types::Standard::is_HashRef( $param ) ) {
 			$code[0] = 'my (@R, %tmp, $tmp, $dtmp);';
 			$return_list = '@R';
 			last PARAM;
 		}
-		elsif (not Types::Standard::is_Bool($param)) {
-			if ($param->has_coercion) {
+		elsif ( not Types::Standard::is_Bool( $param ) ) {
+			if ( $param->has_coercion ) {
 				$code[0] = 'my (@R, %tmp, $tmp, $dtmp);';
 				$return_list = '@R';
 				last PARAM;
 			}
 		}
-	}
+	} #/ PARAM: for my $param ( @_ )
 	
-	my ($extra_env, @extra_lines) = _deal_with_head_and_tail(\%options);
-	if (@extra_lines) {
+	my ( $extra_env, @extra_lines ) = _deal_with_head_and_tail( \%options );
+	if ( @extra_lines ) {
 		push @code, @extra_lines;
-		%env = (%$extra_env, %env);
+		%env         = ( %$extra_env, %env );
 		$return_list = '(@head, @R, @tail)';
 	}
 	
-	my $for = $options{subname}||[caller(1+($options{caller_level}||0))]->[3] || '__ANON__';
-	
+	my $for =
+		$options{subname}
+		|| [ caller( 1 + ( $options{caller_level} || 0 ) ) ]->[3]
+		|| '__ANON__';
+		
 	my @default_indices;
 	my @default_values;
-		
-	while (@_)
-	{
+	
+	while ( @_ ) {
 		++$arg;
 		my $constraint = shift;
 		my $is_optional;
@@ -297,43 +306,57 @@ sub compile
 		my $varname;
 		
 		my $param_options = {};
-		$param_options = shift if Types::Standard::is_HashRef($_[0]) && !exists $_[0]{slurpy};
-		my $default = _mkdefault($param_options);
+		$param_options = shift
+			if Types::Standard::is_HashRef( $_[0] ) && !exists $_[0]{slurpy};
+		my $default = _mkdefault( $param_options );
 		
-		if ($param_options->{optional} or defined $default) {
+		if ( $param_options->{optional} or defined $default ) {
 			$is_optional = 1;
 		}
 		
-		if (Types::Standard::is_Bool($constraint))
-		{
-			$constraint = $constraint ? Types::Standard::Any : Types::Standard::Optional[Types::Standard::Any];
+		if ( Types::Standard::is_Bool( $constraint ) ) {
+			$constraint =
+				$constraint
+				? Types::Standard::Any
+				: Types::Standard::Optional [Types::Standard::Any];
 		}
-
-		if (Types::Standard::is_HashRef($constraint) and exists $constraint->{slurpy})
+		
+		if ( Types::Standard::is_HashRef( $constraint )
+			and exists $constraint->{slurpy} )
 		{
 			$constraint = Types::TypeTiny::to_TypeTiny(
 				$constraint->{slurpy}
-					or Error::TypeTiny::croak("Slurpy parameter malformed")
+					or Error::TypeTiny::croak( "Slurpy parameter malformed" )
 			);
 			push @code,
-				$constraint->is_a_type_of(Types::Standard::Dict)     ? _mkslurpy('$_', '%', $constraint => $arg) :
-				$constraint->is_a_type_of(Types::Standard::Map)      ? _mkslurpy('$_', '%', $constraint => $arg) :
-				$constraint->is_a_type_of(Types::Standard::Tuple)    ? _mkslurpy('$_', '@', $constraint => $arg) :
-				$constraint->is_a_type_of(Types::Standard::HashRef)  ? _mkslurpy('$_', '%', $constraint => $arg) :
-				$constraint->is_a_type_of(Types::Standard::ArrayRef) ? _mkslurpy('$_', '@', $constraint => $arg) :
-				Error::TypeTiny::croak("Slurpy parameter not of type HashRef or ArrayRef");
+				$constraint->is_a_type_of( Types::Standard::Dict )
+				? _mkslurpy( '$_', '%', $constraint => $arg )
+				: $constraint->is_a_type_of( Types::Standard::Map )
+				? _mkslurpy( '$_', '%', $constraint => $arg )
+				: $constraint->is_a_type_of( Types::Standard::Tuple )
+				? _mkslurpy( '$_', '@', $constraint => $arg )
+				: $constraint->is_a_type_of( Types::Standard::HashRef )
+				? _mkslurpy( '$_', '%', $constraint => $arg )
+				: $constraint->is_a_type_of( Types::Standard::ArrayRef )
+				? _mkslurpy( '$_', '@', $constraint => $arg )
+				: Error::TypeTiny::croak(
+				"Slurpy parameter not of type HashRef or ArrayRef" );
 			$varname = '$_';
 			$is_slurpy++;
 			$saw_slurpy++;
-		}
-		else
-		{
-			Error::TypeTiny::croak("Parameter following slurpy parameter") if $saw_slurpy;
+		} #/ if ( Types::Standard::is_HashRef...)
+		else {
+			Error::TypeTiny::croak( "Parameter following slurpy parameter" ) if $saw_slurpy;
 			
-			$is_optional     += grep $_->{uniq} == Types::Standard::Optional->{uniq}, $constraint->parents;
-			$really_optional = $is_optional && $constraint->parent && $constraint->parent->{uniq} eq Types::Standard::Optional->{uniq} && $constraint->type_parameter;
-			
-			if (ref $default) {
+			$is_optional += grep $_->{uniq} == Types::Standard::Optional->{uniq},
+				$constraint->parents;
+			$really_optional =
+				$is_optional
+				&& $constraint->parent
+				&& $constraint->parent->{uniq} eq Types::Standard::Optional->{uniq}
+				&& $constraint->type_parameter;
+				
+			if ( ref $default ) {
 				$env{'@default'}[$arg] = $default;
 				push @code, sprintf(
 					'$dtmp = ($#_ < %d) ? $default[%d]->() : $_[%d];',
@@ -344,8 +367,8 @@ sub compile
 				$saw_opt++;
 				$max_args++;
 				$varname = '$dtmp';
-			}
-			elsif (defined $default) {
+			} #/ if ( ref $default )
+			elsif ( defined $default ) {
 				push @code, sprintf(
 					'$dtmp = ($#_ < %d) ? %s : $_[%d];',
 					$arg,
@@ -355,9 +378,8 @@ sub compile
 				$saw_opt++;
 				$max_args++;
 				$varname = '$dtmp';
-			}
-			elsif ($is_optional)
-			{
+			} #/ elsif ( defined $default )
+			elsif ( $is_optional ) {
 				push @code, sprintf(
 					'return %s if $#_ < %d;',
 					$return_list,
@@ -366,78 +388,78 @@ sub compile
 				$saw_opt++;
 				$max_args++;
 				$varname = sprintf '$_[%d]', $arg;
-			}
-			else
-			{
-				Error::TypeTiny::croak("Non-Optional parameter following Optional parameter") if $saw_opt;
+			} #/ elsif ( $is_optional )
+			else {
+				Error::TypeTiny::croak( "Non-Optional parameter following Optional parameter" )
+					if $saw_opt;
 				$min_args++;
 				$max_args++;
 				$varname = sprintf '$_[%d]', $arg;
 			}
-		}
+		} #/ else [ if ( Types::Standard::is_HashRef...)]
 		
-		if ($constraint->has_coercion and $constraint->coercion->can_be_inlined)
-		{
+		if ( $constraint->has_coercion and $constraint->coercion->can_be_inlined ) {
 			push @code, sprintf(
 				'$tmp%s = %s;',
-				($is_optional ? '{x}' : ''),
-				$constraint->coercion->inline_coercion($varname)
+				( $is_optional ? '{x}' : '' ),
+				$constraint->coercion->inline_coercion( $varname )
 			);
-			$varname = '$tmp'.($is_optional ? '{x}' : '');
+			$varname = '$tmp' . ( $is_optional ? '{x}' : '' );
 		}
-		elsif ($constraint->has_coercion)
-		{
+		elsif ( $constraint->has_coercion ) {
 			$env{'@coerce'}[$arg] = $constraint->coercion->compiled_coercion;
 			push @code, sprintf(
 				'$tmp%s = $coerce[%d]->(%s);',
-				($is_optional ? '{x}' : ''),
+				( $is_optional ? '{x}' : '' ),
 				$arg,
 				$varname,
 			);
-			$varname = '$tmp'.($is_optional ? '{x}' : '');
-		}
+			$varname = '$tmp' . ( $is_optional ? '{x}' : '' );
+		} #/ elsif ( $constraint->has_coercion)
 		
 		# unweaken the constraint in the cache
 		undef $Type::Tiny::ALL_TYPES{ $constraint->{uniq} };
 		$Type::Tiny::ALL_TYPES{ $constraint->{uniq} } = $constraint;
 		
-		if ($constraint->can_be_inlined)
-		{
+		if ( $constraint->can_be_inlined ) {
 			push @code, sprintf(
 				'(%s) or Type::Tiny::_failed_check(%d, %s, %s, varname => %s);',
 				$really_optional
-					? $constraint->type_parameter->inline_check($varname)
-					: $constraint->inline_check($varname),
+				? $constraint->type_parameter->inline_check( $varname )
+				: $constraint->inline_check( $varname ),
 				$constraint->{uniq},
-				$QUOTE->($constraint),
+				$QUOTE->( $constraint ),
 				$varname,
-				$is_slurpy ? 'q{$SLURPY}' : sprintf('q{$_[%d]}', $arg+$options{arg_fudge_factor_head}),
+				$is_slurpy
+				? 'q{$SLURPY}'
+				: sprintf( 'q{$_[%d]}', $arg + $options{arg_fudge_factor_head} ),
 			);
-		}
-		else
-		{
-			$env{'@check'}[$arg] = $really_optional
+		} #/ if ( $constraint->can_be_inlined)
+		else {
+			$env{'@check'}[$arg] =
+				$really_optional
 				? $constraint->type_parameter->compiled_check
 				: $constraint->compiled_check;
 			push @code, sprintf(
 				'%s or Type::Tiny::_failed_check(%d, %s, %s, varname => %s);',
-				sprintf(sprintf '$check[%d]->(%s)', $arg, $varname),
+				sprintf( sprintf '$check[%d]->(%s)', $arg, $varname ),
 				$constraint->{uniq},
-				$QUOTE->($constraint),
+				$QUOTE->( $constraint ),
 				$varname,
-				$is_slurpy ? 'q{$SLURPY}' : sprintf('q{$_[%d]}', $arg+$options{arg_fudge_factor_head}),
+				$is_slurpy
+				? 'q{$SLURPY}'
+				: sprintf( 'q{$_[%d]}', $arg + $options{arg_fudge_factor_head} ),
 			);
-		}
+		} #/ else [ if ( $constraint->can_be_inlined)]
 		
-		unless ($return_list eq '@_') {
+		unless ( $return_list eq '@_' ) {
 			push @code, sprintf 'push @R, %s;', $varname;
 		}
-	}
+	} #/ while ( @_ )
 	
 	my $thang = 'scalar(@_)';
 	
-	if ($min_args == $max_args and not $saw_slurpy)
-	{
+	if ( $min_args == $max_args and not $saw_slurpy ) {
 		$code[1] = sprintf(
 			'"Error::TypeTiny::WrongNumberOfParameters"->throw(got => %s, minimum => %d, maximum => %d) if @_ != %d;',
 			$thang,
@@ -446,8 +468,7 @@ sub compile
 			$min_args + $options{arg_fudge_factor},
 		);
 	}
-	elsif ($min_args < $max_args and not $saw_slurpy)
-	{
+	elsif ( $min_args < $max_args and not $saw_slurpy ) {
 		$code[1] = sprintf(
 			'"Error::TypeTiny::WrongNumberOfParameters"->throw(got => %s, minimum => %d, maximum => %d) if @_ < %d || @_ > %d;',
 			$thang,
@@ -456,9 +477,8 @@ sub compile
 			$min_args + $options{arg_fudge_factor},
 			$max_args + $options{arg_fudge_factor},
 		);
-	}
-	elsif ($min_args and $saw_slurpy)
-	{
+	} #/ elsif ( $min_args < $max_args...)
+	elsif ( $min_args and $saw_slurpy ) {
 		$code[1] = sprintf(
 			'"Error::TypeTiny::WrongNumberOfParameters"->throw(got => %s, minimum => %d) if @_ < %d;',
 			$thang,
@@ -469,55 +489,61 @@ sub compile
 	
 	push @code, $return_list;
 	
-	my $source  = "sub { no warnings; ".join("\n", @code)." };";
+	my $source = "sub { no warnings; " . join( "\n", @code ) . " };";
 	
 	return $source if $options{want_source};
 	
 	my $closure = eval_closure(
 		source      => $source,
-		description => $options{description}||sprintf("parameter validation for '%s'", $for),
+		description => $options{description}
+			|| sprintf( "parameter validation for '%s'", $for ),
 		environment => \%env,
 	);
 	
 	return {
-		min_args    => $options{arg_fudge_factor}+($min_args||0),
-		max_args    => $saw_slurpy ? undef : $options{arg_fudge_factor}+($max_args||0),
+		min_args => $options{arg_fudge_factor} + ( $min_args || 0 ),
+		max_args => $saw_slurpy
+		? undef
+		: $options{arg_fudge_factor} + ( $max_args || 0 ),
 		closure     => $closure,
 		source      => $source,
 		environment => \%env,
 	} if $options{want_details};
 	
 	return $closure;
-}
+} #/ sub compile
 
-sub compile_named
-{
-	my (@code, %env);
+sub compile_named {
+	my ( @code, %env );
 	
 	push @code, 'my (%R, %tmp, $tmp);';
-	push @code, '#placeholder';   # $code[1]
+	push @code, '#placeholder';           # $code[1]
 	
 	my %options;
-	while (ref($_[0]) eq "HASH" && !$_[0]{slurpy}) {
-		%options = (%options, %{+shift});
+	while ( ref( $_[0] ) eq "HASH" && !$_[0]{slurpy} ) {
+		%options = ( %options, %{ +shift } );
 	}
 	my $arg = -1;
 	my $had_slurpy;
-
-	my ($extra_env, @extra_lines) = _deal_with_head_and_tail(\%options);
-	if (@extra_lines) {
+	
+	my ( $extra_env, @extra_lines ) = _deal_with_head_and_tail( \%options );
+	if ( @extra_lines ) {
 		push @code, @extra_lines;
-		%env = (%$extra_env, %env);
+		%env = ( %$extra_env, %env );
 	}
 	
-	my $for = $options{subname}||[caller(1+($options{caller_level}||0))]->[3] || '__ANON__';
-	
-	push @code, 'my %in = ((@_==1) && ref($_[0]) eq "HASH") ? %{$_[0]} : (@_ % 2) ? "Error::TypeTiny::WrongNumberOfParameters"->throw(message => "Odd number of elements in hash") : @_;';
+	my $for =
+		$options{subname}
+		|| [ caller( 1 + ( $options{caller_level} || 0 ) ) ]->[3]
+		|| '__ANON__';
+		
+	push @code,
+		'my %in = ((@_==1) && ref($_[0]) eq "HASH") ? %{$_[0]} : (@_ % 2) ? "Error::TypeTiny::WrongNumberOfParameters"->throw(message => "Odd number of elements in hash") : @_;';
 	my @names;
 	
-	while (@_) {
+	while ( @_ ) {
 		++$arg;
-		my ($name, $constraint) = splice(@_, 0, 2);
+		my ( $name, $constraint ) = splice( @_, 0, 2 );
 		push @names, $name;
 		
 		my $is_optional;
@@ -526,82 +552,91 @@ sub compile_named
 		my $varname;
 		my $default;
 		
-		Types::Standard::is_Str($name)
-			or Error::TypeTiny::croak("Expected parameter name as string, got $name");
-		
+		Types::Standard::is_Str( $name )
+			or Error::TypeTiny::croak(
+			"Expected parameter name as string, got $name" );
+			
 		my $param_options = {};
-		$param_options = shift @_ if Types::Standard::is_HashRef($_[0]) && !exists $_[0]{slurpy};
-		$default = _mkdefault($param_options);
+		$param_options = shift @_
+			if Types::Standard::is_HashRef( $_[0] ) && !exists $_[0]{slurpy};
+		$default = _mkdefault( $param_options );
 		
-		if ($param_options->{optional} or defined $default) {
+		if ( $param_options->{optional} or defined $default ) {
 			$is_optional = 1;
 		}
-	
-		if (Types::Standard::is_Bool($constraint))
-		{
-			$constraint = $constraint ? Types::Standard::Any : Types::Standard::Optional[Types::Standard::Any];
+		
+		if ( Types::Standard::is_Bool( $constraint ) ) {
+			$constraint =
+				$constraint
+				? Types::Standard::Any
+				: Types::Standard::Optional [Types::Standard::Any];
 		}
-	
-		if (Types::Standard::is_HashRef($constraint) and exists $constraint->{slurpy})
+		
+		if ( Types::Standard::is_HashRef( $constraint )
+			and exists $constraint->{slurpy} )
 		{
-			$constraint = Types::TypeTiny::to_TypeTiny($constraint->{slurpy});
+			$constraint = Types::TypeTiny::to_TypeTiny( $constraint->{slurpy} );
 			++$is_slurpy;
 			++$had_slurpy;
 		}
-		else
-		{
-			$is_optional     += grep $_->{uniq} == Types::Standard::Optional->{uniq}, $constraint->parents;
-			$really_optional = $is_optional && $constraint->parent && $constraint->parent->{uniq} eq Types::Standard::Optional->{uniq} && $constraint->type_parameter;
-			
+		else {
+			$is_optional += grep $_->{uniq} == Types::Standard::Optional->{uniq},
+				$constraint->parents;
+			$really_optional =
+				$is_optional
+				&& $constraint->parent
+				&& $constraint->parent->{uniq} eq Types::Standard::Optional->{uniq}
+				&& $constraint->type_parameter;
+				
 			$constraint = $constraint->type_parameter if $really_optional;
-		}
+		} #/ else [ if ( Types::Standard::is_HashRef...)]
 		
-		if (ref $default) {
+		if ( ref $default ) {
 			$env{'@default'}[$arg] = $default;
 			push @code, sprintf(
 				'exists($in{%s}) or $in{%s} = $default[%d]->();',
-				$QUOTE->($name),
-				$QUOTE->($name),
+				$QUOTE->( $name ),
+				$QUOTE->( $name ),
 				$arg,
 			);
 		}
-		elsif (defined $default) {
+		elsif ( defined $default ) {
 			push @code, sprintf(
 				'exists($in{%s}) or $in{%s} = %s;',
-				$QUOTE->($name),
-				$QUOTE->($name),
+				$QUOTE->( $name ),
+				$QUOTE->( $name ),
 				$default,
 			);
 		}
-		elsif (not $is_optional||$is_slurpy) {
+		elsif ( not $is_optional || $is_slurpy ) {
 			push @code, sprintf(
 				'exists($in{%s}) or "Error::TypeTiny::WrongNumberOfParameters"->throw(message => sprintf "Missing required parameter: %%s", %s);',
-				$QUOTE->($name),
-				$QUOTE->($name),
+				$QUOTE->( $name ),
+				$QUOTE->( $name ),
 			);
 		}
 		
 		my $need_to_close_if = 0;
 		
-		if ($is_slurpy) {
+		if ( $is_slurpy ) {
 			$varname = '\\%in';
 		}
-		elsif ($is_optional) {
-			push @code, sprintf('if (exists($in{%s})) {', $QUOTE->($name));
-			push @code, sprintf('$tmp = delete($in{%s});', $QUOTE->($name));
+		elsif ( $is_optional ) {
+			push @code, sprintf( 'if (exists($in{%s})) {',  $QUOTE->( $name ) );
+			push @code, sprintf( '$tmp = delete($in{%s});', $QUOTE->( $name ) );
 			$varname = '$tmp';
 			++$need_to_close_if;
 		}
 		else {
-			push @code, sprintf('$tmp = delete($in{%s});', $QUOTE->($name));
+			push @code, sprintf( '$tmp = delete($in{%s});', $QUOTE->( $name ) );
 			$varname = '$tmp';
 		}
 		
-		if ($constraint->has_coercion) {
-			if ($constraint->coercion->can_be_inlined) {
+		if ( $constraint->has_coercion ) {
+			if ( $constraint->coercion->can_be_inlined ) {
 				push @code, sprintf(
 					'$tmp = %s;',
-					$constraint->coercion->inline_coercion($varname)
+					$constraint->coercion->inline_coercion( $varname )
 				);
 			}
 			else {
@@ -613,81 +648,86 @@ sub compile_named
 				);
 			}
 			$varname = '$tmp';
-		}
+		} #/ if ( $constraint->has_coercion)
 		
-		if ($constraint->can_be_inlined)
-		{
+		if ( $constraint->can_be_inlined ) {
 			push @code, sprintf(
 				'(%s) or Type::Tiny::_failed_check(%d, %s, %s, varname => %s);',
-				$constraint->inline_check($varname),
+				$constraint->inline_check( $varname ),
 				$constraint->{uniq},
-				$QUOTE->($constraint),
+				$QUOTE->( $constraint ),
 				$varname,
-				$is_slurpy ? 'q{$SLURPY}' : sprintf('q{$_{%s}}', $QUOTE->($name)),
+				$is_slurpy ? 'q{$SLURPY}' : sprintf( 'q{$_{%s}}', $QUOTE->( $name ) ),
 			);
-		}
-		else
-		{
+		} #/ if ( $constraint->can_be_inlined)
+		else {
 			$env{'@check'}[$arg] = $constraint->compiled_check;
 			push @code, sprintf(
 				'%s or Type::Tiny::_failed_check(%d, %s, %s, varname => %s);',
-				sprintf(sprintf '$check[%d]->(%s)', $arg, $varname),
+				sprintf( sprintf '$check[%d]->(%s)', $arg, $varname ),
 				$constraint->{uniq},
-				$QUOTE->($constraint),
+				$QUOTE->( $constraint ),
 				$varname,
-				$is_slurpy ? 'q{$SLURPY}' : sprintf('q{$_{%s}}', $QUOTE->($name)),
+				$is_slurpy ? 'q{$SLURPY}' : sprintf( 'q{$_{%s}}', $QUOTE->( $name ) ),
 			);
-		}
+		} #/ else [ if ( $constraint->can_be_inlined)]
 		
-		push @code, sprintf('$R{%s} = %s;', $QUOTE->($name), $varname);
+		push @code, sprintf( '$R{%s} = %s;', $QUOTE->( $name ), $varname );
 		
 		push @code, '}' if $need_to_close_if;
+	} #/ while ( @_ )
+	
+	if ( !$had_slurpy ) {
+		push @code,
+			'keys(%in) and "Error::TypeTiny"->throw(message => sprintf "Unrecognized parameter%s: %s", keys(%in)>1?"s":"", Type::Params::english_list(sort keys %in));';
 	}
 	
-	if (!$had_slurpy) {
-		push @code, 'keys(%in) and "Error::TypeTiny"->throw(message => sprintf "Unrecognized parameter%s: %s", keys(%in)>1?"s":"", Type::Params::english_list(sort keys %in));'
+	if ( $options{named_to_list} ) {
+		Error::TypeTiny::croak( "named_to_list option cannot be used with slurpy" )
+			if $had_slurpy;
+		my @order = ref $options{named_to_list} ? @{ $options{named_to_list} } : @names;
+		push @code, sprintf( '@R{%s}', join ",", map $QUOTE->( $_ ), @order );
 	}
-	
-	if ($options{named_to_list}) {
-		Error::TypeTiny::croak("named_to_list option cannot be used with slurpy") if $had_slurpy;
-		my @order = ref $options{named_to_list} ? @{$options{named_to_list}} : @names;
-		push @code, sprintf('@R{%s}', join ",", map $QUOTE->($_), @order);
-	}
-	elsif ($options{bless}) {
-		if ($options{oo_trace}) {
-			push @code, sprintf('$R{%s} = %s;', $QUOTE->('~~caller'), $QUOTE->($for));
+	elsif ( $options{bless} ) {
+		if ( $options{oo_trace} ) {
+			push @code, sprintf( '$R{%s} = %s;', $QUOTE->( '~~caller' ), $QUOTE->( $for ) );
 		}
-		push @code, sprintf('bless \\%%R, %s;', $QUOTE->($options{bless}));
+		push @code, sprintf( 'bless \\%%R, %s;', $QUOTE->( $options{bless} ) );
 	}
-	elsif (Types::Standard::is_ArrayRef($options{class})) {
-		push @code, sprintf('(%s)->%s(\\%%R);', $QUOTE->($options{class}[0]), $options{class}[1]||'new');
+	elsif ( Types::Standard::is_ArrayRef( $options{class} ) ) {
+		push @code,
+			sprintf( '(%s)->%s(\\%%R);', $QUOTE->( $options{class}[0] ),
+			$options{class}[1] || 'new' );
 	}
-	elsif ($options{class}) {
-		push @code, sprintf('(%s)->%s(\\%%R);', $QUOTE->($options{class}), $options{constructor}||'new');
+	elsif ( $options{class} ) {
+		push @code,
+			sprintf( '(%s)->%s(\\%%R);', $QUOTE->( $options{class} ),
+			$options{constructor} || 'new' );
 	}
 	else {
 		push @code, '\\%R;';
 	}
 	
-	if ($options{head} || $options{tail}) {
+	if ( $options{head} || $options{tail} ) {
 		$code[-1] = 'my @R = ' . $code[-1] . ';';
 		push @code, 'unshift @R, @head;' if $options{head};
-		push @code, 'push @R, @tail;' if $options{tail};
+		push @code, 'push @R, @tail;'    if $options{tail};
 		push @code, '@R;';
 	}
 	
-	my $source  = "sub { no warnings; ".join("\n", @code)." };";
+	my $source = "sub { no warnings; " . join( "\n", @code ) . " };";
 	return $source if $options{want_source};
 	
 	my $closure = eval_closure(
 		source      => $source,
-		description => $options{description}||sprintf("parameter validation for '%s'", $for),
+		description => $options{description}
+			|| sprintf( "parameter validation for '%s'", $for ),
 		environment => \%env,
 	);
 	
 	my $max_args = undef;
-	if (!$had_slurpy) {
-		$max_args = 2 * ($arg+1);
+	if ( !$had_slurpy ) {
+		$max_args = 2 * ( $arg + 1 );
 		$max_args += $options{arg_fudge_factor};
 	}
 	
@@ -700,181 +740,210 @@ sub compile_named
 	} if $options{want_details};
 	
 	return $closure;
-}
+} #/ sub compile_named
 
 my %klasses;
 my $kls_id = 0;
 my $has_cxsa;
 my $want_cxsa;
-sub _mkklass
-{
-	my $klass = sprintf('%s::OO::Klass%d', __PACKAGE__, ++$kls_id);
+
+sub _mkklass {
+	my $klass = sprintf( '%s::OO::Klass%d', __PACKAGE__, ++$kls_id );
 	
-	if (!defined $has_cxsa or !defined $want_cxsa) {
-		$has_cxsa = !! eval {
+	if ( !defined $has_cxsa or !defined $want_cxsa ) {
+		$has_cxsa = !!eval {
 			require Class::XSAccessor;
-			'Class::XSAccessor'->VERSION('1.17'); # exists_predicates, June 2013
+			'Class::XSAccessor'->VERSION( '1.17' );    # exists_predicates, June 2013
 			1;
 		};
 		
 		$want_cxsa =
-			$ENV{PERL_TYPE_PARAMS_XS}         ? 'XS' :
-			exists($ENV{PERL_TYPE_PARAMS_XS}) ? 'PP' :
-			$has_cxsa                         ? 'XS' : 'PP';
-		
-		if ($want_cxsa eq 'XS' and not $has_cxsa) {
-			Error::TypeTiny::croak("Cannot load Class::XSAccessor"); # uncoverable statement
+			$ENV{PERL_TYPE_PARAMS_XS}             ? 'XS'
+			: exists( $ENV{PERL_TYPE_PARAMS_XS} ) ? 'PP'
+			: $has_cxsa                           ? 'XS'
+			:                                       'PP';
+			
+		if ( $want_cxsa eq 'XS' and not $has_cxsa ) {
+			Error::TypeTiny::croak( "Cannot load Class::XSAccessor" );    # uncoverable statement
 		}
-	}
+	} #/ if ( !defined $has_cxsa...)
 	
-	if ($want_cxsa eq 'XS') {
+	if ( $want_cxsa eq 'XS' ) {
 		eval {
 			'Class::XSAccessor'->import(
-				redefine          => 1,
-				class             => $klass,
-				getters           => { map { defined($_->{getter})    ? ($_->{getter}    => $_->{slot}) : () } values %{$_[0]} },
-				exists_predicates => { map { defined($_->{predicate}) ? ($_->{predicate} => $_->{slot}) : () } values %{$_[0]} },
+				redefine => 1,
+				class    => $klass,
+				getters  => {
+					map { defined( $_->{getter} ) ? ( $_->{getter} => $_->{slot} ) : () }
+						values %{ $_[0] }
+				},
+				exists_predicates => {
+					map { defined( $_->{predicate} ) ? ( $_->{predicate} => $_->{slot} ) : () }
+						values %{ $_[0] }
+				},
 			);
 			1;
-		} ? return($klass) : die($@);
-	}
+		} ? return ( $klass ) : die( $@ );
+	} #/ if ( $want_cxsa eq 'XS')
 	
-	for my $attr (values %{$_[0]}) {
-		defined($attr->{getter}) and eval sprintf(
+	for my $attr ( values %{ $_[0] } ) {
+		defined( $attr->{getter} ) and eval sprintf(
 			'package %s; sub %s { $_[0]{%s} }; 1',
 			$klass,
 			$attr->{getter},
 			$attr->{slot},
-		) || die($@);
-		defined($attr->{predicate}) and eval sprintf(
+		) || die( $@ );
+		defined( $attr->{predicate} ) and eval sprintf(
 			'package %s; sub %s { exists $_[0]{%s} }; 1',
 			$klass,
 			$attr->{predicate},
 			$attr->{slot},
-		) || die($@);
-	}
+		) || die( $@ );
+	} #/ for my $attr ( values %...)
 	
 	$klass;
-}
+} #/ sub _mkklass
 
-sub compile_named_oo
-{
+sub compile_named_oo {
 	my %options;
-	while (ref($_[0]) eq "HASH" && !$_[0]{slurpy}) {
-		%options = (%options, %{+shift});
+	while ( ref( $_[0] ) eq "HASH" && !$_[0]{slurpy} ) {
+		%options = ( %options, %{ +shift } );
 	}
 	my @rest = @_;
 	
 	my %attribs;
-	while (@_) {
-		my ($name, $type) = splice(@_, 0, 2);
-		my $opts = (Types::Standard::is_HashRef($_[0]) && !exists $_[0]{slurpy}) ? shift(@_) : {};
+	while ( @_ ) {
+		my ( $name, $type ) = splice( @_, 0, 2 );
+		my $opts =
+			( Types::Standard::is_HashRef( $_[0] ) && !exists $_[0]{slurpy} )
+			? shift( @_ )
+			: {};
 			
-		my $is_optional = 0+!! $opts->{optional};
-		$is_optional += grep $_->{uniq} == Types::Standard::Optional->{uniq}, $type->parents;
-		
-		my $getter = exists($opts->{getter})
+		my $is_optional = 0+ !!$opts->{optional};
+		$is_optional += grep $_->{uniq} == Types::Standard::Optional->{uniq},
+			$type->parents;
+			
+		my $getter =
+			exists( $opts->{getter} )
 			? $opts->{getter}
 			: $name;
-		
-		Error::TypeTiny::croak("Bad accessor name: $getter")
+			
+		Error::TypeTiny::croak( "Bad accessor name: $getter" )
 			unless $getter =~ /\A[A-Za-z][A-Za-z0-9_]*\z/;
-		
-		my $predicate = exists($opts->{predicate})
-			? ($opts->{predicate} eq '1' ? "has_$getter" : $opts->{predicate} eq '0' ? undef : $opts->{predicate})
-			: ($is_optional ? "has_$getter" : undef);
-		
+			
+		my $predicate =
+			exists( $opts->{predicate} )
+			? ( $opts->{predicate} eq '1' ? "has_$getter"
+			: $opts->{predicate} eq '0' ? undef
+			:                             $opts->{predicate} )
+			: ( $is_optional ? "has_$getter" : undef );
+			
 		$attribs{$name} = {
-			slot       => $name,
-			getter     => $getter,
-			predicate  => $predicate,
+			slot      => $name,
+			getter    => $getter,
+			predicate => $predicate,
 		};
-	}
+	} #/ while ( @_ )
 	
 	my $kls = join '//',
-		map sprintf('%s*%s*%s', $attribs{$_}{slot}, $attribs{$_}{getter}, $attribs{$_}{predicate}||'0'),
+		map sprintf( '%s*%s*%s', $attribs{$_}{slot}, $attribs{$_}{getter},
+		$attribs{$_}{predicate} || '0' ),
 		sort keys %attribs;
+		
+	$klasses{$kls} ||= _mkklass( \%attribs );
 	
-	$klasses{$kls} ||= _mkklass(\%attribs);
-	
-	@_ = ({ oo_trace => 1, %options, bless => $klasses{$kls} }, @rest);
+	@_ = ( { oo_trace => 1, %options, bless => $klasses{$kls} }, @rest );
 	goto \&compile_named;
-}
+} #/ sub compile_named_oo
 
 # Would be faster to inline this into validate and validate_named, but
 # that would complicate them. :/
 sub _mk_key {
 	local $_;
 	join ':', map {
-		Types::Standard::is_HashRef($_)  ? do { my %h = %$_; sprintf('{%s}', _mk_key(map {; $_ => $h{$_} } sort keys %h)) } :
-		Types::TypeTiny::is_TypeTiny($_) ? sprintf('TYPE=%s', $_->{uniq}) :
-		Types::Standard::is_Ref($_)      ? sprintf('REF=%s', refaddr($_)) :
-		Types::Standard::is_Undef($_)    ? sprintf('UNDEF') :
-		$QUOTE->($_)
+		Types::Standard::is_HashRef( $_ )
+			? do {
+			my %h = %$_;
+			sprintf( '{%s}', _mk_key( map { ; $_ => $h{$_} } sort keys %h ) );
+			}
+			: Types::TypeTiny::is_TypeTiny( $_ )
+			? sprintf( 'TYPE=%s', $_->{uniq} )
+			: Types::Standard::is_Ref( $_ )
+			? sprintf( 'REF=%s', refaddr( $_ ) )
+			: Types::Standard::is_Undef( $_ ) ? sprintf( 'UNDEF' )
+			: $QUOTE->( $_ )
 	} @_;
-}
+} #/ sub _mk_key
 
 my %compiled;
-sub validate
-{
+
+sub validate {
 	my $arg = shift;
-	my $sub = ($compiled{_mk_key(@_)} ||= compile(
-		{ caller_level => 1, %{ref($_[0])eq'HASH'?shift(@_):+{}} },
-		@_,
-	));
+	my $sub = (
+		$compiled{ _mk_key( @_ ) } ||= compile(
+			{ caller_level => 1, %{ ref( $_[0] ) eq 'HASH' ? shift( @_ ) : +{} } },
+			@_,
+		)
+	);
 	@_ = @$arg;
 	goto $sub;
-}
+} #/ sub validate
 
 my %compiled_named;
-sub validate_named
-{
+
+sub validate_named {
 	my $arg = shift;
-	my $sub = ($compiled_named{_mk_key(@_)} ||= compile_named(
-		{ caller_level => 1, %{ref($_[0])eq'HASH'?shift(@_):+{}} },
-		@_,
-	));
+	my $sub = (
+		$compiled_named{ _mk_key( @_ ) } ||= compile_named(
+			{ caller_level => 1, %{ ref( $_[0] ) eq 'HASH' ? shift( @_ ) : +{} } },
+			@_,
+		)
+	);
 	@_ = @$arg;
 	goto $sub;
-}
+} #/ sub validate_named
 
-sub multisig
-{
-	my %options = (ref($_[0]) eq "HASH" && !$_[0]{slurpy}) ? %{+shift} : ();
+sub multisig {
+	my %options = ( ref( $_[0] ) eq "HASH" && !$_[0]{slurpy} ) ? %{ +shift } : ();
 	$options{message}     ||= "Parameter validation failed";
-	$options{description} ||= sprintf("parameter validation for '%s'", [caller(1+($options{caller_level}||0))]->[3] || '__ANON__');
-	for my $key ( qw[ message description ] )
-	{
-		Types::TypeTiny::is_StringLike($options{$key})
-			or Error::TypeTiny::croak("Option '$key' expected to be string or stringifiable object");
+	$options{description} ||= sprintf( "parameter validation for '%s'",
+		[ caller( 1 + ( $options{caller_level} || 0 ) ) ]->[3] || '__ANON__' );
+	for my $key ( qw[ message description ] ) {
+		Types::TypeTiny::is_StringLike( $options{$key} )
+			or Error::TypeTiny::croak(
+			"Option '$key' expected to be string or stringifiable object" );
 	}
 	
 	my @multi = map {
-		Types::TypeTiny::is_CodeLike($_)  ? { closure => $_ } :
-		Types::TypeTiny::is_ArrayLike($_) ? compile({ want_details => 1 }, @$_) :
-		$_;
+		Types::TypeTiny::is_CodeLike( $_ ) ? { closure => $_ }
+			: Types::TypeTiny::is_ArrayLike( $_ )
+			? compile( { want_details => 1 }, @$_ )
+			: $_;
 	} @_;
 	
 	my @code = 'sub { my $r; ';
 	
-	for my $i (0 .. $#multi)
-	{
-		my $flag = sprintf('${^TYPE_PARAMS_MULTISIG} = %d', $i);
+	for my $i ( 0 .. $#multi ) {
+		my $flag = sprintf( '${^TYPE_PARAMS_MULTISIG} = %d', $i );
 		my $sig  = $multi[$i];
 		my @cond;
-		push @cond, sprintf('@_ >= %s', $sig->{min_args}) if defined $sig->{min_args};
-		push @cond, sprintf('@_ <= %s', $sig->{max_args}) if defined $sig->{max_args};
-		if (defined $sig->{max_args} and defined $sig->{min_args}) {
-			@cond = sprintf('@_ == %s', $sig->{min_args})
+		push @cond, sprintf( '@_ >= %s', $sig->{min_args} ) if defined $sig->{min_args};
+		push @cond, sprintf( '@_ <= %s', $sig->{max_args} ) if defined $sig->{max_args};
+		if ( defined $sig->{max_args} and defined $sig->{min_args} ) {
+			@cond = sprintf( '@_ == %s', $sig->{min_args} )
 				if $sig->{max_args} == $sig->{min_args};
 		}
-		push @code, sprintf('if (%s){', join(' and ', @cond)) if @cond;
-		push @code, sprintf('eval { $r = [ $multi[%d]{closure}->(@_) ]; %s };', $i, $flag);
+		push @code, sprintf( 'if (%s){', join( ' and ', @cond ) ) if @cond;
+		push @code,
+			sprintf( 'eval { $r = [ $multi[%d]{closure}->(@_) ]; %s };', $i,
+			$flag );
 		push @code, 'return(@$r) if $r;';
 		push @code, '}' if @cond;
-	}
+	} #/ for my $i ( 0 .. $#multi)
 	
-	push @code, sprintf('"Error::TypeTiny"->throw(message => "%s");', quotemeta("$options{message}"));
+	push @code,
+		sprintf( '"Error::TypeTiny"->throw(message => "%s");',
+		quotemeta( "$options{message}" ) );
 	push @code, '}';
 	
 	eval_closure(
@@ -882,22 +951,22 @@ sub multisig
 		description => $options{description},
 		environment => { '@multi' => \@multi },
 	);
-}
+} #/ sub multisig
 
 sub wrap_methods {
-	my $opts = ref($_[0]) eq 'HASH' ? shift : {};
-	$opts->{caller}         ||= caller;
-	$opts->{skip_invocant}    = 1;
-	$opts->{use_can}          = 1;
+	my $opts = ref( $_[0] ) eq 'HASH' ? shift : {};
+	$opts->{caller} ||= caller;
+	$opts->{skip_invocant} = 1;
+	$opts->{use_can}       = 1;
 	unshift @_, $opts;
 	goto \&_wrap_subs;
 }
 
 sub wrap_subs {
-	my $opts = ref($_[0]) eq 'HASH' ? shift : {};
-	$opts->{caller}         ||= caller;
-	$opts->{skip_invocant}    = 0;
-	$opts->{use_can}          = 0;
+	my $opts = ref( $_[0] ) eq 'HASH' ? shift : {};
+	$opts->{caller} ||= caller;
+	$opts->{skip_invocant} = 0;
+	$opts->{use_can}       = 0;
 	unshift @_, $opts;
 	goto \&_wrap_subs;
 }
@@ -905,29 +974,42 @@ sub wrap_subs {
 sub _wrap_subs {
 	my $opts = shift;
 	my $subname =
-		eval { require Sub::Util } ? \&Sub::Util::set_subname :
-		eval { require Sub::Name } ? \&Sub::Name::subname : 0;
-	while (@_) {
-		my ($name, $proto) = splice @_, 0, 2;
-		my $fullname = ($name =~ /::/) ? $name : sprintf('%s::%s', $opts->{caller}, $name);
+		eval   { require Sub::Util } ? \&Sub::Util::set_subname
+		: eval { require Sub::Name } ? \&Sub::Name::subname
+		:                              0;
+	while ( @_ ) {
+		my ( $name, $proto ) = splice @_, 0, 2;
+		my $fullname =
+			( $name =~ /::/ )
+			? $name
+			: sprintf( '%s::%s', $opts->{caller}, $name );
 		my $orig = do {
 			no strict 'refs';
-			exists &$fullname
-				? \&$fullname
-				: $opts->{use_can} ? ($opts->{caller}->can($name)||sub{}) : sub {}
+			exists &$fullname               ? \&$fullname
+				: $opts->{use_can} ? ( $opts->{caller}->can( $name ) || sub { } )
+				: sub { }
 		};
-		my $check = ref($proto) eq 'CODE' ? $proto : undef;
-		my $co = { description => "parameter validation for '$name'" };
-		my $new = $opts->{skip_invocant}
-			? sub { my $s = shift; $check ||= compile($co, @$proto); @_ = ($s, &$check); goto $orig }
-			: sub { $check ||= compile($co, @$proto); @_ = (&$check); goto $orig };
-		$new = $subname->($fullname, $new) if $subname;
+		my $check = ref( $proto ) eq 'CODE' ? $proto : undef;
+		my $co    = { description => "parameter validation for '$name'" };
+		my $new   = $opts->{skip_invocant}
+			? sub {
+			my $s = shift;
+			$check ||= compile( $co, @$proto );
+			@_ = ( $s, &$check );
+			goto $orig;
+			}
+			: sub {
+			$check ||= compile( $co, @$proto );
+			@_ = ( &$check );
+			goto $orig;
+			};
+		$new = $subname->( $fullname, $new ) if $subname;
 		no strict 'refs';
 		no warnings 'redefine';
 		*$fullname = $new;
-	}
+	} #/ while ( @_ )
 	1;
-}
+} #/ sub _wrap_subs
 
 1;
 
@@ -1786,4 +1868,3 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-

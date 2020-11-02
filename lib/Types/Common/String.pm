@@ -6,7 +6,7 @@ use warnings;
 use utf8;
 
 BEGIN {
-	if ($] < 5.008) { require Devel::TypeTiny::Perl56Compat };
+	if ( $] < 5.008 ) { require Devel::TypeTiny::Perl56Compat }
 }
 
 BEGIN {
@@ -38,7 +38,7 @@ my $meta = __PACKAGE__->meta;
 $meta->add_type(
 	name       => SimpleStr,
 	parent     => Str,
-	constraint => sub { length($_) <= 255 and not /\n/ },
+	constraint => sub { length( $_ ) <= 255 and not /\n/ },
 	inlined    => sub { undef, qq(length($_) <= 255), qq($_ !~ /\\n/) },
 	message    => sub { "Must be a single line of no more than 255 chars" },
 );
@@ -46,59 +46,64 @@ $meta->add_type(
 $meta->add_type(
 	name       => NonEmptySimpleStr,
 	parent     => SimpleStr,
-	constraint => sub { length($_) > 0 },
+	constraint => sub { length( $_ ) > 0 },
 	inlined    => sub { undef, qq(length($_) > 0) },
-	message    => sub { "Must be a non-empty single line of no more than 255 chars" },
+	message => sub { "Must be a non-empty single line of no more than 255 chars" },
 );
 
 $meta->add_type(
 	name       => NumericCode,
 	parent     => NonEmptySimpleStr,
 	constraint => sub { /^[0-9]+$/ },
-	inlined    => sub { SimpleStr->inline_check($_), qq($_ =~ m/^[0-9]+\$/) },
+	inlined    => sub { SimpleStr->inline_check( $_ ), qq($_ =~ m/^[0-9]+\$/) },
 	message    => sub {
 		'Must be a non-empty single line of no more than 255 chars that consists '
-			. 'of numeric characters only'
+			. 'of numeric characters only';
 	},
 );
 
 NumericCode->coercion->add_type_coercions(
-	NonEmptySimpleStr, q[ do { (my $code = $_) =~ s/[[:punct:][:space:]]//g; $code } ],
+	NonEmptySimpleStr,
+	q[ do { (my $code = $_) =~ s/[[:punct:][:space:]]//g; $code } ],
 );
 
 $meta->add_type(
 	name       => Password,
 	parent     => NonEmptySimpleStr,
-	constraint => sub { length($_) > 3 },
-	inlined    => sub { SimpleStr->inline_check($_), qq(length($_) > 3) },
+	constraint => sub { length( $_ ) > 3 },
+	inlined    => sub { SimpleStr->inline_check( $_ ), qq(length($_) > 3) },
 	message    => sub { "Must be between 4 and 255 chars" },
 );
 
 $meta->add_type(
 	name       => StrongPassword,
 	parent     => Password,
-	constraint => sub { length($_) > 7 and /[^a-zA-Z]/ },
-	inlined    => sub { SimpleStr()->inline_check($_), qq(length($_) > 7), qq($_ =~ /[^a-zA-Z]/) },
-	message    => sub { "Must be between 8 and 255 chars, and contain a non-alpha char" },
+	constraint => sub { length( $_ ) > 7 and /[^a-zA-Z]/ },
+	inlined    => sub {
+		SimpleStr()->inline_check( $_ ), qq(length($_) > 7), qq($_ =~ /[^a-zA-Z]/);
+	},
+	message => sub {
+		"Must be between 8 and 255 chars, and contain a non-alpha char";
+	},
 );
 
-my ($nestr);
-if (Type::Tiny::_USE_XS) {
-	$nestr = Type::Tiny::XS::get_coderef_for('NonEmptyStr');
+my ( $nestr );
+if ( Type::Tiny::_USE_XS ) {
+	$nestr = Type::Tiny::XS::get_coderef_for( 'NonEmptyStr' );
 }
 
 $meta->add_type(
 	name       => NonEmptyStr,
 	parent     => Str,
-	constraint => sub { length($_) > 0 },
+	constraint => sub { length( $_ ) > 0 },
 	inlined    => sub {
-		if ($nestr) {
-			my $xsub = Type::Tiny::XS::get_subname_for($_[0]->name);
+		if ( $nestr ) {
+			my $xsub = Type::Tiny::XS::get_subname_for( $_[0]->name );
 			return "$xsub($_[1])" if $xsub && !$Type::Tiny::AvoidCallbacks;
 		}
 		undef, qq(length($_) > 0);
 	},
-	message    => sub { "Must not be empty" },
+	message => sub { "Must not be empty" },
 	$nestr ? ( compiled_type_constraint => $nestr ) : (),
 );
 
@@ -151,39 +156,40 @@ UpperCaseSimpleStr->coercion->add_type_coercions(
 );
 
 $meta->add_type(
-	name       => StrLength,
-	parent     => Str,
+	name                 => StrLength,
+	parent               => Str,
 	constraint_generator => sub {
-		return $meta->get_type('StrLength') unless @_;
+		return $meta->get_type( 'StrLength' ) unless @_;
 		
-		my ($min, $max) = @_;
-		Types::Standard::is_Int($_)
-			|| Types::Standard::_croak("Parameters for StrLength[`min, `max] expected to be integers; got $_")
+		my ( $min, $max ) = @_;
+		Types::Standard::is_Int( $_ )
+			|| Types::Standard::_croak(
+			"Parameters for StrLength[`min, `max] expected to be integers; got $_" )
 			for @_;
-		
-		if (defined $max) {
-			return sub { length($_[0]) >= $min and length($_[0]) <= $max };
+			
+		if ( defined $max ) {
+			return sub { length( $_[0] ) >= $min and length( $_[0] ) <= $max };
 		}
 		else {
-			return sub { length($_[0]) >= $min };
+			return sub { length( $_[0] ) >= $min };
 		}
 	},
 	inline_generator => sub {
-		my ($min, $max) = @_;
+		my ( $min, $max ) = @_;
 		
 		return sub {
-			my $v = $_[1];
-			my @code = (undef); # parent constraint
+			my $v    = $_[1];
+			my @code = ( undef );    # parent constraint
 			push @code, "length($v) >= $min";
 			push @code, "length($v) <= $max" if defined $max;
 			return @code;
 		};
 	},
 	deep_explanation => sub {
-		my ($type, $value, $varname) = @_;
-		my ($min, $max) = @{ $type->parameters || [] };
+		my ( $type, $value, $varname ) = @_;
+		my ( $min, $max ) = @{ $type->parameters || [] };
 		my @whines;
-		if (defined $max) {
+		if ( defined $max ) {
 			push @whines, sprintf(
 				'"%s" expects length(%s) to be between %d and %d',
 				$type,
@@ -203,7 +209,7 @@ $meta->add_type(
 		push @whines, sprintf(
 			"length(%s) is %d",
 			$varname,
-			length($value),
+			length( $value ),
 		);
 		return \@whines;
 	},
@@ -337,4 +343,3 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-

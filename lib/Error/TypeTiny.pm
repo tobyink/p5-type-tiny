@@ -13,8 +13,8 @@ $Error::TypeTiny::VERSION =~ tr/_//d;
 
 require Type::Tiny;
 __PACKAGE__->Type::Tiny::_install_overloads(
-	q[""]    => sub { $_[0]->to_string },
-	q[bool]  => sub { 1 },
+	q[""]   => sub { $_[0]->to_string },
+	q[bool] => sub { 1 },
 );
 
 our %CarpInternal;
@@ -63,38 +63,43 @@ $CarpInternal{$_}++ for qw(
 	Type::Utils
 );
 
-sub new
-{
-	my $class = shift;
-	my %params = (@_==1) ? %{$_[0]} : @_;
+sub new {
+	my $class  = shift;
+	my %params = ( @_ == 1 ) ? %{ $_[0] } : @_;
 	return bless \%params, $class;
 }
 
-sub throw
-{
+sub throw {
 	my $class = shift;
 	
-	my ($level, @caller, %ctxt) = 0;
-	while (do {
-		my $caller = caller $level;
-		defined $caller and $CarpInternal{$caller};
-	}) { $level++ };
-	if ( ((caller($level - 1))[1]||"") =~ /^(?:parameter validation for|exportable function) '(.+?)'$/ )
+	my ( $level, @caller, %ctxt ) = 0;
+	while (
+		do {
+			my $caller = caller $level;
+			defined $caller and $CarpInternal{$caller};
+		}
+		)
 	{
-		my ($pkg, $func) = ($1 =~ m{^(.+)::(\w+)$});
-		$level++ if caller($level) eq ($pkg||"");
+		$level++;
 	}
+	if ( ( ( caller( $level - 1 ) )[1] || "" ) =~
+		/^(?:parameter validation for|exportable function) '(.+?)'$/ )
+	{
+		my ( $pkg, $func ) = ( $1 =~ m{^(.+)::(\w+)$} );
+		$level++ if caller( $level ) eq ( $pkg || "" );
+	}
+	
 	# Moo's Method::Generate::Constructor puts an eval in the stack trace,
 	# that is useless for debugging, so show the stack frame one above.
-	$level++ if (
-		(caller($level))[1] =~ /^\(eval \d+\)$/ and
-		(caller($level))[3] eq '(eval)' # (caller())[3] is $subroutine
-	);
-	@ctxt{qw/ package file line /} = caller($level);
+	$level++
+		if (
+		( caller( $level ) )[1] =~ /^\(eval \d+\)$/
+		and ( caller( $level ) )[3] eq '(eval)'    # (caller())[3] is $subroutine
+		);
+	@ctxt{qw/ package file line /} = caller( $level );
 	
 	my $stack = undef;
-	if (our $StackTrace)
-	{
+	if ( our $StackTrace ) {
 		require Devel::StackTrace;
 		$stack = "Devel::StackTrace"->new(
 			ignore_package => [ keys %CarpInternal ],
@@ -108,34 +113,32 @@ sub throw
 			@_,
 		)
 	);
-}
+} #/ sub throw
 
-sub message     { $_[0]{message} ||= $_[0]->_build_message };
-sub context     { $_[0]{context} };
-sub stack_trace { $_[0]{stack_trace} };
+sub message     { $_[0]{message} ||= $_[0]->_build_message }
+sub context     { $_[0]{context} }
+sub stack_trace { $_[0]{stack_trace} }
 
-sub to_string
-{
+sub to_string {
 	my $e = shift;
 	my $c = $e->context;
 	my $m = $e->message;
 	
-	$m =~ /\n\z/s ? $m :
-	$c            ? sprintf("%s at %s line %s.\n", $m, $c->{file}||'file?', $c->{line}||'NaN') :
-	sprintf("%s\n", $m);
-}
+	$m =~ /\n\z/s     ? $m
+		: $c ? sprintf( "%s at %s line %s.\n", $m, $c->{file} || 'file?',
+		$c->{line} || 'NaN' )
+		: sprintf( "%s\n", $m );
+} #/ sub to_string
 
-sub _build_message
-{
+sub _build_message {
 	return 'An exception has occurred';
 }
 
-sub croak
-{
-	my ($fmt, @args) = @_;
+sub croak {
+	my ( $fmt, @args ) = @_;
 	@_ = (
 		__PACKAGE__,
-		message => sprintf($fmt, @args),
+		message => sprintf( $fmt, @args ),
 	);
 	goto \&throw;
 }
@@ -302,4 +305,3 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-

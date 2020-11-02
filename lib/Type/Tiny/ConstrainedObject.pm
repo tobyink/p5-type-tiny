@@ -21,11 +21,11 @@ my %errlabel = (
 	constraint => 'a constraint coderef',
 	inlined    => 'an inlining coderef',
 );
-sub new
-{
+
+sub new {
 	my $proto = shift;
-	my %opts = (@_==1) ? %{$_[0]} : @_;
-	for my $key (qw/ parent constraint inlined /) {
+	my %opts  = ( @_ == 1 ) ? %{ $_[0] } : @_;
+	for my $key ( qw/ parent constraint inlined / ) {
 		next unless exists $opts{$key};
 		_croak(
 			'%s type constraints cannot have %s passed to the constructor',
@@ -33,85 +33,89 @@ sub new
 			$errlabel{$key},
 		);
 	}
-	$proto->SUPER::new(%opts);
-}
+	$proto->SUPER::new( %opts );
+} #/ sub new
 
-sub has_parent
-{
+sub has_parent {
 	!!1;
 }
 
-sub parent
-{
+sub parent {
 	require Types::Standard;
 	Types::Standard::Object();
 }
 
-sub _short_name
-{
-	die "subclasses must implement this"; # uncoverable statement
+sub _short_name {
+	die "subclasses must implement this";    # uncoverable statement
 }
 
-my $i = 0;
+my $i                  = 0;
 my $_where_expressions = sub {
 	my $self = shift;
 	my $name = shift;
 	$name ||= "where expression check";
-	my (%env, @codes);
-	while (@_) {
+	my ( %env, @codes );
+	while ( @_ ) {
 		my $expr       = shift;
 		my $constraint = shift;
-		if (!ref $constraint) {
-			push @codes, sprintf('do { local $_ = %s; %s }', $expr, $constraint);
+		if ( !ref $constraint ) {
+			push @codes, sprintf( 'do { local $_ = %s; %s }', $expr, $constraint );
 		}
 		else {
 			require Types::Standard;
-			my $type = Types::Standard::is_RegexpRef($constraint)
-				? Types::Standard::StrMatch()->of($constraint)
-				: Types::TypeTiny::to_TypeTiny($constraint);
-			if ($type->can_be_inlined) {
-				push @codes, sprintf('do { my $tmp = %s; %s }', $expr, $type->inline_check('$tmp'));
+			my $type =
+				Types::Standard::is_RegexpRef( $constraint )
+				? Types::Standard::StrMatch()->of( $constraint )
+				: Types::TypeTiny::to_TypeTiny( $constraint );
+			if ( $type->can_be_inlined ) {
+				push @codes,
+					sprintf( 'do { my $tmp = %s; %s }', $expr,
+					$type->inline_check( '$tmp' ) );
 			}
 			else {
 				++$i;
-				$env{'$chk'.$i} = do { my $chk = $type->compiled_check; \$chk };
-				push @codes, sprintf('$chk%d->(%s)', $i, $expr);
+				$env{ '$chk' . $i } = do { my $chk = $type->compiled_check; \$chk };
+				push @codes, sprintf( '$chk%d->(%s)', $i, $expr );
 			}
-		}
-	}
+		} #/ else [ if ( !ref $constraint )]
+	} #/ while ( @_ )
 	
-	if (keys %env) {
+	if ( keys %env ) {
+	
 		# cannot inline
 		my $sub = Eval::TypeTiny::eval_closure(
-			source      => sprintf('sub ($) { local $_ = shift; %s }', join(q( and ), @codes)),
-			description => sprintf('%s for %s', $name, $self->name),
+			source => sprintf(
+				'sub ($) { local $_ = shift; %s }', join( q( and ), @codes )
+			),
+			description => sprintf( '%s for %s', $name, $self->name ),
 			environment => \%env,
 		);
-		return $self->where($sub);
-	}
+		return $self->where( $sub );
+	} #/ if ( keys %env )
 	else {
-		return $self->where(join(q( and ), @codes));
+		return $self->where( join( q( and ), @codes ) );
 	}
 };
 
 sub stringifies_to {
-	my $self         = shift;
-	my ($constraint) = @_;
-	$self->$_where_expressions("stringification check", q{"$_"}, $constraint);
+	my $self = shift;
+	my ( $constraint ) = @_;
+	$self->$_where_expressions( "stringification check", q{"$_"}, $constraint );
 }
 
 sub numifies_to {
-	my $self         = shift;
-	my ($constraint) = @_;
-	$self->$_where_expressions("numification check", q{0+$_}, $constraint);
+	my $self = shift;
+	my ( $constraint ) = @_;
+	$self->$_where_expressions( "numification check", q{0+$_}, $constraint );
 }
 
 sub with_attribute_values {
-	my $self         = shift;
-	my %constraint   = @_;
+	my $self       = shift;
+	my %constraint = @_;
 	$self->$_where_expressions(
 		"attributes check",
-		map { my $attr = $_; qq{\$_->$attr} => $constraint{$attr} } sort keys %constraint,
+		map { my $attr = $_; qq{\$_->$attr} => $constraint{$attr} }
+			sort keys %constraint,
 	);
 }
 
@@ -240,4 +244,3 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-

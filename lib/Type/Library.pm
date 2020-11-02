@@ -13,34 +13,35 @@ $Type::Library::VERSION =~ tr/_//d;
 
 use Eval::TypeTiny qw< eval_closure >;
 use Scalar::Util qw< blessed refaddr >;
-use Type::Tiny ();
+use Type::Tiny      ();
 use Types::TypeTiny ();
 
 require Exporter::Tiny;
 our @ISA = 'Exporter::Tiny';
 
-BEGIN { *NICE_PROTOTYPES = ($] >= 5.014) ? sub () { !!1 } : sub () { !!0 } };
+BEGIN {
+	*NICE_PROTOTYPES = ( $] >= 5.014 ) ? sub () { !!1 } : sub () { !!0 }
+}
 
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
 {
 	my $subname;
-	my %already; # prevent renaming established functions
-	sub _subname ($$)
-	{
+	my %already;    # prevent renaming established functions
+	
+	sub _subname ($$) {
 		$subname =
-			eval { require Sub::Util } ? \&Sub::Util::set_subname :
-			eval { require Sub::Name } ? \&Sub::Name::subname :
-			0
+			eval   { require Sub::Util } ? \&Sub::Util::set_subname
+			: eval { require Sub::Name } ? \&Sub::Name::subname
+			: 0
 			if not defined $subname;
-		!$already{refaddr($_[1])}++ and return($subname->(@_))
+		!$already{ refaddr( $_[1] ) }++ and return ( $subname->( @_ ) )
 			if $subname;
 		return $_[1];
-	}
+	} #/ sub _subname ($$)
 }
 
-sub _exporter_validate_opts
-{
+sub _exporter_validate_opts {
 	my $class = shift;
 	
 	my $into = $_[0]{into};
@@ -54,59 +55,57 @@ sub _exporter_validate_opts
 	
 	if ( $_[0]{utils} ) {
 		require Type::Utils;
-		'Type::Utils'->import({ into => $into }, '-default');
+		'Type::Utils'->import( { into => $into }, '-default' );
 	}
 	
 	if ( $_[0]{extends} and !ref $into ) {
 		require Type::Utils;
 		my $wrapper = eval "sub { package $into; &Type::Utils::extends; }";
-		my @libs = @{ ref($_[0]{extends}) ? $_[0]{extends} : ($_[0]{extends} ? [$_[0]{extends}] : []) };
-		$wrapper->(@libs);
+		my @libs =
+			@{ ref( $_[0]{extends} )
+			? $_[0]{extends}
+			: ( $_[0]{extends} ? [ $_[0]{extends} ] : [] ) };
+		$wrapper->( @libs );
 	}
+	
+	return $class->SUPER::_exporter_validate_opts( @_ );
+} #/ sub _exporter_validate_opts
 
-	return $class->SUPER::_exporter_validate_opts(@_);
-}
-
-sub _exporter_expand_tag
-{
+sub _exporter_expand_tag {
 	my $class = shift;
-	my ($name, $value, $globals) = @_;
+	my ( $name, $value, $globals ) = @_;
 	
-	$name eq 'types'     and return map [ "$_"        => $value ], $class->type_names;
-	$name eq 'is'        and return map [ "is_$_"     => $value ], $class->type_names;
-	$name eq 'assert'    and return map [ "assert_$_" => $value ], $class->type_names;
-	$name eq 'to'        and return map [ "to_$_"     => $value ], $class->type_names;
-	$name eq 'coercions' and return map [ "$_"        => $value ], $class->coercion_names;
+	$name eq 'types'  and return map [ "$_"        => $value ], $class->type_names;
+	$name eq 'is'     and return map [ "is_$_"     => $value ], $class->type_names;
+	$name eq 'assert' and return map [ "assert_$_" => $value ], $class->type_names;
+	$name eq 'to'     and return map [ "to_$_"     => $value ], $class->type_names;
+	$name eq 'coercions' and return map [ "$_" => $value ], $class->coercion_names;
 	
-	if ($name eq 'all')
-	{
+	if ( $name eq 'all' ) {
 		no strict "refs";
 		return (
-			map(
-				[ "+$_" => $value ],
+			map( [ "+$_" => $value ],
 				$class->type_names,
 			),
-			map(
-				[ $_ => $value ],
+			map( [ $_ => $value ],
 				$class->coercion_names,
 				@{"$class\::EXPORT"},
 				@{"$class\::EXPORT_OK"},
 			),
 		);
-	}
+	} #/ if ( $name eq 'all' )
 	
-	return $class->SUPER::_exporter_expand_tag(@_);
-}
+	return $class->SUPER::_exporter_expand_tag( @_ );
+} #/ sub _exporter_expand_tag
 
-sub _mksub
-{
+sub _mksub {
 	my $class = shift;
-	my ($type, $post_method) = @_;
+	my ( $type, $post_method ) = @_;
 	$post_method ||= q();
 	
 	my $source = $type->is_parameterizable
 		? sprintf(
-			q{
+		q{
 				sub (%s) {
 					if (ref($_[0]) eq 'Type::Tiny::_HalfOp') {
 						my $complete_type = shift->complete($type);
@@ -117,320 +116,311 @@ sub _mksub
 					@_ && wantarray ? return($t%s, @_) : return $t%s;
 				}
 			},
-			NICE_PROTOTYPES ? q(;$) : q(;@),
-			$post_method,
-			$post_method,
+		NICE_PROTOTYPES ? q(;$) : q(;@),
+		$post_method,
+		$post_method,
 		)
 		: sprintf(
-			q{ sub () { $type%s if $] } },
-			$post_method,
+		q{ sub () { $type%s if $] } },
+		$post_method,
 		);
 		
 	return _subname(
 		$type->qualified_name,
 		eval_closure(
 			source      => $source,
-			description => sprintf("exportable function '%s::%s'", $class, $type),
-			environment => {'$type' => \$type},
+			description => sprintf( "exportable function '%s::%s'", $class, $type ),
+			environment => { '$type' => \$type },
 		),
 	);
-}
+} #/ sub _mksub
 
-sub _exporter_permitted_regexp
-{
+sub _exporter_permitted_regexp {
 	my $class = shift;
 	
-	my $inherited = $class->SUPER::_exporter_permitted_regexp(@_);
-	my $types = join "|", map quotemeta, sort {
-		length($b) <=> length($a) or $a cmp $b
-	} $class->type_names;
-	my $coercions = join "|", map quotemeta, sort {
-		length($b) <=> length($a) or $a cmp $b
-	} $class->coercion_names;
-	
+	my $inherited = $class->SUPER::_exporter_permitted_regexp( @_ );
+	my $types     = join "|", map quotemeta,
+		sort { length( $b ) <=> length( $a ) or $a cmp $b }
+		$class->type_names;
+	my $coercions = join "|", map quotemeta,
+		sort { length( $b ) <=> length( $a ) or $a cmp $b }
+		$class->coercion_names;
+		
 	qr{^(?:
 		$inherited
 		| (?: (?:is_|to_|assert_)? (?:$types) )
 		| (?:$coercions)
 	)$}xms;
-}
+} #/ sub _exporter_permitted_regexp
 
-sub _exporter_expand_sub
-{
+sub _exporter_expand_sub {
 	my $class = shift;
-	my ($name, $value, $globals) = @_;
+	my ( $name, $value, $globals ) = @_;
 	
-	if ($name =~ /^\+(.+)/ and $class->has_type($1))
-	{
+	if ( $name =~ /^\+(.+)/ and $class->has_type( $1 ) ) {
 		my $type   = $1;
-		my $value2 = +{%{$value||{}}};
+		my $value2 = +{ %{ $value || {} } };
 		
-		return map $class->_exporter_expand_sub($_, $value2, $globals),
+		return map $class->_exporter_expand_sub( $_, $value2, $globals ),
 			$type, "is_$type", "assert_$type", "to_$type";
 	}
 	
 	my $typename = $name;
 	my $thingy   = undef;
-	if ($name =~ /^(is|assert|to)_(.+)$/)
-	{
+	if ( $name =~ /^(is|assert|to)_(.+)$/ ) {
 		$thingy   = $1;
 		$typename = $2;
 	}
 	
-	if (my $type = $class->get_type($typename))
-	{
+	if ( my $type = $class->get_type( $typename ) ) {
 		my $custom_type = 0;
-		for my $param (qw/ of where /)
-		{
+		for my $param ( qw/ of where / ) {
 			exists $value->{$param} or next;
 			defined $value->{-as}
-				or _croak("Parameter '-as' not supplied");
-			$type = $type->$param($value->{$param});
+				or _croak( "Parameter '-as' not supplied" );
+			$type = $type->$param( $value->{$param} );
 			$name = $value->{-as};
 			++$custom_type;
 		}
 		
-		if (!defined $thingy)
-		{
+		if ( !defined $thingy ) {
 			my $post_method = q();
 			$post_method = '->mouse_type' if $globals->{mouse};
 			$post_method = '->moose_type' if $globals->{moose};
-			return ($name => $class->_mksub($type, $post_method)) if $post_method || $custom_type;
+			return ( $name => $class->_mksub( $type, $post_method ) )
+				if $post_method || $custom_type;
 		}
-		elsif ($thingy eq 'is')
-		{
-			return ($value->{-as} || "is_$typename" => $type->compiled_check) if $custom_type;
+		elsif ( $thingy eq 'is' ) {
+			return ( $value->{-as} || "is_$typename" => $type->compiled_check )
+				if $custom_type;
 		}
-		elsif ($thingy eq 'assert')
-		{
-			return ($value->{-as} || "assert_$typename" => $type->_overload_coderef) if $custom_type;
+		elsif ( $thingy eq 'assert' ) {
+			return ( $value->{-as} || "assert_$typename" => $type->_overload_coderef )
+				if $custom_type;
 		}
-		elsif ($thingy eq 'to')
-		{
-			my $to_type = $type->has_coercion && $type->coercion->frozen
+		elsif ( $thingy eq 'to' ) {
+			my $to_type =
+				$type->has_coercion && $type->coercion->frozen
 				? $type->coercion->compiled_coercion
-				: sub ($) { $type->coerce($_[0]) };
-			return ($value->{-as} || "to_$typename" => $to_type) if $custom_type;
+				: sub ($) { $type->coerce( $_[0] ) };
+			return ( $value->{-as} || "to_$typename" => $to_type ) if $custom_type;
 		}
-	}
+	} #/ if ( my $type = $class...)
 	
-	return $class->SUPER::_exporter_expand_sub(@_);
-}
+	return $class->SUPER::_exporter_expand_sub( @_ );
+} #/ sub _exporter_expand_sub
 
-sub _exporter_install_sub
-{
+sub _exporter_install_sub {
 	my $class = shift;
-	my ($name, $value, $globals, $sym) = @_;
+	my ( $name, $value, $globals, $sym ) = @_;
 	
 	my $package = $globals->{into};
-	my $type = $class->get_type($name);
+	my $type    = $class->get_type( $name );
 	
 	Exporter::Tiny::_carp(
 		"Exporting deprecated type %s to %s",
 		$type->qualified_name,
-		ref($package) ? "reference" : "package $package",
-	) if (defined $type and $type->deprecated and not $globals->{allow_deprecated});
-	
-	if (!ref $package and defined $type)
-	{
-		my ($prefix) = grep defined, $value->{-prefix}, $globals->{prefix}, q();
-		my ($suffix) = grep defined, $value->{-suffix}, $globals->{suffix}, q();
-		my $as = $prefix . ($value->{-as} || $name) . $suffix;
+		ref( $package ) ? "reference" : "package $package",
+		)
+		if ( defined $type
+		and $type->deprecated
+		and not $globals->{allow_deprecated} );
+		
+	if ( !ref $package and defined $type ) {
+		my ( $prefix ) = grep defined, $value->{-prefix}, $globals->{prefix}, q();
+		my ( $suffix ) = grep defined, $value->{-suffix}, $globals->{suffix}, q();
+		my $as         = $prefix . ( $value->{-as} || $name ) . $suffix;
 		
 		$INC{'Type/Registry.pm'}
-			? 'Type::Registry'->for_class($package)->add_type($type, $as)
-			: ($Type::Registry::DELAYED{$package}{$as} = $type);
+			? 'Type::Registry'->for_class( $package )->add_type( $type, $as )
+			: ( $Type::Registry::DELAYED{$package}{$as} = $type );
 	}
 	
-	$class->SUPER::_exporter_install_sub(@_);
-}
+	$class->SUPER::_exporter_install_sub( @_ );
+} #/ sub _exporter_install_sub
 
-sub _exporter_fail
-{
+sub _exporter_fail {
 	my $class = shift;
-	my ($name, $value, $globals) = @_;
+	my ( $name, $value, $globals ) = @_;
 	
 	my $into = $globals->{into}
-		or _croak("Parameter 'into' not supplied");
-	
-	if ($globals->{declare})
-	{
-		my $declared = sub (;$)
-		{
-			my $params; $params = shift if ref($_[0]) eq "ARRAY";
-			my $type = $into->get_type($name);
+		or _croak( "Parameter 'into' not supplied" );
+		
+	if ( $globals->{declare} ) {
+		my $declared = sub (;$) {
+			my $params;
+			$params = shift if ref( $_[0] ) eq "ARRAY";
+			my $type = $into->get_type( $name );
 			my $t;
 			
-			if ($type) {
-				$t = $params ? $type->parameterize(@$params) : $type;
+			if ( $type ) {
+				$t = $params ? $type->parameterize( @$params ) : $type;
 			}
-			else
-			{
+			else {
 				_croak "Cannot parameterize a non-existant type" if $params;
-				$t = Type::Tiny::_DeclaredType->new(library => $into, name => $name);
+				$t = Type::Tiny::_DeclaredType->new( library => $into, name => $name );
 			}
 			
-			@_ && wantarray ? return($t, @_) : return $t;
+			@_ && wantarray ? return ( $t, @_ ) : return $t;
 		};
 		
-		return(
+		return (
 			$name,
 			_subname(
 				"$class\::$name",
 				NICE_PROTOTYPES ? sub (;$) { goto $declared } : sub (;@) { goto $declared },
 			),
 		);
-	}
+	} #/ if ( $globals->{declare...})
 	
-	return $class->SUPER::_exporter_fail(@_);
-}
+	return $class->SUPER::_exporter_fail( @_ );
+} #/ sub _exporter_fail
 
 {
+
 	package Type::Tiny::_DeclaredType;
 	our @ISA = 'Type::Tiny';
+	
 	sub new {
-		my $class = shift;
-		my %opts  = @_==1 ? %{+shift} : @_;
+		my $class   = shift;
+		my %opts    = @_ == 1 ? %{ +shift } : @_;
 		my $library = delete $opts{library};
 		my $name    = delete $opts{name};
 		$opts{display_name} = $name;
-		$opts{constraint} = sub {
+		$opts{constraint}   = sub {
 			my $val = @_ ? pop : $_;
-			$library->get_type($name)->check($val);
+			$library->get_type( $name )->check( $val );
 		};
 		$opts{inlined} = sub {
 			my $val = @_ ? pop : $_;
-			sprintf('%s::is_%s(%s)', $library, $name, $val);
+			sprintf( '%s::is_%s(%s)', $library, $name, $val );
 		};
 		$opts{_build_coercion} = sub {
-			my $realtype = $library->get_type($name);
+			my $realtype = $library->get_type( $name );
 			$_[0] = $realtype->coercion if $realtype;
 		};
-		$class->SUPER::new(%opts);
-	}
+		$class->SUPER::new( %opts );
+	} #/ sub new
 }
 
-sub meta
-{
+sub meta {
 	no strict "refs";
 	no warnings "once";
 	return $_[0] if blessed $_[0];
 	${"$_[0]\::META"} ||= bless {}, $_[0];
 }
 
-sub add_type
-{
+sub add_type {
 	my $meta  = shift->meta;
-	my $class = blessed($meta);
+	my $class = blessed( $meta );
 	
 	my $type =
-		ref($_[0]) =~ /^Type::Tiny\b/  ? $_[0] :
-		blessed($_[0])                 ? Types::TypeTiny::to_TypeTiny($_[0]) :
-		ref($_[0]) eq q(HASH)          ? 'Type::Tiny'->new(library => $class, %{$_[0]}) :
-		"Type::Tiny"->new(library => $class, @_);
+		ref( $_[0] ) =~ /^Type::Tiny\b/ ? $_[0]
+		: blessed( $_[0] ) ? Types::TypeTiny::to_TypeTiny( $_[0] )
+		: ref( $_[0] ) eq q(HASH)
+		? 'Type::Tiny'->new( library => $class, %{ $_[0] } )
+		: "Type::Tiny"->new( library => $class, @_ );
 	my $name = $type->{name};
 	
 	$meta->{types} ||= {};
-	_croak 'Type %s already exists in this library', $name if $meta->has_type($name);
-	_croak 'Type %s conflicts with coercion of same name', $name if $meta->has_coercion($name);
+	_croak 'Type %s already exists in this library', $name
+		if $meta->has_type( $name );
+	_croak 'Type %s conflicts with coercion of same name', $name
+		if $meta->has_coercion( $name );
 	_croak 'Cannot add anonymous type to a library' if $type->is_anon;
 	$meta->{types}{$name} = $type;
 	
 	no strict "refs";
 	no warnings "redefine", "prototype";
 	
-	my $to_type = $type->has_coercion && $type->coercion->frozen
+	my $to_type =
+		$type->has_coercion && $type->coercion->frozen
 		? $type->coercion->compiled_coercion
-		: sub ($) { $type->coerce($_[0]) };
-	
-	*{"$class\::$name"}        = $class->_mksub($type);
-	*{"$class\::is_$name"}     = _subname "$class\::is_$name", $type->compiled_check;
-	*{"$class\::to_$name"}     = _subname "$class\::to_$name", $to_type;
-	*{"$class\::assert_$name"} = _subname "$class\::assert_$name", $type->_overload_coderef;
-	
+		: sub ($) { $type->coerce( $_[0] ) };
+		
+	*{"$class\::$name"}    = $class->_mksub( $type );
+	*{"$class\::is_$name"} = _subname "$class\::is_$name", $type->compiled_check;
+	*{"$class\::to_$name"} = _subname "$class\::to_$name", $to_type;
+	*{"$class\::assert_$name"} = _subname "$class\::assert_$name",
+		$type->_overload_coderef;
+		
 	return $type;
-}
+} #/ sub add_type
 
-sub get_type
-{
+sub get_type {
 	my $meta = shift->meta;
-	$meta->{types}{$_[0]};
+	$meta->{types}{ $_[0] };
 }
 
-sub has_type
-{
+sub has_type {
 	my $meta = shift->meta;
-	exists $meta->{types}{$_[0]};
+	exists $meta->{types}{ $_[0] };
 }
 
-sub type_names
-{
+sub type_names {
 	my $meta = shift->meta;
 	keys %{ $meta->{types} };
 }
 
-sub add_coercion
-{
+sub add_coercion {
 	require Type::Coercion;
 	my $meta = shift->meta;
-	my $c    = blessed($_[0]) ? $_[0] : "Type::Coercion"->new(@_);
+	my $c    = blessed( $_[0] ) ? $_[0] : "Type::Coercion"->new( @_ );
 	my $name = $c->name;
-
+	
 	$meta->{coercions} ||= {};
-	_croak 'Coercion %s already exists in this library', $name if $meta->has_coercion($name);
-	_croak 'Coercion %s conflicts with type of same name', $name if $meta->has_type($name);
+	_croak 'Coercion %s already exists in this library', $name
+		if $meta->has_coercion( $name );
+	_croak 'Coercion %s conflicts with type of same name', $name
+		if $meta->has_type( $name );
 	_croak 'Cannot add anonymous type to a library' if $c->is_anon;
 	$meta->{coercions}{$name} = $c;
-
+	
 	no strict "refs";
 	no warnings "redefine", "prototype";
 	
-	my $class = blessed($meta);
-	*{"$class\::$name"} = $class->_mksub($c);
+	my $class = blessed( $meta );
+	*{"$class\::$name"} = $class->_mksub( $c );
 	
 	return $c;
-}
+} #/ sub add_coercion
 
-sub get_coercion
-{
+sub get_coercion {
 	my $meta = shift->meta;
-	$meta->{coercions}{$_[0]};
+	$meta->{coercions}{ $_[0] };
 }
 
-sub has_coercion
-{
+sub has_coercion {
 	my $meta = shift->meta;
-	exists $meta->{coercions}{$_[0]};
+	exists $meta->{coercions}{ $_[0] };
 }
 
-sub coercion_names
-{
+sub coercion_names {
 	my $meta = shift->meta;
 	keys %{ $meta->{coercions} };
 }
 
-sub make_immutable
-{
+sub make_immutable {
 	my $meta  = shift->meta;
-	my $class = ref($meta);
+	my $class = ref( $meta );
 	
-	for my $type (values %{$meta->{types}})
-	{
+	for my $type ( values %{ $meta->{types} } ) {
 		$type->coercion->freeze;
 		
 		no strict "refs";
 		no warnings "redefine", "prototype";
 		
-		my $to_type = $type->has_coercion && $type->coercion->frozen
+		my $to_type =
+			$type->has_coercion && $type->coercion->frozen
 			? $type->coercion->compiled_coercion
-			: sub ($) { $type->coerce($_[0]) };
+			: sub ($) { $type->coerce( $_[0] ) };
 		my $name = $type->name;
 		
 		*{"$class\::to_$name"} = _subname "$class\::to_$name", $to_type;
-	}
+	} #/ for my $type ( values %...)
 	
 	1;
-}
+} #/ sub make_immutable
 
 1;
 
@@ -704,5 +694,3 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-
-

@@ -22,73 +22,72 @@ sub _short_name { 'Duck' }
 sub new {
 	my $proto = shift;
 	
-	my %opts = (@_==1) ? %{$_[0]} : @_;
+	my %opts = ( @_ == 1 ) ? %{ $_[0] } : @_;
 	_croak "Need to supply list of methods" unless exists $opts{methods};
 	
-	$opts{methods} = [$opts{methods}] unless ref $opts{methods};
+	$opts{methods} = [ $opts{methods} ] unless ref $opts{methods};
 	
-	if (Type::Tiny::_USE_XS)
-	{
-		my $methods = join ",", sort(@{$opts{methods}});
-		my $xsub    = Type::Tiny::XS::get_coderef_for("HasMethods[$methods]");
+	if ( Type::Tiny::_USE_XS ) {
+		my $methods = join ",", sort( @{ $opts{methods} } );
+		my $xsub    = Type::Tiny::XS::get_coderef_for( "HasMethods[$methods]" );
 		$opts{compiled_type_constraint} = $xsub if $xsub;
 	}
-	elsif (Type::Tiny::_USE_MOUSE)
-	{
+	elsif ( Type::Tiny::_USE_MOUSE ) {
 		require Mouse::Util::TypeConstraints;
-		my $maker = "Mouse::Util::TypeConstraints"->can("generate_can_predicate_for");
-		$opts{compiled_type_constraint} = $maker->($opts{methods}) if $maker;
+		my $maker = "Mouse::Util::TypeConstraints"->can( "generate_can_predicate_for" );
+		$opts{compiled_type_constraint} = $maker->( $opts{methods} ) if $maker;
 	}
 	
-	return $proto->SUPER::new(%opts);
-}
+	return $proto->SUPER::new( %opts );
+} #/ sub new
 
-sub methods     { $_[0]{methods} }
-sub inlined     { $_[0]{inlined} ||= $_[0]->_build_inlined }
+sub methods { $_[0]{methods} }
+sub inlined { $_[0]{inlined} ||= $_[0]->_build_inlined }
 
 sub has_inlined { !!1 }
 
 sub _is_null_constraint { 0 }
 
-sub _build_constraint
-{
+sub _build_constraint {
 	my $self    = shift;
-	my @methods = @{$self->methods};
-	return sub { blessed($_[0]) and not grep(!$_[0]->can($_), @methods) };
+	my @methods = @{ $self->methods };
+	return sub {
+		blessed( $_[0] )
+			and not grep( !$_[0]->can( $_ ), @methods );
+	};
 }
 
-sub _build_inlined
-{
-	my $self = shift;
-	my @methods = @{$self->methods};
+sub _build_inlined {
+	my $self    = shift;
+	my @methods = @{ $self->methods };
 	
 	my $xsub;
-	if (Type::Tiny::_USE_XS)
-	{
-		my $methods = join ",", sort(@{$self->methods});
-		$xsub = Type::Tiny::XS::get_subname_for("HasMethods[$methods]");
+	if ( Type::Tiny::_USE_XS ) {
+		my $methods = join ",", sort( @{ $self->methods } );
+		$xsub = Type::Tiny::XS::get_subname_for( "HasMethods[$methods]" );
 	}
 	
 	sub {
 		my $var = $_[1];
 		local $" = q{ };
+		
 		# If $var is $_ or $_->{foo} or $foo{$_} or somesuch, then we
 		# can't use it within the grep expression, so we need to save
 		# it into a temporary variable ($tmp).
-		my $code = ($var =~ /\$_/)
+		my $code =
+			( $var =~ /\$_/ )
 			? qq{ Scalar::Util::blessed($var) and not do { my \$tmp = $var; grep(!\$tmp->can(\$_), qw/@methods/) } }
 			: qq{ Scalar::Util::blessed($var) and not grep(!$var->can(\$_), qw/@methods/) };
-		
+			
 		return qq{do { package Type::Tiny; use Scalar::Util (); $code }}
 			if $Type::Tiny::AvoidCallbacks;
 		return "$xsub\($var\)"
 			if $xsub;
 		$code;
 	};
-}
+} #/ sub _build_inlined
 
-sub _instantiate_moose_type
-{
+sub _instantiate_moose_type {
 	my $self = shift;
 	my %opts = @_;
 	delete $opts{parent};
@@ -96,52 +95,54 @@ sub _instantiate_moose_type
 	delete $opts{inlined};
 	
 	require Moose::Meta::TypeConstraint::DuckType;
-	return "Moose::Meta::TypeConstraint::DuckType"->new(%opts, methods => $self->methods);
-}
+	return
+		"Moose::Meta::TypeConstraint::DuckType"
+		->new( %opts, methods => $self->methods );
+} #/ sub _instantiate_moose_type
 
-sub validate_explain
-{
+sub validate_explain {
 	my $self = shift;
-	my ($value, $varname) = @_;
+	my ( $value, $varname ) = @_;
 	$varname = '$_' unless defined $varname;
 	
-	return undef if $self->check($value);
-	return ["Not a blessed reference"] unless blessed($value);
+	return undef if $self->check( $value );
+	return ["Not a blessed reference"] unless blessed( $value );
 	
 	require Type::Utils;
 	return [
 		sprintf(
 			'"%s" requires that the reference can %s',
 			$self,
-			Type::Utils::english_list(map qq["$_"], @{$self->methods}),
+			Type::Utils::english_list( map qq["$_"], @{ $self->methods } ),
 		),
-		map  sprintf('The reference cannot "%s"', $_),
-		grep !$value->can($_),
-		@{$self->methods}
+		map sprintf( 'The reference cannot "%s"', $_ ),
+		grep !$value->can( $_ ),
+		@{ $self->methods }
 	];
-}
+} #/ sub validate_explain
 
 push @Type::Tiny::CMP, sub {
 	my $A = shift->find_constraining_type;
 	my $B = shift->find_constraining_type;
-	return Type::Tiny::CMP_UNKNOWN unless $A->isa(__PACKAGE__) && $B->isa(__PACKAGE__);
-	
+	return Type::Tiny::CMP_UNKNOWN
+		unless $A->isa( __PACKAGE__ ) && $B->isa( __PACKAGE__ );
+		
 	my %seen;
-	for my $word (@{$A->methods}) {
+	for my $word ( @{ $A->methods } ) {
 		$seen{$word} += 1;
 	}
-	for my $word (@{$B->methods}) {
+	for my $word ( @{ $B->methods } ) {
 		$seen{$word} += 2;
 	}
 	
-	my $values = join('', CORE::values %seen);
-	if ($values =~ /^3*$/) {
+	my $values = join( '', CORE::values %seen );
+	if ( $values =~ /^3*$/ ) {
 		return Type::Tiny::CMP_EQUIVALENT;
 	}
-	elsif ($values !~ /2/) {
+	elsif ( $values !~ /2/ ) {
 		return Type::Tiny::CMP_SUBTYPE;
 	}
-	elsif ($values !~ /1/) {
+	elsif ( $values !~ /1/ ) {
 		return Type::Tiny::CMP_SUPERTYPE;
 	}
 	
@@ -244,4 +245,3 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-

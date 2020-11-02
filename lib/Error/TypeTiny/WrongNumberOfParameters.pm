@@ -14,26 +14,23 @@ $Error::TypeTiny::WrongNumberOfParameters::VERSION =~ tr/_//d;
 require Error::TypeTiny;
 our @ISA = 'Error::TypeTiny';
 
-sub minimum    { $_[0]{minimum} };
-sub maximum    { $_[0]{maximum} };
-sub got        { $_[0]{got} };
+sub minimum { $_[0]{minimum} }
+sub maximum { $_[0]{maximum} }
+sub got     { $_[0]{got} }
 
-sub has_minimum { exists $_[0]{minimum} };
-sub has_maximum { exists $_[0]{maximum} };
+sub has_minimum { exists $_[0]{minimum} }
+sub has_maximum { exists $_[0]{maximum} }
 
-sub _build_message
-{
+sub _build_message {
 	my $e = shift;
-	if ($e->has_minimum and $e->has_maximum and $e->minimum == $e->maximum)
-	{
+	if ( $e->has_minimum and $e->has_maximum and $e->minimum == $e->maximum ) {
 		return sprintf(
 			"Wrong number of parameters; got %d; expected %d",
 			$e->got,
 			$e->minimum,
 		);
 	}
-	elsif ($e->has_minimum and $e->has_maximum and $e->minimum < $e->maximum)
-	{
+	elsif ( $e->has_minimum and $e->has_maximum and $e->minimum < $e->maximum ) {
 		return sprintf(
 			"Wrong number of parameters; got %d; expected %d to %d",
 			$e->got,
@@ -41,22 +38,20 @@ sub _build_message
 			$e->maximum,
 		);
 	}
-	elsif ($e->has_minimum)
-	{
+	elsif ( $e->has_minimum ) {
 		return sprintf(
 			"Wrong number of parameters; got %d; expected at least %d",
 			$e->got,
 			$e->minimum,
 		);
 	}
-	else
-	{
+	else {
 		return sprintf(
 			"Wrong number of parameters; got %d",
 			$e->got,
 		);
 	}
-}
+} #/ sub _build_message
 
 1;
 
@@ -136,4 +131,3 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-

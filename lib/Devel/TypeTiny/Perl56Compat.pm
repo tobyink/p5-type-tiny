@@ -13,20 +13,21 @@ $VERSION =~ tr/_//d;
 
 use B ();
 
-unless (exists &B::perlstring)
-{
+unless ( exists &B::perlstring ) {
 	my $d;
 	*B::perlstring = sub {
 		no warnings 'uninitialized';
 		require Data::Dumper;
-		$d ||= 'Data::Dumper'->new([])->Indent(0)->Purity(0)->Pad('')->Useqq(1)->Terse(1)->Freezer('')->Toaster('');
-		my $perlstring = $d->Values([''.shift])->Dump;
-		($perlstring =~ /^"/) ? $perlstring : qq["$perlstring"];
+		$d ||=
+			'Data::Dumper'
+			->new( [] )->Indent( 0 )->Purity( 0 )->Pad( '' )->Useqq( 1 )
+			->Terse( 1 )->Freezer( '' )->Toaster( '' );
+		my $perlstring = $d->Values( [ '' . shift ] )->Dump;
+		( $perlstring =~ /^"/ ) ? $perlstring : qq["$perlstring"];
 	};
-}
+} #/ unless ( exists &B::perlstring)
 
-unless (exists &B::cstring)
-{
+unless ( exists &B::cstring ) {
 	*B::cstring = \&B::perlstring;
 }
 
@@ -82,4 +83,3 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-

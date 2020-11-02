@@ -11,7 +11,7 @@ BEGIN {
 
 $Types::Standard::StrMatch::VERSION =~ tr/_//d;
 
-use Type::Tiny ();
+use Type::Tiny      ();
 use Types::Standard ();
 use Types::TypeTiny ();
 
@@ -24,103 +24,105 @@ my $has_regexp_util;
 my $serialize_regexp = sub {
 	$has_regexp_util = eval {
 		require Regexp::Util;
-		Regexp::Util->VERSION('0.003');
+		Regexp::Util->VERSION( '0.003' );
 		1;
 	} || 0 unless defined $has_regexp_util;
 	
 	my $re = shift;
 	my $serialized;
-	if ($has_regexp_util) {
-		$serialized = eval { Regexp::Util::serialize_regexp($re) };
+	if ( $has_regexp_util ) {
+		$serialized = eval { Regexp::Util::serialize_regexp( $re ) };
 	}
 	
-	unless (defined $serialized) {
-		my $key = sprintf('%s|%s', ref($re), $re);
+	unless ( defined $serialized ) {
+		my $key = sprintf( '%s|%s', ref( $re ), $re );
 		$expressions{$key} = $re;
-		$serialized = sprintf('$Types::Standard::StrMatch::expressions{%s}', B::perlstring($key));
+		$serialized = sprintf( '$Types::Standard::StrMatch::expressions{%s}',
+			B::perlstring( $key ) );
 	}
 	
 	return $serialized;
 };
 
-sub __constraint_generator
-{
-	return Types::Standard->meta->get_type('StrMatch') unless @_;
+sub __constraint_generator {
+	return Types::Standard->meta->get_type( 'StrMatch' ) unless @_;
 	
-	my ($regexp, $checker) = @_;
+	my ( $regexp, $checker ) = @_;
 	
-	Types::Standard::is_RegexpRef($regexp)
-		or _croak("First parameter to StrMatch[`a] expected to be a Regexp; got $regexp");
-	
-	if (@_ > 1)
-	{
-		$checker = Types::TypeTiny::to_TypeTiny($checker);
-		Types::TypeTiny::is_TypeTiny($checker)
-			or _croak("Second parameter to StrMatch[`a] expected to be a type constraint; got $checker")
+	Types::Standard::is_RegexpRef( $regexp )
+		or _croak(
+		"First parameter to StrMatch[`a] expected to be a Regexp; got $regexp" );
+		
+	if ( @_ > 1 ) {
+		$checker = Types::TypeTiny::to_TypeTiny( $checker );
+		Types::TypeTiny::is_TypeTiny( $checker )
+			or _croak(
+			"Second parameter to StrMatch[`a] expected to be a type constraint; got $checker"
+			);
 	}
 	
 	$checker
 		? sub {
-			my $value = shift;
-			return if ref($value);
-			my @m = ($value =~ $regexp);
-			$checker->check(\@m);
+		my $value = shift;
+		return if ref( $value );
+		my @m = ( $value =~ $regexp );
+		$checker->check( \@m );
 		}
 		: sub {
-			my $value = shift;
-			!ref($value) and $value =~ $regexp;
-		}
-	;
-}
+		my $value = shift;
+		!ref( $value ) and $value =~ $regexp;
+		};
+} #/ sub __constraint_generator
 
-sub __inline_generator
-{
+sub __inline_generator {
 	require B;
-	my ($regexp, $checker) = @_;
+	my ( $regexp, $checker ) = @_;
 	my $serialized_re = $regexp->$serialize_regexp or return;
 	
-	if ($checker)
-	{
+	if ( $checker ) {
 		return unless $checker->can_be_inlined;
 		
-		return sub
-		{
+		return sub {
 			my $v = $_[1];
-			if ($Type::Tiny::AvoidCallbacks and $serialized_re =~ /Types::Standard::StrMatch::expressions/) {
+			if ( $Type::Tiny::AvoidCallbacks
+				and $serialized_re =~ /Types::Standard::StrMatch::expressions/ )
+			{
 				require Carp;
-				Carp::carp("Cannot serialize regexp without callbacks; serializing using callbacks");
+				Carp::carp(
+					"Cannot serialize regexp without callbacks; serializing using callbacks" );
 			}
 			sprintf
 				"!ref($v) and do { my \$m = [$v =~ %s]; %s }",
 				$serialized_re,
-				$checker->inline_check('$m'),
-			;
+				$checker->inline_check( '$m' ),
+				;
 		};
-	}
-	else
-	{
+	} #/ if ( $checker )
+	else {
 		my $regexp_string = "$regexp";
-		if ($regexp_string =~ /\A\(\?\^u?:\\A(\.+)\)\z/) {
+		if ( $regexp_string =~ /\A\(\?\^u?:\\A(\.+)\)\z/ ) {
 			my $length = length $1;
 			return sub { "!ref($_) and length($_)>=$length" };
 		}
 		
-		if ($regexp_string =~ /\A\(\?\^u?:\\A(\.+)\\z\)\z/) {
+		if ( $regexp_string =~ /\A\(\?\^u?:\\A(\.+)\\z\)\z/ ) {
 			my $length = length $1;
 			return sub { "!ref($_) and length($_)==$length" };
 		}
 		
-		return sub
-		{
+		return sub {
 			my $v = $_[1];
-			if ($Type::Tiny::AvoidCallbacks and $serialized_re =~ /Types::Standard::StrMatch::expressions/) {
+			if ( $Type::Tiny::AvoidCallbacks
+				and $serialized_re =~ /Types::Standard::StrMatch::expressions/ )
+			{
 				require Carp;
-				Carp::carp("Cannot serialize regexp without callbacks; serializing using callbacks");
+				Carp::carp(
+					"Cannot serialize regexp without callbacks; serializing using callbacks" );
 			}
 			"!ref($v) and $v =~ $serialized_re";
 		};
-	}
-}
+	} #/ else [ if ( $checker ) ]
+} #/ sub __inline_generator
 
 1;
 
@@ -170,4 +172,3 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-

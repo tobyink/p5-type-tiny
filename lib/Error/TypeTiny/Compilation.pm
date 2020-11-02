@@ -14,14 +14,13 @@ $Error::TypeTiny::Compilation::VERSION =~ tr/_//d;
 require Error::TypeTiny;
 our @ISA = 'Error::TypeTiny';
 
-sub code        { $_[0]{code} };
-sub environment { $_[0]{environment} ||= {} };
-sub errstr      { $_[0]{errstr} };
+sub code        { $_[0]{code} }
+sub environment { $_[0]{environment} ||= {} }
+sub errstr      { $_[0]{errstr} }
 
-sub _build_message
-{
+sub _build_message {
 	my $self = shift;
-	sprintf("Failed to compile source because: %s", $self->errstr);
+	sprintf( "Failed to compile source because: %s", $self->errstr );
 }
 
 1;
@@ -93,4 +92,3 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-

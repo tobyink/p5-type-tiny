@@ -16,171 +16,161 @@ use Scalar::Util qw( refaddr );
 use Type::Parser qw( eval_type );
 use Types::TypeTiny ();
 
-our @ISA = 'Exporter::Tiny';
+our @ISA       = 'Exporter::Tiny';
 our @EXPORT_OK = qw(t);
 
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
-sub _generate_t
-{
+sub _generate_t {
 	my $class = shift;
-	my ($name, $value, $globals) = @_;
+	my ( $name, $value, $globals ) = @_;
 	
 	my $caller = $globals->{into};
-	my $reg = $class->for_class(
-		ref($caller) ? sprintf('HASH(0x%08X)', refaddr($caller)) : $caller
-	);
-	
-	sub (;$) { @_ ? $reg->lookup(@_) : $reg };
-}
+	my $reg    = $class->for_class(
+		ref( $caller ) ? sprintf( 'HASH(0x%08X)', refaddr( $caller ) ) : $caller );
+		
+	sub (;$) { @_ ? $reg->lookup( @_ ) : $reg };
+} #/ sub _generate_t
 
-sub new
-{
+sub new {
 	my $class = shift;
-	ref($class) and _croak("Not an object method");
+	ref( $class ) and _croak( "Not an object method" );
 	bless {}, $class;
 }
 
 {
 	my %registries;
 	
-	sub for_class
-	{
+	sub for_class {
 		my $class = shift;
-		my ($for) = @_;
+		my ( $for ) = @_;
 		$registries{$for} ||= $class->new;
 	}
 	
-	sub for_me
-	{
+	sub for_me {
 		my $class = shift;
 		my $for   = caller;
 		$registries{$for} ||= $class->new;
 	}
 }
 
-sub add_types
-{
+sub add_types {
 	my $self = shift;
-	my $opts = mkopt(\@_);
-	for my $opt (@$opts)
-	{
-		my ($library, $types) = @$opt;
+	my $opts = mkopt( \@_ );
+	for my $opt ( @$opts ) {
+		my ( $library, $types ) = @$opt;
 		$library =~ s/^-/Types::/;
 		
 		{
-			local $SIG{__DIE__} = sub {};
+			local $SIG{__DIE__} = sub { };
 			eval "require $library";
 		};
 		
 		my %hash;
 		
-		if ($library->isa("Type::Library") or $library eq 'Types::TypeTiny')
-		{
+		if ( $library->isa( "Type::Library" ) or $library eq 'Types::TypeTiny' ) {
 			$types ||= [qw/-types/];
-			Types::TypeTiny::is_ArrayLike($types)
-				or _croak("Expected arrayref following '%s'; got %s", $library, $types);
-			
-			$library->import({into => \%hash}, @$types);
-			$hash{$_} = &{$hash{$_}}() for keys %hash;
+			Types::TypeTiny::is_ArrayLike( $types )
+				or _croak( "Expected arrayref following '%s'; got %s", $library,
+				$types );
+				
+			$library->import( { into => \%hash }, @$types );
+			$hash{$_} = &{ $hash{$_} }() for keys %hash;
 		}
-		elsif ($library->isa("MooseX::Types::Base"))
-		{
+		elsif ( $library->isa( "MooseX::Types::Base" ) ) {
 			$types ||= [];
-			Types::TypeTiny::is_ArrayLike($types) && (@$types == 0)
-				or _croak("Library '%s' is a MooseX::Types type constraint library. No import options currently supported", $library);
-			
+			Types::TypeTiny::is_ArrayLike( $types ) && ( @$types == 0 )
+				or _croak(
+				"Library '%s' is a MooseX::Types type constraint library. No import options currently supported",
+				$library );
+				
 			require Moose::Util::TypeConstraints;
 			my $moosextypes = $library->type_storage;
-			for my $name (sort keys %$moosextypes)
-			{
+			for my $name ( sort keys %$moosextypes ) {
 				my $tt = Types::TypeTiny::to_TypeTiny(
-					Moose::Util::TypeConstraints::find_type_constraint($moosextypes->{$name})
-				);
+					Moose::Util::TypeConstraints::find_type_constraint( $moosextypes->{$name} ) );
 				$hash{$name} = $tt;
 			}
-		}
-		elsif ($library->isa("MouseX::Types::Base"))
-		{
+		} #/ elsif ( $library->isa( "MooseX::Types::Base"...))
+		elsif ( $library->isa( "MouseX::Types::Base" ) ) {
 			$types ||= [];
-			Types::TypeTiny::is_ArrayLike($types) && (@$types == 0)
-				or _croak("Library '%s' is a MouseX::Types type constraint library. No import options currently supported", $library);
-			
+			Types::TypeTiny::is_ArrayLike( $types ) && ( @$types == 0 )
+				or _croak(
+				"Library '%s' is a MouseX::Types type constraint library. No import options currently supported",
+				$library );
+				
 			require Mouse::Util::TypeConstraints;
 			my $moosextypes = $library->type_storage;
-			for my $name (sort keys %$moosextypes)
-			{
+			for my $name ( sort keys %$moosextypes ) {
 				my $tt = Types::TypeTiny::to_TypeTiny(
-					Mouse::Util::TypeConstraints::find_type_constraint($moosextypes->{$name})
-				);
+					Mouse::Util::TypeConstraints::find_type_constraint( $moosextypes->{$name} ) );
 				$hash{$name} = $tt;
 			}
-		}
-		else
-		{
-			_croak("%s is not a type library", $library);
+		} #/ elsif ( $library->isa( "MouseX::Types::Base"...))
+		else {
+			_croak( "%s is not a type library", $library );
 		}
 		
-		for my $key (sort keys %hash)
-		{
-			exists($self->{$key})
+		for my $key ( sort keys %hash ) {
+			exists( $self->{$key} )
 				and $self->{$key}{uniq} != $hash{$key}{uniq}
-				and _croak("Duplicate type name: %s", $key);
+				and _croak( "Duplicate type name: %s", $key );
 			$self->{$key} = $hash{$key};
 		}
-	}
+	} #/ for my $opt ( @$opts )
 	$self;
-}
+} #/ sub add_types
 
-sub add_type
-{
+sub add_type {
 	my $self = shift;
-	my ($type, $name) = @_;
-	$type = Types::TypeTiny::to_TypeTiny($type);
+	my ( $type, $name ) = @_;
+	$type = Types::TypeTiny::to_TypeTiny( $type );
 	$name ||= do {
 		$type->is_anon
-			and _croak("Expected named type constraint; got anonymous type constraint");
+			and _croak(
+			"Expected named type constraint; got anonymous type constraint" );
 		$type->name;
 	};
 	
-	exists($self->{$name})
+	exists( $self->{$name} )
 		and $self->{$name}{uniq} != $type->{uniq}
-		and _croak("Duplicate type name: %s", $name);
-	
+		and _croak( "Duplicate type name: %s", $name );
+		
 	$self->{$name} = $type;
 	$self;
-}
+} #/ sub add_type
 
-sub alias_type
-{
+sub alias_type {
 	my $self = shift;
-	my ($old, @new) = @_;
-	my $lookup = eval { $self->lookup($old) }
-		or _croak("Expected existing type constraint name; got '$old'");
+	my ( $old, @new ) = @_;
+	my $lookup = eval { $self->lookup( $old ) }
+		or _croak( "Expected existing type constraint name; got '$old'" );
 	$self->{$_} = $lookup for @new;
 	$self;
 }
 
-sub simple_lookup
-{
+sub simple_lookup {
 	my $self = shift;
 	
-	my ($tc) = @_;
+	my ( $tc ) = @_;
 	$tc =~ s/(^\s+|\s+$)//g;
 	
-	if (exists $self->{$tc}) {
+	if ( exists $self->{$tc} ) {
 		return $self->{$tc};
 	}
-	elsif ($self->has_parent) {
-		return $self->get_parent->simple_lookup(@_);
+	elsif ( $self->has_parent ) {
+		return $self->get_parent->simple_lookup( @_ );
 	}
 	
 	return;
-}
+} #/ sub simple_lookup
 
 sub set_parent {
 	my $self = shift;
-	$self->{'~~parent'} = ref($_[0]) ? $_[0] : (ref($self)||$self)->for_class($_[0]);
+	$self->{'~~parent'} =
+		ref( $_[0] )
+		? $_[0]
+		: ( ref( $self ) || $self )->for_class( $_[0] );
 	$self;
 }
 
@@ -191,125 +181,114 @@ sub clear_parent {
 }
 
 sub has_parent {
-	!!ref(shift->{'~~parent'});
+	!!ref( shift->{'~~parent'} );
 }
 
 sub get_parent {
 	shift->{'~~parent'};
 }
 
-sub foreign_lookup
-{
+sub foreign_lookup {
 	my $self = shift;
 	
-	return $_[1] ? () : $self->simple_lookup($_[0], 1)
+	return $_[1] ? () : $self->simple_lookup( $_[0], 1 )
 		unless $_[0] =~ /^(.+)::(\w+)$/;
-	
+		
 	my $library  = $1;
 	my $typename = $2;
 	
 	{
-		local $SIG{__DIE__} = sub {};
+		local $SIG{__DIE__} = sub { };
 		eval "require $library;";
 	};
 	
-	if ( $library->isa('MooseX::Types::Base') )
-	{
+	if ( $library->isa( 'MooseX::Types::Base' ) ) {
 		require Moose::Util::TypeConstraints;
 		my $type = Moose::Util::TypeConstraints::find_type_constraint(
-			$library->get_type($typename)
-		) or return;
-		return Types::TypeTiny::to_TypeTiny($type);
+			$library->get_type( $typename ) )
+			or return;
+		return Types::TypeTiny::to_TypeTiny( $type );
 	}
 	
-	if ( $library->isa('MouseX::Types::Base') )
-	{
+	if ( $library->isa( 'MouseX::Types::Base' ) ) {
 		require Mouse::Util::TypeConstraints;
-		my $sub  = $library->can($typename) or return;
-		my $type = Mouse::Util::TypeConstraints::find_type_constraint($sub->()) or return;
-		return Types::TypeTiny::to_TypeTiny($type);
+		my $sub  = $library->can( $typename ) or return;
+		my $type = Mouse::Util::TypeConstraints::find_type_constraint( $sub->() )
+			or return;
+		return Types::TypeTiny::to_TypeTiny( $type );
 	}
 	
-	if ( $library->can("get_type") )
-	{
-		my $type = $library->get_type($typename);
-		return Types::TypeTiny::to_TypeTiny($type);
+	if ( $library->can( "get_type" ) ) {
+		my $type = $library->get_type( $typename );
+		return Types::TypeTiny::to_TypeTiny( $type );
 	}
 	
 	return;
-}
+} #/ sub foreign_lookup
 
-sub lookup
-{
+sub lookup {
 	my $self = shift;
 	
-	$self->simple_lookup(@_) or eval_type($_[0], $self);
+	$self->simple_lookup( @_ ) or eval_type( $_[0], $self );
 }
 
-sub make_union
-{
+sub make_union {
 	my $self = shift;
-	my (@types) = @_;
+	my ( @types ) = @_;
 	
 	require Type::Tiny::Union;
-	return "Type::Tiny::Union"->new(type_constraints => \@types);
+	return "Type::Tiny::Union"->new( type_constraints => \@types );
 }
 
-sub make_intersection
-{
+sub make_intersection {
 	my $self = shift;
-	my (@types) = @_;
+	my ( @types ) = @_;
 	
 	require Type::Tiny::Intersection;
-	return "Type::Tiny::Intersection"->new(type_constraints => \@types);
+	return "Type::Tiny::Intersection"->new( type_constraints => \@types );
 }
 
-sub make_class_type
-{
+sub make_class_type {
 	my $self = shift;
-	my ($class) = @_;
+	my ( $class ) = @_;
 	
 	require Type::Tiny::Class;
-	return "Type::Tiny::Class"->new(class => $class);
+	return "Type::Tiny::Class"->new( class => $class );
 }
 
-sub make_role_type
-{
+sub make_role_type {
 	my $self = shift;
-	my ($role) = @_;
+	my ( $role ) = @_;
 	
 	require Type::Tiny::Role;
-	return "Type::Tiny::Role"->new(role => $role);
+	return "Type::Tiny::Role"->new( role => $role );
 }
 
-sub AUTOLOAD
-{
-	my $self = shift;
-	my ($method) = (our $AUTOLOAD =~ /(\w+)$/);
-	my $type = $self->simple_lookup($method);
+sub AUTOLOAD {
+	my $self       = shift;
+	my ( $method ) = ( our $AUTOLOAD =~ /(\w+)$/ );
+	my $type       = $self->simple_lookup( $method );
 	return $type if $type;
-	_croak(q[Can't locate object method "%s" via package "%s"], $method, ref($self));
+	_croak( q[Can't locate object method "%s" via package "%s"], $method,
+		ref( $self ) );
 }
 
 # Prevent AUTOLOAD being called for DESTROY!
-sub DESTROY
-{
-	return; # uncoverable statement
+sub DESTROY {
+	return;    # uncoverable statement
 }
 
 DELAYED: {
 	our %DELAYED;
-	for my $package (sort keys %DELAYED)
-	{
-		my $reg   = __PACKAGE__->for_class($package);
+	for my $package ( sort keys %DELAYED ) {
+		my $reg   = __PACKAGE__->for_class( $package );
 		my $types = $DELAYED{$package};
 		
-		for my $name (sort keys %$types)
-		{
-			$reg->add_type($types->{$name}, $name);
+		for my $name ( sort keys %$types ) {
+			$reg->add_type( $types->{$name}, $name );
 		}
 	}
-}
+} #/ DELAYED:
 
 1;
 
@@ -537,4 +516,3 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-
