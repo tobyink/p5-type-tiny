@@ -168,8 +168,7 @@ Evaluate: {
 } #/ Evaluate:
 
 {
-	package    # hide from CPAN
-		Type::Parser::AstBuilder;
+	package Type::Parser::AstBuilder;
 		
 	sub new {
 		my $class = shift;
@@ -309,15 +308,13 @@ Evaluate: {
 }
 
 {
-	package    # hide from CPAN
-		Type::Parser::Token;
+	package Type::Parser::Token;
 	sub type     { $_[0][0] }
 	sub spelling { $_[0][1] }
 }
 
 {
-	package    # hide from CPAN
-		Type::Parser::TokenStream;
+	package Type::Parser::TokenStream;
 		
 	use Scalar::Util qw(looks_like_number);
 	
