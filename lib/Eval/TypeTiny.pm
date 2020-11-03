@@ -37,20 +37,17 @@ BEGIN {
 	
 	my $implementation;
 	
+	#<<<
+	# uncoverable subroutine
 	sub ALIAS_IMPLEMENTATION () {
-	
-		# uncoverable subroutine
-		$implementation ||= do {    # uncoverable statement
-			do { $] ge '5.022' }
-				? IMPLEMENTATION_NATIVE :    # uncoverable statement
-				eval { require Devel::LexAlias }
-				? IMPLEMENTATION_DEVEL_LEXALIAS
-				:                            # uncoverable statement
-				eval { require PadWalker }
-				? IMPLEMENTATION_PADWALKER
-				: IMPLEMENTATION_TIE         # uncoverable statement
+		$implementation ||= do {
+			do { $] ge '5.022' }              ? IMPLEMENTATION_NATIVE :
+			eval { require Devel::LexAlias }  ? IMPLEMENTATION_DEVEL_LEXALIAS :
+			eval { require PadWalker }        ? IMPLEMENTATION_PADWALKER :
+			IMPLEMENTATION_TIE;
 		};
-	} #/ sub ALIAS_IMPLEMENTATION
+	}
+	#>>>
 	
 	sub _force_implementation {
 		$implementation = shift;
@@ -74,18 +71,17 @@ $VERSION =~ tr/_//d;
 
 # See Types::TypeTiny for an explanation of this import method.
 #
+# uncoverable subroutine
 sub import {
-
-	# uncoverable subroutine
-	no warnings "redefine";                             # uncoverable statement
-	our @ISA = qw( Exporter::Tiny );                    # uncoverable statement
-	require Exporter::Tiny;                             # uncoverable statement
-	my $next = \&Exporter::Tiny::import;                # uncoverable statement
-	*import = $next;                                    # uncoverable statement
-	my $class = shift;                                  # uncoverable statement
-	my $opts  = { ref( $_[0] ) ? %{ +shift } : () };    # uncoverable statement
-	$opts->{into} ||= scalar( caller );                 # uncoverable statement
-	return $class->$next( $opts, @_ );                  # uncoverable statement
+	no warnings "redefine";
+	our @ISA = qw( Exporter::Tiny );
+	require Exporter::Tiny;
+	my $next = \&Exporter::Tiny::import;
+	*import = $next;
+	my $class = shift;
+	my $opts  = { ref( $_[0] ) ? %{ +shift } : () };
+	$opts->{into} ||= scalar( caller );
+	return $class->$next( $opts, @_ );
 } #/ sub import
 
 sub eval_closure {
