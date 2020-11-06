@@ -439,7 +439,7 @@ sub _is_ForeignTypeConstraint {
 		return !!1 if $class->isa( "MooseX::Types::TypeDecorator" );
 		return !!1 if $class->isa( "Validation::Class::Simple" );
 		return !!1 if $class->isa( "Validation::Class" );
-		return !!1 if $t->can( "check" ) && $t->can( "get_message" );
+		return !!1 if $t->can( "check" );
 	}
 	!!0;
 } #/ sub _is_ForeignTypeConstraint
@@ -455,13 +455,13 @@ sub to_TypeTiny {
 	#<<<
 	if ( my $class = blessed $t) {
 		return $t                                 if $class->isa( "Type::Tiny" );
-		return _TypeTinyFromMoose( $t )           if $class eq "MooseX::Types::TypeDecorator";         # needed before MooseX::Types 0.35.
+		return _TypeTinyFromMoose( $t )           if $class eq "MooseX::Types::TypeDecorator";      # needed before MooseX::Types 0.35.
 		return _TypeTinyFromMoose( $t )           if $class->isa( "Moose::Meta::TypeConstraint" );
 		return _TypeTinyFromMoose( $t )           if $class->isa( "MooseX::Types::TypeDecorator" );
 		return _TypeTinyFromMouse( $t )           if $class->isa( "Mouse::Meta::TypeConstraint" );
 		return _TypeTinyFromValidationClass( $t ) if $class->isa( "Validation::Class::Simple" );
 		return _TypeTinyFromValidationClass( $t ) if $class->isa( "Validation::Class" );
-		return _TypeTinyFromGeneric( $t )         if $t->can( "check" ) && $t->can( "get_message" );   # i.e. Type::API::Constraint
+		return _TypeTinyFromGeneric( $t )         if $t->can( "check" );                            # i.e. Type::API::Constraint
 	} #/ if ( my $class = blessed...)
 	#>>>
 	
@@ -649,10 +649,12 @@ sub _TypeTinyFromGeneric {
 	my $t = $_[0];
 	
 	my %opts = (
-		constraint => sub { $t->check( @_       ? @_ : $_ ) },
-		message    => sub { $t->get_message( @_ ? @_ : $_ ) },
+		constraint => sub { $t->check( @_ ? @_ : $_ ) },
 	);
 	
+	$opts{message} = sub { $t->get_message( @_ ? @_ : $_ ) }
+		if $t->can( "get_message" );
+		
 	$opts{display_name} = $t->name if $t->can( "name" );
 	
 	$opts{coercion} = sub { $t->coerce( @_ ? @_ : $_ ) }
