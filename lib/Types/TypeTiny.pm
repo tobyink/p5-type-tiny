@@ -452,19 +452,18 @@ sub to_TypeTiny {
 	
 	return $ttt_cache{ refaddr( $t ) } if $ttt_cache{ refaddr( $t ) };
 	
+	#<<<
 	if ( my $class = blessed $t) {
-		return $t                       if $class->isa( "Type::Tiny" );
-		return _TypeTinyFromMoose( $t ) if $class eq "MooseX::Types::TypeDecorator";   # needed before MooseX::Types 0.35.
-		return _TypeTinyFromMoose( $t ) if $class->isa( "Moose::Meta::TypeConstraint" );
-		return _TypeTinyFromMoose( $t )
-			if $class->isa( "MooseX::Types::TypeDecorator" );
-		return _TypeTinyFromMouse( $t ) if $class->isa( "Mouse::Meta::TypeConstraint" );
-		return _TypeTinyFromValidationClass( $t )
-			if $class->isa( "Validation::Class::Simple" );
+		return $t                                 if $class->isa( "Type::Tiny" );
+		return _TypeTinyFromMoose( $t )           if $class eq "MooseX::Types::TypeDecorator";         # needed before MooseX::Types 0.35.
+		return _TypeTinyFromMoose( $t )           if $class->isa( "Moose::Meta::TypeConstraint" );
+		return _TypeTinyFromMoose( $t )           if $class->isa( "MooseX::Types::TypeDecorator" );
+		return _TypeTinyFromMouse( $t )           if $class->isa( "Mouse::Meta::TypeConstraint" );
+		return _TypeTinyFromValidationClass( $t ) if $class->isa( "Validation::Class::Simple" );
 		return _TypeTinyFromValidationClass( $t ) if $class->isa( "Validation::Class" );
-		return _TypeTinyFromGeneric( $t )
-			if $t->can( "check" ) && $t->can( "get_message" );                          # i.e. Type::API::Constraint
+		return _TypeTinyFromGeneric( $t )         if $t->can( "check" ) && $t->can( "get_message" );   # i.e. Type::API::Constraint
 	} #/ if ( my $class = blessed...)
+	#>>>
 	
 	return _TypeTinyFromCodeRef( $t ) if $ref eq q(CODE);
 	
