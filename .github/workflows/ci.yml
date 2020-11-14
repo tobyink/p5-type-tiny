@@ -97,19 +97,15 @@ jobs:
             extra_dependencies: true
             extended_testing: 'both'
             joblabel: '(Coverage)'
-          - { os: 'ubuntu',  perl: '5.8',  threaded: true, joblabel: '(Thr)' }
-          - { os: 'ubuntu',  perl: '5.14', threaded: true, joblabel: '(Thr)' }
-          - { os: 'ubuntu',  perl: '5.24', threaded: true, joblabel: '(Thr)' }
-          - { os: 'ubuntu',  perl: '5.32', threaded: true, joblabel: '(Thr)' }
           - { os: 'macos',   perl: '5.14', threaded: false }
           - { os: 'macos',   perl: '5.24', threaded: false }
           - { os: 'macos',   perl: '5.32', threaded: false }
-          - { os: 'macos',   perl: '5.14', threaded: true, joblabel: '(Thr)' }
-          - { os: 'macos',   perl: '5.24', threaded: true, joblabel: '(Thr)' }
-          - { os: 'macos',   perl: '5.32', threaded: true, joblabel: '(Thr)' }
-          - { os: 'windows', perl: '5.14' }
-          - { os: 'windows', perl: '5.24' }
-          - { os: 'windows', perl: '5.32' }
+          - { os: 'macos',   perl: '5.14', threaded: true }
+          - { os: 'macos',   perl: '5.24', threaded: true }
+          - { os: 'macos',   perl: '5.32', threaded: true }
+          - { os: 'windows', perl: '5.14', threaded: true }
+          - { os: 'windows', perl: '5.24', threaded: true }
+          - { os: 'windows', perl: '5.32', threaded: true }
     steps:
       - name: Get dist artifact
         uses: actions/download-artifact@v2
