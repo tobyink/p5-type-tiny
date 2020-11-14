@@ -1,0 +1,146 @@
+name: CI
+on:
+  - push
+  - pull_request
+jobs:
+  dist:
+    name: Make distribution using Dist::Inkt
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Cache ~/perl5
+        uses: actions/cache@v2
+        with:
+          key: ${{ runner.os }}-dist-locallib
+          path: ~/perl5
+      - name: Perl version
+        run: |
+          perl -v
+      - name: Install cpanm
+        run: |
+          curl -L https://cpanmin.us | perl - --sudo App::cpanminus
+      - name: Install local::lib
+        run: |
+          cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+      - name: Install Dist::Inkt
+        shell: bash
+        run: |
+          eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+          cpanm -n Dist::Inkt::Profile::TOBYINK
+      - name: Make distribution
+        shell: bash
+        run: |
+          eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+          ~/perl5/bin/distinkt-dist --TRAVIS --targetdir=build
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: dist
+          path: ./
+  inspect:
+    name: Inspect distribution
+    needs: dist
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get dist artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: dist
+      - name: Install dependencies
+        run: |
+          sudo apt install tree
+      - name: Tree
+        run: |
+          tree build
+      - name: Changes
+        run: cat build/Changes
+      - name: COPYRIGHT
+        run: cat build/COPYRIGHT
+      - name: CREDITS
+        run: cat build/CREDITS
+      - name: doap.ttl
+        run: cat build/doap.ttl
+      - name: Makefile.PL
+        run: cat build/Makefile.PL
+      - name: META.json
+        run: cat build/META.json
+      - name: META.yml
+        run: cat build/META.yml
+  test:
+    name: Perl ${{ matrix.perl }} ${{ matrix.os }} ${{ matrix.joblabel }}
+    needs: dist
+    runs-on: ${{ matrix.os }}-latest
+    env:
+      COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
+      CODECOV_TOKEN:        ${{ secrets.CODECOV_TOKEN }}
+      GHA_TESTING_MODE:     ${{ matrix.extended_testing }}
+      GHA_TESTING_COVER:    ${{ matrix.coverage }}
+    strategy:
+      fail-fast: true
+      matrix:
+        os:                 [ 'ubuntu', 'macos' ]
+        perl:               [ '5.24', 'latest' ]
+        threaded:           [ false ]
+        coverage:           [ false ]
+        extra_dependencies: [ true ]
+        extended_testing:   [ 'extended' ]
+        exclude:
+          - { os: 'windows', perl: '5.8' }
+          - { os: 'windows', perl: '5.10' }
+          - { os: 'windows', perl: '5.12' }
+        include:
+          - os: ubuntu
+            perl: '5.30'
+            threaded: false
+            coverage: true
+            extra_dependencies: true
+            extended_testing: 'extended'
+            joblabel: '(Coverage)'
+    steps:
+      - name: Get dist artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: dist
+      - name: Set up perl
+        uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: ${{ matrix.perl }}
+          multi-thread: ${{ matrix.threaded }}
+      - name: Perl version
+        run: |
+          perl -v
+      - name: Configure
+        working-directory: ./build/
+        run: perl Makefile.PL
+      - name: Install dependencies
+        run: |
+          cpanm -n --installdeps ./build
+          cpanm App::GhaProve
+      - name: Install extra dependencies
+        if: matrix.extra_dependencies || matrix.coverage
+        run: cpanm -n --installdeps --with-recommends --with-suggests ./build
+      - name: Install coverage dependencies
+        if: matrix.coverage
+        run: |
+          cpanm -n Devel::Cover
+          cpanm -n Devel::Cover::Report::Coveralls
+          cpanm -n Devel::Cover::Report::Codecov
+      - name: Make
+        working-directory: ./build/
+        run: make
+      - name: Clean coverage data
+        if: matrix.coverage
+        working-directory: ./build/
+        run: cover -delete
+      - name: Test suite
+        working-directory: ./build/
+        run: gha-prove -b -r t
+      - name: Coveralls.io report
+        if: success() && matrix.coverage
+        working-directory: ./build/
+        run: cover -report coveralls
+      - name: Codecov.io report
+        if: success() && matrix.coverage
+        working-directory: ./build/
+        run: cover -report codecov
