@@ -176,8 +176,8 @@ jobs:
       - name: Coveralls.io report
         if: success() && matrix.coverage
         working-directory: ./build/
-        run: cover -report coveralls
+        run: cover -select_re '^lib/' -report coveralls
       - name: Codecov.io report
         if: success() && matrix.coverage
         working-directory: ./build/
-        run: cover -report codecov
+        run: cover -select_re '^lib/' -report codecov
