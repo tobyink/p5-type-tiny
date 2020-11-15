@@ -72,8 +72,6 @@ jobs:
     needs: dist
     runs-on: ${{ matrix.os }}-latest
     env:
-      COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
-      CODECOV_TOKEN:        ${{ secrets.CODECOV_TOKEN }}
       GHA_TESTING_MODE:     ${{ matrix.extended_testing }}
       GHA_TESTING_COVER:    ${{ matrix.coverage }}
     strategy:
@@ -196,8 +194,12 @@ jobs:
       - name: Coveralls.io report
         if: success() && matrix.coverage
         working-directory: ./build/
-        run: cover -select_re '^lib/' -report coveralls
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
+        run: cover -select_re '^blib/lib/' -report coveralls
       - name: Codecov.io report
         if: success() && matrix.coverage
         working-directory: ./build/
-        run: cover -select_re '^lib/' -report codecov
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        run: cover -select_re '^blib/lib/' -report codecov
