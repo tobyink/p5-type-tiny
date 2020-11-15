@@ -161,7 +161,7 @@ jobs:
           cpanm -n Return::Type
           cpanm -n Specio
           cpanm -n Switcheroo
-          cpanm -n Validation::Simple
+          cpanm -n Validate::Simple
       - name: Test suite (No XS, LaxNum)
         working-directory: ./build/
         env:
