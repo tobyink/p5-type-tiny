@@ -142,6 +142,26 @@ jobs:
         if: matrix.coverage
         working-directory: ./build/
         run: cover -delete
+      - name: Install optional deps for better test coverage
+        if: matrix.coverage
+        run: |
+          cpanm -n match::simple
+          cpanm -n Class::InsideOut
+          cpanm -n Data::Constraint
+          cpanm -n Devel::Hide Devel::RefCount
+          cpanm -n Function::Parameters
+          cpanm -n IO::String
+          cpanm -n Kavorka
+          cpanm -n Moops
+          cpanm -n MooseX::Getopt
+          cpanm -n MooseX::Types MooseX::Types::Common
+          cpanm -n MooX::TypeTiny
+          cpanm -n MouseX::Types MouseX::Types::Common
+          cpanm -n Object::Accessor
+          cpanm -n Return::Type
+          cpanm -n Specio
+          cpanm -n Switcheroo
+          cpanm -n Validation::Simple
       - name: Test suite (No XS, LaxNum)
         working-directory: ./build/
         env:
