@@ -148,7 +148,7 @@ jobs:
           cpanm -n match::simple
           cpanm -n Class::InsideOut
           cpanm -n Data::Constraint
-          cpanm -n Devel::Hide Devel::RefCount
+          cpanm -n Devel::Hide Devel::Refcount
           cpanm -n Function::Parameters
           cpanm -n IO::String
           cpanm -n Kavorka
