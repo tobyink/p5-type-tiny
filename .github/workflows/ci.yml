@@ -88,7 +88,7 @@ jobs:
           - { os: 'windows', perl: '5.10' }
           - { os: 'windows', perl: '5.12' }
         include:
-          - os: ubuntu
+          - os: 'ubuntu'
             perl: '5.30'
             threaded: false
             coverage: true
@@ -122,11 +122,11 @@ jobs:
         run: perl Makefile.PL
       - name: Install dependencies
         run: |
-          cpanm -n --installdeps ./build
           cpanm App::GhaProve
+          cpanm -n --installdeps ./build
       - name: Install extra dependencies
         if: matrix.extra_dependencies || matrix.coverage
-        run: cpanm -n --installdeps --with-recommends --with-suggests ./build
+        run: cpanm -n --installdeps --with-recommends --with-suggests ./build || true
       - name: Install coverage dependencies
         if: matrix.coverage
         run: |
@@ -160,6 +160,7 @@ jobs:
           cpanm -n Specio
           cpanm -n Switcheroo
           cpanm -n Validate::Simple
+          cpanm -n Validation::Class
       - name: Test suite (No XS, LaxNum)
         working-directory: ./build/
         env:
