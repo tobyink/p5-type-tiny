@@ -74,6 +74,7 @@ jobs:
     env:
       GHA_TESTING_MODE:     ${{ matrix.extended_testing }}
       GHA_TESTING_COVER:    ${{ matrix.coverage }}
+      GHA_INSTALL_EXTRAS:   ${{ matrix.extra_dependencies }}
     strategy:
       fail-fast: true
       matrix:
