@@ -70,7 +70,7 @@ jobs:
   test:
     name: Perl ${{ matrix.perl }} ${{ matrix.os }} [thr=${{ matrix.threaded }}] ${{ matrix.joblabel }}
     needs: dist
-    runs-on: ${{ ( matrix.os=='strawberry' && 'windows' ) || matrix.os }}-latest
+    runs-on: ${{ ( ( startsWith(matrix.os, 'ubuntu:') && 'ubuntu-latest' ) || ( startsWith(matrix.os, 'macos:') && 'macos-latest' ) || startsWith(matrix.os, 'windows:') && 'windows-latest' ) || matrix.os }}
     env:
       GHA_TESTING_MODE:     ${{ matrix.extended_testing }}
       GHA_TESTING_COVER:    ${{ matrix.coverage }}
@@ -78,36 +78,28 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os:                 [ 'ubuntu' ]
+        os:                 [ 'ubuntu-latest' ]
         perl:               [ '5.8', '5.10', '5.12', '5.14', '5.16', '5.18', '5.20', '5.22', '5.24', '5.26', '5.28', '5.30', '5.32' ]
-        threaded:           [ true, false ]
         coverage:           [ false ]
         extra_dependencies: [ true ]
         extended_testing:   [ 'extended' ]
-        exclude:
-          - { os: 'windows', perl: '5.8' }
-          - { os: 'windows', perl: '5.10' }
-          - { os: 'windows', perl: '5.12' }
-          - { os: 'strawberry', perl: '5.8' }
-          - { os: 'strawberry', perl: '5.10' }
-          - { os: 'strawberry', perl: '5.12' }
         include:
-          - os: 'ubuntu'
+          - os: 'ubuntu:default'
             perl: '5.30'
-            threaded: false
             coverage: true
             extra_dependencies: true
             extended_testing: 'both'
             joblabel: '(Coverage)'
-          - { os: 'macos',   perl: '5.14', threaded: false }
-          - { os: 'macos',   perl: '5.24', threaded: false }
-          - { os: 'macos',   perl: '5.32', threaded: false }
-          - { os: 'macos',   perl: '5.14', threaded: true }
-          - { os: 'macos',   perl: '5.24', threaded: true }
-          - { os: 'macos',   perl: '5.32', threaded: true }
-          - { os: 'windows', perl: '5.14', threaded: true }
-          - { os: 'windows', perl: '5.24', threaded: true }
-          - { os: 'windows', perl: '5.32', threaded: true }
+          - { os: 'macos-latest',       perl: '5.14' }
+          - { os: 'macos-latest',       perl: '5.24' }
+          - { os: 'macos-latest',       perl: '5.32' }
+          - { os: 'macos:thr',          perl: '5.14' }
+          - { os: 'macos:thr',          perl: '5.24' }
+          - { os: 'macos:thr',          perl: '5.32' }
+          - { os: 'windows-latest',     perl: '5.14' }
+          - { os: 'windows-latest',     perl: '5.24' }
+          - { os: 'windows-latest',     perl: '5.32' }
+          - { os: 'windows:strawberry', perl: '5.32' }
     steps:
       - name: Get dist artifact
         uses: actions/download-artifact@v2
@@ -117,8 +109,8 @@ jobs:
         uses: shogo82148/actions-setup-perl@v1
         with:
           perl-version: ${{ matrix.perl }}
-          multi-thread: ${{ matrix.threaded }}
-          distribution: ${{ ( matrix.os=='strawberry' && 'strawberry' ) || 'default' }}
+          multi-thread: ${{ ( ( startsWith(matrix.os, 'windows') || endsWith(matrix.os, ':thr') ) && true ) || false }}
+          distribution: ${{ ( endsWith(matrix.os, ':strawberry') && 'strawberry' ) || 'default' }}
       - name: Perl version
         run: |
           perl -v
