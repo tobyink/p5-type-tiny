@@ -70,7 +70,7 @@ jobs:
   test:
     name: Perl ${{ matrix.perl }} ${{ matrix.os }} [thr=${{ matrix.threaded }}] ${{ matrix.joblabel }}
     needs: dist
-    runs-on: ${{ matrix.os }}-latest
+    runs-on: ${{ ( matrix.os=='strawberry' && 'windows' ) || matrix.os }}-latest
     env:
       GHA_TESTING_MODE:     ${{ matrix.extended_testing }}
       GHA_TESTING_COVER:    ${{ matrix.coverage }}
@@ -88,6 +88,9 @@ jobs:
           - { os: 'windows', perl: '5.8' }
           - { os: 'windows', perl: '5.10' }
           - { os: 'windows', perl: '5.12' }
+          - { os: 'strawberry', perl: '5.8' }
+          - { os: 'strawberry', perl: '5.10' }
+          - { os: 'strawberry', perl: '5.12' }
         include:
           - os: 'ubuntu'
             perl: '5.30'
@@ -115,6 +118,7 @@ jobs:
         with:
           perl-version: ${{ matrix.perl }}
           multi-thread: ${{ matrix.threaded }}
+          distribution: ${{ ( matrix.os=='strawberry' && 'strawberry' ) || 'default' }}
       - name: Perl version
         run: |
           perl -v
@@ -123,7 +127,7 @@ jobs:
         run: perl Makefile.PL
       - name: Install dependencies
         run: |
-          cpanm App::GhaProve
+          cpanm -n App::GhaProve
           cpanm -n --installdeps ./build
       - name: Install extra dependencies
         if: matrix.extra_dependencies || matrix.coverage
