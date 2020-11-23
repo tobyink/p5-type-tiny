@@ -68,7 +68,7 @@ jobs:
       - name: META.yml
         run: cat build/META.yml
   test:
-    name: Perl ${{ matrix.perl }} ${{ matrix.os }} [thr=${{ matrix.threaded }}] ${{ matrix.joblabel }}
+    name: Perl ${{ matrix.perl }} ${{ matrix.os }} ${{ matrix.joblabel }}
     needs: dist
     runs-on: ${{ ( ( startsWith(matrix.os, 'ubuntu:') && 'ubuntu-latest' ) || ( startsWith(matrix.os, 'macos:') && 'macos-latest' ) || startsWith(matrix.os, 'windows:') && 'windows-latest' ) || matrix.os }}
     env:
@@ -90,12 +90,23 @@ jobs:
             extra_dependencies: true
             extended_testing: 'both'
             joblabel: '(Coverage)'
+          - { os: 'ubuntu-16.04',       perl: '5.8' }
+          - { os: 'ubuntu-16.04',       perl: '5.14' }
+          - { os: 'ubuntu-16.04',       perl: '5.24' }
+          - { os: 'ubuntu-16.04',       perl: '5.32' }
+          - { os: 'ubuntu:thr',         perl: '5.8' }
+          - { os: 'ubuntu:thr',         perl: '5.14' }
+          - { os: 'ubuntu:thr',         perl: '5.24' }
+          - { os: 'ubuntu:thr',         perl: '5.32' }
           - { os: 'macos-latest',       perl: '5.14' }
           - { os: 'macos-latest',       perl: '5.24' }
           - { os: 'macos-latest',       perl: '5.32' }
           - { os: 'macos:thr',          perl: '5.14' }
           - { os: 'macos:thr',          perl: '5.24' }
           - { os: 'macos:thr',          perl: '5.32' }
+          - { os: 'macos-11.0',         perl: '5.14' }
+          - { os: 'macos-11.0',         perl: '5.24' }
+          - { os: 'macos-11.0',         perl: '5.32' }
           - { os: 'windows-latest',     perl: '5.14' }
           - { os: 'windows-latest',     perl: '5.24' }
           - { os: 'windows-latest',     perl: '5.32' }
