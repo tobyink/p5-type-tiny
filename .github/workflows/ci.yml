@@ -70,7 +70,7 @@ jobs:
   test:
     name: Perl ${{ matrix.perl }} ${{ matrix.os }} ${{ matrix.joblabel }}
     needs: dist
-    runs-on: ${{ ( ( startsWith(matrix.os, 'ubuntu:') && 'ubuntu-latest' ) || ( startsWith(matrix.os, 'macos:') && 'macos-latest' ) || startsWith(matrix.os, 'windows:') && 'windows-latest' ) || matrix.os }}
+    runs-on: ${{ ( ( matrix.os == 'strawberry') && 'windows-latest' ) || matrix.os }}
     env:
       GHA_TESTING_MODE:     ${{ matrix.extended_testing }}
       GHA_TESTING_COVER:    ${{ matrix.coverage }}
@@ -81,11 +81,15 @@ jobs:
         os:                 [ 'ubuntu-latest' ]
         perl:               [ '5.8', '5.10', '5.12', '5.14', '5.16', '5.18', '5.20', '5.22', '5.24', '5.26', '5.28', '5.30', '5.32' ]
         coverage:           [ false ]
+        threaded:           [ null ]
         extra_dependencies: [ true ]
         extended_testing:   [ 'extended' ]
+        exclude:
+          - { os: 'windows-latest', perl: '5.4' }
         include:
-          - os: 'ubuntu:default'
+          - os: 'ubuntu-latest'
             perl: '5.30'
+            threaded: false
             coverage: true
             extra_dependencies: true
             extended_testing: 'both'
@@ -120,14 +124,11 @@ jobs:
         uses: shogo82148/actions-setup-perl@v1
         with:
           perl-version: ${{ matrix.perl }}
-          multi-thread: ${{ ( ( startsWith(matrix.os, 'windows') || endsWith(matrix.os, ':thr') ) && true ) || false }}
-          distribution: ${{ ( endsWith(matrix.os, ':strawberry') && 'strawberry' ) || 'default' }}
+          multi-thread: ${{ matrix.threaded }}
+          distribution: ${{ ( ( matrix.os == 'strawberry') && 'strawberry' ) || 'default' }}
       - name: Perl version
         run: |
           perl -v
-      - name: Configure
-        working-directory: ./build/
-        run: perl Makefile.PL
       - name: Install dependencies
         run: |
           cpanm -n App::GhaProve
@@ -141,9 +142,12 @@ jobs:
           cpanm -n Devel::Cover
           cpanm -n Devel::Cover::Report::Coveralls
           cpanm -n Devel::Cover::Report::Codecov
+      - name: Configure
+        working-directory: ./build/
+        run: perl Makefile.PL
       - name: Make
         working-directory: ./build/
-        run: make
+        run: perl -MConfig -e'exec $Config{make}'
       - name: Clean coverage data
         if: matrix.coverage
         working-directory: ./build/
