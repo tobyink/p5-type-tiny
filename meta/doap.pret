@@ -15,11 +15,13 @@
 	:maintainer           cpan:TOBYINK;
 	:developer            cpan:TOBYINK;
 	foaf:page
+		<https://typetiny.toby.ink/>;
 		<https://metacpan.org/release/Type-Tiny>,
-		<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>,
 		<https://github.com/tobyink/p5-type-tiny>,
-		<https://travis-ci.org/tobyink/p5-type-tiny>,
-		<https://ci.appveyor.com/project/tobyink/p5-type-tiny>,
+		<https://github.com/tobyink/p5-type-tiny/issues>,
+		<https://github.com/tobyink/p5-type-tiny/actions>,
+		<https://github.com/tobyink/p5-type-tiny/pulls>,
+		<https://github.com/tobyink/p5-type-tiny/security>,
 		<https://codecov.io/gh/tobyink/p5-type-tiny>,
 		<https://coveralls.io/github/tobyink/p5-type-tiny>;	
 	:category
