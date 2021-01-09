@@ -12,7 +12,7 @@ with security-related changes tagged "SECURITY" in capital letters.
 
 ## Reporting a Vulnerability
 
-Please report any issues via [RT](https://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny).
+Please report any issues via [GitHub Issues](https://github.com/tobyink/p5-type-tiny/issues).
 
 If you are concerned that some of the details of your report may lead to an
 exploit being made public, then keep your issue report vague, and email the
