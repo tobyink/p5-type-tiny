@@ -10,7 +10,7 @@ BEGIN {
 
 BEGIN {
 	$Types::Common::Numeric::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Common::Numeric::VERSION   = '1.012000';
+	$Types::Common::Numeric::VERSION   = '1.012001';
 }
 
 $Types::Common::Numeric::VERSION =~ tr/_//d;

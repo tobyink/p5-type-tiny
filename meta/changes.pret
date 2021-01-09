@@ -3882,3 +3882,34 @@
 		dcs:versus `Type-Tiny 1.011_011 cpan:TOBYINK`;
 		item "Update NEWS file."^^Documentation;
 	].
+
+`Type-Tiny 1.012001 cpan:TOBYINK`
+	issued  2021-01-09;
+	changeset [
+		dcs:versus `Type-Tiny 1.012000 cpan:TOBYINK`;
+		item [
+			a dcs:Tests;
+			label "Hide warnings in Kavorka integration tests.";
+		];
+		item [
+			a dcs:Change;
+			label "Much code tidying using perltidy and manually.";
+		];
+		item [
+			a dcs:Packaging;
+			label "Stop hiding Type::Parser::Token, Type::Parser::TokenStream, and Type::Parser::AstBuilder from the CPAN indexer.";
+		];
+		item [
+			a dcs:Tests;
+			label "Extra test cases to improve coverage. (100% on Coveralls; 90% on Codecov.)";
+		];
+		item [
+			a dcs:Change;
+			label "When generic validation objects (blessed objects with a `check` method) are converted to native Type::Tiny type constraints, no longer require them to provide a `get_message` method. This allows Type::Tiny to adopt Data::Constraint type constraints.";
+		];
+		item [
+			a dcs:Packaging;
+			label "Move issue tracker from RT to Github Issues.";
+		];
+	].
+
