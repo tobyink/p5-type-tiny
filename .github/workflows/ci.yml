@@ -68,7 +68,7 @@ jobs:
       - name: META.yml
         run: cat build/META.yml
   test:
-    name: Perl ${{ matrix.perl }} ${{ matrix.os }} ${{ matrix.joblabel }}
+    name: Perl ${{ matrix.perl }} ${{ matrix.os }} [thr=${{ matrix.threaded }}] ${{ matrix.joblabel }}
     needs: dist
     runs-on: ${{ ( ( matrix.os == 'strawberry') && 'windows-latest' ) || matrix.os }}
     env:
@@ -81,7 +81,7 @@ jobs:
         os:                 [ 'ubuntu-latest' ]
         perl:               [ '5.8', '5.10', '5.12', '5.14', '5.16', '5.18', '5.20', '5.22', '5.24', '5.26', '5.28', '5.30', '5.32' ]
         coverage:           [ false ]
-        threaded:           [ null ]
+        threaded:           [ true, false ]
         extra_dependencies: [ true ]
         extended_testing:   [ 'extended' ]
         exclude:
@@ -94,27 +94,26 @@ jobs:
             extra_dependencies: true
             extended_testing: 'both'
             joblabel: '(Coverage)'
-          - { os: 'ubuntu-16.04',       perl: '5.8' }
-          - { os: 'ubuntu-16.04',       perl: '5.14' }
-          - { os: 'ubuntu-16.04',       perl: '5.24' }
-          - { os: 'ubuntu-16.04',       perl: '5.32' }
-          - { os: 'ubuntu:thr',         perl: '5.8' }
-          - { os: 'ubuntu:thr',         perl: '5.14' }
-          - { os: 'ubuntu:thr',         perl: '5.24' }
-          - { os: 'ubuntu:thr',         perl: '5.32' }
-          - { os: 'macos-latest',       perl: '5.14' }
-          - { os: 'macos-latest',       perl: '5.24' }
-          - { os: 'macos-latest',       perl: '5.32' }
-          - { os: 'macos:thr',          perl: '5.14' }
-          - { os: 'macos:thr',          perl: '5.24' }
-          - { os: 'macos:thr',          perl: '5.32' }
-          - { os: 'macos-11.0',         perl: '5.14' }
-          - { os: 'macos-11.0',         perl: '5.24' }
-          - { os: 'macos-11.0',         perl: '5.32' }
-          - { os: 'windows-latest',     perl: '5.14' }
-          - { os: 'windows-latest',     perl: '5.24' }
-          - { os: 'windows-latest',     perl: '5.32' }
-          - { os: 'windows:strawberry', perl: '5.32' }
+          - { os: 'ubuntu-16.04',       perl: '5.8',   threaded: false }
+          - { os: 'ubuntu-16.04',       perl: '5.14',  threaded: false }
+          - { os: 'ubuntu-16.04',       perl: '5.24',  threaded: false }
+          - { os: 'ubuntu-16.04',       perl: '5.32',  threaded: false }
+          - { os: 'macos-latest',       perl: '5.14',  threaded: false }
+          - { os: 'macos-latest',       perl: '5.24',  threaded: false }
+          - { os: 'macos-latest',       perl: '5.32',  threaded: false }
+          - { os: 'macos-latest',       perl: '5.14',  threaded: true  }
+          - { os: 'macos-latest',       perl: '5.24',  threaded: true  }
+          - { os: 'macos-latest',       perl: '5.32',  threaded: true  }
+          - { os: 'macos-11.0',         perl: '5.14',  threaded: false }
+          - { os: 'macos-11.0',         perl: '5.24',  threaded: false }
+          - { os: 'macos-11.0',         perl: '5.32',  threaded: false }
+          - { os: 'windows-latest',     perl: '5.14',  threaded: false }
+          - { os: 'windows-latest',     perl: '5.24',  threaded: false }
+          - { os: 'windows-latest',     perl: '5.32',  threaded: false }
+          - { os: 'windows-latest',     perl: '5.14',  threaded: true  }
+          - { os: 'windows-latest',     perl: '5.24',  threaded: true  }
+          - { os: 'windows-latest',     perl: '5.32',  threaded: true  }
+          - { os: 'strawberry',         perl: '5.32',  threaded: true  }
     steps:
       - name: Get dist artifact
         uses: actions/download-artifact@v2
