@@ -15,7 +15,7 @@
 	:maintainer           cpan:TOBYINK;
 	:developer            cpan:TOBYINK;
 	foaf:page
-		<https://typetiny.toby.ink/>;
+		<https://typetiny.toby.ink/>,
 		<https://metacpan.org/release/Type-Tiny>,
 		<https://github.com/tobyink/p5-type-tiny>,
 		<https://github.com/tobyink/p5-type-tiny/issues>,
