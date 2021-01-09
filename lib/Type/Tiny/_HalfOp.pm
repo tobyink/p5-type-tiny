@@ -73,7 +73,7 @@ It is a class representing a half-completed overloaded operation.
 =head1 BUGS
 
 Please report any bugs to
-L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
+L<https://github.com/tobyink/p5-type-tiny/issues>.
 
 =head1 AUTHOR
 

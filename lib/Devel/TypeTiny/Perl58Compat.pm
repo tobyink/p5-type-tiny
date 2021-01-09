@@ -52,7 +52,7 @@ C<is_regexp> function, as this was only added in Perl 5.9.5.
 =head1 BUGS
 
 Please report any bugs to
-L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
+L<https://github.com/tobyink/p5-type-tiny/issues>.
 
 =head1 AUTHOR
 
