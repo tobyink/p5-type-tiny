@@ -276,7 +276,7 @@ should_pass([qr//,foo=>1,bar=>2], $type8);
 should_fail([qr//,foo=>1,bar=>2,qr//], $type8);
 # note that the slurpy slurps stuff into an hashref to check
 # so it will fail when there's an actual hashref there.
-should_fail([qr//,[foo=>1,bar=>2]], $type8);
+should_fail([qr//,{foo=>1,bar=>2}], $type8);
 
 
 #
