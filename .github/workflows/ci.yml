@@ -94,8 +94,6 @@ jobs:
             extra_dependencies: true
             extended_testing: 'both'
             joblabel: '(Coverage)'
-          - { os: 'ubuntu-latest',      perl: '5.8.1', threaded: false }
-          - { os: 'ubuntu-latest',      perl: '5.8.3', threaded: false }
           - { os: 'ubuntu-latest',      perl: '5.8.6', threaded: false }
           - { os: 'ubuntu-16.04',       perl: '5.8',   threaded: false }
           - { os: 'ubuntu-16.04',       perl: '5.14',  threaded: false }
