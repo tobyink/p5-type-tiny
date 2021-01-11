@@ -121,7 +121,7 @@ sub __inline_generator {
 	if ( defined $slurpy ) {
 		$tmpl =
 			'do { my ($orig, $from, $to) = (%s, %d, $#{%s});'
-			. '($to-$from %% 2) and do { my $tmp = +{@{$orig}[$from..$to]}; %s }'
+			. '(($to-$from) %% 2) and do { my $tmp = +{@{$orig}[$from..$to]}; %s }'
 			. '}'
 			if $slurpy->is_a_type_of( Types::Standard::HashRef );
 		$slurpy_any = 1

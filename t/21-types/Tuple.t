@@ -336,5 +336,17 @@ subtest 'coercion happened as expected' => sub {
 # then the original tuple would have been returned with no coercions done
 # at all!
 
+#
+# slurpy starting at an index greater or equal to 2
+#
+my $type11 = Tuple[
+	Types::Standard::Int,
+	Types::Standard::ScalarRef,
+	slurpy Types::Standard::HashRef,
+];
+should_pass([1,\1], $type11);
+should_pass([1,\1,foo=>3], $type11);
+should_fail([1,\1,'foo'], $type11);
+
 done_testing;
 
