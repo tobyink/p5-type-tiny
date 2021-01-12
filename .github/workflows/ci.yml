@@ -76,10 +76,10 @@ jobs:
       GHA_TESTING_COVER:    ${{ matrix.coverage }}
       GHA_INSTALL_EXTRAS:   ${{ matrix.extra_dependencies }}
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
-        os:                 [ 'ubuntu-latest' ]
-        perl:               [ '5.8.8', '5.8.9', '5.10', '5.12', '5.14', '5.16', '5.18', '5.20', '5.22', '5.24', '5.26', '5.28', '5.30', '5.32' ]
+        os:                 [ 'ubuntu-latest', 'ubuntu-16.04', 'macos-latest', 'macos-11.0', 'windows-latest' ]
+        perl:               [ '5.12', '5.14', '5.16', '5.18', '5.20', '5.22', '5.24', '5.26', '5.28', '5.30', '5.32' ]
         coverage:           [ false ]
         threaded:           [ true, false ]
         extra_dependencies: [ true ]
@@ -94,41 +94,28 @@ jobs:
             extra_dependencies: true
             extended_testing: 'both'
             joblabel: '(Coverage)'
-          # Legacy Perl
-          - { os: 'ubuntu-latest',      perl: '5.8.0', threaded: false }
-          - { os: 'ubuntu-latest',      perl: '5.8.1', threaded: false }
-          - { os: 'ubuntu-latest',      perl: '5.8.2', threaded: false }
-          - { os: 'ubuntu-latest',      perl: '5.8.3', threaded: false }
-          - { os: 'ubuntu-latest',      perl: '5.8.4', threaded: false }
-          - { os: 'ubuntu-latest',      perl: '5.8.5', threaded: false }
-          - { os: 'ubuntu-latest',      perl: '5.8.6', threaded: false }
-          - { os: 'ubuntu-latest',      perl: '5.8.7', threaded: false }
-          # Legacy Ubuntu
-          - { os: 'ubuntu-16.04',       perl: '5.8.9', threaded: false }
-          - { os: 'ubuntu-16.04',       perl: '5.14',  threaded: false }
-          - { os: 'ubuntu-16.04',       perl: '5.24',  threaded: false }
-          - { os: 'ubuntu-16.04',       perl: '5.32',  threaded: false }
-          # Mac OS X
-          - { os: 'macos-latest',       perl: '5.14',  threaded: false }
-          - { os: 'macos-latest',       perl: '5.24',  threaded: false }
-          - { os: 'macos-latest',       perl: '5.32',  threaded: false }
-          # Mac OS X threaded
-          - { os: 'macos-latest',       perl: '5.14',  threaded: true  }
-          - { os: 'macos-latest',       perl: '5.24',  threaded: true  }
-          - { os: 'macos-latest',       perl: '5.32',  threaded: true  }
-          # Mac OS X next
-          - { os: 'macos-11.0',         perl: '5.14',  threaded: false }
-          - { os: 'macos-11.0',         perl: '5.24',  threaded: false }
-          - { os: 'macos-11.0',         perl: '5.32',  threaded: false }
-          # Windows
-          - { os: 'windows-latest',     perl: '5.14',  threaded: false }
-          - { os: 'windows-latest',     perl: '5.24',  threaded: false }
-          - { os: 'windows-latest',     perl: '5.32',  threaded: false }
-          # Windows threaded
-          - { os: 'windows-latest',     perl: '5.14',  threaded: true  }
-          - { os: 'windows-latest',     perl: '5.24',  threaded: true  }
-          - { os: 'windows-latest',     perl: '5.32',  threaded: true  }
+          # Legacy Perl on Latest Ubuntu
+          - { os: 'ubuntu-latest',      perl: '5.8.0',  threaded: false }
+          - { os: 'ubuntu-latest',      perl: '5.8.1',  threaded: false }
+          - { os: 'ubuntu-latest',      perl: '5.8.2',  threaded: false }
+          - { os: 'ubuntu-latest',      perl: '5.8.3',  threaded: false }
+          - { os: 'ubuntu-latest',      perl: '5.8.4',  threaded: false }
+          - { os: 'ubuntu-latest',      perl: '5.8.5',  threaded: false }
+          - { os: 'ubuntu-latest',      perl: '5.8.6',  threaded: false }
+          - { os: 'ubuntu-latest',      perl: '5.8.7',  threaded: false }
+          - { os: 'ubuntu-latest',      perl: '5.8.8',  threaded: false }
+          - { os: 'ubuntu-latest',      perl: '5.8.9',  threaded: false }
+          - { os: 'ubuntu-latest',      perl: '5.10.0', threaded: false }
+          - { os: 'ubuntu-latest',      perl: '5.10.1', threaded: false }
+          # Legacy Perl on Legacy Ubuntu
+          - { os: 'ubuntu-16.04',       perl: '5.8.8',  threaded: false }
+          - { os: 'ubuntu-16.04',       perl: '5.8.9',  threaded: false }
+          - { os: 'ubuntu-16.04',       perl: '5.10.0', threaded: false }
+          - { os: 'ubuntu-16.04',       perl: '5.10.1', threaded: false }
           # Windows Strawberry Perl
+          - { os: 'strawberry',         perl: '5.26',  threaded: true  }
+          - { os: 'strawberry',         perl: '5.28',  threaded: true  }
+          - { os: 'strawberry',         perl: '5.30',  threaded: true  }
           - { os: 'strawberry',         perl: '5.32',  threaded: true  }
     steps:
       - name: Get dist artifact
