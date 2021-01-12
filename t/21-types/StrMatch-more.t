@@ -22,7 +22,7 @@ the same terms as the Perl 5 programming language system itself.
 use strict;
 use warnings;
 use Test::More;
-use Test::Requires '5.016';
+use Test::Requires '5.020';
 use Test::Fatal;
 use Test::TypeTiny;
 use Types::Standard qw( StrMatch );

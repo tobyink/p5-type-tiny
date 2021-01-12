@@ -30,7 +30,7 @@ BEGIN {
 		if "$^V" =~ /c$/;
 };
 
-use Test::Requires '5.018';
+use Test::Requires '5.020';
 use Test::Requires 'Test::Warnings';
 
 use Types::Standard 'StrMatch';

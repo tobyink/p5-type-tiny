@@ -24,7 +24,7 @@ use strict;
 use warnings;
 use lib qw( . ./t ../inc ./inc );
 use Test::More;
-use Test::Requires '5.018';
+use Test::Requires '5.020';
 
 use Types::Standard 'StrMatch';
 
