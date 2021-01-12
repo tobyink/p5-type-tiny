@@ -112,24 +112,17 @@ jobs:
           - { os: 'ubuntu-16.04',       perl: '5.8.9',  threaded: false }
           - { os: 'ubuntu-16.04',       perl: '5.10.0', threaded: false }
           - { os: 'ubuntu-16.04',       perl: '5.10.1', threaded: false }
+          # Modern Perl on Legacy Ubuntu
           - { os: 'ubuntu-16.04',       perl: '5.12',   threaded: false }
-          - { os: 'ubuntu-16.04',       perl: '5.26',   threaded: false }
-          - { os: 'ubuntu-16.04',       perl: '5.28',   threaded: false }
           - { os: 'ubuntu-16.04',       perl: '5.30',   threaded: false }
           - { os: 'ubuntu-16.04',       perl: '5.32',   threaded: false }
           # Modern Perl on Mac OS 11
-          - { os: 'macos-11.0',         perl: '5.26',   threaded: false }
-          - { os: 'macos-11.0',         perl: '5.28',   threaded: false }
           - { os: 'macos-11.0',         perl: '5.30',   threaded: false }
           - { os: 'macos-11.0',         perl: '5.32',   threaded: false }
           # Modern Perl (threaded) on Mac OS 11
-          - { os: 'macos-11.0',         perl: '5.26',   threaded: true  }
-          - { os: 'macos-11.0',         perl: '5.28',   threaded: true  }
           - { os: 'macos-11.0',         perl: '5.30',   threaded: true  }
           - { os: 'macos-11.0',         perl: '5.32',   threaded: true  }
           # Modern (Strawberry) Perl on Windows
-          - { os: 'strawberry',         perl: '5.26',   threaded: true  }
-          - { os: 'strawberry',         perl: '5.28',   threaded: true  }
           - { os: 'strawberry',         perl: '5.30',   threaded: true  }
           - { os: 'strawberry',         perl: '5.32',   threaded: true  }
     steps:
