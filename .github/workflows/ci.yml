@@ -124,6 +124,9 @@ jobs:
           - { os: 'ubuntu-18.04', perl: '5.32',   threaded: true  }
           - { os: 'ubuntu-18.04', perl: '5.32',   threaded: false }
           # Legacy Perl on Ubuntu 20.04
+          - { os: 'ubuntu-20.04', perl: '5.6.1',  threaded: false }
+          - { os: 'ubuntu-20.04', perl: '5.6.2',  threaded: false }
+          - { os: 'ubuntu-20.04', perl: '5.8.0',  threaded: false }
           - { os: 'ubuntu-20.04', perl: '5.8.1',  threaded: false }
           - { os: 'ubuntu-20.04', perl: '5.8.2',  threaded: false }
           - { os: 'ubuntu-20.04', perl: '5.8.3',  threaded: false }
