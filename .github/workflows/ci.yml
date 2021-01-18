@@ -162,7 +162,7 @@ jobs:
           perl -v
       - name: Install dependencies
         run: |
-          cpanm -n App::GhaProve
+          cpanm -n https://cpan.metacpan.org/authors/id/T/TO/TOBYINK/App-GhaProve-0.008.tar.gz
           cpanm -n --installdeps ./build
       - name: Install extra dependencies
         if: matrix.extra_dependencies || matrix.coverage
