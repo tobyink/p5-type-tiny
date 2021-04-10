@@ -438,6 +438,7 @@ sub constraint_generator { $_[0]{constraint_generator} }
 sub inline_generator     { $_[0]{inline_generator} }
 sub name_generator { $_[0]{name_generator} ||= $_[0]->_build_name_generator }
 sub coercion_generator { $_[0]{coercion_generator} }
+sub message_generator  { $_[0]{message_generator} }
 sub parameters         { $_[0]{parameters} }
 sub moose_type         { $_[0]{moose_type} ||= $_[0]->_build_moose_type }
 sub mouse_type         { $_[0]{mouse_type} ||= $_[0]->_build_mouse_type }
@@ -451,6 +452,7 @@ sub has_inlined              { exists $_[0]{inlined} }
 sub has_constraint_generator { exists $_[0]{constraint_generator} }
 sub has_inline_generator     { exists $_[0]{inline_generator} }
 sub has_coercion_generator   { exists $_[0]{coercion_generator} }
+sub has_message_generator    { exists $_[0]{message_generator} }
 sub has_parameters           { exists $_[0]{parameters} }
 sub has_message              { defined $_[0]{message} }
 sub has_deep_explanation     { exists $_[0]{deep_explanation} }
@@ -1030,6 +1032,8 @@ sub is_parameterized {
 				if $compiled;
 			$options{inlined} = $self->inline_generator->( @_ )
 				if $self->has_inline_generator;
+			$options{message} = $self->message_generator->( @_ )
+				if $self->has_message_generator;
 			exists $options{$_} && !defined $options{$_} && delete $options{$_}
 				for keys %options;
 				
@@ -1799,7 +1803,7 @@ then do:
 The constraint generator should generate and return a new constraint coderef
 based on the parameters. Alternatively, the constraint generator can return a
 fully-formed Type::Tiny object, in which case the C<name_generator>,
-C<inline_generator>, and C<coercion_generator> attributes documented below
+C<inline_generator>, C<message_generator> and C<coercion_generator> attributes documented below
 are ignored.
 
 Optional; providing a generator makes this type into a parameterizable
@@ -1817,6 +1821,14 @@ Optional; the default is reasonable.
 =item C<< inline_generator >>
 
 A coderef which generates a new inlining coderef based on parameters. Called
+with the same parameters and package variables as the C<constraint_generator>.
+Expected to return a coderef.
+
+Optional.
+
+=item C<< message_generator >>
+
+A coderef which generates a new message coderef based on parameters. Called
 with the same parameters and package variables as the C<constraint_generator>.
 Expected to return a coderef.
 
@@ -1884,7 +1896,7 @@ constraint. They are each tightly associated with a particular attribute.
 
 =over
 
-=item C<has_parent>, C<has_library>, C<has_inlined>, C<has_constraint_generator>, C<has_inline_generator>, C<has_coercion_generator>, C<has_parameters>, C<has_message>, C<has_deep_explanation>, C<has_sorter>
+=item C<has_parent>, C<has_library>, C<has_inlined>, C<has_constraint_generator>, C<has_inline_generator>, C<has_message_generator>, C<has_coercion_generator>, C<has_parameters>, C<has_message>, C<has_deep_explanation>, C<has_sorter>
 
 Simple Moose-style predicate methods indicating the presence or
 absence of an attribute.

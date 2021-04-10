@@ -122,6 +122,38 @@ is(
 	'inlining stuff can return a list',
 );
 
+my $Message = "Type::Tiny"->new(
+	name       => "Message",
+	constraint_generator => sub { !!1 },
+	message_generator    => sub {
+		my $param = shift;
+		sub { "message: $param $_" }
+	},
+);
+
+ok(!$Message->has_message, 'has_message method works - negative');
+is(
+	$Message->get_message(),
+	'Undef did not pass type constraint "Message"',
+	'default error message',
+);
+
+$Message->{message} = sub { "message: $_" };
+ok($Message->has_message, 'has_message method works - positive');
+is(
+	$Message->get_message('error'),
+	'message: error',
+	'message can be customized',
+);
+
+my $MessageHello = $Message->parameterize("hello");
+ok($MessageHello->has_message, 'has_message method works - positive');
+is(
+	$MessageHello->get_message('world'),
+	'message: hello world',
+	'message can be changed even with parameterized',
+);
+
 use Types::Standard ();
 
 {
