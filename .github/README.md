@@ -10,12 +10,16 @@
 Perl 5 distribution Type-Tiny; see [homepage](https://typetiny.toby.ink/)
 for downloads and documentation.
 
-Directy installing from GitHub is not recommened; download the distribution
+Directly installing from GitHub is not recommened; download the distribution
 from the CPAN.
 
 ## Issues
 
 Please report any issues via [GitHub Issues](https://github.com/tobyink/p5-type-tiny/issues).
+
+## Contributing
+
+[Contributing guidelines](https://toby.ink/open-source/contributing/).
 
 ## Support this project
 
