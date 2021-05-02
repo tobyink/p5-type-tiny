@@ -3913,3 +3913,40 @@
 		];
 	].
 
+`Type-Tiny 1.012002 cpan:TOBYINK`
+	issued  2021-05-02;
+	changeset [
+		dcs:versus `Type-Tiny 1.012001 cpan:TOBYINK`;
+		item [
+			a dcs:Tests;
+			label "Type::Tiny is no longer routinely tested on Perl versions older than 5.8.1.";
+			seealso <https://github.com/tobyink/p5-type-tiny/actions>;
+		];
+		item [
+			a dcs:Change;
+			label "Type::Parser now supports hexadecimal integers.";
+			seealso <https://github.com/tobyink/p5-type-tiny/issues/71>;
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/71>;
+		];
+		item [
+			a dcs:Tests;
+			dcs:blame cpan:BOOK;
+			label "Fix testcase for Tuples with slurpy HashRef to pass a literal hashref (which should fail) instead of an arrayref (which should also fail, but less subtly).";
+			seealso <https://github.com/tobyink/p5-type-tiny/pull/64>;
+		];
+		item [
+			a dcs:Bugfix;
+			dcs:blame cpan:BOOK;
+			label "Fix precendence error in generated code for Tuples.";
+			seealso <https://github.com/tobyink/p5-type-tiny/pull/64>;
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/pull/64>;			
+		];
+		item [
+			a dcs:Documentation;
+			dcs:blame <urn:uuid:43559705-9a3a-45fe-b29c-c4aaed234e37>;
+			label "Fixed typo in pod for Type::Tiny::Enum";
+			seealso <https://github.com/tobyink/p5-type-tiny/pull/70>;
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/pull/70>;
+		];
+	].
+

@@ -182,6 +182,11 @@ cpan:AERUDER
 cpan:SPATOCS
 	:name "Sandor Patocs".
 
+<urn:uuid:43559705-9a3a-45fe-b29c-c4aaed234e37>
+	:name "Windymelt";
+	:page <https://github.com/windymelt>;
+	:page <https://www.3qe.us/>.
+
 # We bundle some files made by these dudes...
 
 cpan:RJBS
