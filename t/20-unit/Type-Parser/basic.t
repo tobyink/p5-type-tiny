@@ -57,11 +57,18 @@ types_equal("Int[]", Int, "empty parameterization against non-parameterizable ty
 types_equal("Tuple[]", Tuple[], "empty parameterization against parameterizble type");
 types_equal("ArrayRef[]", ArrayRef, "empty parameterization against parameterizable type");
 types_equal("ArrayRef[Int]", ArrayRef[Int], "parameterized type");
+types_equal("Overload[15]", Overload[15], "numeric parameter (decimal integer)");
+types_equal("Overload[0x0F]", Overload[15], "numeric parameter (hexadecimal integer)");
+types_equal("Overload[0x0f]", Overload[15], "numeric parameter (hexadecimal integer, lowercase)");
+types_equal("Overload[1.5]", Overload[1.5], "numeric parameter (float)");
 types_equal("Ref['HASH']", Ref['HASH'], "string parameter (singles)");
 types_equal("Ref[\"HASH\"]", Ref['HASH'], "string parameter (doubles)");
 types_equal("Ref[q(HASH)]", Ref['HASH'], "string parameter (q)");
 types_equal("Ref[qq(HASH)]", Ref['HASH'], "string parameter (qq)");
 types_equal("StrMatch[qr{foo}]", StrMatch[qr{foo}], "regexp parameter");
+
+# No, Overload[15] doesn't make much sense, but it's one of the few types in
+# Types::Standard that accept pretty much any list of strings as parameters.
 
 note "Unions";
 types_equal("Int|HashRef", Int|HashRef);

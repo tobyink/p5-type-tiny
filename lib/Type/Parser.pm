@@ -15,6 +15,7 @@ $VERSION =~ tr/_//d;
 sub TYPE ()      { "TYPE" }
 sub QUOTELIKE () { "QUOTELIKE" }
 sub STRING ()    { "STRING" }
+sub HEXNUM ()    { "HEXNUM" }
 sub CLASS ()     { "CLASS" }
 sub L_BRACKET () { "L_BRACKET" }
 sub R_BRACKET () { "R_BRACKET" }
@@ -118,6 +119,10 @@ Evaluate: {
 		
 		if ( $node->{type} eq "primary" and $node->{token}->type eq STRING ) {
 			return $node->{token}->spelling;
+		}
+		
+		if ( $node->{type} eq "primary" and $node->{token}->type eq HEXNUM ) {
+			return hex( $node->{token}->spelling );
 		}
 		
 		if ( $node->{type} eq "primary" and $node->{token}->type eq TYPE ) {
@@ -248,6 +253,7 @@ Evaluate: {
 		if ( $type eq Type::Parser::TYPE
 			or $type eq Type::Parser::QUOTELIKE
 			or $type eq Type::Parser::STRING
+			or $type eq Type::Parser::HEXNUM
 			or $type eq Type::Parser::CLASS )
 		{
 			return { type => "primary", token => $tokens->eat };
@@ -434,6 +440,9 @@ Evaluate: {
 			if ( $spelling =~ /::$/sm ) {
 				return bless( [ Type::Parser::CLASS, $spelling ], "Type::Parser::Token" );
 			}
+			elsif ( $spelling =~ /^[+-]?0x[0-9A-Fa-f]+$/sm ) {
+				return bless( [ Type::Parser::HEXNUM, $spelling ], "Type::Parser::Token" );
+			}
 			elsif ( looks_like_number( $spelling ) ) {
 				return bless( [ Type::Parser::STRING, $spelling ], "Type::Parser::Token" );
 			}
@@ -531,6 +540,8 @@ The following constants correspond to values returned by C<< $token->type >>.
 =item C<< QUOTELIKE >>
 
 =item C<< STRING >>
+
+=item C<< HEXNUM >>
 
 =item C<< CLASS >>
 
