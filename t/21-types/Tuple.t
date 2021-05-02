@@ -276,7 +276,8 @@ should_pass([qr//,foo=>1,bar=>2], $type8);
 should_fail([qr//,foo=>1,bar=>2,qr//], $type8);
 # note that the slurpy slurps stuff into an hashref to check
 # so it will fail when there's an actual hashref there.
-should_fail([qr//,[foo=>1,bar=>2]], $type8);
+should_fail([qr//,{foo=>1,bar=>2}], $type8);
+should_fail([qr//,'foo'], $type8);
 
 
 #
@@ -334,6 +335,18 @@ subtest 'coercion happened as expected' => sub {
 # If any single part of it had ended up not conforming to the target type,
 # then the original tuple would have been returned with no coercions done
 # at all!
+
+#
+# slurpy starting at an index greater or equal to 2
+#
+my $type11 = Tuple[
+	Types::Standard::Int,
+	Types::Standard::ScalarRef,
+	slurpy Types::Standard::HashRef,
+];
+should_pass([1,\1], $type11);
+should_pass([1,\1,foo=>3], $type11);
+should_fail([1,\1,'foo'], $type11);
 
 done_testing;
 
