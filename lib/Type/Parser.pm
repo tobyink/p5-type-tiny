@@ -122,7 +122,15 @@ Evaluate: {
 		}
 		
 		if ( $node->{type} eq "primary" and $node->{token}->type eq HEXNUM ) {
-			return hex( $node->{token}->spelling );
+			my $sign = '+';
+			my $spelling = $node->{token}->spelling;
+			if ( $spelling =~ /^[+-]/ ) {
+				$sign = substr( $spelling, 0, 1);
+				$spelling = substr( $spelling, 1 );
+			}
+			return (
+				( $sign eq '-' ) ? ( 0 - hex($spelling) ) : hex($spelling)
+			);
 		}
 		
 		if ( $node->{type} eq "primary" and $node->{token}->type eq TYPE ) {

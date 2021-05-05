@@ -60,6 +60,7 @@ types_equal("ArrayRef[Int]", ArrayRef[Int], "parameterized type");
 types_equal("Overload[15]", Overload[15], "numeric parameter (decimal integer)");
 types_equal("Overload[0x0F]", Overload[15], "numeric parameter (hexadecimal integer)");
 types_equal("Overload[0x0f]", Overload[15], "numeric parameter (hexadecimal integer, lowercase)");
+types_equal("Overload[-0xF]", Overload[-15], "numeric parameter (hexadecimal integer, negative)");
 types_equal("Overload[1.5]", Overload[1.5], "numeric parameter (float)");
 types_equal("Ref['HASH']", Ref['HASH'], "string parameter (singles)");
 types_equal("Ref[\"HASH\"]", Ref['HASH'], "string parameter (doubles)");
