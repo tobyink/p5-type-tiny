@@ -3939,7 +3939,7 @@
 			dcs:blame cpan:BOOK;
 			label "Fix precendence error in generated code for Tuples.";
 			seealso <https://github.com/tobyink/p5-type-tiny/pull/64>;
-			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/pull/64>;			
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/pull/64>;
 		];
 		item [
 			a dcs:Documentation;
@@ -3947,6 +3947,21 @@
 			label "Fixed typo in pod for Type::Tiny::Enum";
 			seealso <https://github.com/tobyink/p5-type-tiny/pull/70>;
 			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/pull/70>;
+		];
+	].
+
+`Type-Tiny 1.012003 cpan:TOBYINK`
+	issued  2021-05-09;
+	changeset [
+		dcs:versus `Type-Tiny 1.012002 cpan:TOBYINK`;
+		item [
+			a dcs:Change;
+			label "Type::Parser now supports negative hexadecimal integers.";
+		];
+		item [
+			a dcs:Documentation;
+			label "Fixed typo in Type::Tiny::Enum where the `closest_match` method was documented as being called `closet_match`.";
+			dcs:fixes <https://github.com/tobyink/p5-type-tiny/pull/72>;
 		];
 	].
 
