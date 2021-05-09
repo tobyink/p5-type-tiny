@@ -467,7 +467,7 @@ checking each string against
 
 You can get a case-insensitive regexp using C<< $enum->as_regexp('i') >>.
 
-=item C<closet_match>
+=item C<closest_match>
 
 Returns the closest match in the enum for a string.
 
