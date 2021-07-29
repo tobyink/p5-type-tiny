@@ -12,7 +12,7 @@ BEGIN {
 
 BEGIN {
 	$Types::Standard::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::VERSION   = '1.012003';
+	$Types::Standard::VERSION   = '1.012004';
 }
 
 $Types::Standard::VERSION =~ tr/_//d;

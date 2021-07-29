@@ -3965,3 +3965,15 @@
 		];
 	].
 
+`Type-Tiny 1.012004 cpan:TOBYINK`
+	issued  2021-07-29;
+	changeset [
+		dcs:versus `Type-Tiny 1.012003 cpan:TOBYINK`;
+		item [
+			a dcs:Documentation;
+			label "Fixed typo in Types::Standard documentation where StrMatch regexp parameter didn't use qr// properly.";
+			dcs:fixes <https://github.com/tobyink/p5-type-tiny/pull/74>;
+			dcs:blame cpan:LUCAS;
+		];
+	].
+

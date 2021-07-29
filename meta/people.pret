@@ -187,6 +187,9 @@ cpan:SPATOCS
 	:page <https://github.com/windymelt>;
 	:page <https://www.3qe.us/>.
 
+cpan:LUCAS
+	:name "Lucas Tiago de Moraes".
+
 # We bundle some files made by these dudes...
 
 cpan:RJBS
