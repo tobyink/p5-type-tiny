@@ -814,6 +814,7 @@ sub _perlcode {
 		if $self->can_be_inlined;
 		
 	$b ||= do {
+		local $@;
 		require B::Deparse;
 		my $tmp = "B::Deparse"->new;
 		$tmp->ambient_pragmas( strict => "all", warnings => "all" )
