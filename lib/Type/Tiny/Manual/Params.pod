@@ -45,17 +45,17 @@ Multisig allows you to allow multiple ways of calling a sub.
  sub repeat_string {
    state $check = multisig(
      compile(
-       Int,
        Str,
+       Int,
      ),
      compile_named(
        { named_to_list => 1 },
-       count  => Int,
        string => Str,
+       count  => Int,
      ),
    );
-   
-   my ($count, $string) = $check->(@_);
+ 
+   my ($string, $count) = $check->(@_);
    return $string x $count;
  }
  
