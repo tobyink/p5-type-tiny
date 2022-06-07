@@ -3977,3 +3977,24 @@
 		];
 	].
 
+`Type-Tiny 1.012005 cpan:TOBYINK`
+	issued  2022-06-07;
+	changeset [
+		dcs:versus `Type-Tiny 1.012004 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix;
+			label "Ensure coderefs returned by overload::Method are called with three parameters, as passing two parameters can break subs imlpemented in XS.";
+			dcs:fixes <https://github.com/tobyink/p5-type-tiny/pull/87>;
+			dcs:thanks <urn:uuid:3d4e7e7c-a9f5-4f34-915c-6beefd3485a8>;
+		];
+		item [
+			a dcs:Bugfix;
+			label "Fix explanation message for NumRange/IntRange";
+			dcs:fixes <https://github.com/tobyink/p5-type-tiny/pull/89>;
+		];
+		item [
+			a dcs:Tests;
+			label "Add a test that stringifying Error::TypeTiny doesn't clobber $@. Only runs when EXTENDED_TESTING is true.";
+			dcs:thanks <urn:uuid:011f6ebf-6818-409c-bc8a-b98011eab9cb>;
+		];
+	].

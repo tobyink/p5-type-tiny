@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Types::Standard::StrMatch::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::StrMatch::VERSION   = '1.012004';
+	$Types::Standard::StrMatch::VERSION   = '1.012005';
 }
 
 $Types::Standard::StrMatch::VERSION =~ tr/_//d;

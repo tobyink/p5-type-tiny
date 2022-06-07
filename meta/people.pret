@@ -190,6 +190,14 @@ cpan:SPATOCS
 cpan:LUCAS
 	:name "Lucas Tiago de Moraes".
 
+<urn:uuid:3d4e7e7c-a9f5-4f34-915c-6beefd3485a8>
+	:name "Hugo van der Sanden";
+	:page <https://github.com/hvds>.
+
+<urn:uuid:011f6ebf-6818-409c-bc8a-b98011eab9cb>
+	:nick "bokutin";
+	:page <https://github.com/bokutin>.
+
 # We bundle some files made by these dudes...
 
 cpan:RJBS
