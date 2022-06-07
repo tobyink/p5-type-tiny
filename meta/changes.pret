@@ -3993,8 +3993,9 @@
 			dcs:fixes <https://github.com/tobyink/p5-type-tiny/pull/89>;
 		];
 		item [
-			a dcs:Tests;
-			label "Add a test that stringifying Error::TypeTiny doesn't clobber $@. Only runs when EXTENDED_TESTING is true.";
+			a dcs:Bugfix;
+			label "Prevent stringification of Error::TypeTiny from clobbering $@.";
 			dcs:thanks <urn:uuid:011f6ebf-6818-409c-bc8a-b98011eab9cb>;
+			dcs:fixes <https://github.com/tobyink/p5-type-tiny/pull/80>;
 		];
 	].
