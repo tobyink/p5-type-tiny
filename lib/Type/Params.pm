@@ -1779,7 +1779,7 @@ C<compile_named_oo>.
 C<wrap_methods> also exists, which shifts off the invocant from C<< @_ >>
 before the check, but unshifts it before calling the original sub.
 
-   use Type::Param qw(wrap_subs);
+   use Type::Param qw(wrap_methods);
    use Types::Standard qw(Int Str);
    
    sub foobar {
@@ -1787,7 +1787,7 @@ before the check, but unshifts it before calling the original sub.
       ...;
    }
    
-   wrap_subs foobar => [Int, Str];
+   wrap_methods foobar => [Int, Str];
 
 =head3 B<Invocant>
 
