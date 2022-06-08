@@ -36,7 +36,7 @@ sub test_requires {
     }
     $ver ||= '';
 
-    eval qq{package $caller; use $mod $ver}; ## no critic.
+    eval qq{package $caller; no warnings; use $mod $ver}; ## no critic.
     if (my $e = $@) {
         my $skip_all = sub {
             my $builder = __PACKAGE__->builder;
