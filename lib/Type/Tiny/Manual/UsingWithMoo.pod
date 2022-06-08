@@ -488,7 +488,7 @@ C<< q{...} >> operator, they can look just as clean and pretty as coderefs.
   has things => (
     is     => 'rw',
     isa    => ArrayRef->plus_coercions(
-      HashRef,     q{ values %$_ },
+      HashRef,     q{ [ values %$_ ] },
       Str,         q{ [ split /;/, $_ ] },
     ),
     coerce => 1,
