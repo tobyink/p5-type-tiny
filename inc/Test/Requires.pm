@@ -65,6 +65,9 @@ sub test_requires {
         elsif ( $e =~ /^Perl (\S+) required/ ) {
             $skip_all->("requires Perl $1");
         }
+        elsif ( $e =~ /^\Q$mod\E version (\S+) required/ ) {
+            $skip_all->("requires $mod $1");
+        }
         else {
             $skip_all->("$e");
         }
