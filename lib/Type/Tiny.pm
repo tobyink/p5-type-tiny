@@ -797,7 +797,8 @@ sub validate_explain {
 		my $deep = $self->parent->deep_explanation->( $self, $value, $varname );
 		return [ $message, @$deep ] if $deep;
 	}
-	
+
+	local $SIG{__WARN__} = sub {};
 	return [
 		$message,
 		sprintf( '"%s" is defined as: %s', $self, $self->_perlcode )
