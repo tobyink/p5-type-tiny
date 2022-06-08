@@ -62,6 +62,9 @@ sub test_requires {
         if ( $e =~ /^Can't locate/ ) {
             $skip_all->("requires $mod");
         }
+        elsif ( $e =~ /^Perl (\S+) required/ ) {
+            $skip_all->("requires Perl $1");
+        }
         else {
             $skip_all->("$e");
         }
