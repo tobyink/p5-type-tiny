@@ -25,11 +25,13 @@ use Test::More;
 
 use Config;
 BEGIN {
-	plan skip_all => "ithreads"
-		unless $Config{useithreads};
-	
-	if ( defined $ENV{RUNNER_OS} and $ENV{RUNNER_OS} =~ /windows/i ) {
-		plan skip_all => "skipping on CI due to known issues!!!";
+	if ( $] < 5.020
+	and  defined $ENV{RUNNER_OS}
+	and  $ENV{RUNNER_OS} =~ /windows/i ) {
+		plan skip_all => "skipping on CI due to known issues!";
+	}
+	elsif ( not $Config{useithreads} ) {
+		plan skip_all => "ithreads only test";
 	}
 };
 
