@@ -28,7 +28,7 @@ BEGIN {
 	plan skip_all => "ithreads"
 		unless $Config{useithreads};
 	
-	if ( $ENV{CI} and $^O eq 'Win32' and $] =~ /^5.01[78]/ ) {
+	if ( $ENV{CI} and $^O =~ /^Win/i ) {
 		plan skip_all => "skipping on CI due to known issues!!!";
 	}
 };
