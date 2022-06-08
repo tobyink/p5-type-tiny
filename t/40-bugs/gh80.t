@@ -29,23 +29,13 @@ use warnings;
 use Test::More;
 use Type::Tiny;
 
-# Produces annoying warnings, so don't test by default
-BEGIN {
-	$ENV{EXTENDED_TESTING}
-	or $ENV{AUTHOR_TESTING}
-	or $ENV{RELEASE_TESTING}
-	or plan skip_all => 'EXTENDED_TESTING'
-};
-
 my $Type1 = Type::Tiny->new( name => "Type1", constraint => sub { 0 } );
 
 eval { $Type1->('val1') };
 
 isa_ok( $@, 'Error::TypeTiny', '$@' );
-diag "#### BEGIN EXPECTED WARNINGS ####";
-warn $@;
-warn $@;
-diag "#### END EXPECTED WARNINGS ####";
+my $x1 = "$@";
+my $x2 = "$@";
 like( "$@", qr/did not pass type/, '$@ is still defined and stringifies properly' );
 
 done_testing;
