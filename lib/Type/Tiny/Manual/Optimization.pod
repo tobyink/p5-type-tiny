@@ -202,7 +202,7 @@ faster.)
 
 One possibility is to use strict type checks when you're running your
 release tests, and faster, more permissive type checks at other times.
-Devel::StrictMode can make this easier.
+L<Devel::StrictMode> can make this easier.
 
 This provides a C<STRICT> constant that indicates whether your code is
 operating in "strict mode" based on certain environment variables.
