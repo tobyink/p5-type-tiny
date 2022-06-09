@@ -16,7 +16,7 @@ Andrew Ruder E<lt>andy@aeruder.net<gt>
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2020-2021 by Andrew Ruder
+This software is copyright (c) 2020-2022 by Andrew Ruder
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

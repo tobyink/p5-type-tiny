@@ -4014,6 +4014,10 @@
 			label "Various minor documentation improvements.";
 		];
 		item [
+			a dcs:Documentation;
+			label "Update copyright dates to 2022.";
+		];
+		item [
 			a dcs:Tests;
 			label "Rename some directories in the test suite to better reflect their contents.";
 		];
