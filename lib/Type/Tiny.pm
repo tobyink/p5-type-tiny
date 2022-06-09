@@ -941,9 +941,11 @@ sub _failed_check {
 	
 	my $exception_class =
 		delete( $attrs{exception_class} ) || "Error::TypeTiny::Assertion";
-		
+	my $callback = delete( $attrs{on_die} );
+
 	if ( $self ) {
-		$exception_class->throw(
+		return $exception_class->throw_cb(
+			$callback,
 			message => $self->get_message( $value ),
 			type    => $self,
 			value   => $value,
@@ -951,9 +953,9 @@ sub _failed_check {
 		);
 	}
 	else {
-		$exception_class->throw(
-			message =>
-				sprintf( '%s did not pass type constraint "%s"', _dd( $value ), $name ),
+		return $exception_class->throw_cb(
+			$callback,
+			message => sprintf( '%s did not pass type constraint "%s"', _dd( $value ), $name ),
 			value => $value,
 			%attrs,
 		);

@@ -70,7 +70,14 @@ sub new {
 }
 
 sub throw {
+	my $next = $_[0]->can( 'throw_cb' );
+	splice( @_, 1, 0, undef );
+	goto $next;
+}
+
+sub throw_cb {
 	my $class = shift;
+	my $callback = shift;
 	
 	my ( $level, @caller, %ctxt ) = 0;
 	while (
@@ -106,13 +113,13 @@ sub throw {
 		);
 	}
 	
-	die(
-		our $LastError = $class->new(
-			context     => \%ctxt,
-			stack_trace => $stack,
-			@_,
-		)
+	our $LastError = $class->new(
+		context     => \%ctxt,
+		stack_trace => $stack,
+		@_,
 	);
+	
+	$callback ? $callback->( $LastError ) : die( $LastError );
 } #/ sub throw
 
 sub message     { $_[0]{message} ||= $_[0]->_build_message }
@@ -195,6 +202,13 @@ Moose-style constructor function.
 =item C<< throw(%attributes) >>
 
 Constructs an exception and passes it to C<die>.
+
+Automatically populates C<context> and C<stack_trace> if appropriate.
+
+=item C<< throw_cb($callback, %attributes) >>
+
+Constructs an exception and passes it to C<< $callback >> which should
+be a coderef; if undef, uses C<die>.
 
 Automatically populates C<context> and C<stack_trace> if appropriate.
 

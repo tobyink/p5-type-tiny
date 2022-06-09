@@ -108,7 +108,7 @@ sub _mkslurpy {
 		$i,
 		)
 		: sprintf(
-		'%s = (@_==%d and ref $_[%d] eq "HASH") ? +{ %%{$_[%d]} } : (($#_-%d)%%2)==0 ? "Error::TypeTiny::WrongNumberOfParameters"->throw(message => sprintf("Odd number of elements in %%s", %s)) : +{ @_[%d..$#_] };',
+		'%s = (@_==%d and ref $_[%d] eq "HASH") ? +{ %%{$_[%d]} } : (($#_-%d)%%2)==0 ? do { return "Error::TypeTiny::WrongNumberOfParameters"->throw_cb($on_die, message => sprintf("Odd number of elements in %%s", %s)) } : +{ @_[%d..$#_] };',
 		$name,
 		$i + 1,
 		$i,
@@ -146,6 +146,14 @@ sub _mkdefault {
 	
 	$default;
 } #/ sub _mkdefault
+
+sub _deal_with_on_die {
+	my $options = shift;
+	if ( $options->{'on_die'} ) {
+		return ( { '$on_die' => \$options->{'on_die'} }, '1;' );
+	}
+	return ( {}, 'my $on_die = undef;' );
+}
 
 sub _deal_with_head_and_tail {
 	my $options = shift;
@@ -216,7 +224,7 @@ sub _deal_with_head_and_tail {
 			}
 			elsif ( $constraint->can_be_inlined ) {
 				push @lines, sprintf(
-					'(%s) or Type::Tiny::_failed_check(%d, %s, %s, varname => %s);',
+					'(%s) or return Type::Tiny::_failed_check(%d, %s, %s, varname => %s, on_die => $on_die);',
 					$constraint->inline_check( $varname ),
 					$constraint->{uniq},
 					$QUOTE->( $constraint ),
@@ -227,7 +235,7 @@ sub _deal_with_head_and_tail {
 			else {
 				$env{ '@check_' . $position }[$i] = $constraint->compiled_check;
 				push @lines, sprintf(
-					'%s or Type::Tiny::_failed_check(%d, %s, %s, varname => %s);',
+					'%s or return Type::Tiny::_failed_check(%d, %s, %s, varname => %s, on_die => $on_die);',
 					sprintf( sprintf '$check_%s[%d]->(%s)', $position, $i, $varname ),
 					$constraint->{uniq},
 					$QUOTE->( $constraint ),
@@ -240,7 +248,7 @@ sub _deal_with_head_and_tail {
 	
 	if ( @lines ) {
 		unshift @lines => sprintf(
-			'"Error::TypeTiny::WrongNumberOfParameters"->throw("Not enough parameters to satisfy required head and tail of parameter list") if @_ < %d;',
+			'return "Error::TypeTiny::WrongNumberOfParameters"->throw_cb($on_die, "Not enough parameters to satisfy required head and tail of parameter list") if @_ < %d;',
 			$options->{arg_fudge_factor},
 		);
 		unshift @lines, 'my (@head, @tail);';
@@ -281,12 +289,22 @@ sub compile {
 			}
 		}
 	} #/ PARAM: for my $param ( @_ )
-	
-	my ( $extra_env, @extra_lines ) = _deal_with_head_and_tail( \%options );
-	if ( @extra_lines ) {
-		push @code, @extra_lines;
-		%env         = ( %$extra_env, %env );
-		$return_list = '(@head, @R, @tail)';
+
+	{
+		my ( $extra_env, @extra_lines ) = _deal_with_on_die( \%options );
+		if ( @extra_lines ) {
+			$code[0] .= join '', @extra_lines;
+			%env = ( %$extra_env, %env );
+		}
+	}
+
+	{
+		my ( $extra_env, @extra_lines ) = _deal_with_head_and_tail( \%options );
+		if ( @extra_lines ) {
+			push @code, @extra_lines;
+			%env         = ( %$extra_env, %env );
+			$return_list = '(@head, @R, @tail)';
+		}
 	}
 	
 	my $for =
@@ -339,8 +357,7 @@ sub compile {
 				? _mkslurpy( '$_', '%', $constraint => $arg )
 				: $constraint->is_a_type_of( Types::Standard::ArrayRef )
 				? _mkslurpy( '$_', '@', $constraint => $arg )
-				: Error::TypeTiny::croak(
-				"Slurpy parameter not of type HashRef or ArrayRef" );
+				: Error::TypeTiny::croak( "Slurpy parameter not of type HashRef or ArrayRef" );
 			$varname = '$_';
 			$is_slurpy++;
 			$saw_slurpy++;
@@ -423,7 +440,7 @@ sub compile {
 		
 		if ( $constraint->can_be_inlined ) {
 			push @code, sprintf(
-				'(%s) or Type::Tiny::_failed_check(%d, %s, %s, varname => %s);',
+				'(%s) or return Type::Tiny::_failed_check(%d, %s, %s, varname => %s, on_die => $on_die);',
 				$really_optional
 				? $constraint->type_parameter->inline_check( $varname )
 				: $constraint->inline_check( $varname ),
@@ -441,7 +458,7 @@ sub compile {
 				? $constraint->type_parameter->compiled_check
 				: $constraint->compiled_check;
 			push @code, sprintf(
-				'%s or Type::Tiny::_failed_check(%d, %s, %s, varname => %s);',
+				'%s or return Type::Tiny::_failed_check(%d, %s, %s, varname => %s, on_die => $on_die);',
 				sprintf( sprintf '$check[%d]->(%s)', $arg, $varname ),
 				$constraint->{uniq},
 				$QUOTE->( $constraint ),
@@ -461,7 +478,7 @@ sub compile {
 	
 	if ( $min_args == $max_args and not $saw_slurpy ) {
 		$code[1] = sprintf(
-			'"Error::TypeTiny::WrongNumberOfParameters"->throw(got => %s, minimum => %d, maximum => %d) if @_ != %d;',
+			'return "Error::TypeTiny::WrongNumberOfParameters"->throw_cb($on_die, got => %s, minimum => %d, maximum => %d) if @_ != %d;',
 			$thang,
 			$min_args + $options{arg_fudge_factor},
 			$max_args + $options{arg_fudge_factor},
@@ -470,7 +487,7 @@ sub compile {
 	}
 	elsif ( $min_args < $max_args and not $saw_slurpy ) {
 		$code[1] = sprintf(
-			'"Error::TypeTiny::WrongNumberOfParameters"->throw(got => %s, minimum => %d, maximum => %d) if @_ < %d || @_ > %d;',
+			'return "Error::TypeTiny::WrongNumberOfParameters"->throw_cb($on_die, got => %s, minimum => %d, maximum => %d) if @_ < %d || @_ > %d;',
 			$thang,
 			$min_args + $options{arg_fudge_factor},
 			$max_args + $options{arg_fudge_factor},
@@ -480,7 +497,7 @@ sub compile {
 	} #/ elsif ( $min_args < $max_args...)
 	elsif ( $min_args and $saw_slurpy ) {
 		$code[1] = sprintf(
-			'"Error::TypeTiny::WrongNumberOfParameters"->throw(got => %s, minimum => %d) if @_ < %d;',
+			'return "Error::TypeTiny::WrongNumberOfParameters"->throw_cb($on_die, got => %s, minimum => %d) if @_ < %d;',
 			$thang,
 			$min_args + $options{arg_fudge_factor},
 			$min_args + $options{arg_fudge_factor},
@@ -490,7 +507,7 @@ sub compile {
 	push @code, $return_list;
 	
 	my $source = "sub { no warnings; " . join( "\n", @code ) . " };";
-	
+
 	return $source if $options{want_source};
 	
 	my $closure = eval_closure(
@@ -526,10 +543,20 @@ sub compile_named {
 	my $arg = -1;
 	my $had_slurpy;
 	
-	my ( $extra_env, @extra_lines ) = _deal_with_head_and_tail( \%options );
-	if ( @extra_lines ) {
-		push @code, @extra_lines;
-		%env = ( %$extra_env, %env );
+	{
+		my ( $extra_env, @extra_lines ) = _deal_with_on_die( \%options );
+		if ( @extra_lines ) {
+			$code[0] .= join '', @extra_lines;
+			%env = ( %$extra_env, %env );
+		}
+	}
+	
+	{
+		my ( $extra_env, @extra_lines ) = _deal_with_head_and_tail( \%options );
+		if ( @extra_lines ) {
+			push @code, @extra_lines;
+			%env = ( %$extra_env, %env );
+		}
 	}
 	
 	my $for =
@@ -538,7 +565,7 @@ sub compile_named {
 		|| '__ANON__';
 		
 	push @code,
-		'my %in = ((@_==1) && ref($_[0]) eq "HASH") ? %{$_[0]} : (@_ % 2) ? "Error::TypeTiny::WrongNumberOfParameters"->throw(message => "Odd number of elements in hash") : @_;';
+		'my %in = ((@_==1) && ref($_[0]) eq "HASH") ? %{$_[0]} : (@_ % 2) ? do { return "Error::TypeTiny::WrongNumberOfParameters"->throw_cb($on_die, message => "Odd number of elements in hash") } : @_;';
 	my @names;
 	
 	while ( @_ ) {
@@ -609,7 +636,7 @@ sub compile_named {
 		}
 		elsif ( not $is_optional || $is_slurpy ) {
 			push @code, sprintf(
-				'exists($in{%s}) or "Error::TypeTiny::WrongNumberOfParameters"->throw(message => sprintf "Missing required parameter: %%s", %s);',
+				'exists($in{%s}) or return "Error::TypeTiny::WrongNumberOfParameters"->throw_cb($on_die, message => sprintf "Missing required parameter: %%s", %s);',
 				$QUOTE->( $name ),
 				$QUOTE->( $name ),
 			);
@@ -651,7 +678,7 @@ sub compile_named {
 		
 		if ( $constraint->can_be_inlined ) {
 			push @code, sprintf(
-				'(%s) or Type::Tiny::_failed_check(%d, %s, %s, varname => %s);',
+				'(%s) or return Type::Tiny::_failed_check(%d, %s, %s, varname => %s, on_die => $on_die);',
 				$constraint->inline_check( $varname ),
 				$constraint->{uniq},
 				$QUOTE->( $constraint ),
@@ -662,7 +689,7 @@ sub compile_named {
 		else {
 			$env{'@check'}[$arg] = $constraint->compiled_check;
 			push @code, sprintf(
-				'%s or Type::Tiny::_failed_check(%d, %s, %s, varname => %s);',
+				'%s or return Type::Tiny::_failed_check(%d, %s, %s, varname => %s, on_die => $on_die);',
 				sprintf( sprintf '$check[%d]->(%s)', $arg, $varname ),
 				$constraint->{uniq},
 				$QUOTE->( $constraint ),
@@ -678,7 +705,7 @@ sub compile_named {
 	
 	if ( !$had_slurpy ) {
 		push @code,
-			'keys(%in) and "Error::TypeTiny"->throw(message => sprintf "Unrecognized parameter%s: %s", keys(%in)>1?"s":"", Type::Params::english_list(sort keys %in));';
+			'keys(%in) and return "Error::TypeTiny"->throw_cb($on_die, message => sprintf "Unrecognized parameter%s: %s", keys(%in)>1?"s":"", Type::Params::english_list(sort keys %in));';
 	}
 	
 	if ( $options{named_to_list} ) {
@@ -926,8 +953,17 @@ sub multisig {
 			: Types::TypeTiny::is_ArrayLike( $_ ) ? compile( { want_details => 1 }, @$_ )
 			:                                       $_;
 	} @_;
-	
+
+	my %env;
 	my @code = 'sub { my $r; ';
+	
+	{
+		my ( $extra_env, @extra_lines ) = _deal_with_on_die( \%options );
+		if ( @extra_lines ) {
+			$code[0] .= join '', @extra_lines;
+			%env = ( %$extra_env, %env );
+		}
+	}
 	
 	for my $i ( 0 .. $#multi ) {
 		my $flag = sprintf( '${^TYPE_PARAMS_MULTISIG} = %d', $i );
@@ -951,7 +987,7 @@ sub multisig {
 	
 	push @code,
 		sprintf(
-		'"Error::TypeTiny"->throw(message => "%s");',
+		'return "Error::TypeTiny"->throw_cb($on_die, message => "%s");',
 		quotemeta( "$options{message}" )
 		);
 	push @code, '}';
@@ -959,7 +995,7 @@ sub multisig {
 	eval_closure(
 		source      => \@code,
 		description => $options{description},
-		environment => { '@multi' => \@multi },
+		environment => { '@multi' => \@multi, %env },
 	);
 } #/ sub multisig
 
@@ -1251,6 +1287,22 @@ use this.
 
 If you wish to use the default description, but need to change the caller
 level for detecting the sub name, use this.
+
+=item C<< on_die >> B<< Maybe[CodeRef] >>
+
+  my $check = compile(
+    { on_die => sub { ... } },
+    ...,
+  );
+  
+  my @args = $check->( @_ );
+
+Normally, at the first invalid argument the C<< $check >> coderef encounters,
+it will throw an exception.
+
+If an C<on_die> coderef is provided, then it is called instead, and the
+exception is passed to it as an object. The C<< $check >> coderef will still
+immediately return though.
 
 =back
 
