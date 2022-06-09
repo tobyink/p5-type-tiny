@@ -198,6 +198,13 @@ cpan:LUCAS
 	:nick "bokutin";
 	:page <https://github.com/bokutin>.
 
+<urn:uuid:af150f96-4213-481a-968b-58b1325e3d0e>
+	:name "James Wright".
+
+<urn:94ef588e-86af-4cf6-aa8f-e9794208341f>
+	:nick "jsf116";
+	:page <https://github.com/jsf116>.
+
 # We bundle some files made by these dudes...
 
 cpan:RJBS
