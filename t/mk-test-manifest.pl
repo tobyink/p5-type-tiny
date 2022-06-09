@@ -95,12 +95,12 @@ REGRESSION_TESTS:
 	while (my $file = $iter->())
 	{
 		my $test = path($file);
-		if ($test =~ m/rt([0-9]+)/)
+		if ($test =~ m/\/rt([0-9]+)/)
 		{
 			push @{ $bugs{$1} ||= [] }, $test;
 			next;
 		}
-		elsif ($test =~ m/gh([0-9]+)/) {
+		elsif ($test =~ m/\/gh([0-9]+)/) {
 			push @{ $ghbugs{$1} ||= [] }, $test;
 			next;
 		}

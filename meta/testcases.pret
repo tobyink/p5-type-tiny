@@ -250,6 +250,7 @@ m`Types::TypeTiny Type-Tiny`
 [] a :AutomatedTest; :test_script f`t/30-external/Validation-Class-Simple/basic.t Type-Tiny`; :purpose "Check type constraints Validation::Class::Simple objects can be used as type constraints.".
 [] a :AutomatedTest; :test_script f`t/30-external/match-simple/basic.t Type-Tiny`; :purpose "Checks Type::Tiny works with match::simple.".
 [] a :RegressionTest; :test_script f`t/40-bugs/73f51e2d.t Type-Tiny`; :purpose "Possible issue causing segfaults on threaded Perl 5.18.x.".
+[] a :RegressionTest; :test_script f`t/40-bugs/ttxs-gh1.t Type-Tiny`; :purpose "Test that was failing with Type::Tiny::XS prior to 0.009.".
 RT#85911
 	:regression_test [ a :RegressionTest; :test_script f`t/40-bugs/rt85911.t Type-Tiny`; :purpose "Test Type::Params with deep Dict coercion."];
 	.
@@ -314,7 +315,6 @@ RT#133141
 	.
 <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/1>
 	:regression_test [ a :RegressionTest; :test_script f`t/40-bugs/gh1.t Type-Tiny`; :purpose "Test that subtypes of Type::Tiny::Class work."];
-	:regression_test [ a :RegressionTest; :test_script f`t/40-bugs/ttxs-gh1.t Type-Tiny`; :purpose "Test that was failing with Type::Tiny::XS prior to 0.009."];
 	.
 <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/14>
 	:regression_test [ a :RegressionTest; :test_script f`t/40-bugs/gh14.t Type-Tiny`; :purpose "Test for non-inlined coercions in Moo. The issue that prompted this test was actually invalid, caused by a typo in the bug reporter's code. But I wrote the test case, so I might as well include it."];
