@@ -51,14 +51,14 @@ MISC_TESTS:
 
 UNIT_TESTS:
 {
-	my $iter = $rule->iter( TEST_DIR->child('20-unit') );
+	my $iter = $rule->iter( TEST_DIR->child('20-modules') );
 	my %mods;
 	
 	while (my $file = $iter->())
 	{
 		my $test = path($file);
 		
-		my ($module) = ($test =~ m(t/20-unit/([^/]+)/));
+		my ($module) = ($test =~ m(t/20-modules/([^/]+)/));
 		$module =~ s{-}{::}g;
 		
 		push @{ $mods{$module} ||= [] }, $test;
@@ -69,7 +69,7 @@ UNIT_TESTS:
 		say "m`$mod ${\ PROJ_NAME }`";
 		for my $test (sort @{ $mods{$mod} })
 		{
-			say "\t:unit_test [ a :UnitTest; :test_script f`${\ $test->relative(PROJ_DIR) } ${\ PROJ_NAME }`; :purpose \"${\ podpurpose($test,1) }\" ];";
+			say "\t:test [ a :AutomatedTest; :test_script f`${\ $test->relative(PROJ_DIR) } ${\ PROJ_NAME }`; :purpose \"${\ podpurpose($test,1) }\" ];";
 		}
 		say "\t.";
 	}
@@ -77,19 +77,20 @@ UNIT_TESTS:
 
 INTEGRATION_TESTS:
 {
-	my $iter = $rule->iter( TEST_DIR->child('30-integration') );
+	my $iter = $rule->iter( TEST_DIR->child('30-external') );
 	
 	while (my $file = $iter->())
 	{
 		my $test = path($file);
-		say "[] a :IntegrationTest; :test_script f`${\ $test->relative(PROJ_DIR) } ${\ PROJ_NAME }`; :purpose \"${\ podpurpose($test,1) }\".";
+		say "[] a :AutomatedTest; :test_script f`${\ $test->relative(PROJ_DIR) } ${\ PROJ_NAME }`; :purpose \"${\ podpurpose($test,1) }\".";
 	}
 }
 
 REGRESSION_TESTS:
 {
-	my $iter = $rule->iter( TEST_DIR->child('40-regression') );
+	my $iter = $rule->iter( TEST_DIR->child('40-bugs') );
 	my %bugs;
+	my %ghbugs;
 	
 	while (my $file = $iter->())
 	{
@@ -97,6 +98,10 @@ REGRESSION_TESTS:
 		if ($test =~ m/rt([0-9]+)/)
 		{
 			push @{ $bugs{$1} ||= [] }, $test;
+			next;
+		}
+		elsif ($test =~ m/gh([0-9]+)/) {
+			push @{ $ghbugs{$1} ||= [] }, $test;
 			next;
 		}
 		say "[] a :RegressionTest; :test_script f`${\ $test->relative(PROJ_DIR) } ${\ PROJ_NAME }`; :purpose \"${\ podpurpose($test,1) }\".";
@@ -107,6 +112,15 @@ REGRESSION_TESTS:
 		say "RT#$rt";
 		for my $test (@{$bugs{$rt}})
 		{
+			say "\t:regression_test [ a :RegressionTest; :test_script f`${\ $test->relative(PROJ_DIR) } ${\ PROJ_NAME }`; :purpose \"${\ podpurpose($test,1) }\"];";
+		}
+		say "\t.";
+	}
+
+	for my $gh (sort { $a <=> $b } keys %ghbugs)
+	{
+		say "<tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/$gh>";
+		for my $test (@{$ghbugs{$gh}}) {
 			say "\t:regression_test [ a :RegressionTest; :test_script f`${\ $test->relative(PROJ_DIR) } ${\ PROJ_NAME }`; :purpose \"${\ podpurpose($test,1) }\"];";
 		}
 		say "\t.";
