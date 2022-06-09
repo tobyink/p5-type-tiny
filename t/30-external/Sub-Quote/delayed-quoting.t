@@ -40,7 +40,7 @@ my $coderef2 = $type->_overload_coderef;
 is($coderef1, $coderef2, 'overload coderef gets cached instead of being rebuilt');
 
 eval { require Sub::Quote } or do {
-	diag "Sub::Quote required for further testing";
+	note "Sub::Quote required for further testing";
 	done_testing;
 	exit(0);
 };
