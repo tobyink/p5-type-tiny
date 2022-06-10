@@ -1754,7 +1754,7 @@ a full example:
          [ Int, ArrayRef ],
          [ Str, HashRef ],
          sub {
-            my ($meth, $obj);
+            my ($meth, $obj) = @_;
             die unless is_Object($obj);
             die unless $obj->can($meth);
             return ($meth, $obj);
