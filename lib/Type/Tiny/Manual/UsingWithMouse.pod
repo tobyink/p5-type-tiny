@@ -55,7 +55,7 @@ others!)
 Type::Tiny provides automatic deep coercions, so if type B<Xyz> has a coercion,
 the following should "just work":
 
-  isa xyzlist => ( is => 'ro', isa => ArrayRef[Xyz], coerce => 1 );
+  has xyzlist => ( is => 'ro', isa => ArrayRef[Xyz], coerce => 1 );
 
 =item *
 
