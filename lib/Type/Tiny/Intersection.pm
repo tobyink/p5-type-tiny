@@ -113,7 +113,7 @@ sub inline_check {
 	
 	my $code = sprintf '(%s)', join " and ", map $_->inline_check( $_[0] ), @$self;
 	
-	return "do { package Type::Tiny; $code }"
+	return "do { $Type::Tiny::SafePackage $code }"
 		if $Type::Tiny::AvoidCallbacks;
 	return "$self->{xs_sub}\($_[0]\)"
 		if $self->{xs_sub};

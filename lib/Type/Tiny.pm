@@ -21,6 +21,8 @@ $Type::Tiny::XS_VERSION =~ tr/_//d;
 use Scalar::Util qw( blessed );
 use Types::TypeTiny ();
 
+our $SafePackage = sprintf 'package %s;', __PACKAGE__;
+
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
 sub _swap { $_[2] ? @_[ 1, 0 ] : @_[ 0, 1 ] }
@@ -878,7 +880,7 @@ sub inline_check {
 	}
 	my $r = join " && " => map {
 		/[;{}]/ && !/\Ado \{.+\}\z/
-			? "do { package Type::Tiny; $_ }"
+			? "do { $SafePackage $_ }"
 			: "($_)"
 	} @r;
 	return @r == 1 ? $r : "($r)";
@@ -929,8 +931,8 @@ sub inline_assert {
 	} #/ else [ if ( $typevarname ) ]
 	
 	$do_wrapper
-		? qq[do { no warnings "void"; package Type::Tiny; $inline_check or $inline_throw; $varname };]
-		: qq[     no warnings "void"; package Type::Tiny; $inline_check or $inline_throw; $varname   ];
+		? qq[do { no warnings "void"; $SafePackage $inline_check or $inline_throw; $varname };]
+		: qq[     no warnings "void"; $SafePackage $inline_check or $inline_throw; $varname   ];
 } #/ sub inline_assert
 
 sub _failed_check {
@@ -2413,6 +2415,15 @@ L<Types::Common::Numeric>, and L<Types::Common::String> all do.
 if it needs to rely on callbacks when asked not to.)
 
 Most normal users can ignore this.
+
+=item C<< $Type::Tiny::SafePackage >>
+
+This is the string "package Type::Tiny;" which is sometimes inserted
+into strings of inlined code to avoid namespace clashes. In most cases,
+you do not need to change this. However, if you are inlining type
+constraint code, saving that code into Perl modules, and uploading them
+to CPAN, you may wish to change it to avoid problems with the CPAN
+indexer. Most normal users of Type::Tiny do not need to be aware of this.
 
 =back
 

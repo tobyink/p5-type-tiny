@@ -130,7 +130,8 @@ my $maybe_load_modules = sub {
 	my $code = pop;
 	if ( $Type::Tiny::AvoidCallbacks ) {
 		$code = sprintf(
-			'do { package Type::Tiny; %s; %s }',
+			'do { %s %s; %s }',
+			$Type::Tiny::SafePackage,
 			join( '; ', map "use $_ ()", @_ ),
 			$code,
 		);
