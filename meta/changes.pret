@@ -4044,3 +4044,17 @@
 			dcs:thanks <urn:94ef588e-86af-4cf6-aa8f-e9794208341f>;
 		];
 	].
+
+`Type-Tiny 1.013_001 cpan:TOBYINK`
+	issued  2022-06-23;
+	changeset [
+		dcs:versus `Type-Tiny 1.013_000 cpan:TOBYINK`;
+		item [
+			a dcs:Documentation;
+			label "Various minor documentation improvements.";
+		];
+		item [
+			a dcs:Addition;
+			label "$Type::Tiny::SafePackage variable.";
+		];
+	].
