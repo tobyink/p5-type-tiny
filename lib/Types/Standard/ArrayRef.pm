@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Types::Standard::ArrayRef::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::ArrayRef::VERSION   = '1.013_001';
+	$Types::Standard::ArrayRef::VERSION   = '1.014000';
 }
 
 $Types::Standard::ArrayRef::VERSION =~ tr/_//d;

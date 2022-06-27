@@ -4058,3 +4058,54 @@
 			label "$Type::Tiny::SafePackage variable.";
 		];
 	].
+
+`Type-Tiny 1.014000 cpan:TOBYINK`
+	issued  2022-06-27;
+	changeset [
+		dcs:versus `Type-Tiny 1.013_001 cpan:TOBYINK`;
+		item [
+			a dcs:Packaging;
+			label "Repackaged as stable version.";
+		];
+	];
+	changeset [
+		dcs:versus `Type-Tiny 1.012005 cpan:TOBYINK`;
+		item [
+			a dcs:Documentation;
+			label "Various minor documentation improvements.";
+		];
+		item [
+			a dcs:Documentation;
+			label "Update copyright dates to 2022.";
+		];
+		item [
+			a dcs:Tests;
+			label "Rename some directories in the test suite to better reflect their contents.";
+		];
+		item [
+			a dcs:Tests;
+			label "Eliminate some warnings and other noise from the test suite.";
+		];
+		item [
+			a dcs:Change;
+			label "Eliminate warnings while generating deep explanations for type constraint check fails under some circumstances. (Mostly affects StrMatch when Regexp::Util isn't installed.)";
+			dcs:fixes <https://github.com/tobyink/p5-type-tiny/issues/60>;
+			dcs:thanks <urn:uuid:af150f96-4213-481a-968b-58b1325e3d0e>;
+		];
+		item [
+			a dcs:Addition;
+			label "Type::Params `compile`, `compile_named`, and `compile_named_oo` functions now support an `on_die` callback.";
+			dcs:fixes <https://github.com/tobyink/p5-type-tiny/issues/77>;
+			dcs:thanks <urn:94ef588e-86af-4cf6-aa8f-e9794208341f>;
+		];
+		item [
+			a dcs:Addition;
+			label "Error::TypeTiny now has a `throw_cb` method which acts like `throw` but takes an initial callback parameter.";
+			dcs:fixes <https://github.com/tobyink/p5-type-tiny/issues/77>;
+			dcs:thanks <urn:94ef588e-86af-4cf6-aa8f-e9794208341f>;
+		];
+		item [
+			a dcs:Addition;
+			label "$Type::Tiny::SafePackage variable.";
+		];
+	].
