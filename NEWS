@@ -4,15 +4,6 @@
    changes in development releases, see the "Changes" file instead.
 =======================================================================
 
-2019-12-11 Type-Tiny version 1.008000 released!
-
- - Type::Tiny has a website. <http://typetiny.toby.ink/>
- - Resolved all bugs from RT.
- - Completed everything on TODO.
- - Rewrite of the manual.
- - Lots more test cases. (Now almost 14,000 test cases total!)
- - wrap_methods/wrap_subs in Type::Params.
-
 2020-02-19 Type-Tiny version 1.010000 released!
 
  - Recursive definition of type constraints.
@@ -25,3 +16,8 @@
  - Type::Params now provides an ArgsObject type.
  - ArrayLike and HashLike types now parameterizable.
  - Type::Library -extends and -utils flags.
+
+2022-06-27 Type-Tiny version 1.014000 released!
+
+ - Type::Params compile(), compile_named(), and compile_named_oo()
+   functions now support an `on_die` callback.
