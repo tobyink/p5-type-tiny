@@ -55,18 +55,46 @@ like(
 	sub DOES { 0 }
 }
 
-my $e = exception {
-	Type::Tiny::Role
-		->new(name => "Elsa", role => "Foo")
-		->assert_valid( Bar->new );
-};
+{
+	my $e = exception {
+		Type::Tiny::Role
+			->new(name => "Elsa", role => "Foo")
+			->assert_valid( Bar->new );
+	};
 
-is_deeply(
-	$e->explain,
-	[
-		'"Elsa" requires that the reference does Foo',
-		"The reference doesn't Foo",
-	],
-);
+	like(
+		$e->message,
+		qr/did not pass type constraint "Elsa" \(not DOES Foo\)/,
+	);
+
+	is_deeply(
+		$e->explain,
+		[
+			'"Elsa" requires that the reference does Foo',
+			"The reference doesn't Foo",
+		],
+	) or diag explain($e->explain);
+}
+
+{
+	my $e = exception {
+		Type::Tiny::Role
+			->new(role => "Foo")
+			->assert_valid( Bar->new );
+	};
+
+	like(
+		$e->message,
+		qr/did not pass type constraint \(not DOES Foo\)/,
+	);
+
+	is_deeply(
+		$e->explain,
+		[
+			'"__ANON__" requires that the reference does Foo',
+			"The reference doesn't Foo",
+		],
+	) or diag explain($e->explain);
+}
 
 done_testing;
