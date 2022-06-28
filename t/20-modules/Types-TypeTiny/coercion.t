@@ -43,7 +43,7 @@ use Moose::Util::TypeConstraints qw(find_type_constraint);
 
 ok(TypeTiny->has_coercion, "TypeTiny->has_coercion");
 
-subtest "Coercion from Moose type constraint object" => sub
+subtest "Coercion from built-in Moose type constraint object" => sub
 {
 	my $orig = find_type_constraint("Int");
 	my $type = to_TypeTiny $orig;
@@ -61,13 +61,62 @@ subtest "Coercion from Moose type constraint object" => sub
 		should_fail(3.3, $type);
 	};
 
-## We don't do this for Moose for some reason.
-#
+#	This doesn't provide the same message because Type::Tiny isn't
+#	really coercing a Moose type constraint, it's just grabbing `Int`
+#	from Types::Standard.
+#	
 #	is(
 #		$type->get_message(3.3),
 #		$orig->get_message(3.3),
 #		'... and provides proper message',
 #	);
+};
+
+subtest "Coercion from custom Moose type constraint object" => sub
+{
+	my $orig = 'Moose::Meta::TypeConstraint'->new(
+		name => 'EvenInt',
+		parent => find_type_constraint("Int"),
+		constraint => sub {
+			my ( $value ) = @_;
+			$value % 2 == 0;
+		},
+		inlined => sub {
+			my ( $self, $var ) = @_;
+			return sprintf(
+				'do { %s } && !( %s %% 2 )',
+				$self->parent->_inline_check( $var ),
+				$var,
+			);
+		},
+		message => sub {
+			my ( $value ) = @_;
+			return find_type_constraint("Int")->check( $value )
+				? "$value isn't an integer at all"
+				: "$value is odd";
+		},
+	);
+	my $type = to_TypeTiny $orig;
+	
+	should_pass($orig, _ForeignTypeConstraint);
+	should_fail($type, _ForeignTypeConstraint);
+	
+	should_pass($type, TypeTiny, 'to_TypeTiny converted a Moose type constraint to a Type::Tiny one');
+	is($type->display_name, 'EvenInt', '... which has the correct display_name');
+	ok($type->can_be_inlined, '... and which can be inlined');
+	note $type->inline_check('$X');
+	subtest "... and it works" => sub
+	{
+		should_fail(3.3, $type);
+		should_fail(123, $type);
+		should_pass(124, $type);
+	};
+
+	is(
+		$type->get_message(3.3),
+		$orig->get_message(3.3),
+		'... and provides proper message',
+	);
 };
 
 my %moose_ptype_opts = (
