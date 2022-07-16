@@ -4109,3 +4109,17 @@
 			label "$Type::Tiny::SafePackage variable.";
 		];
 	].
+
+`Type-Tiny 1.015_000 cpan:TOBYINK`
+	issued  2022-07-16;
+	changeset [
+		dcs:versus `Type-Tiny 1.014000 cpan:TOBYINK`;
+		item [
+			a dcs:Change;
+			label "Major refactoring of Type::Params, splitting out signature compilation into separate backend OO-modules which Type::Params now acts as a frontend for. Compiling signature checks is probably now a little slower, but once they're compiled Type::Params is still the fastest Perl implementation of typed parameter checks. This refactor should make the code easier to work with, add new features to, and tweak the performance of.";
+		];
+		item [
+			a dcs:BackCompat;
+			label "Type::Params is now smarter at calculating the expected $#_ for functions which take named parameters, so it can 'fail early' more often when there are extra parameters or missing required parameters. This means you may get errors indicating the wrong number of parameters when you were previously getting errors indicating particular unrecognized or missing required parameters. This may break test suites which were looking for particular error messages.";
+		];
+	].

@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Tiny::_HalfOp::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::_HalfOp::VERSION   = '1.014000';
+	$Type::Tiny::_HalfOp::VERSION   = '1.015_000';
 }
 
 $Type::Tiny::_HalfOp::VERSION =~ tr/_//d;
