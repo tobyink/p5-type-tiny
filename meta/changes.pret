@@ -4153,3 +4153,13 @@
 			label "The simple case of compile() with no parameters was broken by refactoring. It should now work.";
 		];
 	].
+
+`Type-Tiny 1.016000 cpan:TOBYINK`
+	issued  2022-07-16;
+	changeset [
+		dcs:versus `Type-Tiny 1.015_003 cpan:TOBYINK`;
+		item [
+			a dcs:Change;
+			label "Add a clone option to parameters in Type::Params to clone them with Storable::dclone(). This is mostly a test of how much easier improving Type::Params is since it was refactored.";
+		];
+	].
