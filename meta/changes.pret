@@ -4133,3 +4133,13 @@
 			label "Type::Params::Signature now avoids using the word `return` in its generated source code, as MooX::Press was using that as a talisman. Also avoid using the `return` keyword to return the final results of the signature check, as falling through performs better on older Perls, plus it enables MooX::Press to convert the coderef into a do{} block.";
 		];
 	].
+
+`Type-Tiny 1.015_002 cpan:TOBYINK`
+	issued  2022-07-16;
+	changeset [
+		dcs:versus `Type-Tiny 1.015_001 cpan:TOBYINK`;
+		item [
+			a dcs:Change;
+			label "Defaults for Type::Params parameters can now be a reference to a string of Perl code (like Mite).";
+		];
+	].
