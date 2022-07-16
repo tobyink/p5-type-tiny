@@ -648,6 +648,27 @@ used in a particular check, will slightly slow down C<< $check >>
 because it means that C<< $check >> can't just check C<< @_ >> and return
 it unaltered if it's valid — it needs to build a new array to return.
 
+=item C<< clone >> B<Bool>
+
+If this is set to true, it will deep clone incoming values via C<dclone>
+from L<Storable> (a core module since Perl 5.7.3).
+
+In the below example, C<< $arr >> is a reference to a I<clone of>
+C<< @numbers >>, so pushing additional numbers to it leaves C<< @numbers >>
+unaffected.
+
+ sub foo {
+   state $check = compile( ArrayRef, { clone => 1 } );
+   my ( $arr ) = &$check;
+   
+   push @$arr, 4, 5, 6;
+ }
+ 
+ my @numbers = ( 1, 2, 3 );
+ foo( \@numbers );
+ 
+ print "@numbers\n";  ## 1 2 3
+
 =back
 
 As a special case, the numbers 0 and 1 may be used as shortcuts for

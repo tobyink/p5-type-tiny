@@ -35,6 +35,8 @@ sub name      { $_[0]{name} }       sub has_name      { exists $_[0]{name} }
 sub type      { $_[0]{type} }       sub has_type      { exists $_[0]{type} }
 sub default   { $_[0]{default} }    sub has_default   { exists $_[0]{default} }
 
+sub should_clone { $_[0]{clone} }
+
 sub coerce  {
 	exists( $_[0]{coerce} )
 		? $_[0]{coerce}
@@ -65,7 +67,7 @@ sub predicate  {
 }
 
 sub might_supply_new_value {
-	$_[0]->has_default or $_[0]->coerce;
+	$_[0]->has_default or $_[0]->coerce or $_[0]->should_clone;
 }
 
 sub _code_for_default {
@@ -89,6 +91,15 @@ sub _code_for_default {
 	}
 
 	$self->_croak( 'Default expected to be undef, string, coderef, or empty arrayref/hashref' );
+}
+
+sub _maybe_clone {
+	my ( $self, $varname ) = @_;
+
+	if ( $self->should_clone ) {
+		return sprintf( 'Storable::dclone( %s )', $varname );
+	}
+	return $varname;
 }
 
 sub _make_code {
@@ -121,6 +132,13 @@ sub _make_code {
 	}
 
 	my $block_needs_ending = 0;
+	my $needs_clone = $self->should_clone;
+
+	if ( $needs_clone and not $signature->{loaded_Storable} ) {
+		$coderef->add_line( 'use Storable ();' );
+		$coderef->add_gap;
+		$signature->{loaded_Storable} = 1;
+	}
 
 	$coderef->add_line( sprintf(
 		'# Parameter %s (type: %s)',
@@ -136,19 +154,21 @@ sub _make_code {
 		$coderef->add_line( sprintf(
 			'$dtmp = %s ? %s : &%s;',
 			$exists_check,
-			$varname,
+			$self->_maybe_clone( $varname ),
 			$default_varname,
 		) );
 		$varname = '$dtmp';
+		$needs_clone = 0;
 	}
 	elsif ( $self->has_default ) {
 		$coderef->add_line( sprintf(
 			'$dtmp = %s ? %s : %s;',
 			$exists_check,
-			$varname,
+			$self->_maybe_clone( $varname ),
 			$self->_code_for_default,
 		) );
 		$varname = '$dtmp';
+		$needs_clone = 0;
 	}
 	elsif ( $self->optional ) {
 		if ( $args{is_named} ) {
@@ -176,6 +196,15 @@ sub _make_code {
 				message => "'Missing required parameter: $args{key}'",
 			),
 		) );
+	}
+
+	if ( $needs_clone ) {
+		$coderef->add_line( sprintf(
+			'$dtmp = %s;',
+			$self->_maybe_clone( $varname ),
+		) );
+		$varname = '$dtmp';
+		$needs_clone = 0;
 	}
 
 	if ( $constraint->has_coercion and $constraint->coercion->can_be_inlined ) {
