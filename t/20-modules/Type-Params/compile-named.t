@@ -144,7 +144,7 @@ sub _simple_test {
 		
 		like(
 			exception { $check->({ foo => 3, bar => 42, xxx => 1, yyy => 2, zzz => 3 }) },
-			qr/^Unrecognized parameters: xxx, yyy, and zzz/,
+			qr/^Unrecognized parameters: xxx, yyy, zzz/,
 			'additional parameters',
 		);
 		
@@ -326,7 +326,7 @@ subtest "Shortcuts for Any and Optional[Any]" => sub {
 	);
 	like(
 		exception { $chk->(foo => "xyz", bar => "abc", baz => "def") },
-		qr/Unrecognized parameter/,
+		qr/(Unrecognized parameter)|(Wrong number of parameters)/,
 	);
 	like(
 		exception { $chk->(bar => "abc") },

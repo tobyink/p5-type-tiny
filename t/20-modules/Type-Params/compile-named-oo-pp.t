@@ -74,8 +74,8 @@ for my $i (2 .. 3) {
 my $e = exception {
 	compile_named_oo( 999 => Int );
 };
-ok(Object->check($e), 'exception thrown for bad accessor name');
-like($e->message, qr/bad accessor name/i, 'correct message');
+ok(defined $e, 'exception thrown for bad accessor name');
+like("$e", qr/bad accessor name/i, 'correct message');
 
 
 my $coderef2 = compile_named_oo(
@@ -101,7 +101,7 @@ like($details->{source}, qr/fooble/, 'want_details');
 		foo    => Num,
 	);
 
-	note($coderef3->{source});
+	note explain($coderef3);
 
 	is($coderef3->{max_args}, 9);
 	ok($coderef3->{min_args} >= 3);
@@ -135,7 +135,6 @@ like($details->{source}, qr/fooble/, 'want_details');
 	ok($coderef3->{min_args} >= 3);
 
 	my @r = $coderef3->{closure}->(1.1, foo => 1.2, bar => [], [1,2,3], ["foo"]);
-
 	is($r[0], 1);
 	is($r[1]->foo, 1.2);
 	is_deeply($r[1]->bar, []);
