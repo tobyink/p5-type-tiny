@@ -38,6 +38,11 @@ use Test::Fatal;
 use Type::Params qw(compile);
 use Types::Standard -types, 'slurpy';
 
+{
+	my $e = exception { compile()->(1) };
+	like($e, qr{^Wrong number of parameters; got 1; expected 0}, 'empty compile()');
+}
+
 my $check;
 sub nth_root
 {

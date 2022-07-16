@@ -31,6 +31,10 @@ use Types::Standard -types, "slurpy";
 use Type::Utils;
 use Scalar::Util qw(refaddr);
 
+{
+	my $e = exception { compile_named()->(foo => 1) };
+	like($e, qr{^Wrong number of parameters});
+}
 
 {
 	package

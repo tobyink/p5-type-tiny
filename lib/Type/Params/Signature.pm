@@ -313,7 +313,7 @@ sub _coderef_check_count {
 		$self->{min_args} = $min_args;
 		$self->{max_args} = $max_args;
 
-		if ( $min_args and defined $max_args and $min_args == $max_args ) {
+		if ( defined $max_args and $min_args == $max_args ) {
 			$coderef->add_line( sprintf(
 				"\@_ == %d\n\tor %s;",
 				$min_args,
@@ -338,13 +338,13 @@ sub _coderef_check_count {
 				),
 			) );
 		}
-		elsif ( $min_args ) {
+		else {
 			$coderef->add_line( sprintf(
 				"\@_ >= %d\n\tor %s;",
-				$min_args,
+				$min_args || 0,
 				$self->_make_count_fail(
 					coderef   => $coderef,
-					minimum   => $min_args,
+					minimum   => $min_args || 0,
 					got       => 'scalar( @_ )',
 				),
 			) );
