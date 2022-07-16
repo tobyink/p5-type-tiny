@@ -4143,3 +4143,13 @@
 			label "Defaults for Type::Params parameters can now be a reference to a string of Perl code (like Mite).";
 		];
 	].
+
+`Type-Tiny 1.015_003 cpan:TOBYINK`
+	issued  2022-07-16;
+	changeset [
+		dcs:versus `Type-Tiny 1.015_002 cpan:TOBYINK`;
+		item [
+			a dcs:Change;
+			label "The simple case of compile() with no parameters was broken by refactoring. It should now work.";
+		];
+	].
