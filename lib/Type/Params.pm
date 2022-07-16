@@ -604,7 +604,7 @@ This is an alternative way of indicating that a parameter is optional.
 The two are not I<exactly> equivalent. The exceptions thrown will
 differ in the type name they mention. (B<Int> versus B<< Optional[Int] >>.)
 
-=item C<< default >> B<< CodeRef|Ref|Str|Undef >>
+=item C<< default >> B<< CodeRef|ScalarRef|Ref|Str|Undef >>
 
 A default may be provided for a parameter.
 
@@ -630,6 +630,15 @@ That coderef may generate any value, including non-empty arrayrefs and
 non-empty hashrefs. For undef, simple strings, numbers, and empty
 structures, avoiding using a coderef will make your parameter processing
 faster.
+
+Instead of a coderef, you can use a reference to a string of Perl source
+code:
+
+ state $check = compile(
+   Int,
+   Int, { default => \ '6 * 111' },
+   Int, { default => \ '9 * 111' },
+ );
 
 The default I<will> be validated against the type constraint, and
 potentially coerced.

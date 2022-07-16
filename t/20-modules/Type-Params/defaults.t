@@ -52,6 +52,19 @@ is_deeply(
 
 @rv = ();
 is(
+	exception { @rv = compile(Int, { default => \'(40+2)' })->() },
+	undef,
+	'compile: no exception thrown because of defaulted argument via Perl source code'
+);
+
+is_deeply(
+	\@rv,
+	[42],
+	'compile: default applied correctly via Perl source code'
+);
+
+@rv = ();
+is(
 	exception { @rv = compile(ArrayRef, { default => [] } )->() },
 	undef,
 	'compile: no exception thrown because of defaulted argument via arrayref'

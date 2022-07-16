@@ -84,6 +84,9 @@ sub _code_for_default {
 	if ( is_ArrayRef $default ) {
 		return '[]';
 	}
+	if ( is_ScalarRef $default ) {
+		return $$default;
+	}
 
 	$self->_croak( 'Default expected to be undef, string, coderef, or empty arrayref/hashref' );
 }
