@@ -10,7 +10,7 @@ BEGIN {
 
 BEGIN {
 	$Error::TypeTiny::Assertion::AUTHORITY = 'cpan:TOBYINK';
-	$Error::TypeTiny::Assertion::VERSION   = '1.015_000';
+	$Error::TypeTiny::Assertion::VERSION   = '1.015_001';
 }
 
 $Error::TypeTiny::Assertion::VERSION =~ tr/_//d;

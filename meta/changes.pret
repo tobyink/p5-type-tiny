@@ -4123,3 +4123,13 @@
 			label "Type::Params is now smarter at calculating the expected $#_ for functions which take named parameters, so it can 'fail early' more often when there are extra parameters or missing required parameters. This means you may get errors indicating the wrong number of parameters when you were previously getting errors indicating particular unrecognized or missing required parameters. This may break test suites which were looking for particular error messages.";
 		];
 	].
+
+`Type-Tiny 1.015_001 cpan:TOBYINK`
+	issued  2022-07-16;
+	changeset [
+		dcs:versus `Type-Tiny 1.015_000 cpan:TOBYINK`;
+		item [
+			a dcs:Change;
+			label "Type::Params::Signature now avoids using the word `return` in its generated source code, as MooX::Press was using that as a talisman. Also avoid using the `return` keyword to return the final results of the signature check, as falling through performs better on older Perls, plus it enables MooX::Press to convert the coderef into a do{} block.";
+		];
+	].
