@@ -160,7 +160,7 @@ sub _make_code {
 			$coderef->add_line( sprintf(
 				"%s\n\tor %s;",
 				$exists_check,
-				$signature->_make_return_expression,
+				$signature->_make_return_expression( is_early => 1 ),
 			) );
 		}
 	}

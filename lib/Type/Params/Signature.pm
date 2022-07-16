@@ -217,13 +217,13 @@ sub _coderef_start {
 	}
 
 	if ( $self->is_named ) {
-		$coderef->add_line( "my ( \%return, \%in, \%tmp, \$tmp, \$dtmp$extravars );" );
+		$coderef->add_line( "my ( \%out, \%in, \%tmp, \$tmp, \$dtmp$extravars );" );
 	}
 	elsif ( $self->can_shortcut ) {
 		$coderef->add_line( "my ( \%tmp, \$tmp$extravars );" );
 	}
 	else {
-		$coderef->add_line( "my ( \@return, \%tmp, \$tmp, \$dtmp$extravars );" );
+		$coderef->add_line( "my ( \@out, \%tmp, \$tmp, \$dtmp$extravars );" );
 	}
 
 	if ( $self->has_on_die ) {
@@ -434,7 +434,7 @@ sub _coderef_parameters {
 				coderef     => $coderef,
 				is_named    => 1,
 				input_slot  => sprintf( '$in{%s}', $qname ),
-				output_slot => sprintf( '$return{%s}', $qname ),
+				output_slot => sprintf( '$out{%s}', $qname ),
 				display_var => sprintf( '$_{%s}', $qname ),
 				key         => $parameter->name,
 				type        => 'named_arg',
@@ -454,7 +454,7 @@ sub _coderef_parameters {
 				input_slot  => sprintf( '$_[%d]', $i ),
 				input_var   => '@_',
 				output_slot => ( $can_shortcut ? undef : sprintf( '$_[%d]', $i ) ),
-				output_var  => ( $can_shortcut ? undef : '@return' ),
+				output_var  => ( $can_shortcut ? undef : '@out' ),
 				index       => $i,
 				display_var => sprintf( '$_[%d]', $i + $head_size ),
 			);
@@ -522,8 +522,8 @@ sub _coderef_slurpy {
 		display_var => '$SLURPY',
 		index       => 0,
 		$self->is_named
-			? ( output_slot => sprintf( '$return{%s}', B::perlstring( $parameter->name ) ) )
-			: ( output_var  => '@return' )
+			? ( output_slot => sprintf( '$out{%s}', B::perlstring( $parameter->name ) ) )
+			: ( output_var  => '@out' )
 	);
 }
 
@@ -549,14 +549,14 @@ sub _coderef_end {
 		my $subname = $self->subname;
 
 		$coderef->add_line( sprintf(
-			'$return{"~~caller"} = %s;',
+			'$out{"~~caller"} = %s;',
 			B::perlstring( "$package\::$subname" ),
 		) );
 		$coderef->add_gap;
 	}
 
 	$self->_coderef_end_extra( $coderef );
-	$coderef->add_line( $self->_make_return_expression . ';' );
+	$coderef->add_line( $self->_make_return_expression( is_early => 0 ) . ';' );
 	$coderef->{indent} =~ s/\t$//;
 	$coderef->add_line( '}' );
 
@@ -574,35 +574,35 @@ sub _make_return_list {
 	}
 
 	if ( not $self->is_named ) {
-		push @return_list, $self->can_shortcut ? '@_' : '@return';
+		push @return_list, $self->can_shortcut ? '@_' : '@out';
 	}
 	elsif ( is_ArrayRef( $self->named_to_list ) ) {
 		push @return_list, map(
-			sprintf( '$return{%s}', B::perlstring( $_ ) ),
+			sprintf( '$out{%s}', B::perlstring( $_ ) ),
 			@{ $self->named_to_list },
 		);
 	}
 	elsif ( $self->named_to_list ) {
 		push @return_list, map(
-			sprintf( '$return{%s}', B::perlstring( $_->name ) ),
+			sprintf( '$out{%s}', B::perlstring( $_->name ) ),
 			@{ $self->parameters || [] },
 		);
 	}
 	elsif ( $self->class ) {
 		push @return_list, sprintf(
-			'%s->%s( \%%return )',
+			'%s->%s( \%%out )',
 			B::perlstring( $self->class ),
 			$self->constructor || 'new',
 		);
 	}
 	elsif ( $self->bless ) {
 		push @return_list, sprintf(
-			'bless( \%%return, %s )',
+			'bless( \%%out, %s )',
 			B::perlstring( $self->bless ),
 		);
 	}
 	else {
-		push @return_list, '\%return';
+		push @return_list, '\%out';
 	}
 
 	if ( $self->has_tail ) {
@@ -613,8 +613,16 @@ sub _make_return_list {
 }
 
 sub _make_return_expression {
-	my $self = shift;
-	sprintf 'return( %s )', join( q{, }, $self->_make_return_list );
+	my ( $self, %args ) = @_;
+
+	if ( $args{is_early} or not exists $args{is_early} ) {
+		return sprintf 'return( %s )',
+			join( q{, }, $self->_make_return_list );
+	}
+	else {
+		return sprintf '( %s )',
+			join( q{, }, $self->_make_return_list );
+	}
 }
 
 sub _make_general_fail {
