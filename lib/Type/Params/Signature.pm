@@ -748,6 +748,8 @@ sub make_class_pp_code {
 	$coderef->add_line( '{' );
 	$coderef->{indent} = "\t";
 	$coderef->add_line( sprintf( 'package %s;', $self->bless ) );
+	$coderef->add_line( 'use strict;' );
+	$coderef->add_line( 'no warnings;' );
 
 	for my $function ( sort keys %{ $attr->{getters} } ) {
 		my $slot = $attr->{getters}{$function};
