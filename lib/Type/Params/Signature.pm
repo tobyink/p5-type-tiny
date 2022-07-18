@@ -195,7 +195,7 @@ sub _build_coderef {
 	my $self = shift;
 	my $coderef = 'Type::Params::Coderef'->new(
 		description => $self->description
-			|| sprintf( 'parameter validation for "%s::%s"', $self->package, $self->subname )
+			|| sprintf( 'parameter validation for "%s::%s"', $self->package || '', $self->subname || '__ANON__' )
 	);
 
 	$self->_coderef_start( $coderef );
