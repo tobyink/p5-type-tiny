@@ -59,14 +59,17 @@ sub new {
 
 sub _klass_key {
 	my $self = shift;
+
+	my @parameters = @{ $self->parameters || [] };
+	if ( $self->has_slurpy ) {
+		push @parameters, $self->slurpy;
+	}
+
 	no warnings 'uninitialized';
 	join(
 		'|',
 		map sprintf( '%s*%s*%s', $_->name, $_->getter, $_->predicate ),
-		sort { $a->{name} cmp $b->{name} } (
-			@{ $self->parameters || [] },
-			( $self->has_slurpy ? $self->slurpy : () )
-		)
+		sort { $a->{name} cmp $b->{name} } @parameters
 	);
 }
 
@@ -134,7 +137,10 @@ sub new_from_compile {
 		$list->[0]{slurpy} or die;
 
 		my %slurpy = %{ shift @$list };
-		$slurpy{type} = $slurpy{slurpy};
+		$slurpy{type} =
+			is_Int($slurpy{slurpy})  ? Any :
+			is_Str($slurpy{slurpy})  ? dwim_type( $slurpy{slurpy}, $opts{package} ? ( for => $opts{package} ) : () ) :
+			to_TypeTiny( $slurpy{slurpy} );
 		$slurpy{name} = $name if defined $name;
 		if ( is_HashRef $list->[0] ) {
 			%slurpy = ( %slurpy, %{ shift @$list } );
@@ -687,7 +693,12 @@ sub _build_class_attributes {
 	my %predicates;
 	my %getters;
 
-	for my $parameter ( @{ $self->parameters || [] } ) {
+	my @parameters = @{ $self->parameters || [] };
+	if ( $self->has_slurpy ) {
+		push @parameters, $self->slurpy;
+	}
+
+	for my $parameter ( @parameters ) {
 
 		my $name = $parameter->name;
 		if ( my $predicate = $parameter->predicate ) {
