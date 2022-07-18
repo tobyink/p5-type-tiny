@@ -40,7 +40,8 @@ sub pair_iterator {
 
 sub __constraint_generator {
 	my $slurpy =
-		Types::TypeTiny::is_TypeTiny( $_[-1] )
+		@_
+		&& Types::TypeTiny::is_TypeTiny( $_[-1] )
 		&& $_[-1]->is_strictly_a_type_of( $_Slurpy )
 		? pop->type_parameter
 		: undef;
@@ -85,7 +86,8 @@ sub __inline_generator {
 	# constraints inside can be inlined.
 	
 	my $slurpy =
-		Types::TypeTiny::is_TypeTiny( $_[-1] )
+		@_
+		&& Types::TypeTiny::is_TypeTiny( $_[-1] )
 		&& $_[-1]->is_strictly_a_type_of( $_Slurpy )
 		? pop->type_parameter
 		: undef;
@@ -163,7 +165,8 @@ sub __deep_explanation {
 	my @params = @{ $type->parameters };
 	
 	my $slurpy =
-		Types::TypeTiny::is_TypeTiny( $params[-1] )
+		@params
+		&& Types::TypeTiny::is_TypeTiny( $params[-1] )
 		&& $params[-1]->is_strictly_a_type_of( $_Slurpy )
 		? pop( @params )->type_parameter
 		: undef;
@@ -237,7 +240,8 @@ our ( $keycheck_counter, @KEYCHECK ) = -1;
 
 sub __coercion_generator {
 	my $slurpy =
-		Types::TypeTiny::is_TypeTiny( $_[-1] )
+		@_
+		&& Types::TypeTiny::is_TypeTiny( $_[-1] )
 		&& $_[-1]->is_strictly_a_type_of( $_Slurpy )
 		? pop->type_parameter
 		: undef;
@@ -392,7 +396,8 @@ sub __dict_is_slurpy {
 	my $dict = $self->find_parent(
 		sub { $_->has_parent && $_->parent == Types::Standard::Dict() } );
 	my $slurpy =
-		Types::TypeTiny::is_TypeTiny( $dict->parameters->[-1] )
+		@{ $dict->parameters }
+		&& Types::TypeTiny::is_TypeTiny( $dict->parameters->[-1] )
 		&& $dict->parameters->[-1]->is_strictly_a_type_of( $_Slurpy )
 		? $dict->parameters->[-1]
 		: undef;

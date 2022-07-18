@@ -24,7 +24,8 @@ no warnings;
 
 sub __constraint_generator {
 	my $slurpy =
-		Types::TypeTiny::is_TypeTiny( $_[-1] )
+		@_
+		&& Types::TypeTiny::is_TypeTiny( $_[-1] )
 		&& $_[-1]->is_strictly_a_type_of( $_Slurpy )
 		? pop
 		: undef;
@@ -90,7 +91,8 @@ sub __constraint_generator {
 
 sub __inline_generator {
 	my $slurpy =
-		Types::TypeTiny::is_TypeTiny( $_[-1] )
+		@_
+		&& Types::TypeTiny::is_TypeTiny( $_[-1] )
 		&& $_[-1]->is_strictly_a_type_of( $_Slurpy )
 		? pop
 		: undef;
@@ -165,7 +167,8 @@ sub __deep_explanation {
 	
 	my @constraints = @{ $type->parameters };
 	my $slurpy =
-		Types::TypeTiny::is_TypeTiny( $constraints[-1] )
+		@constraints
+		&& Types::TypeTiny::is_TypeTiny( $constraints[-1] )
 		&& $constraints[-1]->is_strictly_a_type_of( $_Slurpy )
 		? pop( @constraints )
 		: undef;
@@ -226,7 +229,8 @@ sub __coercion_generator {
 	my ( $parent, $child, @tuple ) = @_;
 	
 	my $slurpy =
-		Types::TypeTiny::is_TypeTiny( $tuple[-1] )
+		@tuple
+		&& Types::TypeTiny::is_TypeTiny( $tuple[-1] )
 		&& $tuple[-1]->is_strictly_a_type_of( $_Slurpy )
 		? pop( @tuple )
 		: undef;
