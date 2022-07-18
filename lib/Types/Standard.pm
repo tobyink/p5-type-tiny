@@ -772,7 +772,8 @@ $meta->add_type(
 		parent         => $_hash,
 		name_generator => sub {
 			my ( $s, @p ) = @_;
-			my $l = Types::TypeTiny::is_TypeTiny( $p[-1] )
+			my $l = @p
+				&& Types::TypeTiny::is_TypeTiny( $p[-1] )
 				&& $p[-1]->is_strictly_a_type_of( Types::Standard::Slurpy() )
 				? pop(@p)
 				: undef;
