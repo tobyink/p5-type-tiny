@@ -90,7 +90,18 @@ sub extends {
 				my $specio = $types->{$name};
 				my $tt     = Types::TypeTiny::to_TypeTiny( $specio );
 				$caller->add_type(
-					$tt->create_child_type( library => $caller, name => $name ) );
+					$tt->create_child_type( library => $caller, name => $name )
+				);
+			}
+		}
+		elsif ( $lib->isa( 'Exporter' )
+		and my $types = do { no strict 'refs'; ${"$lib\::EXPORT_TAGS"}{'types'} } ) {
+			for my $name ( @$types ) {
+				my $obj = $lib->$name;
+				my $tt  = Types::TypeTiny::to_TypeTiny( $obj );
+				$caller->add_type(
+					$tt->create_child_type( library => $caller, name => $name )
+				);
 			}
 		}
 		else {
