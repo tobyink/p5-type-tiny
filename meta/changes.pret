@@ -4163,3 +4163,17 @@
 			label "Add a clone option to parameters in Type::Params to clone them with Storable::dclone(). This is mostly a test of how much easier improving Type::Params is since it was refactored.";
 		];
 	].
+
+`Type-Tiny 1.016001 cpan:TOBYINK`
+	issued  2022-07-18;
+	changeset [
+		dcs:versus `Type-Tiny 1.016001 cpan:TOBYINK`;
+		item [
+			a dcs:Change;
+			label "Improved coercion of Type::Library::Compiler's type constraints to Type::Tiny.";
+		];
+		item [
+			a dcs:Change;
+			label "Allow Type::Utils::extends to extend Type::Library::Compiler libraries.";
+		];
+	].
