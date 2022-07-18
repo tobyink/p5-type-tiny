@@ -4176,4 +4176,8 @@
 			a dcs:Change;
 			label "Allow Type::Utils::extends to extend Type::Library::Compiler libraries.";
 		];
+		item [
+			a dcs:Change;
+			label "Allow the add_types method of Type::Registry to consume Type::Library::Compiler libraries.";
+		];
 	].

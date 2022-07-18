@@ -79,6 +79,11 @@ sub add_types {
 			$library->import( { into => \%hash }, @$types );
 			$hash{$_} = &{ $hash{$_} }() for keys %hash;
 		} #/ if ( $library->isa( "Type::Library"...))
+		elsif ( $library->isa( "Exporter" )
+		and my $type_tag = do { no strict 'refs'; ${"$library\::EXPORT_TAGS"}{'types'} } ) {
+			$types ||= $type_tag;
+			$hash{$_} = $library->$_ for @$types;
+		}
 		elsif ( $library->isa( "MooseX::Types::Base" ) ) {
 			$types ||= [];
 			Types::TypeTiny::is_ArrayLike( $types ) && ( @$types == 0 )

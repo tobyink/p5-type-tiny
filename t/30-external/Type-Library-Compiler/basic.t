@@ -33,6 +33,7 @@ use Test::TypeTiny;
 use CompiledLib qw( Int );
 use Types::Standard qw( ArrayRef );
 use Type::Params qw( compile );
+use Type::Registry ();
 
 my $ArrayOfInt = ArrayRef[ Int ];
 
@@ -69,5 +70,10 @@ like $e, qr/Value "1.1" did not pass type constraint "Int"/;
 }
 
 isa_ok( My::Lib::Str(), 'Type::Tiny' );
+
+my $reg = 'Type::Registry'->new;
+$reg->add_types( 'CompiledLib' );
+ok ! $reg->simple_lookup( 'InstanceOf' );
+ok   $reg->simple_lookup( 'Int' );
 
 done_testing;
