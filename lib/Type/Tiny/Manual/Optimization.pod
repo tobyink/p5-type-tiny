@@ -41,7 +41,7 @@ accelerated only if their parameters are.
 
 The parameterized form of B<Tuple> can be accelerated if its
 parameters are, it has no B<Optional> components, and it does not use
-C<slurpy>.
+B<Slurpy>.
 
 Certain type constraints may benefit partially from Type::Tiny::XS.
 For example, B<RoleName> inherits from B<ClassName>, so part of the

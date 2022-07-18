@@ -36,7 +36,7 @@ Class::Tiny:
       name     => sub { die "name is required"; },
       children => sub { return [] },
     };
-    use Types::Standard qw( Str Num ArrayRef Dict Optional slurpy Any);
+    use Types::Standard qw( Str Num ArrayRef Dict Optional Slurpy Any);
     use Type::Params qw( wrap_methods compile );
     use namespace::autoclean;
     
@@ -47,7 +47,7 @@ Class::Tiny:
         gender     => Optional[Str],
         age        => Optional[Num],
         children   => Optional[ArrayRef],
-        slurpy Any,
+        ()         => Slurpy[Any],
       ]],
       name     => [],
       gender   => [],
@@ -70,7 +70,7 @@ We use C<wrap_methods> from L<Type::Params> to wrap the original C<BUILD>
 method (which doesn't exist, so C<wrap_methods> will just assume an empty
 sub) with a type check for C<< $args >>. The type check is just a B<Dict>
 that checks the class's required and optional attributes and includes
-B<< slurpy Any >> at the end to be flexible for subclasses adding new
+B<< Slurpy[Any] >> at the end to be flexible for subclasses adding new
 attributes.
 
 Then we wrap the C<name>, C<gender>, and C<children> methods with checks

@@ -96,14 +96,16 @@ Or this:
 
 =head2 Mixed Named and Positional Parameters
 
-This can be faked using positional parameters and a slurpy dictionary.
+This can be faked using positional parameters and a Slurpy dictionary.
 
  state $check = compile(
    Int,
-   slurpy Dict[
-     foo => Int,
-     bar => Optional[Int],
-     baz => Optional[Int],
+   Slurpy[
+     Dict[
+       foo => Int,
+       bar => Optional[Int],
+       baz => Optional[Int],
+     ],
    ],
  );
  
@@ -281,7 +283,7 @@ choosing between them.
 
 Type::Params's syntax is more compact:
 
-   state $check = compile(Object, Optional[Int], slurpy ArrayRef);
+   state $check = compile(Object, Optional[Int], Slurpy[ArrayRef]);
 
 Versus:
 

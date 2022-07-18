@@ -278,31 +278,31 @@ absent.
 Or we could just allow tuples to contain an arbitrary list of strings
 after the year and race name:
 
-  use Types::Standard qw( ArrayRef Tuple Str slurpy );
+  use Types::Standard qw( ArrayRef Tuple Str Slurpy );
   use Types::Common::Numeric qw( PositiveInt );
   use Types::Common::String qw( NonEmptyStr );
   
   has wins => (
     is      => 'ro',
     isa     => ArrayRef[
-      Tuple[ PositiveInt, NonEmptyStr, slurpy ArrayRef[Str] ]
+      Tuple[ PositiveInt, NonEmptyStr, Slurpy[ ArrayRef[Str] ] ]
     ],
     default => sub { return [] },
   );
 
-The C<slurpy> indicator will "slurp" all the remaining items in the tuple
-into an arrayref and check it against B<< ArrayRef[Str] >>.
+The B<< Slurpy[ ArrayRef[Str] ] >> type will "slurp" all the remaining items
+in the tuple into an arrayref and check it against B<< ArrayRef[Str] >>.
 
 It's even possible to do this:
 
-  use Types::Standard qw( ArrayRef Tuple Any slurpy );
+  use Types::Standard qw( ArrayRef Tuple Any Slurpy );
   use Types::Common::Numeric qw( PositiveInt );
   use Types::Common::String qw( NonEmptyStr );
   
   has wins => (
     is      => 'ro',
     isa     => ArrayRef[ 
-      Tuple[ PositiveInt, NonEmptyStr, slurpy Any ]
+      Tuple[ PositiveInt, NonEmptyStr, Slurpy[Any] ]
     ],
     default => sub { return [] },
   );
@@ -340,22 +340,22 @@ An example of using it:
     ],
   );
 
-The slurpy indicator does work for B<Dict> too:
+The B<Slurpy> type does work for B<Dict> too:
 
   Dict[
     year    => PositiveInt,
     race    => NonEmptyStr,
     jockey  => Optional[NonEmptyStr],
-    slurpy HashRef[Str],  # other Str values allowed
+    ()      => Slurpy[ HashRef[Str] ],  # other Str values allowed
   ]
 
-And C<< slurpy Any >> means what you probably think it means:
+And C<< Slurpy[Any] >> means what you probably think it means:
 
   Dict[
     year    => PositiveInt,
     race    => NonEmptyStr,
     jockey  => Optional[NonEmptyStr],
-    slurpy Any,  # allow hashref to contain absolutely anything else
+    ()      => Slurpy[Any], # allow hashref to contain absolutely anything else
   ]
 
 Going back to our first example, there's an opportunity to refine our
@@ -648,19 +648,19 @@ it is) and the third parameter is allowed but not required.
 
   state $check = compile(PositiveInt, 1, 0);
 
-It is possible to accept a variable number of values using C<slurpy>:
+It is possible to accept a variable number of values using B<Slurpy>:
 
   package Horse {
     use Types::Common::Numeric qw( PositiveInt );
     use Types::Common::String qw( NonEmptyStr );
-    use Types::Standard qw( ArrayRef slurpy );
+    use Types::Standard qw( ArrayRef Slurpy );
     use Type::Params qw( compile );
     ...;
     
     sub add_wins_for_year {
       state $check = compile(
         PositiveInt,
-        slurpy ArrayRef[NonEmptyStr],
+        Slurpy[ ArrayRef[NonEmptyStr] ],
       );
       
       my $self = shift;
@@ -683,9 +683,9 @@ It would be called like this:
 The additional parameters are slurped into an arrayref and checked against
 B<< ArrayRef[NonEmptyStr] >>.
 
-Optional parameters are only allowed after required parameters, and slurpy
+Optional parameters are only allowed after required parameters, and B<Slurpy>
 parameters are only allowed at the end. (And there can only be a at most
-one slurpy parameter!)
+one B<Slurpy> parameter!)
 
 For methods that accept more than one or two parameters, it is often a good
 idea to provide them as a hash. For example:
@@ -771,7 +771,7 @@ named parameters but return a positional list of parameters:
     }
   }
 
-Optional and slurpy named parameters are supported as you'd expect.
+Optional and Slurpy named parameters are supported as you'd expect.
 
 With named parameters, it can be easy to misspell keys in your method
 definition. For example:

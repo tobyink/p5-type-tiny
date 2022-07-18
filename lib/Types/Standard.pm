@@ -1432,7 +1432,7 @@ essentially equivalent checks, the former should run a lot faster:
    Tuple[ Int, Slurpy[ArrayRef] ]
 
 A function C<< slurpy($type) >> is also exported which was historically
-how slurpy types were specified.
+how slurpy types were created.
 
 Outside of B<Dict> and B<Tuple>, B<< Slurpy[Foo] >> should just act the
 same as B<Foo>. But don't do that.
@@ -1638,7 +1638,7 @@ C<< [1,{},2] >> and C<< [1,{},2,[]] >>.
 
 I think you understand B<CycleTuple> already.
 
-Currently B<Optional> and C<slurpy> parameters are forbidden. There are
+Currently B<Optional> and B<Slurpy> parameters are forbidden. There are
 fairly limited use cases for them, and it's not exactly clear what they
 should mean.
 

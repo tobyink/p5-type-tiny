@@ -180,7 +180,7 @@ sub _deal_with_on_die {
 }
 
 sub multisig {
-	my %options = ( ref( $_[0] ) eq "HASH" && !$_[0]{slurpy} ) ? %{ +shift } : ();
+	my %options = ( ref( $_[0] ) eq "HASH" ) ? %{ +shift } : ();
 	$options{message}     ||= "Parameter validation failed";
 	$options{description} ||= sprintf(
 		"parameter validation for '%s'",
@@ -423,7 +423,7 @@ The generalized form of specifications for positional parameters is:
    $type_for_arg_2, \%opts_for_arg_2,
    $type_for_arg_3, \%opts_for_arg_3,
    ...,
-   slurpy($slurpy_type),
+   Slurpy[...],
  );
 
 If a hashref of options is empty, it can simply be omitted. Much of the
@@ -501,7 +501,7 @@ some required parameters I<after> a slurpy or optional parameter.
 
   my $check = compile(
     { tail => [ CodeRef ] },
-    slurpy ArrayRef[Str],
+    Slurpy[ ArrayRef[Str] ],
   );
   
   my ($strings, $coderef) = $check->("foo", "bar", sub { ... });
@@ -686,7 +686,7 @@ Defaults are not supported for slurpy parameters.
 Example with a slurpy ArrayRef:
 
  sub xyz {
-   state $check = compile(Int, Int, slurpy ArrayRef[Int]);
+   state $check = compile( Int, Int, Slurpy[ ArrayRef[Int] ] );
    my ($foo, $bar, $baz) = $check->(@_);
  }
  
@@ -699,7 +699,7 @@ Example with a slurpy HashRef:
  my $check = compile(
    Int,
    Optional[Str],
-   slurpy HashRef[Int],
+   Slurpy[ HashRef[Int] ],
  );
  
  my ($x, $y, $z) = $check->(1, "y", foo => 666, bar => 999);
@@ -712,14 +712,14 @@ but a type does need to inherit from one of those because otherwise
 Type::Params cannot know what kind of structure to slurp the remaining
 arguments into.
 
-B<< slurpy Any >> is also allowed as a special case, and is treated as
-B<< slurpy ArrayRef >>.
+B<< Slurpy[Any] >> is also allowed as a special case, and is treated as
+B<< Slurpy[ArrayRef] >>.
 
 From Type::Params 1.005000 onwards, slurpy hashrefs can be passed in as a
 true hashref (which will be shallow cloned) rather than key-value pairs.
 
  sub xyz {
-   state $check = compile(Int, slurpy HashRef);
+   state $check = compile(Int, Slurpy[HashRef]);
    my ($num, $hr) = $check->(@_);
    ...
  }
@@ -766,7 +766,7 @@ parameter:
    bar   => $type_for_bar, \%opts_for_bar,
    baz   => $type_for_baz, \%opts_for_baz,
    ...,
-   extra => slurpy($slurpy_type),
+   extra => Slurpy[...],
  );
 
 The C<< $check >> coderef will return a hashref.
@@ -843,14 +843,14 @@ Slurpy parameters are slurped into a nested hashref.
   my $check = compile(
     foo    => Str,
     bar    => Optional[Str],
-    extra  => slurpy HashRef[Str],
+    extra  => Slurpy[ HashRef[Str] ],
   );
   my $args = $check->(foo => "aaa", quux => "bbb");
   
   print $args->{foo}, "\n";             # aaa
   print $args->{extra}{quux}, "\n";     # bbb
 
-B<< slurpy Any >> is treated as B<< slurpy HashRef >>.
+B<< slurpy[Any] >> is treated as B<< slurpy[HashRef] >>.
 
 The C<head> and C<tail> options are supported. This allows for a
 mixture of positional and named arguments, as long as the positional
