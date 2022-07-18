@@ -682,9 +682,58 @@ my $_Optional = $meta->add_type(
 	}
 );
 
+my $_slurpy = $meta->add_type(
+	{
+		name                 => "Slurpy",
+		parent               => $_item,
+		constraint_generator => sub {
+			my $param = @_ ? Types::TypeTiny::to_TypeTiny(shift) : $_any;
+			Types::TypeTiny::is_TypeTiny( $param )
+				or _croak(
+				"Parameter to Slurpy[`a] expected to be a type constraint; got $param" );
+			sub { $param->check( $_[0] ) };
+		},
+		inline_generator => sub {
+			my $param = shift;
+			return unless $param->can_be_inlined;
+			return sub {
+				my $v = $_[1];
+				$param->inline_check( $v );
+			};
+		},
+		deep_explanation => sub {
+			my ( $type, $value, $varname ) = @_;
+			my $param = $type->parameters->[0];
+			return [
+				sprintf( '%s is slurpy', $varname ),
+				@{ $param->validate_explain( $value, $varname ) },
+			];
+		},
+		coercion_generator => sub {
+			my ( $parent, $child, $param ) = @_;
+			return unless $param->has_coercion;
+			return $param->coercion;
+		},
+		my_methods => {
+			'slurp_into' => sub {
+				my $self  = shift;
+				if ( $self->parameters->[1] ) {
+					return $self->parameters->[1];
+				}
+				my $constraint = $self->parameters->[0];
+				return 'HASH'
+					if $constraint->is_a_type_of( HashRef() )
+					or $constraint->is_a_type_of( Map() )
+					or $constraint->is_a_type_of( Dict() );
+				return 'ARRAY';
+			},
+		},
+	}
+);
+
 sub slurpy {
 	my $t = shift;
-	wantarray ? ( +{ slurpy => $t }, @_ ) : +{ slurpy => $t };
+	wantarray ? ( $_slurpy->of( $t ) , @_ ) : $_slurpy->of( $t );
 }
 
 $meta->$add_core_type(
@@ -693,10 +742,7 @@ $meta->$add_core_type(
 		parent         => $_arr,
 		name_generator => sub {
 			my ( $s, @a ) = @_;
-			sprintf(
-				'%s[%s]', $s, join q[,],
-				map { ref( $_ ) eq "HASH" ? sprintf( "slurpy %s", $_->{slurpy} ) : $_ } @a
-			);
+			sprintf( '%s[%s]', $s, join q[,], @a );
 		},
 		constraint_generator => LazyLoad( Tuple => 'constraint_generator' ),
 		inline_generator     => LazyLoad( Tuple => 'inline_generator' ),
@@ -726,12 +772,15 @@ $meta->add_type(
 		parent         => $_hash,
 		name_generator => sub {
 			my ( $s, @p ) = @_;
-			my $l = ref( $p[-1] ) eq q(HASH) ? pop( @p )->{slurpy} : undef;
+			my $l = Types::TypeTiny::is_TypeTiny( $p[-1] )
+				&& $p[-1]->is_strictly_a_type_of( Types::Standard::Slurpy() )
+				? pop(@p)
+				: undef;
 			my %a = @p;
 			sprintf(
 				'%s[%s%s]', $s,
 				join( q[,], map sprintf( "%s=>%s", $_, $a{$_} ), sort keys %a ),
-				$l ? ",slurpy $l" : ''
+				$l ? ",$l" : ''
 			);
 		},
 		constraint_generator => LazyLoad( Dict => 'constraint_generator' ),
@@ -1296,7 +1345,7 @@ A blessed object.
 
 =head2 Structured
 
-OK, so I stole some ideas from L<MooseX::Types::Structured>.
+Okay, so I stole some ideas from L<MooseX::Types::Structured>.
 
 =over
 
@@ -1344,13 +1393,13 @@ L<Type::Params> for a similar purpose to how it's used in B<Tuple>.)
 
 =back
 
-This module also exports a C<slurpy> function, which can be used as
-follows.
+This module also exports a B<Slurpy> parameterized type, which can be
+used as follows.
 
 It can cause additional trailing values in a B<Tuple> to be slurped
 into a structure and validated. For example, slurping into an arrayref:
 
-   my $type = Tuple[Str, slurpy ArrayRef[Int]];
+   my $type = Tuple[ Str, Slurpy[ ArrayRef[Int] ] ];
    
    $type->( ["Hello"] );                # ok
    $type->( ["Hello", 1, 2, 3] );       # ok
@@ -1358,7 +1407,7 @@ into a structure and validated. For example, slurping into an arrayref:
 
 Or into a hashref:
 
-   my $type2 = Tuple[Str, slurpy Map[Int, RegexpRef]];
+   my $type2 = Tuple[ Str, Slurpy[ Map[Int, RegexpRef] ] ];
    
    $type2->( ["Hello"] );                               # ok
    $type2->( ["Hello", 1, qr/one/i, 2, qr/two/] );      # ok
@@ -1366,21 +1415,27 @@ Or into a hashref:
 It can cause additional values in a B<Dict> to be slurped into a
 hashref and validated:
 
-   my $type3 = Dict[ values => ArrayRef, slurpy HashRef[Str] ];
+   my $type3 = Dict[ values => ArrayRef, Slurpy[ HashRef[Str] ] ];
    
    $type3->( { values => [] } );                        # ok
    $type3->( { values => [], name => "Foo" } );         # ok
    $type3->( { values => [], name => [] } );            # not ok
 
-In either B<Tuple> or B<Dict>, B<< slurpy Any >> can be used to indicate
+In either B<Tuple> or B<Dict>, B<< Slurpy[Any] >> can be used to indicate
 that additional values are acceptable, but should not be constrained in
 any way. 
 
-B<< slurpy Any >> is an optimized code path. Although the following are
+B<< Slurpy[Any] >> is an optimized code path. Although the following are
 essentially equivalent checks, the former should run a lot faster:
 
-   Tuple[Int, slurpy Any]
-   Tuple[Int, slurpy ArrayRef]
+   Tuple[ Int, Slurpy[Any] ]
+   Tuple[ Int, Slurpy[ArrayRef] ]
+
+A function C<< slurpy($type) >> is also exported which was historically
+how slurpy types were specified.
+
+Outside of B<Dict> and B<Tuple>, B<< Slurpy[Foo] >> should just act the
+same as B<Foo>. But don't do that.
 
 =begin trustme
 
@@ -1390,7 +1445,7 @@ essentially equivalent checks, the former should run a lot faster:
 
 =head2 Objects
 
-OK, so I stole some ideas from L<MooX::Types::MooseLike::Base>.
+Okay, so I stole some ideas from L<MooX::Types::MooseLike::Base>.
 
 =over
 

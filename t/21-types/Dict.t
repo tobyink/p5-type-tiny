@@ -168,15 +168,15 @@ ok( !$type2->my_hashref_allows_value('bar', 1234), '!my_hashref_allows_value("ba
 
 
 #
-# Example with slurpy
+# Example with Slurpy
 #
 
-use Types::Standard qw( slurpy Map );
+use Types::Standard qw( Slurpy Map );
 
 my $type3 = Dict[
 	foo => Types::Standard::Int,
 	bar => Types::Standard::RegexpRef,
-	slurpy Map[ Types::Standard::Int, Types::Standard::ArrayRef ],
+	()  => Slurpy[ Map[ Types::Standard::Int, Types::Standard::ArrayRef ] ],
 ];
 
 should_pass( { foo => 42, bar => qr// }, $type3 );
@@ -208,7 +208,7 @@ ok( !$type3->my_hashref_allows_value('123', qr//),  '!my_hashref_allows_value("1
 my $type4 = Dict[
 	foo => Types::Standard::Int->where(sub { $_ % 2 == 0 }),
 	bar => Optional[ Types::Standard::RegexpRef ],
-	slurpy Map[ Types::Standard::Int, Types::Standard::ArrayRef ],
+	()  => Slurpy[ Map[ Types::Standard::Int, Types::Standard::ArrayRef ] ],
 ];
 
 should_pass( { foo => 42, bar => qr// }, $type4 );
@@ -292,7 +292,7 @@ is_deeply(
 my $type7 = Dict[
 	foo => $Rounded,
 	bar => Optional[$Rounded],
-	slurpy Types::Standard::HashRef[$Rounded]
+	()  => Slurpy[ Types::Standard::HashRef[$Rounded] ],
 ];
 
 is_deeply(

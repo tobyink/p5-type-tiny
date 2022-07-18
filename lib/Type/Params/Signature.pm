@@ -73,16 +73,24 @@ sub _klass_key {
 	);
 }
 
+sub _looks_like_Slurpy {
+	my $thing = shift;
+	return ( $thing =~ /^Slurpy\b/ )
+		if is_Str( $thing );
+	return to_TypeTiny( $thing )->is_strictly_a_type_of( Slurpy );
+}
+
 sub _parameters_from_list {
 	my ( $class, $style, $list, %opts ) = @_;
 	my @return;
 	my $is_named = ( $style eq 'named' );
 
 	while ( @$list ) {
-		if ( $is_named and is_Str( $list->[0] ) and is_HashRef( $list->[1] ) and $list->[1]{slurpy} ) {
+
+		if ( $is_named and is_Str( $list->[0] ) and _looks_like_Slurpy( $list->[1] ) ) {
 			last;
 		}
-		elsif ( !$is_named and is_HashRef( $list->[0] ) and $list->[0]{slurpy} ) {
+		elsif ( !$is_named and _looks_like_Slurpy( $list->[0] ) ) {
 			last;
 		}
 
@@ -91,7 +99,7 @@ sub _parameters_from_list {
 			$param_opts{name} = assert_Str( shift( @$list ) );
 		}
 		my $type = shift( @$list );
-		if ( is_HashRef( $list->[0] ) and not $list->[0]{slurpy} ) {
+		if ( is_HashRef( $list->[0] ) ) {
 			%param_opts = ( %param_opts, %{ +shift( @$list ) } );
 		}
 		$param_opts{type} =
@@ -112,7 +120,7 @@ sub new_from_compile {
 	my $is_named = ( $style eq 'named' );
 
 	my %opts  = ();
-	while ( is_HashRef( $_[0] )  and not $_[0]{slurpy} ) {
+	while ( is_HashRef( $_[0] ) ) {
 		%opts = ( %opts, %{ +shift } );
 	}
 
@@ -133,14 +141,13 @@ sub new_from_compile {
 		if ( $is_named ) {
 			$name = assert_Str( shift @$list );
 		}
-		assert_HashRef( $list->[0] );
-		$list->[0]{slurpy} or die;
+		_looks_like_Slurpy( my $type = shift @$list )
+			or $class->_croak( "Expected slurpy parameter" );
 
-		my %slurpy = %{ shift @$list };
+		my %slurpy = %{ is_HashRef( $list->[0] ) ? shift( @$list ) : {} };
 		$slurpy{type} =
-			is_Int($slurpy{slurpy})  ? Any :
-			is_Str($slurpy{slurpy})  ? dwim_type( $slurpy{slurpy}, $opts{package} ? ( for => $opts{package} ) : () ) :
-			to_TypeTiny( $slurpy{slurpy} );
+			is_Str($type) ? dwim_type( $type, $opts{package} ? ( for => $opts{package} ) : () ) :
+			to_TypeTiny( $type );
 		$slurpy{name} = $name if defined $name;
 		if ( is_HashRef $list->[0] ) {
 			%slurpy = ( %slurpy, %{ shift @$list } );
@@ -475,20 +482,19 @@ sub _coderef_slurpy {
 
 	my $parameter  = $self->slurpy;
 	my $constraint = $parameter->type;
+	my $slurp_into = $constraint->my_slurp_into;
 
 	if ( $self->is_named ) {
 		$coderef->add_line( 'my $SLURPY = \\%in;' );
 	}
-	elsif ( $constraint->{uniq} == Any->{uniq} ) {
+	elsif ( $constraint->type_parameter->{uniq} == Any->{uniq} ) {
 
 		$coderef->add_line( sprintf(
 			'my $SLURPY = { @_[ %d .. $#_ ] };',
 			scalar( @{ $self->parameters || [] } ),
 		) );
 	}
-	elsif ( $constraint->is_a_type_of( HashRef )
-		or $constraint->is_a_type_of( Map )
-		or $constraint->is_a_type_of( Dict ) ) {
+	elsif ( $slurp_into eq 'HASH' ) {
 
 		my $index = scalar( @{ $self->parameters || [] } );
 		$coderef->add_line( sprintf(
@@ -501,14 +507,12 @@ sub _coderef_slurpy {
 				coderef   => $coderef,
 				message   => sprintf(
 					qq{sprintf( "Odd number of elements in %%s", %s )},
-					B::perlstring( "$constraint" ),
+					B::perlstring( ( $constraint->type_parameter or $constraint )->display_name ),
 				),
 			),
 		) );
 	}
-	elsif ( $constraint->is_a_type_of( ArrayRef )
-		or $constraint->is_a_type_of( Tuple )
-		or $constraint->is_a_type_of( CycleTuple ) ) {
+	elsif ( $slurp_into eq 'ARRAY' ) {
 	
 		$coderef->add_line( sprintf(
 			'my $SLURPY = [ @_[ %d .. $#_ ] ];',

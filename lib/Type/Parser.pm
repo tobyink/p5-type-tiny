@@ -89,7 +89,8 @@ Evaluate: {
 		}
 		
 		if ( $node->{type} eq "slurpy" ) {
-			return +{ slurpy => _eval_type( $node->{of}, $reg ) };
+			require Types::Standard;
+			return Types::Standard::Slurpy()->of( _eval_type( $node->{of}, $reg ) );
 		}
 		
 		if ( $node->{type} eq "complement" ) {

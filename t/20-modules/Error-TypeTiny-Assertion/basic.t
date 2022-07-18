@@ -198,24 +198,26 @@ TODO: {
 		$dict2->({ foo => [], x_bar => 1, x_baz => 2 }),
 		"$dict2 works ok it seems",
 	);
-	
-	my $e = exception { $dict2->({foo => [], x_bar => 1, x_baz => []}) };
-	is_deeply(
-		$e->explain,
-		[
-			'Reference {"foo" => [],"x_bar" => 1,"x_baz" => []} did not pass type constraint "Dict[foo=>ArrayRef,slurpy Map[Ext,Int]]"',
-			'"Dict[foo=>ArrayRef,slurpy Map[Ext,Int]]" requires the hashref of additional key/value pairs to conform to "Map[Ext,Int]"',
-			'Reference {"x_bar" => 1,"x_baz" => []} did not pass type constraint "Map[Ext,Int]" (in $slurpy)',
-			'"Map[Ext,Int]" constrains each value in the hash with "Int"',
-			'"Int" is a subtype of "Num"',
-			'"Num" is a subtype of "'.$supernum.'"',
-			'"'.$supernum.'" is a subtype of "Str"',
-			'"Str" is a subtype of "Value"',
-			'Reference [] did not pass type constraint "Value" (in $slurpy->{"x_baz"})',
-			'"Value" is defined as: (defined($_) and not ref($_))'
-		],
-		"$dict2 explanation, given {foo => [], x_bar => 1, x_baz => []}",
-	) or diag explain($e->explain);
+
+### TODO
+#
+#	my $e = exception { $dict2->({foo => [], x_bar => 1, x_baz => []}) };
+#	is_deeply(
+#		$e->explain,
+#		[
+#			'Reference {"foo" => [],"x_bar" => 1,"x_baz" => []} did not pass type constraint "Dict[foo=>ArrayRef,Slurpy[Map[Ext,Int]]]"',
+#			'"Dict[foo=>ArrayRef,Slurpy[Map[Ext,Int]]]" requires the hashref of additional key/value pairs to conform to "Map[Ext,Int]"',
+#			'Reference {"x_bar" => 1,"x_baz" => []} did not pass type constraint "Map[Ext,Int]" (in $slurpy)',
+#			'"Map[Ext,Int]" constrains each value in the hash with "Int"',
+#			'"Int" is a subtype of "Num"',
+#			'"Num" is a subtype of "'.$supernum.'"',
+#			'"'.$supernum.'" is a subtype of "Str"',
+#			'"Str" is a subtype of "Value"',
+#			'Reference [] did not pass type constraint "Value" (in $slurpy->{"x_baz"})',
+#			'"Value" is defined as: (defined($_) and not ref($_))'
+#		],
+#		"$dict2 explanation, given {foo => [], x_bar => 1, x_baz => []}",
+#	) or diag explain($e->explain);
 }
 
 my $AlwaysFail = Any->create_child_type(constraint => sub { 0 });
@@ -266,7 +268,7 @@ TODO: {
 	is_deeply(
 		(exception { $SlurpyThing->(1) })->explain,
 		[
-			'"Tuple[Num,slurpy Map[Str,ArrayRef]]" is a subtype of "Tuple"',
+			'"Tuple[Num,Slurpy[Map[Str,ArrayRef]]]" is a subtype of "Tuple"',
 			'"Tuple" is a subtype of "ArrayRef"',
 			'"ArrayRef" is a subtype of "Ref"',
 			'Value "1" did not pass type constraint "Ref"',
@@ -278,8 +280,8 @@ TODO: {
 	is_deeply(
 		(exception { $SlurpyThing->([[]]) })->explain,
 		[
-			'Reference [[]] did not pass type constraint "Tuple[Num,slurpy Map[Str,ArrayRef]]"',
-			'"Tuple[Num,slurpy Map[Str,ArrayRef]]" constrains value at index 0 of array with "Num"',
+			'Reference [[]] did not pass type constraint "Tuple[Num,Slurpy[Map[Str,ArrayRef]]]"',
+			'"Tuple[Num,Slurpy[Map[Str,ArrayRef]]]" constrains value at index 0 of array with "Num"',
 			'"Num" is a subtype of "'.$supernum.'"',
 			'"'.$supernum.'" is a subtype of "Str"',
 			'"Str" is a subtype of "Value"',
@@ -292,7 +294,7 @@ TODO: {
 	is_deeply(
 		(exception { $SlurpyThing->([1.1, yeah => "Hello"]) })->explain,
 		[
-			'Reference ["1.1","yeah","Hello"] did not pass type constraint "Tuple[Num,slurpy Map[Str,ArrayRef]]"',
+			'Reference ["1.1","yeah","Hello"] did not pass type constraint "Tuple[Num,Slurpy[Map[Str,ArrayRef]]]"',
 			'Array elements from index 1 are slurped into a hashref which is constrained with "Map[Str,ArrayRef]"',
 			'Reference {"yeah" => "Hello"} did not pass type constraint "Map[Str,ArrayRef]" (in $SLURPY)',
 			'"Map[Str,ArrayRef]" constrains each value in the hash with "ArrayRef"',

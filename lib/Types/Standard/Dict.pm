@@ -21,6 +21,7 @@ sub _croak ($;@) {
 	goto \&Error::TypeTiny::croak;
 }
 
+my $_Slurpy   = Types::Standard::Slurpy;
 my $_optional = Types::Standard::Optional;
 my $_hash     = Types::Standard::HashRef;
 my $_map      = Types::Standard::Map;
@@ -38,25 +39,15 @@ sub pair_iterator {
 }
 
 sub __constraint_generator {
-	my $shash;
-	my $slurpy = ref( $_[-1] ) eq q(HASH)
-		? do {
-		$shash = pop @_;
-		Types::TypeTiny::to_TypeTiny( $shash->{slurpy} );
-		}
+	my $slurpy =
+		Types::TypeTiny::is_TypeTiny( $_[-1] )
+		&& $_[-1]->is_strictly_a_type_of( $_Slurpy )
+		? pop->type_parameter
 		: undef;
 	my $iterator = pair_iterator @_;
 	my %constraints;
 	my %is_optional;
 	my @keys;
-	
-	if ( $slurpy ) {
-		Types::TypeTiny::is_TypeTiny( $slurpy )
-			or _croak(
-			"Slurpy parameter to Dict[...] expected to be a type constraint; got $slurpy" );
-			
-		$shash->{slurpy} = $slurpy;    # store canonicalized slurpy
-	}
 	
 	while ( my ( $k, $v ) = $iterator->() ) {
 		$constraints{$k} = $v;
@@ -73,7 +64,7 @@ sub __constraint_generator {
 	return sub {
 		my $value = $_[0];
 		if ( $slurpy ) {
-			my %tmp = map { exists( $constraints{$_} ) ? () : ( $_ => $value->{$_} ) }
+			my %tmp = map +( exists( $constraints{$_} ) ? () : ( $_ => $value->{$_} ) ),
 				keys %$value;
 			return unless $slurpy->check( \%tmp );
 		}
@@ -93,7 +84,11 @@ sub __inline_generator {
 	# We can only inline a parameterized Dict if all the
 	# constraints inside can be inlined.
 	
-	my $slurpy = ref( $_[-1] ) eq q(HASH) ? pop( @_ )->{slurpy} : undef;
+	my $slurpy =
+		Types::TypeTiny::is_TypeTiny( $_[-1] )
+		&& $_[-1]->is_strictly_a_type_of( $_Slurpy )
+		? pop->type_parameter
+		: undef;
 	return if $slurpy && !$slurpy->can_be_inlined;
 	
 	# Is slurpy a very loose type constraint?
@@ -167,7 +162,11 @@ sub __deep_explanation {
 	my ( $type, $value, $varname ) = @_;
 	my @params = @{ $type->parameters };
 	
-	my $slurpy   = ref( $params[-1] ) eq q(HASH) ? pop( @params )->{slurpy} : undef;
+	my $slurpy =
+		Types::TypeTiny::is_TypeTiny( $params[-1] )
+		&& $params[-1]->is_strictly_a_type_of( $_Slurpy )
+		? pop( @params )->type_parameter
+		: undef;
 	my $iterator = pair_iterator @params;
 	my %constraints;
 	my @keys;
@@ -209,7 +208,7 @@ sub __deep_explanation {
 		my %tmp = map { exists( $constraints{$_} ) ? () : ( $_ => $value->{$_} ) }
 			keys %$value;
 			
-		my $explain = $slurpy->validate_explain( \%tmp, '$slurpy' );
+		my $explain = ( $slurpy->type_parameter || $slurpy )->validate_explain( \%tmp, '$slurpy' );
 		return [
 			sprintf(
 				'"%s" requires the hashref of additional key/value pairs to conform to "%s"',
@@ -237,7 +236,11 @@ my $label_counter = 0;
 our ( $keycheck_counter, @KEYCHECK ) = -1;
 
 sub __coercion_generator {
-	my $slurpy = ref( $_[-1] ) eq q(HASH) ? pop( @_ )->{slurpy} : undef;
+	my $slurpy =
+		Types::TypeTiny::is_TypeTiny( $_[-1] )
+		&& $_[-1]->is_strictly_a_type_of( $_Slurpy )
+		? pop->type_parameter
+		: undef;
 	my ( $parent, $child, %dict ) = @_;
 	my $C = "Type::Coercion"->new( type_constraint => $child );
 	
@@ -388,9 +391,11 @@ sub __dict_is_slurpy {
 	
 	my $dict = $self->find_parent(
 		sub { $_->has_parent && $_->parent == Types::Standard::Dict() } );
-	ref( $dict->parameters->[-1] ) eq q(HASH)
-		? $dict->parameters->[-1]{slurpy}
-		: !!0;
+	my $slurpy =
+		Types::TypeTiny::is_TypeTiny( $dict->parameters->[-1] )
+		&& $dict->parameters->[-1]->is_strictly_a_type_of( $_Slurpy )
+		? $dict->parameters->[-1]
+		: undef;
 } #/ sub __dict_is_slurpy
 
 sub __hashref_allows_key {
@@ -407,6 +412,7 @@ sub __hashref_allows_key {
 		my @args = @{ $dict->parameters };
 		pop @args;
 		%params = @args;
+		$slurpy = $slurpy->type_parameter;
 	}
 	else {
 		%params = @{ $dict->parameters };
@@ -441,6 +447,7 @@ sub __hashref_allows_value {
 		my @args = @{ $dict->parameters };
 		pop @args;
 		%params = @args;
+		$slurpy = $slurpy->type_parameter;
 	}
 	else {
 		%params = @{ $dict->parameters };

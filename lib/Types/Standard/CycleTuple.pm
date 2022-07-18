@@ -19,6 +19,7 @@ sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
 my $_Optional = Types::Standard::Optional;
 my $_arr      = Types::Standard::ArrayRef;
+my $_Slurpy   = Types::Standard::Slurpy;
 
 no warnings;
 
@@ -26,9 +27,6 @@ my $cycleuniq = 0;
 
 sub __constraint_generator {
 	my @params = map {
-		ref( $_ ) eq 'HASH'
-			and exists( $_->{slurpy} )
-			and _croak( "Parameters to CycleTuple[...] cannot be slurpy" );
 		my $param = $_;
 		Types::TypeTiny::is_TypeTiny( $param )
 			or _croak(
@@ -40,7 +38,9 @@ sub __constraint_generator {
 	
 	_croak( "Parameters to CycleTuple[...] cannot be optional" )
 		if grep !!$_->is_strictly_a_type_of( $_Optional ), @params;
-		
+	_croak( "Parameters to CycleTuple[...] cannot be slurpy" )
+		if grep !!$_->is_strictly_a_type_of( $_Slurpy ), @params;
+	
 	sub {
 		my $value = shift;
 		return unless $_arr->check( $value );

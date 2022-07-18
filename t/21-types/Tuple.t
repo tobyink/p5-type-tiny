@@ -178,36 +178,32 @@ should_pass([42,[],{},undef], $type3);   # ... but undef is okay
 
 
 #
-# Simple slurpy example
+# Simple Slurpy example
 #
 
-use Types::Standard qw(slurpy);
+use Types::Standard qw(Slurpy);
 
 my $type4 = Tuple[
 	Types::Standard::RegexpRef,
-	slurpy Types::Standard::ArrayRef[
-		Types::Standard::Int,
-	],
+	Slurpy[ Types::Standard::ArrayRef[ Types::Standard::Int ] ],
 ];
 
 should_pass([qr//], $type4);
 should_pass([qr//,1..4], $type4);
 should_fail([qr//,1..4,qr//], $type4);
-# note that the slurpy slurps stuff into an arrayref to check
+# note that the Slurpy slurps stuff into an arrayref to check
 # so it will fail when there's an actual arrayref there.
 should_fail([qr//,[1..4]], $type4);
 
 
 #
-# Optional + slurpy example
+# Optional + Slurpy example
 #
 
 my $type5 = Tuple[
 	Types::Standard::RegexpRef,
 	Optional[ Types::Standard::HashRef ],
-	slurpy Types::Standard::ArrayRef[
-		Types::Standard::Int,
-	],
+	Slurpy[ Types::Standard::ArrayRef[ Types::Standard::Int ] ],
 ];
 
 should_pass([qr//], $type5);
@@ -223,10 +219,7 @@ should_fail([qr//,1..4], $type5);
 
 my $type6 = Tuple[
 	Types::Standard::RegexpRef,
-	slurpy Types::Standard::Tuple[
-		Types::Standard::Int,
-		Types::Standard::Int,
-	],
+	Slurpy[ Types::Standard::Tuple[ Types::Standard::Int, Types::Standard::Int ] ],
 ];
 
 should_pass([qr//], $type6);
@@ -238,16 +231,13 @@ should_fail([qr//,1,2,3,4,5], $type6);
 
 
 #
-# Optional + slurpy Tuple inside a Tuple
+# Optional + Slurpy Tuple inside a Tuple
 #
 
 my $type7 = Tuple[
 	Types::Standard::RegexpRef,
 	Optional[ Types::Standard::RegexpRef ],
-	slurpy Types::Standard::Tuple[
-		Types::Standard::Int,
-		Types::Standard::Int,
-	],
+	Slurpy[ Types::Standard::Tuple[ Types::Standard::Int, Types::Standard::Int ] ],
 ];
 
 should_pass([qr//], $type7);
@@ -261,14 +251,12 @@ should_fail([qr//,qr//,1,2,3,4,5], $type7);
 
 
 #
-# Simple slurpy hashref example
+# Simple Slurpy hashref example
 #
 
 my $type8 = Tuple[
 	Types::Standard::RegexpRef,
-	slurpy Types::Standard::HashRef[
-		Types::Standard::Int,
-	],
+	Slurpy[ Types::Standard::HashRef[ Types::Standard::Int ] ],
 ];
 
 should_pass([qr//], $type8);
@@ -287,15 +275,13 @@ should_fail([qr//,'foo'], $type8);
 my $type9 = Tuple[
 	Types::Standard::RegexpRef,
 	Optional[ Types::Standard::ScalarRef ],
-	slurpy Types::Standard::HashRef[
-		Types::Standard::Int,
-	],
+	Slurpy[ Types::Standard::HashRef[ Types::Standard::Int ] ],
 ];
 
 should_pass([qr//], $type9);
 should_pass([qr//,\1], $type9);
 should_pass([qr//,\1,foo=>1,bar=>2], $type9);
-# can't omit Optional element but still provide slurpy
+# can't omit Optional element but still provide Slurpy
 should_fail([qr//,foo=>1,bar=>2], $type9);
 
 
@@ -311,7 +297,7 @@ my $type10 = Tuple[
 	$Rounded,
 	Types::Standard::ArrayRef[$Rounded],
 	Optional[$Rounded],
-	slurpy Types::Standard::HashRef[$Rounded],
+	Slurpy[ Types::Standard::HashRef[$Rounded] ],
 ];
 
 my $coerced = $type10->coerce([
@@ -342,7 +328,7 @@ subtest 'coercion happened as expected' => sub {
 my $type11 = Tuple[
 	Types::Standard::Int,
 	Types::Standard::ScalarRef,
-	slurpy Types::Standard::HashRef,
+	Slurpy[ Types::Standard::HashRef ],
 ];
 should_pass([1,\1], $type11);
 should_pass([1,\1,foo=>3], $type11);

@@ -41,10 +41,10 @@ like(
 	"Cannot follow a slurpy parameter with anything",
 );
 
-like(
+is(
 	exception { compile(slurpy Int) },
-	qr{^Slurpy parameter not of type HashRef or ArrayRef},
-	"Slurpy parameters must be hashrefs or arrayrefs",
+	undef,
+	"This makes no sense, but no longer throws an exception",
 );
 
 done_testing;

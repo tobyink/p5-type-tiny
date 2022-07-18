@@ -173,7 +173,8 @@ subtest slurpy_coderef_thing => sub
 	my $allow_extras = 1;
 	my $type = Tuple[Int, slurpy sub { $allow_extras }];
 
-	isa_ok($type->parameters->[-1]{slurpy}, 'Type::Tiny');
+	isa_ok($type->parameters->[-1], 'Type::Tiny');
+	isa_ok($type->parameters->[-1]->type_parameter, 'Type::Tiny');
 
 	should_pass([1], $type);
 	should_pass([1, "extra"], $type);
@@ -307,7 +308,7 @@ subtest "Invalid parameters" => sub {
 	$e = exception { Tuple[1] };
 	like($e, qr/Parameters to Tuple\[\.\.\.] expected to be type constraints/, 'Tuple[INVALID]');
 	$e = exception { Tuple[Str, slurpy 42] };
-	like($e, qr/Slurpy parameter to Tuple\[\.\.\.] expected to be a type constraint/, 'Tuple[Str, slurpy INVALID]');
+	like($e, qr/^Parameter to Slurpy.... expected to be a type constraint/, 'Tuple[Str, slurpy INVALID]');
 	$e = exception { Tuple[Optional[Str], Str] };
 	like($e, qr/Optional parameters to Tuple\[\.\.\.] cannot precede required parameters/, 'Tuple[Optional[Str], Str]');
 	$e = exception { CycleTuple[1] };
@@ -323,7 +324,7 @@ subtest "Invalid parameters" => sub {
 	$e = exception { Dict[foo => 1] };
 	like($e, qr/Parameter for Dict\[\.\.\.\] with key 'foo' expected to be a type constraint/, 'Dict[foo => INVALID]');
 	$e = exception { Dict[foo => Str, slurpy 42] };
-	like($e, qr/Slurpy parameter to Dict\[\.\.\.] expected to be a type constraint/, 'Dict[foo => Str, slurpy INVALID]');
+	like($e, qr/^Parameter to Slurpy.... expected to be a type constraint/, 'Dict[foo => Str, slurpy INVALID]');
 };
 
 done_testing;
