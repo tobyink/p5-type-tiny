@@ -77,5 +77,20 @@ is_deeply(
 	[ Hello => [qw/ foo 1 bar /] ],
 );
 
+
+{
+	my $check;
+	sub xyz {
+		$check ||= compile( Int, Slurpy[HashRef] );
+		my ($num, $hr) = $check->(@_);
+		return [ $num, $hr ];
+	}
+	
+	is_deeply( xyz( 5,   foo => 1, bar => 2   ), [ 5, { foo => 1, bar => 2 } ] );
+	is_deeply( xyz( 5, { foo => 1, bar => 2 } ), [ 5, { foo => 1, bar => 2 } ] );
+}
+
+note compile( { want_source => 1 }, Int, Slurpy[HashRef] );
+
 done_testing;
 
