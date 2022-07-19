@@ -66,6 +66,7 @@ RoleName	Types::Standard	No	No	Any loaded package name where there is no `new` m
 ScalarRef	Types::Standard	No	Yes	Scalarrefs.
 SimpleStr	Types::Common::String	No	No	A string with less than 256 characters with no line breaks.
 SingleDigit	Types::Common::Numeric	No	No	A single digit number. This includes single digit negative numbers!
+Slurpy	Types::Standard	No	Yes	Used in conjunction with Dict or Tuple.
 Str	Types::Standard	No	No	A string.
 StrictNum	Types::Standard	No	No	A number; strict constaint.
 StringLike	Types::TypeTiny	No	No	Strings and objects overloading stringification.
