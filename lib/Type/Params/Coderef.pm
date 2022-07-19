@@ -11,7 +11,7 @@ BEGIN {
 
 BEGIN {
 	$Type::Params::Coderef::AUTHORITY  = 'cpan:TOBYINK';
-	$Type::Params::Coderef::VERSION    = '1.016001';
+	$Type::Params::Coderef::VERSION    = '1.016002';
 }
 
 $Type::Params::Coderef::VERSION =~ tr/_//d;

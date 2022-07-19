@@ -4181,3 +4181,13 @@
 			label "Allow the add_types method of Type::Registry to consume Type::Library::Compiler libraries.";
 		];
 	].
+
+`Type-Tiny 1.016002 cpan:TOBYINK`
+	issued  2022-07-19;
+	changeset [
+		dcs:versus `Type-Tiny 1.016001 cpan:TOBYINK`;
+		item [
+			a dcs:BackCompat;
+			label "The slurpy(Foo) function from Types::Standard has been replaced by a new Slurpy parameterized type, so you can use Slurpy[Foo] instead. A slurpy() function is still provided for backwards compatibility, but if you were relying on the internal detail that this used to return an unblessed hashref, this release might break that assumption.";
+		];
+	].
