@@ -107,7 +107,7 @@ sub _rationalize_slurpies {
 		}
 	}
 	elsif ( @$parameters ) {
-	 	if ( $parameters->[-1]->type->is_strictly_a_type_of( Slurpy ) ) {
+		if ( $parameters->[-1]->type->is_strictly_a_type_of( Slurpy ) ) {
 			$self->{slurpy} = pop @$parameters;
 		}
 		elsif ( $parameters->[-1]{slurpy} ) {
