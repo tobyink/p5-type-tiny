@@ -92,5 +92,31 @@ is_deeply(
 
 note compile( { want_source => 1 }, Int, Slurpy[HashRef] );
 
+{
+	my $check;
+	sub xyz2 {
+		$check ||= compile( Int, HashRef, { slurpy => 1 } );
+		my ($num, $hr) = $check->(@_);
+		return [ $num, $hr ];
+	}
+	
+	is_deeply( xyz2( 5,   foo => 1, bar => 2   ), [ 5, { foo => 1, bar => 2 } ] );
+	is_deeply( xyz2( 5, { foo => 1, bar => 2 } ), [ 5, { foo => 1, bar => 2 } ] );
+}
+
+{
+	my $check;
+	sub xyz3 {
+		$check ||= compile( Int, HashRef, { slurpy => 1 } );
+		my ($num, $hr) = $check->(@_);
+		return [ $num, $hr ];
+	}
+	
+	is_deeply( xyz3( 5,   foo => 1, bar => 2   ), [ 5, { foo => 1, bar => 2 } ] );
+	is_deeply( xyz3( 5, { foo => 1, bar => 2 } ), [ 5, { foo => 1, bar => 2 } ] );
+}
+
+note compile( { want_source => 1 }, Int, HashRef, { slurpy => 1 } );
+
 done_testing;
 

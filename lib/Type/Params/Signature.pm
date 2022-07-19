@@ -42,6 +42,10 @@ sub new {
 	sub BUILD {
 		my $self = shift;
 
+		if ( delete $self->{rationalize_slurpies} ) {
+			$self->_rationalize_slurpies;
+		}
+
 		$self->{class_prefix} ||= 'Type::Params::OO::Klass';
 
 		if ( defined $self->{bless} and $self->{bless} eq 1 ) {
@@ -73,11 +77,60 @@ sub _klass_key {
 	);
 }
 
+sub _rationalize_slurpies {
+	my $self = shift;
+
+	my $parameters = $self->parameters || [];
+
+	if ( $self->is_named ) {
+		my ( @slurpy, @rest );
+		
+		for my $parameter ( @$parameters ) {
+			if ( $parameter->type->is_strictly_a_type_of( Slurpy ) ) {
+				push @slurpy, $parameter;
+			}
+			elsif ( $parameter->{slurpy} ) {
+				$parameter->{type} = Slurpy[ $parameter->type ];
+				push @slurpy, $parameter;
+			}
+			else {
+				push @rest, $parameter;
+			}
+		}
+
+		if ( @slurpy == 1 ) {
+			$self->{slurpy} = $slurpy[0];
+			@$parameters = @rest;
+		}
+		elsif ( @slurpy ) {
+			$self->_croak( 'Found multiple slurpy parameters! There can be only one' );
+		}
+	}
+	elsif ( @$parameters ) {
+
+	 	if ( $parameters->[-1]->type->is_strictly_a_type_of( Slurpy ) ) {
+			$self->{slurpy} = pop @$parameters;
+		}
+		elsif ( $parameters->[-1]{slurpy} ) {
+			$self->{slurpy} = pop @$parameters;
+			$self->{slurpy}{type} = Slurpy[ $self->{slurpy}{type} ];
+		}
+
+		for my $parameter ( @$parameters ) {
+			if ( $parameter->type->is_strictly_a_type_of( Slurpy ) or $parameter->{slurpy} ) {
+				$self->_croak( 'Parameter following slurpy parameter' );
+			}
+		}
+	}
+}
+
 sub _looks_like_Slurpy {
 	my $thing = shift;
 	return ( $thing =~ /^Slurpy\b/ )
 		if is_Str( $thing );
-	return to_TypeTiny( $thing )->is_strictly_a_type_of( Slurpy );
+	return to_TypeTiny( $thing )->is_strictly_a_type_of( Slurpy )
+		if is_Object( $thing );
+	return !!0;
 }
 
 sub _parameters_from_list {
@@ -86,14 +139,6 @@ sub _parameters_from_list {
 	my $is_named = ( $style eq 'named' );
 
 	while ( @$list ) {
-
-		if ( $is_named and is_Str( $list->[0] ) and _looks_like_Slurpy( $list->[1] ) ) {
-			last;
-		}
-		elsif ( !$is_named and _looks_like_Slurpy( $list->[0] ) ) {
-			last;
-		}
-
 		my %param_opts;
 		if ( $is_named ) {
 			$param_opts{name} = assert_Str( shift( @$list ) );
@@ -106,7 +151,6 @@ sub _parameters_from_list {
 			is_Int($type)  ? ( $type ? Any : do { $param_opts{optional} = !!1; Any; } ) :
 			is_Str($type)  ? dwim_type( $type, $opts{package} ? ( for => $opts{package} ) : () ) :
 			to_TypeTiny( $type );
-
 		my $parameter = 'Type::Params::Parameter'->new( %param_opts );
 		push @return, $parameter;
 	}
@@ -136,30 +180,8 @@ sub new_from_compile {
 	$opts{is_named}   = $is_named;
 	$opts{parameters} = $class->_parameters_from_list( $style => $list, %opts );
 
-	if ( @$list ) {
-		my $name;
-		if ( $is_named ) {
-			$name = assert_Str( shift @$list );
-		}
-		_looks_like_Slurpy( my $type = shift @$list )
-			or $class->_croak( "Expected slurpy parameter" );
-
-		my %slurpy = %{ is_HashRef( $list->[0] ) ? shift( @$list ) : {} };
-		$slurpy{type} =
-			is_Str($type) ? dwim_type( $type, $opts{package} ? ( for => $opts{package} ) : () ) :
-			to_TypeTiny( $type );
-		$slurpy{name} = $name if defined $name;
-		if ( is_HashRef $list->[0] ) {
-			%slurpy = ( %slurpy, %{ shift @$list } );
-		}
-		$opts{slurpy} = 'Type::Params::Parameter'->new( %slurpy );
-
-		if ( @$list ) {
-			$class->_croak( 'Parameter following slurpy parameter' );
-		}
-	}
-
-	return $class->new( %opts );
+	my $self = $class->new( %opts, rationalize_slurpies => 1 );
+	return $self;
 }
 
 sub package       { $_[0]{package} }

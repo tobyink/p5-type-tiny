@@ -669,6 +669,13 @@ unaffected.
  
  print "@numbers\n";  ## 1 2 3
 
+=item C<< slurpy >> B<Bool>
+
+The following two should be equivalent:
+
+ my $check = compile( Int, Slurpy[ArrayRef] );
+ my $check = compile( Int, ArrayRef, { slurpy => 1 } );
+
 =back
 
 As a special case, the numbers 0 and 1 may be used as shortcuts for
