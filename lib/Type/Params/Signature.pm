@@ -17,10 +17,9 @@ BEGIN {
 $Type::Params::Signature::VERSION =~ tr/_//d;
 
 use B ();
-use Types::TypeTiny qw( -is -types to_TypeTiny );
+use Eval::TypeTiny::CodeAccumulator;
 use Types::Standard qw( -is -types -assert );
-use Type::Utils qw( dwim_type );
-use Type::Params::Coderef;
+use Types::TypeTiny qw( -is -types to_TypeTiny );
 use Type::Params::Parameter;
 
 sub _croak {
@@ -28,10 +27,22 @@ sub _croak {
 	Carp::croak( pop );
 }
 
+sub _new_parameter {
+	shift;
+	'Type::Params::Parameter'->new( @_ );
+}
+
+sub _new_code_accumulator {
+	shift;
+	'Eval::TypeTiny::CodeAccumulator'->new( @_ );
+}
+
 sub new {
 	my $class = shift;
 	my %self  = @_ == 1 ? %{$_[0]} : @_;
 	my $self = bless \%self, $class;
+	$self->{parameters}   ||= [];
+	$self->{class_prefix} ||= 'Type::Params::OO::Klass';
 	$self->BUILD;
 	return $self;
 }
@@ -45,8 +56,6 @@ sub new {
 		if ( delete $self->{rationalize_slurpies} ) {
 			$self->_rationalize_slurpies;
 		}
-
-		$self->{class_prefix} ||= 'Type::Params::OO::Klass';
 
 		if ( defined $self->{bless} and $self->{bless} eq 1 ) {
 			my $klass_key     = $self->_klass_key;
@@ -64,7 +73,7 @@ sub new {
 sub _klass_key {
 	my $self = shift;
 
-	my @parameters = @{ $self->parameters || [] };
+	my @parameters = @{ $self->parameters };
 	if ( $self->has_slurpy ) {
 		push @parameters, $self->slurpy;
 	}
@@ -80,7 +89,7 @@ sub _klass_key {
 sub _rationalize_slurpies {
 	my $self = shift;
 
-	my $parameters = $self->parameters || [];
+	my $parameters = $self->parameters;
 
 	if ( $self->is_named ) {
 		my ( @slurpy, @rest );
@@ -147,10 +156,10 @@ sub _parameters_from_list {
 			%param_opts = ( %param_opts, %{ +shift( @$list ) } );
 		}
 		$param_opts{type} =
-			is_Int($type)  ? ( $type ? Any : do { $param_opts{optional} = !!1; Any; } ) :
-			is_Str($type)  ? dwim_type( $type, $opts{package} ? ( for => $opts{package} ) : () ) :
+			is_Int($type) ? ( $type ? Any : do { $param_opts{optional} = !!1; Any; } ) :
+			is_Str($type) ? do { require Type::Utils; Type::Utils::dwim_type( $type, $opts{package} ? ( for => $opts{package} ) : () ) } :
 			to_TypeTiny( $type );
-		my $parameter = 'Type::Params::Parameter'->new( %param_opts );
+		my $parameter = $class->_new_parameter( %param_opts );
 		push @return, $parameter;
 	}
 
@@ -163,7 +172,7 @@ sub new_from_compile {
 	my $is_named = ( $style eq 'named' );
 
 	my %opts  = ();
-	while ( is_HashRef( $_[0] ) ) {
+	while ( is_HashRef $_[0] ) {
 		%opts = ( %opts, %{ +shift } );
 	}
 
@@ -214,7 +223,7 @@ sub coderef {
 
 sub _build_coderef {
 	my $self = shift;
-	my $coderef = 'Type::Params::Coderef'->new(
+	my $coderef = $self->_new_code_accumulator(
 		description => $self->description
 			|| sprintf( 'parameter validation for "%s::%s"', $self->package || '', $self->subname || '__ANON__' )
 	);
@@ -286,7 +295,7 @@ sub _coderef_check_count {
 	my $min_args = 0;
 	my $max_args = 0;
 	my $seen_optional = 0;
-	for my $parameter ( @{ $self->parameters || [] } ) {
+	for my $parameter ( @{ $self->parameters } ) {
 		if ( $parameter->optional ) {
 			++$seen_optional;
 			++$max_args;
@@ -461,7 +470,7 @@ sub _coderef_parameters {
 
 		$coderef->add_gap;
 
-		for my $parameter ( @{ $self->parameters || [] } ) {
+		for my $parameter ( @{ $self->parameters } ) {
 			my $qname = B::perlstring( $parameter->name );
 			$parameter->_make_code(
 				signature   => $self,
@@ -480,7 +489,7 @@ sub _coderef_parameters {
 		my $head_size    = $self->has_head ? @{ $self->head } : 0;
 
 		my $i = 0;
-		for my $parameter ( @{ $self->parameters || [] } ) {
+		for my $parameter ( @{ $self->parameters } ) {
 			$parameter->_make_code(
 				signature   => $self,
 				coderef     => $coderef,
@@ -512,12 +521,12 @@ sub _coderef_slurpy {
 
 		$coderef->add_line( sprintf(
 			'my $SLURPY = { @_[ %d .. $#_ ] };',
-			scalar( @{ $self->parameters || [] } ),
+			scalar( @{ $self->parameters } ),
 		) );
 	}
 	elsif ( $slurp_into eq 'HASH' ) {
 
-		my $index = scalar( @{ $self->parameters || [] } );
+		my $index = scalar( @{ $self->parameters } );
 		$coderef->add_line( sprintf(
 			'my $SLURPY = ( %s ) ? { %%{ $_[%d] } } : ( ( $#_ - %d ) %% 2 ) ? { @_[ %d .. $#_ ] } : %s;',
 			HashRef->inline_check("\$_[$index]"),
@@ -537,7 +546,7 @@ sub _coderef_slurpy {
 	
 		$coderef->add_line( sprintf(
 			'my $SLURPY = [ @_[ %d .. $#_ ] ];',
-			scalar( @{ $self->parameters || [] } ),
+			scalar( @{ $self->parameters } ),
 		) );
 	}
 	else {
@@ -616,7 +625,7 @@ sub _make_return_list {
 	elsif ( $self->named_to_list ) {
 		push @return_list, map(
 			sprintf( '$out{%s}', B::perlstring( $_->name ) ),
-			@{ $self->parameters || [] },
+			@{ $self->parameters },
 		);
 	}
 	elsif ( $self->class ) {
@@ -718,7 +727,7 @@ sub _build_class_attributes {
 	my %predicates;
 	my %getters;
 
-	my @parameters = @{ $self->parameters || [] };
+	my @parameters = @{ $self->parameters };
 	if ( $self->has_slurpy ) {
 		push @parameters, $self->slurpy;
 	}
@@ -786,7 +795,7 @@ sub make_class_pp {
 sub make_class_pp_code {
 	my $self = shift;
 
-	my $coderef = 'Type::Params::Coderef'->new;
+	my $coderef = $self->_new_code_accumulator;
 	my $attr    = $self->class_attributes;
 
 	$coderef->add_line( '{' );

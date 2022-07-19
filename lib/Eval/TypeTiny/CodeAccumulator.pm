@@ -1,4 +1,4 @@
-package Type::Params::Coderef;
+package Eval::TypeTiny::CodeAccumulator;
 
 use 5.006001;
 use strict;
@@ -10,13 +10,11 @@ BEGIN {
 }
 
 BEGIN {
-	$Type::Params::Coderef::AUTHORITY  = 'cpan:TOBYINK';
-	$Type::Params::Coderef::VERSION    = '1.016002';
+	$Eval::TypeTiny::CodeAccumulator::AUTHORITY  = 'cpan:TOBYINK';
+	$Eval::TypeTiny::CodeAccumulator::VERSION    = '1.016002';
 }
 
-$Type::Params::Coderef::VERSION =~ tr/_//d;
-
-use Eval::TypeTiny ();
+$Eval::TypeTiny::CodeAccumulator::VERSION =~ tr/_//d;
 
 sub new {
 	my $class = shift;
@@ -31,6 +29,7 @@ sub new {
 
 sub code        { join( "\n", @{ $_[0]{code} } ) }
 sub description { $_[0]{description} }
+sub env         { $_[0]{env} }
 
 sub add_line {
 	my $self = shift;
@@ -85,9 +84,10 @@ sub compile {
 
 	$self->{finalized}++ or $self->finalize();
 
+	require Eval::TypeTiny; 
 	return Eval::TypeTiny::eval_closure(
 		source       => $self->code,
-		environment  => $self->{env},
+		environment  => $self->env,
 		description  => $self->description,
 	);
 }
