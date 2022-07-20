@@ -33,7 +33,7 @@ my $n = 40;
 my $varname = $make_adder->add_variable( '$addend' => \$n );
 
 is $varname, '$addend';
-is $make_adder->add_variable( '$addend' => \999 ), '$addend_1';
+is $make_adder->add_variable( '$addend' => \999 ), '$addend_2';
 
 $make_adder->add_line( 'sub {' );
 $make_adder->increase_indent;
