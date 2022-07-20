@@ -78,7 +78,7 @@ sub add_variable {
 	my ( $self, $suggested_name, $reference ) = ( shift, @_ );
 	
 	my $actual_name = $suggested_name;
-	my $i = 0;
+	my $i = 1;
 	while ( exists $self->{env}{$actual_name} ) {
 		$actual_name = sprintf '%s_%d', $suggested_name, ++$i;
 	}

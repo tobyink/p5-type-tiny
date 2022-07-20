@@ -386,9 +386,13 @@ sub match_on_type {
 } #/ sub match_on_type
 
 sub compile_match_on_type {
-	my @code = 'sub { local $_ = $_[0]; ';
-	my @checks;
-	my @actions;
+	require Eval::TypeTiny::CodeAccumulator;
+	my $coderef = 'Eval::TypeTiny::CodeAccumulator'->new(
+		description => 'compiled match',
+	);
+	$coderef->add_line( 'sub {' );
+	$coderef->increase_indent;
+	$coderef->add_line( 'local $_ = $_[0];' );
 	
 	my $els = '';
 	
@@ -404,38 +408,49 @@ sub compile_match_on_type {
 		}
 		
 		if ( $type->can_be_inlined ) {
-			push @code, sprintf( '%sif (%s)', $els, $type->inline_check( '$_' ) );
+			$coderef->add_line( sprintf(
+				'%sif ( %s ) {',
+				$els,
+				$type->inline_check( '$_' ),
+			) );
 		}
 		else {
-			push @checks, $type;
-			push @code,   sprintf( '%sif ($checks[%d]->check($_))', $els, $#checks );
+			my $varname = $coderef->add_variable( '$type', \$type );
+			$coderef->add_line( sprintf(
+				'%sif ( %s->check($_) ) {',
+				$els,
+				$varname,
+			) );
 		}
+		$coderef->increase_indent;
 		
 		$els = 'els';
 		
 		if ( Types::TypeTiny::is_StringLike( $code ) ) {
-			push @code, sprintf( '  { %s }', $code );
+			$coderef->add_line( $code );
 		}
 		else {
 			Types::TypeTiny::assert_CodeLike( $code );
-			push @actions, $code;
-			push @code,    sprintf( '  { $actions[%d]->(@_) }', $#actions );
+			my $varname = $coderef->add_variable( '$action', \$code );
+			$coderef->add_line( sprintf(
+				'%s->( @_ )',
+				$varname,
+			) );
 		}
+		$coderef->decrease_indent;
+		$coderef->add_line( '}' );
 	} #/ while ( @_ )
 	
-	push @code, 'else',
-		'  { Type::Utils::_croak("No cases matched for %s", Type::Tiny::_dd($_[0])) }';
-		
-	push @code, '}';    # /sub
+	$coderef->add_line( 'else {' );
+	$coderef->increase_indent;
+	$coderef->add_line( 'Type::Utils::_croak( "No cases matched for %s", Type::Tiny::_dd( $_ ) );' );
+	$coderef->decrease_indent;
+	$coderef->add_line( '}' );
 	
-	require Eval::TypeTiny;
-	return Eval::TypeTiny::eval_closure(
-		source      => \@code,
-		environment => {
-			'@actions' => \@actions,
-			'@checks'  => \@checks,
-		},
-	);
+	$coderef->decrease_indent;
+	$coderef->add_line( '}' );
+	
+	return $coderef->compile;
 } #/ sub compile_match_on_type
 
 sub classifier {
