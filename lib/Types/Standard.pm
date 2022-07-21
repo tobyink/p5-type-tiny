@@ -685,21 +685,30 @@ my $_Optional = $meta->add_type(
 my $_slurpy = $meta->add_type(
 	{
 		name                 => "Slurpy",
+		slurpy               => 1,
 		parent               => $_item,
 		constraint_generator => sub {
+			my $self  = $Type::Tiny::parameterize_type;
 			my $param = @_ ? Types::TypeTiny::to_TypeTiny(shift) : $_any;
 			Types::TypeTiny::is_TypeTiny( $param )
 				or _croak(
 				"Parameter to Slurpy[`a] expected to be a type constraint; got $param" );
-			sub { $param->check( $_[0] ) };
-		},
-		inline_generator => sub {
-			my $param = shift;
-			return unless $param->can_be_inlined;
-			return sub {
-				my $v = $_[1];
-				$param->inline_check( $v );
-			};
+			
+			return $self->create_child_type(
+				slurpy          => 1,
+				display_name    => $self->name_generator->( $self, $param ),
+				parameters      => [ $param ],
+				constraint      => sub { $param->check( $_[0] ) },
+				_build_coercion => sub {
+					my $coercion = shift;
+					$coercion->add_type_coercions( @{ $param->coercion->type_coercion_map } )
+						if $param->has_coercion;
+					$coercion->freeze;
+				},
+				$param->can_be_inlined
+					? ( inlined => sub { $param->inline_check( $_[1] ) } )
+					: (),
+			);
 		},
 		deep_explanation => sub {
 			my ( $type, $value, $varname ) = @_;
@@ -708,11 +717,6 @@ my $_slurpy = $meta->add_type(
 				sprintf( '%s is slurpy', $varname ),
 				@{ $param->validate_explain( $value, $varname ) },
 			];
-		},
-		coercion_generator => sub {
-			my ( $parent, $child, $param ) = @_;
-			return unless $param->has_coercion;
-			return $param->coercion;
 		},
 		my_methods => {
 			'slurp_into' => sub {
@@ -733,7 +737,9 @@ my $_slurpy = $meta->add_type(
 
 sub slurpy {
 	my $t = shift;
-	wantarray ? ( $_slurpy->of( $t ) , @_ ) : $_slurpy->of( $t );
+	my $s = $_slurpy->of( $t );
+	$s->{slurpy} ||= 1;
+	wantarray ? ( $s, @_ ) : $s;
 }
 
 $meta->$add_core_type(
