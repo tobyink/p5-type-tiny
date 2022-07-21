@@ -416,10 +416,11 @@ sub _dd {
 } #/ sub _dd
 
 sub _loose_to_TypeTiny {
+	my $caller = caller( 1 ); # assumption
 	map +(
 		ref( $_ )
 		? Types::TypeTiny::to_TypeTiny( $_ )
-		: do { require Type::Utils; Type::Utils::dwim_type( $_ ) }
+		: do { require Type::Utils; Type::Utils::dwim_type( $_, for => $caller ) }
 	), @_;
 }
 

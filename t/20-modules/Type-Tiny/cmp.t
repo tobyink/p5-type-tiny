@@ -95,4 +95,17 @@ is(Type::Tiny::cmp($type3, $type2), Type::Tiny::CMP_UNKNOWN);
 is(Type::Tiny::cmp($type1, $type2->create_child_type), Type::Tiny::CMP_EQUAL);
 is(Type::Tiny::cmp($type1, $type2->where(sub { 0 })), Type::Tiny::CMP_SUPERTYPE);
 
+{
+	package MyBleh;
+	use Type::Registry 't';
+	use Types::Standard -types;
+	t->alias_type( Int => 'WholeNumber' );
+	
+	my $child = Int->where( '$_ > 42' );
+	
+	::ok( $child->is_strictly_a_type_of(Int) );
+	::ok( $child->is_strictly_a_type_of('Int') );
+	::ok( $child->is_strictly_a_type_of('WholeNumber') );
+}
+
 done_testing;
