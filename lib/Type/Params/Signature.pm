@@ -513,11 +513,12 @@ sub _coderef_slurpy {
 	my $parameter  = $self->slurpy;
 	my $constraint = $parameter->type;
 	my $slurp_into = $constraint->my_slurp_into;
+	my $real_type  = $constraint->my_unslurpy;
 
 	if ( $self->is_named ) {
 		$coderef->add_line( 'my $SLURPY = \\%in;' );
 	}
-	elsif ( $constraint->type_parameter->{uniq} == Any->{uniq} ) {
+	elsif ( $real_type and $real_type->{uniq} == Any->{uniq} ) {
 
 		$coderef->add_line( sprintf(
 			'my $SLURPY = { @_[ %d .. $#_ ] };',
@@ -537,7 +538,7 @@ sub _coderef_slurpy {
 				coderef   => $coderef,
 				message   => sprintf(
 					qq{sprintf( "Odd number of elements in %%s", %s )},
-					B::perlstring( ( $constraint->type_parameter or $constraint )->display_name ),
+					B::perlstring( ( $real_type or $constraint )->display_name ),
 				),
 			),
 		) );

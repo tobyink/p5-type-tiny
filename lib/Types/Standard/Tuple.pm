@@ -56,7 +56,7 @@ sub __constraint_generator {
 	
 	my @is_optional = map !!$_->is_strictly_a_type_of( $_Optional ), @constraints;
 	my $slurp_hash  = $slurpy && $slurpy->my_slurp_into eq 'HASH';
-	my $slurp_any   = $slurpy && $slurpy->type_parameter->equals( Types::Standard::Any );
+	my $slurp_any   = $slurpy && $slurpy->my_unslurpy->equals( Types::Standard::Any );
 	
 	my @sorted_is_optional = sort @is_optional;
 	join( "|", @sorted_is_optional ) eq join( "|", @is_optional )
@@ -125,7 +125,7 @@ sub __inline_generator {
 			. '}'
 			if $slurpy->my_slurp_into eq 'HASH';
 		$slurpy_any = 1
-			if $slurpy->type_parameter->equals( Types::Standard::Any );
+			if $slurpy->my_unslurpy->equals( Types::Standard::Any );
 	}
 	
 	my @is_optional = map !!$_->is_strictly_a_type_of( $_Optional ), @constraints;
@@ -213,9 +213,9 @@ sub __deep_explanation {
 				'Array elements from index %d are slurped into a %s which is constrained with "%s"',
 				$#constraints + 1,
 				( $slurpy->my_slurp_into eq 'HASH' ) ? 'hashref' : 'arrayref',
-				( $slurpy->type_parameter || $slurpy ),
+				( $slurpy->my_unslurpy || $slurpy ),
 			),
-			@{ ( $slurpy->type_parameter || $slurpy )->validate_explain( $tmp, '$SLURPY' ) },
+			@{ ( $slurpy->my_unslurpy || $slurpy )->validate_explain( $tmp, '$SLURPY' ) },
 			];
 	} #/ if ( defined( $slurpy ...))
 	

@@ -43,7 +43,7 @@ sub __constraint_generator {
 		@_
 		&& Types::TypeTiny::is_TypeTiny( $_[-1] )
 		&& $_[-1]->is_strictly_a_type_of( $_Slurpy )
-		? pop->type_parameter
+		? pop->my_unslurpy
 		: undef;
 	my $iterator = pair_iterator @_;
 	my %constraints;
@@ -89,7 +89,7 @@ sub __inline_generator {
 		@_
 		&& Types::TypeTiny::is_TypeTiny( $_[-1] )
 		&& $_[-1]->is_strictly_a_type_of( $_Slurpy )
-		? pop->type_parameter
+		? pop->my_unslurpy
 		: undef;
 	return if $slurpy && !$slurpy->can_be_inlined;
 	
@@ -168,7 +168,7 @@ sub __deep_explanation {
 		@params
 		&& Types::TypeTiny::is_TypeTiny( $params[-1] )
 		&& $params[-1]->is_strictly_a_type_of( $_Slurpy )
-		? pop( @params )->type_parameter
+		? pop( @params )->my_unslurpy
 		: undef;
 	my $iterator = pair_iterator @params;
 	my %constraints;
@@ -211,7 +211,7 @@ sub __deep_explanation {
 		my %tmp = map { exists( $constraints{$_} ) ? () : ( $_ => $value->{$_} ) }
 			keys %$value;
 			
-		my $explain = ( $slurpy->type_parameter || $slurpy )->validate_explain( \%tmp, '$slurpy' );
+		my $explain = $slurpy->validate_explain( \%tmp, '$slurpy' );
 		return [
 			sprintf(
 				'"%s" requires the hashref of additional key/value pairs to conform to "%s"',
@@ -243,7 +243,7 @@ sub __coercion_generator {
 		@_
 		&& Types::TypeTiny::is_TypeTiny( $_[-1] )
 		&& $_[-1]->is_strictly_a_type_of( $_Slurpy )
-		? pop->type_parameter
+		? pop->my_unslurpy
 		: undef;
 	my ( $parent, $child, %dict ) = @_;
 	my $C = "Type::Coercion"->new( type_constraint => $child );
@@ -417,7 +417,7 @@ sub __hashref_allows_key {
 		my @args = @{ $dict->parameters };
 		pop @args;
 		%params = @args;
-		$slurpy = $slurpy->type_parameter;
+		$slurpy = $slurpy->my_unslurpy;
 	}
 	else {
 		%params = @{ $dict->parameters };
@@ -452,7 +452,7 @@ sub __hashref_allows_value {
 		my @args = @{ $dict->parameters };
 		pop @args;
 		%params = @args;
-		$slurpy = $slurpy->type_parameter;
+		$slurpy = $slurpy->my_unslurpy;
 	}
 	else {
 		%params = @{ $dict->parameters };

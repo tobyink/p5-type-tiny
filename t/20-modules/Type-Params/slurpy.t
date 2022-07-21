@@ -116,6 +116,18 @@ note compile( { want_source => 1 }, Int, Slurpy[HashRef] );
 	is_deeply( xyz3( 5, { foo => 1, bar => 2 } ), [ 5, { foo => 1, bar => 2 } ] );
 }
 
+{
+	my $check;
+	sub xyz4 {
+		$check ||= compile( Int, ( Slurpy[HashRef] )->where( '1' ) );
+		my ($num, $hr) = $check->(@_);
+		return [ $num, $hr ];
+	}
+	
+	is_deeply( xyz4( 5,   foo => 1, bar => 2   ), [ 5, { foo => 1, bar => 2 } ] );
+	is_deeply( xyz4( 5, { foo => 1, bar => 2 } ), [ 5, { foo => 1, bar => 2 } ] );
+}
+
 note compile( { want_source => 1 }, Int, HashRef, { slurpy => 1 } );
 
 done_testing;

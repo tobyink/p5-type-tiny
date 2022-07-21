@@ -334,5 +334,30 @@ should_pass([1,\1], $type11);
 should_pass([1,\1,foo=>3], $type11);
 should_fail([1,\1,'foo'], $type11);
 
+
+#
+# Coercion with CHILD OF slurpy
+#
+
+my $type12 = Tuple[
+	$Rounded,
+	Types::Standard::ArrayRef[$Rounded],
+	Optional[$Rounded],
+	( Slurpy[ Types::Standard::HashRef[$Rounded] ] )->create_child_type( coercion => 1 ),
+];
+
+my $coerced2 = $type12->coerce([
+	3.1,
+	[ 1.1, 1.2, 1.3 ],
+	4.2,
+	foo => 5.1, bar => 6.1,
+]);
+subtest 'coercion happened as expected' => sub {
+	is($coerced2->[0], 3);
+	is_deeply($coerced2->[1], [1,1,1]);
+	is($coerced2->[2], 4);
+	is_deeply({@$coerced2[3..6]}, {foo=>5,bar=>6});
+};
+
 done_testing;
 

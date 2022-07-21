@@ -682,13 +682,14 @@ my $_Optional = $meta->add_type(
 	}
 );
 
-my $_slurpy = $meta->add_type(
+my $_slurpy;
+$_slurpy = $meta->add_type(
 	{
 		name                 => "Slurpy",
 		slurpy               => 1,
 		parent               => $_item,
 		constraint_generator => sub {
-			my $self  = $Type::Tiny::parameterize_type;
+			my $self  = $_slurpy;
 			my $param = @_ ? Types::TypeTiny::to_TypeTiny(shift) : $_any;
 			Types::TypeTiny::is_TypeTiny( $param )
 				or _croak(
@@ -719,12 +720,21 @@ my $_slurpy = $meta->add_type(
 			];
 		},
 		my_methods => {
+			'unslurpy' => sub {
+				my $self  = shift;
+				$self->{_my_unslurpy} ||= $self->find_parent(
+					sub { $_->parent->{uniq} == $_slurpy->{uniq} }
+				)->type_parameter;
+			},
 			'slurp_into' => sub {
 				my $self  = shift;
-				if ( $self->parameters->[1] ) {
-					return $self->parameters->[1];
+				my $parameters = $self->find_parent(
+					sub { $_->parent->{uniq} == $_slurpy->{uniq} }
+				)->parameters;
+				if ( $parameters->[1] ) {
+					return $parameters->[1];
 				}
-				my $constraint = $self->parameters->[0];
+				my $constraint = $parameters->[0];
 				return 'HASH'
 					if $constraint->is_a_type_of( HashRef() )
 					or $constraint->is_a_type_of( Map() )
