@@ -95,7 +95,7 @@ sub compile {
 
 	$self->{finalized}++ or $self->finalize();
 
-	require Eval::TypeTiny; 
+	require Eval::TypeTiny;
 	return Eval::TypeTiny::eval_closure(
 		source       => $self->code,
 		environment  => $self->env,

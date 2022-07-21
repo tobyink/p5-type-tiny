@@ -4193,11 +4193,27 @@
 	].
 
 `Type-Tiny 1.016003 cpan:TOBYINK`
-	issued  2022-07-21;
+	issued  2022-07-22;
 	changeset [
 		dcs:versus `Type-Tiny 1.016002 cpan:TOBYINK`;
 		item [
 			a dcs:Change;
 			label "Catalyst was relying on the internals of the old slurpy function. Next release of Catalyst should fix that, but this version of Types::Standard introduces a workaround for the issue without going back to implementing Slurpy the old way. (The Catalyst test suite passes at least!)";
+		];
+		item [
+			a dcs:Change;
+			label "In most places that accept a Slurpy, happily accept a child of a child of a child of Slurpy.";
+		];
+		item [
+			a dcs:Change;
+			label "Rename Type::Params::Coderef to Eval::TypeTiny::CodeAccumulator as it's not really Type::Params-specific. Add test cases for it and make it part of the public API.";
+		];
+		item [
+			a dcs:Change;
+			label "When Type::Tiny's is_subtype_of, etc methods are called passing a string as a parameter, pay attention to calling package's type registry.";
+		];
+		item [
+			a dcs:Change;
+			label "Use Eval::TypeTiny::CodeAccumulator in compile_match_on_type.";
 		];
 	].
