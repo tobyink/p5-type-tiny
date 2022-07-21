@@ -4191,3 +4191,13 @@
 			label "The slurpy(Foo) function from Types::Standard has been replaced by a new Slurpy parameterized type, so you can use Slurpy[Foo] instead. A slurpy() function is still provided for backwards compatibility, but if you were relying on the internal detail that this used to return an unblessed hashref, this release might break that assumption.";
 		];
 	].
+
+`Type-Tiny 1.016003 cpan:TOBYINK`
+	issued  2022-07-21;
+	changeset [
+		dcs:versus `Type-Tiny 1.016002 cpan:TOBYINK`;
+		item [
+			a dcs:Change;
+			label "Catalyst was relying on the internals of the old slurpy function. Next release of Catalyst should fix that, but this version of Types::Standard introduces a workaround for the issue without going back to implementing Slurpy the old way. (The Catalyst test suite passes at least!)";
+		];
+	].
