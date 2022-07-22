@@ -4217,3 +4217,13 @@
 			label "Use Eval::TypeTiny::CodeAccumulator in compile_match_on_type.";
 		];
 	].
+
+`Type-Tiny 1.016004 cpan:TOBYINK`
+	issued  2022-07-22;
+	changeset [
+		dcs:versus `Type-Tiny 1.016003 cpan:TOBYINK`;
+		item [
+			a dcs:Addition;
+			label "Type::Params now allows named parameters to have aliases.";
+		];
+	].

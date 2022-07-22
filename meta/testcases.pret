@@ -32,6 +32,9 @@ m`Eval::TypeTiny Type-Tiny`
 	:test [ a :AutomatedTest; :test_script f`t/20-modules/Eval-TypeTiny/basic.t Type-Tiny`; :purpose "Tests Eval::TypeTiny." ];
 	:test [ a :AutomatedTest; :test_script f`t/20-modules/Eval-TypeTiny/lexical-subs.t Type-Tiny`; :purpose "Tests Eval::TypeTiny with experimental lexical subs." ];
 	.
+m`Eval::TypeTiny::CodeAccumulator Type-Tiny`
+	:test [ a :AutomatedTest; :test_script f`t/20-modules/Eval-TypeTiny-CodeAccumulator/basic.t Type-Tiny`; :purpose "Tests Eval::TypeTiny::CodeAccumulator." ];
+	.
 m`Test::TypeTiny Type-Tiny`
 	:test [ a :AutomatedTest; :test_script f`t/20-modules/Test-TypeTiny/basic.t Type-Tiny`; :purpose "Tests Test::TypeTiny (which is somewhat important because Test::TypeTiny is itself used for the majority of the type constraint tests). In particular, this tests that everything works when the '$EXTENDED_TESTING' environment variable is false." ];
 	:test [ a :AutomatedTest; :test_script f`t/20-modules/Test-TypeTiny/extended.t Type-Tiny`; :purpose "Tests Test::TypeTiny works when the '$EXTENDED_TESTING' environment variable is true. Note that Test::Tester appears to have issues with subtests, so currently 'should_pass' and 'should_fail' are not tested." ];
@@ -66,8 +69,10 @@ m`Type::Library Type-Tiny`
 	:test [ a :AutomatedTest; :test_script f`t/20-modules/Type-Library/types.t Type-Tiny`; :purpose "Checks that the type functions exported by a type library work as expected." ];
 	.
 m`Type::Params Type-Tiny`
+	:test [ a :AutomatedTest; :test_script f`t/20-modules/Type-Params/alias.t Type-Tiny`; :purpose "Test 'compile_named' supports parameter aliases." ];
 	:test [ a :AutomatedTest; :test_script f`t/20-modules/Type-Params/badsigs.t Type-Tiny`; :purpose "Check that people doing silly things with Test::Params get" ];
 	:test [ a :AutomatedTest; :test_script f`t/20-modules/Type-Params/carping.t Type-Tiny`; :purpose "Test Type::Params' interaction with Carp: use Type::Params compile => { confess => 1 };" ];
+	:test [ a :AutomatedTest; :test_script f`t/20-modules/Type-Params/clone.t Type-Tiny`; :purpose "Test 'compile' and 'compile_named' support autocloned parameters." ];
 	:test [ a :AutomatedTest; :test_script f`t/20-modules/Type-Params/coerce.t Type-Tiny`; :purpose "Test Type::Params usage of types with coercions." ];
 	:test [ a :AutomatedTest; :test_script f`t/20-modules/Type-Params/compile-named-bless.t Type-Tiny`; :purpose "Test Type::Params' brand spanking new 'compile_named' function." ];
 	:test [ a :AutomatedTest; :test_script f`t/20-modules/Type-Params/compile-named-oo-pp.t Type-Tiny`; :purpose "Test Type::Params 'compile_named_oo' function, with PERL_TYPE_PARAMS_XS set to \"0\"." ];
@@ -243,6 +248,7 @@ m`Types::TypeTiny Type-Tiny`
 [] a :AutomatedTest; :test_script f`t/30-external/Sub-Quote/unquote-coercions.t Type-Tiny`; :purpose "Check type coercions can be unquoted Sub::Quote.".
 [] a :AutomatedTest; :test_script f`t/30-external/Sub-Quote/unquote-constraints.t Type-Tiny`; :purpose "Check type constraints can be unquoted Sub::Quote.".
 [] a :AutomatedTest; :test_script f`t/30-external/Switcheroo/basic.t Type-Tiny`; :purpose "Checks Type::Tiny works with Switcheroo.".
+[] a :AutomatedTest; :test_script f`t/30-external/Type-Library-Compiler/basic.t Type-Tiny`; :purpose "Checks Type::Tiny interacts nicely with Type::Library::Compiled-generated libraries.".
 [] a :AutomatedTest; :test_script f`t/30-external/Type-Tie/basic.t Type-Tiny`; :purpose "Test that this sort of thing works: tie my $var, Int;".
 [] a :AutomatedTest; :test_script f`t/30-external/Type-Tie/type-nano.t Type-Tiny`; :purpose "Test that Type::Tiny works okay with Type::Nano.".
 [] a :AutomatedTest; :test_script f`t/30-external/Types-ReadOnly/basic.t Type-Tiny`; :purpose "Types::ReadOnly does some frickin weird stuff with parameterization. Check it all works!".
