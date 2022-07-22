@@ -600,7 +600,7 @@ push @CMP, sub {
 		Scalar::Util::refaddr( $B_stem->compiled_check );
 		
 	if ( $A_stem->can_be_inlined and $B_stem->can_be_inlined ) {
-		return 0
+		return CMP_EQUIVALENT
 			if $A_stem->inline_check( '$WOLFIE' ) eq $B_stem->inline_check( '$WOLFIE' );
 	}
 	
