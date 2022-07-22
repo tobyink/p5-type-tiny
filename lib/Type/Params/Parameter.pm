@@ -27,6 +27,10 @@ sub new {
 	my $class = shift;
 
 	my %self  = @_ == 1 ? %{$_[0]} : @_;
+	$self{alias} ||= [];
+	if ( defined $self{alias} and not ref $self{alias} ) {
+		$self{alias} = [ $self{alias} ];
+	}
 
 	bless \%self, $class;
 }
@@ -34,6 +38,7 @@ sub new {
 sub name      { $_[0]{name} }       sub has_name      { exists $_[0]{name} }
 sub type      { $_[0]{type} }       sub has_type      { exists $_[0]{type} }
 sub default   { $_[0]{default} }    sub has_default   { exists $_[0]{default} }
+sub alias     { $_[0]{alias} }      sub has_alias     { @{ $_[0]{alias} } }
 
 sub should_clone { $_[0]{clone} }
 
@@ -145,6 +150,39 @@ sub _make_code {
 		$self->name || $args{input_slot},
 		$constraint->display_name,
 	) );
+
+	if ( $args{is_named} and $self->has_alias ) {
+		$coderef->add_line( sprintf(
+			'for my $alias ( %s ) {',
+			join( q{, }, map B::perlstring($_), @{ $self->alias } ),
+		) );
+		$coderef->increase_indent;
+		$coderef->add_line( 'exists $in{$alias} or next;' );
+		$coderef->add_line( sprintf(
+			'if ( %s ) {',
+			$exists_check,
+		) );
+		$coderef->increase_indent;
+		$coderef->add_line( sprintf(
+			'%s;',
+			$signature->_make_general_fail(
+				coderef  => $coderef,
+				message  => q{sprintf( 'Superfluous alias "%s" for argument "%s"', $alias, } . B::perlstring( $self->name || $args{input_slot} ) . q{ )},
+			),
+		) );
+		$coderef->decrease_indent;
+		$coderef->add_line( '}' );
+		$coderef->add_line( 'else {' );
+		$coderef->increase_indent;
+		$coderef->add_line( sprintf(
+			'%s = delete( $in{$alias} );',
+			$varname,
+		) );
+		$coderef->decrease_indent;
+		$coderef->add_line( '}' );
+		$coderef->decrease_indent;
+		$coderef->add_line( '}' );
+	}
 
 	if ( $self->has_default and is_CodeRef $self->default ) {
 		my $default_varname = $coderef->add_variable(

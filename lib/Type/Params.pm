@@ -889,6 +889,35 @@ This can be combined with C<named_to_list>:
   
   say $bar;  # 'y'
 
+There is one additional parameter option supported, in addition to
+the C<optional>, C<default>, C<clone>, and C<slurpy> options already
+supported by positional parameters.
+
+=over
+
+=item C<alias> B<< Str|ArrayRef[Str] >>
+
+A list of alternative names for the parameter, or a single alternative
+name.
+
+  {
+    my $check;
+    sub adder {
+      $check ||= compile_named(
+        first_number   => Int, { alias => [ 'x' ] },
+        second_number  => Int, { alias =>   'y'   },
+      );
+      my ( $arg ) = &$check;
+      return $arg->{first_number} + $arg->{second_number};
+    }
+  }
+  
+  say adder( first_number => 40, second_number => 2 );    # 42
+  say adder( x            => 40, y             => 2 );    # 42
+  say adder( first_number => 40, y             => 2 );    # 42
+
+=back
+
 =head3 C<< validate_named(\@_, @spec) >>
 
 Like C<compile> has C<validate>, C<compile_named> has C<validate_named>.
@@ -945,7 +974,9 @@ fast).
 An optional parameter C<foo> will also get a nifty C<< $arg->has_foo >>
 predicate method. Yay!
 
-C<compile_named_oo> gives you some extra options for parameters.
+C<compile_named_oo> gives you some extra options for parameters, in
+addition to the C<optional>, C<default>, C<clone>, C<slurpy>, and
+C<alias> options already supported by C<compile_named>.
 
    sub add_contact_to_database {
       state $check = compile_named_oo(
@@ -966,12 +997,18 @@ C<compile_named_oo> gives you some extra options for parameters.
 The C<getter> option lets you choose the method name for getting the
 argument value.
 
+If the parameter has an alias, this currently I<does not> result in
+additional getters being defined.
+
 =item C<< predicate >> B<< Str >>
 
 The C<predicate> option lets you choose the method name for checking
 the existence of an argument. By setting an explicit predicate method
 name, you can force a predicate method to be generated for non-optional
 arguments.
+
+If the parameter has an alias, this currently I<does not> result in
+additional predicate methods being defined.
 
 =back
 
