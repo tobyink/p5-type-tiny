@@ -915,7 +915,7 @@ name.
   say adder( first_number => 40, second_number => 2 );    # 42
   say adder( x            => 40, y             => 2 );    # 42
   say adder( first_number => 40, y             => 2 );    # 42
-  say adder( first_number => 40, x=> 1, y => 2 );         # dies!
+  say adder( first_number => 40, x => 1, y => 2 );        # dies!
 
 =back
 
