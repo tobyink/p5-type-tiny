@@ -155,6 +155,7 @@ __PACKAGE__->_install_overloads(
 	},
 	q(eq)  => sub { "$_[0]" eq "$_[1]" },
 	q(cmp) => sub { $_[2] ? ( "$_[1]" cmp "$_[0]" ) : ( "$_[0]" cmp "$_[1]" ) },
+	q(0+)  => sub { $_[0]{uniq} },
 );
 
 __PACKAGE__->_install_overloads(
