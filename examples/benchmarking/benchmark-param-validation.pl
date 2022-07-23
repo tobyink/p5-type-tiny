@@ -17,41 +17,52 @@ nanoseconds.
 
 =head2 With Type::Tiny::XS
 
- Type::Params ....................................   2640 ns (378787/s)
- Params::ValidationCompiler with Type::Tiny ......   3120 ns (320512/s)
- Pure Perl Implementation with Ref::Util::XS .....   3639 ns (274725/s)
- Naive Pure Perl Implementation ..................   4600 ns (217391/s)
- Params::ValidationCompiler with Specio ..........  11719 ns (85324/s)
- Params::ValidationCompiler with Moose ...........  12079 ns (82781/s)
- Data::Validator with Mouse ......................  51760 ns (19319/s)
- Data::Validator with Type::Tiny .................  51920 ns (19260/s)
- Data::Validator with Moose ......................  52120 ns (19186/s)
- MooseX::Params::Validate with Moose .............  83080 ns (12036/s)
- MooseX::Params::Validate with Type::Tiny ........  84839 ns (11786/s)
+ Pure Perl Implementation with Ref::Util::XS .....    479 ns (2083333/s)
+ Type::Params with Type::Tiny ....................    519 ns (1923076/s)
+ Params::ValidationCompiler with Type::Tiny ......    560 ns (1785714/s)
+ Naive Pure Perl Implementation ..................    640 ns (1562499/s)
+ Type::Params with Moose .........................    799 ns (1250000/s)
+ Params::ValidationCompiler with Specio ..........   1399 ns (714285/s)
+ Params::ValidationCompiler with Moose ...........   1479 ns (675675/s)
+ Type::Params with Mouse .........................   1520 ns (657894/s)
+ Type::Params with Specio ........................   1560 ns (641025/s)
+ Params::Validate with Type::Tiny ................   2199 ns (454545/s)
+ Params::Validate ................................   2760 ns (362318/s)
+ Data::Validator with Mouse ......................   5560 ns (179856/s)
+ Data::Validator with Type::Tiny .................   5600 ns (178571/s)
+ Data::Validator with Moose ......................   5680 ns (176056/s)
+ MooseX::Params::Validate with Moose .............   8079 ns (123762/s)
+ MooseX::Params::Validate with Type::Tiny ........   8120 ns (123152/s)
+ Type::Params with Type::Nano ....................   9160 ns (109170/s)
 
 =head2 Without Type::Tiny::XS
 
- Pure Perl Implementation with Ref::Util::XS .....   3560 ns (280898/s)
- Naive Pure Perl Implementation ..................   4479 ns (223214/s)
- Type::Params ....................................   7879 ns (126903/s)
- Params::ValidationCompiler with Type::Tiny ......   8319 ns (120192/s)
- Params::ValidationCompiler with Specio ..........  11800 ns (84745/s)
- Params::ValidationCompiler with Moose ...........  12159 ns (82236/s)
- Data::Validator with Type::Tiny .................  51039 ns (19592/s)
- Data::Validator with Moose ......................  51559 ns (19394/s)
- Data::Validator with Mouse ......................  51760 ns (19319/s)
- MooseX::Params::Validate with Type::Tiny ........  82800 ns (12077/s)
- MooseX::Params::Validate with Moose .............  93160 ns (10734/s)
+ Pure Perl Implementation with Ref::Util::XS .....    479 ns (2083333/s)
+ Naive Pure Perl Implementation ..................    599 ns (1666666/s)
+ Type::Params with Type::Tiny ....................   1079 ns (925925/s)
+ Params::ValidationCompiler with Type::Tiny ......   1120 ns (892857/s)
+ Type::Params with Moose .........................   1240 ns (806451/s)
+ Type::Params with Specio ........................   1520 ns (657894/s)
+ Params::ValidationCompiler with Specio ..........   1560 ns (641025/s)
+ Params::ValidationCompiler with Moose ...........   1599 ns (625000/s)
+ Params::Validate ................................   2640 ns (378787/s)
+ Type::Params with Mouse .........................   2760 ns (362318/s)
+ Params::Validate with Type::Tiny ................   3279 ns (304878/s)
+ Data::Validator with Moose ......................   5760 ns (173611/s)
+ Data::Validator with Type::Tiny .................   5799 ns (172413/s)
+ Data::Validator with Mouse ......................   5800 ns (172413/s)
+ MooseX::Params::Validate with Type::Tiny ........   8079 ns (123762/s)
+ MooseX::Params::Validate with Moose .............   8120 ns (123152/s)
+ Type::Params with Type::Nano ....................   9119 ns (109649/s)
 
 =head1 ANALYSIS
 
-Type::Params (using Type::Tiny type constraints) provides the fastest convenient
-way of checking positional parameters for a function, whether or not Type::Tiny::XS
+Type::Params (using Type::Tiny type constraints) is the fastest framework for
+checking positional parameters for a function, whether or not Type::Tiny::XS
 is available.
 
 The only way to beat it is to write your own type checking in longhand,
-but if Type::Tiny::XS is installed, you probably still won't be able
-to match Type::Params' speed.
+but if Type::Tiny::XS is installed, hand-rolled code might still be slower.
 
 Params::ValidationCompiler (also using Type::Tiny type constraints) is very
 nearly as fast.
@@ -61,6 +72,8 @@ and when Type::Tiny::XS is not available, Moose and Specio constraints run
 almost as fast as Type::Tiny constraints.
 
 Data::Validator and MooseX::Params::Validate are far slower.
+
+Type::Nano is slow. (But it's not written for speed!)
 
 =head1 DEPENDENCIES
 
@@ -86,7 +99,7 @@ use v5.12;
 use strict;
 use warnings;
 use Benchmark qw(:hireswallclock timeit);
-use Benchmark::Featureset::ParamCheck 0.002;
+use Benchmark::Featureset::ParamCheck 0.006;
 use Module::Runtime qw(use_module);
 
 my $data = 'Benchmark::Featureset::ParamCheck'->trivial_positional_data;
