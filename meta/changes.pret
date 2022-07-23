@@ -4227,3 +4227,22 @@
 			label "Type::Params now allows named parameters to have aliases.";
 		];
 	].
+
+`Type-Tiny 1.016005 cpan:TOBYINK`
+	issued  2022-07-23;
+	changeset [
+		dcs:versus `Type-Tiny 1.016004 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix;
+			label "Minor bugfix in Type::Tiny::cmp where in some cases it was returning '0' instead of '0E0'; unlikely to affect anything.";
+		];
+		item [
+			a dcs:Change;
+			label "When Type::Registry/Type::Parser has to create a class or role type constraint, use Types::Standard InstanceOf/ConsumerOf instead of creating new anonymous Type::Tiny::Class/Type::Tiny::Role constraints.";
+		];
+		item [
+			a dcs:Update;
+			label "Updated Type::Params benchmarking scripts.";
+		];
+	].
+
