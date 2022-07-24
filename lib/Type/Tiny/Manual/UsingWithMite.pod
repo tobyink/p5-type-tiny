@@ -1,0 +1,188 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Type::Tiny::Manual::UsingWithMite - how to use Type::Tiny with Mite
+
+=head1 MANUAL
+
+Mite takes an unorthodox approach to object-oriented code. When you first
+start a project with Mite (which we'll assume is called Your::Project), Mite
+will create a module called Your::Project::Mite for you.
+
+Then all your classes use code like:
+
+   package Your::Project::Widget;
+   
+   use Your::Project::Mite -all;
+   
+   has name => (
+      is => ro,
+      isa => 'Str',
+   );
+   
+   has id => (
+      is => ro,
+      isa => 'PositiveInt',
+   );
+   
+   signature_for warble => (
+      named => [
+         foo   => 'Int',
+         bar   => 'ArrayRef',
+      ],
+   );
+   
+   sub warble {
+      my ( $self, $arg ) = @_;
+      printf( "%s: %d\n", $self->name, $arg->foo );
+      return;
+   }
+   
+   1;
+
+After writing or editing each class or role, you run the command
+C<< mite compile >> and Mite will output a collection of compiled Perl
+classes which have no non-core dependencies (on Perl 5.14+. There are
+a couple of non-core dependencies on older versions of Perl.)
+
+Attribute C<isa> options are Type::Tiny type constraints expressed as
+strings. Mite looks them up during compilation using C<dwim_type>
+from L<Type::Utils>, and pre-loads L<Types::Standard>,
+L<Types::Common::String>, and L<Types::Common::Numeric> for you.
+
+The C<signature_for> keyword is a wrapper around C<compile> and
+C<compile_named_oo> from L<Type::Params>, depending on whether you
+are using a positional or named parameter signature. Again, note that
+types are expressed as strings and looked up using C<dwim_type>.
+
+Any types which are inlineable should work. If using coercion, any
+coercions which are inlineable should work.
+
+=head2 Custom Types in Mite
+
+You can define your own type library (say, Your::Project::Types) using
+L<Type::Library> as normal:
+
+   package Your::Project::Types;
+   
+   use Type::Library
+      -extends => [ 'Types::Standard', 'Types::Common::Numeric' ];
+   
+   __PACKAGE__->add_type(
+      name    => 'Widget',
+      parent  => InstanceOf['Your::Project::Widget'],
+   )->coercion->add_type_coercions(
+      HashRef, q{Your::Project::Widget->new($_)},
+   );
+   
+   __PACKAGE__->make_immutable;
+   
+   1;
+
+Now if your classes load Your::Project::Types they'll suddenly have a
+dependency on Type::Library, so you don't get that nice zero-dependency
+feeling. But you can add this to your C<< .mite/config >> file:
+
+   types: Your::Project::Types
+
+Now Mite will know to load that type library at compile time, and will
+make those types available as stringy types everywhere.
+
+=head2 Compiled Type Libraries
+
+It does look really pretty to not have to quote your type constraints:
+
+   has name => (
+      is   => ro,
+      isa  => Str,
+   );
+
+One solution for that is L<Type::Library::Compiler>.
+
+Say you've created the custom type library above, you can use 
+L<Type::Library::Compiler> to compile it into a module called
+Your::Project::Types::Compiled, which just uses L<Exporter> and
+doesn't rely on L<Type::Library> or any other part of L<Type::Tiny>.
+
+Then your Widget class can use that:
+
+   package Your::Project::Widget;
+   
+   use Your::Project::Mite -all;
+   use Your::Project::Types::Compiled -types;
+   
+   has name => (
+      is   => ro,
+      isa  => Str,
+   );
+   
+   has id => (
+      is   => ro,
+      isa  => PositiveInt,
+   );
+   
+   signature_for warble => (
+      named => [
+         foo   => Int,
+         bar   => ArrayRef,
+      ],
+   );
+   
+   sub warble {
+      my ( $self, $arg ) = @_;
+      printf( "%s: %d\n", $self->name, $arg->foo );
+      return;
+   }
+   
+   1;
+
+The compiled type libraries are more limited than real type libraries.
+You can't, for example, do parameterized types with them. However, they
+still offer some cool features like:
+
+   Foo->check( $value )     # a few basic methods like this
+   is_Foo( $value )         # boolean checks
+   assert_Foo( $value )     # assertions which die
+   Foo | Bar                # unions!
+
+This way you can write a project with object orientation, roles, method
+modifiers, type-checked attributes, type-checked signatures, and even
+coercion, with no non-core dependencies! (The tools like L<Mite> and
+L<Type::Library::Compiler> are only needed by the developer, not the
+end user.)
+
+=head1 NEXT STEPS
+
+Here's your next step:
+
+=over
+
+=item * L<Type::Tiny::Manual::UsingWithClassTiny>
+
+Including how to Type::Tiny in your object's C<BUILD> method, and
+third-party shims between Type::Tiny and Class::Tiny.
+
+=back
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2022 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+=cut
+

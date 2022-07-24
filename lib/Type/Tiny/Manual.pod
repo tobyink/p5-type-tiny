@@ -151,6 +151,12 @@ over built-in type constraints, and Moose-specific features.
 How to use Type::Tiny with Mouse, including the advantages of Type::Tiny
 over built-in type constraints, and Mouse-specific features.
 
+=item * L<Type::Tiny::Manual::UsingWithMite>
+
+How to use Type::Tiny with Mite, including how to write an entire Perl
+project using clean Moose-like code and no non-core dependencies.
+(Not even dependencies on Mite or Type::Tiny!)
+
 =item * L<Type::Tiny::Manual::UsingWithClassTiny>
 
 Including how to Type::Tiny in your object's C<BUILD> method, and
