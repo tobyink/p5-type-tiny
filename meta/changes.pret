@@ -4246,3 +4246,17 @@
 		];
 	].
 
+`Type-Tiny 1.016006 cpan:TOBYINK`
+	issued  2022-07-25;
+	changeset [
+		dcs:versus `Type-Tiny 1.016005 cpan:TOBYINK`;
+		item [
+			a dcs:Documentation;
+			label "Added a new page to the manual: Type::Tiny::Manual::UsingWithMite.";
+		];
+		item [
+			a dcs:Change;
+			label "Type::Tiny now overloads 0+ to return a unique number per type constraint.";
+		];
+	].
+
