@@ -8,7 +8,7 @@ Type::Tiny::Manual::UsingWithMite - how to use Type::Tiny with Mite
 
 =head1 MANUAL
 
-Mite takes an unorthodox approach to object-oriented code. When you first
+L<Mite> takes an unorthodox approach to object-oriented code. When you first
 start a project with Mite (which we'll assume is called Your::Project), Mite
 will create a module called Your::Project::Mite for you.
 
