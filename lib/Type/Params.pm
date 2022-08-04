@@ -548,6 +548,43 @@ If an C<on_die> coderef is provided, then it is called instead, and the
 exception is passed to it as an object. The C<< $check >> coderef will still
 immediately return though.
 
+=item C<< strictness >> B<< Bool | Str >>
+
+If you set C<strictness> to a false value (0, undef, or the empty string), then
+certain signature checks will simply never be done. The initial check that
+there's the correct number of parameters, plus type checks on parameters which
+don't coerce can be skipped.
+
+If you set it to a true boolean (i.e. 1) or do not set it at all, then these
+checks will always be done.
+
+Alternatively, it may be set to the quoted fully-qualified name of a Perl
+global variable or a constant, and that will be compiled into the coderef
+as a condition to enable strict checks.
+
+  state $check = compile(
+    { strictness => '$::CHECK_TYPES' },
+    Int,
+    ArrayRef,
+  );
+  
+  # Type checks are skipped
+  {
+    local $::CHECK_TYPES = 0;
+    my ( $number, $list ) = $check->( {}, {} );
+  }
+  
+  # Type checks are performed
+  {
+    local $::CHECK_TYPES = 1;
+    my ( $number, $list ) = $check->( {}, {} );
+  }
+
+A recommended use of this is with L<Devel::StrictMode>.
+
+  use Devel::StrictMode qw( STRICT );
+  state $check = compile( { strictness => STRICT }, Int, ArrayRef );
+
 =back
 
 The types for each parameter may be any L<Type::Tiny> type constraint, or
@@ -668,6 +705,10 @@ unaffected.
  foo( \@numbers );
  
  print "@numbers\n";  ## 1 2 3
+
+=item C<< strictness >> B<< Bool | Str >>
+
+Overrides the signature-wide C<strictness> setting on a per-parameter basis.
 
 =item C<< slurpy >> B<Bool>
 

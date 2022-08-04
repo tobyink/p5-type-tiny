@@ -35,10 +35,11 @@ sub new {
 	bless \%self, $class;
 }
 
-sub name      { $_[0]{name} }       sub has_name      { exists $_[0]{name} }
-sub type      { $_[0]{type} }       sub has_type      { exists $_[0]{type} }
-sub default   { $_[0]{default} }    sub has_default   { exists $_[0]{default} }
-sub alias     { $_[0]{alias} }      sub has_alias     { @{ $_[0]{alias} } }
+sub name       { $_[0]{name} }        sub has_name       { exists $_[0]{name} }
+sub type       { $_[0]{type} }        sub has_type       { exists $_[0]{type} }
+sub default    { $_[0]{default} }     sub has_default    { exists $_[0]{default} }
+sub alias      { $_[0]{alias} }       sub has_alias      { @{ $_[0]{alias} } }
+sub strictness { $_[0]{strictness} }  sub has_strictness { exists $_[0]{strictness} }
 
 sub should_clone { $_[0]{clone} }
 
@@ -123,6 +124,14 @@ sub _make_code {
 		&& $constraint->parent->{uniq} eq Optional->{uniq}
 		&& $constraint->type_parameter;
 
+	my $strictness;
+	if ( $self->has_strictness ) {
+		$strictness = \ $self->strictness;
+	}
+	elsif ( $signature->has_strictness ) {
+		$strictness = \ $signature->strictness;
+	}
+
 	my ( $vartail, $exists_check );
 	if ( $args{is_named} ) {
 		my $bit = $args{key};
@@ -138,6 +147,7 @@ sub _make_code {
 
 	my $block_needs_ending = 0;
 	my $needs_clone = $self->should_clone;
+	my $in_big_optional_block = 0;
 
 	if ( $needs_clone and not $signature->{loaded_Storable} ) {
 		$coderef->add_line( 'use Storable ();' );
@@ -216,6 +226,7 @@ sub _make_code {
 			) );
 			$coderef->{indent} .= "\t";
 			++$block_needs_ending;
+			++$in_big_optional_block;
 		}
 		else {
 			$coderef->add_line( sprintf(
@@ -270,11 +281,22 @@ sub _make_code {
 	undef $Type::Tiny::ALL_TYPES{ $constraint->{uniq} };
 	$Type::Tiny::ALL_TYPES{ $constraint->{uniq} } = $constraint;
 
-	if ( $constraint->{uniq} == Any->{uniq} ) {
+	my $strictness_test = '';
+	if ( $strictness and $$strictness eq 1 ) {
+		$strictness_test = '';
+	}
+	elsif ( $strictness and $$strictness ) {
+		$strictness_test = sprintf "( not %s )\n\tor ", $$strictness; 
+	}
+
+	if ( $strictness and not $$strictness ) {
+		$coderef->add_line( '1; # ... nothing to do' );
+	}
+	elsif ( $constraint->{uniq} == Any->{uniq} ) {
 		$coderef->add_line( '1; # ... nothing to do' );
 	}
 	elsif ( $constraint->can_be_inlined ) {
-		$coderef->add_line( sprintf(
+		$coderef->add_line( $strictness_test . sprintf(
 			"%s\n\tor %s;",
 			( $really_optional or $constraint )->inline_check( $varname ),
 			$signature->_make_constraint_fail(
@@ -291,7 +313,7 @@ sub _make_code {
 			'$check_for_' . $vartail,
 			\ ( ( $really_optional or $constraint )->compiled_check ),
 		);
-		$coderef->add_line( sprintf(
+		$coderef->add_line( $strictness_test . sprintf(
 			"&%s( %s )\n\tor %s;",
 			$compiled_check_varname,
 			$varname,
@@ -313,7 +335,7 @@ sub _make_code {
 		) );
 	}
 	elsif ( $args{output_slot} and $args{output_slot} ne $varname ) {
-		if ( $varname =~ /\{/ ) {
+		if ( !$in_big_optional_block and $varname =~ /\{/ ) {
 			$coderef->add_line( sprintf(
 				'%s = %s if exists( %s );',
 				$args{output_slot},

@@ -200,6 +200,7 @@ sub tail          { $_[0]{tail} }            sub has_tail          { exists $_[0
 sub parameters    { $_[0]{parameters} }      sub has_parameters    { exists $_[0]{parameters} }
 sub slurpy        { $_[0]{slurpy} }          sub has_slurpy        { exists $_[0]{slurpy} }
 sub on_die        { $_[0]{on_die} }          sub has_on_die        { exists $_[0]{on_die} }
+sub strictness    { $_[0]{strictness} }      sub has_strictness    { exists $_[0]{strictness} }
 
 sub is_named      { $_[0]{is_named} }
 sub bless         { $_[0]{bless} }
@@ -287,6 +288,17 @@ sub _coderef_start_extra {}
 sub _coderef_check_count {
 	my ( $self, $coderef ) = ( shift, @_ );
 
+	my $strictness_test = '';
+	if ( defined $self->strictness and $self->strictness eq 1 ) {
+		$strictness_test = '';
+	}
+	elsif ( $self->strictness ) {
+		$strictness_test = sprintf '( not %s ) or ', $self->strictness;
+	}
+	elsif ( $self->has_strictness ) {
+		return $self;
+	}
+
 	my $headtail = 0;
 	$headtail += @{ $self->head } if $self->has_head;
 	$headtail += @{ $self->tail } if $self->has_tail;
@@ -337,7 +349,7 @@ sub _coderef_check_count {
 				if defined $max_args_if_hash;
 		}
 
-		$coderef->add_line( sprintf(
+		$coderef->add_line( $strictness_test . sprintf(
 			"\@_ == %d && %s\n\tor \@_ %% 2 == %d%s\n\tor %s;",
 			$args_if_hashref,
 			HashRef->inline_check( sprintf '$_[%d]', $hashref_index ),
@@ -357,7 +369,7 @@ sub _coderef_check_count {
 		$self->{max_args} = $max_args;
 
 		if ( defined $max_args and $min_args == $max_args ) {
-			$coderef->add_line( sprintf(
+			$coderef->add_line( $strictness_test . sprintf(
 				"\@_ == %d\n\tor %s;",
 				$min_args,
 				$self->_make_count_fail(
@@ -369,7 +381,7 @@ sub _coderef_check_count {
 			) );
 		}
 		elsif ( $min_args and defined $max_args ) {
-			$coderef->add_line( sprintf(
+			$coderef->add_line( $strictness_test . sprintf(
 				"\@_ >= %d && \@_ <= %d\n\tor %s;",
 				$min_args,
 				$max_args,
@@ -382,7 +394,7 @@ sub _coderef_check_count {
 			) );
 		}
 		else {
-			$coderef->add_line( sprintf(
+			$coderef->add_line( $strictness_test . sprintf(
 				"\@_ >= %d\n\tor %s;",
 				$min_args || 0,
 				$self->_make_count_fail(
@@ -571,13 +583,18 @@ sub _coderef_slurpy {
 sub _coderef_extra_names {
 	my ( $self, $coderef ) = ( shift, @_ );
 
+	return $self if $self->has_strictness && ! $self->strictness;
+
 	$coderef->add_line( '# Unrecognized parameters' );
 	$coderef->add_line( sprintf(
-		'%s if keys %%in;',
+		'%s if %skeys %%in;',
 		$self->_make_general_fail(
 			coderef   => $coderef,
 			message   => 'sprintf( q{Unrecognized parameter%s: %s}, keys( %in ) > 1 ? q{s} : q{}, join( q{, }, sort keys %in ) )',
 		),
+		defined( $self->strictness ) && $self->strictness ne 1
+			? sprintf( '%s && ', $self->strictness )
+			: ''
 	) );
 	$coderef->add_gap;
 }
