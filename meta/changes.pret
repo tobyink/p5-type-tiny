@@ -4260,3 +4260,13 @@
 		];
 	].
 
+`Type-Tiny 1.016007 cpan:TOBYINK`
+	issued  2022-08-04;
+	changeset [
+		dcs:versus `Type-Tiny 1.016006 cpan:TOBYINK`;
+		item [
+			a dcs:Addition;
+			label "Type::Params now has a `strictness` option, which if set to false (or certain strings of Perl code that evaluate to false) will skip type checks apart from when needed for coercions, skip parameter count checks, and skip checks for unknown named parameters. You generally don't want to set it to false or indeed set it at all.";
+		];
+	].
+

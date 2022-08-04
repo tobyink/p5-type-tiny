@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Coercion::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Coercion::VERSION   = '1.016006';
+	$Type::Coercion::VERSION   = '1.016007';
 }
 
 $Type::Coercion::VERSION =~ tr/_//d;
