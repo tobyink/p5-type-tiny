@@ -286,7 +286,7 @@ sub _make_code {
 		$strictness_test = '';
 	}
 	elsif ( $strictness and $$strictness ) {
-		$strictness_test = sprintf "( not %s )\n\tor ", $$strictness; 
+		$strictness_test = sprintf "( not %s )\n\tor ", $$strictness;
 	}
 
 	if ( $strictness and not $$strictness ) {
