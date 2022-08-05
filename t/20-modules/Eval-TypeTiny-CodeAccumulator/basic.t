@@ -38,6 +38,7 @@ is $make_adder->add_variable( '$addend' => \999 ), '$addend_2';
 $make_adder->add_line( 'sub {' );
 $make_adder->increase_indent;
 $make_adder->add_placeholder( 'unpack-args' );
+$make_adder->add_placeholder( 'dummy' );
 $make_adder->add_gap;
 $make_adder->add_line( 'return ' . $varname . ' + $other_addend;' );
 $make_adder->decrease_indent;
@@ -45,9 +46,9 @@ $make_adder->add_line( '}' );
 
 $make_adder->fill_placeholder( 'unpack-args', 'my $other_addend = shift;' );
 
-note( $make_adder->code );
-
 my $adder = $make_adder->compile;
+
+note( $make_adder->code );
 
 is $adder->( 2 ), 42;
 

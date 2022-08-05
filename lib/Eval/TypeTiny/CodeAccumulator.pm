@@ -89,7 +89,15 @@ sub add_variable {
 	$actual_name;
 }
 
-sub finalize {}
+sub finalize {
+	my $self = shift;
+
+	for my $p ( values %{ $self->{placeholders} } ) {
+		splice( @{ $self->{code} }, $p->[0], 1 );
+	}
+
+	return $self;
+}
 
 sub compile {
 	my $self = shift;
@@ -173,7 +181,7 @@ Returns the source code so far.
 
 Returns the same description given to the constructor, if any.
 
-=item C<< add_line( $line_of_code ) >>
+=item C<< add_line( @lines_of_code ) >>
 
 Adds the next line of code.
 
@@ -202,7 +210,7 @@ continue to refer to the variable with that returned name, just in case.
 
 Adds a line of code which is just a comment, but remembers its line number.
 
-=item C<< fill_placeholder( $placeholder_name, $line_of_code ) >>
+=item C<< fill_placeholder( $placeholder_name, @lines_of_code ) >>
 
 Goes back to a previously inserted placeholder and replaces it with code.
 
@@ -212,8 +220,9 @@ Compiles the code and returns it as a coderef.
 
 =item C<< finalize() >>
 
-This method does nothing but is called by C<compile> just before compiling
-the code. It may be useful if subclassing this class.
+This method is called by C<compile> just before compiling the code. All it
+does is remove unfilled placeholder comments, but it may also be useful if
+subclassing this class.
 
 =back
 
