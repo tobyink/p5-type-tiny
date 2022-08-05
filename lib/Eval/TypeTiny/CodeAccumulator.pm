@@ -59,8 +59,8 @@ sub add_placeholder {
 	my ( $self, $for ) = ( shift, @_ );
 	my $indent = $self->{indent} || '';
 
-	$self->{placeholders}{$for} = @{ $self->{code} };
-	push @{ $self->{code} }, "$indent# placeholder for $for";
+	$self->{placeholders}{$for} = [ scalar( @{ $self->{code} } ), $self->{indent} ];
+	push @{ $self->{code} }, "$indent# placeholder [ $for ]";
 
 	$self;
 }
@@ -68,8 +68,9 @@ sub add_placeholder {
 sub fill_placeholder {
 	my ( $self, $for, @lines ) = ( shift, @_ );
 
-	my $line_number = delete $self->{placeholders}{$for};
-	splice( @{ $self->{code} }, $line_number, 1, @lines );
+	my ( $line_number, $indent ) = @{ delete $self->{placeholders}{$for} or die };
+	my @indented_lines = map { $indent . $_ } map { split /\n/ } @lines;
+	splice( @{ $self->{code} }, $line_number, 1, @indented_lines );
 
 	$self;
 }
@@ -204,8 +205,6 @@ Adds a line of code which is just a comment, but remembers its line number.
 =item C<< fill_placeholder( $placeholder_name, $line_of_code ) >>
 
 Goes back to a previously inserted placeholder and replaces it with code.
-
-Currently doesn't play nice with indentation.
 
 =item C<< compile() >>
 
