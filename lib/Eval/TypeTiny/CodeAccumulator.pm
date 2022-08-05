@@ -59,10 +59,15 @@ sub add_placeholder {
 	my ( $self, $for ) = ( shift, @_ );
 	my $indent = $self->{indent} || '';
 
-	$self->{placeholders}{$for} = [ scalar( @{ $self->{code} } ), $self->{indent} ];
+	$self->{placeholders}{$for} = [
+		scalar( @{ $self->{code} } ),
+		$self->{indent},
+	];
 	push @{ $self->{code} }, "$indent# placeholder [ $for ]";
 
-	$self;
+	if ( defined wantarray ) {
+		return sub { $self->fill_placeholder( $for, @_ ) };
+	}
 }
 
 sub fill_placeholder {
@@ -96,7 +101,7 @@ sub finalize {
 		splice( @{ $self->{code} }, $p->[0], 1 );
 	}
 
-	return $self;
+	$self;
 }
 
 sub compile {
@@ -214,6 +219,9 @@ Adds a line of code which is just a comment, but remembers its line number.
 
 Goes back to a previously inserted placeholder and replaces it with code.
 
+As an alternative, C<add_placeholder> returns a coderef, which you can call
+like C<< $callback->( @lines_of_code ) >>.
+
 =item C<< compile() >>
 
 Compiles the code and returns it as a coderef.
@@ -221,7 +229,8 @@ Compiles the code and returns it as a coderef.
 =item C<< finalize() >>
 
 This method is called by C<compile> just before compiling the code. All it
-does is remove unfilled placeholder comments, but it may also be useful if
+does is remove unfilled placeholder comments. It is not intended for end
+users to call, but is documented as it may be a useful hook if you are
 subclassing this class.
 
 =back
