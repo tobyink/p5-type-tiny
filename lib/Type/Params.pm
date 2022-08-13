@@ -522,7 +522,15 @@ into too many details about what else this hashref contains.
 Description of the coderef that will show up in stack traces. Defaults to
 "parameter validation for X" where X is the caller sub name.
 
+=item C<< package >> B<< Str >>
+
+The package of the sub we're supposed to be checking. Not usually important.
+The default is probably fine.
+
 =item C<< subname >> B<< Str >>
+
+The name of the sub we're supposed to be checking. Not usually important.
+The default is probably fine.
 
 If you wish to use the default description, but need to change the sub name,
 use this.
@@ -547,6 +555,48 @@ it will throw an exception.
 If an C<on_die> coderef is provided, then it is called instead, and the
 exception is passed to it as an object. The C<< $check >> coderef will still
 immediately return though.
+
+=item C<< goto_next >> B<< Bool | CodeLike >>
+
+Defaults to false.
+
+This can be used to turn signatures inside out. Instead of your signature
+being a coderef which is called by your function, your function can be a
+coderef which is called by the signature.
+
+  # The function people call.
+  sub foo {
+    state $sig = compile { goto_next => 1 }, Int;
+    $sig->( \&_real_foo, @_ );
+  }
+  
+  # Your real function which receives checked/coerced arguments
+  sub _real_foo {
+    my ( $n ) = ( @_ );
+    ...;
+  }
+
+Alternatively, using a coderef:
+
+  sub foo {
+    state $sig = compile { goto_next => \&_real_foo }, Int;
+    $sig->( @_ );
+  }
+  
+  sub _real_foo {
+    my ( $n ) = ( @_ );
+    ...;
+  }
+
+Or even:
+
+  {
+    my $real_foo = sub {
+      my ( $n ) = ( @_ );
+      ...;
+    };
+    *foo = compile { subname => 'foo', goto_next => $real_foo }, Int;
+  }
 
 =item C<< strictness >> B<< Bool | Str >>
 

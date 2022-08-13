@@ -201,7 +201,7 @@ sub parameters    { $_[0]{parameters} }      sub has_parameters    { exists $_[0
 sub slurpy        { $_[0]{slurpy} }          sub has_slurpy        { exists $_[0]{slurpy} }
 sub on_die        { $_[0]{on_die} }          sub has_on_die        { exists $_[0]{on_die} }
 sub strictness    { $_[0]{strictness} }      sub has_strictness    { exists $_[0]{strictness} }
-
+sub goto_next      { $_[0]{goto_next} }
 sub is_named      { $_[0]{is_named} }
 sub bless         { $_[0]{bless} }
 sub class         { $_[0]{class} }
@@ -249,6 +249,16 @@ sub _coderef_start {
 
 	$coderef->add_line( 'sub {' );
 	$coderef->{indent} .= "\t";
+
+	if ( my $next = $self->goto_next ) {
+		if ( is_CodeLike $next ) {
+			$coderef->add_variable( '$__NEXT__', \$next );
+		}
+		else {
+			$coderef->add_line( 'my $__NEXT__ = shift;' );
+			$coderef->add_gap;
+		}
+	}
 
 	$self->_coderef_start_extra( $coderef );
 
@@ -673,7 +683,17 @@ sub _make_return_list {
 sub _make_return_expression {
 	my ( $self, %args ) = @_;
 
-	if ( $args{is_early} or not exists $args{is_early} ) {
+	if ( $self->goto_next ) {
+		my $list = join( q{, }, $self->_make_return_list );
+		if ( $list eq '@_' ) {
+			return sprintf 'goto( $__NEXT__ )';
+		}
+		else {
+			return sprintf 'do { @_ = ( %s ); goto $__NEXT__ }',
+				$list;
+		}
+	}
+	elsif ( $args{is_early} or not exists $args{is_early} ) {
 		return sprintf 'return( %s )',
 			join( q{, }, $self->_make_return_list );
 	}
