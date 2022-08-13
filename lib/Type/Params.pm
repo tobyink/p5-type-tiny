@@ -261,51 +261,54 @@ sub wrap_subs {
 	goto \&_wrap_subs;
 }
 
-sub _wrap_subs {
-	my $opts = shift;
-	my $subname =
-		eval   { require Sub::Util } ? \&Sub::Util::set_subname
-		: eval { require Sub::Name } ? \&Sub::Name::subname
-		: sub { pop; };
-	while ( @_ ) {
-		my ( $name, $proto ) = splice @_, 0, 2;
-		my $fullname = ( $name =~ /::/ ) ? $name : sprintf( '%s::%s', $opts->{caller}, $name );
-		my $orig = do {
+{
+	my $subname;
+	sub _wrap_subs {
+		my $opts = shift;
+		$subname ||=
+			eval   { require Sub::Util } ? \&Sub::Util::set_subname
+			: eval { require Sub::Name } ? \&Sub::Name::subname
+			: sub { pop; };
+		while ( @_ ) {
+			my ( $name, $proto ) = splice @_, 0, 2;
+			my $fullname = ( $name =~ /::/ ) ? $name : sprintf( '%s::%s', $opts->{caller}, $name );
+			my $orig = do {
+				no strict 'refs';
+				exists &$fullname     ? \&$fullname
+					: $opts->{use_can} ? ( $opts->{caller}->can( $name ) || sub { } )
+					: sub { }
+			};
+			my $new;
+			if ( ref $proto eq 'CODE' ) {
+				$new = $opts->{skip_invocant}
+					? sub {
+						my $s = shift;
+						@_ = ( $s, &$proto );
+						goto $orig;
+					}
+					: sub {
+						@_ = &$proto;
+						goto $orig;
+					};
+			}
+			else {
+				$new = compile(
+					{
+						'package'   => $opts->{caller},
+						'subname'   => $name,
+						'goto_next' => $orig,
+						'head'      => $opts->{skip_invocant} ? 1 : 0,
+					},
+					@$proto,
+				);
+			}
 			no strict 'refs';
-			exists &$fullname     ? \&$fullname
-				: $opts->{use_can} ? ( $opts->{caller}->can( $name ) || sub { } )
-				: sub { }
-		};
-		my $new;
-		if ( ref $proto eq 'CODE' ) {
-			$new = $opts->{skip_invocant}
-				? sub {
-					my $s = shift;
-					@_ = ( $s, &$proto );
-					goto $orig;
-				}
-				: sub {
-					@_ = &$proto;
-					goto $orig;
-				};
-		}
-		else {
-			$new = compile(
-				{
-					'package'   => $opts->{caller},
-					'subname'   => $name,
-					'goto_next' => $orig,
-					'head'      => $opts->{skip_invocant} ? 1 : 0,
-				},
-				@$proto,
-			);
-		}
-		no strict 'refs';
-		no warnings 'redefine';
-		*$fullname = $subname->( $fullname, $new );
-	} #/ while ( @_ )
-	1;
-} #/ sub _wrap_subs
+			no warnings 'redefine';
+			*$fullname = $subname->( $fullname, $new );
+		} #/ while ( @_ )
+		1;
+	} #/ sub _wrap_subs
+}
 
 1;
 
