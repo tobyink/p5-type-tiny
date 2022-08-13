@@ -201,7 +201,7 @@ sub parameters    { $_[0]{parameters} }      sub has_parameters    { exists $_[0
 sub slurpy        { $_[0]{slurpy} }          sub has_slurpy        { exists $_[0]{slurpy} }
 sub on_die        { $_[0]{on_die} }          sub has_on_die        { exists $_[0]{on_die} }
 sub strictness    { $_[0]{strictness} }      sub has_strictness    { exists $_[0]{strictness} }
-sub goto_next      { $_[0]{goto_next} }
+sub goto_next     { $_[0]{goto_next} }
 sub is_named      { $_[0]{is_named} }
 sub bless         { $_[0]{bless} }
 sub class         { $_[0]{class} }

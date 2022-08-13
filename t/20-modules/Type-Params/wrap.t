@@ -122,7 +122,7 @@ subtest "simple use of wrap_methods" => sub {
 		Local::Test2->uvw({}),
 	};
 	
-	like($e, qr/Reference \{\} did not pass type constraint "Str" \(in \$_\[0]\)/);
+	like($e, qr/Reference \{\} did not pass type constraint "Str" \(in \$_\[1]\)/);
 	
 	$e = exception {
 		Local::Test2->xyz(x => 1, y => 2, z => []),
@@ -168,19 +168,19 @@ subtest "wrap_methods with inheritance" => sub {
 		Local::Test3->abc(1, 2, 2),
 	};
 	
-	like($e, qr/Value "1" did not pass type constraint \(in \$_\[0\]\)/);
+	like($e, qr/Value "1" did not pass type constraint \(in \$_\[1\]\)/);
 	
 	$e = exception {
 		Local::Test3->def({}),
 	};
 	
-	like($e, qr/Reference \{\} did not pass type constraint "Num" \(in \$_\[0]\)/);
+	like($e, qr/Reference \{\} did not pass type constraint "Num" \(in \$_\[1]\)/);
 	
 	$e = exception {
 		Local::Test3->uvw({}),
 	};
 	
-	like($e, qr/Reference \{\} did not pass type constraint "Str" \(in \$_\[0]\)/);
+	like($e, qr/Reference \{\} did not pass type constraint "Str" \(in \$_\[1]\)/);
 	
 	$e = exception {
 		Local::Test3->xyz(x => 1, y => 2, z => []),
