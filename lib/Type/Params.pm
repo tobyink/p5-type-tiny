@@ -607,6 +607,15 @@ Or even:
     *foo = compile( { subname => 'foo', goto_next => $real_foo }, Int );
   }
 
+If you're using Moose/Mouse/Moo, then this should work:
+
+  sub foo {
+    my ( $n ) = ( @_ );
+    ...;
+  }
+  
+  around foo => compile( { subname => 'foo', goto_next => 1 }, Int );
+
 =item C<< strictness >> B<< Bool | Str >>
 
 If you set C<strictness> to a false value (0, undef, or the empty string), then
