@@ -10,7 +10,7 @@ BEGIN {
 
 BEGIN {
 	$Type::Params::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Params::VERSION   = '1.016007';
+	$Type::Params::VERSION   = '1.016008';
 }
 
 $Type::Params::VERSION =~ tr/_//d;
@@ -575,7 +575,7 @@ coderef which is called by the signature.
 
   # The function people call.
   sub foo {
-    state $sig = compile { goto_next => 1 }, Int;
+    state $sig = compile( { goto_next => 1 }, Int );
     $sig->( \&_real_foo, @_ );
   }
   
@@ -588,7 +588,7 @@ coderef which is called by the signature.
 Alternatively, using a coderef:
 
   sub foo {
-    state $sig = compile { goto_next => \&_real_foo }, Int;
+    state $sig = compile( { goto_next => \&_real_foo }, Int );
     $sig->( @_ );
   }
   
@@ -604,7 +604,7 @@ Or even:
       my ( $n ) = ( @_ );
       ...;
     };
-    *foo = compile { subname => 'foo', goto_next => $real_foo }, Int;
+    *foo = compile( { subname => 'foo', goto_next => $real_foo }, Int );
   }
 
 =item C<< strictness >> B<< Bool | Str >>

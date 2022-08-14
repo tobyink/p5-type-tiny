@@ -4270,3 +4270,21 @@
 		];
 	].
 
+`Type-Tiny 1.016008 cpan:TOBYINK`
+	issued  2022-08-14;
+	changeset [
+		dcs:versus `Type-Tiny 1.016007 cpan:TOBYINK`;
+		item [
+			a dcs:Addition;
+			label "Type::Params now has a `goto_next` option, which if set to a coderef will generate a signature which on success, instead of returning @_, passes @_ to the coderef. If `goto_next` is set to true, the signature instead expects to be passed such a coderef as its first argument.";
+		];
+		item [
+			a dcs:Change;
+			label "Type::Params `wrap_subs` and `wrap_methods` internally use `goto_next`.";
+		];
+		item [
+			a dcs:Change;
+			label "Eval::TypeTiny::CodeAccumulator now better handles placeholders.";
+		];
+	].
+
