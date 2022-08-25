@@ -440,14 +440,14 @@ sub inlined              { $_[0]{inlined} }
 sub deprecated           { $_[0]{deprecated} }
 sub constraint_generator { $_[0]{constraint_generator} }
 sub inline_generator     { $_[0]{inline_generator} }
-sub name_generator { $_[0]{name_generator} ||= $_[0]->_build_name_generator }
-sub coercion_generator { $_[0]{coercion_generator} }
-sub parameters         { $_[0]{parameters} }
-sub moose_type         { $_[0]{moose_type} ||= $_[0]->_build_moose_type }
-sub mouse_type         { $_[0]{mouse_type} ||= $_[0]->_build_mouse_type }
-sub deep_explanation   { $_[0]{deep_explanation} }
-sub my_methods         { $_[0]{my_methods} ||= $_[0]->_build_my_methods }
-sub sorter             { $_[0]{sorter} }
+sub name_generator       { $_[0]{name_generator} ||= $_[0]->_build_name_generator }
+sub coercion_generator   { $_[0]{coercion_generator} }
+sub parameters           { $_[0]{parameters} }
+sub moose_type           { $_[0]{moose_type} ||= $_[0]->_build_moose_type }
+sub mouse_type           { $_[0]{mouse_type} ||= $_[0]->_build_mouse_type }
+sub deep_explanation     { $_[0]{deep_explanation} }
+sub my_methods           { $_[0]{my_methods} ||= $_[0]->_build_my_methods }
+sub sorter               { $_[0]{sorter} }
 
 sub has_parent               { exists $_[0]{parent} }
 sub has_library              { exists $_[0]{library} }
@@ -516,7 +516,7 @@ sub _build_default_message {
 sub _build_name_generator {
 	my $self = shift;
 	return sub {
-		my ( $s, @a ) = @_;
+		s/[\x00-\x1F]//smg for ( my ( $s, @a ) = @_ );
 		sprintf( '%s[%s]', $s, join q[,], @a );
 	};
 }
