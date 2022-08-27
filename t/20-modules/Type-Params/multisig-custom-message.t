@@ -117,7 +117,7 @@ my @tests = (
 for my $test ( @tests ) {
 	no warnings 'uninitialized';
 	my($name, $code, $expected, $sig) = @$test;
-	like( exception { $code->() }, qr/\A\Q$expected/, $name);
+	like( exception { $code->() } || '', qr/\A\Q$expected/, $name );
 	is ${^TYPE_PARAMS_MULTISIG}, $sig, "$name \${^TYPE_PARAMS_MULTISIG}";
 }
 
