@@ -3961,7 +3961,7 @@
 		item [
 			a dcs:Documentation;
 			label "Fixed typo in Type::Tiny::Enum where the `closest_match` method was documented as being called `closet_match`.";
-			dcs:fixes <https://github.com/tobyink/p5-type-tiny/pull/72>;
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/pull/72>;
 		];
 	].
 
@@ -3972,7 +3972,7 @@
 		item [
 			a dcs:Documentation;
 			label "Fixed typo in Types::Standard documentation where StrMatch regexp parameter didn't use qr// properly.";
-			dcs:fixes <https://github.com/tobyink/p5-type-tiny/pull/74>;
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/pull/74>;
 			dcs:blame cpan:LUCAS;
 		];
 	].
@@ -3984,19 +3984,19 @@
 		item [
 			a dcs:Bugfix;
 			label "Ensure coderefs returned by overload::Method are called with three parameters, as passing two parameters can break subs imlpemented in XS.";
-			dcs:fixes <https://github.com/tobyink/p5-type-tiny/pull/87>;
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/pull/87>;
 			dcs:thanks <urn:uuid:3d4e7e7c-a9f5-4f34-915c-6beefd3485a8>;
 		];
 		item [
 			a dcs:Bugfix;
 			label "Fix explanation message for NumRange/IntRange";
-			dcs:fixes <https://github.com/tobyink/p5-type-tiny/pull/89>;
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/pull/89>;
 		];
 		item [
 			a dcs:Bugfix;
 			label "Prevent stringification of Error::TypeTiny from clobbering $@.";
 			dcs:thanks <urn:uuid:011f6ebf-6818-409c-bc8a-b98011eab9cb>;
-			dcs:fixes <https://github.com/tobyink/p5-type-tiny/pull/80>;
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/pull/80>;
 		];
 		item [
 			a dcs:Documentation;
@@ -4028,20 +4028,20 @@
 		item [
 			a dcs:Change;
 			label "Eliminate warnings while generating deep explanations for type constraint check fails under some circumstances. (Mostly affects StrMatch when Regexp::Util isn't installed.)";
-			dcs:fixes <https://github.com/tobyink/p5-type-tiny/issues/60>;
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/60>;
 			dcs:thanks <urn:uuid:af150f96-4213-481a-968b-58b1325e3d0e>;
 		];
 		item [
 			a dcs:Addition;
 			label "Type::Params `compile`, `compile_named`, and `compile_named_oo` functions now support an `on_die` callback.";
-			dcs:fixes <https://github.com/tobyink/p5-type-tiny/issues/77>;
-			dcs:thanks <urn:94ef588e-86af-4cf6-aa8f-e9794208341f>;
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/77>;
+			dcs:thanks <urn:uuid:94ef588e-86af-4cf6-aa8f-e9794208341f>;
 		];
 		item [
 			a dcs:Addition;
 			label "Error::TypeTiny now has a `throw_cb` method which acts like `throw` but takes an initial callback parameter.";
-			dcs:fixes <https://github.com/tobyink/p5-type-tiny/issues/77>;
-			dcs:thanks <urn:94ef588e-86af-4cf6-aa8f-e9794208341f>;
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/77>;
+			dcs:thanks <urn:uuid:94ef588e-86af-4cf6-aa8f-e9794208341f>;
 		];
 	].
 
@@ -4089,20 +4089,20 @@
 		item [
 			a dcs:Change;
 			label "Eliminate warnings while generating deep explanations for type constraint check fails under some circumstances. (Mostly affects StrMatch when Regexp::Util isn't installed.)";
-			dcs:fixes <https://github.com/tobyink/p5-type-tiny/issues/60>;
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/60>;
 			dcs:thanks <urn:uuid:af150f96-4213-481a-968b-58b1325e3d0e>;
 		];
 		item [
 			a dcs:Addition;
 			label "Type::Params `compile`, `compile_named`, and `compile_named_oo` functions now support an `on_die` callback.";
-			dcs:fixes <https://github.com/tobyink/p5-type-tiny/issues/77>;
-			dcs:thanks <urn:94ef588e-86af-4cf6-aa8f-e9794208341f>;
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/77>;
+			dcs:thanks <urn:uuid:94ef588e-86af-4cf6-aa8f-e9794208341f>;
 		];
 		item [
 			a dcs:Addition;
 			label "Error::TypeTiny now has a `throw_cb` method which acts like `throw` but takes an initial callback parameter.";
-			dcs:fixes <https://github.com/tobyink/p5-type-tiny/issues/77>;
-			dcs:thanks <urn:94ef588e-86af-4cf6-aa8f-e9794208341f>;
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/77>;
+			dcs:thanks <urn:uuid:94ef588e-86af-4cf6-aa8f-e9794208341f>;
 		];
 		item [
 			a dcs:Addition;
@@ -4288,3 +4288,14 @@
 		];
 	].
 
+`Type-Tiny 1.016009 cpan:TOBYINK`
+	issued  2022-08-27;
+	changeset [
+		dcs:versus `Type-Tiny 1.016008 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix;
+			label "Parameterizable type constraints have a name generator, which is a coderef that generates the names of their parameterized child type constraints. The default name generator now strips ASCII control characters (such as null, tab, and new line) from names it generates.";
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/96>;
+			dcs:thanks <urn:uuid:1e423144-9fa1-42b4-86fa-7a4e47a5519e>;
+		];
+	].
