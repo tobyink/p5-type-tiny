@@ -23,6 +23,7 @@ sub COMMA ()     { "COMMA" }
 sub SLURPY ()    { "SLURPY" }
 sub UNION ()     { "UNION" }
 sub INTERSECT () { "INTERSECT" }
+sub SLASH ()     { "SLASH" }
 sub NOT ()       { "NOT" }
 sub L_PAREN ()   { "L_PAREN" }
 sub R_PAREN ()   { "R_PAREN" }
@@ -86,6 +87,13 @@ Evaluate: {
 				map _eval_type( $_, $reg ),
 				@{ $node->{intersect} }
 			);
+		}
+		
+		if ( $node->{type} eq "slash" ) {
+			my @types = map _eval_type( $_, $reg ), @{ $node->{slash} };
+			_croak( "Expected exactly two types joined with slash operator" )
+				unless @types == 2;
+			return $types[0] / $types[1];
 		}
 		
 		if ( $node->{type} eq "slurpy" ) {
@@ -160,6 +168,10 @@ Evaluate: {
 			return _simplify( "intersect", INTERSECT, $expr );
 		}
 		
+		if ( $expr->{type} eq "expression" and $expr->{op}[0] eq SLASH ) {
+			return _simplify( "slash", SLASH, $expr );
+		}
+		
 		return $expr;
 	} #/ sub _simplify_expression
 	
@@ -195,6 +207,7 @@ Evaluate: {
 	our %precedence = (
 	
 		#		Type::Parser::COMMA()     , 1 ,
+		Type::Parser::SLASH(),     1,
 		Type::Parser::UNION(),     2,
 		Type::Parser::INTERSECT(), 3,
 		Type::Parser::NOT(),       4,
@@ -416,8 +429,9 @@ Evaluate: {
 		','      => bless( [ Type::Parser::COMMA,     "," ],   "Type::Parser::Token" ),
 		'=>'     => bless( [ Type::Parser::COMMA,     "=>" ],  "Type::Parser::Token" ),
 		'slurpy' => bless( [ Type::Parser::SLURPY, "slurpy" ], "Type::Parser::Token" ),
-		'|'      => bless( [ Type::Parser::UNION,  "|" ],      "Type::Parser::Token" ),
+		'|'      => bless( [ Type::Parser::UNION,     "|" ],   "Type::Parser::Token" ),
 		'&'      => bless( [ Type::Parser::INTERSECT, "&" ],   "Type::Parser::Token" ),
+		'/'      => bless( [ Type::Parser::SLASH,     "/" ],   "Type::Parser::Token" ),
 		'~'      => bless( [ Type::Parser::NOT,       "~" ],   "Type::Parser::Token" ),
 	);
 	
@@ -429,7 +443,7 @@ Evaluate: {
 		# Punctuation
 		#
 		
-		if ( $self->{remaining} =~ /^( => | [()\]\[|&~,] )/xsm ) {
+		if ( $self->{remaining} =~ /^( => | [()\]\[|&~,\/] )/xsm ) {
 			my $spelling = $1;
 			substr( $self->{remaining}, 0, length $spelling ) = "";
 			return $punctuation{$spelling};
@@ -565,6 +579,8 @@ The following constants correspond to values returned by C<< $token->type >>.
 =item C<< UNION >>
 
 =item C<< INTERSECT >>
+
+=item C<< SLASH >>
 
 =item C<< NOT >>
 
