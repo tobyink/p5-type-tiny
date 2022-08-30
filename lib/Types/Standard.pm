@@ -212,6 +212,7 @@ my $_any = $meta->$add_core_type(
 		name            => "Any",
 		inlined         => sub { "!!1" },
 		complement_name => 'None',
+		type_default    => sub { return undef; },
 	}
 );
 
@@ -233,6 +234,7 @@ my $_bool = $meta->$add_core_type(
 		inlined => sub {
 			"!ref $_[1] and (!defined $_[1] or $_[1] eq q() or $_[1] eq '0' or $_[1] eq '1')";
 		},
+		type_default => sub { return !!0; },
 	}
 );
 
@@ -244,6 +246,7 @@ my $_undef = $meta->$add_core_type(
 		parent     => $_item,
 		constraint => sub { !defined $_ },
 		inlined    => sub { "!defined($_[1])" },
+		type_default => sub { return undef; },
 	}
 );
 
@@ -276,10 +279,11 @@ my $_str = $meta->$add_core_type(
 		constraint => sub {
 			ref( \$_ ) eq 'SCALAR' or ref( \( my $val = $_ ) ) eq 'SCALAR';
 		},
-		inlined => sub {
+		inlined    => sub {
 			"defined($_[1]) and do { ref(\\$_[1]) eq 'SCALAR' or ref(\\(my \$val = $_[1])) eq 'SCALAR' }";
 		},
-		sorter => sub { $_[0] cmp $_[1] }
+		sorter     => sub { $_[0] cmp $_[1] },
+		type_default => sub { return ''; },
 	}
 );
 
@@ -296,7 +300,8 @@ my $_laxnum = $meta->add_type(
 				: "defined($_[1]) && !ref($_[1]) && Scalar::Util::looks_like_number($_[1]) && ref(\\($_[1])) ne 'GLOB'"
 			);
 		},
-		sorter => sub { $_[0] <=> $_[1] }
+		sorter     => sub { $_[0] <=> $_[1] },
+		type_default => sub { return 0; },
 	}
 );
 
@@ -316,7 +321,7 @@ my $_strictnum = $meta->add_type(
 					\z/x
 				);
 		},
-		inlined => sub {
+		inlined    => sub {
 			'my $val = '
 				. $_[1] . ';'
 				. Value()->inline_check( '$val' )
@@ -328,7 +333,8 @@ my $_strictnum = $meta->add_type(
 			(?:[Ee](?:[+-]?[0-9]+))?          # matches E1 or e1 or e-1 or e+1 etc
 		\z/x ); '
 		},
-		sorter => sub { $_[0] <=> $_[1] }
+		sorter     => sub { $_[0] <=> $_[1] },
+		type_default => sub { return 0; },
 	}
 );
 
@@ -347,6 +353,7 @@ $meta->$add_core_type(
 		inlined    => sub {
 			"do { my \$tmp = $_[1]; defined(\$tmp) and !ref(\$tmp) and \$tmp =~ /\\A-?[0-9]+\\z/ }";
 		},
+		type_default => sub { return 0; },
 	}
 );
 
@@ -436,6 +443,7 @@ $meta->$add_core_type(
 				? "Ref::Util::XS::is_plain_coderef($_[1])"
 				: "ref($_[1]) eq 'CODE'";
 		},
+		type_default => sub { return sub {}; },
 	}
 );
 
@@ -446,13 +454,14 @@ my $_regexp = $meta->$add_core_type(
 		constraint => sub {
 			ref( $_ ) && !!re::is_regexp( $_ ) or blessed( $_ ) && $_->isa( 'Regexp' );
 		},
-		inlined => sub {
+		inlined    => sub {
 			my $v = $_[1];
 			$maybe_load_modules->(
 				qw/ Scalar::Util re /,
 				"ref($v) && !!re::is_regexp($v) or Scalar::Util::blessed($v) && $v\->isa('Regexp')"
 			);
 		},
+		type_default => sub { return qr//; },
 	}
 );
 
@@ -501,6 +510,11 @@ my $_arr = $meta->$add_core_type(
 		inline_generator     => LazyLoad( ArrayRef => 'inline_generator' ),
 		deep_explanation     => LazyLoad( ArrayRef => 'deep_explanation' ),
 		coercion_generator   => LazyLoad( ArrayRef => 'coercion_generator' ),
+		type_default         => sub { return []; },
+		type_default_generator => sub {
+			return $Type::Tiny::parameterize_type->type_default if @_ < 2;
+			return undef;
+		},
 	}
 );
 
@@ -518,6 +532,11 @@ my $_hash = $meta->$add_core_type(
 		inline_generator     => LazyLoad( HashRef => 'inline_generator' ),
 		deep_explanation     => LazyLoad( HashRef => 'deep_explanation' ),
 		coercion_generator   => LazyLoad( HashRef => 'coercion_generator' ),
+		type_default         => sub { return {}; },
+		type_default_generator => sub {
+			return $Type::Tiny::parameterize_type->type_default if @_ < 2;
+			return undef;
+		},
 		my_methods           => {
 			hashref_allows_key   => LazyLoad( HashRef => 'hashref_allows_key' ),
 			hashref_allows_value => LazyLoad( HashRef => 'hashref_allows_value' ),
@@ -535,6 +554,7 @@ $meta->$add_core_type(
 		inline_generator     => LazyLoad( ScalarRef => 'inline_generator' ),
 		deep_explanation     => LazyLoad( ScalarRef => 'deep_explanation' ),
 		coercion_generator   => LazyLoad( ScalarRef => 'coercion_generator' ),
+		type_default         => sub { my $x; return \$x; },
 	}
 );
 
@@ -624,6 +644,10 @@ $meta->$add_core_type(
 			return unless $param->has_coercion;
 			return $param->coercion;
 		},
+		type_default       => sub { return undef; },
+		type_default_generator => sub {
+			return $Type::Tiny::parameterize_type->type_default;
+		},
 	}
 );
 
@@ -638,6 +662,9 @@ my $_map = $meta->$add_core_type(
 		my_methods           => {
 			hashref_allows_key   => LazyLoad( Map => 'hashref_allows_key' ),
 			hashref_allows_value => LazyLoad( Map => 'hashref_allows_value' ),
+		},
+		type_default_generator => sub {
+			return $Type::Tiny::parameterize_type->type_default;
 		},
 	}
 );

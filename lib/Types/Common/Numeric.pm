@@ -45,6 +45,7 @@ $meta->add_type(
 	constraint => sub { $_ >= 0 },
 	inlined    => sub { undef, qq($_ >= 0) },
 	message    => sub { "Must be a number greater than or equal to zero" },
+	type_default => sub { return 0; },
 );
 
 my ( $pos_int, $posz_int );
@@ -82,6 +83,7 @@ $meta->add_type(
 	},
 	message => sub { "Must be an integer greater than or equal to zero" },
 	$posz_int ? ( compiled_type_constraint => $posz_int ) : (),
+	type_default => sub { return 0; },
 );
 
 $meta->add_type(
@@ -98,6 +100,7 @@ $meta->add_type(
 	constraint => sub { $_ <= 0 },
 	inlined    => sub { undef, qq($_ <= 0) },
 	message    => sub { "Must be a number less than or equal to zero" },
+	type_default => sub { return 0; },
 );
 
 $meta->add_type(
@@ -114,6 +117,7 @@ $meta->add_type(
 	constraint => sub { $_ <= 0 },
 	inlined    => sub { undef, qq($_ <= 0) },
 	message    => sub { "Must be an integer less than or equal to zero" },
+	type_default => sub { return 0; },
 );
 
 $meta->add_type(
@@ -122,6 +126,7 @@ $meta->add_type(
 	constraint => sub { $_ >= -9 and $_ <= 9 },
 	inlined    => sub { undef, qq($_ >= -9), qq($_ <= 9) },
 	message    => sub { "Must be a single digit" },
+	type_default => sub { return 0; },
 );
 
 for my $base ( qw/Num Int/ ) {
