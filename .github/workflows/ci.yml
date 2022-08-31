@@ -99,17 +99,6 @@ jobs:
             extra_dependencies: true
             extended_testing: 'both'
             joblabel: '(Coverage)'
-          # Legacy Perl on Ubuntu 18.04
-          - { os: 'ubuntu-18.04', perl: '5.8.8',  threaded: false }
-          - { os: 'ubuntu-18.04', perl: '5.8.9',  threaded: false }
-          - { os: 'ubuntu-18.04', perl: '5.10.0', threaded: false }
-          - { os: 'ubuntu-18.04', perl: '5.10.1', threaded: false }
-          # Old Perl on Ubuntu 18.04
-          - { os: 'ubuntu-18.04', perl: '5.12',   threaded: true  }
-          - { os: 'ubuntu-18.04', perl: '5.12',   threaded: false }
-          # Modern Perl on Ubuntu 18.04
-          - { os: 'ubuntu-18.04', perl: '5.36',   threaded: true  }
-          - { os: 'ubuntu-18.04', perl: '5.36',   threaded: false }
           # Legacy Perl on Ubuntu 20.04
           - { os: 'ubuntu-20.04', perl: '5.8.1',  threaded: false }
           - { os: 'ubuntu-20.04', perl: '5.8.2',  threaded: false }
@@ -131,7 +120,7 @@ jobs:
           # Modern Perl on Windows 2019
           - { os: 'windows-2019', perl: '5.36',   threaded: true  }
           - { os: 'windows-2019', perl: '5.36',   threaded: false }
-          # Modern (Strawberry) Perl on Windows
+          # Strawberry Perl on Windows
           - { os: 'strawberry',   perl: '5.32',   threaded: true  }
     steps:
       - name: Get dist artifact
