@@ -615,12 +615,13 @@ sub _coderef_end {
 	if ( $self->bless and $self->oo_trace) {
 		my $package = $self->package;
 		my $subname = $self->subname;
-
-		$coderef->add_line( sprintf(
-			'$out{"~~caller"} = %s;',
-			B::perlstring( "$package\::$subname" ),
-		) );
-		$coderef->add_gap;
+		if ( defined $package and defined $subname ) {
+			$coderef->add_line( sprintf(
+				'$out{"~~caller"} = %s;',
+				B::perlstring( "$package\::$subname" ),
+			) );
+			$coderef->add_gap;
+		}
 	}
 
 	$self->_coderef_end_extra( $coderef );
