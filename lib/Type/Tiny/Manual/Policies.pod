@@ -133,6 +133,14 @@ Additionally, releases where the second component is an odd number will
 be considered unstable/trial releases. (These will also include an
 underscore in the version number as per the usual CPAN convention.)
 
+=head2 Perl Version Support
+
+Type::Tiny 0.000_01 to Type::Tiny 0.015_04 required Perl 5.8.1.
+
+Type::Tiny 0.015_05+ and Type::Tiny 1.000000+ requires Perl 5.6.1.
+
+Type::Tiny 2.000000+ will require Perl 5.8.1.
+
 =head1 NEXT STEPS
 
 Here's your next step:

@@ -4310,4 +4310,8 @@
 			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/91>;
 			dcs:thanks cpan:DJERIUS;
 		];
+		item [
+			a dcs:Documentation;
+			label "List which versions of Perl Type::Tiny requires in Type::Tiny::Manual::Policies.";
+		];
 	].
