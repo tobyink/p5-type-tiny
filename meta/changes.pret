@@ -4299,3 +4299,15 @@
 			dcs:thanks <urn:uuid:1e423144-9fa1-42b4-86fa-7a4e47a5519e>;
 		];
 	].
+
+`Type-Tiny 1.016010 cpan:TOBYINK`
+	issued  2022-08-31;
+	changeset [
+		dcs:versus `Type-Tiny 1.016009 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix;
+			label "Fix an uninitialized warning when calling compile_named_oo outside a sub.";
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/91>;
+			dcs:thanks cpan:DJERIUS;
+		];
+	].
