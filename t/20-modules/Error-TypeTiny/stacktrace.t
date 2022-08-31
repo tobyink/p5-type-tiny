@@ -27,24 +27,44 @@ use strict;
 use warnings;
 use lib qw( ./lib ./t/lib ../inc ./inc );
 
+use Error::TypeTiny ();
 local $Error::TypeTiny::StackTrace;
 
 use Test::More;
 use Test::Fatal;
 use Test::Requires { "Devel::StackTrace" => 0 };
 
-use Types::Standard slurpy => -types;
+use Types::Standard ();
 
-sub foo {
-	local $Error::TypeTiny::StackTrace = 1;
-	Int->(@_);
+{
+	package Local::Guts;
+	
+	sub foo {
+		local $Error::TypeTiny::StackTrace = 1;
+		local $Error::TypeTiny::CarpInternal{'Local::Guts'} = 1;
+		Types::Standard::Int->( @_ );
+	}
 }
 
-my $e = exception { foo(undef) };
+sub bar {
+	Local::Guts::foo( @_ );
+}
 
-is(
-	$e->stack_trace->frame(1)->subroutine,
-	"main::foo",
-);
+sub baz {
+	bar( @_ );
+}
+
+my $e = exception { baz(undef) };
+
+my $subs = [ 
+	map
+		$e->stack_trace->frame( $_ )->subroutine,
+		0 .. 2
+];
+
+is_deeply(
+	$subs,
+	[ 'Local::Guts::foo', 'main::bar', 'main::baz' ],
+) or diag explain( $subs );
 
 done_testing;
