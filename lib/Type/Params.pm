@@ -174,39 +174,21 @@ sub signature {
 }
 
 sub compile {
-	require Type::Params::Signature;
-
-	my $sig = 'Type::Params::Signature'->new_from_compile( pos => @_ );
-	my $for = [ caller( 1 + ( $sig->{caller_level} || 0 ) ) ]->[3] || '__ANON__::__ANON__';
-	my ( $pkg, $sub ) = ( $for =~ /^(.+)::(\w+)$/ );
-	$sig->{package} ||= $pkg;
-	$sig->{subname} ||= $sub;
-
-	$sig->return_wanted;
+	my @args = @_;
+	@_ = ( positional => \@args );
+	goto \&signature;
 }
 
 sub compile_named {
-	require Type::Params::Signature;
-
-	my $sig = 'Type::Params::Signature'->new_from_compile( named => @_ );
-	my $for = [ caller( 1 + ( $sig->{caller_level} || 0 ) ) ]->[3] || '__ANON__::__ANON__';
-	my ( $pkg, $sub ) = ( $for =~ /^(.+)::(\w+)$/ );
-	$sig->{package} ||= $pkg;
-	$sig->{subname} ||= $sub;
-
-	$sig->return_wanted;
+	my @args = @_;
+	@_ = ( bless => 0, named => \@args );
+	goto \&signature;
 }
 
 sub compile_named_oo {
-	require Type::Params::Signature;
-
-	my $sig = 'Type::Params::Signature'->new_from_compile( named => { bless => 1 }, @_ );
-	my $for = [ caller( 1 + ( $sig->{caller_level} || 0 ) ) ]->[3] || '__ANON__::__ANON__';
-	my ( $pkg, $sub ) = ( $for =~ /^(.+)::(\w+)$/ );
-	$sig->{package} ||= $pkg;
-	$sig->{subname} ||= $sub;
-
-	$sig->return_wanted;
+	my @args = @_;
+	@_ = ( bless => 1, named => \@args );
+	goto \&signature;
 }
 
 # Would be faster to inline this into validate and validate_named, but
@@ -214,45 +196,49 @@ sub compile_named_oo {
 sub _mk_key {
 	local $_;
 	join ':', map {
-		Types::Standard::is_HashRef( $_ )
-			? do {
+		Types::Standard::is_HashRef( $_ ) ? do {
 			my %h = %$_;
 			sprintf( '{%s}', _mk_key( map { ; $_ => $h{$_} } sort keys %h ) );
-			}
-			: Types::TypeTiny::is_TypeTiny( $_ ) ? sprintf( 'TYPE=%s', $_->{uniq} )
-			: Types::Standard::is_Ref( $_ )      ? sprintf( 'REF=%s', refaddr( $_ ) )
-			: Types::Standard::is_Undef( $_ )    ? sprintf( 'UNDEF' )
-			: B::perlstring( $_ )
+		} :
+		Types::TypeTiny::is_TypeTiny( $_ ) ? sprintf( 'TYPE=%s', $_->{uniq} ) :
+		Types::Standard::is_Ref( $_ )      ? sprintf( 'REF=%s', refaddr( $_ ) ) :
+		Types::Standard::is_Undef( $_ )    ? sprintf( 'UNDEF' ) :
+		B::perlstring( $_ )
 	} @_;
 } #/ sub _mk_key
 
-my %compiled;
+{
+	my %compiled;
+	sub validate {
+		my $arg = shift;
+		my $sub = (
+			$compiled{ _mk_key( @_ ) } ||= signature(
+				caller_level => 1,
+				%{ ref( $_[0] ) eq 'HASH' ? shift( @_ ) : +{} },
+				positional => [ @_ ],
+			)
+		);
+		@_ = @$arg;
+		goto $sub;
+	} #/ sub validate
+}
 
-sub validate {
-	my $arg = shift;
-	my $sub = (
-		$compiled{ _mk_key( @_ ) } ||= compile(
-			{ caller_level => 1, %{ ref( $_[0] ) eq 'HASH' ? shift( @_ ) : +{} } },
-			@_,
-		)
-	);
-	@_ = @$arg;
-	goto $sub;
-} #/ sub validate
-
-my %compiled_named;
-
-sub validate_named {
-	my $arg = shift;
-	my $sub = (
-		$compiled_named{ _mk_key( @_ ) } ||= compile_named(
-			{ caller_level => 1, %{ ref( $_[0] ) eq 'HASH' ? shift( @_ ) : +{} } },
-			@_,
-		)
-	);
-	@_ = @$arg;
-	goto $sub;
-} #/ sub validate_named
+{
+	my %compiled;
+	sub validate_named {
+		my $arg = shift;
+		my $sub = (
+			$compiled{ _mk_key( @_ ) } ||= signature(
+				caller_level => 1,
+				bless => 0,
+				%{ ref( $_[0] ) eq 'HASH' ? shift( @_ ) : +{} },
+				named => [ @_ ],
+			)
+		);
+		@_ = @$arg;
+		goto $sub;
+	} #/ sub validate_named
+}
 
 sub multisig {
 	my %options = ( ref( $_[0] ) eq "HASH" ) ? %{ +shift } : ();
