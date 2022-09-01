@@ -27,10 +27,27 @@ use Types::TypeTiny ();
 require Exporter::Tiny;
 our @ISA = 'Exporter::Tiny';
 
-our @EXPORT = qw( compile compile_named );
-our @EXPORT_OK =
-	qw( multisig validate validate_named compile_named_oo Invocant wrap_subs wrap_methods ArgsObject );
+our @EXPORT = qw(
+	compile compile_named
+);
+
+our @EXPORT_OK = qw(
+	compile_named_oo
+	validate validate_named
+	multisig
+	Invocant ArgsObject
+	wrap_subs wrap_methods
+	signature signature_for
+);
+
+our %EXPORT_TAGS = (
+	compile => [ qw( compile compile_named ) ],
+	sigs    => [ qw( signature signature_for ) ],
 	
+	v1      => [ qw( compile compile_named ) ],
+	v2      => [ qw( signature signature_for ) ],
+);
+
 {
 	my $Invocant;
 	
@@ -87,6 +104,70 @@ our @EXPORT_OK =
 	
 	if ( $] ge '5.014' ) {
 		&Scalar::Util::set_prototype( $_, ';$' ) for \&ArgsObject;
+	}
+}
+
+sub signature {
+	require Type::Params::Signature;
+	my ( %opts ) = @_;
+
+	my $positional = delete( $opts{positional} ) || delete( $opts{pos} );
+	my $named      = delete( $opts{named} );
+
+	my ( $type, $args ) = ( pos => $positional );
+	if ( $named ) {
+		( $type, $args ) = ( named => $named );
+		if ( $positional ) {
+			require Error::TypeTiny;
+			Error::TypeTiny::croak( "Signature cannot have both positional and named arguments" );
+		}
+	}
+
+	my $sig = 'Type::Params::Signature'->new_from_compile( $type, \%opts, @$args );
+	my $for = [ caller( 1 + ( $opts{caller_level} || 0 ) ) ]->[3] || '__ANON__::__ANON__';
+	my ( $pkg, $sub ) = ( $for =~ /^(.+)::(\w+)$/ );
+	$sig->{package} ||= $pkg;
+	$sig->{subname} ||= $sub;
+
+	$sig->return_wanted;
+}
+
+{
+	my $subname;
+	sub signature_for {
+		require Type::Params::Signature;
+		my ( $function, %opts ) = @_;
+		my $package = caller( $opts{caller_level} || 0 );
+
+		my $positional = delete( $opts{positional} ) || delete( $opts{pos} );
+		my $named      = delete( $opts{named} );
+
+		my ( $type, $args ) = ( pos => $positional );
+		if ( $named ) {
+			( $type, $args ) = ( named => $named );
+			if ( $positional ) {
+				require Error::TypeTiny;
+				Error::TypeTiny::croak( "Signature cannot have both positional and named arguments" );
+			}
+		}
+
+		my $fullname = "$package\::$function";
+		my $orig     = do { no strict 'refs'; \&$fullname };
+		$opts{goto_next} = $orig;
+
+		my $sig = 'Type::Params::Signature'->new_from_compile( $type, \%opts, @$args );
+		$sig->{package} ||= $package;
+		$sig->{subname} ||= $function;
+		my $coderef = $sig->return_wanted;
+
+		$subname ||=
+			eval { require Sub::Util } ? \&Sub::Util::set_subname :
+			eval { require Sub::Name } ? \&Sub::Name::subname :
+			sub { pop; };
+
+		no strict 'refs';
+		no warnings 'redefine';
+		*$fullname = $subname->( $fullname, $coderef );
 	}
 }
 
@@ -171,14 +252,6 @@ sub validate_named {
 	goto $sub;
 } #/ sub validate_named
 
-sub _deal_with_on_die {
-	my $options = shift;
-	if ( $options->{'on_die'} ) {
-		return ( { '$on_die' => \$options->{'on_die'} }, '1;' );
-	}
-	return ( {}, 'my $on_die = undef;' );
-}
-
 sub multisig {
 	my %options = ( ref( $_[0] ) eq "HASH" ) ? %{ +shift } : ();
 	$options{message}     ||= "Parameter validation failed";
@@ -202,7 +275,10 @@ sub multisig {
 	my @code = 'sub { my $r; ';
 	
 	{
-		my ( $extra_env, @extra_lines ) = _deal_with_on_die( \%options );
+		my ( $extra_env, @extra_lines ) = ( {}, 'my $on_die = undef;' );
+		if ( $options{'on_die'} ) {
+			my ( $extra_env, @extra_lines ) = ( { '$on_die' => \$options{'on_die'} }, '1;' );
+		}
 		if ( @extra_lines ) {
 			$code[0] .= join '', @extra_lines;
 			%env = ( %$extra_env, %env );

@@ -57,6 +57,16 @@ sub new {
 			$self->_rationalize_slurpies;
 		}
 
+		if ( $self->{method} ) {
+			my $type = ( ! ref( $self->{method} ) and $self->{method} eq 1 )
+				? Defined
+				: to_TypeTiny( $self->{method} );
+			unshift @{ $self->{head} ||= [] }, $self->_new_parameter(
+				name    => 'invocant',
+				type    => $type,
+			);
+		}
+
 		if ( defined $self->{bless} and $self->{bless} eq 1 ) {
 			my $klass_key     = $self->_klass_key;
 			$self->{bless}    = ( $klass_cache{$klass_key} ||= sprintf( '%s%d', $self->{class_prefix}, ++$klass_id ) );
