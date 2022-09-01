@@ -58,9 +58,11 @@ sub new {
 		}
 
 		if ( $self->{method} ) {
-			my $type = ( ! ref( $self->{method} ) and $self->{method} eq 1 )
-				? Defined
-				: to_TypeTiny( $self->{method} );
+			my $type = $self->{method};
+			$type = 
+				is_Int($type) ? Defined :
+				is_Str($type) ? do { require Type::Utils; Type::Utils::dwim_type( $type, $self->{package} ? ( for => $self->{package} ) : () ) } :
+				to_TypeTiny( $type );
 			unshift @{ $self->{head} ||= [] }, $self->_new_parameter(
 				name    => 'invocant',
 				type    => $type,

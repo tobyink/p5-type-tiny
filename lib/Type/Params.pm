@@ -114,20 +114,21 @@ sub signature {
 	my $positional = delete( $opts{positional} ) || delete( $opts{pos} );
 	my $named      = delete( $opts{named} );
 
-	my ( $type, $args ) = ( pos => $positional );
+	my ( $sig_kind, $args ) = ( pos => $positional );
 	if ( $named ) {
-		( $type, $args ) = ( named => $named );
+		( $sig_kind, $args ) = ( named => $named );
+		$opts{bless} = 1 unless exists $opts{bless};
 		if ( $positional ) {
 			require Error::TypeTiny;
 			Error::TypeTiny::croak( "Signature cannot have both positional and named arguments" );
 		}
 	}
 
-	my $sig = 'Type::Params::Signature'->new_from_compile( $type, \%opts, @$args );
-	my $for = [ caller( 1 + ( $opts{caller_level} || 0 ) ) ]->[3] || '__ANON__::__ANON__';
+	my $for = [ caller( 1 + ( $opts{caller_level} || 0 ) ) ]->[3] || ( ( $opts{package} || '__ANON__' ) . '::__ANON__' );
 	my ( $pkg, $sub ) = ( $for =~ /^(.+)::(\w+)$/ );
-	$sig->{package} ||= $pkg;
-	$sig->{subname} ||= $sub;
+	$opts{package} ||= $pkg;
+	$opts{subname} ||= $sub;
+	my $sig = 'Type::Params::Signature'->new_from_compile( $sig_kind, \%opts, @$args );
 
 	$sig->return_wanted;
 }
@@ -137,28 +138,29 @@ sub signature {
 	sub signature_for {
 		require Type::Params::Signature;
 		my ( $function, %opts ) = @_;
-		my $package = caller( $opts{caller_level} || 0 );
+		my $package = $opts{package} || caller( $opts{caller_level} || 0 );
 
 		my $positional = delete( $opts{positional} ) || delete( $opts{pos} );
 		my $named      = delete( $opts{named} );
 
-		my ( $type, $args ) = ( pos => $positional );
+		my ( $sig_kind, $args ) = ( pos => $positional );
 		if ( $named ) {
-			( $type, $args ) = ( named => $named );
+			( $sig_kind, $args ) = ( named => $named );
+			$opts{bless} = 1 unless exists $opts{bless};
 			if ( $positional ) {
 				require Error::TypeTiny;
 				Error::TypeTiny::croak( "Signature cannot have both positional and named arguments" );
 			}
 		}
 
-		my $fullname = "$package\::$function";
-		my $orig     = do { no strict 'refs'; \&$fullname };
-		$opts{goto_next} = $orig;
+		my $fullname = ( $function =~ /::/ ) ? $function : "$package\::$function";
+		$opts{goto_next} = do { no strict 'refs'; \&$fullname };
 
-		my $sig = 'Type::Params::Signature'->new_from_compile( $type, \%opts, @$args );
-		$sig->{package} ||= $package;
-		$sig->{subname} ||= $function;
-		my $coderef = $sig->return_wanted;
+		$opts{package} ||= $package;
+		$opts{subname} ||= ( $function =~ /::(\w+)$/ ) ? $1 : $function;
+
+		my $sig = 'Type::Params::Signature'->new_from_compile( $sig_kind, \%opts, @$args );
+		my $coderef = $sig->coderef->compile;
 
 		$subname ||=
 			eval { require Sub::Util } ? \&Sub::Util::set_subname :
@@ -398,26 +400,30 @@ __END__
 
 =head1 NAME
 
-Type::Params - Params::Validate-like parameter validation using Type::Tiny type constraints and coercions
+Type::Params - sub signature validation using Type::Tiny type constraints and coercions
 
 =head1 SYNOPSIS
 
- use v5.12;
+ use v5.20;
  use strict;
  use warnings;
+ use experimental 'signatures';
  
  package Horse {
    use Moo;
    use Types::Standard qw( Object );
-   use Type::Params qw( compile );
+   use Type::Params -sigs;
    use namespace::autoclean;
    
    ...;   # define attributes, etc
    
-   sub add_child {
-     state $check = compile( Object, Object );  # method signature
+   signature_for add_child => (
+     method     => 1,
+     positional => [ Object ],
+   );
+   
+   sub add_child ( $self, $child ) {
      
-     my ($self, $child) = $check->(@_);         # unpack @_
      push @{ $self->children }, $child;
      
      return $self;
@@ -463,37 +469,349 @@ only need to do it the first time the sub is called. The second stage is
 fast; according to my benchmarks faster even than the XS version of
 L<Params::Validate>.
 
-If you're using a modern version of Perl, you can use the C<state> keyword
-which was a feature added to Perl in 5.10. If you're stuck on Perl 5.8, the
-example from the SYNOPSIS could be rewritten as:
+=head1 MODERN API
 
-   my $add_child_check;
-   sub add_child {
-     $add_child_check ||= compile( Object, Object );
-     
-     my ($self, $child) = $add_child_check->(@_);  # unpack @_
-     push @{ $self->children }, $child;
-     
-     return $self;
-   }
+=head2 C<< signature( %spec ) >>
 
-Not quite as neat, but not awful either.
+The C<signature> function takes a specification for your function's
+signature and returns a coderef. You then call the coderef in list
+context, passing C<< @_ >> to it. The coderef will check, coerce, and
+apply other procedures to the values, and return the tidied values,
+or die with an error.
 
-If you don't like the two step, there's a shortcut reducing it to one step:
+The usual way of using it is:
 
-   use Type::Params qw( validate );
+ sub your_function {
+   state $signature = signature( ... );
+   my ( $arg1, $arg2, $arg3 ) = $signature->( @_ );
    
-   sub add_child {
-     my ($self, $child) = validate(\@_, Object, Object);
-     push @{ $self->children }, $child;
-     return $self;
-   }
+   ...;
+ }
 
-Type::Params has a few tricks up its sleeve to make sure performance doesn't
-suffer too much with the shortcut, but it's never going to be as fast as the
-two stage compile/execute.
+Perl allows a slightly archaic way of calling coderefs without using
+parentheses, which may be slightly faster at the cost of being more
+obscure:
 
-=head2 Functions
+ sub your_function {
+   state $signature = signature( ... );
+   my ( $arg1, $arg2, $arg3 ) = &$signature;
+   
+   ...;
+ }
+
+If you need to support Perl 5.8, which didn't have the C<state> keyword:
+
+ my $__your_function_sig;
+ sub your_function {
+   $__your_function_sig ||= signature( ... );
+   my ( $arg1, $arg2, $arg3 ) = $__your_function_sig->( @_ );
+   
+   ...;
+ }
+
+One important thing to note is how the signature is only compiled into a
+coderef the first time your function gets called, and thereafter will be
+reused.
+
+=head3 Signature Specification Options
+
+The signature specification is a hash which must contain either a
+C<positional> or C<named> key indicating whether your function takes
+positional parameters or named parameters, but may also include
+other options.
+
+=head4 C<< positional >> B<ArrayRef>
+
+This is conceptually a list of type constraints, one for each positional
+parameter. For example, a signature for a function which accepts two
+integers:
+
+ signature( positional => [ Int, Int ] )
+
+However, each type constraint is optionally followed by a hashref of
+options which affect that parameter. For example:
+
+ signature( positional => [
+   Int, { default => 40 },
+   Int, { default =>  2 },
+ ] )
+
+Type constraints can instead of strings, which will be looked up using
+C<dwim_type> from L<Type::Utils>.
+
+ signature( positional => [
+   'Int', { default => 40 },
+   'Int', { default =>  2 },
+ ] )
+
+See the section below for more information on parameter options.
+
+Optional parameters must follow required parameters, and can be specified
+using either the B<Optional> parameterizable type constraint, the
+C<optional> parameter option, or by providing a default.
+
+ signature( positional => [
+   Optional[Int],
+   Int, { optional => !!1 },
+   Int, { default  => 42 },
+ ] )
+
+A single slurpy parameter may be provided at the end, using the B<Slurpy>
+parameterizable type constraint, or the C<slurpy> parameter option:
+
+ signature( positional => [
+   Int,
+   Slurpy[ ArrayRef[Int] ],
+ ] )
+
+ signature( positional => [
+   Int,
+   ArrayRef[Int], { slurpy => !!1 },
+ ] )
+
+The C<positional> option can also be abbreviated to C<pos>.
+
+So C<< signature( pos => [...] ) >> can be used instead of the longer
+C<< signature( positional => [...] ) >>.
+
+=head4 C<< named >> B<ArrayRef>
+
+This is conceptually a list of pairs of names and type constraints, one
+name+type pair for each positional parameter. For example, a signature for
+a function which accepts two integers:
+
+ signature( named => [ foo => Int, bar => Int ] )
+
+However, each type constraint is optionally followed by a hashref of
+options which affect that parameter. For example:
+
+ signature( named => [
+   foo => Int, { default => 40 },
+   bar => Int, { default =>  2 },
+ ] )
+
+Type constraints can instead of strings, which will be looked up using
+C<dwim_type> from L<Type::Utils>.
+
+ signature( named => [
+   foo => 'Int', { default => 40 },
+   bar => 'Int', { default =>  2 },
+ ] )
+
+Optional and slurpy parameters are allowed, but unlike positional parameters,
+they do not need to be at the end.
+
+See the section below for more information on parameter options.
+
+=head4 C<< named_to_list >> B<< ArrayRef|Bool >>
+
+TODO
+
+=head4 C<< method >> B<< Bool|TypeTiny >>
+
+TODO
+
+=head4 C<< head >> B<< Int|ArrayRef >>
+
+TODO
+
+=head4 C<< tail >> B<< Int|ArrayRef >>
+
+TODO
+
+=head4 C<< description >> B<Str>
+
+TODO
+
+=head4 C<< package >> B<Str>
+
+TODO
+
+=head4 C<< subname >> B<Str>
+
+TODO
+
+=head4 C<< caller_level >> B<Int>
+
+TODO
+
+=head4 C<< on_die >> B<< Maybe[CodeRef] >>
+
+TODO
+
+=head4 C<< goto_next >> B<< Bool|CodeLike >>
+
+TODO
+
+=head4 C<< strictness >> B<< Bool|Str >>
+
+TODO
+
+=head4 C<< want_source >> B<Bool>
+
+TODO
+
+=head4 C<< want_details >> B<Bool>
+
+TODO
+
+=head4 C<< bless >> B<Bool>, C<< class >> B<ClassName> and C<< constructor >> B<Str>
+
+TODO
+
+=head3 Parameter Options
+
+TODO
+
+=head4 C<< optional >> B<Bool>
+
+TODO
+
+=head4 C<< slurpy >> B<Bool>
+
+TODO
+
+=head4 C<< default >> B<< CodeRef|ScalarRef|Ref|Str|Undef >>
+
+TODO
+
+=head4 C<< clone >> B<Bool>
+
+TODO
+
+=head4 C<< name >> B<Str>
+
+TODO
+
+=head4 C<< getter >> B<Str>
+
+TODO
+
+=head4 C<< predicate >> B<Str>
+
+TODO
+
+=head4 C<< alias >> B<< ArrayRef[Str] >>
+
+TODO
+
+=head4 C<< strictness >> B<Bool|Str>
+
+TODO
+
+=head2 C<< signature_for $function_name => ( %spec ) >>
+
+Like C<signature>, but instead of returning a coderef, wraps an existing
+function, so you don't need to deal with the mechanics of generating the
+signature at run-time, calling it, and extracting the returned values.
+
+The following three examples are roughly equivalent:
+
+ sub add_nums {
+   state $signature = signature(
+     positional => [ Num, Num ],
+   );
+   my ( $x, $y ) = $signature->( @_ );
+   
+   return $x + $y;
+ }
+
+Or:
+
+ signature_for add_nums => (
+   positional => [ Num, Num ],
+ );
+ 
+ sub add_nums {
+   my ( $x, $y ) = @_;
+   
+   return $x + $y;
+ }
+
+Or since Perl 5.20:
+
+ signature_for add_nums => (
+   positional => [ Num, Num ],
+ );
+ 
+ sub add_nums ( $x, $y ) {
+   return $x + $y;
+ }
+
+This function should support all the same options as C<signature>.
+
+=head3 Signature Specification Options
+
+The same signature specification options are supported, with the exception
+of C<want_source>, C<want_details>, and C<goto_next>.
+
+=head3 Parameter Options
+
+The same parameter options are supported.
+
+=head1 LEGACY API
+
+The following functions were the API prior to Type::Params v2. They are
+still supported, but their use is now discouraged.
+
+=head2 C<< compile( @pos_params ) >>
+
+Equivalent to C<< signature( positional => \@pos_params ) >>.
+
+C<< compile( \%spec, @pos_params ) >> is equivalent to
+C<< signature( %spec, positional => \@pos_params ) >>.
+
+=head2 C<< compile_named( @named_params ) >>
+
+Equivalent to C<< signature( bless => 0, named => \@named_params ) >>.
+
+C<< compile_named( \%spec, @named_params ) >> is equivalent to
+C<< signature( bless => 0, %spec, named => \@named_params ) >>.
+
+=head2 C<< compile_named_oo( @named_params ) >>
+
+Equivalent to C<< signature( bless => 1, named => \@named_params ) >>.
+
+C<< compile_named_oo( \%spec, @named_params ) >> is equivalent to
+C<< signature( bless => 1, %spec, named => \@named_params ) >>.
+
+=head2 C<< validate( \@args, @pos_params ) >>
+
+Equivalent to C<< signature( positional => \@pos_params )->( @args ) >>.
+
+The C<validate> function has I<never> been recommended.
+
+=head2 C<< validate_named( \@args, @named_params ) >>
+
+Equivalent to C<< signature( bless => 0, named => \@named_params )->( @args ) >>.
+
+The C<validate_named> function has I<never> been recommended.
+
+=head2 C<< wrap_subs( func1 => \@params1, func2 => \@params2, ... ) >>
+
+Equivalent to:
+
+ signature_for func1 => ( positional => \@params1 );
+ signature_for func2 => ( positional => \@params2 );
+
+One slight difference is that instead of arrayrefs, you can provide the
+output of one of the C<compile> functions:
+
+ wrap_subs( func1 => compile_named( @params1 ) );
+
+=head2 C<< wrap_methods( func1 => \@params1, func2 => \@params2, ... ) >>
+
+Equivalent to:
+
+ signature_for func1 => ( method => 1, positional => \@params1 );
+ signature_for func2 => ( method => 1, positional => \@params2 );
+
+One slight difference is that instead of arrayrefs, you can provide the
+output of one of the C<compile> functions:
+
+  wrap_methods( func1 => compile_named( @params1 ) );
+
+=head1 OLD DOCUMENTATION
 
 =head3 C<< compile(@spec) >>
 
