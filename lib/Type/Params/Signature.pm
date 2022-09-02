@@ -808,7 +808,7 @@ sub make_class {
 	my $self = shift;
 	
 	my $env = uc( $ENV{PERL_TYPE_PARAMS_XS} || 'XS' );
-	if ( $env eq 'PP' ) {
+	if ( $env eq 'PP' or $ENV{PERL_ONLY} ) {
 		$self->make_class_pp;
 	}
 
