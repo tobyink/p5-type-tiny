@@ -17,6 +17,9 @@ __PACKAGE__->Type::Tiny::_install_overloads(
 	q[bool] => sub { 1 },
 );
 
+require Carp;
+*CarpInternal = \%Carp::CarpInternal;
+
 our %CarpInternal;
 $CarpInternal{$_}++ for qw(
 	Types::Standard::_Stringable
@@ -268,9 +271,10 @@ Stringification is overloaded to call C<to_string>.
 
 =over
 
-=item C<< %Error::TypeTiny::CarpInternal >>
+=item C<< %Carp::CarpInternal >>
 
-Serves a similar purpose to C<< %Carp::CarpInternal >>.
+Error::TypeTiny honours this package variable from L<Carp>.
+(C< %Error::TypeTiny::CarpInternal> is an alias for it.)
 
 =item C<< $Error::TypeTiny::StackTrace >>
 
