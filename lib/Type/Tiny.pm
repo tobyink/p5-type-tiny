@@ -568,6 +568,15 @@ sub find_constraining_type {
 	$self;
 }
 
+sub type_default {
+	my $self = shift;
+	return $self->{type_default} if exists $self->{type_default};
+	if ( my $parent = $self->parent ) {
+		return $parent->type_default if $self->_is_null_constraint;
+	}
+	return undef;
+}
+
 our @CMP;
 
 sub CMP_SUPERTYPE ()  { -1 }
@@ -1048,9 +1057,11 @@ sub is_parameterized {
 				if $compiled;
 			$options{inlined} = $self->inline_generator->( @_ )
 				if $self->has_inline_generator;
+			$options{type_default} = $self->{type_default_generator}->( @_ )
+				if exists $self->{type_default_generator}; # undocumented
 			exists $options{$_} && !defined $options{$_} && delete $options{$_}
 				for keys %options;
-				
+			
 			$P = $self->create_child_type( %options );
 			
 			if ( $self->has_coercion_generator ) {
@@ -1778,6 +1789,34 @@ The idea is to allow for:
 
   @sorted = Int->sort( 2, 1, 11 );    # => 1, 2, 11
   @sorted = Str->sort( 2, 1, 11 );    # => 1, 11, 2 
+
+=item C<< type_default >>
+
+A coderef which returns a sensible default value for this type. For example,
+for a B<Counter> type, a sensible default might be "0":
+
+  my $Size = Type::Tiny->new(
+    name          => 'Size',
+    parent        => Types::Standard::Enum[ qw( XS S M L XL ) ],
+    type_default  => sub { return 'M'; },
+  );
+  
+  package Tshirt {
+    use Moo;
+    has size => (
+      is       => 'ro',
+      isa      => $Size,
+      default  => $Size->type_default,
+    );
+  }
+
+Child types will inherit a type default from their parent unless the child
+has a C<constraint>. If a type neither has nor inherits a type default, then
+calling C<type_default> will return undef.
+
+Many of the types defined in L<Types::Standard> and other bundled type
+libraries have type defaults, but discovering them is left as an exercise
+for the reader.
 
 =item C<< my_methods >>
 

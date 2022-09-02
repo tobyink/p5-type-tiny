@@ -41,6 +41,7 @@ $meta->add_type(
 	constraint => sub { length( $_ ) <= 255 and not /\n/ },
 	inlined    => sub { undef, qq(length($_) <= 255), qq($_ !~ /\\n/) },
 	message    => sub { "Must be a single line of no more than 255 chars" },
+	type_default => sub { return ''; },
 );
 
 $meta->add_type(
