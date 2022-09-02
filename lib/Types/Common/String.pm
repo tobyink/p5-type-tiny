@@ -11,7 +11,7 @@ BEGIN {
 
 BEGIN {
 	$Types::Common::String::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Common::String::VERSION   = '1.016010';
+	$Types::Common::String::VERSION   = '1.999_000';
 }
 
 $Types::Common::String::VERSION =~ tr/_//d;
