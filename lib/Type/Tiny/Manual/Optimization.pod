@@ -268,6 +268,26 @@ slurpies will continue to work:
  return $x + 1;
  ...;
 
+=head2 The Slash Operator
+
+Under normal circumstances, the following evaluates to B<Any>:
+
+  Num / Any
+
+However, using the same logic as Devel::StrictMode, in strict mode it will
+become B<Num>.
+
+So the previous example using Devel::StrictMode in an attribute definition
+can be written as:
+
+ use Types::Standard -types;
+ 
+ has numbers => (
+   is      => 'ro',
+   isa     => ArrayRef[ Num / Any ],
+   default => sub { [] },
+ );
+
 =head1 NEXT STEPS
 
 Here's your next step:

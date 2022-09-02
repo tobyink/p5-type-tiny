@@ -55,6 +55,15 @@ BEGIN {
 		$try_xs
 		? sub () { $INC{'Mouse/Util.pm'} and Mouse::Util::MOUSE_XS() }
 		: sub () { !!0 };
+	
+	my $strict_mode = 0;
+	$ENV{$_} && ++$strict_mode for qw(
+		EXTENDED_TESTING
+		AUTHOR_TESTING
+		RELEASE_TESTING
+		PERL_STRICT
+	);
+	*_STRICT_MODE = $strict_mode ? sub () { !!1 } : sub () { !!0 };
 } #/ BEGIN
 
 {
@@ -156,6 +165,7 @@ __PACKAGE__->_install_overloads(
 	q(eq)  => sub { "$_[0]" eq "$_[1]" },
 	q(cmp) => sub { $_[2] ? ( "$_[1]" cmp "$_[0]" ) : ( "$_[0]" cmp "$_[1]" ) },
 	q(0+)  => sub { $_[0]{uniq} },
+	q(/)   => sub { ( _STRICT_MODE xor $_[2] ) ? $_[0] : $_[1] },
 );
 
 __PACKAGE__->_install_overloads(
@@ -2361,6 +2371,12 @@ See L<Type::Tiny::Union>.
 
 The C<< & >> operator is overloaded to build the intersection of two type
 constraints. See L<Type::Tiny::Intersection>.
+
+=item *
+
+The C<< / >> operator provides magical L<Devel::StrictMode> support.
+If C<< $ENV{PERL_STRICT} >> (or a few other environment variables) is true,
+then it returns the left operand. Normally it returns the right operand.
 
 =back
 
