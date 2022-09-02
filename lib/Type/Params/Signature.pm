@@ -57,6 +57,18 @@ sub new {
 			$self->_rationalize_slurpies;
 		}
 
+		if ( $self->{method} ) {
+			my $type = $self->{method};
+			$type = 
+				is_Int($type) ? Defined :
+				is_Str($type) ? do { require Type::Utils; Type::Utils::dwim_type( $type, $self->{package} ? ( for => $self->{package} ) : () ) } :
+				to_TypeTiny( $type );
+			unshift @{ $self->{head} ||= [] }, $self->_new_parameter(
+				name    => 'invocant',
+				type    => $type,
+			);
+		}
+
 		if ( defined $self->{bless} and $self->{bless} eq 1 ) {
 			my $klass_key     = $self->_klass_key;
 			$self->{bless}    = ( $klass_cache{$klass_key} ||= sprintf( '%s%d', $self->{class_prefix}, ++$klass_id ) );
@@ -796,7 +808,7 @@ sub make_class {
 	my $self = shift;
 	
 	my $env = uc( $ENV{PERL_TYPE_PARAMS_XS} || 'XS' );
-	if ( $env eq 'PP' ) {
+	if ( $env eq 'PP' or $ENV{PERL_ONLY} ) {
 		$self->make_class_pp;
 	}
 

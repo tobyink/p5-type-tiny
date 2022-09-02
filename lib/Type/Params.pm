@@ -27,10 +27,29 @@ use Types::TypeTiny ();
 require Exporter::Tiny;
 our @ISA = 'Exporter::Tiny';
 
-our @EXPORT = qw( compile compile_named );
-our @EXPORT_OK =
-	qw( multisig validate validate_named compile_named_oo Invocant wrap_subs wrap_methods ArgsObject );
+our @EXPORT = qw(
+	compile compile_named
+);
+
+our @EXPORT_OK = qw(
+	compile_named_oo
+	validate validate_named
+	multisig
+	Invocant ArgsObject
+	wrap_subs wrap_methods
+	signature signature_for
+);
+
+our %EXPORT_TAGS = (
+	compile  => [ qw( compile compile_named compile_named_oo ) ],
+	wrap     => [ qw( wrap_subs wrap_methods ) ],
+	sigs     => [ qw( signature signature_for ) ],
+	validate => [ qw( validate validate_named ) ],
 	
+	v1       => [ qw( compile compile_named ) ],   # Old default
+	v2       => [ qw( signature signature_for ) ], # New recommendation
+);
+
 {
 	my $Invocant;
 	
@@ -90,40 +109,88 @@ our @EXPORT_OK =
 	}
 }
 
-sub compile {
+sub signature {
 	require Type::Params::Signature;
+	my ( %opts ) = @_;
 
-	my $sig = 'Type::Params::Signature'->new_from_compile( pos => @_ );
-	my $for = [ caller( 1 + ( $sig->{caller_level} || 0 ) ) ]->[3] || '__ANON__::__ANON__';
+	my $positional = delete( $opts{positional} ) || delete( $opts{pos} );
+	my $named      = delete( $opts{named} );
+
+	my ( $sig_kind, $args ) = ( pos => $positional );
+	if ( $named ) {
+		( $sig_kind, $args ) = ( named => $named );
+		$opts{bless} = 1 unless exists $opts{bless};
+		if ( $positional ) {
+			require Error::TypeTiny;
+			Error::TypeTiny::croak( "Signature cannot have both positional and named arguments" );
+		}
+	}
+
+	my $for = [ caller( 1 + ( $opts{caller_level} || 0 ) ) ]->[3] || ( ( $opts{package} || '__ANON__' ) . '::__ANON__' );
 	my ( $pkg, $sub ) = ( $for =~ /^(.+)::(\w+)$/ );
-	$sig->{package} ||= $pkg;
-	$sig->{subname} ||= $sub;
+	$opts{package} ||= $pkg;
+	$opts{subname} ||= $sub;
+	my $sig = 'Type::Params::Signature'->new_from_compile( $sig_kind, \%opts, @$args );
 
 	$sig->return_wanted;
+}
+
+{
+	my $subname;
+	sub signature_for {
+		require Type::Params::Signature;
+		my ( $function, %opts ) = @_;
+		my $package = $opts{package} || caller( $opts{caller_level} || 0 );
+
+		my $positional = delete( $opts{positional} ) || delete( $opts{pos} );
+		my $named      = delete( $opts{named} );
+
+		my ( $sig_kind, $args ) = ( pos => $positional );
+		if ( $named ) {
+			( $sig_kind, $args ) = ( named => $named );
+			$opts{bless} = 1 unless exists $opts{bless};
+			if ( $positional ) {
+				require Error::TypeTiny;
+				Error::TypeTiny::croak( "Signature cannot have both positional and named arguments" );
+			}
+		}
+
+		my $fullname = ( $function =~ /::/ ) ? $function : "$package\::$function";
+		$opts{goto_next} = do { no strict 'refs'; \&$fullname };
+
+		$opts{package} ||= $package;
+		$opts{subname} ||= ( $function =~ /::(\w+)$/ ) ? $1 : $function;
+
+		my $sig = 'Type::Params::Signature'->new_from_compile( $sig_kind, \%opts, @$args );
+		my $coderef = $sig->coderef->compile;
+
+		$subname ||=
+			eval { require Sub::Util } ? \&Sub::Util::set_subname :
+			eval { require Sub::Name } ? \&Sub::Name::subname :
+			sub { pop; };
+
+		no strict 'refs';
+		no warnings 'redefine';
+		*$fullname = $subname->( $fullname, $coderef );
+	}
+}
+
+sub compile {
+	my @args = @_;
+	@_ = ( positional => \@args );
+	goto \&signature;
 }
 
 sub compile_named {
-	require Type::Params::Signature;
-
-	my $sig = 'Type::Params::Signature'->new_from_compile( named => @_ );
-	my $for = [ caller( 1 + ( $sig->{caller_level} || 0 ) ) ]->[3] || '__ANON__::__ANON__';
-	my ( $pkg, $sub ) = ( $for =~ /^(.+)::(\w+)$/ );
-	$sig->{package} ||= $pkg;
-	$sig->{subname} ||= $sub;
-
-	$sig->return_wanted;
+	my @args = @_;
+	@_ = ( bless => 0, named => \@args );
+	goto \&signature;
 }
 
 sub compile_named_oo {
-	require Type::Params::Signature;
-
-	my $sig = 'Type::Params::Signature'->new_from_compile( named => { bless => 1 }, @_ );
-	my $for = [ caller( 1 + ( $sig->{caller_level} || 0 ) ) ]->[3] || '__ANON__::__ANON__';
-	my ( $pkg, $sub ) = ( $for =~ /^(.+)::(\w+)$/ );
-	$sig->{package} ||= $pkg;
-	$sig->{subname} ||= $sub;
-
-	$sig->return_wanted;
+	my @args = @_;
+	@_ = ( bless => 1, named => \@args );
+	goto \&signature;
 }
 
 # Would be faster to inline this into validate and validate_named, but
@@ -131,52 +198,48 @@ sub compile_named_oo {
 sub _mk_key {
 	local $_;
 	join ':', map {
-		Types::Standard::is_HashRef( $_ )
-			? do {
+		Types::Standard::is_HashRef( $_ ) ? do {
 			my %h = %$_;
 			sprintf( '{%s}', _mk_key( map { ; $_ => $h{$_} } sort keys %h ) );
-			}
-			: Types::TypeTiny::is_TypeTiny( $_ ) ? sprintf( 'TYPE=%s', $_->{uniq} )
-			: Types::Standard::is_Ref( $_ )      ? sprintf( 'REF=%s', refaddr( $_ ) )
-			: Types::Standard::is_Undef( $_ )    ? sprintf( 'UNDEF' )
-			: B::perlstring( $_ )
+		} :
+		Types::TypeTiny::is_TypeTiny( $_ ) ? sprintf( 'TYPE=%s', $_->{uniq} ) :
+		Types::Standard::is_Ref( $_ )      ? sprintf( 'REF=%s', refaddr( $_ ) ) :
+		Types::Standard::is_Undef( $_ )    ? sprintf( 'UNDEF' ) :
+		B::perlstring( $_ )
 	} @_;
 } #/ sub _mk_key
 
-my %compiled;
+{
+	my %compiled;
+	sub validate {
+		my $arg = shift;
+		my $sub = (
+			$compiled{ _mk_key( @_ ) } ||= signature(
+				caller_level => 1,
+				%{ ref( $_[0] ) eq 'HASH' ? shift( @_ ) : +{} },
+				positional => [ @_ ],
+			)
+		);
+		@_ = @$arg;
+		goto $sub;
+	} #/ sub validate
+}
 
-sub validate {
-	my $arg = shift;
-	my $sub = (
-		$compiled{ _mk_key( @_ ) } ||= compile(
-			{ caller_level => 1, %{ ref( $_[0] ) eq 'HASH' ? shift( @_ ) : +{} } },
-			@_,
-		)
-	);
-	@_ = @$arg;
-	goto $sub;
-} #/ sub validate
-
-my %compiled_named;
-
-sub validate_named {
-	my $arg = shift;
-	my $sub = (
-		$compiled_named{ _mk_key( @_ ) } ||= compile_named(
-			{ caller_level => 1, %{ ref( $_[0] ) eq 'HASH' ? shift( @_ ) : +{} } },
-			@_,
-		)
-	);
-	@_ = @$arg;
-	goto $sub;
-} #/ sub validate_named
-
-sub _deal_with_on_die {
-	my $options = shift;
-	if ( $options->{'on_die'} ) {
-		return ( { '$on_die' => \$options->{'on_die'} }, '1;' );
-	}
-	return ( {}, 'my $on_die = undef;' );
+{
+	my %compiled;
+	sub validate_named {
+		my $arg = shift;
+		my $sub = (
+			$compiled{ _mk_key( @_ ) } ||= signature(
+				caller_level => 1,
+				bless => 0,
+				%{ ref( $_[0] ) eq 'HASH' ? shift( @_ ) : +{} },
+				named => [ @_ ],
+			)
+		);
+		@_ = @$arg;
+		goto $sub;
+	} #/ sub validate_named
 }
 
 sub multisig {
@@ -202,7 +265,10 @@ sub multisig {
 	my @code = 'sub { my $r; ';
 	
 	{
-		my ( $extra_env, @extra_lines ) = _deal_with_on_die( \%options );
+		my ( $extra_env, @extra_lines ) = ( {}, 'my $on_die = undef;' );
+		if ( $options{'on_die'} ) {
+			my ( $extra_env, @extra_lines ) = ( { '$on_die' => \$options{'on_die'} }, '1;' );
+		}
 		if ( @extra_lines ) {
 			$code[0] .= join '', @extra_lines;
 			%env = ( %$extra_env, %env );
@@ -322,26 +388,30 @@ __END__
 
 =head1 NAME
 
-Type::Params - Params::Validate-like parameter validation using Type::Tiny type constraints and coercions
+Type::Params - sub signature validation using Type::Tiny type constraints and coercions
 
 =head1 SYNOPSIS
 
- use v5.12;
+ use v5.20;
  use strict;
  use warnings;
+ use experimental 'signatures';
  
  package Horse {
    use Moo;
    use Types::Standard qw( Object );
-   use Type::Params qw( compile );
+   use Type::Params -sigs;
    use namespace::autoclean;
    
    ...;   # define attributes, etc
    
-   sub add_child {
-     state $check = compile( Object, Object );  # method signature
+   signature_for add_child => (
+     method     => 1,
+     positional => [ Object ],
+   );
+   
+   sub add_child ( $self, $child ) {
      
-     my ($self, $child) = $check->(@_);         # unpack @_
      push @{ $self->children }, $child;
      
      return $self;
@@ -387,241 +457,416 @@ only need to do it the first time the sub is called. The second stage is
 fast; according to my benchmarks faster even than the XS version of
 L<Params::Validate>.
 
-If you're using a modern version of Perl, you can use the C<state> keyword
-which was a feature added to Perl in 5.10. If you're stuck on Perl 5.8, the
-example from the SYNOPSIS could be rewritten as:
+=head1 MODERN API
 
-   my $add_child_check;
-   sub add_child {
-     $add_child_check ||= compile( Object, Object );
-     
-     my ($self, $child) = $add_child_check->(@_);  # unpack @_
-     push @{ $self->children }, $child;
-     
-     return $self;
-   }
+The modern API can be exported using:
 
-Not quite as neat, but not awful either.
+ use Type::Params -sigs;
 
-If you don't like the two step, there's a shortcut reducing it to one step:
+Or:
 
-   use Type::Params qw( validate );
+ use Type::Params -v2;
+
+Or by requesting functions by name:
+
+ use Type::Params qw( signature signature_for );
+
+=head2 C<< signature( %spec ) >>
+
+The C<signature> function takes a specification for your function's
+signature and returns a coderef. You then call the coderef in list
+context, passing C<< @_ >> to it. The coderef will check, coerce, and
+apply other procedures to the values, and return the tidied values,
+or die with an error.
+
+The usual way of using it is:
+
+ sub your_function {
+   state $signature = signature( ... );
+   my ( $arg1, $arg2, $arg3 ) = $signature->( @_ );
    
-   sub add_child {
-     my ($self, $child) = validate(\@_, Object, Object);
-     push @{ $self->children }, $child;
-     return $self;
-   }
+   ...;
+ }
 
-Type::Params has a few tricks up its sleeve to make sure performance doesn't
-suffer too much with the shortcut, but it's never going to be as fast as the
-two stage compile/execute.
+Perl allows a slightly archaic way of calling coderefs without using
+parentheses, which may be slightly faster at the cost of being more
+obscure:
 
-=head2 Functions
+ sub your_function {
+   state $signature = signature( ... );
+   my ( $arg1, $arg2, $arg3 ) = &$signature;
+   
+   ...;
+ }
 
-=head3 C<< compile(@spec) >>
+If you need to support Perl 5.8, which didn't have the C<state> keyword:
 
-Given specifications for positional parameters, compiles a coderef
-that can check against them.
+ my $__your_function_sig;
+ sub your_function {
+   $__your_function_sig ||= signature( ... );
+   my ( $arg1, $arg2, $arg3 ) = $__your_function_sig->( @_ );
+   
+   ...;
+ }
 
-The generalized form of specifications for positional parameters is:
+One important thing to note is how the signature is only compiled into a
+coderef the first time your function gets called, and thereafter will be
+reused.
 
- state $check = compile(
-   \%general_opts,
-   $type_for_arg_1, \%opts_for_arg_1,
-   $type_for_arg_2, \%opts_for_arg_2,
-   $type_for_arg_3, \%opts_for_arg_3,
-   ...,
-   Slurpy[...],
- );
+=head3 Signature Specification Options
 
-If a hashref of options is empty, it can simply be omitted. Much of the
-time, you won't need to specify any options.
+The signature specification is a hash which must contain either a
+C<positional> or C<named> key indicating whether your function takes
+positional parameters or named parameters, but may also include
+other options.
 
- # In this example, we omit all the hashrefs
- #
- my $check = compile(
-   Str,
+=head4 C<< positional >> B<ArrayRef>
+
+This is conceptually a list of type constraints, one for each positional
+parameter. For example, a signature for a function which accepts two
+integers:
+
+ signature( positional => [ Int, Int ] )
+
+However, each type constraint is optionally followed by a hashref of
+options which affect that parameter. For example:
+
+ signature( positional => [
+   Int, { default => 40 },
+   Int, { default =>  2 },
+ ] )
+
+Type constraints can instead be given as strings, which will be looked
+up using C<dwim_type> from L<Type::Utils>.
+
+ signature( positional => [
+   'Int', { default => 40 },
+   'Int', { default =>  2 },
+ ] )
+
+See the section below for more information on parameter options.
+
+Optional parameters must follow required parameters, and can be specified
+using either the B<Optional> parameterizable type constraint, the
+C<optional> parameter option, or by providing a default.
+
+ signature( positional => [
+   Optional[Int],
+   Int, { optional => !!1 },
+   Int, { default  => 42 },
+ ] )
+
+A single slurpy parameter may be provided at the end, using the B<Slurpy>
+parameterizable type constraint, or the C<slurpy> parameter option:
+
+ signature( positional => [
    Int,
-   Optional[ArrayRef],
+   Slurpy[ ArrayRef[Int] ],
+ ] )
+
+ signature( positional => [
+   Int,
+   ArrayRef[Int], { slurpy => !!1 },
+ ] )
+
+The C<positional> option can also be abbreviated to C<pos>.
+
+So C<< signature( pos => [...] ) >> can be used instead of the longer
+C<< signature( positional => [...] ) >>.
+
+If a signature uses positional parameters, the values are returned by the
+coderef as a list:
+
+ sub add_numbers {
+   state $sig = signature( positional => [ Num, Num ] );
+   my ( $num1, $num2 ) = $sig->( @_ );
+   
+   return $num1 + $num2;
+ }
+ 
+ say add_numbers( 2, 3 );   # says 5
+
+=head4 C<< named >> B<ArrayRef>
+
+This is conceptually a list of pairs of names and type constraints, one
+name+type pair for each positional parameter. For example, a signature for
+a function which accepts two integers:
+
+ signature( named => [ foo => Int, bar => Int ] )
+
+However, each type constraint is optionally followed by a hashref of
+options which affect that parameter. For example:
+
+ signature( named => [
+   foo => Int, { default => 40 },
+   bar => Int, { default =>  2 },
+ ] )
+
+Type constraints can instead be given as strings, which will be looked
+up using C<dwim_type> from L<Type::Utils>.
+
+ signature( named => [
+   foo => 'Int', { default => 40 },
+   bar => 'Int', { default =>  2 },
+ ] )
+
+Optional and slurpy parameters are allowed, but unlike positional parameters,
+they do not need to be at the end.
+
+See the section below for more information on parameter options.
+
+If a signature uses named parameters, the values are returned by the
+coderef as an object:
+
+ sub add_numbers {
+   state $sig = signature( named => [ num1 => Num, num2 => Num ] );
+   my ( $arg ) = $sig->( @_ );
+   
+   return $arg->num1 + $arg->num2;
+ }
+ 
+ say add_numbers(   num1 => 2, num2 => 3   );   # says 5
+ say add_numbers( { num1 => 2, num2 => 3 } );   # also says 5
+
+=head4 C<< named_to_list >> B<< ArrayRef|Bool >>
+
+The C<named_to_list> option is ignored for signatures using positional
+parameters, but for signatures using named parameters, allows them to
+be returned in a list instead of as an object:
+
+ sub add_numbers {
+   state $sig = signature(
+     named         => [ num1 => Num, num2 => Num ],
+     named_to_list => !!1,
+   );
+   my ( $num1, $num2 ) = $sig->( @_ );
+   
+   return $num1 + $num2;
+ }
+ 
+ say add_numbers(   num1 => 2, num2 => 3   );   # says 5
+ say add_numbers( { num1 => 2, num2 => 3 } );   # also says 5
+
+You can think of C<add_numbers> above as a function which takes named
+parameters from the outside, but receives positional parameters on the
+inside.
+
+You can use an arrayref to specify the order the paramaters will be
+returned in. (By default they are returned in the order they were defined
+in.)
+
+ sub add_numbers {
+   state $sig = signature(
+     named         => [ num1 => Num, num2 => Num ],
+     named_to_list => [ qw( num2 num1 ) ],
+   );
+   my ( $num2, $num1 ) = $sig->( @_ );
+   
+   return $num1 + $num2;
+ }
+
+=head4 C<< head >> B<< Int|ArrayRef >>
+
+C<head> provides an additional list of non-optional, positional parameters
+at the start of C<< @_ >>. This is often used for method calls. For example,
+if you wish to define a signature for:
+
+ $object->my_method( foo => 123, bar => 456 );
+
+You could write it as this:
+
+ sub my_method {
+   state $signature = signature(
+     head    => [ Object ],
+     named   => [ foo => Optional[Int], bar => Optional[Int] ],
+   );
+   my ( $self, $arg ) = $signature->( @_ );
+   
+   ...;
+ }
+
+If C<head> is set as a number instead of an arrayref, it is the number of
+additional arguments at the start:
+
+ sub my_method {
+   state $signature = signature(
+     head    => 1,
+     named   => [ foo => Optional[Int], bar => Optional[Int] ],
+   );
+   my ( $self, $arg ) = $signature->( @_ );
+   
+   ...;
+}
+
+In this case, no type checking is performed on those additional arguments;
+it is just checked that they exist.
+
+=head4 C<< tail >> B<< Int|ArrayRef >>
+
+A C<tail> is like a C<head> except that it is for arguments at the I<end>
+of C<< @_ >>.
+
+ sub my_method {
+   state $signature = signature(
+     head    => [ Object ],
+     named   => [ foo => Optional[Int], bar => Optional[Int] ],
+     tail    => [ CodeRef ],
+   );
+   my ( $self, $arg, $callback ) = $signature->( @_ );
+   
+   ...;
+ }
+ 
+ $object->my_method( foo => 123, bar => 456, sub { ... } );
+
+=head4 C<< method >> B<< Bool|TypeTiny >>
+
+While C<head> can be used for method signatures, a more declarative way is
+to set C<< method => 1 >>.
+
+If you wish to be specific that this is an object method, intended to be
+called on blessed objects only, then you may use C<< method => Object >>,
+using the B<Object> type from L<Types::Standard>. If you wish to specify
+that it's a class method, then use C<< method => Str >>, using the B<Str>
+type from L<Types::Standard>. (C<< method => ClassName >> is perhaps
+clearer, but it's a slower check.)
+
+ sub my_method {
+   state $signature = signature(
+     method  => 1,
+     named   => [ foo => Optional[Int], bar => Optional[Int] ],
+   );
+   my ( $self, $arg ) = $signature->( @_ );
+   
+   ...;
+ }
+
+=head4 C<< description >> B<Str>
+
+This is the description of the coderef that will show up in stack traces.
+It defaults to "parameter validation for X" where X is the caller sub name.
+Usually the default will be fine.
+
+=head4 C<< package >> B<Str>
+
+The package of the sub whose paramaters we're supposed to be checking.
+As well as showing up in stack traces, it's used by C<dwim_type> if you
+provide any type constraints as strings.
+
+The default is probably fine, but if you're wrapping C<signature> so that
+you can check signatures on behalf of another package, you may need to
+provide it.
+
+=head4 C<< subname >> B<Str>
+
+The name of the sub whose paramaters we're supposed to be checking.
+
+The default is probably fine, but if you're wrapping C<signature> so that
+you can check signatures on behalf of another package, you may need to
+provide it.
+
+=head4 C<< caller_level >> B<Int>
+
+If you're wrapping C<signature> so that you can check signatures on behalf
+of another package, then setting C<caller_level> to 1 (or more, depending on
+the level of wrapping!) may be an alternative to manually setting the
+C<package> and C<subname>.
+
+=head4 C<< on_die >> B<< Maybe[CodeRef] >>
+
+Usually when your coderef hits an error, it will throw an exception, which
+is a blessed L<Error::TypeTiny> object.
+
+If you provide an C<on_die> coderef, then instead the L<Error::TypeTiny>
+object will be passed to it. If the C<on_die> coderef returns something,
+then whatever it returns will be returned as your signature's parameters.
+
+ sub add_numbers {
+   state $sig = signature(
+     positional => [ Num, Num ],
+     on_die     => sub {
+       my $error = shift;
+       print "Existential crisis: $error\n";
+       exit( 1 );
+     },
+   );
+   my ( $num1, $num2 ) = $sig->( @_ );
+   
+   return $num1 + $num2;
+ }
+ 
+ say add_numbers();   # has an existential crisis
+
+This is probably not very useful.
+
+=head4 C<< goto_next >> B<< Bool|CodeLike >>
+
+This can be used for chaining coderefs. If you understand C<on_die>, it's
+more like an "on_live".
+
+ sub add_numbers {
+   state $sig = signature(
+     positional => [ Num, Num ],
+     goto_next  => sub {
+       my ( $num1, $num2 ) = @_;
+       
+       return $num1 + $num2;
+     },
+   );
+   
+   my $sum = $sig->( @_ );
+   return $sum;
+ }
+ 
+ say add_numbers( 2, 3 );   # says 5
+
+If set to a true boolean instead of a coderef, has a slightly different
+behaviour:
+
+ sub add_numbers {
+   state $sig = signature(
+     positional => [ Num, Num ],
+     goto_next  => !!1,
+   );
+   
+   my $sum = $sig->(
+     sub { return $_[0] + $_[1] },
+     @_,
+   );
+   return $sum;
+ }
+ 
+ say add_numbers( 2, 3 );   # says 5
+
+This looks strange. Why would this be useful? Well, it works nicely with
+Moose's C<around> keyword.
+
+ sub add_numbers {
+   return $_[0] + $_[1];
+ }
+ 
+ around add_numbers => signature(
+   positional => [ Num, Num ],
+   goto_next  => !!1,
+   package    => __PACKAGE__,
+   subname    => 'add_numbers',
  );
  
- my ($str, $int, $arr) = $check->("Hello", 42, []);   # ok
- my ($str, $int, $arr) = $check->("", -1);            # ok
- my ($str, $int, $arr) = $check->("", -1, "bleh");    # dies
+ say add_numbers( 2, 3 );   # says 5
 
-The coderef returned (i.e. C<< $check >>) will check the arguments
-passed to it conform to the spec (coercing them if appropriate),
-and return them as a list if they do. If they don't, it will throw
-an exception.
+Note the way C<around> works in Moose is that it expects a wrapper coderef
+as its final argument. That wrapper coderef then expects to be given a
+reference to the original function as its first parameter.
 
-The first hashref, before any type constraints, is for general options
-which affect the entire compiled coderef. Currently supported general
-options are:
+This is kind of complex, and you're unlikely to use it, but it's been proven
+useful for tools that integrate Type::Params with Moose-like method modifiers.
 
-=over
+=head4 C<< strictness >> B<< Bool|Str >>
 
-=item C<< head >> B<< Int|ArrayRef[TypeTiny] >>
-
-Parameters to shift off C<< @_ >> before doing the main type check.
-These parameters may also be checked, and cannot be optional or slurpy.
-They may not have defaults.
-
-  my $check = compile(
-    { head => [ Int, Int ] },
-    Str,
-    Str,
-  );
-  
-  # ... is basically the same as...
-  
-  my $check = compile(
-    Int,
-    Int,
-    Str,
-    Str,
-  );
-
-A number may be given if you do not care to check types:
-
-  my $check = compile(
-    { head => 2 },
-    Str,
-    Str,
-  );
-  
-  # ... is basically the same as...
-  
-  my $check = compile(
-    Any,
-    Any,
-    Str,
-    Str,
-  );
-
-This is mostly useless for C<compile>, but can be useful for
-C<compile_named> and C<compile_named_oo>.
-
-=item C<< tail >> B<< Int|ArrayRef[TypeTiny] >>
-
-Similar to C<head>, but pops parameters off the end of C<< @_ >> instead.
-This is actually useful for C<compile> because it allows you to sneak in
-some required parameters I<after> a slurpy or optional parameter.
-
-  my $check = compile(
-    { tail => [ CodeRef ] },
-    Slurpy[ ArrayRef[Str] ],
-  );
-  
-  my ($strings, $coderef) = $check->("foo", "bar", sub { ... });
-
-=item C<< want_source >> B<< Bool >>
-
-Instead of returning a coderef, return Perl source code string. Handy
-for debugging.
-
-=item C<< want_details >> B<< Bool >>
-
-Instead of returning a coderef, return a hashref of stuff including the
-coderef. This is mostly for people extending Type::Params and I won't go
-into too many details about what else this hashref contains.
-
-=item C<< description >> B<< Str >>
-
-Description of the coderef that will show up in stack traces. Defaults to
-"parameter validation for X" where X is the caller sub name.
-
-=item C<< package >> B<< Str >>
-
-The package of the sub we're supposed to be checking. Not usually important.
-The default is probably fine.
-
-=item C<< subname >> B<< Str >>
-
-The name of the sub we're supposed to be checking. Not usually important.
-The default is probably fine.
-
-If you wish to use the default description, but need to change the sub name,
-use this.
-
-=item C<< caller_level >> B<< Int >>
-
-If you wish to use the default description, but need to change the caller
-level for detecting the sub name, use this.
-
-=item C<< on_die >> B<< Maybe[CodeRef] >>
-
-  my $check = compile(
-    { on_die => sub { ... } },
-    ...,
-  );
-  
-  my @args = $check->( @_ );
-
-Normally, at the first invalid argument the C<< $check >> coderef encounters,
-it will throw an exception.
-
-If an C<on_die> coderef is provided, then it is called instead, and the
-exception is passed to it as an object. The C<< $check >> coderef will still
-immediately return though.
-
-=item C<< goto_next >> B<< Bool | CodeLike >>
-
-Defaults to false.
-
-This can be used to turn signatures inside out. Instead of your signature
-being a coderef which is called by your function, your function can be a
-coderef which is called by the signature.
-
-  # The function people call.
-  sub foo {
-    state $sig = compile( { goto_next => 1 }, Int );
-    $sig->( \&_real_foo, @_ );
-  }
-  
-  # Your real function which receives checked/coerced arguments
-  sub _real_foo {
-    my ( $n ) = ( @_ );
-    ...;
-  }
-
-Alternatively, using a coderef:
-
-  sub foo {
-    state $sig = compile( { goto_next => \&_real_foo }, Int );
-    $sig->( @_ );
-  }
-  
-  sub _real_foo {
-    my ( $n ) = ( @_ );
-    ...;
-  }
-
-Or even:
-
-  {
-    my $real_foo = sub {
-      my ( $n ) = ( @_ );
-      ...;
-    };
-    *foo = compile( { subname => 'foo', goto_next => $real_foo }, Int );
-  }
-
-If you're using Moose/Mouse/Moo, then this should work:
-
-  sub foo {
-    my ( $n ) = ( @_ );
-    ...;
-  }
-  
-  around foo => compile( { subname => 'foo', goto_next => 1 }, Int );
-
-=item C<< strictness >> B<< Bool | Str >>
-
-If you set C<strictness> to a false value (0, undef, or the empty string), then
-certain signature checks will simply never be done. The initial check that
-there's the correct number of parameters, plus type checks on parameters which
-don't coerce can be skipped.
+If you set C<strictness> to a false value (0, undef, or the empty string),
+then certain signature checks will simply never be done. The initial check
+that there's the correct number of parameters, plus type checks on parameters
+which don't coerce can be skipped.
 
 If you set it to a true boolean (i.e. 1) or do not set it at all, then these
 checks will always be done.
@@ -630,93 +875,282 @@ Alternatively, it may be set to the quoted fully-qualified name of a Perl
 global variable or a constant, and that will be compiled into the coderef
 as a condition to enable strict checks.
 
-  state $check = compile(
-    { strictness => '$::CHECK_TYPES' },
-    Int,
-    ArrayRef,
-  );
-  
-  # Type checks are skipped
-  {
-    local $::CHECK_TYPES = 0;
-    my ( $number, $list ) = $check->( {}, {} );
-  }
-  
-  # Type checks are performed
-  {
-    local $::CHECK_TYPES = 1;
-    my ( $number, $list ) = $check->( {}, {} );
-  }
+ state $signature = signature(
+   strictness => '$::CHECK_TYPES',
+   positional => [ Int, ArrayRef ],
+ );
+ 
+ # Type checks are skipped
+ {
+   local $::CHECK_TYPES = 0;
+   my ( $number, $list ) = $signature->( {}, {} );
+ }
+ 
+ # Type checks are performed
+ {
+   local $::CHECK_TYPES = 1;
+   my ( $number, $list ) = $signature->( {}, {} );
+ }
 
 A recommended use of this is with L<Devel::StrictMode>.
 
-  use Devel::StrictMode qw( STRICT );
-  state $check = compile( { strictness => STRICT }, Int, ArrayRef );
-
-=back
-
-The types for each parameter may be any L<Type::Tiny> type constraint, or
-anything that Type::Tiny knows how to coerce into a Type::Tiny type
-constraint, such as a MooseX::Types type constraint or a coderef.
-
-Type coercions are automatically applied for all types that have
-coercions.
-
-If you wish to avoid coercions for a type, use Type::Tiny's
-C<no_coercions> method.
-
- my $check = compile(
-   Int,
-   ArrayRef->of(Bool)->no_coercions,
+ use Devel::StrictMode qw( STRICT );
+ 
+ state $signature = signature(
+   strictness => STRICT,
+   positional => [ Int, ArrayRef ],
  );
 
-Note that having any coercions in a specification, even if they're not
-used in a particular check, will slightly slow down C<< $check >>
-because it means that C<< $check >> can't just check C<< @_ >> and return
-it unaltered if it's valid — it needs to build a new array to return.
+=head4 C<< want_source >> B<Bool>
 
-Optional parameters can be given using the B<< Optional[] >> type
-constraint. In the example above, the third parameter is optional.
-If it's present, it's required to be an arrayref, but if it's absent,
-it is ignored.
+Instead of returning a coderef, return Perl source code string. Handy
+for debugging.
 
-Optional parameters need to be I<after> required parameters in the
-spec.
+=head4 C<< want_details >> B<Bool>
 
-An alternative way to specify optional parameters is using a parameter
-options hashref.
+Instead of returning a coderef, return a hashref of stuff including the
+coderef. This is mostly for people extending Type::Params and I won't go
+into too many details about what else this hashref contains.
 
- my $check = compile(
-   Str,
-   Int,
-   ArrayRef, { optional => 1 },
+=head4 C<< bless >> B<Bool|ClassName>, C<< class >> B<< ClassName|ArrayRef >> and C<< constructor >> B<Str>
+
+Named parameters are usually returned as a blessed object:
+
+ sub add_numbers {
+   state $sig = signature( named => [ num1 => Num, num2 => Num ] );
+   my ( $arg ) = $sig->( @_ );
+   
+   return $arg->num1 + $arg->num2;
+ }
+
+The class they are blessed into is one built on-the-fly by Type::Params.
+However, these three signature options allow you more control over that
+process.
+
+Firstly, if you set C<< bless => false >> and do not set C<class> or
+C<constructor>, then C<< $arg >> will just be an unblessed hashref.
+
+ sub add_numbers {
+   state $sig = signature(
+     named        => [ num1 => Num, num2 => Num ],
+     bless        => !!0,
+   );
+   my ( $arg ) = $sig->( @_ );
+   
+   return $arg->{num1} + $arg->{num2};
+ }
+
+This is a good speed boost, but having proper methods for each named
+parameter is a helpful way to catch misspelled names.
+
+If you wish to manually create a class instead of relying on Type::Params
+generating one on-the-fly, you can do this:
+
+ package Params::For::AddNumbers {
+   sub num1 { return $_[0]{num1} }
+   sub num2 { return $_[0]{num2} }
+   sub sum {
+     my $self = shift;
+     return $self->num1 + $self->num2;
+   }
+ }
+ 
+ sub add_numbers {
+   state $sig = signature(
+     named        => [ num1 => Num, num2 => Num ],
+     bless        => 'Params::For::AddNumbers',
+   );
+   my ( $arg ) = $sig->( @_ );
+   
+   return $arg->sum;
+ }
+
+Note that C<Params::For::AddNumbers> here doesn't include a C<new> method
+because Type::Params will directly do C<< bless( $arg, $opts{bless} ) >>.
+
+If you want Type::Params to use a proper constructor, you should use the
+C<class> option instead:
+
+ package Params::For::AddNumbers {
+   use Moo;
+   has [ 'num1', 'num2' ] => ( is => 'ro' );
+   sub sum {
+     my $self = shift;
+     return $self->num1 + $self->num2;
+   }
+ }
+ 
+ sub add_numbers {
+   state $sig = signature(
+     named        => [ num1 => Num, num2 => Num ],
+     class        => 'Params::For::AddNumbers',
+   );
+   my ( $arg ) = $sig->( @_ );
+   
+   return $arg->sum;
+ }
+
+If you wish to use a constructor named something other than C<new>, then
+use:
+
+ state $sig = signature(
+   named        => [ num1 => Num, num2 => Num ],
+   class        => 'Params::For::AddNumbers',
+   constructor  => 'new_from_hashref',
  );
 
-The following parameter options are supported:
+Or as a shortcut:
 
-=over
-
-=item C<< optional >> B<< Bool >>
-
-This is an alternative way of indicating that a parameter is optional.
-
- state $check = compile(
-   Int,
-   Int, { optional => 1 },
-   Optional[Int],
+ state $sig = signature(
+   named        => [ num1 => Num, num2 => Num ],
+   class        => [ 'Params::For::AddNumbers', 'new_from_hashref' ],
  );
 
-The two are not I<exactly> equivalent. The exceptions thrown will
-differ in the type name they mention. (B<Int> versus B<< Optional[Int] >>.)
+It is doubtful you want to use any of these options, except
+C<< bless => false >>.
 
-=item C<< default >> B<< CodeRef|ScalarRef|Ref|Str|Undef >>
+=head3 Parameter Options
+
+In the parameter lists for the C<positional> and C<named> signature
+options, each parameter may be followed by a hashref of options specific
+to that parameter:
+
+ signature(
+   positional => [
+     Int, \%options_for_first_parameter,
+     Int, \%options_for_other_parameter,
+   ],
+   %more_options_for_signature,
+ );
+
+ signature(
+   named => [
+     foo => Int, \%options_for_foo,
+     bar => Int, \%options_for_bar,
+   ],
+   %more_options_for_signature,
+ );
+
+The following options are supported for parameters.
+
+=head4 C<< optional >> B<Bool>
+
+An option I<called> optional!
+
+This makes a parameter optional:
+
+ sub add_nums {
+   state $sig = signature(
+     positional => [
+       Int,
+       Int,
+       Bool, { optional => !!1 },
+     ],
+   );
+   
+   my ( $num1, $num2, $debug ) = $sig->( @_ );
+   
+   my $sum = $num1 + $num2;
+   warn "$sum = $num1 + $num2" if $debug;
+   
+   return $sum;
+ }
+ 
+ add_nums( 2, 3, 1 );   # prints warning
+ add_nums( 2, 3, 0 );   # no warning
+ add_nums( 2, 3    );   # no warning
+
+L<Types::Standard> also provides a B<Optional> parameterizable type
+which may be a neater way to do this:
+
+ state $sig = signature(
+   positional => [ Int, Int, Optional[Bool] ],
+ );
+
+In signatures with positional parameters, any optional parameters must be
+defined I<after> non-optional parameters. The C<tail> option provides a
+workaround for required parameters at the end of C<< @_ >>.
+
+In signatures with named parameters, the order of optional and non-optional
+parameters is unimportant.
+
+=head4 C<< slurpy >> B<Bool>
+
+A signature may contain a single slurpy parameter, which mops up any other
+arguments the caller provides your function.
+
+In signatures with positional parameters, slurpy params must always have
+some kind of B<ArrayRef> or B<HashRef> type constraint, must always appear
+at the I<end> of the list of positional parameters, and they work like this:
+
+ sub add_nums {
+   state $sig = signature(
+     positional => [
+       Num,
+       ArrayRef[Num], { slurpy => !!1 },
+     ],
+   );
+   my ( $first_num, $other_nums ) = $sig->( @_ );
+   
+   my $sum = $first_num;
+   $sum += $_ for @$other_nums;
+   
+   return $sum;
+ }
+ 
+ say add_nums( 1 );            # says 1
+ say add_nums( 1, 2 );         # says 3
+ say add_nums( 1, 2, 3 );      # says 6
+ say add_nums( 1, 2, 3, 4 );   # says 10
+
+In signatures with named parameters, slurpy params must always have
+some kind of B<HashRef> type constraint, and they work like this:
+
+ use builtin qw( true false );
+ 
+ sub process_data {
+   state $sig = signature(
+     method => true,
+     named  => [
+       input   => FileHandle,
+       output  => FileHandle,
+       flags   => HashRef[Bool], { slurpy => true },
+     ],
+   );
+   my ( $self, $arg ) = @_;
+   warn "Beginning data processing" if $arg->flags->{debug};
+   
+   ...;
+ }
+ 
+ $widget->process_data(
+   input  => \*STDIN,
+   output => \*STDOUT,
+   debug  => true,
+ );
+
+The B<Slurpy> type constraint from L<Types::Standard> may be used as
+a shortcut to specify slurpy parameters:
+
+ signature(
+   positional => [ Num, Slurpy[ ArrayRef[Num] ] ],
+ )
+
+The type B<< Slurpy[Any] >> is handled specially and treated as a
+slurpy B<ArrayRef> in signatures with positional parameters, and a
+slurpy B<HashRef> in signatures with named parameters, but has some
+additional optimizations for speed.
+
+=head4 C<< default >> B<< CodeRef|ScalarRef|Ref|Str|Undef >>
 
 A default may be provided for a parameter.
 
- state $check = compile(
-   Int,
-   Int, { default => "666" },
-   Int, { default => "999" },
+ state $check = signature(
+   positional => [
+     Int,
+     Int, { default => "666" },
+     Int, { default => "999" },
+   ],
  );
 
 Supported defaults are any strings (including numerical ones), C<undef>,
@@ -725,10 +1159,12 @@ I<< not allowed as defaults >>.
 
 Alternatively, you may provide a coderef to generate a default value:
 
- state $check = compile(
-   Int,
-   Int, { default => sub { 6 * 111 } },
-   Int, { default => sub { 9 * 111 } },
+ state $check = signature(
+   positional => [
+     Int,
+     Int, { default => sub { 6 * 111 } },
+     Int, { default => sub { 9 * 111 } },
+   ]
  );
 
 That coderef may generate any value, including non-empty arrayrefs and
@@ -739,21 +1175,47 @@ faster.
 Instead of a coderef, you can use a reference to a string of Perl source
 code:
 
- state $check = compile(
-   Int,
-   Int, { default => \ '6 * 111' },
-   Int, { default => \ '9 * 111' },
+ state $check = signature(
+   positional => [
+     Int,
+     Int, { default => \ '6 * 111' },
+     Int, { default => \ '9 * 111' },
+   ],
  );
 
-The default I<will> be validated against the type constraint, and
+Defaults I<will> be validated against the type constraint, and
 potentially coerced.
 
-Note that having any defaults in a specification, even if they're not
-used in a particular check, will slightly slow down C<< $check >>
-because it means that C<< $check >> can't just check C<< @_ >> and return
-it unaltered if it's valid — it needs to build a new array to return.
+Any parameter with a default will automatically be optional.
 
-=item C<< clone >> B<Bool>
+Note that having I<any> defaults in a signature (even if they never
+end up getting used) can slow it down, as Type::Params will need to
+build a new array instead of just returning C<< @_ >>.
+
+=head4 C<< coerce >> B<Bool>
+
+Speaking of which, the C<coerce> option allows you to indicate that a
+value should be coerced into the correct type:
+
+ state $sig = signature(
+   positional => [
+     Int,
+     Int,
+     Bool, { coerce => true },
+   ],
+ );
+
+Setting C<coerce> to false will disable coercion.
+
+If C<coerce> is not specified, so is neither true nor false, then
+coercion will be enabled if the type constraint has a coercion, and
+disabled otherwise.
+
+Note that having I<any> coercions in a signature (even if they never
+end up getting used) can slow it down, as Type::Params will need to
+build a new array instead of just returning C<< @_ >>.
+
+=head4 C<< clone >> B<Bool>
 
 If this is set to true, it will deep clone incoming values via C<dclone>
 from L<Storable> (a core module since Perl 5.7.3).
@@ -763,7 +1225,11 @@ C<< @numbers >>, so pushing additional numbers to it leaves C<< @numbers >>
 unaffected.
 
  sub foo {
-   state $check = compile( ArrayRef, { clone => 1 } );
+   state $check = signature(
+     positional => [
+       ArrayRef, { clone => 1 }
+     ],
+   );
    my ( $arr ) = &$check;
    
    push @$arr, 4, 5, 6;
@@ -774,366 +1240,255 @@ unaffected.
  
  print "@numbers\n";  ## 1 2 3
 
-=item C<< strictness >> B<< Bool | Str >>
+Note that cloning will significantly slow down your signature.
 
-Overrides the signature-wide C<strictness> setting on a per-parameter basis.
+=head4 C<< name >> B<Str>
 
-=item C<< slurpy >> B<Bool>
+This overrides the name of a named parameter. I don't know why you
+would want to do that.
 
-The following two should be equivalent:
+The following signature has two parameters: C<foo> and C<bar>. The
+name C<fool> is completely ignored.
 
- my $check = compile( Int, Slurpy[ArrayRef] );
- my $check = compile( Int, ArrayRef, { slurpy => 1 } );
+ signature(
+   named => [
+     fool   => Int, { name => 'foo' },
+     bar    => Int,
+   ],
+ )
 
-=back
+You can, however, also name positional parameters, which don't usually
+have names.
 
-As a special case, the numbers 0 and 1 may be used as shortcuts for
-B<< Optional[Any] >> and B<< Any >>.
+ signature(
+   positional => [
+     Int, { name => 'foo' },
+     Int, { name => 'bar' },
+   ],
+ )
 
- # Positional parameters
- state $check = compile(1, 0, 0);
- my ($foo, $bar, $baz) = $check->(@_);  # $bar and $baz are optional
+The names of positional parameters are not really I<used> for anything
+at the moment, but may be incorporated into error messages or
+similar in the future.
 
-After any required and optional parameters may be a slurpy parameter.
-Any additional arguments passed to C<< $check >> will be slurped into
-an arrayref or hashref and checked against the slurpy parameter.
-Defaults are not supported for slurpy parameters.
+=head4 C<< getter >> B<Str>
 
-Example with a slurpy ArrayRef:
+For signatures with named parameters, specifies the method name used
+to retrieve this parameter's value from the C<< $arg >> object.
 
- sub xyz {
-   state $check = compile( Int, Int, Slurpy[ ArrayRef[Int] ] );
-   my ($foo, $bar, $baz) = $check->(@_);
+ sub process_data {
+   state $sig = signature(
+     method => true,
+     named  => [
+       input   => FileHandle,    { getter => 'in' },
+       output  => FileHandle,    { getter => 'out' },
+       flags   => HashRef[Bool], { slurpy => true },
+     ],
+   );
+   my ( $self, $arg ) = @_;
+   warn "Beginning data processing" if $arg->flags->{debug};
+   
+   my ( $in, $out ) = ( $arg->in, $arg->out );
+   ...;
  }
  
- xyz(1..5);  # $foo = 1
-             # $bar = 2
-             # $baz = [ 3, 4, 5 ]
-
-Example with a slurpy HashRef:
-
- my $check = compile(
-   Int,
-   Optional[Str],
-   Slurpy[ HashRef[Int] ],
+ $widget->process_data(
+   input  => \*STDIN,
+   output => \*STDOUT,
+   debug  => true,
  );
+
+Ignored by signatures with positional parameters.
+
+=head4 C<< predicate >> B<Str>
+
+The C<< $arg >> object provided by signatures with named parameters
+will also include "has" methods for any optional arguments.
+For example:
+
+ state $sig = signature(
+   method => true,
+   named  => [
+     input   => Optional[ FileHandle ],
+     output  => Optional[ FileHandle ],
+     flags   => Slurpy[ HashRef[Bool] ],
+   ],
+ );
+ my ( $self, $arg ) = $sig->( @_ );
  
- my ($x, $y, $z) = $check->(1, "y", foo => 666, bar => 999);
- # $x is 1
- # $y is "y"
- # $z is { foo => 666, bar => 999 }
-
-Any type constraints derived from B<ArrayRef> or B<HashRef> should work,
-but a type does need to inherit from one of those because otherwise
-Type::Params cannot know what kind of structure to slurp the remaining
-arguments into.
-
-B<< Slurpy[Any] >> is also allowed as a special case, and is treated as
-B<< Slurpy[ArrayRef] >>.
-
-From Type::Params 1.005000 onwards, slurpy hashrefs can be passed in as a
-true hashref (which will be shallow cloned) rather than key-value pairs.
-
- sub xyz {
-   state $check = compile(Int, Slurpy[HashRef]);
-   my ($num, $hr) = $check->(@_);
-   ...
- }
- 
- xyz( 5,   foo => 1, bar => 2   );   # works
- xyz( 5, { foo => 1, bar => 2 } );   # works from 1.005000
-
-This feature is only implemented for slurpy hashrefs, not slurpy arrayrefs.
-
-Note that having a slurpy parameter will slightly slow down C<< $check >>
-because it means that C<< $check >> can't just check C<< @_ >> and return
-it unaltered if it's valid — it needs to build a new array to return.
-
-=head3 C<< validate(\@_, @spec) >>
-
-This example of C<compile>:
-
- sub foo {
-   state $check = compile(@spec);
-   my @args = $check->(@_);
+ if ( $self->has_input and $self->has_output ) {
    ...;
  }
 
-Can be written using C<validate> as:
+Setting a C<predicate> option allows you to choose a different name
+for this method.
 
- sub foo {
-   my @args = validate(\@_, @spec);
-   ...;
- }
+It is also possible to set a C<predicate> for non-optional parameters,
+which don't normally get a "has" method.
 
-Performance using C<compile> will I<always> beat C<validate> though.
+Ignored by signatures with positional parameters.
 
-=head3 C<< compile_named(@spec) >>
-
-C<compile_named> is a variant of C<compile> for named parameters instead
-of positional parameters.
-
-The format of the specification is changed to include names for each
-parameter:
-
- state $check = compile_named(
-   \%general_opts,
-   foo   => $type_for_foo, \%opts_for_foo,
-   bar   => $type_for_bar, \%opts_for_bar,
-   baz   => $type_for_baz, \%opts_for_baz,
-   ...,
-   extra => Slurpy[...],
- );
-
-The C<< $check >> coderef will return a hashref.
-
- my $check = compile_named(
-   foo => Int,
-   bar => Str, { default => "hello" },
- );
- 
- my $args = $check->(foo => 42);
- # $args->{foo} is 42
- # $args->{bar} is "hello"
-
-The C<< %general_opts >> hash supports the same options as C<compile>
-plus a few additional options:
-
-=over
-
-=item C<< class >> B<< ClassName >>
-
-The check coderef will, instead of returning a simple hashref, call
-C<< $class->new($hashref) >> and return the result.
-
-=item C<< constructor >> B<< Str >>
-
-Specifies an alternative method name instead of C<new> for the C<class>
-option described above.
-
-=item C<< class >> B<< Tuple[ClassName, Str] >>
-
-Shortcut for declaring both the C<class> and C<constructor> options at once.
-
-=item C<< bless >> B<< ClassName >>
-
-Like C<class>, but bypass the constructor and directly bless the hashref.
-
-=item C<< named_to_list >> B<< Bool >>
-
-Instead of returning a hashref, return a hash slice.
-
- myfunc(bar => "x", foo => "y");
- 
- sub myfunc {
-    state $check = compile_named(
-       { named_to_list => 1 },
-       foo => Str, { optional => 1 },
-       bar => Str, { optional => 1 },
-    );
-    my ($foo, $bar) = $check->(@_);
-    ...; ## $foo is "y" and $bar is "x"
- }
-
-The order of keys for the hash slice is the same as the order of the names
-passed to C<compile_named>. For missing named parameters, C<undef> is
-returned in the list.
-
-Basically in the above example, C<myfunc> takes named parameters, but
-receieves positional parameters.
-
-=item C<< named_to_list >> B<< ArrayRef[Str] >>
-
-As above, but explicitly specify the keys of the hash slice.
-
-=back
-
-Like C<compile>, the numbers 0 and 1 may be used as shortcuts for
-B<< Optional[Any] >> and B<< Any >>.
-
- state $check = compile_named(foo => 1, bar => 0, baz => 0);
- my $args = $check->(@_);  # $args->{bar} and $args->{baz} are optional
-
-Slurpy parameters are slurped into a nested hashref.
-
-  my $check = compile(
-    foo    => Str,
-    bar    => Optional[Str],
-    extra  => Slurpy[ HashRef[Str] ],
-  );
-  my $args = $check->(foo => "aaa", quux => "bbb");
-  
-  print $args->{foo}, "\n";             # aaa
-  print $args->{extra}{quux}, "\n";     # bbb
-
-B<< slurpy[Any] >> is treated as B<< slurpy[HashRef] >>.
-
-The C<head> and C<tail> options are supported. This allows for a
-mixture of positional and named arguments, as long as the positional
-arguments are non-optional and at the head and tail of C<< @_ >>.
-
-  my $check = compile(
-    { head => [ Int, Int ], tail => [ CodeRef ] },
-    foo => Str,
-    bar => Str,
-    baz => Str,
-  );
-  
-  my ($int1, $int2, $args, $coderef)
-    = $check->( 666, 999, foo=>'x', bar=>'y', baz=>'z', sub {...} );
-  
-  say $args->{bar};  # 'y'
-
-This can be combined with C<named_to_list>:
-
-  my $check = compile(
-    { head => [ Int, Int ], tail => [ CodeRef ], named_to_list => 1 },
-    foo => Str,
-    bar => Str,
-    baz => Str,
-  );
-  
-  my ($int1, $int2, $foo, $bar, $baz, $coderef)
-    = $check->( 666, 999, foo=>'x', bar=>'y', baz=>'z', sub {...} );
-  
-  say $bar;  # 'y'
-
-There is one additional parameter option supported, in addition to
-the C<optional>, C<default>, C<clone>, and C<slurpy> options already
-supported by positional parameters.
-
-=over
-
-=item C<alias> B<< Str|ArrayRef[Str] >>
+=head4 C<< alias >> B<< Str|ArrayRef[Str] >>
 
 A list of alternative names for the parameter, or a single alternative
 name.
 
-  {
-    my $check;
-    sub adder {
-      $check ||= compile_named(
-        first_number   => Int, { alias => [ 'x' ] },
-        second_number  => Int, { alias =>   'y'   },
-      );
-      my ( $arg ) = &$check;
-      return $arg->{first_number} + $arg->{second_number};
-    }
-  }
-  
-  say adder( first_number => 40, second_number => 2 );    # 42
-  say adder( x            => 40, y             => 2 );    # 42
-  say adder( first_number => 40, y             => 2 );    # 42
-  say adder( first_number => 40, x => 1, y => 2 );        # dies!
+ sub add_numbers {
+   state $sig = signature(
+     named => [
+       first_number   => Int, { alias => [ 'x' ] },
+       second_number  => Int, { alias =>   'y'   },
+     ],
+   );
+   my ( $arg ) = $sig->( @_ );
+   
+   return $arg->first_number + $arg->second_number;
+ }
+ 
+ say add_numbers( first_number => 40, second_number => 2 );  # 42
+ say add_numbers( x            => 40, y             => 2 );  # 42
+ say add_numbers( first_number => 40, y             => 2 );  # 42
+ say add_numbers( first_number => 40, x => 1, y => 2 );      # dies!
 
-=back
+Ignored by signatures with positional parameters.
 
-=head3 C<< validate_named(\@_, @spec) >>
+=head4 C<< strictness >> B<Bool|Str>
 
-Like C<compile> has C<validate>, C<compile_named> has C<validate_named>.
-Just like C<validate>, it's the slower way to do things, so stick with
-C<compile_named>.
+Overrides the signature option C<strictness> on a per-parameter basis.
 
-=head3 C<< compile_named_oo(@spec) >>
+=head2 C<< signature_for $function_name => ( %spec ) >>
 
-Here's a quick example function:
+Like C<signature>, but instead of returning a coderef, wraps an existing
+function, so you don't need to deal with the mechanics of generating the
+signature at run-time, calling it, and extracting the returned values.
 
-   sub add_contact_to_database {
-      state $check = compile_named(
-         dbh     => Object,
-         id      => Int,
-         name    => Str,
-      );
-      my $arg = $check->(@_);
-      
-      my $sth = $arg->{db}->prepare('INSERT INTO contacts VALUES (?, ?)');
-      $sth->execute($arg->{id}, $arg->{name});
-   }
+The following three examples are roughly equivalent:
 
-Looks simple, right? Did you spot that it will always die with an error
-message I<< Can't call method "prepare" on an undefined value >>?
+ sub add_nums {
+   state $signature = signature(
+     positional => [ Num, Num ],
+   );
+   my ( $x, $y ) = $signature->( @_ );
+   
+   return $x + $y;
+ }
 
-This is because we defined a parameter called 'dbh' but later tried to
-refer to it as C<< $arg{db} >>. Here, Perl gives us a pretty clear
-error, but sometimes the failures will be far more subtle. Wouldn't it
-be nice if instead we could do this?
+Or:
 
-   sub add_contact_to_database {
-      state $check = compile_named_oo(
-         dbh     => Object,
-         id      => Int,
-         name    => Str,
-      );
-      my $arg = $check->(@_);
-      
-      my $sth = $arg->dbh->prepare('INSERT INTO contacts VALUES (?, ?)');
-      $sth->execute($arg->id, $arg->name);
-   }
+ signature_for add_nums => (
+   positional => [ Num, Num ],
+ );
+ 
+ sub add_nums {
+   my ( $x, $y ) = @_;
+   
+   return $x + $y;
+ }
 
-If we tried to call C<< $arg->db >>, it would fail because there was
-no such method.
+Or since Perl 5.20:
 
-Well, that's exactly what C<compile_named_oo> does.
+ signature_for add_nums => (
+   positional => [ Num, Num ],
+ );
+ 
+ sub add_nums ( $x, $y ) {
+   return $x + $y;
+ }
 
-As well as giving you nice protection against mistyped parameter names,
-It also looks kinda pretty, I think. Hash lookups are a little faster
-than method calls, of course (though Type::Params creates the methods
-using L<Class::XSAccessor> if it's installed, so they're still pretty
-fast).
+The C<signature_for> keyword turns C<signature> inside-out.
 
-An optional parameter C<foo> will also get a nifty C<< $arg->has_foo >>
-predicate method. Yay!
+The same signature specification options are supported, with the exception
+of C<want_source>, C<want_details>, and C<goto_next>, which will not work.
 
-C<compile_named_oo> gives you some extra options for parameters, in
-addition to the C<optional>, C<default>, C<clone>, C<slurpy>, and
-C<alias> options already supported by C<compile_named>.
+=head1 LEGACY API
 
-   sub add_contact_to_database {
-      state $check = compile_named_oo(
-         dbh     => Object,
-         id      => Int,    { default => '0', getter => 'identifier' },
-         name    => Str,    { optional => 1, predicate => 'has_name' },
-      );
-      my $arg = $check->(@_);
-      
-      my $sth = $arg->dbh->prepare('INSERT INTO contacts VALUES (?, ?)');
-      $sth->execute($arg->identifier, $arg->name) if $arg->has_name;
-   }
+The following functions were the API prior to Type::Params v2. They are
+still supported, but their use is now discouraged.
 
-=over
+If you don't provide an import list at all, you will import C<compile>
+and C<compile_named>:
 
-=item C<< getter >> B<< Str >>
+ use Type::Params;
 
-The C<getter> option lets you choose the method name for getting the
-argument value.
+This does the same:
 
-If the parameter has an alias, this currently I<does not> result in
-additional getters being defined.
+  use Type::Params -v1;
 
-=item C<< predicate >> B<< Str >>
+The following exports C<compile>, C<compile_named>, and C<compile_named_oo>:
 
-The C<predicate> option lets you choose the method name for checking
-the existence of an argument. By setting an explicit predicate method
-name, you can force a predicate method to be generated for non-optional
-arguments.
+ use Type::Params -compile;
 
-If the parameter has an alias, this currently I<does not> result in
-additional predicate methods being defined.
+The following exports C<wrap_subs> and C<wrap_methods>:
 
-=back
+ use Type::Params -wrap;
 
-The objects returned by C<compile_named_oo> are blessed into lightweight
-classes which have been generated on the fly. Don't expect the names of
-the classes to be stable or predictable. It's probably a bad idea to be
-checking C<can>, C<isa>, or C<DOES> on any of these objects. If you're
-doing that, you've missed the point of them.
+=head2 C<< compile( @pos_params ) >>
 
-They don't have any constructor (C<new> method). The C<< $check >>
-coderef effectively I<is> the constructor.
+Equivalent to C<< signature( positional => \@pos_params ) >>.
 
-=head3 C<< validate_named_oo(\@_, @spec) >>
+C<< compile( \%spec, @pos_params ) >> is equivalent to
+C<< signature( %spec, positional => \@pos_params ) >>.
 
-This function doesn't even exist. :D
+=head2 C<< compile_named( @named_params ) >>
+
+Equivalent to C<< signature( bless => 0, named => \@named_params ) >>.
+
+C<< compile_named( \%spec, @named_params ) >> is equivalent to
+C<< signature( bless => 0, %spec, named => \@named_params ) >>.
+
+=head2 C<< compile_named_oo( @named_params ) >>
+
+Equivalent to C<< signature( bless => 1, named => \@named_params ) >>.
+
+C<< compile_named_oo( \%spec, @named_params ) >> is equivalent to
+C<< signature( bless => 1, %spec, named => \@named_params ) >>.
+
+=head2 C<< validate( \@args, @pos_params ) >>
+
+Equivalent to C<< signature( positional => \@pos_params )->( @args ) >>.
+
+The C<validate> function has I<never> been recommended, and is not
+exported unless requested by name.
+
+=head2 C<< validate_named( \@args, @named_params ) >>
+
+Equivalent to C<< signature( bless => 0, named => \@named_params )->( @args ) >>.
+
+The C<validate_named> function has I<never> been recommended, and is not
+exported unless requested by name.
+
+=head2 C<< wrap_subs( func1 => \@params1, func2 => \@params2, ... ) >>
+
+Equivalent to:
+
+ signature_for func1 => ( positional => \@params1 );
+ signature_for func2 => ( positional => \@params2 );
+
+One slight difference is that instead of arrayrefs, you can provide the
+output of one of the C<compile> functions:
+
+ wrap_subs( func1 => compile_named( @params1 ) );
+
+C<wrap_subs> is not exported unless requested by name.
+
+=head2 C<< wrap_methods( func1 => \@params1, func2 => \@params2, ... ) >>
+
+Equivalent to:
+
+ signature_for func1 => ( method => 1, positional => \@params1 );
+ signature_for func2 => ( method => 1, positional => \@params2 );
+
+One slight difference is that instead of arrayrefs, you can provide the
+output of one of the C<compile> functions:
+
+  wrap_methods( func1 => compile_named( @params1 ) );
+
+C<wrap_methods> is not exported unless requested by name.
+
+=head1 OTHER FUNCTIONS
+
+These are really part of the legacy API, but don't currently have
+any replacements in the modern API.
 
 =head3 C<< multisig(@alternatives) >>
 
@@ -1221,53 +1576,7 @@ message string:
    $obj->foo(\%opts, "Hello");
    $obj->foo("World");
 
-=head3 C<< wrap_subs( $subname1, $wrapper1, ... ) >>
-
-It's possible to turn the check inside-out and instead of the sub calling
-the check, the check can call the original sub.
-
-Normal way:
-
-   use Type::Param qw(compile);
-   use Types::Standard qw(Int Str);
-   
-   sub foobar {
-      state $check = compile(Int, Str);
-      my ($foo, $bar) = @_;
-      ...;
-   }
-
-Inside-out way:
-
-   use Type::Param qw(wrap_subs);
-   use Types::Standard qw(Int Str);
-   
-   sub foobar {
-      my ($foo, $bar) = @_;
-      ...;
-   }
-   
-   wrap_subs foobar => [Int, Str];
-
-C<wrap_subs> takes a hash of subs to wrap. The keys are the sub names and the
-values are either arrayrefs of arguments to pass to C<compile> to make a check,
-or coderefs that have already been built by C<compile>, C<compile_named>, or
-C<compile_named_oo>.
-
-=head3 C<< wrap_methods( $subname1, $wrapper1, ... ) >>
-
-C<wrap_methods> also exists, which shifts off the invocant from C<< @_ >>
-before the check, but unshifts it before calling the original sub.
-
-   use Type::Param qw(wrap_methods);
-   use Types::Standard qw(Int Str);
-   
-   sub foobar {
-      my ($self, $foo, $bar) = @_;
-      ...;
-   }
-   
-   wrap_methods foobar => [Int, Str];
+C<multisig> is not exported unless requested by name.
 
 =head3 B<Invocant>
 
@@ -1283,10 +1592,13 @@ constraint which accepts classnames I<and> blessed objects.
    return $arr->[ $ix ];
  }
 
+C<Invocant> is not exported unless requested by name.
+
 =head3 B<ArgsObject>
 
 Type::Params exports a parameterizable type constraint B<ArgsObject>.
-It accepts the kinds of objects returned by C<compile_named_oo> checks.
+It accepts the kinds of objects returned by signature checks for named
+parameters.
 
   package Foo {
     use Moo;
@@ -1318,16 +1630,20 @@ It accepts the kinds of objects returned by C<compile_named_oo> checks.
 The parameter "Bar::bar" refers to the caller when the check is compiled,
 rather than when the parameters are checked.
 
+C<ArgsObject> is not exported unless requested by name.
+
 =head1 ENVIRONMENT
 
 =over
 
 =item C<PERL_TYPE_PARAMS_XS>
 
-Affects the building of accessors for C<compile_named_oo>. If set to true,
+Affects the building of accessors for C<< $arg >> objects. If set to true,
 will use L<Class::XSAccessor>. If set to false, will use pure Perl. If this
-environment variable does not exist, will use L<Class::XSAccessor> if it
-is available.
+environment variable does not exist, will use Class::XSAccessor.
+
+If Class::XSAccessor is not installed or is too old, pure Perl will always
+be used as a fallback.
 
 =back
 
