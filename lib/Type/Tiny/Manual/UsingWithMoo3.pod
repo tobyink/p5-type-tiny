@@ -146,7 +146,7 @@ This is a shortcut for checking a value meets a type constraint:
 
   use Types::Standard qw( is_Int );
   
-  if ( is_Int($value) ) {
+  if ( is_Int $value ) {
     ...;
   }
 
@@ -271,6 +271,18 @@ C<< ArrayRef->of(Int)->check($value) >>.
 This trick only works for parameterized types that have a single
 parameter, like B<ArrayRef>, B<HashRef>, B<InstanceOf>, etc.
 (Sorry, C<Dict> and C<Tuple>!)
+
+=head2 Lexical imports
+
+Type::Tiny 2.0 combined with Perl 5.37.2+ allows lexically scoped imports.
+So:
+
+  my $is_ok = do {
+    use Types::Standard -lexical, qw( Str ArrayRef );
+    ArrayRef->of( Str )->check( \@things );
+  };
+  
+  # The Str and ArrayRef types aren't defined here.
 
 =head2 Do What I Mean!
 
