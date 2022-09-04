@@ -517,6 +517,29 @@ And of course you can still add more coercions to the inherited ones...
     coerce => 1
   );
 
+=head2 Type Defaults
+
+A previous example included:
+
+  has children => (
+    is      => 'ro',
+    isa     => ArrayRef,
+    default => sub { return [] },
+  );
+
+It's actually pretty common that you'll want an arrayref attribute to
+default to being an empty arrayref, a numeric attribute to default to
+zero, etc. Type::Tiny provides a method for that:
+
+  has children => (
+    is      => 'ro',
+    isa     => ArrayRef,
+    default => ArrayRef->type_default,
+  );
+
+Many of the types in L<Types::Standard> have sensible type defaults
+defined.
+
 =head2 Method Parameters
 
 So far we have just concentrated on the definition of object attributes, but
