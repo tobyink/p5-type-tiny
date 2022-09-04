@@ -4315,3 +4315,42 @@
 			label "List which versions of Perl Type::Tiny requires in Type::Tiny::Manual::Policies.";
 		];
 	].
+
+`Type-Tiny 1.999_000 cpan:TOBYINK`
+	issued  2022-09-04;
+	label "Type::Tiny 2.0 Preview A";
+	changeset [
+		dcs:versus `Type-Tiny 1.016010 cpan:TOBYINK`;
+		item [
+			a dcs:Change;
+			label "The Type::Params API has had a major overhaul, introducing `signature` and `signature_for` functions. The `compile`, `compile_named`, `compile_named_oo`, `validate`, `validate_named`, `wrap_subs`, and `wrap_methods` functions are now considered the legacy API. There are no plans to drop support for the legacy API in the foreseeable future.";
+		];
+		item [
+			a dcs:Addition;
+			label "Types::Common module.";
+		];
+		item [
+			a dcs:Addition;
+			label "Type::Tiny `type_default` method.";
+		];
+		item [
+			a dcs:Addition;
+			label "Type::Tiny overloads `/`.";
+		];
+		item [
+			a dcs:Update;
+			label "Dropping support for Perl 5.6.1 (which was released in April 2001), 5.6.2 (November 2003), and Perl 5.8.0 (July 2002). Type::Tiny now requires at least Perl 5.8.1.";
+		];
+		item [
+			a dcs:Update;
+			label "Require Exporter::Tiny 1.004000+. (Previously required Exporter::Tiny 1.000000.)";
+		];
+		item [
+			a dcs:Documentation;
+			label "Updated Type::Tiny::Manual to cover new features.";
+		];
+		item [
+			a dcs:Change;
+			label "%Error::TypeTiny::CarpInternal is now an alias for %Carp::CarpInternal.";
+		];
+	].
