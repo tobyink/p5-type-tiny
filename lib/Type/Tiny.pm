@@ -1586,7 +1586,7 @@ Type::Tiny - tiny, yet Moo(se)-compatible type constraint
  package Horse {
    use Moo;
    use Types::Standard qw( Str Int Enum ArrayRef Object );
-   use Type::Params qw( compile );
+   use Type::Params qw( signature );
    use namespace::autoclean;
    
    has name => (
@@ -1609,11 +1609,13 @@ Type::Tiny - tiny, yet Moo(se)-compatible type constraint
    );
    
    sub add_child {
-     state $check = compile( Object, Object );  # method signature
+     state $check = signature(
+       method     => Object,
+       positional => [ Object ],
+     );                                         # method signature
+     my ( $self, $child ) = $check->( @_ );     # unpack @_
      
-     my ($self, $child) = $check->(@_);         # unpack @_
      push @{ $self->children }, $child;
-     
      return $self;
    }
  }

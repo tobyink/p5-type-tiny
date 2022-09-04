@@ -1617,7 +1617,10 @@ constraint which accepts classnames I<and> blessed objects.
  use Type::Params qw( compile Invocant );
  
  sub my_method {
-   state $check = compile(Invocant, ArrayRef, Int);
+   state $check = signature(
+     method     => Invocant,
+     positional => [ ArrayRef, Int ],
+   );
    my ($self_or_class, $arr, $ix) = $check->(@_);
    
    return $arr->[ $ix ];
@@ -1643,16 +1646,18 @@ parameters.
   
   package Bar {
     use Types::Standard -types;
-    use Type::Params 'compile_named_oo';
+    use Type::Params 'signature';
     
     sub bar {
-      state $check = compile_named_oo(
-        xxx => Int,
-        yyy => ArrayRef,
+      state $check = signature(
+        named => [
+          xxx => Int,
+          yyy => ArrayRef,
+        ],
       );
-      my $args = &$check;
+      my ( $got ) = $check->( @_ );
       
-      return 'Foo'->new( args => $args );
+      return 'Foo'->new( args => $got );
     }
   }
   
