@@ -138,6 +138,12 @@ sub signature {
 		my ( $function, %opts ) = @_;
 		my $package = $opts{package} || caller( $opts{caller_level} || 0 );
 
+		if ( ref($function) eq 'ARRAY' ) {
+			$opts{package} = $package;
+			signature_for( $_, %opts ) for @$function;
+			return;
+		}
+
 		my $positional = delete( $opts{positional} ) || delete( $opts{pos} );
 		my $named      = delete( $opts{named} );
 
@@ -147,15 +153,21 @@ sub signature {
 			$opts{bless} = 1 unless exists $opts{bless};
 			if ( $positional ) {
 				require Error::TypeTiny;
-				Error::TypeTiny::croak( "Signature cannot have both positional and named arguments" );
+				return Error::TypeTiny::croak( "Signature cannot have both positional and named arguments" );
 			}
 		}
 
 		my $fullname = ( $function =~ /::/ ) ? $function : "$package\::$function";
-		$opts{goto_next} = do { no strict 'refs'; \&$fullname };
-
-		$opts{package} ||= $package;
-		$opts{subname} ||= ( $function =~ /::(\w+)$/ ) ? $1 : $function;
+		$opts{package}   ||= $package;
+		$opts{subname}   ||= ( $function =~ /::(\w+)$/ ) ? $1 : $function;
+		$opts{goto_next} ||= do { no strict 'refs'; exists(&$fullname) ? \&$fullname : undef; };
+		if ( $opts{fallback} and not $opts{goto_next} ) {
+			$opts{goto_next} = ref( $opts{fallback} ) ? $opts{fallback} : sub {};
+		}
+		if ( not $opts{goto_next} ) {
+			require Error::TypeTiny;
+			return Error::TypeTiny::croak( "Function '$function' not found to wrap!" );
+		}
 
 		my $sig = 'Type::Params::Signature'->new_from_compile( $sig_kind, \%opts, @$args );
 		my $coderef = $sig->coderef->compile;
@@ -168,6 +180,8 @@ sub signature {
 		no strict 'refs';
 		no warnings 'redefine';
 		*$fullname = $subname->( $fullname, $coderef );
+
+		return;
 	}
 }
 
@@ -1394,7 +1408,28 @@ Or since Perl 5.20:
 The C<signature_for> keyword turns C<signature> inside-out.
 
 The same signature specification options are supported, with the exception
-of C<want_source>, C<want_details>, and C<goto_next>, which will not work.
+of C<want_source> and C<want_details> which will not work.
+
+The C<goto_next> option is what C<signature_for> uses to "connect" the
+signature to the body of the sub, so do not use that unless you understand
+the consequences.
+
+An additional C<fallback> option is allowed, which allows C<signature_for>
+to "succeed" even if the sub you're wrapping doesn't exist. Here,
+C<signature_for> will install the fallback sub if C<add_nums> doesn't
+already exist. If C<add_nums> does already exist, then the C<fallback> will
+be ignored.
+
+ signature_for add_nums => (
+   positional => [ Num, Num ],
+   fallback   => sub { $_[0] + $_[1] },
+ );
+
+A shortcut C<< fallback => 1 >> is allowed, which means the same as
+C<< fallback => sub {} >>.
+
+C<< signature_for( \@functions, %opts ) >> is a useful shortcut if you have
+multiple functions with the same signature.
 
 =head1 LEGACY API
 
