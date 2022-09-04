@@ -56,7 +56,7 @@ sub baz {
 
 my $e = exception { baz(undef) };
 
-my $subs = [ 
+my $subs = [
 	map
 		$e->stack_trace->frame( $_ )->subroutine,
 		0 .. 2
