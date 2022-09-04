@@ -37,7 +37,7 @@ be changed to C<use Moose> or C<use Mouse> and it would still work.
  package Horse {
    use Moo;
    use Types::Standard qw( Str Int Enum ArrayRef InstanceOf );
-   use Type::Params -sigs;
+   use Type::Params qw( signature );
    use namespace::autoclean;
    
    has name => (
@@ -98,7 +98,7 @@ be changed to C<use Moose> or C<use Mouse> and it would still work.
  
  # assert_Object will return $secretariat or die
  #
- say assert_Object($secretariat)->name;
+ say assert_Object( $secretariat )->name;
 
 =head1 MANUAL
 

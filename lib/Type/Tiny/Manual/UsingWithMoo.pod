@@ -517,7 +517,6 @@ And of course you can still add more coercions to the inherited ones...
     coerce => 1
   );
 
-
 =head2 Method Parameters
 
 So far we have just concentrated on the definition of object attributes, but

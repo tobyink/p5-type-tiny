@@ -409,6 +409,9 @@ Any non-reference value, including undef.
 
 =back
 
+The module L<Types::Common> incorporates all the types found in
+L<Types::Standard>, L<Types::Common::Numeric>, and L<Types::Common::String>.
+
 =head1 NEXT STEPS
 
 Here's your next step:

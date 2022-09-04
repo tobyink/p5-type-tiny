@@ -32,10 +32,10 @@ BEGIN {
 	}
 };
 
-use Type::Registry ();
 push @EXPORT_OK, 't';
 sub _generate_t {
 	my $package = shift;
+	require Type::Registry;
 	my $t = 'Type::Registry'->_generate_t( @_ );
 	$t->()->add_types( $package );
 	return $t;

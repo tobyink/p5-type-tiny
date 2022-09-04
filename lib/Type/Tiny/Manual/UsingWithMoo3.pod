@@ -297,6 +297,46 @@ The C<is> function will use C<dwim_type> if you pass it a string as a type.
     ...;
   }
 
+=head2 Types::Common
+
+Notice that in a lot of examples we're importing one or two functions
+each from a few different modules:
+
+  use Types::Common::Numeric qw( PositiveInt );
+  use Types::Common::String qw( NonEmptyStr );
+  use Types::Standard qw( ArrayRef Slurpy );
+  use Type::Params qw( signature );
+
+A module called L<Types::Common> exists which acts as a single place you
+can use for importing most of Type::Tiny's commonly used types and functions.
+
+  use Types::Common qw(
+    PositiveInt NonEmptyStr ArrayRef Slurpy
+    signature
+  );
+
+Types::Common provides:
+
+=over
+
+=item *
+
+All the types from L<Types::Standard>.
+
+=item *
+
+All the types from L<Types::Common::Numeric> and L<Types::Common::String>.
+
+=item *
+
+The C<< -sigs >> tag from L<Type::Params>.
+
+=item *
+
+The C<< t() >> function from L<Type::Registry>.
+
+=back
+
 =head1 NEXT STEPS
 
 You now know pretty much everything there is to know about how to use
