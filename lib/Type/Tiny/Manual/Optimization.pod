@@ -277,15 +277,12 @@ slurpies will continue to work:
 
 =head2 The Slash Operator
 
-Under normal circumstances, the following evaluates to B<Any>:
+Type::Tiny has some of the same logic as Devel::StrictMode built in.
+In particular, it overloads the slash (division) operator so that
+B<< TypeA/TypeB >> evaluates to B<TypeB> normally, but to B<TypeA>
+in strict mode.
 
-  Num / Any
-
-However, using the same logic as Devel::StrictMode, in strict mode it will
-become B<Num>.
-
-So the previous example using Devel::StrictMode in an attribute definition
-can be written as:
+An example using this feature:
 
  use Types::Standard -types;
  
@@ -294,6 +291,10 @@ can be written as:
    isa     => ArrayRef[ Num / Any ],
    default => sub { [] },
  );
+
+In strict mode, this attribute would check that its value is an arrayref
+of numbers (which may be slow if it contains a lot of numbers). Normally
+though, it will just check that the value is an arrayref.
 
 =head1 NEXT STEPS
 
