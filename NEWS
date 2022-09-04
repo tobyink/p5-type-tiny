@@ -4,20 +4,12 @@
    changes in development releases, see the "Changes" file instead.
 =======================================================================
 
-2020-02-19 Type-Tiny version 1.010000 released!
+2022-XX-XX Type-Tiny version 2.000000 released!
 
- - Recursive definition of type constraints.
-
-2020-10-28 Type-Tiny version 1.012000 released!
-
- - List processing methods (grep, map, etc).
- - Type::Utils::is() and Type::Utils::assert().
- - Improvements to Types::TypeTiny.
- - Type::Params now provides an ArgsObject type.
- - ArrayLike and HashLike types now parameterizable.
- - Type::Library -extends and -utils flags.
-
-2022-06-27 Type-Tiny version 1.014000 released!
-
- - Type::Params compile(), compile_named(), and compile_named_oo()
-   functions now support an `on_die` callback.
+ - Improved API for `Type::Params`.
+ - New `Types::Common` module.
+ - Dropped support for versions of Perl older than Perl 5.8.1.
+ - Uses `Exporter::Tiny` 1.004000 for lexical imports on Perl blead.
+ - `Type::Tiny` now has a `type_default` method.
+ - `Type::Tiny` now overloads the division (slash) operator.
+ - `%Error::TypeTiny::CarpInternal` is now an alias for `%Carp::CarpInternal`.
