@@ -88,7 +88,7 @@ L<Type::Tiny::Duck> objects.
 
 In the case of a type constraint like this:
 
- my $type = Int->where(sub { $_ >= 0 });
+ my $type = Int->where( sub { $_ >= 0 } );
 
 Type::Tiny will need to call one sub to verify a value meets the B<Int>
 type constraint, and your coderef to check that the value is above zero.
@@ -104,7 +104,7 @@ more complicated, but this is close enough as an example.)
 
 If you provide your check as a string instead of a coderef, like this:
 
- my $type = Int->where(q{ $_ >= 0 });
+ my $type = Int->where( q{ $_ >= 0 } );
 
 Then Type::Tiny will be able to combine them into one string:
 
@@ -128,10 +128,10 @@ variable name and can use that in the string of code it generates.
  my $type = Type::Tiny->new(
    parent  => Int,
    inlined => sub {
-     my ($self, $varname) = @_;
+     my ( $self, $varname ) = @_;
      return sprintf(
        '(%s) && ( %s >= 0 )',
-       $self->parent->inline_check($varname),
+       $self->parent->inline_check( $varname ),
        $varname,
      );
    }
@@ -146,10 +146,10 @@ type check.
  my $type = Type::Tiny->new(
    parent  => Int,
    inlined => sub {
-     my ($self, $varname) = @_;
+     my ( $self, $varname ) = @_;
      return (
        undef,
-       sprintf('%s >= 0', $varname),
+       sprintf( '%s >= 0', $varname ),
      );
    }
  );
@@ -168,8 +168,8 @@ to.
  my $type = Type::Tiny->new(
    parent  => Int,
    inlined => sub {
-     my ($self, $varname) = @_;
-     return sprintf('%s =~ /^[0-9]+$/', $varname);
+     my ( $self, $varname ) = @_;
+     return sprintf( '%s =~ /^[0-9]+$/', $varname );
    }
  );
 
@@ -227,12 +227,15 @@ Very efficient way which avoids compiling the signature at all if
 C<STRICT> is false:
 
  use Types::Standard qw( Num Object );
- use Type::Params qw( compile );
+ use Type::Params qw( signature );
  use Devel::StrictMode qw( STRICT );
  
  sub add_number {
    state $check;
-   $check = compile( Object, Num ) if STRICT;
+   STRICT and $check //= signature(
+     method     => 1,
+     positional => [ Num ],
+   );
    
    my ( $self, $num ) = STRICT ? &$check : @_;
    
@@ -248,11 +251,15 @@ checks which are safe(ish) to disable, while coercions, defaults, and
 slurpies will continue to work:
 
  use Types::Standard qw( Num Object );
- use Type::Params qw( compile );
+ use Type::Params qw( signature );
  use Devel::StrictMode qw( STRICT );
  
  sub add_number {
-   state $check = compile( { strictness => STRICT }, Object, Num );
+   state $check = signature(
+     strictness => STRICT,
+     method     => 1,
+     positional => [ Num ],
+   );
    
    my ( $self, $num ) = &$check;
    

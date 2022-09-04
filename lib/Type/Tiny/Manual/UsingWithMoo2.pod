@@ -312,7 +312,7 @@ Here is a longer example using builders and triggers.
   package Horse {
     use Moo;
     use Types::Standard qw( Str Num ArrayRef InstanceOf );
-    use Type::Params qw(compile);
+    use Type::Params qw( signature );
     use namespace::autoclean;
     
     my $ThisClass = InstanceOf[ __PACKAGE__ ];
@@ -342,8 +342,11 @@ Here is a longer example using builders and triggers.
     }
     
     sub add_child {
-      state $check = compile($ThisClass, $ThisClass);
-      my ($self, $kid) = &$check;
+      state $check = signature(
+        method     => $ThisClass,
+        positional => [ $ThisClass ],
+      );
+      my ( $self, $kid ) = &$check;
       push @{ $self->children }, $kid;
       return $self;
     }
@@ -351,6 +354,9 @@ Here is a longer example using builders and triggers.
 
 Now it's pretty much impossible for the caller to make a mess by adding
 a non-horse as a child.
+
+(Note there's a L<Types::Self> module on CPAN that will define a B<Self>
+type meaning B<< InstanceOf[ __PACKAGE__ ] >> for you!)
 
 =head1 NEXT STEPS
 

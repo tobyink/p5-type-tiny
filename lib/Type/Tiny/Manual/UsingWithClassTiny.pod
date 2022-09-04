@@ -36,23 +36,29 @@ Class::Tiny:
       name     => sub { die "name is required"; },
       children => sub { return [] },
     };
-    use Types::Standard qw( Str Num ArrayRef Dict Optional Slurpy Any);
-    use Type::Params qw( wrap_methods compile );
+    use Types::Standard qw( Str Num ArrayRef Dict Optional Slurpy Any Object );
+    use Type::Params qw( signature_for );
     use namespace::autoclean;
     
     # type checks
-    wrap_methods(
-      BUILD    => [Dict[
+    signature_for BUILD => (
+      method => Object,
+      named  => [
         name       => Str,
         gender     => Optional[Str],
         age        => Optional[Num],
         children   => Optional[ArrayRef],
         ()         => Slurpy[Any],
-      ]],
-      name     => [],
-      gender   => [],
-      age      => Optional[Num],
-      children => [],
+      ],
+      fallback => 1,
+    );
+    signature_for [ 'name', 'gender', 'children' ] => (
+      method     => Object,
+      positional => [],
+    );
+    signature_for age => (
+      method     => Object,
+      positional => [ Optional[Num] ],
     );
   }
 
@@ -66,10 +72,10 @@ Well, Class::Tiny, after it has built a new object, will do this:
 parent classes too.) We can hook onto this in order to check type constraints
 for the constructor.
 
-We use C<wrap_methods> from L<Type::Params> to wrap the original C<BUILD>
-method (which doesn't exist, so C<wrap_methods> will just assume an empty
-sub) with a type check for C<< $args >>. The type check is just a B<Dict>
-that checks the class's required and optional attributes and includes
+We use C<signature_for> from L<Type::Params> to wrap the original C<BUILD>
+method (which doesn't exist, so C<< fallback => 1 >> will just assume an
+empty sub) with a type check for its arguments. The type check is just a
+B<Dict> that checks the class's required and optional attributes and includes
 B<< Slurpy[Any] >> at the end to be flexible for subclasses adding new
 attributes.
 

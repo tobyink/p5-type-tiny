@@ -12,50 +12,22 @@ To get started with Type::Params, please read
 L<Type::Tiny::Manual::UsingWithMoo> which will cover a lot of the basics,
 even if you're not using Moo.
 
-=head2 C<validate> and C<validate_named>
-
-The generally recommended way of using Type::Params is this:
-
-  sub mysub {
-    state $check = compile( SIGNATURE );
-    my @args = $check->( @_ );
-  }
-
-But it is possible to do it in one call:
-
-  sub mysub {
-    my @args = validate( \@_, SIGNATURE );
-  }
-
-There is also a C<validate_named> function which acts as a counterpart for
-C<compile_named>.
-
-This will generally be slower and less efficient than using C<compile> first
-because Type::Tiny can do a lot of optimizations in that first stage to make
-the second stage a lot faster. (And the results of C<compile> get stored in
-the C<state> variable so that only has to happen once.)
-
-There is rarely a reason to use C<validate> and C<validate_named>, but
-they exist if you want them.
-
 =head2 C<multisig>
 
 Multisig allows you to allow multiple ways of calling a sub.
 
  sub repeat_string {
    state $check = multisig(
-     compile(
-       Int,
-       Str,
+     signature(
+       positional    => [ Int, Str ],
      ),
-     compile_named(
-       { named_to_list => 1 },
-       count  => Int,
-       string => Str,
+     signature(
+       named         => [ count => Int, string => Str ],
+       named_to_list => 1,
      ),
    );
    
-   my ($count, $string) = $check->(@_);
+   my ( $count, $string ) = $check->( @_ );
    return $string x $count;
  }
  
@@ -66,73 +38,85 @@ Multisig allows you to allow multiple ways of calling a sub.
 
 It combines multiple checks and tries each until one works.
 
-=head2 C<wrap_subs> and C<wrap_methods>
+=head2 C<signature_for>
 
-C<wrap_subs> turns the C<compile> idea inside out.
+C<signature_for> turns C<signature> inside out.
 
 Instead of this:
 
  sub foobar {
-   state $check = compile(Int, Str);
-   my ($foo, $bar) = @_;
+   state $check = signature( positional => [ Int, Str ] );
+   my ( $foo, $bar ) = $check->( @_ );
    ...;
  }
 
 You do this:
 
+ signature_for foobar => (
+   positional => [ Int, Str ],
+ );
+ 
  sub foobar {
-   my ($foo, $bar) = @_;
+   my ( $foo, $bar ) = @_;
    ...;
  }
- wrap_subs foobar => [ Int, Str ];
 
-Or this:
+Or in Perl 5.20+, you can even do this:
 
- sub foobar {
-   my ($foo, $bar) = @_;
+ signature_for foobar => (
+   positional => [ Int, Str ],
+ );
+ 
+ sub foobar ( $foo, $bar ) {
    ...;
  }
- wrap_subs foobar => compile( Int, Str );
+
+=head2 Functions versus Methods
+
+For subs which are intended to be called as functions:
+
+ signature( method => 0, ... );
+ signature( ... );                       # this is the default anyway
+
+For subs which are intended to be called as methods on a blessed object:
+
+ signature( method => Object, ... );
+
+And for subs which are intended to be called as methods on a class:
+
+ signature( method => ClassName, ... );
+ signature( method => Str, ... );        # less readable, but faster check!
+
+The following is also allowed, which indicates that the sub is intended
+to be called as a method, but you don't want to do type checks on the
+invocant:
+
+ signature( method => 1, ... );
 
 =head2 Mixed Named and Positional Parameters
 
-This can be faked using positional parameters and a Slurpy dictionary.
+The C<head> and C<tail> options allow required positional parameters at the
+start or end of a named parameter list:
 
- state $check = compile(
-   Int,
-   Slurpy[
-     Dict[
-       foo => Int,
-       bar => Optional[Int],
-       baz => Optional[Int],
-     ],
+ state $check = signature(
+   head  => [ Int ],
+   named => [
+     foo => Int,
+     bar => Optional[Int],
+     baz => Optional[Int],
    ],
  );
  
- @_ = (42, foo => 21);                 # ok
- @_ = (42, foo => 21, bar  => 84);     # ok
- @_ = (42, foo => 21, bar  => 10.5);   # not ok
- @_ = (42, foo => 21, quux => 84);     # not ok
-
-From Type::Params 1.009_002, C<head> and C<tail> options are accepted, which
-provide another option for mixed named and positional arguments:
-
- state $check = compile_named(
-   { head => [ Int ] },
-   foo => Int,
-   bar => Optional[Int],
-   baz => Optional[Int],
-   ],
- );
-
-The C<head> is shifted off C<< @_ >> before C<< @_ >> is considered as a hash.
-The C<tail> is popped off C<< @_ >> before C<< @_ >> is considered as a hash.
+ $check->( 42, foo => 21 );                 # ok
+ $check->( 42, foo => 21, bar  => 84 );     # ok
+ $check->( 42, foo => 21, bar  => 10.5 );   # not ok
+ $check->( 42, foo => 21, quux => 84 );     # not ok
 
 =head2 Proper Signatures
 
 Don't you wish your subs could look like this?
 
-  sub set_name (Object $self, Str $name) {
+  sub set_name ( Object $self, Str $name ) {
     $self->{name} = $name;
   }
 
@@ -150,13 +134,13 @@ throughout.
     class Person {
       has name ( type => Str );
       
-      method rename (Str $new_name) {
-        printf("%s will now be called %s\n", $self->name, $new_name);
-        $self->name($new_name);
+      method rename ( Str $new_name ) {
+        printf( "%s will now be called %s\n", $self->name, $new_name );
+        $self->name( $new_name );
       }
       
       coerce from Str via {
-        $class->new(name => $_)
+        $class->new( name => $_ )
       }
     }
     
@@ -165,8 +149,8 @@ throughout.
     }
   }
   
-  my $acme = MyApp->new_company(owner => "Robert");
-  $acme->owner->rename("Bob");
+  my $acme = MyApp->new_company( owner => "Robert" );
+  $acme->owner->rename( "Bob" );
 
 =head3 Kavorka
 
@@ -174,7 +158,7 @@ L<Kavorka> is a sub signatures implementation written to natively use
 L<Type::Utils>' C<dwim_type> for type constraints, and take advantage
 of Type::Tiny's features such as inlining, and coercions.
 
-  method set_name (Str $name) {
+  method set_name ( Str $name ) {
     $self->{name} = $name;
   }
 
@@ -194,7 +178,7 @@ Function::Parameters offers support for Type::Tiny and MooseX::Types.
   use Types::Standard qw( Str );
   use Function::Parameters;
   
-  method set_name (Str $name) {
+  method set_name ( Str $name ) {
       $self->{name} = $name;
   }
 
@@ -283,7 +267,13 @@ choosing between them.
 
 Type::Params's syntax is more compact:
 
-   state $check = compile(Object, Optional[Int], Slurpy[ArrayRef]);
+   state $check = signature(
+     pos => [
+       Object,
+       Optional[Int],
+       Slurpy[ArrayRef],
+     ],
+   );
 
 Versus:
 

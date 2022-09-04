@@ -563,18 +563,20 @@ for that:
   package Horse {
     use Types::Common::Numeric qw( PositiveInt );
     use Types::Common::String qw( NonEmptyStr );
-    use Type::Params qw( compile );
+    use Type::Params qw( signature );
     ...;
     
     sub add_win {
-      state $check = compile(
-        PositiveInt,
-        NonEmptyStr,
-        NonEmptyStr, { optional => 1 },
+      state $check = signature(
+        method     => 1,              # allow for $self
+        positional => [
+          PositiveInt,
+          NonEmptyStr,
+          NonEmptyStr, { optional => 1 },
+        ],
       );
       
-      my $self = shift;
-      my ($year, $race, $jockey) = $check->(@_);
+      my ( $self, $year, $race, $jockey ) = $check->(@_);
       my $win = [
         $year,
         $race,
@@ -589,13 +591,16 @@ The first time this method is called, it will compile a coderef called
 C<< $check >>. Then every time it is run, C<< $check >> will be called
 to check the method's parameters. It will throw an exception if they
 fail. C<< $check >> will also perform coercions if types have them
-(and you don't even need to remember C<< coerce => 1 >>; it's always
-automatic) and can even add in defaults:
+(and you don't even need to remember C<< coerce => 1 >>; it's automatic)
+and can even add in defaults:
 
-  state $check = compile(
-    PositiveInt,
-    NonEmptyStr,
-    NonEmptyStr, { default => sub { "Eddie" } },
+  state $check = signature(
+    method     => 1,
+    positional => [
+      PositiveInt,
+      NonEmptyStr,
+      NonEmptyStr, { default => sub { "Eddie" } },
+    ],
   );
 
 On older versions of Perl (prior to 5.10), C<state> variables are not
@@ -623,22 +628,27 @@ the C<< @_ >> array for the called coderef. A lot of people dislike calling
 subs with an ampersand, so we will stick to the C<< $check->(@_) >> syntax
 in these examples. But do consider using the shortcut!)
 
-The generalized syntax for C<compile> is:
+The generalized syntax for positional parameters in C<signature> is:
 
-  state $check = compile(
-    \%general_options,
-    TypeForFirstParam,  \%options_for_first_param,
-    TypeForSecondParam, \%options_for_second_param,
-    ...,
+  state $check = signature(
+    %general_options,
+    positional => [
+      TypeForFirstParam,  \%options_for_first_param,
+      TypeForSecondParam, \%options_for_second_param,
+      ...,
+    ],
   );
 
-As a shortcut for the C<< { optional => 1 }} >> option, you can just use
+As a shortcut for the C<< { optional => 1 } >> option, you can just use
 B<Optional> like in B<Tuple>.
 
-  state $check = compile(
-    PositiveInt,
-    NonEmptyStr,
-    Optional[NonEmptyStr],
+  state $check = signature(
+    method     => 1,
+    positional => [
+      PositiveInt,
+      NonEmptyStr,
+      Optional[NonEmptyStr],
+    ],
   );
 
 You can also use C<0> and C<1> as shortcuts for B<< Optional[Any] >> and
@@ -646,7 +656,7 @@ B<< Any >>. The following checks that the first parameter is a positive
 integer, the second parameter is required (but doesn't care what value
 it is) and the third parameter is allowed but not required.
 
-  state $check = compile(PositiveInt, 1, 0);
+  state $check = signature positional => [ PositiveInt, 1, 0 ];
 
 It is possible to accept a variable number of values using B<Slurpy>:
 
@@ -654,17 +664,19 @@ It is possible to accept a variable number of values using B<Slurpy>:
     use Types::Common::Numeric qw( PositiveInt );
     use Types::Common::String qw( NonEmptyStr );
     use Types::Standard qw( ArrayRef Slurpy );
-    use Type::Params qw( compile );
+    use Type::Params qw( signature );
     ...;
     
     sub add_wins_for_year {
-      state $check = compile(
-        PositiveInt,
-        Slurpy[ ArrayRef[NonEmptyStr] ],
+      state $check = signature(
+        method     => 1,
+        positional => [
+          PositiveInt,
+          Slurpy[ ArrayRef[NonEmptyStr] ],
+        ],
       );
       
-      my $self = shift;
-      my ($year, $races) = $check->(@_);
+      my ( $self, $year, $races ) = $check->(@_);
       for my $race (@$races) {
         push @{ $self->wins }, [$year, $win];
       }
@@ -698,69 +710,71 @@ idea to provide them as a hash. For example:
 
 This can make your code more readable.
 
-To accept named parameters, use C<compile_named> instead of C<compile>.
+To accept named parameters, use the C<named> option instead of C<positional>.
 
   package Horse {
     use Types::Common::Numeric qw( PositiveInt );
     use Types::Common::String qw( NonEmptyStr );
-    use Type::Params qw( compile_named );
+    use Type::Params qw( signature );
     ...;
     
     sub add_win {
-      state $check = compile_named(
-        year    => PositiveInt,
-        race    => NonEmptyStr,
-        jockey  => NonEmptyStr, { optional => 1 },
+      state $check = signature(
+        method     => 1,
+        named      => [
+          year    => PositiveInt,
+          race    => NonEmptyStr,
+          jockey  => NonEmptyStr, { optional => 1 },
+        ],
       );
       
-      my $self = shift;
-      my $args = $check->(@_);
+      my ( $self, $arg ) = $check->(@_);
       my $win = [
-        $args->{year},
-        $args->{race},
-        exists($args->{jockey}) ? $args->{jockey} : (),
+        $arg->year,
+        $arg->race,
+        $arg->has_jockey ? $arg->jockey : (),
       ];
       push @{ $self->wins }, $win;
       return $self;
     }
   }
 
-C<compile> and C<compile_named> work pretty much the same, except the latter
-accepts named parameters instead of positional, and returns a hashref.
+The C<named> option will bundle all of your named arguments into an object
+C<< $arg >>. It allows your method to be called with a list of name-value
+pairs or a hashref:
 
-It will automatically allow for a hashref to be provided instead of a full
-hash. The following both work, but the C<< $args >> variable will always
-be given a hashref.
-
-  $horse->add_win({
-    year    => 1956,
-    race    => "Juvenile Stakes",
-  });
   $horse->add_win(
     year    => 1956,
     race    => "Futurity Stakes",
     jockey  => "Eddie",
   );
+  
+  $horse->add_win( {
+    year    => 1956,
+    race    => "Juvenile Stakes",
+  } );
 
-Well... I say "always" but you can tell C<compile_named> to accept
-named parameters but return a positional list of parameters:
+It is also possible for your check to I<accept> named parameters but
+I<return> a positional list of parameters, using C<named_to_list>.
 
   package Horse {
     use Types::Common::Numeric qw( PositiveInt );
     use Types::Common::String qw( NonEmptyStr );
-    use Type::Params qw( compile_named );
+    use Type::Params qw( signature );
     ...;
     
     sub add_win {
-      state $check = compile_named(
-        { named_to_list => 1 },
-        year    => PositiveInt,
-        race    => NonEmptyStr,
-        jockey  => NonEmptyStr, { optional => 1 },
+      state $check = signature(
+        method     => 1,
+        named      => [
+          year    => PositiveInt,
+          race    => NonEmptyStr,
+          jockey  => NonEmptyStr, { optional => 1 },
+        ],
+        named_to_list => 1,
       );
       
-      my $self = shift;
-      my ($year, $race, $jockey) = $check->(@_);
+      my ( $self, $year, $race, $jockey ) = $check->(@_);
       my $win = [
         $year,
         $race,
@@ -772,47 +786,6 @@ named parameters but return a positional list of parameters:
   }
 
 Optional and Slurpy named parameters are supported as you'd expect.
-
-With named parameters, it can be easy to misspell keys in your method
-definition. For example:
-
-  my $win = [
-    $args->{year},
-    $args->{race},
-    exists($args->{jockee}) ? $args->{jockey} : (),
-  ];
-
-Note "jockee"! This can lead to hard-to-find bugs. There's a
-C<compile_named_oo> function which may help and can lead to cleaner
-code.
-
-  package Horse {
-    use Types::Common::Numeric qw( PositiveInt );
-    use Types::Common::String qw( NonEmptyStr );
-    use Type::Params qw( compile_named_oo );
-    ...;
-    
-    sub add_win {
-      state $check = compile_named_oo(
-        year    => PositiveInt,
-        race    => NonEmptyStr,
-        jockey  => NonEmptyStr, { optional => 1 },
-      );
-      
-      my $self = shift;
-      my $args = $check->(@_);
-      my $win = [
-        $args->year,
-        $args->race,
-        $args->has_jockey ? $args->jockey : (),
-      ];
-      push @{ $self->wins }, $win;
-      return $self;
-    }
-  }
-
-Now C<< $args >> is a blessed object that you can call methods on. There is
-of course a performance penalty for this, but it's surprisingly small.
 
 For more information on Type::Params, and third-party alternatives,
 see L<Type::Tiny::Manual::Params>.

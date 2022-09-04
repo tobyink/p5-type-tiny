@@ -148,9 +148,9 @@ any existing ones.
 L<Type::Tiny::Class> provides a C<plus_constructors> method as a shortcut
 for coercing via a constructor method. The following two are the same:
 
-  Path->plus_constructors(Str, "new")
+  Path->plus_constructors( Str, "new" )
   
-  Path->plus_coercions(Str, q{ Path::Tiny->new($_) })
+  Path->plus_coercions( Str, q{ Path::Tiny->new($_) } )
 
 To create a type constraint without particular existing coercions, you
 can use C<minus_coercions>. The following uses the B<Datetime> type
@@ -162,7 +162,7 @@ B<Int> but keeping the coercions from B<Undef> and B<Dict>.
   
   has start_date => (
     is      => 'ro',
-    isa     => Datetime->minus_coercions(Int),
+    isa     => Datetime->minus_coercions( Int ),
     coerce  => 1,
   );
 
@@ -170,7 +170,7 @@ There's also a C<no_coercions> method that creates a subtype with no
 coercions at all. This is most useful either to create a "blank slate" for
 C<plus_coercions>:
 
-  my $Path = Path->no_coercions->plus_coercions(Str, sub { ... });
+  my $Path = Path->no_coercions->plus_coercions( Str, sub { ... } );
 
 Or to disable coercions for L<Type::Params>. Type::Params will always
 automatically coerce a parameter if there is a coercion for that type.
@@ -180,15 +180,18 @@ automatically coerce a parameter if there is a coercion for that type.
   use Type::Params;
   
   sub set_account_name {
-    state $check = compile( Object, UpperCaseStr->no_coercions );
-    my ($self, $name) = $check->(@_);
-    $self->_account_name($name);
-    $self->db->update($self);
+    state $check = signature(
+      method     => Object,
+      positional => [ UpperCaseStr->no_coercions ],
+    );
+    my ( $self, $name ) = $check->( @_ );
+    $self->_account_name( $name );
+    $self->db->update( $self );
     return $self;
   }
   
   # This will die instead of coercing from lowercase
-  $robert->_set_account_name('bob');
+  $robert->set_account_name( 'bob' );
 
 =head2 Named Coercions
 
@@ -199,10 +202,8 @@ constraint.
 
   {
     package MyApp::Types;
-    use Type::Library -base;
-    use Type::Utils qw( extends );
-    
-    BEGIN { extends 'Types::Standard' };
+    use Type::Library
+      -extends => [ 'Types::Standard' ];
     
     __PACKAGE__->add_coercion(
       name              => "FromLines",
@@ -228,7 +229,7 @@ L<Types::Standard> defines a named coercion B<MkOpt> designed to be used
 for B<OptList>.
 
   use Types::Standard qw( OptList MkOpt );
-  my $OptList = OptList->plus_coercions(MkOpt);
+  my $OptList = OptList->plus_coercions( MkOpt );
 
 =head2 Parameterized Coercions
 
@@ -246,7 +247,7 @@ to how they are implemented.
 Certain parameterized type constraints can automatically acquire coercions
 if their parameters have coercions. For example:
 
-   ArrayRef[ Int->plus_coercions(Num, q{int($_)}) ]
+   ArrayRef[ Int->plus_coercions( Num, q{int($_)} ) ]
 
 ... does what you mean!
 

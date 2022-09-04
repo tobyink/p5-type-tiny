@@ -53,10 +53,9 @@ strings. Mite looks them up during compilation using C<dwim_type>
 from L<Type::Utils>, and pre-loads L<Types::Standard>,
 L<Types::Common::String>, and L<Types::Common::Numeric> for you.
 
-The C<signature_for> keyword is a wrapper around C<compile> and
-C<compile_named_oo> from L<Type::Params>, depending on whether you
-are using a positional or named parameter signature. Again, note that
-types are expressed as strings and looked up using C<dwim_type>.
+The C<signature_for> keyword is similar to the corresponding function
+in L<Type::Params>. Again, note that types are expressed as strings
+and looked up using C<dwim_type>.
 
 Any types which are inlineable should work. If using coercion, any
 coercions which are inlineable should work.

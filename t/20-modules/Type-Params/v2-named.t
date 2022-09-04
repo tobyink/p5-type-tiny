@@ -4,7 +4,7 @@
 
 =head1 PURPOSE
 
-Initial tests for modern Type::Params v2 API.
+Named parameter tests for modern Type::Params v2 API.
 
 =head1 AUTHOR
 
@@ -40,54 +40,54 @@ BEGIN {
 	
 	signature_for myfunc => (
 		method => Object | Str,
-		pos    => [ ArrayRef, Int ],
+		named  => [ arr => ArrayRef, int => Int ],
 	);
 	
-	sub myfunc ( $self, $arr, $int ) {
-		return $arr->[$int];
+	sub myfunc ( $self, $arg ) {
+		return $arg->arr->[ $arg->int ];
 	}
 	
 	sub myfunc2 {
 		state $signature = signature(
 			method => 1,
-			pos    => [ ArrayRef, Int ],
+			named  => [ arr => ArrayRef, int => Int ],
 		);
-		my ( $self, $arr, $int ) = &$signature;
+		my ( $self, $arg ) = &$signature;
 		
-		return $arr->[$int];
+		return $arg->arr->[ $arg->int ];
 	}
 };
 
 my $o   = bless {} => 'Local::MyPackage';
 my @arr = ( 'a' .. 'z' );
 
-is $o->myfunc( \@arr, 2 ),  'c', 'myfunc (happy path)';
-is $o->myfunc2( \@arr, 4 ), 'e', 'myfunc2 (happy path)';
+is $o->myfunc( arr => \@arr, int => 2 ),  'c', 'myfunc (happy path)';
+is $o->myfunc2( arr => \@arr, int => 4 ), 'e', 'myfunc2 (happy path)';
 
 {
 	my $e = exception {
-		$o->myfunc( \@arr, undef );
+		$o->myfunc( arr => \@arr, int => undef );
 	};
 	like $e, qr/Undef did not pass type constraint "Int"/, 'myfunc (type exception)'
 }
 
 {
 	my $e = exception {
-		$o->myfunc2( \@arr, undef );
+		$o->myfunc2( arr => \@arr, int => undef );
 	};
 	like $e, qr/Undef did not pass type constraint "Int"/, 'myfunc2 (type exception)'
 }
 
 {
 	my $e = exception {
-		$o->myfunc( \@arr, 6, undef );
+		$o->myfunc( arr => \@arr, int => 6, debug => undef );
 	};
 	like $e, qr/Wrong number of parameters/, 'myfunc (param count exception)'
 }
 
 {
 	my $e = exception {
-		$o->myfunc2( \@arr, 8, undef );
+		$o->myfunc2( arr => \@arr, int => 8, debug => undef );
 	};
 	like $e, qr/Wrong number of parameters/, 'myfunc2 (param count exception)'
 }

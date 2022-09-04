@@ -28,7 +28,7 @@ C<get_hook> and C<set_hook> options.
     use Class::InsideOut qw( public );
     use Types::Standard qw( Str Int );
     use Types::Common::Numeric qw( PositiveInt );
-    use Type::Params qw( compile );
+    use Type::Params qw( signature );
     
     # Type checks are really easy.
     # Just supply the type as a set hook.
@@ -47,10 +47,9 @@ C<get_hook> and C<set_hook> options.
     
     # Parameter checking for methods is as expected.
     sub get_older {
-      state $check = compile( $Years );
-      my $self = shift;
-      my ($years) = $check->(@_);
-      $self->_set_age($self->age + $years);
+      state $check = signature( method => 1, positional => [ $Years ] );
+      my ( $self, $years ) = $check->( @_ );
+      $self->_set_age( $self->age + $years );
     }
   }
 
