@@ -1,13 +1,9 @@
 package Types::Common::String;
 
-use 5.006001;
+use 5.008001;
 use strict;
 use warnings;
 use utf8;
-
-BEGIN {
-	if ( $] < 5.008 ) { require Devel::TypeTiny::Perl56Compat }
-}
 
 BEGIN {
 	$Types::Common::String::AUTHORITY = 'cpan:TOBYINK';

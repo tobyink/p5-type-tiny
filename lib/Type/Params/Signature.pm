@@ -1,11 +1,10 @@
 package Type::Params::Signature;
 
-use 5.006001;
+use 5.008001;
 use strict;
 use warnings;
 
 BEGIN {
-	if ( $] < 5.008 ) { require Devel::TypeTiny::Perl56Compat }
 	if ( $] < 5.010 ) { require Devel::TypeTiny::Perl58Compat }
 }
 

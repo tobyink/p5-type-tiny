@@ -4,7 +4,7 @@
 
 `Type-Tiny`
 	deps:runtime-requirement [
-		deps:on "perl 5.006001"^^deps:CpanId;
+		deps:on "perl 5.008001"^^deps:CpanId;
 	];
 	deps:runtime-recommendation [
 		deps:on "perl 5.010001"^^deps:CpanId;

@@ -53,7 +53,7 @@ If you are installing into a system-wide directory, you may need to run:
 
 =head2 Dependencies
 
-Type::Tiny requires at least Perl 5.6.1, though certain Unicode-related
+Type::Tiny requires at least Perl 5.8.1, though certain Unicode-related
 features (e.g. non-ASCII type constraint names) may work better in newer
 versions of Perl.
 

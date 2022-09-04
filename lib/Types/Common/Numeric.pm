@@ -1,12 +1,8 @@
 package Types::Common::Numeric;
 
-use 5.006001;
+use 5.008001;
 use strict;
 use warnings;
-
-BEGIN {
-	if ( $] < 5.008 ) { require Devel::TypeTiny::Perl56Compat }
-}
 
 BEGIN {
 	$Types::Common::Numeric::AUTHORITY = 'cpan:TOBYINK';

@@ -100,9 +100,10 @@ type libraries is experimental.
 
 These modules are considered part of Type::Tiny's internals, and not
 covered by the stability policy:
-L<Devel::TypeTiny::Perl56Compat>,
 L<Devel::TypeTiny::Perl58Compat>,
 L<Type::Coercion::FromMoose>,
+L<Type::Params::Parameter>,
+L<Type::Params::Signature>,
 L<Type::Tiny::_HalfOp>,
 L<Types::Standard::ArrayRef>,
 L<Types::Standard::CycleTuple>,
