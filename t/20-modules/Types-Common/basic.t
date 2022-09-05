@@ -27,17 +27,14 @@ use Test::More;
 	my %imported;
 	use Types::Common { into => \%imported }, -all;
 
-	my @types = (
-		'Types::Standard'->type_names,
-		'Types::Common::Numeric'->type_names,
-		'Types::Common::String'->type_names,
+	my @libs = qw(
+		Types::Standard
+		Types::Common::Numeric
+		Types::Common::String
+		Types::TypeTiny
 	);
-
-	my @coercions = (
-		'Types::Standard'->coercion_names,
-		'Types::Common::Numeric'->coercion_names,
-		'Types::Common::String'->coercion_names,
-	);
+	my @types     = map $_->type_names, @libs;
+	my @coercions = map $_->coercion_names, @libs;
 
 	is_deeply(
 		[ sort keys %imported ],

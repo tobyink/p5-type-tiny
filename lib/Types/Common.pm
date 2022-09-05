@@ -21,6 +21,7 @@ use Type::Library
 		Types::Standard
 		Types::Common::Numeric
 		Types::Common::String
+		Types::TypeTiny
 	) ];
 
 use Type::Params ();
@@ -74,6 +75,10 @@ All the types from L<Types::Standard>.
 =item *
 
 All the types from L<Types::Common::Numeric> and L<Types::Common::String>.
+
+=item *
+
+All the types from L<Types::TypeTiny>.
 
 =item *
 

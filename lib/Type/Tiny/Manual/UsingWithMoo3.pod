@@ -341,6 +341,10 @@ All the types from L<Types::Common::Numeric> and L<Types::Common::String>.
 
 =item *
 
+All the types from L<Types::TypeTiny>.
+
+=item *
+
 The C<< -sigs >> tag from L<Type::Params>.
 
 =item *

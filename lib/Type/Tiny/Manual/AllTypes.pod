@@ -409,8 +409,7 @@ Any non-reference value, including undef.
 
 =back
 
-The module L<Types::Common> incorporates all the types found in
-L<Types::Standard>, L<Types::Common::Numeric>, and L<Types::Common::String>.
+The module L<Types::Common> incorporates all of the above.
 
 =head1 NEXT STEPS
 
