@@ -28,26 +28,64 @@ use Test::Fatal;
 use Type::Params qw(compile);
 use Types::Standard -types;
 
+sub code_contains {
+	s/\s+//msg for ( my ( $code, $want ) = @_ );
+	index( $code, $want ) >= 0;
+}
+
+subtest 'strictness => CONDITION_STRING' => sub {
+	my $got = compile(
+		{ strictness => '$::CHECK_TYPES', want_source => 1 },
+		Int,
+		ArrayRef,
+	);
+	my $expected = <<'EXPECTED';
+		# Parameter $_[0] (type: Int)
+		( not $::CHECK_TYPES )
+			or (do { my $tmp = $_[0]; defined($tmp) and !ref($tmp) and $tmp =~ /\A-?[0-9]+\z/ })
+			or Type::Tiny::_failed_check( 13, "Int", $_[0], varname => "\$_[0]" );
+EXPECTED
+	ok code_contains( $got, $expected ), 'code contains expected Int check'
+		or diag( $got );
+	is( ref(eval $got), 'CODE', 'code compiles' )
+		or diag( $got );
+};
+
+subtest 'strictness => 1' => sub {
+	my $got = compile(
+		{ strictness => 1, want_source => 1 },
+		Int,
+		ArrayRef,
+	);
+	my $expected = <<'EXPECTED';
+		# Parameter $_[0] (type: Int)
+		(do { my $tmp = $_[0]; defined($tmp) and !ref($tmp) and $tmp =~ /\A-?[0-9]+\z/ })
+			or Type::Tiny::_failed_check( 13, "Int", $_[0], varname => "\$_[0]" );
+EXPECTED
+	ok code_contains( $got, $expected ), 'code contains expected Int check'
+		or diag( $got );
+	is( ref(eval $got), 'CODE', 'code compiles' )
+		or diag( $got );
+};
+
+subtest 'strictness => 0' => sub {
+	my $got = compile(
+		{ strictness => 0, want_source => 1 },
+		Int,
+		ArrayRef,
+	);
+	my $expected = <<'EXPECTED';
+		# Parameter $_[0] (type: Int)
+		1; # ... nothing to do
+EXPECTED
+	ok code_contains( $got, $expected ), 'code contains expected Int check'
+		or diag( $got );
+	is( ref(eval $got), 'CODE', 'code compiles' )
+		or diag( $got );
+};
+
 my $check = compile(
 	{ strictness => '$::CHECK_TYPES' },
-	Int,
-	ArrayRef,
-);
-
-note compile(
-	{ strictness => '$::CHECK_TYPES', want_source => 1 },
-	Int,
-	ArrayRef,
-);
-
-note compile(
-	{ strictness => 1, want_source => 1 },
-	Int,
-	ArrayRef,
-);
-
-note compile(
-	{ strictness => 1, want_source => 1 },
 	Int,
 	ArrayRef,
 );
