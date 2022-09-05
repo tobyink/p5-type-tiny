@@ -37,6 +37,7 @@ ok(NumericCode->can_be_inlined, 'NumericCode can be inlined');
 is(exception { NumericCode->inline_check(q/$xyz/) }, undef, "Inlining NumericCode doesn't throw an exception");
 ok(NumericCode->has_coercion, "NumericCode has a coercion");
 ok(!NumericCode->is_parameterizable, "NumericCode isn't parameterizable");
+is(NumericCode->type_default, undef, "NumericCode has no type_default");
 
 #
 # The @tests array is a list of triples:

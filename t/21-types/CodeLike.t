@@ -37,6 +37,8 @@ ok(CodeLike->can_be_inlined, 'CodeLike can be inlined');
 is(exception { CodeLike->inline_check(q/$xyz/) }, undef, "Inlining CodeLike doesn't throw an exception");
 ok(!CodeLike->has_coercion, "CodeLike doesn't have a coercion");
 ok(!CodeLike->is_parameterizable, "CodeLike isn't parameterizable");
+isnt(CodeLike->type_default, undef, "CodeLike has a type_default");
+is(scalar CodeLike->type_default->()->(), undef, "CodeLike type_default is sub {}");
 
 #
 # The @tests array is a list of triples:

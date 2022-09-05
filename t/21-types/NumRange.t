@@ -37,6 +37,8 @@ ok(NumRange->can_be_inlined, 'NumRange can be inlined');
 is(exception { NumRange->inline_check(q/$xyz/) }, undef, "Inlining NumRange doesn't throw an exception");
 ok(!NumRange->has_coercion, "NumRange doesn't have a coercion");
 ok(NumRange->is_parameterizable, "NumRange is parameterizable");
+isnt(NumRange->type_default, undef, "NumRange has a type_default");
+is(NumRange->type_default->(), 0, "NumRange type_default is zero");
 
 #
 # The @tests array is a list of triples:
@@ -133,6 +135,8 @@ should_pass( 5, $NumRange_2);
 should_pass( 6, $NumRange_2);
 should_pass(3.1416, $NumRange_2);
 should_fail([], $NumRange_2);
+
+is($NumRange_2->type_default, undef, "$NumRange_2 has no type_default");
 
 #
 # If there's two parameters, they are inclusive minimum and maximum.

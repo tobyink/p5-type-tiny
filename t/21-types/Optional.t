@@ -37,6 +37,8 @@ ok(Optional->can_be_inlined, 'Optional can be inlined');
 is(exception { Optional->inline_check(q/$xyz/) }, undef, "Inlining Optional doesn't throw an exception");
 ok(!Optional->has_coercion, "Optional doesn't have a coercion");
 ok(Optional->is_parameterizable, "Optional is parameterizable");
+isnt(Optional->type_default, undef, "Optional has a type_default");
+is(Optional->type_default->(), undef, "Optional type_default is undef");
 
 #
 # The @tests array is a list of triples:
@@ -126,6 +128,9 @@ should_pass(0, $type);
 should_pass(1, $type);
 should_fail(1.1, $type);
 should_fail(undef, $type);
+
+isnt($type->type_default, undef, "$type has a type_default");
+is($type->type_default->(), 0, "$type type_default is zero, because of Int's type_default");
 
 if (eval q{
 	package Local::MyClass::Moo;

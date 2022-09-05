@@ -37,6 +37,7 @@ ok(NonEmptySimpleStr->can_be_inlined, 'NonEmptySimpleStr can be inlined');
 is(exception { NonEmptySimpleStr->inline_check(q/$xyz/) }, undef, "Inlining NonEmptySimpleStr doesn't throw an exception");
 ok(!NonEmptySimpleStr->has_coercion, "NonEmptySimpleStr doesn't have a coercion");
 ok(!NonEmptySimpleStr->is_parameterizable, "NonEmptySimpleStr isn't parameterizable");
+is(NonEmptySimpleStr->type_default, undef, "NonEmptySimpleStr has no type_default");
 
 #
 # The @tests array is a list of triples:

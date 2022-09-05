@@ -37,6 +37,7 @@ ok(HasMethods->can_be_inlined, 'HasMethods can be inlined');
 is(exception { HasMethods->inline_check(q/$xyz/) }, undef, "Inlining HasMethods doesn't throw an exception");
 ok(!HasMethods->has_coercion, "HasMethods doesn't have a coercion");
 ok(HasMethods->is_parameterizable, "HasMethods is parameterizable");
+is(HasMethods->type_default, undef, "HasMethods has no type_default");
 
 #
 # The @tests array is a list of triples:

@@ -37,6 +37,8 @@ ok(HashRef->can_be_inlined, 'HashRef can be inlined');
 is(exception { HashRef->inline_check(q/$xyz/) }, undef, "Inlining HashRef doesn't throw an exception");
 ok(!HashRef->has_coercion, "HashRef doesn't have a coercion");
 ok(HashRef->is_parameterizable, "HashRef is parameterizable");
+isnt(HashRef->type_default, undef, "HashRef has a type_default");
+is_deeply(HashRef->type_default->(), {}, "HashRef type_default is {}");
 
 #
 # The @tests array is a list of triples:
@@ -129,6 +131,8 @@ ok($HashOfInts->can_be_inlined, '$HashOfInts can be inlined');
 is(exception { $HashOfInts->inline_check(q/$xyz/) }, undef, "Inlining \$HashOfInts doesn't throw an exception");
 ok(!$HashOfInts->has_coercion, "\$HashOfInts doesn't have a coercion");
 ok(!$HashOfInts->is_parameterizable, "\$HashOfInts is not parameterizable");
+isnt($HashOfInts->type_default, undef, "\$HashOfInts has a type_default");
+is_deeply($HashOfInts->type_default->(), {}, "\$HashOfInts type_default is {}");
 ok_subtype(HashRef, $HashOfInts);
 
 should_fail( 1,               $HashOfInts );

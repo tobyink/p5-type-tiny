@@ -37,6 +37,8 @@ ok(Undef->can_be_inlined, 'Undef can be inlined');
 is(exception { Undef->inline_check(q/$xyz/) }, undef, "Inlining Undef doesn't throw an exception");
 ok(!Undef->has_coercion, "Undef doesn't have a coercion");
 ok(!Undef->is_parameterizable, "Undef isn't parameterizable");
+isnt(Undef->type_default, undef, "Undef has a type_default");
+is(Undef->type_default->(), undef, "Undef type_default is undef");
 
 #
 # The @tests array is a list of triples:

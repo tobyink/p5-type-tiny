@@ -37,6 +37,8 @@ ok(SingleDigit->can_be_inlined, 'SingleDigit can be inlined');
 is(exception { SingleDigit->inline_check(q/$xyz/) }, undef, "Inlining SingleDigit doesn't throw an exception");
 ok(!SingleDigit->has_coercion, "SingleDigit doesn't have a coercion");
 ok(!SingleDigit->is_parameterizable, "SingleDigit isn't parameterizable");
+isnt(SingleDigit->type_default, undef, "SingleDigit has a type_default");
+is(SingleDigit->type_default->(), 0, "SingleDigit type_default is zero");
 
 #
 # The @tests array is a list of triples:

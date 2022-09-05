@@ -37,6 +37,7 @@ ok(ClassName->can_be_inlined, 'ClassName can be inlined');
 is(exception { ClassName->inline_check(q/$xyz/) }, undef, "Inlining ClassName doesn't throw an exception");
 ok(!ClassName->has_coercion, "ClassName doesn't have a coercion");
 ok(!ClassName->is_parameterizable, "ClassName isn't parameterizable");
+is(ClassName->type_default, undef, "ClassName has no type_default");
 
 #
 # The @tests array is a list of triples:

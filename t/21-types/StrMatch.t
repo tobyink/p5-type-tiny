@@ -41,6 +41,8 @@ ok(StrMatch->can_be_inlined, 'StrMatch can be inlined');
 is(exception { StrMatch->inline_check(q/$xyz/) }, undef, "Inlining StrMatch doesn't throw an exception");
 ok(!StrMatch->has_coercion, "StrMatch doesn't have a coercion");
 ok(StrMatch->is_parameterizable, "StrMatch is parameterizable");
+isnt(StrMatch->type_default, undef, "StrMatch has a type_default");
+is(StrMatch->type_default->(), '', "StrMatch type_default is the empty string");
 
 #
 # The @tests array is a list of triples:
@@ -131,6 +133,8 @@ should_pass('ABC', $type1);
 should_pass('fooabcbar', $type1);
 should_pass('fooABCbar', $type1);
 should_fail('a[b]c', $type1);
+
+is($type1->type_default, undef, "$type1 has no type_default");
 
 #
 # StrMatch only accepts true strings.

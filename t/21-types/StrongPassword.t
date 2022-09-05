@@ -37,6 +37,7 @@ ok(StrongPassword->can_be_inlined, 'StrongPassword can be inlined');
 is(exception { StrongPassword->inline_check(q/$xyz/) }, undef, "Inlining StrongPassword doesn't throw an exception");
 ok(!StrongPassword->has_coercion, "StrongPassword doesn't have a coercion");
 ok(!StrongPassword->is_parameterizable, "StrongPassword isn't parameterizable");
+is(StrongPassword->type_default, undef, "StrongPassword has no type_default");
 
 #
 # The @tests array is a list of triples:

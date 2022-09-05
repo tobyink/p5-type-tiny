@@ -37,6 +37,7 @@ ok(Overload->can_be_inlined, 'Overload can be inlined');
 is(exception { Overload->inline_check(q/$xyz/) }, undef, "Inlining Overload doesn't throw an exception");
 ok(!Overload->has_coercion, "Overload doesn't have a coercion");
 ok(Overload->is_parameterizable, "Overload is parameterizable");
+is(Overload->type_default, undef, "Overload has no type_default");
 
 #
 # The @tests array is a list of triples:

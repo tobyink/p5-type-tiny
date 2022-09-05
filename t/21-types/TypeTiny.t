@@ -37,6 +37,8 @@ ok(TypeTiny->can_be_inlined, 'TypeTiny can be inlined');
 is(exception { TypeTiny->inline_check(q/$xyz/) }, undef, "Inlining TypeTiny doesn't throw an exception");
 ok(TypeTiny->has_coercion, "TypeTiny has a coercion");
 ok(!TypeTiny->is_parameterizable, "TypeTiny isn't parameterizable");
+isnt(TypeTiny->type_default, undef, "TypeTiny has a type_default");
+is(TypeTiny->type_default->(), do { require Types::Standard; Types::Standard::Any() }, "TypeTiny type_default is Any");
 
 #
 # The @tests array is a list of triples:

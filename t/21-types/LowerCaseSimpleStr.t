@@ -37,6 +37,7 @@ ok(LowerCaseSimpleStr->can_be_inlined, 'LowerCaseSimpleStr can be inlined');
 is(exception { LowerCaseSimpleStr->inline_check(q/$xyz/) }, undef, "Inlining LowerCaseSimpleStr doesn't throw an exception");
 ok(LowerCaseSimpleStr->has_coercion, "LowerCaseSimpleStr has a coercion");
 ok(!LowerCaseSimpleStr->is_parameterizable, "LowerCaseSimpleStr isn't parameterizable");
+is(LowerCaseSimpleStr->type_default, undef, "LowerCaseSimpleStr has no type_default");
 
 #
 # The @tests array is a list of triples:

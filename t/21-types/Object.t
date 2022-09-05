@@ -37,6 +37,7 @@ ok(Object->can_be_inlined, 'Object can be inlined');
 is(exception { Object->inline_check(q/$xyz/) }, undef, "Inlining Object doesn't throw an exception");
 ok(!Object->has_coercion, "Object doesn't have a coercion");
 ok(!Object->is_parameterizable, "Object isn't parameterizable");
+is(Object->type_default, undef, "Object has no type_default");
 
 #
 # The @tests array is a list of triples:

@@ -37,6 +37,8 @@ ok(Str->can_be_inlined, 'Str can be inlined');
 is(exception { Str->inline_check(q/$xyz/) }, undef, "Inlining Str doesn't throw an exception");
 ok(!Str->has_coercion, "Str doesn't have a coercion");
 ok(!Str->is_parameterizable, "Str isn't parameterizable");
+isnt(Str->type_default, undef, "Str has a type_default");
+is(Str->type_default->(), '', "Str type_default is the empty string");
 
 #
 # The @tests array is a list of triples:

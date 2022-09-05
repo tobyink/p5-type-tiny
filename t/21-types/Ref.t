@@ -37,6 +37,7 @@ ok(Ref->can_be_inlined, 'Ref can be inlined');
 is(exception { Ref->inline_check(q/$xyz/) }, undef, "Inlining Ref doesn't throw an exception");
 ok(!Ref->has_coercion, "Ref doesn't have a coercion");
 ok(Ref->is_parameterizable, "Ref is parameterizable");
+is(Ref->type_default, undef, "Ref has no type_default");
 
 #
 # The @tests array is a list of triples:

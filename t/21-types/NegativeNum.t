@@ -37,6 +37,7 @@ ok(NegativeNum->can_be_inlined, 'NegativeNum can be inlined');
 is(exception { NegativeNum->inline_check(q/$xyz/) }, undef, "Inlining NegativeNum doesn't throw an exception");
 ok(!NegativeNum->has_coercion, "NegativeNum doesn't have a coercion");
 ok(!NegativeNum->is_parameterizable, "NegativeNum isn't parameterizable");
+is(NegativeNum->type_default, undef, "NegativeNum has no type_default");
 
 #
 # The @tests array is a list of triples:

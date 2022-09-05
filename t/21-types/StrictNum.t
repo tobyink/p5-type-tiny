@@ -37,6 +37,8 @@ ok(StrictNum->can_be_inlined, 'StrictNum can be inlined');
 is(exception { StrictNum->inline_check(q/$xyz/) }, undef, "Inlining StrictNum doesn't throw an exception");
 ok(!StrictNum->has_coercion, "StrictNum doesn't have a coercion");
 ok(!StrictNum->is_parameterizable, "StrictNum isn't parameterizable");
+isnt(StrictNum->type_default, undef, "StrictNum has a type_default");
+is(StrictNum->type_default->(), 0, "StrictNum type_default is zero");
 
 #
 # The @tests array is a list of triples:

@@ -37,6 +37,7 @@ ok(InstanceOf->can_be_inlined, 'InstanceOf can be inlined');
 is(exception { InstanceOf->inline_check(q/$xyz/) }, undef, "Inlining InstanceOf doesn't throw an exception");
 ok(!InstanceOf->has_coercion, "InstanceOf doesn't have a coercion");
 ok(InstanceOf->is_parameterizable, "InstanceOf is parameterizable");
+is(InstanceOf->type_default, undef, "InstanceOf has no type_default");
 
 #
 # The @tests array is a list of triples:

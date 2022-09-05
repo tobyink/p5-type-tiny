@@ -37,6 +37,7 @@ ok(Tied->can_be_inlined, 'Tied can be inlined');
 is(exception { Tied->inline_check(q/$xyz/) }, undef, "Inlining Tied doesn't throw an exception");
 ok(!Tied->has_coercion, "Tied doesn't have a coercion");
 ok(Tied->is_parameterizable, "Tied is parameterizable");
+is(Tied->type_default, undef, "Tied has no type_default");
 
 #
 # The @tests array is a list of triples:

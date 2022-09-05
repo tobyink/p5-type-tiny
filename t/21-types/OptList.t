@@ -37,6 +37,8 @@ ok(OptList->can_be_inlined, 'OptList can be inlined');
 is(exception { OptList->inline_check(q/$xyz/) }, undef, "Inlining OptList doesn't throw an exception");
 ok(!OptList->has_coercion, "OptList doesn't have a coercion");
 ok(!OptList->is_parameterizable, "OptList isn't parameterizable");
+isnt(OptList->type_default, undef, "OptList has a type_default");
+is_deeply(OptList->type_default->(), [], "OptList type_default is []");
 
 #
 # The @tests array is a list of triples:

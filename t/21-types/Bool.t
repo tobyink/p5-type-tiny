@@ -37,6 +37,8 @@ ok(Bool->can_be_inlined, 'Bool can be inlined');
 is(exception { Bool->inline_check(q/$xyz/) }, undef, "Inlining Bool doesn't throw an exception");
 ok(Bool->has_coercion, "Bool has a coercion");
 ok(!Bool->is_parameterizable, "Bool isn't parameterizable");
+isnt(Bool->type_default, undef, "Bool has a type_default");
+is(Bool->type_default->(), !!0, "Bool type_default is false");
 
 #
 # The @tests array is a list of triples:

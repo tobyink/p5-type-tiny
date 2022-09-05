@@ -37,6 +37,7 @@ ok(FileHandle->can_be_inlined, 'FileHandle can be inlined');
 is(exception { FileHandle->inline_check(q/$xyz/) }, undef, "Inlining FileHandle doesn't throw an exception");
 ok(!FileHandle->has_coercion, "FileHandle doesn't have a coercion");
 ok(!FileHandle->is_parameterizable, "FileHandle isn't parameterizable");
+is(FileHandle->type_default, undef, "FileHandle has no type_default");
 
 #
 # The @tests array is a list of triples:

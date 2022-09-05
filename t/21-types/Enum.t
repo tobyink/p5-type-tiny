@@ -37,6 +37,7 @@ ok(Enum->can_be_inlined, 'Enum can be inlined');
 is(exception { Enum->inline_check(q/$xyz/) }, undef, "Inlining Enum doesn't throw an exception");
 ok(!Enum->has_coercion, "Enum doesn't have a coercion");
 ok(Enum->is_parameterizable, "Enum is parameterizable");
+is(Enum->type_default, undef, "Enum has no type_default");
 
 #
 # The @tests array is a list of triples:

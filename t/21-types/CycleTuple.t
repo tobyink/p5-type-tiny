@@ -37,6 +37,8 @@ ok(CycleTuple->can_be_inlined, 'CycleTuple can be inlined');
 is(exception { CycleTuple->inline_check(q/$xyz/) }, undef, "Inlining CycleTuple doesn't throw an exception");
 ok(!CycleTuple->has_coercion, "CycleTuple doesn't have a coercion");
 ok(CycleTuple->is_parameterizable, "CycleTuple is parameterizable");
+isnt(CycleTuple->type_default, undef, "CycleTuple has a type_default");
+is_deeply(CycleTuple->type_default->(), [], "CycleTuple type_default is []");
 
 #
 # The @tests array is a list of triples:

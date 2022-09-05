@@ -37,6 +37,8 @@ ok(Dict->can_be_inlined, 'Dict can be inlined');
 is(exception { Dict->inline_check(q/$xyz/) }, undef, "Inlining Dict doesn't throw an exception");
 ok(!Dict->has_coercion, "Dict doesn't have a coercion");
 ok(Dict->is_parameterizable, "Dict is parameterizable");
+isnt(Dict->type_default, undef, "Dict has a type_default");
+is_deeply(Dict->type_default->(), {}, "Dict type_default is {}");
 
 #
 # The @tests array is a list of triples:
@@ -138,6 +140,8 @@ ok(  $type1->my_hashref_allows_key('bar'),  'my_hashref_allows_key("bar")' );
 ok( !$type1->my_hashref_allows_key('baz'), '!my_hashref_allows_key("baz")' );
 ok(  $type1->my_hashref_allows_value('bar', qr//),  'my_hashref_allows_value("bar", qr//)' );
 ok( !$type1->my_hashref_allows_value('bar', 1234), '!my_hashref_allows_value("bar", 1234)' );
+
+is($type1->type_default, undef, "$type1 has no type_default");
 
 
 #

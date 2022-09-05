@@ -37,6 +37,8 @@ ok(Tuple->can_be_inlined, 'Tuple can be inlined');
 is(exception { Tuple->inline_check(q/$xyz/) }, undef, "Inlining Tuple doesn't throw an exception");
 ok(!Tuple->has_coercion, "Tuple doesn't have a coercion");
 ok(Tuple->is_parameterizable, "Tuple is parameterizable");
+isnt(Tuple->type_default, undef, "Tuple has a type_default");
+is_deeply(Tuple->type_default->(), [], "Tuple type_default is []");
 
 #
 # The @tests array is a list of triples:
@@ -137,6 +139,7 @@ should_fail( [], $type1 );  # not enough slots (empty arrayref)
 should_fail( 42, $type1 );  # not even an arrayref
 should_fail( bless([42,[1..10],undef], 'Foo'), $type1 ); # blessed
 
+is($type1->type_default, undef, "$type1 has no type_default");
 
 #
 # Some Optional slots.

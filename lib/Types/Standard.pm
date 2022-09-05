@@ -645,7 +645,7 @@ $meta->$add_core_type(
 		},
 		type_default       => sub { return undef; },
 		type_default_generator => sub {
-			return $Type::Tiny::parameterize_type->type_default;
+			$_[0]->type_default || $Type::Tiny::parameterize_type->type_default ;
 		},
 	}
 );
@@ -705,6 +705,9 @@ my $_Optional = $meta->add_type(
 			return unless $param->has_coercion;
 			return $param->coercion;
 		},
+		type_default_generator => sub {
+			return $_[0]->type_default;
+		},
 	}
 );
 
@@ -726,6 +729,7 @@ $_slurpy = $meta->add_type(
 				display_name    => $self->name_generator->( $self, $param ),
 				parameters      => [ $param ],
 				constraint      => sub { $param->check( $_[0] ) },
+				type_default    => $param->type_default,
 				_build_coercion => sub {
 					my $coercion = shift;
 					$coercion->add_type_coercions( @{ $param->coercion->type_coercion_map } )
@@ -921,6 +925,7 @@ $meta->add_type(
 			push @code, '$ok }';
 			return ( undef, join( q( ), @code ) );
 		},
+		type_default => sub { return [] },
 	}
 );
 
@@ -1058,6 +1063,7 @@ $meta->add_type(
 				$coercion ? ( coercion => $coercion ) : (),
 			);
 		},
+		type_default => undef,
 	}
 );
 

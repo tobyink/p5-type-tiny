@@ -37,6 +37,8 @@ ok(StrLength->can_be_inlined, 'StrLength can be inlined');
 is(exception { StrLength->inline_check(q/$xyz/) }, undef, "Inlining StrLength doesn't throw an exception");
 ok(!StrLength->has_coercion, "StrLength doesn't have a coercion");
 ok(StrLength->is_parameterizable, "StrLength is parameterizable");
+isnt(StrLength->type_default, undef, "StrLength has a type_default");
+is(StrLength->type_default->(), '', "StrLength type_default is the empty string");
 
 #
 # The @tests array is a list of triples:
@@ -132,6 +134,8 @@ should_pass('123456',    $StrLength_2);
 should_pass('1234567',   $StrLength_2);
 should_pass('12345678',  $StrLength_2);
 should_pass('123456789', $StrLength_2);
+
+is($StrLength_2->type_default, undef, "$StrLength_2 has no type_default");
 
 # Cyrillic Small Letter Zhe - two bytes as UTF-8 but only one character
 should_fail("\x{0436}" x 1, $StrLength_2);

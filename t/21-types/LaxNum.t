@@ -37,6 +37,8 @@ ok(LaxNum->can_be_inlined, 'LaxNum can be inlined');
 is(exception { LaxNum->inline_check(q/$xyz/) }, undef, "Inlining LaxNum doesn't throw an exception");
 ok(!LaxNum->has_coercion, "LaxNum doesn't have a coercion");
 ok(!LaxNum->is_parameterizable, "LaxNum isn't parameterizable");
+isnt(LaxNum->type_default, undef, "LaxNum has a type_default");
+is(LaxNum->type_default->(), 0, "LaxNum type_default is zero");
 
 #
 # The @tests array is a list of triples:

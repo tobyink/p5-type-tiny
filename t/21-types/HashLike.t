@@ -37,6 +37,8 @@ ok(HashLike->can_be_inlined, 'HashLike can be inlined');
 is(exception { HashLike->inline_check(q/$xyz/) }, undef, "Inlining HashLike doesn't throw an exception");
 ok(!HashLike->has_coercion, "HashLike doesn't have a coercion");
 ok(HashLike->is_parameterizable, "HashLike is parameterizable");
+isnt(HashLike->type_default, undef, "HashLike has a type_default");
+is_deeply(HashLike->type_default->(), {}, "HashLike type_default is {}");
 
 #
 # The @tests array is a list of triples:

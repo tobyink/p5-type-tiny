@@ -37,6 +37,8 @@ ok(SimpleStr->can_be_inlined, 'SimpleStr can be inlined');
 is(exception { SimpleStr->inline_check(q/$xyz/) }, undef, "Inlining SimpleStr doesn't throw an exception");
 ok(!SimpleStr->has_coercion, "SimpleStr doesn't have a coercion");
 ok(!SimpleStr->is_parameterizable, "SimpleStr isn't parameterizable");
+isnt(SimpleStr->type_default, undef, "SimpleStr has a type_default");
+is(SimpleStr->type_default->(), '', "SimpleStr type_default is the empty string");
 
 #
 # The @tests array is a list of triples:

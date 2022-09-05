@@ -37,6 +37,8 @@ ok(Slurpy->can_be_inlined, 'Slurpy can be inlined');
 is(exception { Slurpy->inline_check(q/$xyz/) }, undef, "Inlining Slurpy doesn't throw an exception");
 ok(!Slurpy->has_coercion, "Slurpy doesn't have a coercion");
 ok(Slurpy->is_parameterizable, "Slurpy is parameterizable");
+isnt(Slurpy->type_default, undef, "Slurpy has a type_default");
+is(Slurpy->type_default->(), undef, "Slurpy type_default is undef");
 
 #
 # The @tests array is a list of triples:
@@ -183,6 +185,11 @@ while (@tests_from_CodeRef) {
 	}
 }
 
+isnt(Slurpy->of( Types::Standard::HashRef )->type_default, undef, "Slurpy[HashRef] has a type_default");
+is_deeply(Slurpy->of( Types::Standard::HashRef )->type_default->(), {}, "Slurpy[HashRef] type_default is {}");
+
+is(Slurpy->of( Types::Standard::Defined )->type_default, undef, "Slurpy[Defined] has no type_default");
+
 # Convenience method:
 #
 is( Slurpy->of( Types::Standard::Any )->my_slurp_into, 'ARRAY' );
@@ -192,5 +199,9 @@ is( Slurpy->of( Types::Standard::Map )->my_slurp_into, 'HASH' );
 is( Slurpy->of( Types::Standard::ArrayRef )->my_slurp_into, 'ARRAY' );
 is( Slurpy->of( Types::Standard::Tuple )->my_slurp_into, 'ARRAY' );
 is( Slurpy->of( Types::Standard::CycleTuple )->my_slurp_into, 'ARRAY' );
+
+#
+# See also: Dict.t, Tuple.t, CycleTuple.t.
+#
 
 done_testing;

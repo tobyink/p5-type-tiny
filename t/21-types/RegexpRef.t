@@ -37,6 +37,8 @@ ok(RegexpRef->can_be_inlined, 'RegexpRef can be inlined');
 is(exception { RegexpRef->inline_check(q/$xyz/) }, undef, "Inlining RegexpRef doesn't throw an exception");
 ok(!RegexpRef->has_coercion, "RegexpRef doesn't have a coercion");
 ok(!RegexpRef->is_parameterizable, "RegexpRef isn't parameterizable");
+isnt(RegexpRef->type_default, undef, "RegexpRef has a type_default");
+is( '' . RegexpRef->type_default->(), '' . qr//, "RegexpRef type_default is qr//");
 
 #
 # The @tests array is a list of triples:

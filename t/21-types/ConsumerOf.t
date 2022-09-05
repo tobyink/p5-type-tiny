@@ -37,6 +37,7 @@ ok(ConsumerOf->can_be_inlined, 'ConsumerOf can be inlined');
 is(exception { ConsumerOf->inline_check(q/$xyz/) }, undef, "Inlining ConsumerOf doesn't throw an exception");
 ok(!ConsumerOf->has_coercion, "ConsumerOf doesn't have a coercion");
 ok(ConsumerOf->is_parameterizable, "ConsumerOf is parameterizable");
+is(ConsumerOf->type_default, undef, "ConsumerOf has no type_default");
 
 #
 # The @tests array is a list of triples:

@@ -37,6 +37,8 @@ ok(Int->can_be_inlined, 'Int can be inlined');
 is(exception { Int->inline_check(q/$xyz/) }, undef, "Inlining Int doesn't throw an exception");
 ok(!Int->has_coercion, "Int doesn't have a coercion");
 ok(!Int->is_parameterizable, "Int isn't parameterizable");
+isnt(Int->type_default, undef, "Int has a type_default");
+is(Int->type_default->(), 0, "Int type_default is zero");
 
 #
 # The @tests array is a list of triples:

@@ -37,6 +37,7 @@ ok(RoleName->can_be_inlined, 'RoleName can be inlined');
 is(exception { RoleName->inline_check(q/$xyz/) }, undef, "Inlining RoleName doesn't throw an exception");
 ok(!RoleName->has_coercion, "RoleName doesn't have a coercion");
 ok(!RoleName->is_parameterizable, "RoleName isn't parameterizable");
+is(RoleName->type_default, undef, "RoleName has no type_default");
 
 #
 # The @tests array is a list of triples:

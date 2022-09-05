@@ -37,6 +37,8 @@ ok(ArrayLike->can_be_inlined, 'ArrayLike can be inlined');
 is(exception { ArrayLike->inline_check(q/$xyz/) }, undef, "Inlining ArrayLike doesn't throw an exception");
 ok(!ArrayLike->has_coercion, "ArrayLike doesn't have a coercion");
 ok(ArrayLike->is_parameterizable, "ArrayLike is parameterizable");
+isnt(ArrayLike->type_default, undef, "ArrayLike has a type_default");
+is_deeply(ArrayLike->type_default->(), [], "ArrayLike type_default is []");
 
 #
 # The @tests array is a list of triples:

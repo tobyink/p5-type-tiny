@@ -37,6 +37,8 @@ ok(CodeRef->can_be_inlined, 'CodeRef can be inlined');
 is(exception { CodeRef->inline_check(q/$xyz/) }, undef, "Inlining CodeRef doesn't throw an exception");
 ok(!CodeRef->has_coercion, "CodeRef doesn't have a coercion");
 ok(!CodeRef->is_parameterizable, "CodeRef isn't parameterizable");
+isnt(CodeRef->type_default, undef, "CodeRef has a type_default");
+is(scalar CodeRef->type_default->()->(), undef, "CodeRef type_default is sub {}");
 
 #
 # The @tests array is a list of triples:

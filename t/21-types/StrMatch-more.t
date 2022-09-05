@@ -30,7 +30,7 @@ use Test::Requires { 'Test::Warnings' => 0.005 };
 use Test::Warnings ':all';
 
 #
-# This is a regexp containing embeeded Perl code.
+# This is a regexp containing embedded Perl code.
 # It's interesting because it cannot easily be inlined.
 #
 

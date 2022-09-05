@@ -37,6 +37,7 @@ ok(UpperCaseSimpleStr->can_be_inlined, 'UpperCaseSimpleStr can be inlined');
 is(exception { UpperCaseSimpleStr->inline_check(q/$xyz/) }, undef, "Inlining UpperCaseSimpleStr doesn't throw an exception");
 ok(UpperCaseSimpleStr->has_coercion, "UpperCaseSimpleStr has a coercion");
 ok(!UpperCaseSimpleStr->is_parameterizable, "UpperCaseSimpleStr isn't parameterizable");
+is(UpperCaseSimpleStr->type_default, undef, "UpperCaseSimpleStr has no type_default");
 
 #
 # The @tests array is a list of triples:

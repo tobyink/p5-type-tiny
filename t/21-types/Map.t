@@ -37,6 +37,8 @@ ok(Map->can_be_inlined, 'Map can be inlined');
 is(exception { Map->inline_check(q/$xyz/) }, undef, "Inlining Map doesn't throw an exception");
 ok(!Map->has_coercion, "Map doesn't have a coercion");
 ok(Map->is_parameterizable, "Map is parameterizable");
+isnt(Map->type_default, undef, "Map has a type_default");
+is_deeply(Map->type_default->(), {}, "Map type_default is {}");
 
 #
 # The @tests array is a list of triples:
@@ -130,6 +132,8 @@ ok($MapWithIntKeys->can_be_inlined, '$MapWithIntKeys can be inlined');
 is(exception { $MapWithIntKeys->inline_check(q/$xyz/) }, undef, "Inlining \$MapWithIntKeys doesn't throw an exception");
 ok(!$MapWithIntKeys->has_coercion, "\$MapWithIntKeys doesn't have a coercion");
 ok(!$MapWithIntKeys->is_parameterizable, "\$MapWithIntKeys is not parameterizable");
+isnt($MapWithIntKeys->type_default, undef, "\$MapWithIntKeys has a type_default");
+is_deeply($MapWithIntKeys->type_default->(), {}, "\$MapWithIntKeys type_default is {}");
 ok_subtype(Types::Standard::HashRef, $MapWithIntKeys);
 
 should_fail( 1,               $MapWithIntKeys );

@@ -37,6 +37,8 @@ ok(Any->can_be_inlined, 'Any can be inlined');
 is(exception { Any->inline_check(q/$xyz/) }, undef, "Inlining Any doesn't throw an exception");
 ok(!Any->has_coercion, "Any doesn't have a coercion");
 ok(!Any->is_parameterizable, "Any isn't parameterizable");
+isnt(Any->type_default, undef, "Any has a type_default");
+is(Any->type_default->(), undef, "Any type_default is undef");
 
 my @none_tests =
 #

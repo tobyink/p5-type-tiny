@@ -37,6 +37,7 @@ ok(GlobRef->can_be_inlined, 'GlobRef can be inlined');
 is(exception { GlobRef->inline_check(q/$xyz/) }, undef, "Inlining GlobRef doesn't throw an exception");
 ok(!GlobRef->has_coercion, "GlobRef doesn't have a coercion");
 ok(!GlobRef->is_parameterizable, "GlobRef isn't parameterizable");
+is(GlobRef->type_default, undef, "GlobRef has no type_default");
 
 #
 # The @tests array is a list of triples:

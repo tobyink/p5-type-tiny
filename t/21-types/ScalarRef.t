@@ -37,6 +37,8 @@ ok(ScalarRef->can_be_inlined, 'ScalarRef can be inlined');
 is(exception { ScalarRef->inline_check(q/$xyz/) }, undef, "Inlining ScalarRef doesn't throw an exception");
 ok(!ScalarRef->has_coercion, "ScalarRef doesn't have a coercion");
 ok(ScalarRef->is_parameterizable, "ScalarRef is parameterizable");
+isnt(ScalarRef->type_default, undef, "ScalarRef has a type_default");
+is_deeply(ScalarRef->type_default->(), \undef, "ScalarRef type_default is a reference to undef");
 
 #
 # The @tests array is a list of triples:

@@ -37,6 +37,7 @@ ok(Defined->can_be_inlined, 'Defined can be inlined');
 is(exception { Defined->inline_check(q/$xyz/) }, undef, "Inlining Defined doesn't throw an exception");
 ok(!Defined->has_coercion, "Defined doesn't have a coercion");
 ok(!Defined->is_parameterizable, "Defined isn't parameterizable");
+is(Defined->type_default, undef, "Defined has no type_default");
 
 #
 # The @tests array is a list of triples:

@@ -37,6 +37,8 @@ ok(StringLike->can_be_inlined, 'StringLike can be inlined');
 is(exception { StringLike->inline_check(q/$xyz/) }, undef, "Inlining StringLike doesn't throw an exception");
 ok(!StringLike->has_coercion, "StringLike doesn't have a coercion");
 ok(!StringLike->is_parameterizable, "StringLike isn't parameterizable");
+isnt(StringLike->type_default, undef, "StringLike has a type_default");
+is(StringLike->type_default->(), '', "StringLike type_default is the empty string");
 
 #
 # The @tests array is a list of triples:

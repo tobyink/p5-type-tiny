@@ -37,6 +37,8 @@ ok(ArrayRef->can_be_inlined, 'ArrayRef can be inlined');
 is(exception { ArrayRef->inline_check(q/$xyz/) }, undef, "Inlining ArrayRef doesn't throw an exception");
 ok(!ArrayRef->has_coercion, "ArrayRef doesn't have a coercion");
 ok(ArrayRef->is_parameterizable, "ArrayRef is parameterizable");
+isnt(ArrayRef->type_default, undef, "ArrayRef has a type_default");
+is_deeply(ArrayRef->type_default->(), [], "ArrayRef type_default is []");
 
 #
 # The @tests array is a list of triples:
@@ -130,6 +132,9 @@ ok($ArrayOfInts->can_be_inlined, '$ArrayOfInts can be inlined');
 is(exception { $ArrayOfInts->inline_check(q/$xyz/) }, undef, "Inlining \$ArrayOfInts doesn't throw an exception");
 ok(!$ArrayOfInts->has_coercion, "\$ArrayOfInts doesn't have a coercion");
 ok(!$ArrayOfInts->is_parameterizable, "\$ArrayOfInts is not parameterizable");
+isnt($ArrayOfInts->type_default, undef, "\$ArrayOfInts has a type_default");
+is_deeply($ArrayOfInts->type_default->(), [], "\$ArrayOfInts type_default is []");
+
 ok_subtype(ArrayRef, $ArrayOfInts);
 
 should_fail( 1,        $ArrayOfInts );
@@ -178,6 +183,8 @@ should_pass( [  1,   2 ], $ArrayOfAtLeastTwoInts );
 should_fail( [  1,  [] ], $ArrayOfAtLeastTwoInts );
 should_pass( [  1,  -1 ], $ArrayOfAtLeastTwoInts );
 should_pass( [  1 .. 9 ], $ArrayOfAtLeastTwoInts );
+
+is($ArrayOfAtLeastTwoInts->type_default, undef, "\$ArrayOfAtLeastTwoInts has no type_default");
 
 
 #

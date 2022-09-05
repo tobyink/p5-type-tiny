@@ -37,6 +37,7 @@ ok(_ForeignTypeConstraint->can_be_inlined, '_ForeignTypeConstraint can be inline
 is(exception { _ForeignTypeConstraint->inline_check(q/$xyz/) }, undef, "Inlining _ForeignTypeConstraint doesn't throw an exception");
 ok(!_ForeignTypeConstraint->has_coercion, "_ForeignTypeConstraint doesn't have a coercion");
 ok(!_ForeignTypeConstraint->is_parameterizable, "_ForeignTypeConstraint isn't parameterizable");
+is(_ForeignTypeConstraint->type_default, undef, "_ForeignTypeConstraint has no type_default");
 
 #
 # The @tests array is a list of triples:

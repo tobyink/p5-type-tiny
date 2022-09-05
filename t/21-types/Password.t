@@ -37,6 +37,7 @@ ok(Password->can_be_inlined, 'Password can be inlined');
 is(exception { Password->inline_check(q/$xyz/) }, undef, "Inlining Password doesn't throw an exception");
 ok(!Password->has_coercion, "Password doesn't have a coercion");
 ok(!Password->is_parameterizable, "Password isn't parameterizable");
+is(Password->type_default, undef, "Password has no type_default");
 
 #
 # The @tests array is a list of triples:
