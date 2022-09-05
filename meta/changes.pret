@@ -4356,7 +4356,7 @@
 	].
 
 `Type-Tiny 1.999_001 cpan:TOBYINK`
-	issued  2022-09-04;
+	issued  2022-09-05;
 	label "Type::Tiny 2.0 Preview B";
 	changeset [
 		dcs:versus `Type-Tiny 1.999_000 cpan:TOBYINK`;
