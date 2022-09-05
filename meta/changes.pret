@@ -4354,3 +4354,34 @@
 			label "%Error::TypeTiny::CarpInternal is now an alias for %Carp::CarpInternal.";
 		];
 	].
+
+`Type-Tiny 1.999_001 cpan:TOBYINK`
+	issued  2022-09-04;
+	label "Type::Tiny 2.0 Preview B";
+	changeset [
+		dcs:versus `Type-Tiny 1.999_000 cpan:TOBYINK`;
+		item [
+			a dcs:Change;
+			label "Types::Common now also extends Types::TypeTiny.";
+		];
+		item [
+			a dcs:Tests;
+			label "Tests for the `type_default` of all builtin types.";
+		];
+		item [
+			a dcs:Change;
+			label "Changes to the `type_default` for a few parameterized types.";
+		];
+		item [
+			a dcs:Documentation;
+			label "Further revisions of Type::Manual.";
+		];
+		item [
+			a dcs:Documentation;
+			label "Update the SYNOPSIS for Types::Standard and Type::Tiny.";
+		];
+		item [
+			a dcs:Documentation;
+			label "Fix misspelling of 'GitHub' in documentation.";
+		];
+	].

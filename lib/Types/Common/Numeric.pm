@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Types::Common::Numeric::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Common::Numeric::VERSION   = '1.999_000';
+	$Types::Common::Numeric::VERSION   = '1.999_001';
 }
 
 $Types::Common::Numeric::VERSION =~ tr/_//d;
