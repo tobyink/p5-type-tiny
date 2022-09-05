@@ -1521,7 +1521,7 @@ C<wrap_methods> is not exported unless requested by name.
 These are really part of the legacy API, but don't currently have
 any replacements in the modern API.
 
-=head3 C<< multisig(@alternatives) >>
+=head2 C<< multisig(@alternatives) >>
 
 Type::Params can export a C<multisig> function that compiles multiple
 alternative signatures into one, and uses the first one that works:
@@ -1609,7 +1609,7 @@ message string:
 
 C<multisig> is not exported unless requested by name.
 
-=head3 B<Invocant>
+=head2 B<Invocant>
 
 Type::Params exports a type B<Invocant> on request. This gives you a type
 constraint which accepts classnames I<and> blessed objects.
@@ -1628,7 +1628,7 @@ constraint which accepts classnames I<and> blessed objects.
 
 C<Invocant> is not exported unless requested by name.
 
-=head3 B<ArgsObject>
+=head2 B<ArgsObject>
 
 Type::Params exports a parameterizable type constraint B<ArgsObject>.
 It accepts the kinds of objects returned by signature checks for named
