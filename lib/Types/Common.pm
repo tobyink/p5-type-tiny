@@ -24,16 +24,10 @@ use Type::Library
 		Types::TypeTiny
 	) ];
 
-use Type::Params ();
-BEGIN {
-	if ( my $sigs = $Type::Params::EXPORT_TAGS{-sigs} ) {
-		'Type::Params'->import(-sigs);
-		$EXPORT_TAGS{-sigs} = [ @$sigs ];
-		push @EXPORT_OK, @$sigs;
-	}
-};
+use Type::Params -sigs;
+$EXPORT_TAGS{sigs} = $Type::Params::EXPORT_TAGS{sigs};
+push @EXPORT_OK, @{ $EXPORT_TAGS{sigs} };
 
-push @EXPORT_OK, 't';
 sub _generate_t {
 	my $package = shift;
 	require Type::Registry;
@@ -41,6 +35,7 @@ sub _generate_t {
 	$t->()->add_types( $package );
 	return $t;
 }
+push @EXPORT_OK, 't';
 
 1;
 

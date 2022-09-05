@@ -44,7 +44,7 @@ use Test::More;
 			map( "is_$_", @types ),
 			map( "to_$_", @types ),
 			@coercions,
-			@{ $Type::Params::EXPORT_TAGS{-sigs} || [] },
+			@{ $Type::Params::EXPORT_TAGS{sigs} || [] },
 			qw( t ),
 		) ],
 		'correct imports',
