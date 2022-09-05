@@ -12,7 +12,7 @@ The following is a list of type constraints bundled with Type::Tiny,
 with very brief descriptions. For more information, see the type
 library's documentation, and the test cases in C<< t/21-types/ >>.
 
-GitHib link:
+GitHub link:
 L<https://github.com/tobyink/p5-type-tiny/tree/master/t/21-types>.
 
 =over
