@@ -73,12 +73,12 @@ is(
 is(
 	Maybe->type_default->(),
 	undef,
-	'ArrayRef->type_default',
+	'Maybe->type_default',
 );
 
 is(
 	Maybe->of( Str )->type_default->(),
-	undef,
+	'',
 	'Maybe[Str]->type_default generated for parameterized type',
 );
 
