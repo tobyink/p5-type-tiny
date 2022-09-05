@@ -13,3 +13,18 @@
  - `Type::Tiny` now has a `type_default` method.
  - `Type::Tiny` now overloads the division (slash) operator.
  - `%Error::TypeTiny::CarpInternal` is now an alias for `%Carp::CarpInternal`.
+ 
+Test Suite Statistics:
+
+ - Type-Tiny-0.001:
+   > Files=31, Tests=657, 2 wallclock secs
+
+ - Type-Tiny-1.000000:
+   > Files=150, Tests=8316, 14 wallclock secs
+
+ - Type-Tiny-1.016000:
+   > Files=285, Tests=14294, 26 wallclock secs
+
+ - Type-Tiny-2.000000:
+   > Files=300, Tests=14636, 31 wallclock secs
+
