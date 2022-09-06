@@ -568,10 +568,16 @@ sub find_constraining_type {
 }
 
 sub type_default {
-	my $self = shift;
-	return $self->{type_default} if exists $self->{type_default};
+	my ( $self, @args ) = @_;
+	if ( exists $self->{type_default} ) {
+		if ( @args ) {
+			my $td = $self->{type_default};
+			return sub { local $_ = \@args; &$td; };
+		}
+		return $self->{type_default};
+	}
 	if ( my $parent = $self->parent ) {
-		return $parent->type_default if $self->_is_null_constraint;
+		return $parent->type_default( @args ) if $self->_is_null_constraint;
 	}
 	return undef;
 }
@@ -1814,6 +1820,17 @@ for a B<Counter> type, a sensible default might be "0":
 Child types will inherit a type default from their parent unless the child
 has a C<constraint>. If a type neither has nor inherits a type default, then
 calling C<type_default> will return undef.
+
+As a special case, this:
+
+  $type->type_default( @args )
+
+Will return:
+
+  sub {
+    local $_ = \@args;
+    $type->type_default->( @_ );
+  }
 
 Many of the types defined in L<Types::Standard> and other bundled type
 libraries have type defaults, but discovering them is left as an exercise

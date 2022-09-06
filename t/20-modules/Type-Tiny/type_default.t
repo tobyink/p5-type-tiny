@@ -124,4 +124,24 @@ is_deeply(
 	'Map[Str, Int]->type_default generated for parameterized type',
 );
 
+subtest "quasi-curry" => sub {
+	my @got;
+	my $type = ArrayRef->create_child_type(
+		name          => 'MyArrayRef',
+		type_default  => sub { @got = @_; return $_ },
+	);
+	my $td = $type->type_default( 1 .. 5 );
+	is( ref($td), 'CODE', 'quasi-curry worked' );
+	is_deeply(
+		$td->( bless {}, 'Local::Dummy' ),
+		[ 1 .. 5 ],
+		'quasi-curried arguments',
+	);
+	is_deeply(
+		\@got,
+		[ bless {}, 'Local::Dummy' ],
+		'regular arguments',
+	);
+};
+
 done_testing;
