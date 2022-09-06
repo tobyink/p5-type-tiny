@@ -106,8 +106,13 @@ our %EXPORT_TAGS = (
 }
 
 sub signature {
-	require Type::Params::Signature;
+	if ( @_ % 2 ) {
+		require Error::TypeTiny;
+		Error::TypeTiny::croak( "Expected even-sized list of arguments" );
+	}
 	my ( %opts ) = @_;
+
+	require Type::Params::Signature;
 
 	my $positional = delete( $opts{positional} ) || delete( $opts{pos} );
 	my $named      = delete( $opts{named} );
@@ -134,7 +139,10 @@ sub signature {
 {
 	my $subname;
 	sub signature_for {
-		require Type::Params::Signature;
+		if ( not @_ % 2 ) {
+			require Error::TypeTiny;
+			Error::TypeTiny::croak( "Expected odd-sized list of arguments; did you forget the function name?" );
+		}
 		my ( $function, %opts ) = @_;
 		my $package = $opts{package} || caller( $opts{caller_level} || 0 );
 
@@ -143,6 +151,8 @@ sub signature {
 			signature_for( $_, %opts ) for @$function;
 			return;
 		}
+
+		require Type::Params::Signature;
 
 		my $positional = delete( $opts{positional} ) || delete( $opts{pos} );
 		my $named      = delete( $opts{named} );
