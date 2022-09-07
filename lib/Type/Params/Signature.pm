@@ -104,7 +104,11 @@ sub _rationalize_slurpies {
 
 	if ( $self->is_named ) {
 		my ( @slurpy, @rest );
-		
+
+		if ( $self->named_to_list and not ref $self->named_to_list ) {
+			$self->{named_to_list} = [ map $_->name, @$parameters ];
+		}
+
 		for my $parameter ( @$parameters ) {
 			if ( $parameter->type->is_strictly_a_type_of( Slurpy ) ) {
 				push @slurpy, $parameter;
@@ -119,8 +123,14 @@ sub _rationalize_slurpies {
 		}
 
 		if ( @slurpy == 1 ) {
-			$self->{slurpy} = $slurpy[0];
-			@$parameters = @rest;
+			my $constraint = $slurpy[0]->type;
+			if ( $constraint->{uniq} == Any->{uniq} or $constraint->my_slurp_into eq 'HASH' ) {
+				$self->{slurpy} = $slurpy[0];
+				@$parameters = @rest;
+			}
+			else {
+				$self->_croak( 'Signatures with named parameters can only have slurpy parameters which are a subtype of HashRef' );
+			}
 		}
 		elsif ( @slurpy ) {
 			$self->_croak( 'Found multiple slurpy parameters! There can be only one' );
