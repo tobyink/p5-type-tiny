@@ -231,7 +231,7 @@ sub constructor   { $_[0]{constructor} }
 sub named_to_list { $_[0]{named_to_list} }
 sub oo_trace      { $_[0]{oo_trace} }
 
-sub method_invocant { $_[0]{method_invocant} //= 'undef' }
+sub method_invocant { $_[0]{method_invocant} = defined( $_[0]{method_invocant} ) ? $_[0]{method_invocant} : 'undef' }
 
 sub can_shortcut {
 	return $_[0]{can_shortcut}
