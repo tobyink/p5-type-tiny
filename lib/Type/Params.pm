@@ -23,7 +23,7 @@ use Types::TypeTiny ();
 BEGIN {
 	my $import1 = q{ require Sub::Util; Sub::Util->import( 'set_subname' ); 1 };
 	my $import2 = q{ require Sub::Name; *set_subname = \&Sub::Name::subname; 1 };
-	eval($import1) or eval($import2) or *set_subname = sub { pop; };
+	eval $import1 or eval $import2 or *set_subname = sub { pop; };
 };
 
 require Exporter::Tiny;
