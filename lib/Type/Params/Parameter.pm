@@ -76,9 +76,16 @@ sub might_supply_new_value {
 }
 
 sub _code_for_default {
-	my $self = shift;
+	my ( $self, $signature, $coderef ) = @_;
 	my $default = $self->default;
 
+	if ( is_CodeRef $default ) {
+		my $default_varname = $coderef->add_variable(
+			'$default_for_' . $self->{vartail},
+			\$default,
+		);
+		return sprintf( '%s->( %s )', $default_varname, $signature->method_invocant );
+	}
 	if ( is_Undef $default ) {
 		return 'undef';
 	}
@@ -193,26 +200,13 @@ sub _make_code {
 		$coderef->add_line( '}' );
 	}
 
-	if ( $self->has_default and is_CodeRef $self->default ) {
-		my $default_varname = $coderef->add_variable(
-			'$default_for_' . $vartail,
-			\ $self->default,
-		);
-		$coderef->add_line( sprintf(
-			'$dtmp = %s ? %s : &%s;',
-			$exists_check,
-			$self->_maybe_clone( $varname ),
-			$default_varname,
-		) );
-		$varname = '$dtmp';
-		$needs_clone = 0;
-	}
-	elsif ( $self->has_default ) {
+	if ( $self->has_default ) {
+		$self->{vartail} = $vartail; # hack
 		$coderef->add_line( sprintf(
 			'$dtmp = %s ? %s : %s;',
 			$exists_check,
 			$self->_maybe_clone( $varname ),
-			$self->_code_for_default,
+			$self->_code_for_default( $signature, $coderef ),
 		) );
 		$varname = '$dtmp';
 		$needs_clone = 0;

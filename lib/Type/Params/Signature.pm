@@ -216,6 +216,7 @@ sub new_from_compile {
 sub package       { $_[0]{package} }
 sub subname       { $_[0]{subname} }
 sub description   { $_[0]{description} }     sub has_description   { exists $_[0]{description} }
+sub method        { $_[0]{method} }
 sub head          { $_[0]{head} }            sub has_head          { exists $_[0]{head} }
 sub tail          { $_[0]{tail} }            sub has_tail          { exists $_[0]{tail} }
 sub parameters    { $_[0]{parameters} }      sub has_parameters    { exists $_[0]{parameters} }
@@ -229,6 +230,8 @@ sub class         { $_[0]{class} }
 sub constructor   { $_[0]{constructor} }
 sub named_to_list { $_[0]{named_to_list} }
 sub oo_trace      { $_[0]{oo_trace} }
+
+sub method_invocant { $_[0]{method_invocant} //= 'undef' }
 
 sub can_shortcut {
 	return $_[0]{can_shortcut}
@@ -279,6 +282,13 @@ sub _coderef_start {
 			$coderef->add_line( 'my $__NEXT__ = shift;' );
 			$coderef->add_gap;
 		}
+	}
+
+	if ( $self->method ) {
+		# Passed to parameter defaults
+		$self->{method_invocant} = '$__INVOCANT__';
+		$coderef->add_line( sprintf 'my %s = $_[0];', $self->method_invocant );
+		$coderef->add_gap;
 	}
 
 	$self->_coderef_start_extra( $coderef );

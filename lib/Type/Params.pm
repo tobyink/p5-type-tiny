@@ -752,6 +752,9 @@ clearer, but it's a slower check.)
    ...;
  }
 
+If C<< method >> is true (or a type constraint) then any parameter
+defaults which are coderefs will be called as methods.
+
 =head4 C<< description >> B<Str>
 
 This is the description of the coderef that will show up in stack traces.
