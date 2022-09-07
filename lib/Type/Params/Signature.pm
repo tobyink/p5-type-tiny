@@ -158,13 +158,22 @@ sub _parameters_from_list {
 	my $is_named = ( $style eq 'named' );
 
 	while ( @$list ) {
-		my %param_opts;
+		my ( $type, %param_opts );
 		if ( $is_named ) {
 			$param_opts{name} = assert_Str( shift( @$list ) );
 		}
-		my $type = shift( @$list );
+		if ( is_HashRef $list->[0] and exists $list->[0]{slurpy} and not is_Bool $list->[0]{slurpy} ) {
+			my %new_opts = %{ shift( @$list ) };
+			$type = delete $new_opts{slurpy};
+			%param_opts = ( %param_opts, %new_opts, slurpy => 1 );
+		}
+		else {
+			$type = shift( @$list );
+		}
 		if ( is_HashRef( $list->[0] ) ) {
-			%param_opts = ( %param_opts, %{ +shift( @$list ) } );
+			unless ( exists $list->[0]{slurpy} and not is_Bool $list->[0]{slurpy} ) {
+				%param_opts = ( %param_opts, %{ +shift( @$list ) } );
+			}
 		}
 		$param_opts{type} =
 			is_Int($type) ? ( $type ? Any : do { $param_opts{optional} = !!1; Any; } ) :
@@ -183,7 +192,7 @@ sub new_from_compile {
 	my $is_named = ( $style eq 'named' );
 
 	my %opts  = ();
-	while ( is_HashRef $_[0] ) {
+	while ( is_HashRef $_[0] and not exists $_[0]{slurpy} ) {
 		%opts = ( %opts, %{ +shift } );
 	}
 

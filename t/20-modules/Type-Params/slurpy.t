@@ -46,22 +46,32 @@ like(
 	qr{did not pass type constraint "HashRef\[Int\]" \(in \$SLURPY\)},
 );
 
-my $chk2 = compile(Str, slurpy HashRef);
+for my $compile_this (
+	[ 'Str, slurpy HashRef'           => Str, slurpy HashRef ],
+	[ 'Str, Slurpy[HashRef]'          => Str, Slurpy[HashRef] ],
+	[ 'Str, HashRef, { slurpy => 1 }' => Str, HashRef, { slurpy => 1 } ],
+	[ 'Str, { slurpy => HashRef }'    => Str, { 'slurpy' => HashRef } ],
+) {
+	my ( $desc, @args ) = @$compile_this;
+	subtest "Compiling: $desc" => sub {
+		my $chk2 = compile @args;
 
-is_deeply(
-	[ $chk2->("Hello", foo => 1, bar => 2) ],
-	[ "Hello", { foo => 1, bar => 2 } ]
-);
+		is_deeply(
+			[ $chk2->("Hello", foo => 1, bar => 2) ],
+			[ "Hello", { foo => 1, bar => 2 } ]
+		);
 
-is_deeply(
-	[ $chk2->("Hello", { foo => 1, bar => 2 }) ],
-	[ "Hello", { foo => 1, bar => 2 } ]
-);
+		is_deeply(
+			[ $chk2->("Hello", { foo => 1, bar => 2 }) ],
+			[ "Hello", { foo => 1, bar => 2 } ]
+		);
 
-like(
-	exception { $chk2->("Hello", foo => 1, "bar") },
-	qr{^Odd number of elements in HashRef},
-);
+		like(
+			exception { $chk2->("Hello", foo => 1, "bar") },
+			qr{^Odd number of elements in HashRef},
+		);
+	};
+}
 
 my $chk3 = compile(Str, slurpy Map);
 
