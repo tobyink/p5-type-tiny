@@ -143,15 +143,6 @@ sub _rationalize_slurpies {
 	}
 }
 
-sub _looks_like_Slurpy {
-	my $thing = shift;
-	return ( $thing =~ /^Slurpy\b/ )
-		if is_Str( $thing );
-	return to_TypeTiny( $thing )->is_strictly_a_type_of( Slurpy )
-		if is_Object( $thing );
-	return !!0;
-}
-
 sub _parameters_from_list {
 	my ( $class, $style, $list, %opts ) = @_;
 	my @return;
