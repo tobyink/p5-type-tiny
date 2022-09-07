@@ -20,6 +20,12 @@ use Error::TypeTiny::WrongNumberOfParameters;
 use Types::Standard ();
 use Types::TypeTiny ();
 
+BEGIN {
+	eval { require Sub::Util; Sub::Util->import( 'set_subname' ); 1 } or
+	eval { require Sub::Name; *set_subname = \&Sub::Name::subname; } or
+	*set_subname = sub { pop; };
+};
+
 require Exporter::Tiny;
 our @ISA = 'Exporter::Tiny';
 
@@ -136,63 +142,55 @@ sub signature {
 	$sig->return_wanted;
 }
 
-{
-	my $subname;
-	sub signature_for {
-		if ( not @_ % 2 ) {
-			require Error::TypeTiny;
-			Error::TypeTiny::croak( "Expected odd-sized list of arguments; did you forget the function name?" );
-		}
-		my ( $function, %opts ) = @_;
-		my $package = $opts{package} || caller( $opts{caller_level} || 0 );
+sub signature_for {
+	if ( not @_ % 2 ) {
+		require Error::TypeTiny;
+		Error::TypeTiny::croak( "Expected odd-sized list of arguments; did you forget the function name?" );
+	}
+	my ( $function, %opts ) = @_;
+	my $package = $opts{package} || caller( $opts{caller_level} || 0 );
 
-		if ( ref($function) eq 'ARRAY' ) {
-			$opts{package} = $package;
-			signature_for( $_, %opts ) for @$function;
-			return;
-		}
-
-		require Type::Params::Signature;
-
-		my $positional = delete( $opts{positional} ) || delete( $opts{pos} );
-		my $named      = delete( $opts{named} );
-
-		my ( $sig_kind, $args ) = ( pos => $positional );
-		if ( $named ) {
-			( $sig_kind, $args ) = ( named => $named );
-			$opts{bless} = 1 unless exists $opts{bless};
-			if ( $positional ) {
-				require Error::TypeTiny;
-				return Error::TypeTiny::croak( "Signature cannot have both positional and named arguments" );
-			}
-		}
-
-		my $fullname = ( $function =~ /::/ ) ? $function : "$package\::$function";
-		$opts{package}   ||= $package;
-		$opts{subname}   ||= ( $function =~ /::(\w+)$/ ) ? $1 : $function;
-		$opts{goto_next} ||= do { no strict 'refs'; exists(&$fullname) ? \&$fullname : undef; };
-		if ( $opts{fallback} and not $opts{goto_next} ) {
-			$opts{goto_next} = ref( $opts{fallback} ) ? $opts{fallback} : sub {};
-		}
-		if ( not $opts{goto_next} ) {
-			require Error::TypeTiny;
-			return Error::TypeTiny::croak( "Function '$function' not found to wrap!" );
-		}
-
-		my $sig = 'Type::Params::Signature'->new_from_compile( $sig_kind, \%opts, @$args );
-		my $coderef = $sig->coderef->compile;
-
-		$subname ||=
-			eval { require Sub::Util } ? \&Sub::Util::set_subname :
-			eval { require Sub::Name } ? \&Sub::Name::subname :
-			sub { pop; };
-
-		no strict 'refs';
-		no warnings 'redefine';
-		*$fullname = $subname->( $fullname, $coderef );
-
+	if ( ref($function) eq 'ARRAY' ) {
+		$opts{package} = $package;
+		signature_for( $_, %opts ) for @$function;
 		return;
 	}
+
+	require Type::Params::Signature;
+
+	my $positional = delete( $opts{positional} ) || delete( $opts{pos} );
+	my $named      = delete( $opts{named} );
+
+	my ( $sig_kind, $args ) = ( pos => $positional );
+	if ( $named ) {
+		( $sig_kind, $args ) = ( named => $named );
+		$opts{bless} = 1 unless exists $opts{bless};
+		if ( $positional ) {
+			require Error::TypeTiny;
+			return Error::TypeTiny::croak( "Signature cannot have both positional and named arguments" );
+		}
+	}
+
+	my $fullname = ( $function =~ /::/ ) ? $function : "$package\::$function";
+	$opts{package}   ||= $package;
+	$opts{subname}   ||= ( $function =~ /::(\w+)$/ ) ? $1 : $function;
+	$opts{goto_next} ||= do { no strict 'refs'; exists(&$fullname) ? \&$fullname : undef; };
+	if ( $opts{fallback} and not $opts{goto_next} ) {
+		$opts{goto_next} = ref( $opts{fallback} ) ? $opts{fallback} : sub {};
+	}
+	if ( not $opts{goto_next} ) {
+		require Error::TypeTiny;
+		return Error::TypeTiny::croak( "Function '$function' not found to wrap!" );
+	}
+
+	my $sig = 'Type::Params::Signature'->new_from_compile( $sig_kind, \%opts, @$args );
+	my $coderef = $sig->coderef->compile;
+
+	no strict 'refs';
+	no warnings 'redefine';
+	*$fullname = set_subname( $fullname, $coderef );
+
+	return;
 }
 
 sub compile {
@@ -347,54 +345,47 @@ sub wrap_subs {
 	goto \&_wrap_subs;
 }
 
-{
-	my $subname;
-	sub _wrap_subs {
-		my $opts = shift;
-		$subname ||=
-			eval   { require Sub::Util } ? \&Sub::Util::set_subname
-			: eval { require Sub::Name } ? \&Sub::Name::subname
-			: sub { pop; };
-		while ( @_ ) {
-			my ( $name, $proto ) = splice @_, 0, 2;
-			my $fullname = ( $name =~ /::/ ) ? $name : sprintf( '%s::%s', $opts->{caller}, $name );
-			my $orig = do {
-				no strict 'refs';
-				exists &$fullname     ? \&$fullname
-					: $opts->{use_can} ? ( $opts->{caller}->can( $name ) || sub { } )
-					: sub { }
-			};
-			my $new;
-			if ( ref $proto eq 'CODE' ) {
-				$new = $opts->{skip_invocant}
-					? sub {
-						my $s = shift;
-						@_ = ( $s, &$proto );
-						goto $orig;
-					}
-					: sub {
-						@_ = &$proto;
-						goto $orig;
-					};
-			}
-			else {
-				$new = compile(
-					{
-						'package'   => $opts->{caller},
-						'subname'   => $name,
-						'goto_next' => $orig,
-						'head'      => $opts->{skip_invocant} ? 1 : 0,
-					},
-					@$proto,
-				);
-			}
+sub _wrap_subs {
+	my $opts = shift;
+	while ( @_ ) {
+		my ( $name, $proto ) = splice @_, 0, 2;
+		my $fullname = ( $name =~ /::/ ) ? $name : sprintf( '%s::%s', $opts->{caller}, $name );
+		my $orig = do {
 			no strict 'refs';
-			no warnings 'redefine';
-			*$fullname = $subname->( $fullname, $new );
-		} #/ while ( @_ )
-		1;
-	} #/ sub _wrap_subs
-}
+			exists &$fullname     ? \&$fullname
+				: $opts->{use_can} ? ( $opts->{caller}->can( $name ) || sub { } )
+				: sub { }
+		};
+		my $new;
+		if ( ref $proto eq 'CODE' ) {
+			$new = $opts->{skip_invocant}
+				? sub {
+					my $s = shift;
+					@_ = ( $s, &$proto );
+					goto $orig;
+				}
+				: sub {
+					@_ = &$proto;
+					goto $orig;
+				};
+		}
+		else {
+			$new = compile(
+				{
+					'package'   => $opts->{caller},
+					'subname'   => $name,
+					'goto_next' => $orig,
+					'head'      => $opts->{skip_invocant} ? 1 : 0,
+				},
+				@$proto,
+			);
+		}
+		no strict 'refs';
+		no warnings 'redefine';
+		*$fullname = set_subname( $fullname, $new );
+	} #/ while ( @_ )
+	1;
+} #/ sub _wrap_subs
 
 1;
 
