@@ -4385,3 +4385,42 @@
 			label "Fix misspelling of 'GitHub' in documentation.";
 		];
 	].
+
+`Type-Tiny 1.999_002 cpan:TOBYINK`
+	issued  2022-09-07;
+	label "Type::Tiny 2.0 Preview C";
+	changeset [
+		dcs:versus `Type-Tiny 1.999_001 cpan:TOBYINK`;
+		item [
+			a dcs:Change;
+			label "Minor bugfixes and improvements to slurpy handling in Type::Params.";
+		];
+		item [
+			a dcs:Tests;
+			label "Improved tests for slurpy handling in Type::Params.";
+		];
+		item [
+			a dcs:Change;
+			label "The type_default method will accept parameters, and sort-of curry them.";
+		];
+		item [
+			a dcs:Tests;
+			label "Better tests for `strictness` option in Type::Params.";
+		];
+		item [
+			a dcs:Documentation;
+			label "Fix up some heading levels in the pod for Type::Params.";
+		];
+		item [
+			a dcs:Bugfix;
+			label "Types::Common was not correctly handling the -sigs export tag.";
+		];
+		item [
+			a dcs:Tests;
+			label "The internal module Type::Params::Signature now has some tests of its own.";
+		];
+		item [
+			a dcs:Documentation;
+			label "Update NEWS.";
+		];
+	].
