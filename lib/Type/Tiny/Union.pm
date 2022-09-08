@@ -364,6 +364,19 @@ Union type constraints.
 This package inherits from L<Type::Tiny>; see that for most documentation.
 Major differences are listed below:
 
+=head2 Constructor
+
+=over
+
+=item C<< new_by_overload(%attributes) >>
+
+Like the C<new> constructor, but will sometimes return another type
+constraint which is not strictly an instance of L<Type::Tiny::Union>, but
+still encapsulates the same meaning. This constructor is used by
+Type::Tiny's overloading of the C<< | >> operator.
+
+=back
+
 =head2 Attributes
 
 =over
