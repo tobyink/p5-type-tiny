@@ -26,6 +26,18 @@ __PACKAGE__->_install_overloads(
 sub new_by_overload {
 	my $proto = shift;
 	my %opts  = ( @_ == 1 ) ? %{ $_[0] } : @_;
+
+	my @types = @{ $opts{type_constraints} };
+	if ( my @makers = map scalar( blessed($_) && $_->can( 'new_intersection' ) ), @types ) {
+		my $first_maker = shift @makers;
+		if ( ref $first_maker ) {
+			my $all_same = not grep $_ ne $first_maker, @makers;
+			if ( $all_same ) {
+				return ref( $types[0] )->$first_maker( %opts );
+			}
+		}
+	}
+
 	return $proto->new( \%opts );
 }
 
