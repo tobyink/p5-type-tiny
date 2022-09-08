@@ -84,6 +84,32 @@ sub is_word_safe {
 	return not grep /\W/, @{ $self->unique_values };
 }
 
+sub exportables {
+	my ( $self, $base_name ) = @_;
+	if ( not $self->is_anon ) {
+		$base_name ||= $self->name;
+	}
+	
+	my $exportables = $self->SUPER::exportables( $base_name );
+	
+	if ( $self->is_word_safe ) {
+		require Eval::TypeTiny;
+		require B;
+		for my $value ( @{ $self->unique_values } ) {
+			push @$exportables, {
+				name => uc( sprintf '%s_%s', $base_name, $value ),
+				tags => [ 'constants' ],
+				code => Eval::TypeTiny::eval_closure(
+					source      => sprintf( 'sub () { %s }', B::perlstring($value) ),
+					environment => {},
+				),
+			};
+		}
+	}
+	
+	return $exportables;
+}
+
 {
 	my $new_xs;
 	
