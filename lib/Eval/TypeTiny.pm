@@ -413,6 +413,8 @@ a second time if it's already named it.
 
 Turns a L<Type::Tiny> object into a coderef, suitable for installing
 into a symbol table to create a function like C<ArrayRef> or C<Int>.
+(Actually should work for any object which provides C<is_parameterizable>,
+C<parameterize>, and C<qualified_name> methods, such as L<Type::Coercion>.)
 
 C<< $options{post_method} >> can be a string of Perl indicating a
 method to call on the type constraint before returning it. For
