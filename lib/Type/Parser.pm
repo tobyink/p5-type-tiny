@@ -80,11 +80,11 @@ Evaluate: {
 		}
 		
 		if ( $node->{type} eq "union" ) {
-			return $reg->make_union( map _eval_type( $_, $reg ), @{ $node->{union} } );
+			return $reg->_make_union_by_overload( map _eval_type( $_, $reg ), @{ $node->{union} } );
 		}
 		
 		if ( $node->{type} eq "intersect" ) {
-			return $reg->make_intersection(
+			return $reg->_make_intersection_by_overload(
 				map _eval_type( $_, $reg ),
 				@{ $node->{intersect} }
 			);

@@ -68,6 +68,23 @@ sub new {
 	return $proto->SUPER::new( %opts );
 } #/ sub new
 
+sub new_union {
+	my $proto  = shift;
+	my %opts   = ( @_ == 1 ) ? %{ $_[0] } : @_;
+	my @types  = @{ delete $opts{type_constraints} };
+	my @values = map @$_, @types;
+	$proto->new( %opts, values => \@values );
+}
+
+sub new_intersection {
+	my $proto  = shift;
+	my %opts   = ( @_ == 1 ) ? %{ $_[0] } : @_;
+	my @types  = @{ delete $opts{type_constraints} };
+	my %values; ++$values{$_} for map @$_, @types;
+	my @values = sort grep $values{$_}==@types, keys %values; 
+	$proto->new( %opts, values => \@values );
+}
+
 sub values        { $_[0]{values} }
 sub unique_values { $_[0]{unique_values} }
 sub constraint    { $_[0]{constraint} ||= $_[0]->_build_constraint }
@@ -436,6 +453,22 @@ Enum type constraints.
 
 This package inherits from L<Type::Tiny>; see that for most documentation.
 Major differences are listed below:
+
+=head2 Constructors
+
+=over
+
+=item C<< new_union( type_constraints => @enums, %opts ) >>
+
+Creates a new enum type constraint which is the union of existing enum
+type constraints.
+
+=item C<< new_intersection( type_constraints => @enums, %opts ) >>
+
+Creates a new enum type constraint which is the intersection of existing enum
+type constraints.
+
+=back
 
 =head2 Attributes
 
