@@ -79,6 +79,11 @@ sub _build_display_name {
 	sprintf( "Enum[%s]", join q[,], @{ $self->unique_values } );
 }
 
+sub is_word_safe {
+	my $self = shift;
+	return not grep /\W/, @{ $self->unique_values };
+}
+
 {
 	my $new_xs;
 	
@@ -489,6 +494,12 @@ and finally, if given an integer, will use that as an index.
   say $enum->closest_match(  1 );  # ==> bar
   say $enum->closest_match(  2 );  # ==> baz
   say $enum->closest_match( -1 );  # ==> quux
+
+=item C<< is_word_safe >>
+
+Returns true if none of the values in the enumeration contain a non-word
+character. Word characters include letters, numbers, and underscores, but
+not most punctuation or whitespace.
 
 =back
 
