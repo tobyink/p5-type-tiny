@@ -20,7 +20,8 @@ use Type::Library -base;
 
 our @EXPORT_OK = qw( slurpy );
 
-use Scalar::Util qw( blessed looks_like_number );
+use Eval::TypeTiny  qw( set_subname );
+use Scalar::Util    qw( blessed looks_like_number );
 use Type::Tiny      ();
 use Types::TypeTiny ();
 
@@ -158,8 +159,6 @@ my $meta = __PACKAGE__->meta;
 	}
 	Types::Standard::_Stringable->Type::Tiny::_install_overloads(
 		q[""] => sub { $_[0]{text} ||= $_[0]{code}->() } );
-		
-	my $subname;
 	
 	sub LazyLoad ($$) {
 		bless \@_, 'Types::Standard::LazyLoad';
@@ -179,15 +178,10 @@ my $meta = __PACKAGE__->meta;
 			}
 			my $mm = $type->{my_methods} || {};
 			for my $key ( keys %$mm ) {
-				$subname =
-					eval   { require Sub::Util } ? \&Sub::Util::set_subname
-					: eval { require Sub::Name } ? \&Sub::Name::subname
-					: 0
-					if not defined $subname;
 				next unless ref( $mm->{$key} ) eq 'Types::Standard::LazyLoad';
 				my $f = $mm->{$key}[1];
 				$mm->{$key} = $class->can( "__$f" );
-				$subname and $subname->(
+				set_subname(
 					sprintf( "%s::my_%s", $type->qualified_name, $key ),
 					$mm->{$key},
 				);

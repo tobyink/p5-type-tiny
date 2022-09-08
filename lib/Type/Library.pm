@@ -11,7 +11,7 @@ BEGIN {
 
 $Type::Library::VERSION =~ tr/_//d;
 
-use Eval::TypeTiny qw< eval_closure >;
+use Eval::TypeTiny qw< eval_closure set_subname type_to_coderef NICE_PROTOTYPES >;
 use Scalar::Util qw< blessed refaddr >;
 use Type::Tiny      ();
 use Types::TypeTiny ();
@@ -19,27 +19,7 @@ use Types::TypeTiny ();
 require Exporter::Tiny;
 our @ISA = 'Exporter::Tiny';
 
-BEGIN {
-	*NICE_PROTOTYPES = ( $] >= 5.014 ) ? sub () { !!1 } : sub () { !!0 }
-}
-
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
-
-{
-	my $subname;
-	my %already;    # prevent renaming established functions
-	
-	sub _subname ($$) {
-		$subname =
-			eval   { require Sub::Util } ? \&Sub::Util::set_subname
-			: eval { require Sub::Name } ? \&Sub::Name::subname
-			: 0
-			if not defined $subname;
-		!$already{ refaddr( $_[1] ) }++ and return ( $subname->( @_ ) )
-			if $subname;
-		return $_[1];
-	} #/ sub _subname ($$)
-}
 
 sub _exporter_validate_opts {
 	my $class = shift;
@@ -99,45 +79,6 @@ sub _exporter_expand_tag {
 	return $class->SUPER::_exporter_expand_tag( @_ );
 } #/ sub _exporter_expand_tag
 
-sub _mksub {
-	my $class = shift;
-	my ( $type, $post_method ) = @_;
-	$post_method ||= q();
-	
-	#<<<
-	my $source = $type->is_parameterizable
-		? sprintf(
-			q{
-				sub (%s) {
-					if (ref($_[0]) eq 'Type::Tiny::_HalfOp') {
-						my $complete_type = shift->complete($type);
-						@_ && wantarray ? return($complete_type, @_) : return $complete_type;
-					}
-					my $params; $params = shift if ref($_[0]) eq q(ARRAY);
-					my $t = $params ? $type->parameterize(@$params) : $type;
-					@_ && wantarray ? return($t%s, @_) : return $t%s;
-				}
-			},
-			NICE_PROTOTYPES ? q(;$) : q(;@),
-			$post_method,
-			$post_method,
-		)
-		: sprintf(
-			q{ sub () { $type%s if $] } },
-			$post_method,
-		);
-	#>>>
-	
-	return _subname(
-		$type->qualified_name,
-		eval_closure(
-			source      => $source,
-			description => sprintf( "exportable function '%s::%s'", $class, $type ),
-			environment => { '$type' => \$type },
-		),
-	);
-} #/ sub _mksub
-
 sub _exporter_permitted_regexp {
 	my $class = shift;
 	
@@ -188,7 +129,7 @@ sub _exporter_expand_sub {
 			my $post_method = q();
 			$post_method = '->mouse_type' if $globals->{mouse};
 			$post_method = '->moose_type' if $globals->{moose};
-			return ( $name => $class->_mksub( $type, $post_method ) )
+			return ( $name => type_to_coderef( $type, post_method => $post_method ) )
 				if $post_method || $custom_type;
 		}
 		elsif ( $thingy eq 'is' ) {
@@ -267,7 +208,7 @@ sub _exporter_fail {
 		
 		return (
 			$name,
-			_subname(
+			set_subname(
 				"$class\::$name",
 				NICE_PROTOTYPES ? sub (;$) { goto $declared } : sub (;@) { goto $declared },
 			),
@@ -339,10 +280,10 @@ sub add_type {
 		? $type->coercion->compiled_coercion
 		: sub ($) { $type->coerce( $_[0] ) };
 		
-	*{"$class\::$name"}    = $class->_mksub( $type );
-	*{"$class\::is_$name"} = _subname "$class\::is_$name", $type->compiled_check;
-	*{"$class\::to_$name"} = _subname "$class\::to_$name", $to_type;
-	*{"$class\::assert_$name"} = _subname "$class\::assert_$name",
+	*{"$class\::$name"}    = type_to_coderef( $type );
+	*{"$class\::is_$name"} = set_subname "$class\::is_$name", $type->compiled_check;
+	*{"$class\::to_$name"} = set_subname "$class\::to_$name", $to_type;
+	*{"$class\::assert_$name"} = set_subname "$class\::assert_$name",
 		$type->_overload_coderef;
 		
 	return $type;
@@ -381,7 +322,7 @@ sub add_coercion {
 	no warnings "redefine", "prototype";
 	
 	my $class = blessed( $meta );
-	*{"$class\::$name"} = $class->_mksub( $c );
+	*{"$class\::$name"} = type_to_coderef( $c );
 	
 	return $c;
 } #/ sub add_coercion
@@ -417,7 +358,7 @@ sub make_immutable {
 			: sub ($) { $type->coerce( $_[0] ) };
 		my $name = $type->name;
 		
-		*{"$class\::to_$name"} = _subname "$class\::to_$name", $to_type;
+		*{"$class\::to_$name"} = set_subname "$class\::to_$name", $to_type;
 	} #/ for my $type ( values %...)
 	
 	1;
@@ -581,22 +522,6 @@ Type::Library-based libraries are exporters.
 
 A shortcut for calling C<< $type->coercion->freeze >> on every
 type constraint in the library.
-
-=back
-
-=head2 Constants
-
-=over
-
-=item C<< NICE_PROTOTYPES >>
-
-If this is true, then Type::Library will give parameterizable type constraints
-slightly the nicer prototype of C<< (;$) >> instead of the default C<< (;@) >>.
-This allows constructs like:
-
-   ArrayRef[Int] | HashRef[Int]
-
-... to "just work".
 
 =back
 

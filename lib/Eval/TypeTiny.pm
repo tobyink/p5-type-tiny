@@ -13,7 +13,8 @@ sub _clean_eval {
 use warnings;
 
 BEGIN {
-	*HAS_LEXICAL_SUBS = ( $] >= 5.018 ) ? sub() { !!1 } : sub() { !!0 };
+	*HAS_LEXICAL_SUBS = ( $] >= 5.018 ) ? sub () { !!1 } : sub () { !!0 };
+	*NICE_PROTOTYPES  = ( $] >= 5.014 ) ? sub () { !!1 } : sub () { !!0 };
 }
 
 {
@@ -65,6 +66,7 @@ our @EXPORT_OK = qw(
 	HAS_LEXICAL_SUBS HAS_LEXICAL_VARS ALIAS_IMPLEMENTATION
 	IMPLEMENTATION_DEVEL_LEXALIAS IMPLEMENTATION_PADWALKER
 	IMPLEMENTATION_NATIVE IMPLEMENTATION_TIE
+	set_subname type_to_coderef NICE_PROTOTYPES
 );
 
 $VERSION =~ tr/_//d;
@@ -83,6 +85,53 @@ sub import {
 	$opts->{into} ||= scalar( caller );
 	return $class->$next( $opts, @_ );
 } #/ sub import
+
+{
+	my $subname;
+	my %already;    # prevent renaming established functions
+	sub set_subname ($$) {
+		defined $subname or $subname =
+			eval { require Sub::Util } ? \&Sub::Util::set_subname :
+			eval { require Sub::Name } ? \&Sub::Name::subname :
+			0;
+		$subname and !$already{$_[1]}++ and return &$subname;
+		$_[1];
+	} #/ sub set_subname ($$)
+}
+
+sub type_to_coderef {
+	my ( $type, %args ) = @_;
+	my $post_method = $args{post_method} || q();
+	
+	#<<<
+	my $source = $type->is_parameterizable ?
+		sprintf(
+			q{
+				sub (%s) {
+					if (ref($_[0]) eq 'Type::Tiny::_HalfOp') {
+						my $complete_type = shift->complete($type);
+						@_ && wantarray ? return($complete_type, @_) : return $complete_type;
+					}
+					my $params; $params = shift if ref($_[0]) eq q(ARRAY);
+					my $t = $params ? $type->parameterize(@$params) : $type;
+					@_ && wantarray ? return($t%s, @_) : return $t%s;
+				}
+			},
+			NICE_PROTOTYPES ? q(;$) : q(;@),
+			$post_method,
+			$post_method,
+		) :
+		sprintf( q{ sub () { $type%s if $] } }, $post_method );
+	#>>>
+	
+	my $coderef = eval_closure(
+		source      => $source,
+		description => $args{description} || sprintf( "type '%s'", $type->qualified_name ),
+		environment => { '$type' => \$type },
+	);
+	
+	$args{anonymous} ? $coderef : set_subname( $type->qualified_name, $coderef );
+}
 
 sub eval_closure {
 	my ( %args ) = @_;
@@ -340,12 +389,40 @@ Perl code, and hashrefs of variables to close over.
 
 =head2 Functions
 
-This module exports one function, which works much like the similarly named
-function from L<Eval::Closure>:
+By default this module exports one function, which works much like the
+similarly named function from L<Eval::Closure>:
 
 =over
 
 =item C<< eval_closure(source => $source, environment => \%env, %opt) >>
+
+=back
+
+Other functions can be imported on request:
+
+=over
+
+=item C<< set_subname( $fully_qualified_name, $coderef ) >>
+
+Works like the similarly named function from L<Sub::Util>, but will
+fallback to doing nothing if neither L<Sub::Util> nor L<Sub::Name> are
+available. Also will cowardly refuse the set the name of a coderef
+a second time if it's already named it.
+
+=item C<< type_to_coderef( $type, %options ) >>
+
+Turns a L<Type::Tiny> object into a coderef, suitable for installing
+into a symbol table to create a function like C<ArrayRef> or C<Int>.
+
+C<< $options{post_method} >> can be a string of Perl indicating a
+method to call on the type constraint before returning it. For
+example C<< '->moose_type' >>.
+
+C<< $options{description} >> can be a description of the coderef which
+may be shown in stack traces, etc.
+
+The coderef will be named using C<set_subname> unless
+C<< $options{anonymous} >> is true.
 
 =back
 
@@ -389,6 +466,16 @@ slowest implementation, and may cause problems in certain edge cases, like
 trying to alias already-tied variables, but it's the only way to implement
 C<< alias => 1 >> without a recent version of Perl or one of the two optional
 modules mentioned above.
+
+=item C<< NICE_PROTOTYPES >>
+
+If this is true, then type_to_coderef will give parameterizable type
+constraints slightly the nicer prototype of C<< (;$) >> instead of the
+default C<< (;@) >>. This allows constructs like:
+
+   ArrayRef[Int] | HashRef[Int]
+
+... to "just work".
 
 =back
 
