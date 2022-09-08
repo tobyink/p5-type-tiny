@@ -2405,6 +2405,12 @@ allow the following to work:
    push @list, 123, 456;   # ok
    push @list, "Hello";    # dies
 
+=item C<< exportables( $base_name ) >>
+
+Returns a list of the functions a type library should export if it contains
+this type constraint. The return type is
+B<< ArrayRef[ Dict[ name => Str, tags => ArrayRef[Str], code => CodeRef ] ] >>.
+
 =back
 
 The following methods exist for Moose/Mouse compatibility, but do not do
