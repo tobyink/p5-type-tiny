@@ -67,4 +67,31 @@ is(
 	"don't create duplicate coderefs",
 );
 
+{
+	my $exportables = FBB->exportables;
+	my %exportables = map {; $_->{name} => $_->{code} } @$exportables;
+	is_deeply(
+		[ sort keys %exportables ],
+		[ sort qw( FBB is_FBB assert_FBB to_FBB FBB_FOO FBB_BAR FBB_BAZ ) ],
+		'correct exportables',
+	) or diag explain( \%exportables );
+
+	is(
+		$exportables{FBB_BAZ}->(),
+		'baz',
+		'exported constant actually works',
+	);
+}
+
+{
+	my $type = enum( FBB2 => [qw/ foo bar baz ... /] );
+	my $exportables = $type->exportables;
+	my %exportables = map {; $_->{name} => $_->{code} } @$exportables;
+	is_deeply(
+		[ sort keys %exportables ],
+		[ sort qw( FBB2 is_FBB2 assert_FBB2 to_FBB2 ) ],
+		'correct exportables for non-word-safe enum',
+	) or diag explain( \%exportables );
+}
+
 done_testing;
