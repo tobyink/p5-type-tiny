@@ -1188,6 +1188,44 @@ sub _build_mouse_type {
 	return $r;
 } #/ sub _build_mouse_type
 
+sub exportables {
+	my ( $self, $base_name ) = @_;
+	if ( not $self->is_anon ) {
+		$base_name ||= $self->name;
+	}
+
+	my @exportables;
+	return \@exportables if ! $base_name;
+
+	push @exportables, {
+		name => $base_name,
+		code => Eval::TypeTiny::type_to_coderef( $self ),
+		tags => [ 'types' ],
+	};
+
+	push @exportables, {
+		name => sprintf( 'is_%s', $base_name ),
+		code => $self->compiled_check,
+		tags => [ 'is' ],
+	};
+
+	push @exportables, {
+		name => sprintf( 'assert_%s', $base_name ),
+		code => $self->_overload_coderef,
+		tags => [ 'assert' ],
+	};
+
+	push @exportables, {
+		name => sprintf( 'to_%s', $base_name ),
+		code => $self->has_coercion && $self->coercion->frozen
+			? $self->coercion->compiled_coercion
+			: sub ($) { $self->coerce( $_[0] ) },
+		tags => [ 'to' ],
+	};
+
+	return \@exportables;
+}
+
 sub _process_coercion_list {
 	my $self = shift;
 	

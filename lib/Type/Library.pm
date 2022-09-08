@@ -52,59 +52,15 @@ sub _exporter_validate_opts {
 	return $class->SUPER::_exporter_validate_opts( @_ );
 } #/ sub _exporter_validate_opts
 
-sub _exporter_expand_tag {
-	my $class = shift;
-	my ( $name, $value, $globals ) = @_;
-	
-	$name eq 'types'  and return map [ "$_"        => $value ], $class->type_names;
-	$name eq 'is'     and return map [ "is_$_"     => $value ], $class->type_names;
-	$name eq 'assert' and return map [ "assert_$_" => $value ], $class->type_names;
-	$name eq 'to'     and return map [ "to_$_"     => $value ], $class->type_names;
-	$name eq 'coercions' and return map [ "$_" => $value ], $class->coercion_names;
-	
-	if ( $name eq 'all' ) {
-		no strict "refs";
-		return (
-			map( [ "+$_" => $value ],
-				$class->type_names,
-			),
-			map( [ $_ => $value ],
-				$class->coercion_names,
-				@{"$class\::EXPORT"},
-				@{"$class\::EXPORT_OK"},
-			),
-		);
-	} #/ if ( $name eq 'all' )
-	
-	return $class->SUPER::_exporter_expand_tag( @_ );
-} #/ sub _exporter_expand_tag
-
-sub _exporter_permitted_regexp {
-	my $class = shift;
-	
-	my $inherited = $class->SUPER::_exporter_permitted_regexp( @_ );
-	my $types     = join "|", map quotemeta,
-		sort { length( $b ) <=> length( $a ) or $a cmp $b } $class->type_names;
-	my $coercions = join "|", map quotemeta,
-		sort { length( $b ) <=> length( $a ) or $a cmp $b } $class->coercion_names;
-		
-	qr{^(?:
-		$inherited
-		| (?: (?:is_|to_|assert_)? (?:$types) )
-		| (?:$coercions)
-	)$}xms;
-} #/ sub _exporter_permitted_regexp
-
 sub _exporter_expand_sub {
 	my $class = shift;
 	my ( $name, $value, $globals ) = @_;
 	
-	if ( $name =~ /^\+(.+)/ and $class->has_type( $1 ) ) {
-		my $type   = $1;
-		my $value2 = +{ %{ $value || {} } };
-		
-		return map $class->_exporter_expand_sub( $_, $value2, $globals ),
-			$type, "is_$type", "assert_$type", "to_$type";
+	if ( $name =~ /^\+(.+)/ and $class->has_type( "$1" ) ) {
+		my $type     = $class->get_type( "$1" );
+		my $value2   = +{ %{ $value || {} } };
+		my $exported = $type->exportables;
+		return map $class->_exporter_expand_sub( $_->{name}, $value2, $globals ), @$exported;
 	}
 	
 	my $typename = $name;
@@ -125,27 +81,21 @@ sub _exporter_expand_sub {
 			++$custom_type;
 		}
 		
-		if ( !defined $thingy ) {
+		if ( not defined $thingy ) {
 			my $post_method = q();
 			$post_method = '->mouse_type' if $globals->{mouse};
 			$post_method = '->moose_type' if $globals->{moose};
 			return ( $name => type_to_coderef( $type, post_method => $post_method ) )
 				if $post_method || $custom_type;
 		}
-		elsif ( $thingy eq 'is' ) {
-			return ( $value->{-as} || "is_$typename" => $type->compiled_check )
-				if $custom_type;
-		}
-		elsif ( $thingy eq 'assert' ) {
-			return ( $value->{-as} || "assert_$typename" => $type->_overload_coderef )
-				if $custom_type;
-		}
-		elsif ( $thingy eq 'to' ) {
-			my $to_type =
-				$type->has_coercion && $type->coercion->frozen
-				? $type->coercion->compiled_coercion
-				: sub ($) { $type->coerce( $_[0] ) };
-			return ( $value->{-as} || "to_$typename" => $to_type ) if $custom_type;
+		elsif ( $custom_type ) {
+			for my $exportable ( @{ $type->exportables( $typename ) } ) {
+				for my $tag ( @{ $exportable->{tags} } ) {
+					if ( $thingy eq $tag ) {
+						return ( $value->{-as} || $exportable->{name}, $exportable->{code} );
+					}
+				}
+			}
 		}
 	} #/ if ( my $type = $class...)
 	
@@ -163,11 +113,8 @@ sub _exporter_install_sub {
 		"Exporting deprecated type %s to %s",
 		$type->qualified_name,
 		ref( $package ) ? "reference" : "package $package",
-		)
-		if ( defined $type
-		and $type->deprecated
-		and not $globals->{allow_deprecated} );
-		
+	) if ( defined $type and $type->deprecated and not $globals->{allow_deprecated} );
+	
 	if ( !ref $package and defined $type ) {
 		my ( $prefix ) = grep defined, $value->{-prefix}, $globals->{prefix}, q();
 		my ( $suffix ) = grep defined, $value->{-suffix}, $globals->{suffix}, q();
@@ -275,17 +222,15 @@ sub add_type {
 	no strict "refs";
 	no warnings "redefine", "prototype";
 	
-	my $to_type =
-		$type->has_coercion && $type->coercion->frozen
-		? $type->coercion->compiled_coercion
-		: sub ($) { $type->coerce( $_[0] ) };
-		
-	*{"$class\::$name"}    = type_to_coderef( $type );
-	*{"$class\::is_$name"} = set_subname "$class\::is_$name", $type->compiled_check;
-	*{"$class\::to_$name"} = set_subname "$class\::to_$name", $to_type;
-	*{"$class\::assert_$name"} = set_subname "$class\::assert_$name",
-		$type->_overload_coderef;
-		
+	for my $exportable ( @{ $type->exportables } ) {
+		my $name = $exportable->{name};
+		my $code = $exportable->{code};
+		my $tags = $exportable->{tags};
+		*{"$class\::$name"} = set_subname( "$class\::$name", $code );
+		push @{"$class\::EXPORT_OK"}, $name;
+		push @{ ${"$class\::EXPORT_TAGS"}{$_} ||= [] }, $name for @$tags;
+	}
+	
 	return $type;
 } #/ sub add_type
 
@@ -324,6 +269,9 @@ sub add_coercion {
 	my $class = blessed( $meta );
 	*{"$class\::$name"} = type_to_coderef( $c );
 	
+	push @{"$class\::EXPORT_OK"}, $name;
+	push @{ ${"$class\::EXPORT_TAGS"}{'coercions'} ||= [] }, $name;
+
 	return $c;
 } #/ sub add_coercion
 
@@ -346,19 +294,16 @@ sub make_immutable {
 	my $meta  = shift->meta;
 	my $class = ref( $meta );
 	
+	no strict "refs";
+	no warnings "redefine", "prototype";
+	
 	for my $type ( values %{ $meta->{types} } ) {
 		$type->coercion->freeze;
-		
-		no strict "refs";
-		no warnings "redefine", "prototype";
-		
-		my $to_type =
-			$type->has_coercion && $type->coercion->frozen
-			? $type->coercion->compiled_coercion
-			: sub ($) { $type->coerce( $_[0] ) };
 		my $name = $type->name;
-		
-		*{"$class\::to_$name"} = set_subname "$class\::to_$name", $to_type;
+		*{"$class\::to_$name"} = set_subname(
+			"$class\::to_$name",
+			$type->coercion->compiled_coercion,
+		) if $type->has_coercion && $type->coercion->frozen;
 	} #/ for my $type ( values %...)
 	
 	1;
