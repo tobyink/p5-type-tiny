@@ -12,19 +12,13 @@ BEGIN {
 $Type::Params::VERSION =~ tr/_//d;
 
 use B qw();
-use Eval::TypeTiny;
-use Scalar::Util qw(refaddr);
+use Eval::TypeTiny qw( eval_closure set_subname );
+use Scalar::Util qw( refaddr );
 use Error::TypeTiny;
 use Error::TypeTiny::Assertion;
 use Error::TypeTiny::WrongNumberOfParameters;
 use Types::Standard ();
 use Types::TypeTiny ();
-
-BEGIN {
-	my $import1 = q{ require Sub::Util; Sub::Util->import( 'set_subname' ); 1 };
-	my $import2 = q{ require Sub::Name; *set_subname = \&Sub::Name::subname; 1 };
-	eval $import1 or eval $import2 or *set_subname = sub { pop; };
-};
 
 require Exporter::Tiny;
 our @ISA = 'Exporter::Tiny';
