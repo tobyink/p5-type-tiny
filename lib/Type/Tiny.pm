@@ -112,7 +112,7 @@ __PACKAGE__->_install_overloads(
 					return "Type::Tiny::_HalfOp"->new(
 						$op,
 						$param,
-						"Type::Tiny::Union"->new( type_constraints => [ $type, $tc[1] ] ),
+						"Type::Tiny::Union"->new_by_overload( type_constraints => [ $type, $tc[1] ] ),
 					);
 				} #/ if ( blessed $tc[0] eq...)
 			} #/ if ( blessed $tc[0] )
@@ -122,7 +122,7 @@ __PACKAGE__->_install_overloads(
 			}
 		} #/ if ( !_FIXED_PRECEDENCE...)
 		require Type::Tiny::Union;
-		return "Type::Tiny::Union"->new( type_constraints => \@tc );
+		return "Type::Tiny::Union"->new_by_overload( type_constraints => \@tc );
 	},
 	q(&) => sub {
 		my @tc = _swap @_;
@@ -136,7 +136,7 @@ __PACKAGE__->_install_overloads(
 					return "Type::Tiny::_HalfOp"->new(
 						$op,
 						$param,
-						"Type::Tiny::Intersection"->new( type_constraints => [ $type, $tc[1] ] ),
+						"Type::Tiny::Intersection"->new_by_overload( type_constraints => [ $type, $tc[1] ] ),
 					);
 				} #/ if ( blessed $tc[0] eq...)
 			} #/ if ( blessed $tc[0] )
@@ -146,7 +146,7 @@ __PACKAGE__->_install_overloads(
 			}
 		} #/ if ( !_FIXED_PRECEDENCE...)
 		require Type::Tiny::Intersection;
-		"Type::Tiny::Intersection"->new( type_constraints => \@tc );
+		"Type::Tiny::Intersection"->new_by_overload( type_constraints => \@tc );
 	},
 	q(~)  => sub { shift->complementary_type },
 	q(==) => sub { $_[0]->equals( $_[1] ) },

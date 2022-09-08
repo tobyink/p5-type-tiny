@@ -23,6 +23,12 @@ __PACKAGE__->_install_overloads(
 	q[@{}] => sub { $_[0]{type_constraints} ||= [] },
 );
 
+sub new_by_overload {
+	my $proto = shift;
+	my %opts  = ( @_ == 1 ) ? %{ $_[0] } : @_;
+	return $proto->new( \%opts );
+}
+
 sub new {
 	my $proto = shift;
 	
