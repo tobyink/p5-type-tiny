@@ -4424,3 +4424,69 @@
 			label "Update NEWS.";
 		];
 	].
+
+`Type-Tiny 1.999_003 cpan:TOBYINK`
+	issued  2022-09-09;
+	label "Type::Tiny 2.0 Preview D";
+	changeset [
+		dcs:versus `Type-Tiny 1.999_002 cpan:TOBYINK`;
+		item [
+			a dcs:Change;
+			label "Type::Params will call default coderefs as a method for signatures where method => 1.";
+		];
+		item [
+			a dcs:Addition;
+			label "Move two helper subs out of Type::Library and into Eval::TypeTiny, clean them up, and document them as part of the API (set_subname and type_to_coderef).";
+		];
+		item [
+			a dcs:Change;
+			label "The NICE_PROTOTYPES constant has been moved from Type::Library to Eval::TypeTiny, though a copy of it is still available in Type::Library for backwards compatibility.";
+		];
+		item [
+			a dcs:Change;
+			label "The union of two Type::Tiny::Enum objects is now a Type::Tiny::Enum instead of a Type::Tiny::Union.";
+		];
+		item [
+			a dcs:Change;
+			label "The intersection of two Type::Tiny::Enum objects is now a Type::Tiny::Enum instead of a Type::Tiny::Intersection.";
+		];
+		item [
+			a dcs:Bugfix;
+			label "Setting a default for a slurpy parameter in Type::Params now warns and ignores the default instead of failing to compile because of a syntax error.";
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/108>;
+			dcs:thanks <urn:uuid:c98016a1-919d-4e92-a138-1c37a307fe22>;
+		];
+		item [
+			a dcs:Addition;
+			label "Type::Tiny now has an `exportables` method which provides a list of functions that the type can export. Type libraries now defer to this when deciding what they can export.";
+		];
+		item [
+			a dcs:Change;
+			label "Major simplifications of Type::Library internals.";
+		];
+		item [
+			a dcs:Addition;
+			label "Type::Tiny::Enum has an is_word_safe method which indicates whether all values in the enumeration are 'words' (i.e. contain only word characters).";
+		];
+		item [
+			a dcs:Addition;
+			label "Word-safe enumerations export constants for each value.";
+		];
+		item [
+			a dcs:Addition;
+			label "Type::Tiny::Enum is now an exporter.";
+		];
+		item [
+			a dcs:Addition;
+			label "Type::Tiny::Duck is now an exporter.";
+		];
+		item [
+			a dcs:Addition;
+			label "Type::Tiny::Class is now an exporter.";
+		];
+		item [
+			a dcs:Addition;
+			label "Type::Tiny::Role is now an exporter.";
+		];
+	].
+

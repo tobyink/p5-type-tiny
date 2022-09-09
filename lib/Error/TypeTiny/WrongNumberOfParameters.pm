@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Error::TypeTiny::WrongNumberOfParameters::AUTHORITY = 'cpan:TOBYINK';
-	$Error::TypeTiny::WrongNumberOfParameters::VERSION   = '1.999_002';
+	$Error::TypeTiny::WrongNumberOfParameters::VERSION   = '1.999_003';
 }
 
 $Error::TypeTiny::WrongNumberOfParameters::VERSION =~ tr/_//d;

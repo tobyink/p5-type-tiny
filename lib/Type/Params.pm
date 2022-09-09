@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Params::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Params::VERSION   = '1.999_002';
+	$Type::Params::VERSION   = '1.999_003';
 }
 
 $Type::Params::VERSION =~ tr/_//d;
