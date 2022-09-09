@@ -21,6 +21,31 @@ sub _short_name { 'Role' }
 
 my %cache;
 
+sub import {
+	my $class = shift;
+	if ( @_ ) {
+		my $caller = caller;
+		while ( @_ ) {
+			my $role_name = shift;
+			( my $type_name  = $role_name ) =~ s{::}{}g;
+			
+			my $type = $class->new(
+				name      => $type_name,
+				role      => $role_name,
+			);
+			
+			for my $exportable ( @{ $type->exportables } ) {
+				no strict 'refs';
+				*{ $caller . '::' . $exportable->{name} } = $exportable->{code};
+			}
+			
+			$INC{'Type/Registry.pm'}
+				? 'Type::Registry'->for_class( $caller )->add_type( $type, $type_name )
+				: ( $Type::Registry::DELAYED{$caller}{$type_name} = $type );
+		}
+	}
+}
+
 sub new {
 	my $proto = shift;
 	my %opts  = ( @_ == 1 ) ? %{ $_[0] } : @_;
@@ -161,6 +186,30 @@ See L<Type::Tiny::ConstrainedObject>.
 See L<Type::Tiny::ConstrainedObject>.
 
 =back
+
+=head2 Exports
+
+Type::Tiny::Role can be used as an exporter.
+
+  use Type::Tiny::Role 'MyApp::Printable';
+
+This will export the following functions into your namespace:
+
+=over
+
+=item C<< MyAppPrintable >>
+
+=item C<< is_MyAppPrintable( $value ) >>
+
+=item C<< assert_MyAppPrintable( $value ) >>
+
+=item C<< to_MyAppPrintable( $value ) >>
+
+=back
+
+Multiple types can be exported at once:
+
+  use Type::Tiny::Role qw( MyApp::Printable MyApp::Sendable );
 
 =head1 BUGS
 

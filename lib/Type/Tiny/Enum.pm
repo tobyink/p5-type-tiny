@@ -619,7 +619,6 @@ Multiple enumerations can be exported at once:
     TaxStatus => [ 'paid', 'pending' ],
   );
 
-
 =head2 Overloading
 
 =over

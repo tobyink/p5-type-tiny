@@ -19,6 +19,33 @@ use Type::Tiny::ConstrainedObject ();
 our @ISA = 'Type::Tiny::ConstrainedObject';
 sub _short_name { 'Class' }
 
+sub import {
+	my $class = shift;
+	if ( @_ ) {
+		my $caller = caller;
+		while ( @_ ) {
+			my $class_name = shift;
+			( my $type_name  = $class_name ) =~ s{::}{}g;
+			
+			eval "require $class_name;";
+			
+			my $type = $class->new(
+				name      => $type_name,
+				class     => $class_name,
+			);
+			
+			for my $exportable ( @{ $type->exportables } ) {
+				no strict 'refs';
+				*{ $caller . '::' . $exportable->{name} } = $exportable->{code};
+			}
+			
+			$INC{'Type/Registry.pm'}
+				? 'Type::Registry'->for_class( $caller )->add_type( $type, $type_name )
+				: ( $Type::Registry::DELAYED{$caller}{$type_name} = $type );
+		}
+	}
+}
+
 sub new {
 	my $proto = shift;
 	return $proto->class->new( @_ ) if blessed $proto;    # DWIM
@@ -334,6 +361,33 @@ See L<Type::Tiny::ConstrainedObject>.
 See L<Type::Tiny::ConstrainedObject>.
 
 =back
+
+=head2 Exports
+
+Type::Tiny::Class can be used as an exporter.
+
+  use Type::Tiny::Class 'HTTP::Tiny';
+
+This will export the following functions into your namespace:
+
+=over
+
+=item C<< HTTPTiny >>
+
+=item C<< is_HTTPTiny( $value ) >>
+
+=item C<< assert_HTTPTiny( $value ) >>
+
+=item C<< to_HTTPTiny( $value ) >>
+
+=back
+
+You will also be able to use C<< HTTPTiny->new(...) >> as a shortcut for
+C<< HTTP::Tiny->new(...) >>.
+
+Multiple types can be exported at once:
+
+  use Type::Tiny::Class qw( HTTP::Tiny LWP::UserAgent );
 
 =head1 BUGS
 

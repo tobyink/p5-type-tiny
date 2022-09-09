@@ -19,6 +19,31 @@ use Type::Tiny::ConstrainedObject ();
 our @ISA = 'Type::Tiny::ConstrainedObject';
 sub _short_name { 'Duck' }
 
+sub import {
+	my $class = shift;
+	if ( @_ ) {
+		my $caller = caller;
+		while ( @_ ) {
+			my $type_name = shift;
+			my $methods   = shift;
+			
+			my $type = $class->new(
+				name      => $type_name,
+				methods   => [ @$methods ],
+			);
+			
+			for my $exportable ( @{ $type->exportables } ) {
+				no strict 'refs';
+				*{ $caller . '::' . $exportable->{name} } = $exportable->{code};
+			}
+			
+			$INC{'Type/Registry.pm'}
+				? 'Type::Registry'->for_class( $caller )->add_type( $type, $type_name )
+				: ( $Type::Registry::DELAYED{$caller}{$type_name} = $type );
+		}
+	}
+}
+
 sub new {
 	my $proto = shift;
 	
@@ -214,6 +239,33 @@ See L<Type::Tiny::ConstrainedObject>.
 See L<Type::Tiny::ConstrainedObject>.
 
 =back
+
+=head2 Exports
+
+Type::Tiny::Duck can be used as an exporter.
+
+  use Type::Tiny::Duck HttpClient => [ 'get', 'post' ];
+
+This will export the following functions into your namespace:
+
+=over
+
+=item C<< HttpClient >>
+
+=item C<< is_HttpClient( $value ) >>
+
+=item C<< assert_HttpClient( $value ) >>
+
+=item C<< to_HttpClient( $value ) >>
+
+=back
+
+Multiple types can be exported at once:
+
+  use Type::Tiny::Duck (
+    HttpClient   => [ 'get', 'post' ],
+    FtpClient    => [ 'upload', 'download' ],
+  );
 
 =head1 BUGS
 
