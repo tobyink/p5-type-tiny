@@ -920,7 +920,7 @@ Instead of returning a coderef, return a hashref of stuff including the
 coderef. This is mostly for people extending Type::Params and I won't go
 into too many details about what else this hashref contains.
 
-=head4 C<< bless >> B<Bool|ClassName>, C<< class >> B<< ClassName|ArrayRef >> and C<< constructor >> B<Str>
+=head4 C<< bless >> B<Bool|ClassName>, C<< class >> B<< ClassName|ArrayRef >>, and C<< constructor >> B<Str>
 
 Named parameters are usually returned as a blessed object:
 
