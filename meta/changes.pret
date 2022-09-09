@@ -4490,3 +4490,25 @@
 		];
 	].
 
+`Type-Tiny 1.999_004 cpan:TOBYINK`
+	issued  2022-09-09;
+	label "Type::Tiny 2.0 Preview E";
+	changeset [
+		dcs:versus `Type-Tiny 1.999_003 cpan:TOBYINK`;
+		item [
+			a dcs:Documentation;
+			label "Minor documentation clarifications around new constructor methods for Type::Tiny subclasses.";
+		];
+		item [
+			a dcs:Change;
+			label "Type::Tiny::{Class,Duck,Enum,Role} subclass Exporter::Tiny instead of handling exports manually.";
+		];
+		item [
+			a dcs:Packaging;
+			label "Require Exporter::Tiny 1.004001.";
+		];
+		item [
+			a dcs:Tests;
+			label "More tests for Type::Tiny::{Class,Duck,Enum,Role} exporting.";
+		];
+	].
