@@ -4511,4 +4511,8 @@
 			a dcs:Tests;
 			label "More tests for Type::Tiny::{Class,Duck,Enum,Role} exporting.";
 		];
+		item [
+			a dcs:Tests;
+			label "Add versions of tests for the new Type::Params v2 API which don't rely on Perl 5.20 features.";
+		];
 	].
