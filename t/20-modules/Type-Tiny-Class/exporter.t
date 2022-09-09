@@ -29,4 +29,7 @@ isa_ok HTTPTiny, 'Type::Tiny', 'HTTPTiny';
 
 ok is_HTTPTiny( bless {}, 'HTTP::Tiny' );
 
+require Type::Registry;
+is( 'Type::Registry'->for_me->{'HTTPTiny'}, HTTPTiny );
+
 done_testing;

@@ -15,35 +15,25 @@ use Scalar::Util qw< blessed >;
 
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
+use Exporter::Tiny 1.004001 ();
 use Type::Tiny::ConstrainedObject ();
-our @ISA = 'Type::Tiny::ConstrainedObject';
+our @ISA = qw( Type::Tiny::ConstrainedObject Exporter::Tiny );
+
 sub _short_name { 'Class' }
 
-sub import {
-	my $class = shift;
-	if ( @_ ) {
-		my $caller = caller;
-		while ( @_ ) {
-			my $class_name = shift;
-			( my $type_name  = $class_name ) =~ s{::}{}g;
-			
-			eval "require $class_name;";
-			
-			my $type = $class->new(
-				name      => $type_name,
-				class     => $class_name,
-			);
-			
-			for my $exportable ( @{ $type->exportables } ) {
-				no strict 'refs';
-				*{ $caller . '::' . $exportable->{name} } = $exportable->{code};
-			}
-			
-			$INC{'Type/Registry.pm'}
-				? 'Type::Registry'->for_class( $caller )->add_type( $type, $type_name )
-				: ( $Type::Registry::DELAYED{$caller}{$type_name} = $type );
-		}
-	}
+sub _exporter_fail {
+	my ( $class, $name, $opts, $globals ) = @_;
+	my $caller = $globals->{into};
+	
+	$opts->{name}  = $name unless exists $opts->{name}; $opts->{name} =~ s/:://g;
+	$opts->{class} = $name unless exists $opts->{class};
+	my $type = $class->new($opts);
+	
+	$INC{'Type/Registry.pm'}
+		? 'Type::Registry'->for_class( $caller )->add_type( $type )
+		: ( $Type::Registry::DELAYED{$caller}{$type->name} = $type )
+		unless( ref($caller) or $caller eq '-lexical' or $globals->{'lexical'} );
+	return map +( $_->{name} => $_->{code} ), @{ $type->exportables };
 }
 
 sub new {

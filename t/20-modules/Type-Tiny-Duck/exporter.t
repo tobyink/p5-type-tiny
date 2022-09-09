@@ -35,4 +35,7 @@ isa_ok HttpClient, 'Type::Tiny', 'HttpClient';
 
 ok is_HttpClient( bless {}, 'Local::Agent' );
 
+require Type::Registry;
+is( 'Type::Registry'->for_me->{'HttpClient'}, HttpClient );
+
 done_testing;

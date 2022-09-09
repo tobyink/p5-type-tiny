@@ -4,7 +4,7 @@
 
 =head1 PURPOSE
 
-Checks Type::Tiny::Role can export.
+Checks Type::Tiny::Class can export.
 
 =head1 AUTHOR
 
@@ -23,18 +23,13 @@ use strict;
 use warnings;
 use Test::More;
 
-use Type::Tiny::Role 'Local::Foo';
+use Type::Tiny::Class HT => { class => 'HTTP::Tiny' };
 
-{
-	package Local::Bar;
-	sub DOES { 1 }
-}
+isa_ok HT, 'Type::Tiny', 'HT';
 
-isa_ok LocalFoo, 'Type::Tiny', 'LocalFoo';
-
-ok is_LocalFoo( bless {}, 'Local::Bar' );
+ok is_HT( bless {}, 'HTTP::Tiny' );
 
 require Type::Registry;
-is( 'Type::Registry'->for_me->{'LocalFoo'}, LocalFoo );
+is( 'Type::Registry'->for_me->{'HT'}, HT );
 
 done_testing;

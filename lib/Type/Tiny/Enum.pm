@@ -13,37 +13,27 @@ $Type::Tiny::Enum::VERSION =~ tr/_//d;
 
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
+use Exporter::Tiny 1.004001 ();
 use Type::Tiny ();
-our @ISA = 'Type::Tiny';
+our @ISA = qw( Type::Tiny Exporter::Tiny );
 
 __PACKAGE__->_install_overloads(
 	q[@{}] => sub { shift->values },
 );
 
-sub import {
-	my $class = shift;
-	if ( @_ ) {
-		my $caller = caller;
-		while ( @_ ) {
-			my $type_name = shift;
-			my $values    = shift;
-			
-			my $type = $class->new(
-				name      => $type_name,
-				values    => [ @$values ],
-				coercion  => 1,
-			);
-			
-			for my $exportable ( @{ $type->exportables } ) {
-				no strict 'refs';
-				*{ $caller . '::' . $exportable->{name} } = $exportable->{code};
-			}
-			
-			$INC{'Type/Registry.pm'}
-				? 'Type::Registry'->for_class( $caller )->add_type( $type, $type_name )
-				: ( $Type::Registry::DELAYED{$caller}{$type_name} = $type );
-		}
-	}
+sub _exporter_fail {
+	my ( $class, $type_name, $values, $globals ) = @_;
+	my $caller = $globals->{into};
+	my $type = $class->new(
+		name      => $type_name,
+		values    => [ @$values ],
+		coercion  => 1,
+	);
+	$INC{'Type/Registry.pm'}
+		? 'Type::Registry'->for_class( $caller )->add_type( $type, $type_name )
+		: ( $Type::Registry::DELAYED{$caller}{$type_name} = $type )
+		unless( ref($caller) or $caller eq '-lexical' or $globals->{'lexical'} );
+	return map +( $_->{name} => $_->{code} ), @{ $type->exportables };
 }
 
 sub new {

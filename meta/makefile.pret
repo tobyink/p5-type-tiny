@@ -11,7 +11,7 @@
 		comment "For smartmatch operator overloading; and to avoid some pre-5.10 hacks."@en;
 	];
 	deps:runtime-requirement [
-		deps:on "Exporter::Tiny 1.004000"^^deps:CpanId;
+		deps:on "Exporter::Tiny 1.004001"^^deps:CpanId;
 		comment "This module was spun off from the Type-Tiny distribution."@en;
 	];
 	deps:runtime-recommendation [
