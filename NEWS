@@ -13,7 +13,9 @@
  - `Type::Tiny` now has a `type_default` method.
  - `Type::Tiny` now overloads the division (slash) operator.
  - `%Error::TypeTiny::CarpInternal` is now an alias for `%Carp::CarpInternal`.
- 
+ - Type::Tiny::{Class,Duck,Enum,Role} are now exporters.
+ - Enum types now export constants for each value.
+
 Test Suite Statistics:
 
  - Type-Tiny-0.001:
@@ -26,5 +28,5 @@ Test Suite Statistics:
    > Files=285, Tests=14294, 26 wallclock secs
 
  - Type-Tiny-2.000000:
-   > Files=301, Tests=14646, 35 wallclock secs
+   > Files=308, Tests=14675, 35 wallclock secs
 
