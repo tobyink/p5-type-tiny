@@ -378,6 +378,9 @@ Major differences are listed below:
 
 =head2 Constructor
 
+The C<new> constructor from L<Type::Tiny> still works, of course. But there
+is also:
+
 =over
 
 =item C<< new_by_overload(%attributes) >>
