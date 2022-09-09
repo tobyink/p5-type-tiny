@@ -482,14 +482,17 @@ Major differences are listed below:
 
 =head2 Constructors
 
+The C<new> constructor from L<Type::Tiny> still works, of course. But there
+is also:
+
 =over
 
-=item C<< new_union( type_constraints => @enums, %opts ) >>
+=item C<< new_union( type_constraints => \@enums, %opts ) >>
 
 Creates a new enum type constraint which is the union of existing enum
 type constraints.
 
-=item C<< new_intersection( type_constraints => @enums, %opts ) >>
+=item C<< new_intersection( type_constraints => \@enums, %opts ) >>
 
 Creates a new enum type constraint which is the intersection of existing enum
 type constraints.
