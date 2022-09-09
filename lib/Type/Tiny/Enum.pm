@@ -107,7 +107,7 @@ sub new_intersection {
 	my %opts   = ( @_ == 1 ) ? %{ $_[0] } : @_;
 	my @types  = @{ delete $opts{type_constraints} };
 	my %values; ++$values{$_} for map @$_, @types;
-	my @values = sort grep $values{$_}==@types, keys %values; 
+	my @values = sort grep $values{$_}==@types, keys %values;
 	$proto->new( %opts, values => \@values );
 }
 
