@@ -188,4 +188,40 @@ cmp_deeply(
 	) or diag explain ( \%imported );
 }
 
+{
+	my %imported;
+	use My::Types { into => \%imported }, qw( +HTTPTiny );
+	cmp_deeply(
+		\%imported,
+		{
+			assert_HTTPTiny => ignore(),
+			is_HTTPTiny => ignore(),
+			to_HTTPTiny => ignore(),
+			HTTPTiny => ignore(),
+		},
+		'qw( +HTTPTiny )',
+	) or diag explain ( \%imported );
+}
+
+{
+	my %imported;
+	use My::Types { into => \%imported }, qw( +Rainbow );
+	cmp_deeply(
+		\%imported,
+		{
+			assert_Rainbow => ignore(),
+			RAINBOW_RED    => ignore(),
+			RAINBOW_ORANGE => ignore(),
+			RAINBOW_YELLOW => ignore(),
+			RAINBOW_GREEN  => ignore(),
+			RAINBOW_BLUE   => ignore(),
+			RAINBOW_PURPLE => ignore(),
+			is_Rainbow => ignore(),
+			to_Rainbow => ignore(),
+			Rainbow => ignore(),
+		},
+		'qw( +Rainbow )',
+	) or diag explain ( \%imported );
+}
+
 done_testing;
