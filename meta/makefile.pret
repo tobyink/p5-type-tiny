@@ -42,6 +42,10 @@
 		deps:on "Test::Warnings"^^deps:CpanId;
 		comment "For testing Type::Utils."@en;
 	];
+	deps:test-recommendation [
+		deps:on "Test::Deep"^^deps:CpanId;
+		comment "For testing Type::Library."@en;
+	];
 	deps:test-suggestion [
 		deps:on "Test::Memory::Cycle"^^deps:CpanId;
 	];
