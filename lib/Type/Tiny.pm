@@ -1197,6 +1197,8 @@ sub exportables {
 	my @exportables;
 	return \@exportables if ! $base_name;
 
+	require Eval::TypeTiny;
+
 	push @exportables, {
 		name => $base_name,
 		code => Eval::TypeTiny::type_to_coderef( $self ),

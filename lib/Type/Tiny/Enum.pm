@@ -20,6 +20,32 @@ __PACKAGE__->_install_overloads(
 	q[@{}] => sub { shift->values },
 );
 
+sub import {
+	my $class = shift;
+	if ( @_ ) {
+		my $caller = caller;
+		while ( @_ ) {
+			my $type_name = shift;
+			my $values    = shift;
+			
+			my $type = $class->new(
+				name      => $type_name,
+				values    => [ @$values ],
+				coercion  => 1,
+			);
+			
+			for my $exportable ( @{ $type->exportables } ) {
+				no strict 'refs';
+				*{ $caller . '::' . $exportable->{name} } = $exportable->{code};
+			}
+			
+			$INC{'Type/Registry.pm'}
+				? 'Type::Registry'->for_class( $caller )->add_type( $type, $type_name )
+				: ( $Type::Registry::DELAYED{$caller}{$type_name} = $type );
+		}
+	}
+}
+
 sub new {
 	my $proto = shift;
 	
@@ -561,6 +587,38 @@ character. Word characters include letters, numbers, and underscores, but
 not most punctuation or whitespace.
 
 =back
+
+=head2 Exports
+
+Type::Tiny::Enum can be used as an exporter.
+
+  use Type::Tiny::Enum Status => [ 'dead', 'alive' ];
+
+This will export the following functions into your namespace:
+
+=over
+
+=item C<< Status >>
+
+=item C<< is_Status( $value ) >>
+
+=item C<< assert_Status( $value ) >>
+
+=item C<< to_Status( $value ) >>
+
+=item C<< STATUS_DEAD >>
+
+=item C<< STATUS_ALIVE >>
+
+=back
+
+Multiple enumerations can be exported at once:
+
+  use Type::Tiny::Enum (
+    Status    => [ 'dead', 'alive' ],
+    TaxStatus => [ 'paid', 'pending' ],
+  );
+
 
 =head2 Overloading
 
