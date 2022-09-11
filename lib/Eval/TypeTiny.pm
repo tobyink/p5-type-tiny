@@ -126,7 +126,7 @@ sub type_to_coderef {
 	
 	my $coderef = eval_closure(
 		source      => $source,
-		description => $args{description} || sprintf( "type '%s'", $type->qualified_name ),
+		description => $args{description} || sprintf( "exportable function '%s'", $type->qualified_name ),
 		environment => { '$type' => \$type },
 	);
 	

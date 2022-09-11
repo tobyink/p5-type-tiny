@@ -92,7 +92,7 @@ sub _build_coderef {
 	my $self = shift;
 	my $coderef = $self->_new_code_accumulator(
 		description => $self->base_options->{description}
-			|| sprintf( 'parameter validation for "%s::%s"', $self->base_options->{package} || '', $self->base_options->{subname} || '__ANON__' )
+			|| sprintf( q{parameter validation for '%s::%s'}, $self->base_options->{package} || '', $self->base_options->{subname} || '__ANON__' )
 	);
 
 	$self->_coderef_start( $coderef );
