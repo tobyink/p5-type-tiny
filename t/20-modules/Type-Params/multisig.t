@@ -146,7 +146,7 @@ is exception  {
 {
 	my $error;
 	my $other = multisig(
-		{ on_die => sub { $error = shift->message; () } }, 
+		{ on_die => sub { $error = shift->message; () } },
 		[ Int, ArrayRef[$Rounded] ],
 		[ ArrayRef[$Rounded], Int ],
 		[ HashRef[Num] ],
