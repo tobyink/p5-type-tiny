@@ -163,8 +163,7 @@ sub make_class_pp_code {
 	return join(
 		qq{\n},
 		grep { length $_ }
-		map  { $_->{object}->make_class_pp_code }
-		grep { ref $_->{object} }
+		map  { $_->{class_definition} || '' }
 		@{ $self->meta_alternatives }
 	);
 }

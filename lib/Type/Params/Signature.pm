@@ -954,13 +954,13 @@ sub return_wanted {
 	}
 	elsif ( $self->{want_details} ) {
 		return {
-			min_args    => $self->{min_args},
-			max_args    => $self->{max_args},
-			environment => $coderef->{env},
-			source      => $coderef->code,
-			closure     => $coderef->compile,
-			named       => $self->is_named,
-			object      => $self,
+			min_args         => $self->{min_args},
+			max_args         => $self->{max_args},
+			environment      => $coderef->{env},
+			source           => $coderef->code,
+			closure          => $coderef->compile,
+			named            => $self->is_named,
+			class_definition => $self->make_class_pp_code,
 		};
 	}
 
