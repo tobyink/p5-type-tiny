@@ -1542,10 +1542,10 @@ Equivalent to:
 C<< multisig( \%spec, @alternatives ) >> is equivalent to
 C<< signature( %spec, multiple => \@alternatives ) >>.
 
-=head1 OTHER FUNCTIONS
+=head1 TYPE CONSTRAINTS
 
-These are really part of the legacy API, but don't currently have
-any replacements in the modern API.
+Although Type::Params is not a real type library, it exports two type
+constraints. Their use is no longer recommended.
 
 =head2 B<Invocant>
 
@@ -1565,6 +1565,8 @@ constraint which accepts classnames I<and> blessed objects.
  }
 
 C<Invocant> is not exported unless requested by name.
+
+Recommendation: use B<Defined> from L<Types::Standard> instead.
 
 =head2 B<ArgsObject>
 
@@ -1605,6 +1607,8 @@ The parameter "Bar::bar" refers to the caller when the check is compiled,
 rather than when the parameters are checked.
 
 C<ArgsObject> is not exported unless requested by name.
+
+Recommendation: use B<Object> from L<Types::Standard> instead.
 
 =head1 ENVIRONMENT
 

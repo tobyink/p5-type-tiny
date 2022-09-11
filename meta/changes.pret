@@ -4530,4 +4530,8 @@
 			a dcs:Bugfix;
 			label "What was supposed to be a warning for slurpy+default in Type::Params was throwing an exception. Corrected to be a warning.";
 		];
+		item [
+			a dcs:Documentation;
+			label "Minor improvements to Type::Params documentation.";
+		];
 	].
