@@ -155,7 +155,7 @@ sub _rationalize_slurpies {
 	if ( $self->{slurpy} and $self->{slurpy}->has_default ) {
 		require Carp;
 		our @CARP_NOT = ( __PACKAGE__, 'Type::Params' );
-		Carp::croak( "Warning: the default for the slurpy parameter will be ignored, continuing anyway" );
+		Carp::carp( "Warning: the default for the slurpy parameter will be ignored, continuing anyway" );
 		delete $self->{slurpy}{default};
 	}
 }
