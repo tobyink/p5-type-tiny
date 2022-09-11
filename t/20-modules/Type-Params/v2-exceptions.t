@@ -85,5 +85,21 @@ subtest "signature_for function_does_not_exist => ( positional => ... )" => sub 
 	like $e->message, qr/not found to wrap/i;
 };
 
+subtest "signature()" => sub {
+	my $e = exception { signature() };
+
+	ok $e->isa( 'Error::TypeTiny' );
+	like $e->message, qr/Signature must be positional, named, or multiple/i;
+};
+
+sub bleh333 {}
+subtest "signature_for bleh333 => ()" => sub {
+	my $e = exception {
+		signature_for bleh333 => ();
+	};
+
+	ok $e->isa( 'Error::TypeTiny' );
+	like $e->message, qr/Signature must be positional, named, or multiple/i;
+};
 
 done_testing;

@@ -227,7 +227,7 @@ sub new_from_v2api {
 	my $named      = delete( $opts->{named} );
 	my $multiple   = delete( $opts->{multiple} ) || delete( $opts->{multi} );
 
-	$class->_croak( "Signature must have a positional or named argument" )
+	$class->_croak( "Signature must be positional, named, or multiple" )
 		unless $positional || $named || $multiple;
 
 	if ( $multiple ) {
