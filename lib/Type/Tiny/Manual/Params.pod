@@ -12,19 +12,17 @@ To get started with Type::Params, please read
 L<Type::Tiny::Manual::UsingWithMoo> which will cover a lot of the basics,
 even if you're not using Moo.
 
-=head2 C<multisig>
+=head2 C<multiple>
 
-Multisig allows you to allow multiple ways of calling a sub.
+The C<multiple> option allows you to specify multiple ways of calling
+a sub.
 
  sub repeat_string {
-   state $check = multisig(
-     signature(
-       positional    => [ Int, Str ],
-     ),
-     signature(
-       named         => [ count => Int, string => Str ],
-       named_to_list => 1,
-     ),
+   state $check = signature(
+     multiple => [
+       { positional => [ Int, Str ] },
+       { named => [ count => Int, string => Str ], named_to_list => 1 },
+     ],
    );
    
    my ( $count, $string ) = $check->( @_ );

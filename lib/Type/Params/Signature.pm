@@ -22,8 +22,8 @@ use Types::TypeTiny qw( -is -types to_TypeTiny );
 use Type::Params::Parameter;
 
 sub _croak {
-	require Carp;
-	Carp::croak( pop );
+	require Error::TypeTiny;
+	return Error::TypeTiny::croak( pop );
 }
 
 sub _new_parameter {
@@ -218,6 +218,39 @@ sub new_from_compile {
 
 	my $self = $class->new( %opts, rationalize_slurpies => 1 );
 	return $self;
+}
+
+sub new_from_v2api {
+	my ( $class, $opts ) = @_;
+
+	my $positional = delete( $opts->{positional} ) || delete( $opts->{pos} );
+	my $named      = delete( $opts->{named} );
+	my $multiple   = delete( $opts->{multiple} ) || delete( $opts->{multi} );
+
+	$class->_croak( "Signature must have a positional or named argument" )
+		unless $positional || $named || $multiple;
+
+	if ( $multiple ) {
+		$multiple = [] unless is_ArrayRef $multiple;
+		unshift @$multiple, { positional => $positional } if $positional;
+		unshift @$multiple, { named      => $named      } if $named;
+		require Type::Params::Alternatives;
+		return 'Type::Params::Alternatives'->new(
+			base_options => $opts,
+			alternatives => $multiple,
+			sig_class    => $class,
+		);
+	}
+
+	my ( $sig_kind, $args ) = ( pos => $positional );
+	if ( $named ) {
+		$opts->{bless} = 1 unless exists $opts->{bless};
+		( $sig_kind, $args ) = ( named => $named );
+		$class->_croak( "Signature cannot have both positional and named arguments" )
+			if $positional;
+	}
+
+	return $class->new_from_compile( $sig_kind, $opts, @$args );
 }
 
 sub package       { $_[0]{package} }

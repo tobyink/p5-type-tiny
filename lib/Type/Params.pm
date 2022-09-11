@@ -112,28 +112,13 @@ sub signature {
 	}
 	my ( %opts ) = @_;
 
-	require Type::Params::Signature;
-
-	my $positional = delete( $opts{positional} ) || delete( $opts{pos} );
-	my $named      = delete( $opts{named} );
-
-	my ( $sig_kind, $args ) = ( pos => $positional );
-	if ( $named ) {
-		( $sig_kind, $args ) = ( named => $named );
-		$opts{bless} = 1 unless exists $opts{bless};
-		if ( $positional ) {
-			require Error::TypeTiny;
-			Error::TypeTiny::croak( "Signature cannot have both positional and named arguments" );
-		}
-	}
-
 	my $for = [ caller( 1 + ( $opts{caller_level} || 0 ) ) ]->[3] || ( ( $opts{package} || '__ANON__' ) . '::__ANON__' );
 	my ( $pkg, $sub ) = ( $for =~ /^(.+)::(\w+)$/ );
 	$opts{package} ||= $pkg;
 	$opts{subname} ||= $sub;
-	my $sig = 'Type::Params::Signature'->new_from_compile( $sig_kind, \%opts, @$args );
 
-	$sig->return_wanted;
+	require Type::Params::Signature;
+	'Type::Params::Signature'->new_from_v2api( \%opts )->return_wanted;
 }
 
 sub signature_for {
@@ -150,21 +135,6 @@ sub signature_for {
 		return;
 	}
 
-	require Type::Params::Signature;
-
-	my $positional = delete( $opts{positional} ) || delete( $opts{pos} );
-	my $named      = delete( $opts{named} );
-
-	my ( $sig_kind, $args ) = ( pos => $positional );
-	if ( $named ) {
-		( $sig_kind, $args ) = ( named => $named );
-		$opts{bless} = 1 unless exists $opts{bless};
-		if ( $positional ) {
-			require Error::TypeTiny;
-			return Error::TypeTiny::croak( "Signature cannot have both positional and named arguments" );
-		}
-	}
-
 	my $fullname = ( $function =~ /::/ ) ? $function : "$package\::$function";
 	$opts{package}   ||= $package;
 	$opts{subname}   ||= ( $function =~ /::(\w+)$/ ) ? $1 : $function;
@@ -177,7 +147,8 @@ sub signature_for {
 		return Error::TypeTiny::croak( "Function '$function' not found to wrap!" );
 	}
 
-	my $sig = 'Type::Params::Signature'->new_from_compile( $sig_kind, \%opts, @$args );
+	require Type::Params::Signature;
+	my $sig     = 'Type::Params::Signature'->new_from_v2api( \%opts );
 	my $coderef = $sig->coderef->compile;
 
 	no strict 'refs';
@@ -256,68 +227,9 @@ sub _mk_key {
 
 sub multisig {
 	my %options = ( ref( $_[0] ) eq "HASH" ) ? %{ +shift } : ();
-	$options{message}     ||= "Parameter validation failed";
-	$options{description} ||= sprintf(
-		"parameter validation for '%s'",
-		[ caller( 1 + ( $options{caller_level} || 0 ) ) ]->[3] || '__ANON__'
-	);
-	for my $key ( qw[ message description ] ) {
-		Types::TypeTiny::is_StringLike( $options{$key} )
-			or Error::TypeTiny::croak(
-			"Option '$key' expected to be string or stringifiable object" );
-	}
-	
-	my @multi = map {
-		Types::TypeTiny::is_CodeLike( $_ )       ? { closure => $_ }
-			: Types::TypeTiny::is_ArrayLike( $_ ) ? compile( { want_details => 1 }, @$_ )
-			:                                       $_;
-	} @_;
-
-	my %env;
-	my @code = 'sub { my $r; ';
-	
-	{
-		my ( $extra_env, @extra_lines ) = ( {}, 'my $on_die = undef;' );
-		if ( $options{'on_die'} ) {
-			( $extra_env, @extra_lines ) = ( { '$on_die' => \$options{'on_die'} }, '1;' );
-		}
-		if ( @extra_lines ) {
-			$code[0] .= join '', @extra_lines;
-			%env = ( %$extra_env, %env );
-		}
-	}
-	
-	for my $i ( 0 .. $#multi ) {
-		my $flag = sprintf( '${^TYPE_PARAMS_MULTISIG} = %d', $i );
-		my $sig  = $multi[$i];
-		my @cond;
-		push @cond, sprintf( '@_ >= %s', $sig->{min_args} ) if defined $sig->{min_args};
-		push @cond, sprintf( '@_ <= %s', $sig->{max_args} ) if defined $sig->{max_args};
-		if ( defined $sig->{max_args} and defined $sig->{min_args} ) {
-			@cond = sprintf( '@_ == %s', $sig->{min_args} )
-				if $sig->{max_args} == $sig->{min_args};
-		}
-		push @code, sprintf( 'if (%s){', join( ' and ', @cond ) ) if @cond;
-		push @code,
-			sprintf(
-			'eval { $r = [ $multi[%d]{closure}->(@_) ]; %s };', $i,
-			$flag
-			);
-		push @code, 'return(@$r) if $r;';
-		push @code, '}' if @cond;
-	} #/ for my $i ( 0 .. $#multi)
-	
-	push @code,
-		sprintf(
-		'return "Error::TypeTiny"->throw_cb($on_die, message => "%s");',
-		quotemeta( "$options{message}" )
-		);
-	push @code, '}';
-	
-	eval_closure(
-		source      => \@code,
-		description => $options{description},
-		environment => { '@multi' => \@multi, %env },
+	signature(
+		%options,
+		multi => \@_,
 	);
 } #/ sub multisig
 
@@ -521,9 +433,9 @@ reused.
 =head3 Signature Specification Options
 
 The signature specification is a hash which must contain either a
-C<positional> or C<named> key indicating whether your function takes
-positional parameters or named parameters, but may also include
-other options.
+C<positional>, C<named>, or C<multiple> key indicating whether your
+function takes positional parameters, named parameters, or supports
+multiple calling conventions, but may also include other options.
 
 =head4 C<< positional >> B<ArrayRef>
 
@@ -908,6 +820,110 @@ A recommended use of this is with L<Devel::StrictMode>.
    strictness => STRICT,
    positional => [ Int, ArrayRef ],
  );
+
+=head4 C<< multiple >> B<< ArrayRef >>
+
+This option allows your signature to support multiple calling conventions.
+Each entry in the array is an alternative signature, as a hashref:
+
+ state $signature = signature(
+   multiple => [
+     {
+       positional => [ ArrayRef, Int ],
+     },
+     {
+       named      => [ array => ArrayRef, index => Int ],
+       named_to_list => 1,
+     },
+   ],
+ );
+
+That signature will allow your function to be called as:
+
+ your_function( $arr, $ix )
+ your_function( array => $arr, index => $ix )
+ your_function( { array => $arr, index => $ix } )
+
+Sometimes the alternatives will return the parameters in a different
+order:
+
+ state $signature = signature(
+   multiple => [
+     { positional => [ ArrayRef, Int ] },
+     { positional => [ Int, ArrayRef ] },
+   ],
+ );
+ my ( $xxx, $yyy ) = $signature->( @_ );
+
+So how does your sub know whether C<< $xxx >> or C<< $yyy > is the arrayref?
+One option is to use the C<< ${^TYPE_PARAMS_MULTISIG} >> global variable
+which will be set to the index of the signature which was used:
+
+ my @results = $signature->( @_ );
+ my ( $arr, $ix ) = ${^TYPE_PARAMS_MULTISIG} == 1 ? reverse( @_ ) : @_;
+
+A neater solution is to use a C<goto_next> coderef to re-order alternative
+signature results into your preferred order:
+
+ state $signature = signature(
+   multiple => [
+     { positional => [ ArrayRef, Int ] },
+     { positional => [ Int, ArrayRef ], goto_next => sub { reverse @_ } },
+   ],
+ );
+ my ( $arr, $ix ) = $signature->( @_ );
+
+While conceptally C<multiple> is an arrayref of hashrefs, it is also possible
+to use arrayrefs in the arrayref.
+
+ multiple => [
+   [ ArrayRef, Int ],
+   [ Int, ArrayRef ],
+ ]
+
+When an arrayref is used like that, it is a shortcut for a positional
+signature.
+
+Coderefs may additionally be used:
+
+ state $signature = signature(
+   multiple => [
+     [ ArrayRef, Int ],
+     { positional => [ Int, ArrayRef ], goto_next => sub { reverse @_ } },
+     sub { ... },
+     sub { ... },
+   ],
+ );
+
+The coderefs should be subs which return a list of parameters if they
+succeed and throw an exception if they fail.
+
+The following signatures are equivalent:
+
+ state $sig_1 = signature(
+   multiple => [
+     { method => 1, positional => [ ArrayRef, Int ] },
+     { method => 1, positional => [ Int, ArrayRef ] },
+   ],
+ );
+ 
+ state $sig_2 = signature(
+   method   => 1,
+   multiple => [
+     { positional => [ ArrayRef, Int ] },
+     { positional => [ Int, ArrayRef ] },
+   ],
+ );
+
+The C<multiple> option can also be abbreviated to C<multi>.
+
+So C<< signature( multi => [...] ) >> can be used instead of the longer
+C<< signature( multiple => [...] ) >>. Three whole keystrokes saved!
+
+=head4 C<< message >> B<Str>
+
+Only used by C<multiple> signatures. The error message to throw when no
+signatures match.
 
 =head4 C<< want_source >> B<Bool>
 
@@ -1429,6 +1445,9 @@ C<< fallback => sub {} >>.
 C<< signature_for( \@functions, %opts ) >> is a useful shortcut if you have
 multiple functions with the same signature.
 
+C<< signature_for >> has not been thoroughly tested with the C<multiple>
+option. For now, you are advised not to use this combination.
+
 =head1 LEGACY API
 
 The following functions were the API prior to Type::Params v2. They are
@@ -1514,98 +1533,19 @@ output of one of the C<compile> functions:
 
 C<wrap_methods> is not exported unless requested by name.
 
+=head2 C<< multisig( @alternatives ) >>
+
+Equivalent to:
+
+  signature( multiple => \@alternatives )
+
+C<< multisig( \%spec, @alternatives ) >> is equivalent to
+C<< signature( %spec, multiple => \@alternatives ) >>.
+
 =head1 OTHER FUNCTIONS
 
 These are really part of the legacy API, but don't currently have
 any replacements in the modern API.
-
-=head2 C<< multisig(@alternatives) >>
-
-Type::Params can export a C<multisig> function that compiles multiple
-alternative signatures into one, and uses the first one that works:
-
-   state $check = multisig(
-      [ Int, ArrayRef ],
-      [ HashRef, Num ],
-      [ CodeRef ],
-   );
-   
-   my ($int, $arrayref) = $check->( 1, [] );      # okay
-   my ($hashref, $num)  = $check->( {}, 1.1 );    # okay
-   my ($code)           = $check->( sub { 1 } );  # okay
-   
-   $check->( sub { 1 }, 1.1 );  # throws an exception
-
-Coercions, slurpy parameters, etc still work.
-
-The magic global C<< ${^TYPE_PARAMS_MULTISIG} >> is set to the index of
-the first signature which succeeded.
-
-The present implementation involves compiling each signature independently,
-and trying them each (in their given order!) in an C<eval> block. The only
-slightly intelligent part is that it checks if C<< scalar(@_) >> fits into
-the signature properly (taking into account optional and slurpy parameters),
-and skips evals which couldn't possibly succeed.
-
-It's also possible to list coderefs as alternatives in C<multisig>:
-
-   state $check = multisig(
-      [ Int, ArrayRef ],
-      sub { ... },
-      [ HashRef, Num ],
-      [ CodeRef ],
-      compile_named( needle => Value, haystack => Ref ),
-   );
-
-The coderef is expected to die if that alternative should be abandoned (and
-the next alternative tried), or return the list of accepted parameters. Here's
-a full example:
-
-   sub get_from {
-      state $check = multisig(
-         [ Int, ArrayRef ],
-         [ Str, HashRef ],
-         sub {
-            my ($meth, $obj) = @_;
-            die unless is_Object($obj);
-            die unless $obj->can($meth);
-            return ($meth, $obj);
-         },
-      );
-      
-      my ($needle, $haystack) = $check->(@_);
-      
-      for (${^TYPE_PARAMS_MULTISIG}) {
-         return $haystack->[$needle] if $_ == 0;
-         return $haystack->{$needle} if $_ == 1;
-         return $haystack->$needle   if $_ == 2;
-      }
-   }
-   
-   get_from(0, \@array);      # returns $array[0]
-   get_from('foo', \%hash);   # returns $hash{foo}
-   get_from('foo', $obj);     # returns $obj->foo
-   
-The default error message is just C<"Parameter validation failed">.
-You can pass an option hashref as the first argument with an informative
-message string:
-
-   sub foo {
-      state $OptionsDict = Dict[...];
-      state $check = multisig(
-         { message => 'USAGE: $object->foo(\%options?, $string)' },
-         [ Object, $OptionsDict, StringLike ],
-         [ Object, StringLike ],
-      );
-      my ($self, @args) = $check->(@_);
-      my ($opts, $str)  = ${^TYPE_PARAMS_MULTISIG} ? ({}, @args) : @_;
-      ...;
-   }
-   
-   $obj->foo(\%opts, "Hello");
-   $obj->foo("World");
-
-C<multisig> is not exported unless requested by name.
 
 =head2 B<Invocant>
 
