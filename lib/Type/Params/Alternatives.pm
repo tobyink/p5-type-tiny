@@ -66,6 +66,7 @@ sub _build_meta_alternative {
 			%{ $self->base_options },
 			%$alt,
 			want_source  => !!0,
+			want_object  => !!0,
 			want_details => !!1,
 		);
 		my $sig = $self->sig_class->new_from_v2api( \%opts );
@@ -76,6 +77,7 @@ sub _build_meta_alternative {
 			%{ $self->base_options },
 			positional   => $alt,
 			want_source  => !!0,
+			want_object  => !!0,
 			want_details => !!1,
 		);
 		my $sig = $self->sig_class->new_from_v2api( \%opts );
@@ -153,6 +155,18 @@ sub _coderef_check_count {
 
 sub _make_return_list {
 	'@$return';
+}
+
+sub make_class_pp_code {
+	my $self = shift;
+	
+	return join(
+		qq{\n},
+		grep { length $_ }
+		map  { $_->{object}->make_class_pp_code }
+		grep { ref $_->{object} }
+		@{ $self->meta_alternatives }
+	);
 }
 
 1;

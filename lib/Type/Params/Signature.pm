@@ -68,7 +68,7 @@ sub new {
 			);
 		}
 
-		if ( defined $self->{bless} and $self->{bless} eq 1 ) {
+		if ( defined $self->{bless} and $self->{bless} eq 1 and not $self->{named_to_list} ) {
 			my $klass_key     = $self->_klass_key;
 			$self->{bless}    = ( $klass_cache{$klass_key} ||= sprintf( '%s%d', $self->{class_prefix}, ++$klass_id ) );
 			$self->{oo_trace} = 1 unless exists $self->{oo_trace};
@@ -905,6 +905,9 @@ sub make_class_pp {
 sub make_class_pp_code {
 	my $self = shift;
 
+	return ''
+		unless $self->is_named && $self->bless && !$self->named_to_list;
+
 	my $coderef = $self->_new_code_accumulator;
 	my $attr    = $self->class_attributes;
 
@@ -946,6 +949,9 @@ sub return_wanted {
 	if ( $self->{want_source} ) {
 		return $coderef->code;
 	}
+	elsif ( $self->{want_object} ) { # undocumented for now
+		return $self;
+	}
 	elsif ( $self->{want_details} ) {
 		return {
 			min_args    => $self->{min_args},
@@ -954,6 +960,7 @@ sub return_wanted {
 			source      => $coderef->code,
 			closure     => $coderef->compile,
 			named       => $self->is_named,
+			object      => $self,
 		};
 	}
 
