@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Types::Standard::CycleTuple::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::CycleTuple::VERSION   = '1.999_004';
+	$Types::Standard::CycleTuple::VERSION   = '1.999_005';
 }
 
 $Types::Standard::CycleTuple::VERSION =~ tr/_//d;

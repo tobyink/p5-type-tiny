@@ -4516,3 +4516,18 @@
 			label "Add versions of tests for the new Type::Params v2 API which don't rely on Perl 5.20 features.";
 		];
 	].
+
+`Type-Tiny 1.999_005 cpan:TOBYINK`
+	issued  2022-09-11;
+	label "Type::Tiny 2.0 Preview F";
+	changeset [
+		dcs:versus `Type-Tiny 1.999_004 cpan:TOBYINK`;
+		item [
+			a dcs:Change;
+			label "The functionality provided by Type::Params::multisig() is now provided in the Type::Params v2 API. (And is slightly more functional!)";
+		];
+		item [
+			a dcs:Bugfix;
+			label "What was supposed to be a warning for slurpy+default in Type::Params was throwing an exception. Corrected to be a warning.";
+		];
+	].
