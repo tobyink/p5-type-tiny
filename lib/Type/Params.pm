@@ -279,7 +279,7 @@ sub multisig {
 	{
 		my ( $extra_env, @extra_lines ) = ( {}, 'my $on_die = undef;' );
 		if ( $options{'on_die'} ) {
-			my ( $extra_env, @extra_lines ) = ( { '$on_die' => \$options{'on_die'} }, '1;' );
+			( $extra_env, @extra_lines ) = ( { '$on_die' => \$options{'on_die'} }, '1;' );
 		}
 		if ( @extra_lines ) {
 			$code[0] .= join '', @extra_lines;

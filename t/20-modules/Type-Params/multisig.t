@@ -143,4 +143,20 @@ is exception  {
 	$check->( b => 3 );
 }, undef;
 
+{
+	my $error;
+	my $other = multisig(
+		{ on_die => sub { $error = shift->message; () } }, 
+		[ Int, ArrayRef[$Rounded] ],
+		[ ArrayRef[$Rounded], Int ],
+		[ HashRef[Num] ],
+	);
+	$other->();
+	is(
+		$error,
+		'Parameter validation failed',
+		'on_die works',
+	);
+}
+
 done_testing;
