@@ -4537,3 +4537,23 @@
 			label "Minor improvements to Type::Params documentation.";
 		];
 	].
+
+`Type-Tiny 1.999_006 cpan:TOBYINK`
+	issued  2022-09-12;
+	label "Type::Tiny 2.0 Preview G";
+	changeset [
+		dcs:versus `Type-Tiny 1.999_005 cpan:TOBYINK`;
+		item [
+			a dcs:Change;
+			label "Improved test cases and miscellaneous small bugfixes for slurpy parameters in Type::Params.";
+		];
+		item [
+			a dcs:Change;
+			label "Get the `multiple` option working with the `signature_for` function from Type::Params.";
+		];
+		item [
+			a dcs:BackCompat;
+			label "If none of a multisig's alternative sigs match the parameter list ${^TYPE_PARAMS_MULTISIG} will be explicitly set to undef, instead of being left as-is.";
+		];
+	].
+
