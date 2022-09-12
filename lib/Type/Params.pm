@@ -100,9 +100,8 @@ our %EXPORT_TAGS = (
 		@_ ? $ArgsObject->parameterize( @{ $_[0] } ) : $ArgsObject;
 	} #/ sub ArgsObject (;@)
 	
-	if ( $] ge '5.014' ) {
-		&Scalar::Util::set_prototype( $_, ';$' ) for \&ArgsObject;
-	}
+	&Scalar::Util::set_prototype( \&ArgsObject, ';$' )
+		if Eval::TypeTiny::NICE_PROTOTYPES;
 }
 
 sub signature {
