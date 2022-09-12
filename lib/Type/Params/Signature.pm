@@ -52,6 +52,10 @@ sub new {
 	sub BUILD {
 		my $self = shift;
 
+		if ( $self->{named_to_list} and not ref $self->{named_to_list} ) {
+			$self->{named_to_list} = [ map $_->name, @{ $self->{parameters} } ];
+		}
+
 		if ( delete $self->{rationalize_slurpies} ) {
 			$self->_rationalize_slurpies;
 		}
@@ -104,10 +108,6 @@ sub _rationalize_slurpies {
 
 	if ( $self->is_named ) {
 		my ( @slurpy, @rest );
-
-		if ( $self->named_to_list and not ref $self->named_to_list ) {
-			$self->{named_to_list} = [ map $_->name, @$parameters ];
-		}
 
 		for my $parameter ( @$parameters ) {
 			if ( $parameter->type->is_strictly_a_type_of( Slurpy ) ) {
@@ -714,16 +714,10 @@ sub _make_return_list {
 	if ( not $self->is_named ) {
 		push @return_list, $self->can_shortcut ? '@_' : '@out';
 	}
-	elsif ( is_ArrayRef( $self->named_to_list ) ) {
+	elsif ( $self->named_to_list ) {
 		push @return_list, map(
 			sprintf( '$out{%s}', B::perlstring( $_ ) ),
 			@{ $self->named_to_list },
-		);
-	}
-	elsif ( $self->named_to_list ) {
-		push @return_list, map(
-			sprintf( '$out{%s}', B::perlstring( $_->name ) ),
-			@{ $self->parameters },
 		);
 	}
 	elsif ( $self->class ) {
