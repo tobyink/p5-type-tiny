@@ -22,6 +22,7 @@ the same terms as the Perl 5 programming language system itself.
 use strict;
 use warnings;
 use Test::More;
+use Test::Fatal;
 
 use Types::Common -sigs, -types;
 
@@ -134,6 +135,11 @@ use Types::Common -sigs, -types;
 			'helloworld',
 			'final alternative',
 		);
+		
+		my $e = exception { array_lookup() };
+		like $e, qr/Parameter validation failed/;
+		
+		is ${^TYPE_PARAMS_MULTISIG}, undef;
 	};
 }
 
@@ -234,6 +240,11 @@ use Types::Common -sigs, -types;
 		);
 		
 		is ${^TYPE_PARAMS_MULTISIG}, 4;
+		
+		my $e = exception { array_lookup() };
+		like $e, qr/Parameter validation failed/;
+		
+		is ${^TYPE_PARAMS_MULTISIG}, undef;
 	};
 }
 

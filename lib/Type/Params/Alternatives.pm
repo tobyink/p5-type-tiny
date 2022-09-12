@@ -98,6 +98,8 @@ sub _build_coderef {
 
 	$self->_coderef_start( $coderef );
 
+	$coderef->add_line( 'undef ${^TYPE_PARAMS_MULTISIG};' );
+	$coderef->add_gap;
 	$coderef->add_line( 'my $return;' );
 	$coderef->add_gap;
 
