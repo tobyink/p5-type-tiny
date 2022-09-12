@@ -100,7 +100,7 @@ sub _build_coderef {
 
 	$coderef->add_line( 'undef ${^TYPE_PARAMS_MULTISIG};' );
 	$coderef->add_gap;
-	$coderef->add_line( 'my $return;' );
+	$coderef->add_line( 'my $r;' );
 	$coderef->add_gap;
 
 	for my $meta ( @{ $self->meta_alternatives } ) {
@@ -114,25 +114,44 @@ sub _build_coderef {
 
 sub _coderef_meta_alternative {
 	my ( $self, $coderef, $meta ) = ( shift, @_ );
-
-	my @cond = '! $return';
+	
+	my @cond = '! $r';
 	push @cond, sprintf( '@_ >= %s', $meta->{min_args} ) if defined $meta->{min_args};
 	push @cond, sprintf( '@_ <= %s', $meta->{max_args} ) if defined $meta->{max_args};
 	if ( defined $meta->{max_args} and defined $meta->{min_args} ) {
 		splice @cond, -2, 2, sprintf( '@_ == %s', $meta->{min_args} )
 			if $meta->{max_args} == $meta->{min_args};
 	}
-
-	my $callback_var = $coderef->add_variable( '$alt', \$meta->{closure} );
-	$coderef->add_line( sprintf(
-		'eval { $return = [ %s->(@_) ]; ${^TYPE_PARAMS_MULTISIG} = %d }%sif ( %s );',
-		$callback_var,
-		$meta->{_index},
-		"\n\t",
-		join( ' and ', @cond ),
-	) );
-	$coderef->add_gap;
-
+	
+	# It is sometimes possible to inline $meta->{source} here
+	if ( $meta->{source}
+	and $meta->{source} !~ /return/
+	and ! keys %{ $meta->{environment} } ) {
+		
+		my $alt_code = $meta->{source};
+		$alt_code =~ s/^sub [{]/do {/;
+		$coderef->add_line( sprintf(
+			'eval { local @_ = @_; $r = [ %s ]; ${^TYPE_PARAMS_MULTISIG} = %d }%sif ( %s );',
+			$alt_code,
+			$meta->{_index},
+			"\n\t",
+			join( ' and ', @cond ),
+		) );
+		$coderef->add_gap;
+	}
+	else {
+		
+		my $callback_var = $coderef->add_variable( '$alt', \$meta->{closure} );
+		$coderef->add_line( sprintf(
+			'eval { $r = [ %s->(@_) ]; ${^TYPE_PARAMS_MULTISIG} = %d }%sif ( %s );',
+			$callback_var,
+			$meta->{_index},
+			"\n\t",
+			join( ' and ', @cond ),
+		) );
+		$coderef->add_gap;
+	}
+	
 	return $self;
 }
 
@@ -140,7 +159,7 @@ sub _coderef_end {
 	my ( $self, $coderef ) = ( shift, @_ );
 	
 	$coderef->add_line( sprintf(
-		'%s unless $return;',
+		'%s unless $r;',
 		$self->_make_general_fail( message => B::perlstring( $self->{message} ) ),
 	) );
 	$coderef->add_gap;
@@ -157,7 +176,7 @@ sub _coderef_check_count {
 }
 
 sub _make_return_list {
-	'@$return';
+	'@$r';
 }
 
 sub make_class_pp_code {
