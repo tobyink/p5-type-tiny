@@ -357,11 +357,12 @@ sub new {
 	# type constraint without needing to load Type::Coercion yet.
 	
 	if ( $params{my_methods} ) {
-		$subname =
-			eval   { require Sub::Util } ? \&Sub::Util::set_subname
-			: eval { require Sub::Name } ? \&Sub::Name::subname
-			: 0
-			if not defined $subname;
+		require Eval::TypeTiny;
+		$subname = Eval::TypeTiny::_pick_alternative(
+			needs => 'Sub::Util' => sub { \&Sub::Util::set_subname },
+			needs => 'Sub::Name' => sub { \&Sub::Name::subname     },
+			if    => !!1         => 0,
+		) unless defined $subname;
 		if ( $subname ) {
 			( Scalar::Util::reftype( $params{my_methods}{$_} ) eq 'CODE' ) && $subname->(
 				sprintf( "%s::my_%s", $self->qualified_name, $_ ),
