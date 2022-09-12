@@ -52,7 +52,6 @@ our %EXPORT_TAGS = (
 	sub Invocant () {
 		$Invocant ||= do {
 			require Type::Tiny::Union;
-			require Types::Standard;
 			'Type::Tiny::Union'->new(
 				name             => 'Invocant',
 				type_constraints => [
@@ -67,7 +66,6 @@ our %EXPORT_TAGS = (
 	
 	sub ArgsObject (;@) {
 		$ArgsObject ||= do {
-			require Types::Standard;
 			'Type::Tiny'->new(
 				name                 => 'ArgsObject',
 				parent               => Types::Standard::Object(),
