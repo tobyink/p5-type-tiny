@@ -17,6 +17,22 @@ BEGIN {
 	*NICE_PROTOTYPES  = ( $] >= 5.014 ) ? sub () { !!1 } : sub () { !!0 };
 }
 
+sub _pick_alternative {
+	my $ok = 0;
+	while ( @_ ) {
+		my ( $type, $condition, $result ) = splice @_, 0, 3;
+		if ( $type eq 'needs' ) {
+			++$ok if eval "require $condition; 1";
+		}
+		elsif ( $type eq 'if' ) {
+			++$ok if $condition;
+		}
+		next unless $ok;
+		return ref( $result ) ? $result->() : $result;
+	}
+	return;
+}
+
 {
 	sub IMPLEMENTATION_DEVEL_LEXALIAS () { 'Devel::LexAlias' }
 	sub IMPLEMENTATION_PADWALKER ()      { 'PadWalker' }
@@ -28,12 +44,12 @@ BEGIN {
 	#<<<
 	# uncoverable subroutine
 	sub ALIAS_IMPLEMENTATION () {
-		$implementation ||= do {
-			do { $] ge '5.022' }              ? IMPLEMENTATION_NATIVE :
-			eval { require Devel::LexAlias }  ? IMPLEMENTATION_DEVEL_LEXALIAS :
-			eval { require PadWalker }        ? IMPLEMENTATION_PADWALKER :
-			IMPLEMENTATION_TIE;
-		};
+		$implementation ||= _pick_alternative(
+			if    => ( $] ge '5.022' ) => IMPLEMENTATION_NATIVE,
+			needs => 'Devel::LexAlias' => IMPLEMENTATION_DEVEL_LEXALIAS,
+			needs => 'PadWalker'       => IMPLEMENTATION_PADWALKER,
+			if    => !!1               => IMPLEMENTATION_TIE,
+		);
 	}
 	#>>>
 	
@@ -77,10 +93,11 @@ sub import {
 	my $subname;
 	my %already;    # prevent renaming established functions
 	sub set_subname ($$) {
-		defined $subname or $subname =
-			eval { require Sub::Util } ? \&Sub::Util::set_subname :
-			eval { require Sub::Name } ? \&Sub::Name::subname :
-			0;
+		$subname = _pick_alternative(
+			needs => 'Sub::Util' => sub { \&Sub::Util::set_subname },
+			needs => 'Sub::Name' => sub { \&Sub::Name::subname     },
+			if    => !!1         => 0,
+		) unless defined $subname;
 		$subname and !$already{$_[1]}++ and return &$subname;
 		$_[1];
 	} #/ sub set_subname ($$)
