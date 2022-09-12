@@ -40,6 +40,8 @@ sub sig_class         { $_[0]{sig_class} }
 sub meta_alternatives { $_[0]{meta_alternatives} ||= $_[0]->_build_meta_alternatives }
 sub parameters        { [] }
 sub goto_next         { $_[0]{base_options}{goto_next} }
+sub package           { $_[0]{base_options}{package}   }
+sub subname           { $_[0]{base_options}{subname}   }
 
 sub _build_meta_alternatives {
 	my $self = shift;
@@ -89,27 +91,18 @@ sub _build_meta_alternative {
 	}
 }
 
-sub _build_coderef {
-	my $self = shift;
-	my $coderef = $self->_new_code_accumulator(
-		description => $self->base_options->{description}
-			|| sprintf( q{parameter validation for '%s::%s'}, $self->base_options->{package} || '', $self->base_options->{subname} || '__ANON__' )
-	);
-
-	$self->_coderef_start( $coderef );
-
-	$coderef->add_line( 'undef ${^TYPE_PARAMS_MULTISIG};' );
-	$coderef->add_gap;
+sub _coderef_start_extra {
+	my ( $self, $coderef ) = ( shift, @_ );
+	
 	$coderef->add_line( 'my $r;' );
+	$coderef->add_line( 'undef ${^TYPE_PARAMS_MULTISIG};' );
 	$coderef->add_gap;
 
 	for my $meta ( @{ $self->meta_alternatives } ) {
 		$self->_coderef_meta_alternative( $coderef, $meta );
 	}
-
-	$self->_coderef_end( $coderef );
-
-	return $coderef;
+	
+	$self;
 }
 
 sub _coderef_meta_alternative {
@@ -141,7 +134,7 @@ sub _coderef_meta_alternative {
 	}
 	else {
 		
-		my $callback_var = $coderef->add_variable( '$alt', \$meta->{closure} );
+		my $callback_var = $coderef->add_variable( '$signature', \$meta->{closure} );
 		$coderef->add_line( sprintf(
 			'eval { $r = [ %s->(@_) ]; ${^TYPE_PARAMS_MULTISIG} = %d }%sif ( %s );',
 			$callback_var,
@@ -155,7 +148,7 @@ sub _coderef_meta_alternative {
 	return $self;
 }
 
-sub _coderef_end {
+sub _coderef_end_extra {
 	my ( $self, $coderef ) = ( shift, @_ );
 	
 	$coderef->add_line( sprintf(
@@ -164,10 +157,6 @@ sub _coderef_end {
 	) );
 	$coderef->add_gap;
 	
-	$coderef->add_line( $self->_make_return_expression( is_early => 0 ) );
-	
-	$coderef->{indent} =~ s/\t$//;
-	$coderef->add_line( '}' );
 	return $self;
 }
 
