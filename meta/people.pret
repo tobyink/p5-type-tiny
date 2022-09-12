@@ -13,6 +13,10 @@ cpan:AVENJ :name "Jon Portnoy".
 `List-Objects-Types` doap:developer cpan:AVENJ .
 `Acme-Types-NonStandard` doap:developer cpan:AVENJ .
 
+# Didn't use many of Branislav's suggestions directly, but deserves some credit.
+
+cpan:BARNEY :name "Branislav Zahradník".
+
 # General credits...
 
 cpan:MSTROUT
@@ -205,20 +209,6 @@ cpan:LUCAS
 	:nick "jsf116";
 	:page <https://github.com/jsf116>.
 
-# We bundle some files made by these dudes...
-
-cpan:RJBS
-	:name  "Ricardo Signes".
-
-cpan:TOKUHIROM
-	:name  "MATSUNO Tokuhiro".
-
-cpan:NUFFIN
-	:name  "Yuval Kogman".
-
-cpan:INGY
-	:name  "Ingy döt Net".
-
 <urn:uuid:febe859c-fa5c-4abd-8c6c-464643c79e4e>
 	:name "KB Jørgensen".
 
@@ -236,3 +226,18 @@ cpan:MARKF
 
 <urn:uuid:c98016a1-919d-4e92-a138-1c37a307fe22>
 	:nick "Zhtwn".
+
+# We bundle some files made by these dudes...
+
+cpan:RJBS
+	:name  "Ricardo Signes".
+
+cpan:TOKUHIROM
+	:name  "MATSUNO Tokuhiro".
+
+cpan:NUFFIN
+	:name  "Yuval Kogman".
+
+cpan:INGY
+	:name  "Ingy döt Net".
+

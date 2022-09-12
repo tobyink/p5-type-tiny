@@ -4449,6 +4449,7 @@
 		item [
 			a dcs:Change;
 			label "The intersection of two Type::Tiny::Enum objects is now a Type::Tiny::Enum instead of a Type::Tiny::Intersection.";
+			dcs:thanks cpan:BARNEY;
 		];
 		item [
 			a dcs:Bugfix;
@@ -4471,6 +4472,7 @@
 		item [
 			a dcs:Addition;
 			label "Word-safe enumerations export constants for each value.";
+			dcs:thanks cpan:BARNEY;
 		];
 		item [
 			a dcs:Addition;
