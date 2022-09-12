@@ -637,15 +637,12 @@ sub _coderef_slurpy {
 			),
 		) );
 	}
-	elsif ( $slurp_into eq 'ARRAY' ) {
+	else {
 	
 		$coderef->add_line( sprintf(
 			'my $SLURPY = [ @_[ %d .. $#_ ] ];',
 			scalar( @{ $self->parameters } ),
 		) );
-	}
-	else {
-		$self->_croak( "Slurpy parameter not of type HashRef or ArrayRef" );
 	}
 
 	$coderef->add_gap;
