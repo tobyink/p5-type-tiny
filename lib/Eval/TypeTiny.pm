@@ -18,19 +18,6 @@ BEGIN {
 }
 
 {
-	# this is unused now and will be removed in a future version of Eval::TypeTiny
-	my $hlv;
-	
-	sub HAS_LEXICAL_VARS () {
-		$hlv = !!eval {
-			require Devel::LexAlias;
-			exists( &Devel::LexAlias::lexalias );
-		} unless defined $hlv;
-		$hlv;
-	}
-}
-
-{
 	sub IMPLEMENTATION_DEVEL_LEXALIAS () { 'Devel::LexAlias' }
 	sub IMPLEMENTATION_PADWALKER ()      { 'PadWalker' }
 	sub IMPLEMENTATION_TIE ()            { 'tie' }

@@ -4555,5 +4555,9 @@
 			a dcs:BackCompat;
 			label "If none of a multisig's alternative sigs match the parameter list ${^TYPE_PARAMS_MULTISIG} will be explicitly set to undef, instead of being left as-is.";
 		];
+		item [
+			a dcs:BackCompat;
+			label "The Eval::TypeTiny::HAS_LEXICAL_VARS constant no longer exists. It was deprecated in Type-Tiny-1.004000 (2018-07-27).";
+		];
 	].
 

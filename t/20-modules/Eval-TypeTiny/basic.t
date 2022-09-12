@@ -30,7 +30,6 @@ use Eval::TypeTiny;
 
 subtest "constants exist" => sub {
 	my @constants = qw(
-		HAS_LEXICAL_VARS
 		HAS_LEXICAL_SUBS
 		ALIAS_IMPLEMENTATION
 		IMPLEMENTATION_DEVEL_LEXALIAS
