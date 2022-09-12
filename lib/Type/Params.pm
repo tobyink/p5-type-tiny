@@ -855,7 +855,7 @@ order:
  );
  my ( $xxx, $yyy ) = $signature->( @_ );
 
-So how does your sub know whether C<< $xxx >> or C<< $yyy > is the arrayref?
+So how does your sub know whether C<< $xxx >> or C<< $yyy >> is the arrayref?
 One option is to use the C<< ${^TYPE_PARAMS_MULTISIG} >> global variable
 which will be set to the index of the signature which was used:
 
