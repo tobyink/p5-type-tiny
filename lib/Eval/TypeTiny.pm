@@ -28,7 +28,7 @@ sub _pick_alternative {
 			++$ok if $condition;
 		}
 		next unless $ok;
-		return ref( $result ) ? $result->() : $result;
+		return ref( $result ) eq 'CODE' ? $result->() : ref( $result ) eq 'SCALAR' ? eval( $$result ) : $result;
 	}
 	return;
 }
@@ -94,8 +94,8 @@ sub import {
 	my %already;    # prevent renaming established functions
 	sub set_subname ($$) {
 		$subname = _pick_alternative(
-			needs => 'Sub::Util' => sub { \&Sub::Util::set_subname },
-			needs => 'Sub::Name' => sub { \&Sub::Name::subname     },
+			needs => 'Sub::Util' => \ q{ \&Sub::Util::set_subname },
+			needs => 'Sub::Name' => \ q{ \&Sub::Name::subname     },
 			if    => !!1         => 0,
 		) unless defined $subname;
 		$subname and !$already{$_[1]}++ and return &$subname;

@@ -235,5 +235,9 @@ subtest "exception for wrong reference type" => sub {
 	}
 };
 
+subtest "_pick_alternative" => sub {
+	is Eval::TypeTiny::_pick_alternative( if => 1, 'foo' ) || 'bar', 'foo';
+	is Eval::TypeTiny::_pick_alternative( if => 0, 'foo' ) || 'bar', 'bar';
+};
 
 done_testing;
