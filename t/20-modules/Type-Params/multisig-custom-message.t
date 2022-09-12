@@ -65,19 +65,19 @@ my @tests = (
 	[ 'bar()'  => sub { bar() },    "",             0 ],
 	[
 		'foo($string, num => "x")' => sub { foo( "baz", num => "x" ) },
-		'USAGE: foo($string [, \\%options|%options])', 0,
+		'USAGE: foo($string [, \\%options|%options])', undef,
 	],
 	[
 		'foo([], num => 42)' => sub { foo( [], num => 42 ) },
-		'USAGE: foo($string [, \\%options|%options])', 0,
+		'USAGE: foo($string [, \\%options|%options])', undef,
 	],
 	[
 		'foo($string, quux => 0)' => sub { foo( "baz", quux => 0 ) },
-		'USAGE: foo($string [, \\%options|%options])', 0,
+		'USAGE: foo($string [, \\%options|%options])', undef,
 	],
 	[
 		'foo($string, [])' => sub { foo( "baz", [] ) },
-		'USAGE: foo($string [, \\%options|%options])', 0,
+		'USAGE: foo($string [, \\%options|%options])', undef,
 	],
 	[
 		'foo($string, bool => 1)',
