@@ -614,7 +614,7 @@ sub _coderef_slurpy {
 	elsif ( $real_type and $real_type->{uniq} == Any->{uniq} ) {
 
 		$coderef->add_line( sprintf(
-			'my $SLURPY = { @_[ %d .. $#_ ] };',
+			'my $SLURPY = [ @_[ %d .. $#_ ] ];',
 			scalar( @{ $self->parameters } ),
 		) );
 	}
@@ -622,7 +622,8 @@ sub _coderef_slurpy {
 
 		my $index = scalar( @{ $self->parameters } );
 		$coderef->add_line( sprintf(
-			'my $SLURPY = ( %s ) ? { %%{ $_[%d] } } : ( ( $#_ - %d ) %% 2 ) ? { @_[ %d .. $#_ ] } : %s;',
+			'my $SLURPY = ( $#_ == %d and ( %s ) ) ? { %%{ $_[%d] } } : ( ( $#_ - %d ) %% 2 ) ? { @_[ %d .. $#_ ] } : %s;',
+			$index,
 			HashRef->inline_check("\$_[$index]"),
 			$index,
 			$index,
