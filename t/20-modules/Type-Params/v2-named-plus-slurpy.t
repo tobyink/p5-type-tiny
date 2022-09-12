@@ -29,7 +29,7 @@ my $sig = signature(
 	named => [
 		in      => Str,
 		out     => Str,
-		options => HashRef, { slurpy => 1 },
+		options => Any, { slurpy => 1 },
 	],
 );
 

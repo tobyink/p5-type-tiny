@@ -124,7 +124,7 @@ sub _rationalize_slurpies {
 
 		if ( @slurpy == 1 ) {
 			my $constraint = $slurpy[0]->type;
-			if ( $constraint->{uniq} == Any->{uniq} or $constraint->my_slurp_into eq 'HASH' ) {
+			if ( $constraint->type_parameter && $constraint->type_parameter->{uniq} == Any->{uniq} or $constraint->my_slurp_into eq 'HASH' ) {
 				$self->{slurpy} = $slurpy[0];
 				@$parameters = @rest;
 			}
