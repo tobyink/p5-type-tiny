@@ -181,6 +181,7 @@ like($details->{source}, qr/fooble/, 'want_details');
 my $args = Local::Foo::bar( foo => 42 );
 ok Type::Params::ArgsObject->check($args), 'ArgsObject';
 ok Type::Params::ArgsObject->of('Local::Foo::bar')->check($args), 'ArgsObject["Local::Foo::bar"]';
+ok !Type::Params::ArgsObject->of('Local::Foo::baz')->check($args), '!ArgsObject["Local::Foo::barz"]';
 note explain($args);
 
 done_testing;
