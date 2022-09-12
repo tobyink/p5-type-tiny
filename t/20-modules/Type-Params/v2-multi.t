@@ -278,4 +278,9 @@ use Types::Common -sigs, -types;
 	};
 }
 
+my $e = exception {
+	signature multiple => [ 123 ];
+};
+like $e, qr/Alternative signatures must be CODE, HASH, or ARRAY refs/;
+
 done_testing;
