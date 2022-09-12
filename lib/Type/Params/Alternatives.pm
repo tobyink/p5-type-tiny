@@ -39,6 +39,7 @@ sub alternatives      { $_[0]{alternatives}      ||= [] }
 sub sig_class         { $_[0]{sig_class} }
 sub meta_alternatives { $_[0]{meta_alternatives} ||= $_[0]->_build_meta_alternatives }
 sub parameters        { [] }
+sub goto_next         { $_[0]{base_options}{goto_next} }
 
 sub _build_meta_alternatives {
 	my $self = shift;
@@ -57,13 +58,12 @@ sub _build_meta_alternative {
 	my ( $self, $alt ) = @_;
 
 	if ( is_CodeRef $alt ) {
-		return {
-			closure => $alt,
-		};
+		return { closure => $alt };
 	}
 	elsif ( is_HashRef $alt ) {
 		my %opts = (
 			%{ $self->base_options },
+			goto_next    => !!0, # don't propagate
 			%$alt,
 			want_source  => !!0,
 			want_object  => !!0,
@@ -75,6 +75,7 @@ sub _build_meta_alternative {
 	elsif ( is_ArrayRef $alt ) {
 		my %opts = (
 			%{ $self->base_options },
+			goto_next    => !!0, # don't propagate
 			positional   => $alt,
 			want_source  => !!0,
 			want_object  => !!0,

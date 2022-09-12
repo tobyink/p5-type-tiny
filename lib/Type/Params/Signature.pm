@@ -755,8 +755,9 @@ sub _make_return_list {
 sub _make_return_expression {
 	my ( $self, %args ) = @_;
 
+	my $list = join q{, }, $self->_make_return_list;
+
 	if ( $self->goto_next ) {
-		my $list = join( q{, }, $self->_make_return_list );
 		if ( $list eq '@_' ) {
 			return sprintf 'goto( $__NEXT__ )';
 		}
@@ -766,12 +767,10 @@ sub _make_return_expression {
 		}
 	}
 	elsif ( $args{is_early} or not exists $args{is_early} ) {
-		return sprintf 'return( %s )',
-			join( q{, }, $self->_make_return_list );
+		return sprintf 'return( %s )', $list;
 	}
 	else {
-		return sprintf '( %s )',
-			join( q{, }, $self->_make_return_list );
+		return sprintf '( %s )', $list;
 	}
 }
 

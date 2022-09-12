@@ -1445,9 +1445,6 @@ C<< fallback => sub {} >>.
 C<< signature_for( \@functions, %opts ) >> is a useful shortcut if you have
 multiple functions with the same signature.
 
-C<< signature_for >> has not been thoroughly tested with the C<multiple>
-option. For now, you are advised not to use this combination.
-
 =head1 LEGACY API
 
 The following functions were the API prior to Type::Params v2. They are
