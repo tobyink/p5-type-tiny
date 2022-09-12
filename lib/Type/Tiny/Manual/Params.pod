@@ -20,12 +20,12 @@ a sub.
  sub repeat_string {
    state $check = signature(
      multiple => [
-       { positional => [ Int, Str ] },
-       { named => [ count => Int, string => Str ], named_to_list => 1 },
+       { positional => [ Str, Int ] },
+       { named => [ string => Str, count => Int ], named_to_list => 1 },
      ],
    );
    
-   my ( $count, $string ) = $check->( @_ );
+   my ( $string, $count ) = $check->( @_ );
    return $string x $count;
  }
  
