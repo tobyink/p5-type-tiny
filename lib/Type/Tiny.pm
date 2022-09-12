@@ -235,7 +235,6 @@ our %ALL_TYPES;
 
 my $QFS;
 my $uniq = 1;
-my $subname;
 
 sub new {
 	my $class  = shift;
@@ -358,17 +357,11 @@ sub new {
 	
 	if ( $params{my_methods} ) {
 		require Eval::TypeTiny;
-		$subname = Eval::TypeTiny::_pick_alternative(
-			needs => 'Sub::Util' => sub { \&Sub::Util::set_subname },
-			needs => 'Sub::Name' => sub { \&Sub::Name::subname     },
-			if    => !!1         => 0,
-		) unless defined $subname;
-		if ( $subname ) {
-			( Scalar::Util::reftype( $params{my_methods}{$_} ) eq 'CODE' ) && $subname->(
+		Scalar::Util::reftype( $params{my_methods}{$_} ) eq 'CODE'
+			and Eval::TypeTiny::set_subname(
 				sprintf( "%s::my_%s", $self->qualified_name, $_ ),
 				$params{my_methods}{$_},
 			) for keys %{ $params{my_methods} };
-		}
 	} #/ if ( $params{my_methods...})
 	
 	return $self;
