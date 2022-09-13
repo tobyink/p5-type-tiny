@@ -45,7 +45,7 @@ __END__
 
 =head1 NAME
 
-Type::Tiny::_HalfOp - half-completed overloaded operation
+Type::Tiny::_DeclaredType - half-defined type constraint
 
 =head1 STATUS
 
