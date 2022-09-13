@@ -83,7 +83,7 @@ sub _exporter_expand_sub {
 	# type constraint? If so, which one. If not, then forget the rest
 	# and just use the superclass method.
 	#
-	if ( my $f = $class->meta->{'functions'}{$name} ) {
+	if ( my $f = $class->meta->{'functions'}{$name} and $class->meta->{'functions'}{$name}{'type'} ) {
 		
 		my $type      = $f->{type};
 		my $tag       = $f->{tags}[0];
@@ -219,7 +219,7 @@ sub add_type {
 		*{"$class\::$name"} = set_subname( "$class\::$name", $code );
 		push @{"$class\::EXPORT_OK"}, $name;
 		push @{ ${"$class\::EXPORT_TAGS"}{$_} ||= [] }, $name for @$tags;
-		$meta->{functions}{$name} = { type => $type, tags => $tags };
+		$meta->{'functions'}{$name} = { type => $type, tags => $tags };
 	}
 	
 	return $type;
