@@ -10,7 +10,7 @@ BEGIN {
 
 BEGIN {
 	$Type::Params::Alternatives::AUTHORITY  = 'cpan:TOBYINK';
-	$Type::Params::Alternatives::VERSION    = '1.999_006';
+	$Type::Params::Alternatives::VERSION    = '1.999_007';
 }
 
 $Type::Params::Alternatives::VERSION =~ tr/_//d;

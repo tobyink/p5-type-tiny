@@ -4561,3 +4561,22 @@
 		];
 	].
 
+`Type-Tiny 1.999_007 cpan:TOBYINK`
+	issued  2022-09-13;
+	label "Type::Tiny 2.0 Preview H";
+	changeset [
+		dcs:versus `Type-Tiny 1.999_006 cpan:TOBYINK`;
+		item [
+			a dcs:Tests;
+			label "Improved test cases; now 100% coverage on coveralls.io.";
+		];
+		item [
+			a dcs:Change;
+			label "Minor refactoring, mostly to make things more easily testable.";
+		];
+		item [
+			a dcs:Documentation;
+			label "Fix pod formatting issue in Type::Params.";
+		];
+	].
+
