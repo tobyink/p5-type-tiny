@@ -21,93 +21,127 @@ our @ISA = 'Exporter::Tiny';
 
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
-sub _exporter_validate_opts {
-	my $class = shift;
+sub setup_type_library {
+	my ( $class, $type_library, $install_utils, $extends ) = @_;
 	
-	my $into = $_[0]{into};
+	my @extends = ref( $extends ) ? @$extends : $extends ? $extends : ();
+	unshift @extends, $class if $class ne __PACKAGE__;
 	
-	if ( $_[0]{base} || $_[0]{extends} and !ref $into ) {
+	if ( not ref $type_library ) {
 		no strict "refs";
-		push @{"$into\::ISA"}, $class;
-		( my $file = $into ) =~ s{::}{/}g;
+		push @{"$type_library\::ISA"}, $class;
+		( my $file = $type_library ) =~ s{::}{/}g;
 		$INC{"$file.pm"} ||= __FILE__;
 	}
 	
-	if ( $_[0]{utils} ) {
+	if ( $install_utils ) {
 		require Type::Utils;
-		'Type::Utils'->import( { into => $into }, '-default' );
+		'Type::Utils'->import( { into => $type_library }, '-default' );
 	}
 	
-	if ( $_[0]{extends} and !ref $into ) {
+	if ( @extends and not ref $type_library ) {
 		require Type::Utils;
-		my $wrapper = eval "sub { package $into; &Type::Utils::extends; }";
-		my @libs    = @{
-			ref( $_[0]{extends} )
-			? $_[0]{extends}
-			: ( $_[0]{extends} ? [ $_[0]{extends} ] : [] )
-		};
-		$wrapper->( @libs );
-	} #/ if ( $_[0]{extends} and...)
+		my $wrapper = eval "sub { package $type_library; &Type::Utils::extends; }";
+		$wrapper->( @extends );
+	}
+}
+
+sub _exporter_validate_opts {
+	my ( $class, $opts ) = ( shift, @_ );
+	
+	$class->setup_type_library( @{$opts}{qw/ into utils extends /} )
+		if $_[0]{base} || $_[0]{extends};
 	
 	return $class->SUPER::_exporter_validate_opts( @_ );
-} #/ sub _exporter_validate_opts
+}
 
+# In Exporter::Tiny, this method takes a sub name, a 'value' (i.e.
+# potentially an options hashref for the export), and some global
+# options, and returns a list of name+coderef pairs to actually
+# export. We override it to provide some useful features.
+#
 sub _exporter_expand_sub {
 	my $class = shift;
 	my ( $name, $value, $globals ) = @_;
 	
+	# Handle exporting '+Type'.
+	#
+	# Note that this recurses, so if used in conjunction with the other
+	# special cases handled by this method, will still work.
+	#
 	if ( $name =~ /^\+(.+)/ and $class->has_type( "$1" ) ) {
 		my $type     = $class->get_type( "$1" );
-		my $value2   = +{ %{ $value || {} } };
 		my $exported = $type->exportables;
-		return map $class->_exporter_expand_sub( $_->{name}, $value2, $globals ), @$exported;
+		return map $class->_exporter_expand_sub(
+			$_->{name},
+			+{ %{ $value || {} } },
+			$globals,
+		), @$exported;
 	}
 	
-	my $typename = $name;
-	my $thingy   = undef;
-	if ( $name =~ /^(is|assert|to)_(.+)$/ ) {
-		$thingy   = $1;
-		$typename = $2;
-	}
-	
-	if ( my $type = $class->get_type( $typename ) ) {
+	# Is the function being exported one which is associated with a
+	# type constraint? If so, which one. If not, then forget the rest
+	# and just use the superclass method.
+	#
+	if ( my $f = $class->meta->{'functions'}{$name} ) {
+		
+		my $type      = $f->{type};
+		my $tag       = $f->{tags}[0];
+		my $typename  = $type->name;
+		
+		# If $value has `of` or `where` options, then this is a
+		# custom type.
+		#
 		my $custom_type = 0;
 		for my $param ( qw/ of where / ) {
 			exists $value->{$param} or next;
-			defined $value->{-as}
-				or _croak( "Parameter '-as' not supplied" );
+			defined $value->{-as} or _croak( "Parameter '-as' not supplied" );
 			$type = $type->$param( $value->{$param} );
 			$name = $value->{-as};
 			++$custom_type;
 		}
 		
-		if ( not defined $thingy ) {
+		# If we're exporting a type itself, then export a custom
+		# function if they customized the type or want a Moose/Mouse
+		# type constraint.
+		#
+		if ( $tag eq 'types' ) {
 			my $post_method = q();
 			$post_method = '->mouse_type' if $globals->{mouse};
 			$post_method = '->moose_type' if $globals->{moose};
 			return ( $name => type_to_coderef( $type, post_method => $post_method ) )
 				if $post_method || $custom_type;
 		}
+		
+		# If they're exporting some other type of function, like
+		# 'to', 'is', or 'assert', then find the correct exportable
+		# by tag name, and return that.
+		#
+		# XXX: this will fail for tags like 'constants' where there
+		# will be multiple exportables which match!
+		#
 		elsif ( $custom_type ) {
 			for my $exportable ( @{ $type->exportables( $typename ) } ) {
-				for my $tag ( @{ $exportable->{tags} } ) {
-					if ( $thingy eq $tag ) {
+				for my $etag ( @{ $exportable->{tags} } ) {
+					if ( $etag eq $tag ) {
 						return ( $value->{-as} || $exportable->{name}, $exportable->{code} );
 					}
 				}
 			}
 		}
-	} #/ if ( my $type = $class...)
+	}
 	
+	# In all other cases, the superclass method will work.
+	#
 	return $class->SUPER::_exporter_expand_sub( @_ );
-} #/ sub _exporter_expand_sub
+}
 
 sub _exporter_install_sub {
 	my $class = shift;
 	my ( $name, $value, $globals, $sym ) = @_;
 	
 	my $package = $globals->{into};
-	my $type    = $class->get_type( $name );
+	my $type    = $class->meta->{'functions'}{$name}{'type'};
 	
 	Exporter::Tiny::_carp(
 		"Exporting deprecated type %s to %s",
@@ -185,6 +219,7 @@ sub add_type {
 		*{"$class\::$name"} = set_subname( "$class\::$name", $code );
 		push @{"$class\::EXPORT_OK"}, $name;
 		push @{ ${"$class\::EXPORT_TAGS"}{$_} ||= [] }, $name for @$tags;
+		$meta->{functions}{$name} = { type => $type, tags => $tags };
 	}
 	
 	return $type;
@@ -331,7 +366,7 @@ libraries which are compatible with Moo, Moose and Mouse.
 If you're reading this because you want to create a type library, then
 you're probably better off reading L<Type::Tiny::Manual::Libraries>.
 
-=head2 Methods
+=head2 Type library methods
 
 A type library is a singleton class. Use the C<meta> method to get a blessed
 object which other methods can get called on. For example:
@@ -426,7 +461,7 @@ type constraint in the library.
 
 =back
 
-=head2 Export
+=head2 Type library exported functions
 
 Type libraries are exporters. For the purposes of the following examples,
 assume that the C<Types::Mine> library defines types C<Number> and C<String>.
@@ -490,6 +525,22 @@ assume that the C<Types::Mine> library defines types C<Number> and C<String>.
 
 Type libraries automatically inherit from L<Exporter::Tiny>; see the
 documentation of that module for tips and tricks importing from libraries.
+
+=head2 Type::Library's methods
+
+The above sections describe the characteristics of libraries built with
+Type::Library. The following methods are available on Type::Library itself.
+
+=over
+
+=item C<< setup_type_library( $package, $utils, \@extends ) >>
+
+Sets up a package to be a type library. C<< $utils >> is a boolean
+indicating whether to import L<Type::Utils> into the package.
+C<< @extends >> is a list of existing type libraries the package
+should extend.
+
+=back
 
 =head1 BUGS
 
