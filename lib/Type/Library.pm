@@ -132,65 +132,21 @@ sub _exporter_fail {
 	my $class = shift;
 	my ( $name, $value, $globals ) = @_;
 	
-	my $into = $globals->{into}
-		or _croak( "Parameter 'into' not supplied" );
-		
+	# Passing the `-declare` flag means that if a type isn't found, then
+	# we export a placeholder function instead of failing.
 	if ( $globals->{declare} ) {
-		my $declared = sub (;$) {
-			my $params;
-			$params = shift if ref( $_[0] ) eq "ARRAY";
-			my $type = $into->get_type( $name );
-			my $t;
-			
-			if ( $type ) {
-				$t = $params ? $type->parameterize( @$params ) : $type;
-			}
-			else {
-				_croak "Cannot parameterize a non-existant type" if $params;
-				$t = Type::Tiny::_DeclaredType->new( library => $into, name => $name );
-			}
-			
-			@_ && wantarray ? return ( $t, @_ ) : return $t;
-		};
-		
 		return (
 			$name,
-			set_subname(
-				"$class\::$name",
-				NICE_PROTOTYPES ? sub (;$) { goto $declared } : sub (;@) { goto $declared },
+			type_to_coderef(
+				undef,
+				type_name    => $name,
+				type_library => $globals->{into} || _croak( "Parameter 'into' not supplied" ),
 			),
 		);
 	} #/ if ( $globals->{declare...})
 	
 	return $class->SUPER::_exporter_fail( @_ );
 } #/ sub _exporter_fail
-
-{
-
-	package Type::Tiny::_DeclaredType;
-	our @ISA = 'Type::Tiny';
-	
-	sub new {
-		my $class   = shift;
-		my %opts    = @_ == 1 ? %{ +shift } : @_;
-		my $library = delete $opts{library};
-		my $name    = delete $opts{name};
-		$opts{display_name} = $name;
-		$opts{constraint}   = sub {
-			my $val = @_ ? pop : $_;
-			$library->get_type( $name )->check( $val );
-		};
-		$opts{inlined} = sub {
-			my $val = @_ ? pop : $_;
-			sprintf( '%s::is_%s(%s)', $library, $name, $val );
-		};
-		$opts{_build_coercion} = sub {
-			my $realtype = $library->get_type( $name );
-			$_[0] = $realtype->coercion if $realtype;
-		};
-		$class->SUPER::new( %opts );
-	} #/ sub new
-}
 
 sub meta {
 	no strict "refs";

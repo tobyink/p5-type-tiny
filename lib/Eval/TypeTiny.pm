@@ -107,34 +107,68 @@ sub type_to_coderef {
 	my ( $type, %args ) = @_;
 	my $post_method = $args{post_method} || q();
 	
-	#<<<
-	my $source = $type->is_parameterizable ?
-		sprintf(
-			q{
-				sub (%s) {
-					if (ref($_[0]) eq 'Type::Tiny::_HalfOp') {
-						my $complete_type = shift->complete($type);
-						@_ && wantarray ? return($complete_type, @_) : return $complete_type;
+	my ( $coderef, $qualified_name );
+	
+	if ( ! defined $type ) {
+		my $library = $args{type_library};
+		my $name    = $args{type_name};
+		
+		$qualified_name = "$library\::$name";
+		$coderef = sub (;@) {
+			my $params;
+			$params = shift if ref( $_[0] ) eq "ARRAY";
+			my $type = $library->get_type( $name );
+			my $t;
+			
+			if ( $type ) {
+				$t = $params ? $type->parameterize( @$params ) : $type;
+				$t = $t->$post_method if $post_method;
+			}
+			else {
+				require Error::TypeTiny && Error::TypeTiny::croak( "Cannot parameterize a non-existant type" )
+					if $params;
+				require Type::Tiny::_DeclaredType;
+				$t = Type::Tiny::_DeclaredType->new( library => $library, name => $name );
+			}
+			
+			@_ && wantarray ? return ( $t, @_ ) : return $t;
+		};
+		
+		require Scalar::Util && &Scalar::Util::set_prototype( $coderef, ';$' )
+			if Eval::TypeTiny::NICE_PROTOTYPES;
+	}
+	else {
+	
+		#<<<
+		my $source = $type->is_parameterizable ?
+			sprintf(
+				q{
+					sub (%s) {
+						if (ref($_[0]) eq 'Type::Tiny::_HalfOp') {
+							my $complete_type = shift->complete($type);
+							@_ && wantarray ? return($complete_type, @_) : return $complete_type;
+						}
+						my $params; $params = shift if ref($_[0]) eq q(ARRAY);
+						my $t = $params ? $type->parameterize(@$params) : $type;
+						@_ && wantarray ? return($t%s, @_) : return $t%s;
 					}
-					my $params; $params = shift if ref($_[0]) eq q(ARRAY);
-					my $t = $params ? $type->parameterize(@$params) : $type;
-					@_ && wantarray ? return($t%s, @_) : return $t%s;
-				}
-			},
-			NICE_PROTOTYPES ? q(;$) : q(;@),
-			$post_method,
-			$post_method,
-		) :
-		sprintf( q{ sub () { $type%s if $] } }, $post_method );
-	#>>>
+				},
+				NICE_PROTOTYPES ? q(;$) : q(;@),
+				$post_method,
+				$post_method,
+			) :
+			sprintf( q{ sub () { $type%s if $] } }, $post_method );
+		#>>>
+		
+		$qualified_name = $type->qualified_name;
+		$coderef = eval_closure(
+			source      => $source,
+			description => $args{description} || sprintf( "exportable function '%s'", $qualified_name ),
+			environment => { '$type' => \$type },
+		);
+	}
 	
-	my $coderef = eval_closure(
-		source      => $source,
-		description => $args{description} || sprintf( "exportable function '%s'", $type->qualified_name ),
-		environment => { '$type' => \$type },
-	);
-	
-	$args{anonymous} ? $coderef : set_subname( $type->qualified_name, $coderef );
+	$args{anonymous} ? $coderef : set_subname( $qualified_name, $coderef );
 }
 
 sub eval_closure {
@@ -429,6 +463,11 @@ may be shown in stack traces, etc.
 
 The coderef will be named using C<set_subname> unless
 C<< $options{anonymous} >> is true.
+
+If C<< $type >> is undef, then it is assumed that the type constraint
+hasn't been defined yet but will later, yet you still want a function now.
+C<< $options{type_library} >> and C<< $options{type_name} >> will be
+used to find the type constraint when the function gets called.
 
 =back
 
