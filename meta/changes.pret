@@ -4580,3 +4580,29 @@
 		];
 	].
 
+`Type-Tiny 1.999_008 cpan:TOBYINK`
+	issued  2022-09-14;
+	label "Type::Tiny 2.0 Preview I";
+	changeset [
+		dcs:versus `Type-Tiny 1.999_007 cpan:TOBYINK`;
+		item [
+			a dcs:Change;
+			label "If a type library has been made immutable, you can no longer add new types and coercions to it.";
+		];
+		item [
+			a dcs:Addition;
+			label "Type::Tiny now has an exportables_by_tag method.";
+		];
+		item [
+			a dcs:Addition;
+			label "Type::Tiny::_DeclaredType is now a separate module. (It was previously defined inline in Type/Library.pm.)";
+		];
+		item [
+			a dcs:Change;
+			label "Eval::TypeTiny::type_to_coderef() can now handle being passed undef as a type constraint and will create a Type::Tiny::_DeclaredType object to wrap instead.";
+		];
+		item [
+			a dcs:Change;
+			label "Various Type::Library cleanups.";
+		];
+	].
