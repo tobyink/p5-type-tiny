@@ -34,7 +34,6 @@ BEGIN {
 	use Type::Utils -all;
 	extends 'Types::Standard';
 	declare "Foo", as "Str";
-	$INC{'Local/Types.pm'} = __FILE__;
 };
 
 use Local::Types -all;
@@ -116,5 +115,17 @@ is(
 	'$JoinPipe->coerce($arr_bytes_western)',
 );
 should_pass($_, Str);
+
+BEGIN {
+	package Local::Types2;
+	use Types::Standard -base, -utils;
+	declare "Bar", as "Str";
+};
+
+ok 'Local::Types2'->isa( 'Type::Library' ), 'use Types::Standard -base will set up a type library';
+ok 'Local::Types2'->isa( 'Types::Standard' ), 'use Types::Standard -base will inherit from Types::Standard';
+ok 'Local::Types2'->has_type( 'Bar' ), 'new type works';
+ok 'Local::Types2'->has_type( 'ArrayRef' ), 'inherited type works';
+
 
 done_testing;
