@@ -117,9 +117,15 @@ sub type_to_coderef {
 		$coderef = sub (;@) {
 			my $params;
 			$params = shift if ref( $_[0] ) eq "ARRAY";
-			my $type = $library->get_type( $name );
-			my $t;
 			
+			$type ||= do {
+				$library->can( 'get_type' )
+					or require Error::TypeTiny
+					&& Error::TypeTiny::croak( "Expected $library to be a type library, but it doesn't seem to be" );
+				$library->get_type( $name );
+			};
+			
+			my $t;
 			if ( $type ) {
 				$t = $params ? $type->parameterize( @$params ) : $type;
 				$t = $t->$post_method if $post_method;

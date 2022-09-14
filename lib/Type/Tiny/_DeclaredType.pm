@@ -17,8 +17,13 @@ our @ISA = qw( Type::Tiny );
 sub new {
 	my $class   = shift;
 	my %opts    = @_ == 1 ? %{ +shift } : @_;
+	
 	my $library = delete $opts{library};
 	my $name    = delete $opts{name};
+	
+	$library->can( 'get_type' )
+		or Type::Tiny::_croak( "Expected $library to be a type library, but it doesn't seem to be" );
+	
 	$opts{display_name} = $name;
 	$opts{constraint}   = sub {
 		my $val = @_ ? pop : $_;
