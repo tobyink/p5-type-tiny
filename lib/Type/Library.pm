@@ -478,7 +478,8 @@ Type::Library-based libraries are exporters.
 
 =item C<< make_immutable >>
 
-A shortcut for calling C<< $type->coercion->freeze >> on every
+Prevents new type constraints and coercions from being added to the
+library, and also calls C<< $type->coercion->freeze >> on every
 type constraint in the library.
 
 =back
