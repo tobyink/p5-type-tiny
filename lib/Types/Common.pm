@@ -37,7 +37,7 @@ sub _generate_t {
 }
 push @EXPORT_OK, 't';
 
-1;
+__PACKAGE__->meta->make_immutable;
 
 __END__
 

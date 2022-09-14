@@ -189,6 +189,8 @@ sub add_type {
 	my $meta  = shift->meta;
 	my $class = blessed( $meta );
 	
+	_croak( 'Type library is immutable' ) if $meta->{immutable};
+	
 	my $type =
 		ref( $_[0] ) =~ /^Type::Tiny\b/ ? $_[0]
 		: blessed( $_[0] )              ? Types::TypeTiny::to_TypeTiny( $_[0] )
@@ -238,6 +240,9 @@ sub type_names {
 
 sub add_coercion {
 	my $meta  = shift->meta;
+	my $class = blessed( $meta );
+	
+	_croak( 'Type library is immutable' ) if $meta->{immutable};
 	
 	require Type::Coercion;
 	my $c     = blessed( $_[0] ) ? $_[0] : "Type::Coercion"->new( @_ );
@@ -253,7 +258,6 @@ sub add_coercion {
 	no strict "refs";
 	no warnings "redefine", "prototype";
 	
-	my $class = blessed( $meta );
 	*{"$class\::$name"} = type_to_coderef( $c );
 	push @{"$class\::EXPORT_OK"}, $name;
 	push @{ ${"$class\::EXPORT_TAGS"}{'coercions'} ||= [] }, $name;
@@ -293,7 +297,7 @@ sub make_immutable {
 		}
 	}
 	
-	1;
+	$meta->{immutable} = 1;
 }
 
 1;
