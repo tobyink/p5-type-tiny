@@ -21,31 +21,12 @@ our @ISA = 'Exporter::Tiny';
 
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
-sub setup_type_library {
-	my ( $class, $type_library, $install_utils, $extends ) = @_;
-	
-	my @extends = ref( $extends ) ? @$extends : $extends ? $extends : ();
-	unshift @extends, $class if $class ne __PACKAGE__;
-	
-	if ( not ref $type_library ) {
-		no strict "refs";
-		push @{"$type_library\::ISA"}, $class;
-		( my $file = $type_library ) =~ s{::}{/}g;
-		$INC{"$file.pm"} ||= __FILE__;
-	}
-	
-	if ( $install_utils ) {
-		require Type::Utils;
-		'Type::Utils'->import( { into => $type_library }, '-default' );
-	}
-	
-	if ( @extends and not ref $type_library ) {
-		require Type::Utils;
-		my $wrapper = eval "sub { package $type_library; &Type::Utils::extends; }";
-		$wrapper->( @extends );
-	}
-}
+####
+#### Hooks for Exporter::Tiny
+####
 
+# Handling for -base, -extends, and -utils tags.
+#
 sub _exporter_validate_opts {
 	my ( $class, $opts ) = ( shift, @_ );
 	
@@ -132,27 +113,42 @@ sub _exporter_expand_sub {
 	return $class->SUPER::_exporter_expand_sub( @_ );
 }
 
+# Mostly just rely on superclass to do the actual export, but add
+# a couple of useful behaviours.
+#
 sub _exporter_install_sub {
 	my $class = shift;
 	my ( $name, $value, $globals, $sym ) = @_;
 	
-	my $package = $globals->{into};
-	my $type    = $class->meta->{'functions'}{$name}{'type'};
+	my $into = $globals->{into};
+	my $type = $class->meta->{'functions'}{$name}{'type'};
+	my $tags = $class->meta->{'functions'}{$name}{'tags'};
 	
+	# Issue a warning if exporting a deprecated type constraint.
+	# 
 	Exporter::Tiny::_carp(
 		"Exporting deprecated type %s to %s",
 		$type->qualified_name,
-		ref( $package ) ? "reference" : "package $package",
+		ref( $into ) ? "reference" : "package $into",
 	) if ( defined $type and $type->deprecated and not $globals->{allow_deprecated} );
 	
-	if ( !ref $package and defined $type ) {
+	# If exporting a type constraint into a real package, then
+	# add it to the package's type registry.
+	# 
+	if ( !ref $into
+	and  $into ne '-lexical'
+	and  defined $type
+	and  grep $_ eq 'types', @$tags ) {
+		
+		# If they're renaming it, figure out what name, and use that.
+		# XXX: `-as` can be a coderef, and can be in $globals in that case.
 		my ( $prefix ) = grep defined, $value->{-prefix}, $globals->{prefix}, q();
 		my ( $suffix ) = grep defined, $value->{-suffix}, $globals->{suffix}, q();
 		my $as         = $prefix . ( $value->{-as} || $name ) . $suffix;
 		
 		$INC{'Type/Registry.pm'}
-			? 'Type::Registry'->for_class( $package )->add_type( $type, $as )
-			: ( $Type::Registry::DELAYED{$package}{$as} = $type );
+			? 'Type::Registry'->for_class( $into )->add_type( $type, $as )
+			: ( $Type::Registry::DELAYED{$into}{$as} = $type );
 	}
 	
 	$class->SUPER::_exporter_install_sub( @_ );
@@ -178,6 +174,35 @@ sub _exporter_fail {
 	return $class->SUPER::_exporter_fail( @_ );
 } #/ sub _exporter_fail
 
+####
+#### Type library functionality
+####
+
+sub setup_type_library {
+	my ( $class, $type_library, $install_utils, $extends ) = @_;
+	
+	my @extends = ref( $extends ) ? @$extends : $extends ? $extends : ();
+	unshift @extends, $class if $class ne __PACKAGE__;
+	
+	if ( not ref $type_library ) {
+		no strict "refs";
+		push @{"$type_library\::ISA"}, $class;
+		( my $file = $type_library ) =~ s{::}{/}g;
+		$INC{"$file.pm"} ||= __FILE__;
+	}
+	
+	if ( $install_utils ) {
+		require Type::Utils;
+		'Type::Utils'->import( { into => $type_library }, '-default' );
+	}
+	
+	if ( @extends and not ref $type_library ) {
+		require Type::Utils;
+		my $wrapper = eval "sub { package $type_library; &Type::Utils::extends; }";
+		$wrapper->( @extends );
+	}
+}
+
 sub meta {
 	no strict "refs";
 	no warnings "once";
@@ -192,19 +217,16 @@ sub add_type {
 	_croak( 'Type library is immutable' ) if $meta->{immutable};
 	
 	my $type =
-		ref( $_[0] ) =~ /^Type::Tiny\b/ ? $_[0]
-		: blessed( $_[0] )              ? Types::TypeTiny::to_TypeTiny( $_[0] )
-		: ref( $_[0] ) eq q(HASH)
-		? 'Type::Tiny'->new( library => $class, %{ $_[0] } )
-		: "Type::Tiny"->new( library => $class, @_ );
+		ref( $_[0] ) =~ /^Type::Tiny\b/ ? $_[0] :
+		blessed( $_[0] )                ? Types::TypeTiny::to_TypeTiny( $_[0] ) :
+		ref( $_[0] ) eq q(HASH)         ? 'Type::Tiny'->new( library => $class, %{ $_[0] } ) :
+		"Type::Tiny"->new( library => $class, @_ );
 	my $name = $type->{name};
 	
+	_croak( 'Type %s already exists in this library', $name )       if $meta->has_type( $name );
+	_croak( 'Type %s conflicts with coercion of same name', $name ) if $meta->has_coercion( $name );
+	_croak( 'Cannot add anonymous type to a library' )              if $type->is_anon;
 	$meta->{types} ||= {};
-	_croak 'Type %s already exists in this library', $name
-		if $meta->has_type( $name );
-	_croak 'Type %s conflicts with coercion of same name', $name
-		if $meta->has_coercion( $name );
-	_croak 'Cannot add anonymous type to a library' if $type->is_anon;
 	$meta->{types}{$name} = $type;
 	
 	no strict "refs";
