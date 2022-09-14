@@ -521,7 +521,7 @@ modules mentioned above.
 =item C<< NICE_PROTOTYPES >>
 
 If this is true, then type_to_coderef will give parameterizable type
-constraints slightly the nicer prototype of C<< (;$) >> instead of the
+constraints the slightly nicer prototype of C<< (;$) >> instead of the
 default C<< (;@) >>. This allows constructs like:
 
    ArrayRef[Int] | HashRef[Int]
