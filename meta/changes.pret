@@ -4611,4 +4611,8 @@
 			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/119>;
 			dcs:thanks cpan:DJERIUS;
 		];
+		item [
+			a dcs:Change;
+			label "Type::Params `signature_for` will now delay most of the signature compilation until the function is called for the first time, like `wrap_subs`/`wrap_methods` used to do. It still does enough up-front to detect some common errors in signatures.";
+		];
 	].

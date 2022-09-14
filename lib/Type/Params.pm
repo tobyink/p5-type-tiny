@@ -147,14 +147,14 @@ sub signature_for {
 	require Type::Params::Signature;
 	my $sig = 'Type::Params::Signature'->new_from_v2api( \%opts );
 	# Delay compilation
+	my $compiled;
 	my $coderef = sub {
-		my $compiled = $sig->coderef->compile;
+		$compiled ||= $sig->coderef->compile;
 		
 		no strict 'refs';
 		no warnings 'redefine';
 		*$fullname = set_subname( $fullname, $compiled );
 		
-		undef $sig;
 		goto( $compiled );
 	};
 
