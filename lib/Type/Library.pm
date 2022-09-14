@@ -83,7 +83,8 @@ sub _exporter_expand_sub {
 	# type constraint? If so, which one. If not, then forget the rest
 	# and just use the superclass method.
 	#
-	if ( my $f = $class->meta->{'functions'}{$name} and $class->meta->{'functions'}{$name}{'type'} ) {
+	if ( my $f = $class->meta->{'functions'}{$name}
+	and  defined $class->meta->{'functions'}{$name}{'type'} ) {
 		
 		my $type      = $f->{type};
 		my $tag       = $f->{tags}[0];
@@ -120,14 +121,9 @@ sub _exporter_expand_sub {
 		# XXX: this will fail for tags like 'constants' where there
 		# will be multiple exportables which match!
 		#
-		elsif ( $custom_type ) {
-			for my $exportable ( @{ $type->exportables( $typename ) } ) {
-				for my $etag ( @{ $exportable->{tags} } ) {
-					if ( $etag eq $tag ) {
-						return ( $value->{-as} || $exportable->{name}, $exportable->{code} );
-					}
-				}
-			}
+		if ( $custom_type and $tag ne 'types' ) {
+			my $exportable = $type->exportables_by_tag( $tag, $typename );
+			return ( $value->{-as} || $exportable->{name}, $exportable->{code} );
 		}
 	}
 	
@@ -241,17 +237,17 @@ sub type_names {
 }
 
 sub add_coercion {
+	my $meta  = shift->meta;
+	
 	require Type::Coercion;
-	my $meta = shift->meta;
-	my $c    = blessed( $_[0] ) ? $_[0] : "Type::Coercion"->new( @_ );
-	my $name = $c->name;
+	my $c     = blessed( $_[0] ) ? $_[0] : "Type::Coercion"->new( @_ );
+	my $name  = $c->name;
+	
+	_croak( 'Coercion %s already exists in this library', $name )   if $meta->has_coercion( $name );
+	_croak( 'Coercion %s conflicts with type of same name', $name ) if $meta->has_type( $name );
+	_croak( 'Cannot add anonymous type to a library' )              if $c->is_anon;
 	
 	$meta->{coercions} ||= {};
-	_croak 'Coercion %s already exists in this library', $name
-		if $meta->has_coercion( $name );
-	_croak 'Coercion %s conflicts with type of same name', $name
-		if $meta->has_type( $name );
-	_croak 'Cannot add anonymous type to a library' if $c->is_anon;
 	$meta->{coercions}{$name} = $c;
 	
 	no strict "refs";
@@ -259,9 +255,9 @@ sub add_coercion {
 	
 	my $class = blessed( $meta );
 	*{"$class\::$name"} = type_to_coderef( $c );
-	
 	push @{"$class\::EXPORT_OK"}, $name;
 	push @{ ${"$class\::EXPORT_TAGS"}{'coercions'} ||= [] }, $name;
+	$meta->{'functions'}{$name} = { coercion => $c, tags => [ 'coercions' ] };
 
 	return $c;
 } #/ sub add_coercion
@@ -290,15 +286,15 @@ sub make_immutable {
 	
 	for my $type ( values %{ $meta->{types} } ) {
 		$type->coercion->freeze;
-		my $name = $type->name;
-		*{"$class\::to_$name"} = set_subname(
-			"$class\::to_$name",
-			$type->coercion->compiled_coercion,
-		) if $type->has_coercion && $type->coercion->frozen;
-	} #/ for my $type ( values %...)
+		next unless $type->has_coercion && $type->coercion->frozen;
+		for my $e ( $type->exportables_by_tag( 'to' ) ) {
+			my $qualified_name = $class . '::' . $e->{name};
+			*$qualified_name = set_subname( $qualified_name, $e->{code} );
+		}
+	}
 	
 	1;
-} #/ sub make_immutable
+}
 
 1;
 

@@ -1183,10 +1183,11 @@ sub _build_mouse_type {
 } #/ sub _build_mouse_type
 
 sub exportables {
-	my ( $self, $base_name ) = @_;
+	my ( $self, $base_name, $tag ) = ( shift, @_ ); # $tag is undocumented
 	if ( not $self->is_anon ) {
 		$base_name ||= $self->name;
 	}
+	$tag ||= 0;
 
 	my @exportables;
 	return \@exportables if ! $base_name;
@@ -1197,19 +1198,19 @@ sub exportables {
 		name => $base_name,
 		code => Eval::TypeTiny::type_to_coderef( $self ),
 		tags => [ 'types' ],
-	};
+	} if $tag eq 'types' || !$tag;
 
 	push @exportables, {
 		name => sprintf( 'is_%s', $base_name ),
 		code => $self->compiled_check,
 		tags => [ 'is' ],
-	};
+	} if $tag eq 'is' || !$tag;
 
 	push @exportables, {
 		name => sprintf( 'assert_%s', $base_name ),
 		code => $self->_overload_coderef,
 		tags => [ 'assert' ],
-	};
+	} if $tag eq 'assert' || !$tag;
 
 	push @exportables, {
 		name => sprintf( 'to_%s', $base_name ),
@@ -1217,9 +1218,21 @@ sub exportables {
 			? $self->coercion->compiled_coercion
 			: sub ($) { $self->coerce( $_[0] ) },
 		tags => [ 'to' ],
-	};
+	} if $tag eq 'to' || !$tag;
 
 	return \@exportables;
+}
+
+sub exportables_by_tag {
+	my ( $self, $tag, $base_name ) = ( shift, @_ );
+	my @matched = grep {
+		my $e = $_;
+		grep $_ eq $tag, @{ $e->{tags} || [] };
+	} @{ $self->exportables( $base_name, $tag ) };
+	return @matched if wantarray;
+	_croak( 'Expected to find one exportable tagged "%s", found %d', $tag, scalar @matched )
+		unless @matched == 1;
+	return $matched[0];
 }
 
 sub _process_coercion_list {
@@ -2404,8 +2417,26 @@ allow the following to work:
 =item C<< exportables( $base_name ) >>
 
 Returns a list of the functions a type library should export if it contains
-this type constraint. The return type is
-B<< ArrayRef[ Dict[ name => Str, tags => ArrayRef[Str], code => CodeRef ] ] >>.
+this type constraint.
+
+Example:
+
+  [
+    { name => 'Int',        tags => [ 'types' ],  code => sub { ... } },
+    { name => 'is_Int',     tags => [ 'is' ],     code => sub { ... } },
+    { name => 'assert_Int', tags => [ 'assert' ], code => sub { ... } },
+    { name => 'to_Int',     tags => [ 'to' ],     code => sub { ... } },
+  ]
+
+C<< $base_name >> is optional, but allows you to get a list of exportables
+using a specific name. This is useful if the type constraint has a name
+which wouldn't be a legal Perl function name.
+
+=item C<< exportables_by_tag( $tag, $base_name ) >>
+
+Filters C<exportables> by a specific tag name. In list context, returns all
+matching exportables. In scalar context returns a single matching exportable
+and dies if multiple exportables match, or none do!
 
 =back
 
