@@ -4605,4 +4605,10 @@
 			a dcs:Change;
 			label "Various Type::Library cleanups.";
 		];
+		item [
+			a dcs:Bugfix;
+			label "More sensible error message trying to import a type constraint using -declare outside a type library.";
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/119>;
+			dcs:thanks cpan:DJERIUS;
+		];
 	].
