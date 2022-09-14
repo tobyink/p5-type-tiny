@@ -193,8 +193,7 @@ The following might be useful:
 
 This is best explained with an example:
 
-   use Types::Standard qw(InstanceOf StrMatch);
-   use Types::Common::Numeric qw(IntRange);
+   use Types::Common qw( InstanceOf StrMatch IntRange );
    
    my $person = InstanceOf['Local::Human'];
    my $woman  = $person->with_attribute_values(
