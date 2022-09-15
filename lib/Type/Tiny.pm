@@ -520,7 +520,7 @@ sub _build_name_generator {
 	my $self = shift;
 	return sub {
 		defined && s/[\x00-\x1F]//smg for ( my ( $s, @a ) = @_ );
-		sprintf( '%s[%s]', $s, join q[,], map !defined ? 'undef' : !ref && /\W/ ? B::perlstring($_) : $_, @a );
+		sprintf( '%s[%s]', $s, join q[,], map !defined() ? 'undef' : !ref() && /\W/ ? B::perlstring($_) : $_, @a );
 	};
 }
 
