@@ -1010,7 +1010,7 @@ sub is_parameterized {
 		join ',', map {
 			Types::TypeTiny::is_TypeTiny( $_ )  ? sprintf( '$Type::Tiny::ALL_TYPES{%s}', defined( $_->{uniq} ) ? $_->{uniq} : '____CANNOT_KEY____' ) :
 			ref() eq 'ARRAY'                    ? do { $seen{$_}++ ? '____CANNOT_KEY____' : sprintf( '[%s]', ____make_key( @$_ ) ) } :
-			ref() eq 'HASH'                     ? do { $seen{$_}++ ? '____CANNOT_KEY____' : sprintf( '{%s}', ____make_key( %$_ ) ) } :
+			ref() eq 'HASH'                     ? do { $seen{$_}++ ? '____CANNOT_KEY____' : sprintf( '{%s}', ____make_key( do { my %h = %$_; map +( $_, $h{$_} ), sort keys %h; } ) ) } :
 			ref() eq 'SCALAR' || ref() eq 'REF' ? do { $seen{$_}++ ? '____CANNOT_KEY____' : sprintf( '\\(%s)', ____make_key( $$_ ) ) } :
 			!defined()                          ? 'undef' :
 			!ref()                              ? do { require B; B::perlstring( $_ ) } :

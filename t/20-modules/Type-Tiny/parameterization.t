@@ -73,10 +73,9 @@ my $p8 = ArrayRef[Dict[foo =>Int, slurpy Any]];
 is($p7->inline_check(q/$X/), $p8->inline_check(q/$X/), '$p7 and $p8 stringify the same');
 is($p7->{uniq}, $p8->{uniq}, '$p7 and $p8 are the same');
 
-#like(
-#	exception { ArrayRef[Int, Int] },
-#	qr/^\QOnly one parameter to ArrayRef[`a] expected; got 2/,
-#	'error message when ArrayRef[`a] passed multiple parameters'
-#);
+is(
+	Type::Tiny::____make_key( [ 1..5, \0, [ { foo => undef, bar => Int } ] ] ),
+	'["1","2","3","4","5",\("0"),[{"bar",$Type::Tiny::ALL_TYPES{' . Int->{uniq} . '},"foo",undef}]]',
+);
 
 done_testing;
