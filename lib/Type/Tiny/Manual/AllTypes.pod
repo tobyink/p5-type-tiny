@@ -79,6 +79,12 @@ Any value other than undef.
 
 =item *
 
+B<< DelimitedStr >> I<< [parameterizable] >> in L<Types::Common::String>
+
+A comma-delimited or other delimited string.
+
+=item *
+
 B<< Dict >> I<< [parameterizable] >> in L<Types::Standard>
 
 A hashref with constraints on each of its values.

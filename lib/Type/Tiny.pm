@@ -519,8 +519,8 @@ sub _build_default_message {
 sub _build_name_generator {
 	my $self = shift;
 	return sub {
-		s/[\x00-\x1F]//smg for ( my ( $s, @a ) = @_ );
-		sprintf( '%s[%s]', $s, join q[,], @a );
+		defined && s/[\x00-\x1F]//smg for ( my ( $s, @a ) = @_ );
+		sprintf( '%s[%s]', $s, join q[,], map !defined ? 'undef' : !ref && /\W/ ? B::perlstring($_) : $_, @a );
 	};
 }
 
