@@ -104,15 +104,16 @@ sub finalize {
 }
 
 sub compile {
-	my $self = shift;
+	my ( $self, %opts ) = ( shift, @_ );
 
 	$self->{finalized}++ or $self->finalize();
 
 	require Eval::TypeTiny;
 	return Eval::TypeTiny::eval_closure(
+		description  => $self->description,
+		%opts,
 		source       => $self->code,
 		environment  => $self->env,
-		description  => $self->description,
 	);
 }
 
@@ -221,9 +222,14 @@ Goes back to a previously inserted placeholder and replaces it with code.
 As an alternative, C<add_placeholder> returns a coderef, which you can call
 like C<< $callback->( @lines_of_code ) >>.
 
-=item C<< compile() >>
+=item C<< compile( %opts ) >>
 
 Compiles the code and returns it as a coderef.
+
+Options are passed on to C<< eval_closure >> from L<Eval::TypeTiny>,
+but cannot include C<code> or C<environment>. C<< alias => 1 >>
+is probably the option most likely to be useful, but in general
+you won't need to provide any options.
 
 =item C<< finalize() >>
 
