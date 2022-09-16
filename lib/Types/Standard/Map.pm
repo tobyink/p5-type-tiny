@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Types::Standard::Map::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::Map::VERSION   = '1.999_008';
+	$Types::Standard::Map::VERSION   = '1.999_009';
 }
 
 $Types::Standard::Map::VERSION =~ tr/_//d;

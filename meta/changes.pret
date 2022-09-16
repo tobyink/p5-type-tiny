@@ -4616,3 +4616,28 @@
 			label "Type::Params `signature_for` will now delay most of the signature compilation until the function is called for the first time, like `wrap_subs`/`wrap_methods` used to do. It still does enough up-front to detect some common errors in signatures.";
 		];
 	].
+
+##
+`Type-Tiny 1.999_009 cpan:TOBYINK`
+	issued  2022-09-16;
+	label "Type::Tiny 2.0 Preview J";
+	changeset [
+		dcs:versus `Type-Tiny 1.999_008 cpan:TOBYINK`;
+		item [
+			a dcs:Addition;
+			label "Types::Common::String now has a DelimitedStr type.";
+		];
+		item [
+			a dcs:Change;
+			label "Minor improvements to the default name generator, used to generate the display_name for parameterized type constraints.";
+		];
+		item [
+			a dcs:Tests;
+			label "Another test for `-base`.";
+		];
+		item [
+			a dcs:Change;
+			label "Improve cache key generation for parameterized types.";
+		];
+	].
+
