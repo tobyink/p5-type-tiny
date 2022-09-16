@@ -163,6 +163,7 @@ jobs:
         if: matrix.coverage
         run: |
           cpanm -n match::simple
+          cpanm -n Alt::Lexical::Var::ButSupportModernPerl Sub::Exporter::Lexical
           cpanm -n Class::InsideOut
           cpanm -n Data::Constraint
           cpanm -n Devel::Hide Devel::Refcount
