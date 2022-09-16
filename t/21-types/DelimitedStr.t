@@ -35,7 +35,7 @@ ok(!DelimitedStr->deprecated, 'DelimitedStr is not deprecated');
 ok(!DelimitedStr->is_anon, 'DelimitedStr is not anonymous');
 ok(DelimitedStr->can_be_inlined, 'DelimitedStr can be inlined');
 is(exception { DelimitedStr->inline_check(q/$xyz/) }, undef, "Inlining DelimitedStr doesn't throw an exception");
-ok(!DelimitedStr->has_coercion, "DelimitedStr doesn't have a coercion");
+ok(DelimitedStr->has_coercion, "DelimitedStr has a coercion");
 ok(DelimitedStr->is_parameterizable, "DelimitedStr is parameterizable");
 is(DelimitedStr->type_default, undef, "DelimitedStr has a type_default");
 
@@ -117,6 +117,29 @@ while (@tests) {
 	}
 }
 
+{
+	local $" = '|';
+	is(
+		DelimitedStr->coerce( [ 1..4 ] ),
+		'1|2|3|4',
+		'The unparameterized type coerces by joining with $"',
+	);
+	
+	$" = ',';
+	is(
+		DelimitedStr->coerce( [ 1..4 ] ),
+		'1,2,3,4',
+		'... and again',
+	);
+
+	$" = '';
+	is(
+		DelimitedStr->coerce( [ 1..4 ] ),
+		'1234',
+		'... and again',
+	);
+}
+
 use Types::Standard qw( Int ArrayRef );
 
 # Two or three integers, separated by commas, with optional whitespace
@@ -128,7 +151,7 @@ is( $SomeInts->display_name, q{DelimitedStr[",",Int,2,3,1]}, "\$SomeInts->displa
 
 should_pass( '1,2,3', $SomeInts );
 should_pass( '1, 2, 3', $SomeInts );
-should_fail( ' 1,2,3 ', $SomeInts );  # this behaviour might change!
+should_pass( '  1,2,3 ' . "\t\n\t", $SomeInts );
 should_fail( '1', $SomeInts );
 should_fail( '1,2,3,4', $SomeInts );
 should_fail( 'foo,bar,baz', $SomeInts );

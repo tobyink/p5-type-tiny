@@ -15,6 +15,7 @@
  - `%Error::TypeTiny::CarpInternal` is now an alias for `%Carp::CarpInternal`.
  - Type::Tiny::{Class,Duck,Enum,Role} are now exporters.
  - Enum types now export constants for each value.
+ - `Types::Common::String` now provides a `DelimitedStr` type.
 
 Test Suite Statistics:
 

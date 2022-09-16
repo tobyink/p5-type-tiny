@@ -231,7 +231,9 @@ $meta->add_type(
 			: quotemeta( $delimiter );
 		
 		return sub {
-			my @split = split $q_delimiter, $_[0];
+			my @split = $ws
+				? split( $q_delimiter, do { ( my $trimmed = $_[0] ) =~ s{\A\s+|\s+\z}{}g; $trimmed } )
+				: split( $q_delimiter, $_[0] );
 			return if @split < $min_parts;
 			return if defined($max_parts) && ( @split > $max_parts );
 			!$part_constraint or $part_constraint->all( @split );
@@ -256,7 +258,9 @@ $meta->add_type(
 				undef,
 				sprintf(
 					'do { my $split = [ split %s, %s ]; %s }',
-					B::perlstring( $q_delimiter ), $v, join( q{ and }, @cond ),
+					B::perlstring( $q_delimiter ),
+					$ws ? sprintf( 'do { ( my $trimmed = %s ) =~ s{\A\s+|\s+\z}{}g; $trimmed }', $v ) : $v,
+					join( q{ and }, @cond ),
 				),
 			);
 		};
@@ -279,6 +283,11 @@ $meta->add_type(
 		);
 		return $c;
 	},
+);
+
+DelimitedStr->coercion->add_type_coercions(
+	Types::Standard::ArrayRef->of( Types::Standard::Str ),
+	'join( $", @$_ )',
 );
 
 __PACKAGE__->meta->make_immutable;
@@ -388,12 +397,16 @@ B<< DelimitedStr[",", Int, 1, 3] >> will allow between 1 and 3 integers,
 separated by commas. So C<< "1,42,-999" >> will pass the type constraint,
 but C<< "Hello,45" >> will fail.
 
-The ws parameter allows optional whitespace surrounding the delimiters.
+The ws parameter allows optional whitespace surrounding the delimiters,
+as well as optional leading and trailing whitespace.
 
 The type, min, max, and ws paramaters are optional.
 
-This type constraint will automatically have a coercion from
-B<< ArrayRef[`type] >> which uses C<< join >>.
+Parameterized B<DelimitedStr> type constraints will automatically have a
+coercion from B<< ArrayRef[`type] >> which uses C<< join >> to join by the
+delimiter. The plain unparameterized type constraint B<DelimitedStr> has
+a coercion from B<< ArrayRef[Str] >> which joins the strings using the
+list separator C<< $" >> (which is a space by default).
 
 =back
 
