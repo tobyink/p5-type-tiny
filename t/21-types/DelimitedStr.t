@@ -124,6 +124,8 @@ use Types::Standard qw( Int ArrayRef );
 #
 my $SomeInts = DelimitedStr[ q{,}, Int, 2, 3, !!1 ];
 
+is( $SomeInts->display_name, q{DelimitedStr[",",Int,2,3,1]}, "\$SomeInts->display_name" );
+
 should_pass( '1,2,3', $SomeInts );
 should_pass( '1, 2, 3', $SomeInts );
 should_fail( ' 1,2,3 ', $SomeInts );  # this behaviour might change!
