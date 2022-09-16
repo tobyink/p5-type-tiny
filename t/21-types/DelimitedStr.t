@@ -147,7 +147,9 @@ use Types::Standard qw( Int ArrayRef );
 #
 my $SomeInts = DelimitedStr[ q{,}, Int, 2, 3, !!1 ];
 
-is( $SomeInts->display_name, q{DelimitedStr[",",Int,2,3,1]}, "\$SomeInts->display_name" );
+ok( $SomeInts->can_be_inlined, '$SomeInts->can_be_inlined' );
+ok( $SomeInts->coercion->can_be_inlined, '$SomeInts->coercion->can_be_inlined' );
+is( $SomeInts->display_name, q{DelimitedStr[",",Int,2,3,1]}, '$SomeInts->display_name is ' . $SomeInts );
 
 should_pass( '1,2,3', $SomeInts );
 should_pass( '1, 2, 3', $SomeInts );
@@ -166,6 +168,11 @@ is(
 	$SomeInts->coerce( [ 4, 5, 6 ] ),
 	'4,5,6',
 	'... and it works',
+);
+
+ok(
+	!$SomeInts->coercion->has_coercion_for_type( ArrayRef[Int] ),
+	"$SomeInts does not have a coercion from a posentially inappropriate arrayref",
 );
 
 done_testing;
