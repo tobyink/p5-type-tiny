@@ -863,11 +863,11 @@ order:
  my ( $xxx, $yyy ) = $signature->( @_ );
 
 So how does your sub know whether C<< $xxx >> or C<< $yyy >> is the arrayref?
-One option is to use the C<< ${^TYPE_PARAMS_MULTISIG} >> global variable
+One option is to use the C<< ${^_TYPE_PARAMS_MULTISIG} >> global variable
 which will be set to the index of the signature which was used:
 
  my @results = $signature->( @_ );
- my ( $arr, $ix ) = ${^TYPE_PARAMS_MULTISIG} == 1 ? reverse( @_ ) : @_;
+ my ( $arr, $ix ) = ${^_TYPE_PARAMS_MULTISIG} == 1 ? reverse( @_ ) : @_;
 
 A neater solution is to use a C<goto_next> coderef to re-order alternative
 signature results into your preferred order:
@@ -926,6 +926,10 @@ The C<multiple> option can also be abbreviated to C<multi>.
 
 So C<< signature( multi => [...] ) >> can be used instead of the longer
 C<< signature( multiple => [...] ) >>. Three whole keystrokes saved!
+
+(B<Note:> in older releases of Type::Params, C<< ${^_TYPE_PARAMS_MULTISIG} >>
+was called C<< ${^TYPE_PARAMS_MULTISIG} >>. The latter name is deprecated,
+and support for it will be removed in a future release of Type::Params.)
 
 =head4 C<< message >> B<Str>
 

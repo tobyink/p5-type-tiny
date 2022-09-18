@@ -139,7 +139,7 @@ use Types::Common -sigs, -types;
 		my $e = exception { array_lookup() };
 		like $e, qr/Parameter validation failed/;
 		
-		is ${^TYPE_PARAMS_MULTISIG}, undef;
+		is ${^_TYPE_PARAMS_MULTISIG}, undef;
 	};
 }
 
@@ -175,7 +175,7 @@ use Types::Common -sigs, -types;
 			'first alternative',
 		);
 		
-		is ${^TYPE_PARAMS_MULTISIG}, 0;
+		is ${^_TYPE_PARAMS_MULTISIG}, 0;
 		
 		is(
 			__PACKAGE__->array_lookup2( $ix, \@arr ),
@@ -183,7 +183,7 @@ use Types::Common -sigs, -types;
 			'second alternative',
 		);
 		
-		is ${^TYPE_PARAMS_MULTISIG}, 0;
+		is ${^_TYPE_PARAMS_MULTISIG}, 0;
 		
 		is(
 			__PACKAGE__->array_lookup2( array => \@arr, index => $ix ),
@@ -191,7 +191,7 @@ use Types::Common -sigs, -types;
 			'third alternative (hash)',
 		);
 		
-		is ${^TYPE_PARAMS_MULTISIG}, 1;
+		is ${^_TYPE_PARAMS_MULTISIG}, 1;
 		
 		is(
 			__PACKAGE__->array_lookup2( { array => \@arr, index => $ix } ),
@@ -199,7 +199,7 @@ use Types::Common -sigs, -types;
 			'third alternative (hashref)',
 		);
 		
-		is ${^TYPE_PARAMS_MULTISIG}, 1;
+		is ${^_TYPE_PARAMS_MULTISIG}, 1;
 		
 		is(
 			__PACKAGE__->array_lookup2( array => \@arr, ix => $ix ),
@@ -207,7 +207,7 @@ use Types::Common -sigs, -types;
 			'third alternative (hash, alias)',
 		);
 		
-		is ${^TYPE_PARAMS_MULTISIG}, 1;
+		is ${^_TYPE_PARAMS_MULTISIG}, 1;
 		
 		is(
 			__PACKAGE__->array_lookup2( { array => \@arr, ix => $ix } ),
@@ -215,7 +215,7 @@ use Types::Common -sigs, -types;
 			'third alternative (hashref, alias)',
 		);
 		
-		is ${^TYPE_PARAMS_MULTISIG}, 1;
+		is ${^_TYPE_PARAMS_MULTISIG}, 1;
 		
 		is(
 			array_lookup2( \@arr, $ix ),
@@ -223,7 +223,7 @@ use Types::Common -sigs, -types;
 			'fourth alternative',
 		);
 		
-		is ${^TYPE_PARAMS_MULTISIG}, 2;
+		is ${^_TYPE_PARAMS_MULTISIG}, 2;
 		
 		is(
 			__PACKAGE__->array_lookup2( LIST => \@arr, INDEX => $ix ),
@@ -231,7 +231,7 @@ use Types::Common -sigs, -types;
 			'fifth alternative',
 		);
 		
-		is ${^TYPE_PARAMS_MULTISIG}, 3;
+		is ${^_TYPE_PARAMS_MULTISIG}, 3;
 		
 		is(
 			array_lookup2( 'HELLOWORLD' ),
@@ -239,12 +239,12 @@ use Types::Common -sigs, -types;
 			'final alternative',
 		);
 		
-		is ${^TYPE_PARAMS_MULTISIG}, 4;
+		is ${^_TYPE_PARAMS_MULTISIG}, 4;
 		
 		my $e = exception { array_lookup() };
 		like $e, qr/Parameter validation failed/;
 		
-		is ${^TYPE_PARAMS_MULTISIG}, undef;
+		is ${^_TYPE_PARAMS_MULTISIG}, undef;
 	};
 }
 
@@ -268,13 +268,13 @@ use Types::Common -sigs, -types;
 		);
 		
 		is xyz( foo => 666 ), 666;
-		is ${^TYPE_PARAMS_MULTISIG}, 0;
+		is ${^_TYPE_PARAMS_MULTISIG}, 0;
 		
 		is xyz( { foolish => 999 } ), 999;
-		is ${^TYPE_PARAMS_MULTISIG}, 0;
+		is ${^_TYPE_PARAMS_MULTISIG}, 0;
 		
 		is xyz(42), 42;
-		is ${^TYPE_PARAMS_MULTISIG}, 1;
+		is ${^_TYPE_PARAMS_MULTISIG}, 1;
 	};
 }
 

@@ -96,6 +96,7 @@ sub _coderef_start_extra {
 	
 	$coderef->add_line( 'my $r;' );
 	$coderef->add_line( 'undef ${^TYPE_PARAMS_MULTISIG};' );
+	$coderef->add_line( 'undef ${^_TYPE_PARAMS_MULTISIG};' );
 	$coderef->add_gap;
 
 	for my $meta ( @{ $self->meta_alternatives } ) {
@@ -124,7 +125,7 @@ sub _coderef_meta_alternative {
 		my $alt_code = $meta->{source};
 		$alt_code =~ s/^sub [{]/do {/;
 		$coderef->add_line( sprintf(
-			'eval { local @_ = @_; $r = [ %s ]; ${^TYPE_PARAMS_MULTISIG} = %d }%sif ( %s );',
+			'eval { local @_ = @_; $r = [ %s ]; ${^TYPE_PARAMS_MULTISIG} = ${^_TYPE_PARAMS_MULTISIG} = %d }%sif ( %s );',
 			$alt_code,
 			$meta->{_index},
 			"\n\t",
@@ -136,7 +137,7 @@ sub _coderef_meta_alternative {
 		
 		my $callback_var = $coderef->add_variable( '$signature', \$meta->{closure} );
 		$coderef->add_line( sprintf(
-			'eval { $r = [ %s->(@_) ]; ${^TYPE_PARAMS_MULTISIG} = %d }%sif ( %s );',
+			'eval { $r = [ %s->(@_) ]; ${^TYPE_PARAMS_MULTISIG} = ${^_TYPE_PARAMS_MULTISIG} = %d }%sif ( %s );',
 			$callback_var,
 			$meta->{_index},
 			"\n\t",
