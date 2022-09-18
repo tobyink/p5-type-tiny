@@ -867,7 +867,9 @@ One option is to use the C<< ${^_TYPE_PARAMS_MULTISIG} >> global variable
 which will be set to the index of the signature which was used:
 
  my @results = $signature->( @_ );
- my ( $arr, $ix ) = ${^_TYPE_PARAMS_MULTISIG} == 1 ? reverse( @_ ) : @_;
+ my ( $arr, $ix ) = ${^_TYPE_PARAMS_MULTISIG} == 1
+   ? reverse( @results )
+   : @results;
 
 A neater solution is to use a C<goto_next> coderef to re-order alternative
 signature results into your preferred order:
