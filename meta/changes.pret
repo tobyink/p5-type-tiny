@@ -4617,7 +4617,6 @@
 		];
 	].
 
-##
 `Type-Tiny 1.999_009 cpan:TOBYINK`
 	issued  2022-09-16;
 	label "Type::Tiny 2.0 Preview J";
@@ -4638,6 +4637,33 @@
 		item [
 			a dcs:Change;
 			label "Improve cache key generation for parameterized types.";
+		];
+	].
+
+`Type-Tiny 1.999_010 cpan:TOBYINK`
+	issued  2022-09-18;
+	label "Type::Tiny 2.0 Preview K";
+	changeset [
+		dcs:versus `Type-Tiny 1.999_009 cpan:TOBYINK`;
+		item [
+			a dcs:Change;
+			label "The ${^TYPE_PARAMS_MULTISIG} magic global variable is now called ${^_TYPE_PARAMS_MULTISIG}. The old name will still be supported for at least six months after the next stable release.";
+		];
+		item [
+			a dcs:Tests;
+			label "More tests.";
+		];
+		item [
+			a dcs:Change;
+			label "If the `ws parameter is set to true in parameterized DelimitedStr type constraints, leading and trailing whitespace will now be permitted.";
+		];
+		item [
+			a dcs:Change;
+			label "Non-parameterized DelimitedStr now has a coercion from ArrayRef[Str].";
+		];
+		item [
+			a dcs:Change;
+			label "Eval::TypeTiny::CodeAccumulator now supports $coderef->compile(alias => 1).";
 		];
 	].
 

@@ -7,7 +7,7 @@ use warnings;
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '1.999_009';
+our $VERSION   = '1.999_010';
 
 $VERSION =~ tr/_//d;
 
