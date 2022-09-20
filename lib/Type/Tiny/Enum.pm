@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Tiny::Enum::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::Enum::VERSION   = '1.999_010';
+	$Type::Tiny::Enum::VERSION   = '1.999_011';
 }
 
 $Type::Tiny::Enum::VERSION =~ tr/_//d;

@@ -4667,3 +4667,13 @@
 		];
 	].
 
+`Type-Tiny 1.999_011 cpan:TOBYINK`
+	issued  2022-09-20;
+	label "Type::Tiny 2.0 Preview L";
+	changeset [
+		dcs:versus `Type-Tiny 1.999_010 cpan:TOBYINK`;
+		item [
+			a dcs:Addition;
+			label "Bundle Type::Tie which was previously in a separate distribution on the CPAN.";
+		];
+	].

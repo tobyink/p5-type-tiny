@@ -14,7 +14,7 @@ use Tie::Scalar ();
 BEGIN {
 	package Type::Tie;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '1.999_010';
+	our $VERSION   = '1.999_011';
 	our @ISA       = qw( Exporter::Tiny );
 	our @EXPORT    = qw( ttie );
 	
@@ -43,7 +43,7 @@ BEGIN {
 BEGIN {
 	package Type::Tie::BASE;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '1.999_010';
+	our $VERSION   = '1.999_011';
 	
 	$VERSION =~ tr/_//d;
 	
@@ -157,7 +157,7 @@ BEGIN {
 BEGIN {
 	package Type::Tie::ARRAY;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '1.999_010';
+	our $VERSION   = '1.999_011';
 	our @ISA       = qw( Tie::StdArray Type::Tie::BASE );
 	
 	$VERSION =~ tr/_//d;
@@ -200,7 +200,7 @@ BEGIN {
 BEGIN {
 	package Type::Tie::HASH;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '1.999_010';
+	our $VERSION   = '1.999_011';
 	our @ISA       = qw( Tie::StdHash Type::Tie::BASE );
 	
 	$VERSION =~ tr/_//d;
@@ -227,7 +227,7 @@ BEGIN {
 BEGIN {
 	package Type::Tie::SCALAR;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '1.999_010';
+	our $VERSION   = '1.999_011';
 	our @ISA       = qw( Tie::StdScalar Type::Tie::BASE );
 	
 	$VERSION =~ tr/_//d;
