@@ -47,7 +47,6 @@ if ( $extended_testing ) {
 			Test::Requires
 			Test::Tester
 			Test::Warnings
-			Type::Tie
 		);
 	if ( $] ge '5.028' ) {
 		$meta->{prereqs}{test}{requires}{$_} = '0'

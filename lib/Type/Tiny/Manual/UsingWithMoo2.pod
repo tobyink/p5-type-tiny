@@ -283,10 +283,6 @@ It is possible to tie variables to a type constraint.
   $n = 5;         # ok
   $n = "foo";     # dies
 
-This feature requires L<Type::Tie> which is a separate thing to install.
-Type::Tiny will automatically load Type::Tie in the background if it
-detects you're trying to tie a variable to a type.
-
 You can also tie arrays:
 
   tie my @numbers, Int;

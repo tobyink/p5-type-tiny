@@ -29,7 +29,6 @@ use strict;
 use warnings;
 use Test::More;
 
-use Test::Requires 'Type::Tie';
 use Types::Standard qw( ArrayRef Int );
 use Test::Fatal;
 

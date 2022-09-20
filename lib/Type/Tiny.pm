@@ -2405,9 +2405,8 @@ See also L<Type::API::Constraint>, etc.
 
 =item C<< TIESCALAR >>, C<< TIEARRAY >>, C<< TIEHASH >>
 
-These are provided as hooks that wrap L<Type::Tie>. (Type::Tie is distributed
-separately, and can be used with non-Type::Tiny type constraints too.) They
-allow the following to work:
+These are provided as hooks that wrap L<Type::Tie>. They allow the following
+to work:
 
    use Types::Standard qw(Int);
    tie my @list, Int;
