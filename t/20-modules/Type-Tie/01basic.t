@@ -70,6 +70,18 @@ is_deeply(
 	[ 0..5 ],
 );
 
+splice @numbers, 1, 0, 999, 666;
+
+like(
+	exception { splice @numbers, 1, 0, "Foo", "Bar"; },
+	qr{^Value "Foo" did not pass type constraint "Int"},
+);
+
+is_deeply(
+	\@numbers,
+	[ 0, 999, 666, 1..5 ],
+);
+
 ttie my %stuff, Int, foo => 1;
 $stuff{bar} = 2;
 
