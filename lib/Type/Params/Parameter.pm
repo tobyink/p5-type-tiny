@@ -1,3 +1,5 @@
+# INTERNAL MODULE: a parameter within a Type::Params::Signature.
+
 package Type::Params::Parameter;
 
 use 5.008001;

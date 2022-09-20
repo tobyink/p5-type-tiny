@@ -1,3 +1,5 @@
+# INTERNAL MODULE: OO backend for Type::Params multisig-type signatures.
+
 package Type::Params::Alternatives;
 
 use 5.008001;

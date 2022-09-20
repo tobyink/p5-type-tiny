@@ -1,3 +1,5 @@
+# INTERNAL MODULE: OO backend for Type::Params signatures.
+
 package Type::Params::Signature;
 
 use 5.008001;
