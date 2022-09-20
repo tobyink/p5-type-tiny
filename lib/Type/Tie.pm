@@ -11,7 +11,7 @@ use Tie::Scalar ();
 
 ++$Carp::CarpInternal{"Type::Tie::$_"} for qw( BASE SCALAR ARRAY HASH );
 
-BEGIN {
+{
 	package Type::Tie;
 	our $AUTHORITY = 'cpan:TOBYINK';
 	our $VERSION   = '1.999_011';
@@ -40,7 +40,7 @@ BEGIN {
 	}
 };
 
-BEGIN {
+{
 	package Type::Tie::BASE;
 	our $AUTHORITY = 'cpan:TOBYINK';
 	our $VERSION   = '1.999_011';
@@ -154,7 +154,7 @@ BEGIN {
 	}
 };
 
-BEGIN {
+{
 	package Type::Tie::ARRAY;
 	our $AUTHORITY = 'cpan:TOBYINK';
 	our $VERSION   = '1.999_011';
@@ -197,7 +197,7 @@ BEGIN {
 	}
 };
 
-BEGIN {
+{
 	package Type::Tie::HASH;
 	our $AUTHORITY = 'cpan:TOBYINK';
 	our $VERSION   = '1.999_011';
@@ -224,7 +224,7 @@ BEGIN {
 	}
 };
 
-BEGIN {
+{
 	package Type::Tie::SCALAR;
 	our $AUTHORITY = 'cpan:TOBYINK';
 	our $VERSION   = '1.999_011';
