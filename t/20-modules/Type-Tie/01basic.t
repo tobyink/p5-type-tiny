@@ -31,6 +31,8 @@ use Types::Standard qw( Int Num );
 
 ttie my $count, Int, 0;
 
+is( tied($count)->type, Int );
+
 $count++;            is($count, 1);
 $count = 2;          is($count, 2);
 

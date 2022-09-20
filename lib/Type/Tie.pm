@@ -312,6 +312,8 @@ conform.
    
    ttie my $count, Int->plus_coercions(Num, 'int $_'), 0;
    
+   print tied($count)->type, "\n";   # 'Int'
+   
    $count++;            # ok
    $count = 2;          # ok
    $count = 3.14159;    # ok, coerced to 3
