@@ -2,10 +2,18 @@ use strict;
 use warnings;
 no warnings 'uninitialized';
 
-$meta->{prereqs}{runtime}{requires}{'Scalar::Util'}   = '1.13'  if $] < 5.007003;
-$meta->{prereqs}{runtime}{requires}{'Data::Dumper'}   = '1.121' if $] < 5.008001;
-$meta->{prereqs}{runtime}{requires}{'Text::Balanced'} = '1.95'  if $] < 5.007003;
-$meta->{prereqs}{runtime}{requires}{'Exporter'}       = '5.57'  if $] < 5.009001;
+# Hash::Util::FieldHash was first released with perl v5.9.4
+if ( $] lt 5.009004 ) {
+	$meta->{prereqs}{runtime}{recommends}{'Hash::FieldHash'} = 0;
+	$meta->{prereqs}{runtime}{requires}{'Hash::Util::FieldHash::Compat'} = 0;
+}
+
+# Old versions of Perl come with old versions of Exporter.
+# Not that we use Exporter a whole lot anyway.
+if ( $] lt 5.009001 ) {
+	$meta->{prereqs}{runtime}{requires}{'Exporter'} = '5.57';
+}
+
 
 my $extended_testing = 0;
 if ( $ENV{EXTENDED_TESTING} and $] ge '5.008009' ) {
@@ -54,12 +62,6 @@ if ( $extended_testing ) {
 				Validation::Class::Simple
 			);
 	}
-}
-
-if ( $ENV{TRAVIS}
-and exists $ENV{PERL_TYPE_TINY_XS}
-and not $ENV{PERL_TYPE_TINY_XS} ) {
-	delete $meta->{prereqs}{runtime}{recommends}{'Type::Tiny::XS'};
 }
 
 if ( $ENV{AUTOMATED_TESTING} and "$^V" =~ /c$/ ) {
