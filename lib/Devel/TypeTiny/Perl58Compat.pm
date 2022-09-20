@@ -1,3 +1,5 @@
+# INTERNAL MODULE: Perl 5.8 compatibility for Type::Tiny.
+
 package Devel::TypeTiny::Perl58Compat;
 
 use 5.008;
@@ -23,50 +25,3 @@ unless ( exists &re::is_regexp ) {
 #### Done!
 
 5.8;
-
-__END__
-
-=pod
-
-=encoding utf-8
-
-=for stopwords pragmas
-
-=head1 NAME
-
-Devel::TypeTiny::Perl58Compat - shims to allow Type::Tiny to run on Perl 5.8.x
-
-=head1 STATUS
-
-This module is considered part of Type-Tiny's internals. It is not
-covered by the
-L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
-
-=head1 DESCRIPTION
-
-This is not considered part of Type::Tiny's public API.
-
-Currently this module just has one job: it patches L<re> to provide a
-C<is_regexp> function, as this was only added in Perl 5.9.5.
-
-=head1 BUGS
-
-Please report any bugs to
-L<https://github.com/tobyink/p5-type-tiny/issues>.
-
-=head1 AUTHOR
-
-Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
-
-=head1 COPYRIGHT AND LICENCE
-
-This software is copyright (c) 2013-2014, 2017-2022 by Toby Inkster.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
-=head1 DISCLAIMER OF WARRANTIES
-
-THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
-WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
-MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
