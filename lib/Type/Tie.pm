@@ -343,6 +343,19 @@ L<Type::Tiny|Type::Tiny::Manual>
 
 =back
 
+However, with Type::Tiny, you don't even need to C<< use Type::Tie >>.
+
+   use Types::Standard qw( Int Num );
+   
+   tie my $count, Int->plus_coercions(Num, 'int $_'), 0;
+   
+   print tied($count)->type, "\n";   # 'Int'
+   
+   $count++;            # ok
+   $count = 2;          # ok
+   $count = 3.14159;    # ok, coerced to 3
+   $count = "Monkey!";  # dies
+
 =begin trustme
 
 =item ttie
