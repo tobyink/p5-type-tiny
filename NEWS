@@ -8,6 +8,7 @@
 
  - Improved API for `Type::Params`.
  - New `Types::Common` module.
+ - `Type::Tie` which was a separate distribution, is now included.
  - Dropped support for versions of Perl older than Perl 5.8.1.
  - Uses `Exporter::Tiny 1.004` for lexical imports on Perl blead.
  - `Type::Tiny` now has a `type_default` method.
@@ -29,5 +30,5 @@ Test Suite Statistics:
    > Files=285, Tests=14294, 26 wallclock secs
 
  - Type-Tiny-2.000000:
-   > Files=322, Tests=14809, 32 wallclock secs
+   > Files=327, Tests=14855, 32 wallclock secs
 
