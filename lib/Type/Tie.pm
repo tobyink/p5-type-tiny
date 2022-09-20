@@ -347,21 +347,16 @@ L<Type::Tiny|Type::Tiny::Manual>
 
 =end trustme
 
-=head2 About Cloning with Storable::dclone (and Clone::clone)
-
-Cloning variables with Storable::dclone works, but cloning
-with Clone::clone is not possible. See
-L<Bug #127576 for Type-Tie: Doesn't work with Clone::clone|https://rt.cpan.org/Public/Bug/Display.html?id=127576>
-
 =head1 BUGS
 
 Please report any bugs to
 L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
 
-=head1 SUPPORT
+=head2 Cloning with Storable::dclone (and Clone::clone)
 
-B<< IRC: >> support is available through in the I<< #moops >> channel
-on L<irc.perl.org|http://www.irc.perl.org/channels.html>.
+Cloning variables with Storable::dclone works, but cloning
+with Clone::clone is not possible. See
+L<Bug #127576 for Type-Tie: Doesn't work with Clone::clone|https://rt.cpan.org/Public/Bug/Display.html?id=127576>
 
 =head1 SEE ALSO
 
