@@ -30,6 +30,10 @@
 		deps:on "Sub::Util"^^deps:CpanId;
 		comment "This allows Type::Library to name subs nicely."@en;
 	];
+	deps:runtime-recommendation [
+		deps:on "Class::XSAccessor 1.17"^^deps:CpanId;
+		comment "Makes some stuff marginally faster."@en;
+	];
 	deps:test-requirement [
 		deps:on "Test::More 0.96"^^deps:CpanId;
 		comment "I don't have the patience to maintain a test suite that runs on ancient versions of Test::More."@en;

@@ -4727,5 +4727,9 @@
 			a dcs:Change;
 			label "Type::Parser's internal packages now have version numbers.";
 		];
+		item [
+			a dcs:Packaging;
+			label "Add Class::XSAccessor to Type::Tiny's recommendations.";
+		];
 	].
 
