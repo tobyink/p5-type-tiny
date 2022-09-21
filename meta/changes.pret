@@ -4677,3 +4677,51 @@
 			label "Bundle Type::Tie which was previously in a separate distribution on the CPAN.";
 		];
 	].
+
+`Type-Tiny 1.999_012 cpan:TOBYINK`
+	issued  2022-09-21;
+	label "Type::Tiny 2.0 Preview M";
+	changeset [
+		dcs:versus `Type-Tiny 1.999_011 cpan:TOBYINK`;
+		item [
+			a dcs:Change;
+			label "Rewrite much of Type::Tie to no longer use inside-out objects and avoid a dependency on Hash::Util::FieldHash or alternative implementations of fieldhashes.";
+		];
+		item [
+			a dcs:Change;
+			label "Using Type::Utils to declare a named type will now automatically add the type to the caller's type registry.";
+		];
+		item [
+			a dcs:Change;
+			label "Adding a type constraint to a type library will now also add it to the library's type registry. (Even though this registry is unlikely to be used.)";
+		];
+		item [
+			a dcs:Documentation;
+			label "Removed stub pod from a bunch of internal modules. They're internal, so nobody should be expecting pod.";
+		];
+		item [
+			a dcs:Documentation;
+			label "Document the Type::Tie::BASE `type` method.";
+		];
+		item [
+			a dcs:Documentation;
+			label "Document in Type::Tie that Type::Tie is implicitly loaded when you tie a variable to a Type::Tiny type constraint. (It was already documented in the manual.)";
+		];
+		item [
+			a dcs:Tests;
+			label "Improved test cases for Type::Tie with an aim at 100% coverage.";
+		];
+		item [
+			a dcs:Tests;
+			label "Bundle a (renamed) copy of Type::Nano in the test suite for some tests combining Type::Nano and Type::Tiny type constraints, and converting Type::Nano to Type::Tiny.";
+		];
+		item [
+			a dcs:Change;
+			label "Type::Tie now supports variables being cloned with Clone::clone(). It already supported Storable::dclone().";
+		];
+		item [
+			a dcs:Change;
+			label "Type::Tie will now try to load Class::XSAccessor::Array for a speed-up.";
+		];
+	].
+
