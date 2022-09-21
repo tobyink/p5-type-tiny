@@ -4,7 +4,7 @@ Running the test suite
 In the main directory for the distribution (i.e. the directory containing
 dist.ini), run the following command:
 
-	prove -lr "t"
+	prove -lr -Iinc "t"
 
 
 
@@ -13,14 +13,17 @@ Test suite structure
 
 Each test should contain its own documentation in pod format.
 
-t/20-unit/
-	- unit tests for each module in the distribution
+t/20-modules/
+	- tests for each module in the distribution
 
-t/30-integration/
-	- integration tests for using Type-Tiny with other software
+t/21-types/
+	- tests for each type in every bundled type library
+
+t/30-external/
+	- tests for using Type-Tiny with other software
 	- these should be skipped if the other software is not available
 
-t/40-regression/
+t/40-bugs/
 	- tests related to specific bug reports
 
 t/lib/
