@@ -197,8 +197,12 @@ Evaluate: {
 } #/ Evaluate:
 
 {
-
 	package Type::Parser::AstBuilder;
+	
+	our $AUTHORITY = 'cpan:TOBYINK';
+	our $VERSION   = '1.999_012';
+	
+	$VERSION =~ tr/_//d;
 	
 	sub new {
 		my $class = shift;
@@ -342,15 +346,24 @@ Evaluate: {
 }
 
 {
-
 	package Type::Parser::Token;
+	
+	our $AUTHORITY = 'cpan:TOBYINK';
+	our $VERSION   = '1.999_012';
+	
+	$VERSION =~ tr/_//d;
+	
 	sub type     { $_[0][0] }
 	sub spelling { $_[0][1] }
 }
 
 {
-
 	package Type::Parser::TokenStream;
+	
+	our $AUTHORITY = 'cpan:TOBYINK';
+	our $VERSION   = '1.999_012';
+	
+	$VERSION =~ tr/_//d;
 	
 	use Scalar::Util qw(looks_like_number);
 	

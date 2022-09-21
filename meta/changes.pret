@@ -4723,5 +4723,9 @@
 			a dcs:Change;
 			label "Type::Tie will now try to load Class::XSAccessor::Array for a speed-up.";
 		];
+		item [
+			a dcs:Change;
+			label "Type::Parser's internal packages now have version numbers.";
+		];
 	].
 
