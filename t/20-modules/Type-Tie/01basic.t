@@ -84,6 +84,20 @@ is_deeply(
 	[ 0, 999, 666, 1..5 ],
 );
 
+shift @numbers for 0..2;
+pop @numbers;
+
+is_deeply(
+	\@numbers,
+	[ 1..4 ],
+);
+
+# These don't really make sense for arrays, so I don't care about the
+# results so much. Mostly just checking they don't throw an exception.
+is( exists($numbers[0]), exists( tied(@numbers)->_REF->[0] ) );
+delete $numbers[0];
+$#numbers = 3;
+
 ttie my %stuff, Int, foo => 1;
 $stuff{bar} = 2;
 
@@ -103,5 +117,7 @@ is_deeply(
 	\%stuff,
 	{ foo => 1 },
 );
+
+ok scalar( %stuff );
 
 done_testing;

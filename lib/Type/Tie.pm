@@ -81,6 +81,7 @@ use Scalar::Util ();
 		shift->_TYPE;
 	}
 	
+	# Only used if the type has no get_message method
 	sub _dd {
 		require Type::Tiny;
 		goto \&Type::Tiny::_dd;
@@ -131,7 +132,7 @@ use Scalar::Util ();
 		Carp::croak( "Storable::thaw only supported for dclone-ing" )
 			unless $cloning;
 		
-		$o->_STORABLE_thaw_update_from_ref( $o2 );
+		$o->_THAW( $o2 ); # implement in child classes
 		
 		my $refaddr = unpack( 'j', $packedRefaddr );
 		my $type = $tmp_clone_types{$refaddr}[0];
@@ -167,8 +168,8 @@ use Scalar::Util ();
 	sub UNSHIFT   { my $s = shift; unshift @{$s->_REF}, $s->coerce_and_check_value( @_ ) }
 	sub EXISTS    { exists $_[0]->_REF->[ $_[1] ] }
 	sub DELETE    { delete $_[0]->_REF->[ $_[1] ] }
-	
-	sub SPLICE {
+	sub EXTEND    {}
+	sub SPLICE    {
 		my $o   = shift;
 		my $sz  = scalar @{$o->_REF};
 		my $off = @_ ? shift : 0;
@@ -176,11 +177,7 @@ use Scalar::Util ();
 		my $len = @_ ? shift : $sz-$off;
 		splice @{$o->_REF}, $off, $len, $o->coerce_and_check_value( @_ );
 	}
-	
-	sub EXTEND    {}
-	sub DESTROY   {}
-	
-	sub _STORABLE_thaw_update_from_ref { @{ $_[0][0] ||= [] } = @{$_[1]} }
+	sub _THAW     { @{ $_[0][0] ||= [] } = @{$_[1]} }
 };
 
 {
@@ -206,10 +203,7 @@ use Scalar::Util ();
 	sub DELETE    { delete $_[0]->_REF->{ $_[1] } }
 	sub CLEAR     { %{ $_[0]->_REF } = () }
 	sub SCALAR    { scalar %{ $_[0]->_REF } }
-	
-	sub DESTROY   {}
-	
-	sub _STORABLE_thaw_update_from_ref { %{ $_[0][0] ||= {} } = %{$_[1]} }
+	sub _THAW     { %{ $_[0][0] ||= {} } = %{$_[1]} }
 };
 
 {
@@ -230,9 +224,7 @@ use Scalar::Util ();
 	
 	sub STORE     { ${ $_[0]->_REF } = $_[0]->coerce_and_check_value( $_[1] ) }
 	sub FETCH     { ${ $_[0]->_REF } }
-	sub DESTROY   { undef ${ $_[0]->_REF } }
-	
-	sub _STORABLE_thaw_update_from_ref { ${ $_[0][0] ||= do { my $x; \$x } } = ${$_[1]} }
+	sub _THAW     { ${ $_[0][0] ||= do { my $x; \$x } } = ${$_[1]} }
 };
 
 1;
