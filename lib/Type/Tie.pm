@@ -356,6 +356,12 @@ However, with Type::Tiny, you don't even need to C<< use Type::Tie >>.
    $count = 3.14159;    # ok, coerced to 3
    $count = "Monkey!";  # dies
 
+=head2 Cloning tied variables
+
+If you clone tied variables with C<dclone> from L<Storable>, the clone
+will also be tied. Other cloning mechanisms like the L<Clone> module
+are not currently supported, and just produce clones without the tie.
+
 =begin trustme
 
 =item ttie
@@ -366,12 +372,6 @@ However, with Type::Tiny, you don't even need to C<< use Type::Tie >>.
 
 Please report any bugs to
 L<http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>.
-
-=head2 Cloning with Storable::dclone (and Clone::clone)
-
-Cloning variables with Storable::dclone works, but cloning
-with Clone::clone is not possible. See
-L<Bug #127576 for Type-Tie: Doesn't work with Clone::clone|https://rt.cpan.org/Public/Bug/Display.html?id=127576>
 
 =head1 SEE ALSO
 
