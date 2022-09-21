@@ -71,7 +71,7 @@ my $scalarContainer = [ '' ];
 
 ttie $scalarContainer->[0], Int;
 
-my $scalarContainerDclone = dclone(\@array);
+my $scalarContainerDclone = dclone($scalarContainer);
 
 eval {
 	$scalarContainerDclone->[0] = 1;
