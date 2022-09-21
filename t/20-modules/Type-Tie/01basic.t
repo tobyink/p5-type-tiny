@@ -118,6 +118,8 @@ is_deeply(
 	{ foo => 1 },
 );
 
-ok scalar( %stuff );
+# Just test this throws no exception. Don't really care what it
+# returns.
+scalar( %stuff );
 
 done_testing;
