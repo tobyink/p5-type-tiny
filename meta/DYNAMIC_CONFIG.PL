@@ -2,12 +2,6 @@
 	use warnings;
 	no warnings 'uninitialized';
 	
-	# Hash::Util::FieldHash was first released with perl v5.9.4
-	if ( $] lt 5.009004 ) {
-		$meta->{prereqs}{runtime}{recommends}{'Hash::FieldHash'} = 0;
-		$meta->{prereqs}{runtime}{requires}{'Hash::Util::FieldHash::Compat'} = 0;
-	}
-	
 	# Old versions of Perl come with old versions of Exporter.
 	# Not that we use Exporter a whole lot anyway.
 	if ( $] lt 5.009001 ) {

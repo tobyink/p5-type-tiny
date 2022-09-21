@@ -5,9 +5,6 @@ use warnings;
 use Carp ();
 use Exporter::Tiny ();
 use Scalar::Util ();
-use Tie::Array ();
-use Tie::Hash ();
-use Tie::Scalar ();
 
 ++$Carp::CarpInternal{"Type::Tie::$_"} for qw( BASE SCALAR ARRAY HASH );
 
@@ -22,7 +19,7 @@ use Tie::Scalar ();
 	
 	sub ttie (\[$@%]@)#>&%*/&<%\$[]^!@;@)
 	{
-		my ($ref, $type, @vals) = @_;
+		my ( $ref, $type, @vals ) = @_;
 		
 		if ( 'HASH' eq ref $ref ) {
 			tie %$ref, "Type::Tie::HASH", $type;
@@ -45,47 +42,43 @@ use Tie::Scalar ();
 	our $AUTHORITY = 'cpan:TOBYINK';
 	our $VERSION   = '1.999_011';
 	
+	sub _REF    { $_[0][0] }                                      # ro
+	sub _TYPE   { ( @_ == 2 ) ? ( $_[0][1] = $_[1] ) : $_[0][1] } # rw
+	sub _CHECK  { ( @_ == 2 ) ? ( $_[0][2] = $_[1] ) : $_[0][2] } # rw
+	sub _COERCE { ( @_ == 2 ) ? ( $_[0][3] = $_[1] ) : $_[0][3] } # rw
+	
 	$VERSION =~ tr/_//d;
-	
-	BEGIN {
-		my $impl;
-		$impl ||= eval { require Hash::FieldHash;               'Hash::FieldHash' };
-		$impl ||= eval { require Hash::Util::FieldHash;         'Hash::Util::FieldHash' };
-		$impl ||= do   { require Hash::Util::FieldHash::Compat; 'Hash::Util::FieldHash::Compat' };
-		$impl->import('fieldhash');
-	};
-	
-	fieldhash(my %TYPE);
-	fieldhash(my %COERCE);
-	fieldhash(my %CHECK);
 	
 	sub _set_type {
 		my $self = shift;
 		my $type = $_[0];
 		
-		$TYPE{$self} = $type;
+		$self->_TYPE( $type );
 		
-		if ( Scalar::Util::blessed($type) and $type->isa( 'Type::Tiny' ) ) {
-			$CHECK{$self} = $type->compiled_check;
-			$COERCE{$self} = undef;
-			$COERCE{$self} = $type->coercion->compiled_coercion
-				if $type->has_coercion;
+		if ( Scalar::Util::blessed( $type ) and $type->isa( 'Type::Tiny' ) ) {
+			$self->_CHECK( $type->compiled_check );
+			$self->_COERCE(
+				$type->has_coercion
+					? $type->coercion->compiled_coercion
+					: undef
+			);
 		}
 		else {
-			$CHECK{$self} = $type->can('compiled_check')
-				? $type->compiled_check
-				: sub { $type->check($_[0]) };
-			$COERCE{$self} = undef;
-			$COERCE{$self} = sub { $type->coerce($_[0]) }
-				if $type->can("has_coercion")
-				&& $type->can("coerce")
-				&& $type->has_coercion;
+			$self->_CHECK(
+				$type->can( 'compiled_check' )
+					? $type->compiled_check
+					: sub { $type->check( $_[0] ) }
+			);
+			$self->_COERCE(
+				$type->can( 'has_coercion' ) && $type->can( 'coerce' ) && $type->has_coercion
+					? sub { $type->coerce( $_[0] ) }
+					: undef
+			);
 		}
 	}
 	
 	sub type {
-		my $self = shift;
-		$TYPE{$self};
+		shift->_TYPE;
 	}
 	
 	sub _dd {
@@ -95,17 +88,17 @@ use Tie::Scalar ();
 	
 	sub coerce_and_check_value {
 		my $self   = shift;
-		my $check  = $CHECK{$self};
-		my $coerce = $COERCE{$self};
+		my $check  = $self->_CHECK;
+		my $coerce = $self->_COERCE;
 		
 		my @vals = map {
-			my $val = $coerce ? $coerce->($_) : $_;
-			if (not $check->($val)) {
-				my $type = $TYPE{$self};
+			my $val = $coerce ? $coerce->( $_ ) : $_;
+			if ( not $check->( $val ) ) {
+				my $type = $self->_TYPE;
 				Carp::croak(
-					$type && $type->can('get_message')
-						? $type->get_message($val)
-						: sprintf("%s does not meet type constraint %s", _dd($_), $type||'Unknown')
+					$type && $type->can( 'get_message' )
+						? $type->get_message( $val )
+						: sprintf( '%s does not meet type constraint %s', _dd($_), $type || 'Unknown' )
 				);
 			}
 			$val;
@@ -121,36 +114,30 @@ use Tie::Scalar ();
 	# a particular type deletes its key.
 	my %tmp_clone_types;
 	sub STORABLE_freeze {
-		die "Scalar::Util is needed for cloning with Storage::dclone"
-			unless eval { require Scalar::Util };
-		my $self = shift;
-		my $cloning = shift;
-		
-		die "Storage::freeze only supported for dclone-ing"
+		my ( $o, $cloning ) = @_;
+		Carp::croak( "Storable::freeze only supported for dclone-ing" )
 			unless $cloning;
 		
-		my $type = $TYPE{$self};
-		my $refaddr = Scalar::Util::refaddr($type);
+		my $type = $o->_TYPE;
+		my $refaddr = Scalar::Util::refaddr( $type );
 		$tmp_clone_types{$refaddr} ||= [ $type, 0 ];
 		++$tmp_clone_types{$refaddr}[1];
-		return (pack('j', $refaddr), $self);
+		
+		return ( pack( 'j', $refaddr ), $o->_REF );
 	}
 	
 	sub STORABLE_thaw {
-		my $self = shift;
-		my $cloning = shift;
-		my $packedRefaddr = shift;
-		my $obj = shift;
-		
-		die "Storage::thaw only supported for dclone-ing"
+		my ( $o, $cloning, $packedRefaddr, $o2 ) = @_;
+		Carp::croak( "Storable::thaw only supported for dclone-ing" )
 			unless $cloning;
 		
-		$self->_STORABLE_thaw_update_from_obj($obj);
-		my $refaddr = unpack('j', $packedRefaddr);
+		$o->_STORABLE_thaw_update_from_ref( $o2 );
+		
+		my $refaddr = unpack( 'j', $packedRefaddr );
 		my $type = $tmp_clone_types{$refaddr}[0];
 		--$tmp_clone_types{$refaddr}[1]
 			or delete $tmp_clone_types{$refaddr};
-		$self->_set_type($type);
+		$o->_set_type($type);
 	}
 };
 
@@ -158,97 +145,94 @@ use Tie::Scalar ();
 	package Type::Tie::ARRAY;
 	our $AUTHORITY = 'cpan:TOBYINK';
 	our $VERSION   = '1.999_011';
-	our @ISA       = qw( Tie::StdArray Type::Tie::BASE );
+	our @ISA       = qw( Type::Tie::BASE );
 	
 	$VERSION =~ tr/_//d;
 	
 	sub TIEARRAY {
 		my $class = shift;
-		my $self = $class->SUPER::TIEARRAY;
-		$self->_set_type($_[0]);
-		return $self;
+		my $self  = bless( [ [] ], $class );
+		$self->_set_type( $_[0] );
+		$self;
 	}
 	
-	sub STORE {
-		my $self = shift;
-		$self->SUPER::STORE($_[0], $self->coerce_and_check_value($_[1]));
-	}
-	
-	sub PUSH {
-		my $self = shift;
-		$self->SUPER::PUSH( $self->coerce_and_check_value(@_) );
-	}
-	
-	sub UNSHIFT {
-		my $self = shift;
-		$self->SUPER::UNSHIFT( $self->coerce_and_check_value(@_) );
-	}
+	sub FETCHSIZE { scalar @{ $_[0]->_REF } }
+	sub STORESIZE { $#{ $_[0]->_REF } = $_[1] }
+	sub STORE     { $_[0]->_REF->[ $_[1] ] = $_[0]->coerce_and_check_value( $_[2] ) }
+	sub FETCH     { $_[0]->_REF->[ $_[1] ] }
+	sub CLEAR     { @{ $_[0]->_REF } = () }
+	sub POP       { pop @{ $_[0]->_REF } }
+	sub PUSH      { my $s = shift; push @{$s->_REF}, $s->coerce_and_check_value( @_ ) }
+	sub SHIFT     { shift @{ $_[0]->_REF } }
+	sub UNSHIFT   { my $s = shift; unshift @{$s->_REF}, $s->coerce_and_check_value( @_ ) }
+	sub EXISTS    { exists $_[0]->_REF->[ $_[1] ] }
+	sub DELETE    { delete $_[0]->_REF->[ $_[1] ] }
 	
 	sub SPLICE {
-		my $self = shift;
-		my ($start, $len, @rest) = @_;
-		$self->SUPER::SPLICE($start, $len, $self->coerce_and_check_value(@rest) );
+		my $o   = shift;
+		my $sz  = scalar @{$o->_REF};
+		my $off = @_ ? shift : 0;
+		$off   += $sz if $off < 0;
+		my $len = @_ ? shift : $sz-$off;
+		splice @{$o->_REF}, $off, $len, $o->coerce_and_check_value( @_ );
 	}
 	
-	sub _STORABLE_thaw_update_from_obj {
-		my $self = shift;
-		my $obj = shift;
-		@$self = @$obj;
-	}
+	sub EXTEND    {}
+	sub DESTROY   {}
+	
+	sub _STORABLE_thaw_update_from_ref { @{ $_[0][0] ||= [] } = @{$_[1]} }
 };
 
 {
 	package Type::Tie::HASH;
 	our $AUTHORITY = 'cpan:TOBYINK';
 	our $VERSION   = '1.999_011';
-	our @ISA       = qw( Tie::StdHash Type::Tie::BASE );
+	our @ISA       = qw( Type::Tie::BASE );
 	
 	$VERSION =~ tr/_//d;
 	
 	sub TIEHASH {
 		my $class = shift;
-		my $self = $class->SUPER::TIEHASH;
-		$self->_set_type($_[0]);
-		return $self;
+		my $self  = bless( [ {} ], $class );
+		$self->_set_type( $_[0] );
+		$self;
 	}
 	
-	sub STORE {
-		my $self = shift;
-		$self->SUPER::STORE($_[0], $self->coerce_and_check_value($_[1]));
-	}
+	sub STORE     { $_[0]->_REF->{ $_[1] } = $_[0]->coerce_and_check_value( $_[2] ) }
+	sub FETCH     { $_[0]->_REF->{ $_[1] } }
+	sub FIRSTKEY  { my $a = scalar keys %{ $_[0]->_REF }; each %{ $_[0]->_REF } }
+	sub NEXTKEY   { each %{ $_[0]->_REF } }
+	sub EXISTS    { exists $_[0]->_REF->{ $_[1] } }
+	sub DELETE    { delete $_[0]->_REF->{ $_[1] } }
+	sub CLEAR     { %{ $_[0]->_REF } = () }
+	sub SCALAR    { scalar %{ $_[0]->_REF } }
 	
-	sub _STORABLE_thaw_update_from_obj {
-		my $self = shift;
-		my $obj = shift;
-		%$self = %$obj;
-	}
+	sub DESTROY   {}
+	
+	sub _STORABLE_thaw_update_from_ref { %{ $_[0][0] ||= {} } = %{$_[1]} }
 };
 
 {
 	package Type::Tie::SCALAR;
 	our $AUTHORITY = 'cpan:TOBYINK';
 	our $VERSION   = '1.999_011';
-	our @ISA       = qw( Tie::StdScalar Type::Tie::BASE );
+	our @ISA       = qw( Type::Tie::BASE );
 	
 	$VERSION =~ tr/_//d;
 	
 	sub TIESCALAR {
 		my $class = shift;
-		my $self = $class->SUPER::TIESCALAR;
+		my $x;
+		my $self  = bless( [ \$x ], $class );
 		$self->_set_type($_[0]);
-		return $self;
+		$self;
 	}
 	
-	sub STORE {
-		my $self = shift;
-		$self->SUPER::STORE( $self->coerce_and_check_value($_[0]) );
-	}
+	sub STORE     { ${ $_[0]->_REF } = $_[0]->coerce_and_check_value( $_[1] ) }
+	sub FETCH     { ${ $_[0]->_REF } }
+	sub DESTROY   { undef ${ $_[0]->_REF } }
 	
-	sub _STORABLE_thaw_update_from_obj {
-		my $self = shift;
-		my $obj = shift;
-		$self = $obj;
-	}
+	sub _STORABLE_thaw_update_from_ref { ${ $_[0][0] ||= do { my $x; \$x } } = ${$_[1]} }
 };
 
 1;
@@ -359,8 +343,8 @@ However, with Type::Tiny, you don't even need to C<< use Type::Tie >>.
 =head2 Cloning tied variables
 
 If you clone tied variables with C<dclone> from L<Storable>, the clone
-will also be tied. Other cloning mechanisms like the L<Clone> module
-are not currently supported, and just produce clones without the tie.
+will also be tied. The L<Clone> module is also able to successfully clone
+tied variables. With other cloning techniques, your level of success may vary.
 
 =begin trustme
 

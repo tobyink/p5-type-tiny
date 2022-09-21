@@ -62,11 +62,9 @@ bundled in this distribution, but has since been spun off as a separate
 distribution. Don't worry - it's quick and easy to install.
 
 At run-time, Type::Tiny also requires the following Perl modules:
-L<B>, L<B::Deparse>, L<Carp>, L<Data::Dumper>, L<Hash::Util::FieldHash>,
-L<Scalar::Util>, L<Text::Balanced>, L<overload>, L<strict>, and L<warnings>.
-All of these come bundled with Perl itself. Prior to Perl 5.10,
-L<Hash::Util::FieldHash> was not included with Perl, so instead
-L<Hash::Util::FieldHash::Compat> should be installed from the CPAN.
+L<B>, L<B::Deparse>, L<Carp>, L<Data::Dumper>, L<Scalar::Util>,
+L<Text::Balanced>, L<overload>, L<strict>, and L<warnings>.
+All of these come bundled with Perl itself.
 
 Certain features require additional modules. Stack traces on exceptions
 require L<Devel::StackTrace>. The L<Reply::Plugin::TypeTiny> plugin for
