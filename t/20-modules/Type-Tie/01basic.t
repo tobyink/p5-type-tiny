@@ -41,6 +41,12 @@ like(
 	qr{^Value "Monkey!" did not pass type constraint "Int"},
 );
 
+is(
+	scalar( @{ tied($count) } ),
+	Type::Tie::BASE::_NEXT_SLOT(),
+	'_NEXT_SLOT',
+);
+
 ttie my @numbers, Int, 1, 2, 3;
 
 unshift @numbers, 0;
