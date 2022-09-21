@@ -38,7 +38,7 @@ my $Num = bless(
 	'Local::TypeConstraint',
 );
 
-ttie my $x, $Num, 0;
+ttie my($x), $Num, 0;
 
 $x = 1;
 
