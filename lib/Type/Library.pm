@@ -212,7 +212,7 @@ sub meta {
 
 sub add_type {
 	my $meta  = shift->meta;
-	my $class = blessed( $meta );
+	my $class = blessed( $meta ) ;
 	
 	_croak( 'Type library is immutable' ) if $meta->{immutable};
 	
@@ -241,6 +241,10 @@ sub add_type {
 		push @{ ${"$class\::EXPORT_TAGS"}{$_} ||= [] }, $name for @$tags;
 		$meta->{'functions'}{$name} = { type => $type, tags => $tags };
 	}
+	
+	$INC{'Type/Registry.pm'}
+		? 'Type::Registry'->for_class( $class )->add_type( $type, $name )
+		: ( $Type::Registry::DELAYED{$class}{$name} = $type );
 	
 	return $type;
 } #/ sub add_type

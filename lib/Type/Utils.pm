@@ -152,8 +152,14 @@ sub declare {
 		$type = $bless->new( %opts );
 	}
 	
-	if ( $caller->isa( "Type::Library" ) ) {
-		$caller->meta->add_type( $type ) unless $type->is_anon;
+	if ( not $type->is_anon ) {
+		
+		$caller->meta->add_type( $type )
+			if $caller->isa( 'Type::Library' );
+		
+		$INC{'Type/Registry.pm'}
+			? 'Type::Registry'->for_class( $caller )->add_type( $type, $opts{name} )
+			: ( $Type::Registry::DELAYED{$caller}{$opts{name}} = $type );
 	}
 	
 	return $type;
@@ -718,9 +724,10 @@ specify the parent type (if any) and (possibly) refine its definition.
    my $EvenInt = declare as Int, where { $_ % 2 == 0 };
 
 I<< NOTE: >>
-If the caller package inherits from L<Type::Library> then any non-anonymous
-types declared in the package will be automatically installed into the
-library.
+Named types will be automatically added to the caller's type registry.
+(See L<Type::Registry>.) If the caller package inherits from L<Type::Library>
+named types will also be automatically installed into the library and
+made available as exports.
 
 Hidden gem: if you're inheriting from a type constraint that includes some
 coercions, you can include C<< coercion => 1 >> in the C<< %options >> hash
