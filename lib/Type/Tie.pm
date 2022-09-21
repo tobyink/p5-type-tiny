@@ -42,12 +42,36 @@ use Scalar::Util ();
 	our $AUTHORITY = 'cpan:TOBYINK';
 	our $VERSION   = '1.999_011';
 	
-	sub _REF    { $_[0][0] }                                      # ro
-	sub _TYPE   { ( @_ == 2 ) ? ( $_[0][1] = $_[1] ) : $_[0][1] } # rw
-	sub _CHECK  { ( @_ == 2 ) ? ( $_[0][2] = $_[1] ) : $_[0][2] } # rw
-	sub _COERCE { ( @_ == 2 ) ? ( $_[0][3] = $_[1] ) : $_[0][3] } # rw
-	
 	$VERSION =~ tr/_//d;
+	
+	# Type::Tie::BASE is an array-based object. If you need to subclass it
+	# and store more attributes, use $yourclass->SUPER::_NEXT_SLOT to find
+	# the next available slot, then override _NEXT_SLOT so that other people
+	# can subclass your class too.
+	#
+	sub _REF       { $_[0][0] }                                      # ro
+	sub _TYPE      { ( @_ == 2 ) ? ( $_[0][1] = $_[1] ) : $_[0][1] } # rw
+	sub _CHECK     { ( @_ == 2 ) ? ( $_[0][2] = $_[1] ) : $_[0][2] } # rw
+	sub _COERCE    { ( @_ == 2 ) ? ( $_[0][3] = $_[1] ) : $_[0][3] } # rw
+	sub _NEXT_SLOT { 4 }
+	
+	sub type       { shift->_TYPE }
+	sub _INIT_REF  { $_[0][0] ||= $_[0]->_DEFAULT }
+	
+	{
+		my $try_xs =
+			exists( $ENV{PERL_TYPE_TINY_XS} ) ? !!$ENV{PERL_TYPE_TINY_XS} :
+			exists( $ENV{PERL_ONLY} )         ? !$ENV{PERL_ONLY} :
+			!!1;
+		eval {
+			require Class::XSAccessor::Array;
+			'Class::XSAccessor::Array'->import(
+				replace   => !!1,
+				getters   => { _REF => 0, type => 1 },
+				accessors => { _TYPE => 1, _CHECK => 2, _COERCE => 3 },
+			);
+		} if $try_xs;
+	}
 	
 	sub _set_type {
 		my $self = shift;
@@ -75,10 +99,6 @@ use Scalar::Util ();
 					: undef
 			);
 		}
-	}
-	
-	sub type {
-		shift->_TYPE;
 	}
 	
 	# Only used if the type has no get_message method
@@ -150,26 +170,26 @@ use Scalar::Util ();
 	
 	$VERSION =~ tr/_//d;
 	
-	sub TIEARRAY {
+	sub TIEARRAY   {
 		my $class = shift;
-		my $self  = bless( [ [] ], $class );
+		my $self  = bless( [ $class->_DEFAULT ], $class );
 		$self->_set_type( $_[0] );
 		$self;
 	}
-	
-	sub FETCHSIZE { scalar @{ $_[0]->_REF } }
-	sub STORESIZE { $#{ $_[0]->_REF } = $_[1] }
-	sub STORE     { $_[0]->_REF->[ $_[1] ] = $_[0]->coerce_and_check_value( $_[2] ) }
-	sub FETCH     { $_[0]->_REF->[ $_[1] ] }
-	sub CLEAR     { @{ $_[0]->_REF } = () }
-	sub POP       { pop @{ $_[0]->_REF } }
-	sub PUSH      { my $s = shift; push @{$s->_REF}, $s->coerce_and_check_value( @_ ) }
-	sub SHIFT     { shift @{ $_[0]->_REF } }
-	sub UNSHIFT   { my $s = shift; unshift @{$s->_REF}, $s->coerce_and_check_value( @_ ) }
-	sub EXISTS    { exists $_[0]->_REF->[ $_[1] ] }
-	sub DELETE    { delete $_[0]->_REF->[ $_[1] ] }
-	sub EXTEND    {}
-	sub SPLICE    {
+	sub _DEFAULT   { [] }
+	sub FETCHSIZE  { scalar @{ $_[0]->_REF } }
+	sub STORESIZE  { $#{ $_[0]->_REF } = $_[1] }
+	sub STORE      { $_[0]->_REF->[ $_[1] ] = $_[0]->coerce_and_check_value( $_[2] ) }
+	sub FETCH      { $_[0]->_REF->[ $_[1] ] }
+	sub CLEAR      { @{ $_[0]->_REF } = () }
+	sub POP        { pop @{ $_[0]->_REF } }
+	sub PUSH       { my $s = shift; push @{$s->_REF}, $s->coerce_and_check_value( @_ ) }
+	sub SHIFT      { shift @{ $_[0]->_REF } }
+	sub UNSHIFT    { my $s = shift; unshift @{$s->_REF}, $s->coerce_and_check_value( @_ ) }
+	sub EXISTS     { exists $_[0]->_REF->[ $_[1] ] }
+	sub DELETE     { delete $_[0]->_REF->[ $_[1] ] }
+	sub EXTEND     {}
+	sub SPLICE     {
 		my $o   = shift;
 		my $sz  = scalar @{$o->_REF};
 		my $off = @_ ? shift : 0;
@@ -177,7 +197,7 @@ use Scalar::Util ();
 		my $len = @_ ? shift : $sz-$off;
 		splice @{$o->_REF}, $off, $len, $o->coerce_and_check_value( @_ );
 	}
-	sub _THAW     { @{ $_[0][0] ||= [] } = @{$_[1]} }
+	sub _THAW      { @{ $_[0]->_INIT_REF } = @{ $_[1] } }
 };
 
 {
@@ -188,22 +208,22 @@ use Scalar::Util ();
 	
 	$VERSION =~ tr/_//d;
 	
-	sub TIEHASH {
+	sub TIEHASH    {
 		my $class = shift;
-		my $self  = bless( [ {} ], $class );
+		my $self  = bless( [ $class->_DEFAULT ], $class );
 		$self->_set_type( $_[0] );
 		$self;
 	}
-	
-	sub STORE     { $_[0]->_REF->{ $_[1] } = $_[0]->coerce_and_check_value( $_[2] ) }
-	sub FETCH     { $_[0]->_REF->{ $_[1] } }
-	sub FIRSTKEY  { my $a = scalar keys %{ $_[0]->_REF }; each %{ $_[0]->_REF } }
-	sub NEXTKEY   { each %{ $_[0]->_REF } }
-	sub EXISTS    { exists $_[0]->_REF->{ $_[1] } }
-	sub DELETE    { delete $_[0]->_REF->{ $_[1] } }
-	sub CLEAR     { %{ $_[0]->_REF } = () }
-	sub SCALAR    { scalar %{ $_[0]->_REF } }
-	sub _THAW     { %{ $_[0][0] ||= {} } = %{$_[1]} }
+	sub _DEFAULT   { +{} }
+	sub STORE      { $_[0]->_REF->{ $_[1] } = $_[0]->coerce_and_check_value( $_[2] ) }
+	sub FETCH      { $_[0]->_REF->{ $_[1] } }
+	sub FIRSTKEY   { my $a = scalar keys %{ $_[0]->_REF }; each %{ $_[0]->_REF } }
+	sub NEXTKEY    { each %{ $_[0]->_REF } }
+	sub EXISTS     { exists $_[0]->_REF->{ $_[1] } }
+	sub DELETE     { delete $_[0]->_REF->{ $_[1] } }
+	sub CLEAR      { %{ $_[0]->_REF } = () }
+	sub SCALAR     { scalar %{ $_[0]->_REF } }
+	sub _THAW      { %{ $_[0]->_INIT_REF } = %{ $_[1] } }
 };
 
 {
@@ -214,17 +234,16 @@ use Scalar::Util ();
 	
 	$VERSION =~ tr/_//d;
 	
-	sub TIESCALAR {
+	sub TIESCALAR  {
 		my $class = shift;
-		my $x;
-		my $self  = bless( [ \$x ], $class );
+		my $self  = bless( [ $class->_DEFAULT ], $class );
 		$self->_set_type($_[0]);
 		$self;
 	}
-	
-	sub STORE     { ${ $_[0]->_REF } = $_[0]->coerce_and_check_value( $_[1] ) }
-	sub FETCH     { ${ $_[0]->_REF } }
-	sub _THAW     { ${ $_[0][0] ||= do { my $x; \$x } } = ${$_[1]} }
+	sub _DEFAULT   { my $x; \$x }
+	sub STORE      { ${ $_[0]->_REF } = $_[0]->coerce_and_check_value( $_[1] ) }
+	sub FETCH      { ${ $_[0]->_REF } }
+	sub _THAW      { ${ $_[0]->_INIT_REF } = ${ $_[1] } }
 };
 
 1;
