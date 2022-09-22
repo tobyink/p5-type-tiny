@@ -136,6 +136,9 @@ sub signature_for {
 	$opts{package}   ||= $package;
 	$opts{subname}   ||= ( $function =~ /::(\w+)$/ ) ? $1 : $function;
 	$opts{goto_next} ||= do { no strict 'refs'; exists(&$fullname) ? \&$fullname : undef; };
+	if ( $opts{method} ) {
+		$opts{goto_next} ||= eval { $package->can( $opts{subname} ) };
+	}
 	if ( $opts{fallback} and not $opts{goto_next} ) {
 		$opts{goto_next} = ref( $opts{fallback} ) ? $opts{fallback} : sub {};
 	}
