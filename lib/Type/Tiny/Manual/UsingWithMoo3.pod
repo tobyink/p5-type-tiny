@@ -119,7 +119,7 @@ For now, here's the best way to think of the difference:
 =item * Type registry
 
 Curate a collection of types for me to use here in this class.
-This collection is an implementaion detail.
+This collection is an implementation detail.
 
 =item * Type library
 
