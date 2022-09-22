@@ -772,21 +772,25 @@ This looks strange. Why would this be useful? Well, it works nicely with
 Moose's C<around> keyword.
 
  sub add_numbers {
-   return $_[0] + $_[1];
+   return $_[1] + $_[2];
  }
  
  around add_numbers => signature(
+   method     => !!1,
    positional => [ Num, Num ],
    goto_next  => !!1,
    package    => __PACKAGE__,
    subname    => 'add_numbers',
  );
  
- say add_numbers( 2, 3 );   # says 5
+ say __PACKAGE__->add_numbers( 2, 3 );   # says 5
 
 Note the way C<around> works in Moose is that it expects a wrapper coderef
 as its final argument. That wrapper coderef then expects to be given a
 reference to the original function as its first parameter.
+
+This can allow, for example, a role to provide a signature wrapping
+a method defined in a class.
 
 This is kind of complex, and you're unlikely to use it, but it's been proven
 useful for tools that integrate Type::Params with Moose-like method modifiers.
@@ -1440,23 +1444,31 @@ The C<signature_for> keyword turns C<signature> inside-out.
 The same signature specification options are supported, with the exception
 of C<want_source> and C<want_details> which will not work.
 
-The C<goto_next> option is what C<signature_for> uses to "connect" the
-signature to the body of the sub, so do not use that unless you understand
-the consequences.
+If you are providing a signature for a sub in another package, then
+C<< signature_for "Some::Package::some_sub" => ( ... ) >> will work,
+as will C<< signature_for some_sub => ( package => "Some::Package", ... ) >>.
+If C<method> is true, then C<signature_for> will respect inheritance when
+determining which sub to wrap. C<signature_for> will not be able to find
+lexical subs, so use C<signature> within the sub instead.
 
-An additional C<fallback> option is allowed, which allows C<signature_for>
-to "succeed" even if the sub you're wrapping doesn't exist. Here,
-C<signature_for> will install the fallback sub if C<add_nums> doesn't
-already exist. If C<add_nums> does already exist, then the C<fallback> will
-be ignored.
+The C<goto_next> option is what C<signature_for> uses to "connect" the
+signature to the body of the sub, so do not use it unless you understand
+the consequences and want to override the normal behaviour.
+
+If the sub being wrapped cannot be found, then C<signature_for> will usually
+throw an error. If you want it to "work" in this situation, use the
+C<fallback> option. C<< fallback => \&alternative_coderef_to_wrap >>
+or C<< fallback => 1 >> will instead wrap a different coderef if the original
+cannot be found. C<< fallback => 1 >> is a shortcut for
+C<< fallback => sub {} >>. An example where this might be useful is if you're
+adding signatures to methods which are inherited from a parent class, but
+you are not 100% confident will exist (perhaps dependent on the version of
+the parent class).
 
  signature_for add_nums => (
    positional => [ Num, Num ],
    fallback   => sub { $_[0] + $_[1] },
  );
-
-A shortcut C<< fallback => 1 >> is allowed, which means the same as
-C<< fallback => sub {} >>.
 
 C<< signature_for( \@functions, %opts ) >> is a useful shortcut if you have
 multiple functions with the same signature.
