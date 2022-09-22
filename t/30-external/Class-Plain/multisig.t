@@ -41,11 +41,22 @@ class Point {
 	field y :reader;
 	
 	signature_for new => (
-		method => 1,
-		bless  => 0,
-		named  => [
-			x => Int,
-			y => Int,
+		method   => !!1,
+		multiple => [
+			{
+				named => [
+					x => Int,
+					y => Int,
+				],
+				bless => !!0,
+			},
+			{
+				positional => [ Int, Int ],
+				goto_next  => sub {
+					my ( $class, $x, $y ) = @_;
+					return ( $class, { x => $x, y => $y } ),
+				},
+			},
 		],
 	);
 	
@@ -63,7 +74,14 @@ is_deeply(
 
 like(
 	exception { Point->new( x => 42, y => [] ) },
-	qr/did not pass type constraint "Int"/,
+	qr/Parameter validation failed/,
+);
+
+my $point2 = Point->new( 42, 999 );
+
+is_deeply(
+	$point2->as_arrayref,
+	[ 42, 999 ],
 );
 
 done_testing;

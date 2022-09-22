@@ -121,6 +121,64 @@ in production as it slows down C<UNIVERSAL::isa> globally.
   $bob->name("Robert");   # okay
   $bob->name([]);         # dies
 
+=head2 Class::Plain
+
+There is not currently a high level of integration, but here's a quick
+example of type checking attributes in the constructor.
+
+If any of your accessors are C<< :rw >> then you would also need to
+add type checks to those.
+
+  use Class::Plain;
+  
+  class Point {
+    use Types::Common -types, -sigs;
+    
+    field x :reader;
+    field y :reader;
+    
+    signature_for new => (
+      method => !!1,
+      bless  => !!0,
+      named  => [
+        x => Int,
+        y => Int,
+      ],
+    );
+    
+    method as_arrayref () {
+      return [ $self->x, $self->y ];
+    }
+  }
+
+The following signature may also be of interest:
+
+  signature_for new => (
+    method   => !!1,
+    multiple => [
+      {
+        named => [
+          x => Int,
+          y => Int,
+        ],
+        bless => !!0,
+      },
+      {
+        positional => [ Int, Int ],
+        goto_next  => sub {
+          my ( $class, $x, $y ) = @_;
+          return ( $class, { x => $x, y => $y } ),
+        },
+      },
+    ],
+  );
+
+This would allow your class to be instantiated using any of the following:
+
+  my $point11 = Point->new( { x => 1, y => 1 } );
+  my $point22 = Point->new(   x => 2, y => 2   );
+  my $point33 = Point->new( 3, 3 );
+
 =head1 NEXT STEPS
 
 Here's your next step:
