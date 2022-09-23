@@ -32,6 +32,7 @@ use Test::Fatal;
 use Test::Requires '5.026';
 use Test::Requires { "Class::Plain" => 0.02 };
 
+use experimental 'signatures';
 use Class::Plain;
 
 class Point {
