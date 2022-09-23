@@ -4,7 +4,7 @@
    changes in development releases, see the "Changes" file instead.
 =======================================================================
 
-2022-XX-XX Type-Tiny version 2.000000 released!
+2022-09-23 Type-Tiny version 2.000000 released!
 
  - Improved API for `Type::Params`.
  - New `Types::Common` module.

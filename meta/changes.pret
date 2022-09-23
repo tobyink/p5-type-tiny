@@ -4760,3 +4760,17 @@
 			dcs:blame <urn:uuid:baa9b789-35d5-459d-82da-f04cd91a34c7>;
 		];
 	].
+
+`Type-Tiny 2.000000 cpan:TOBYINK`
+	issued  2022-09-23;
+	changeset [
+		dcs:versus `Type-Tiny 1.999_013 cpan:TOBYINK`;
+		item [
+			a dcs:Packaging;
+			label "Repackage Type-Tiny 1.999_013 as a stable release.";
+		];
+		item [
+			a dcs:Tests;
+			label "Minor fix for Class::Plain-related tests.";
+		];
+	].

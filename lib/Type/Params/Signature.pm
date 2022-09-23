@@ -12,7 +12,7 @@ BEGIN {
 
 BEGIN {
 	$Type::Params::Signature::AUTHORITY  = 'cpan:TOBYINK';
-	$Type::Params::Signature::VERSION    = '1.999_013';
+	$Type::Params::Signature::VERSION    = '2.000000';
 }
 
 $Type::Params::Signature::VERSION =~ tr/_//d;
