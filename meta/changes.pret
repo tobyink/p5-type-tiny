@@ -4733,3 +4733,30 @@
 		];
 	].
 
+`Type-Tiny 1.999_013 cpan:TOBYINK`
+	issued  2022-09-23;
+	label "Type::Tiny 2.0 Preview N";
+	changeset [
+		dcs:versus `Type-Tiny 1.999_012 cpan:TOBYINK`;
+		item [
+			a dcs:Documentation;
+			label "Document usage with Class::Plain.";
+		];
+		item [
+			a dcs:Tests;
+			label "Test usage with Class::Plain.";
+		];
+		item [
+			a dcs:Documentation;
+			label "Improvements to Type::Params documentation.";
+		];
+		item [
+			a dcs:Change;
+			label "Type::Params signature_for will respect inheritance when looking for methods to wrap, when the `method` option is true.";
+		];
+		item [
+			a dcs:Documentation;
+			label "Fix pod typo in manual.";
+			dcs:blame <urn:uuid:baa9b789-35d5-459d-82da-f04cd91a34c7>;
+		];
+	].

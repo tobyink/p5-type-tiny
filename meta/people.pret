@@ -227,6 +227,10 @@ cpan:MARKF
 <urn:uuid:c98016a1-919d-4e92-a138-1c37a307fe22>
 	:nick "Zhtwn".
 
+<urn:uuid:baa9b789-35d5-459d-82da-f04cd91a34c7>
+	:name "Florian Schlichting";
+	:page <https://github.com/fschlich>.
+
 # We bundle some files made by these dudes...
 
 cpan:RJBS
