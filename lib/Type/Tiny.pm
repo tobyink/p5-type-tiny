@@ -1726,6 +1726,11 @@ objects which are compatible with Moo, Moose and Mouse.
       has favourite_number => (is => "ro", isa => $NUM);
    }
 
+Type::Tiny conforms to L<Type::API::Constraint>,
+L<Type::API::Constraint::Coercible>,
+L<Type::API::Constraint::Constructor>, and
+L<Type::API::Constraint::Inlinable>.
+
 Maybe now we won't need to have separate MooseX, MouseX and MooX versions
 of everything? We can but hope...
 
