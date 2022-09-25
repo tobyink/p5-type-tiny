@@ -28,6 +28,7 @@ use warnings;
 use lib qw( ./lib ./t/lib ../inc ./inc );
 
 use Test::More;
+use Test::Fatal;
 use Test::TypeTiny;
 
 use BiggerLib qw( :types );
@@ -107,5 +108,11 @@ ok(!$SmallEven->can_be_inlined, "not ($SmallEven)->can_be_inlined");
 should_pass(2, $SmallEven);
 should_fail(20, $SmallEven);
 should_fail(3, $SmallEven);
+
+isnt(
+	exception { push @{ $SmallEven }, 'quux' },
+	undef,
+	'cannot push to overloaded arrayref'
+);
 
 done_testing;

@@ -28,6 +28,7 @@ use warnings;
 use lib qw( ./lib ./t/lib ../inc ./inc );
 
 use Test::More;
+use Test::Fatal;
 use Test::TypeTiny;
 
 use BiggerLib qw( :types );
@@ -116,6 +117,12 @@ my $c2 = union [
 	class_type({ class => "Local::B" }),
 	class_type({ class => "Local::C" }),
 ];
+
+isnt(
+	exception { push @{ $c2 }, 'quux' },
+	undef,
+	'cannot push to overloaded arrayref'
+);
 
 ok(
 	$c2->parent == Types::Standard::Object(),

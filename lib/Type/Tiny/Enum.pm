@@ -84,6 +84,11 @@ sub new {
 	return $proto->SUPER::new( %opts );
 } #/ sub new
 
+sub _lockdown {
+	my ( $self, $callback ) = @_;
+	$callback->( $self->{values}, $self->{unique_values} );
+}
+
 sub new_union {
 	my $proto  = shift;
 	my %opts   = ( @_ == 1 ) ? %{ $_[0] } : @_;

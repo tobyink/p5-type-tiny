@@ -85,6 +85,11 @@ sub new {
 	return $proto->SUPER::new( %opts );
 } #/ sub new
 
+sub _lockdown {
+	my ( $self, $callback ) = @_;
+	$callback->( $self->{type_constraints} );
+}
+
 sub type_constraints { $_[0]{type_constraints} }
 sub constraint       { $_[0]{constraint} ||= $_[0]->_build_constraint }
 

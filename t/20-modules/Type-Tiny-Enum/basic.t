@@ -24,6 +24,7 @@ use warnings;
 use lib qw( ./lib ./t/lib ../inc ./inc );
 
 use Test::More;
+use Test::Fatal;
 use Test::TypeTiny;
 use Type::Utils qw< enum >;
 
@@ -57,6 +58,18 @@ is_deeply(
 	FBB->values,
 	[qw/foo bar baz/],
 	'FBB->values retains order',
+);
+
+is_deeply(
+	[@{ +FBB }],
+	[qw/foo bar baz/],
+	'overload retains order',
+);
+
+isnt(
+	exception { push @{ +FBB }, 'quux' },
+	undef,
+	'cannot push to overloaded arrayref'
 );
 
 use Scalar::Util qw(refaddr);

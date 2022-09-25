@@ -15,7 +15,6 @@ use Scalar::Util qw< blessed >;
 
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
-
 use Exporter::Tiny 1.004001 ();
 use Type::Tiny::ConstrainedObject ();
 our @ISA = qw( Type::Tiny::ConstrainedObject Exporter::Tiny );
@@ -57,6 +56,11 @@ sub new {
 	
 	return $proto->SUPER::new( %opts );
 } #/ sub new
+
+sub _lockdown {
+	my ( $self, $callback ) = @_;
+	$callback->( $self->{methods} );
+}
 
 sub methods { $_[0]{methods} }
 sub inlined { $_[0]{inlined} ||= $_[0]->_build_inlined }

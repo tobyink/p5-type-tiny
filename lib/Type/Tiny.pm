@@ -364,8 +364,19 @@ sub new {
 			) for keys %{ $params{my_methods} };
 	} #/ if ( $params{my_methods...})
 	
+	# In general, mutating a type constraint after it's been created
+	# is a bad idea and will probably not work. However some places are
+	# especially harmful and can lead to confusing errors, so allow
+	# subclasses to lock down particular keys.
+	#
+	$self->_lockdown( sub {
+		&Internals::SvREADONLY( $_, !!1 ) for @_;
+	} );
+	
 	return $self;
 } #/ sub new
+
+sub _lockdown {}
 
 sub DESTROY {
 	my $self = shift;
