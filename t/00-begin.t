@@ -119,7 +119,6 @@ __END__
 
 Exporter::Tiny
 Return::Type
-Type::Tie
 Type::Tiny::XS
 
 Scalar::Util/Sub::Util
