@@ -439,7 +439,7 @@ my %ttt_cache;
 sub _is_ForeignTypeConstraint {
 	my $t = @_ ? $_[0] : $_;
 	return !!1 if ref $t eq 'CODE';
-	if ( my $class = blessed $t) {
+	if ( my $class = blessed $t ) {
 		return !!0 if $class->isa( "Type::Tiny" );
 		return !!1 if $class->isa( "Moose::Meta::TypeConstraint" );
 		return !!1 if $class->isa( "MooseX::Types::TypeDecorator" );
@@ -838,23 +838,52 @@ Yes, the underscore is included.
 
 =item C<< to_TypeTiny($constraint) >>
 
-Promotes (or "demotes" if you prefer) a Moose::Meta::TypeConstraint object
-to a Type::Tiny object.
+Promotes (or "demotes" if you prefer) a "foreign" type constraint to a
+Type::Tiny object. Can handle:
 
-Can also handle L<Validation::Class> objects. Type constraints built from 
-Validation::Class objects deliberately I<ignore> field filters when they
-do constraint checking (and go to great lengths to do so); using filters for
-coercion only. (The behaviour of C<coerce> if we don't do that is just too
-weird!)
+=over
 
-Can also handle any object providing C<check> and C<get_message> methods.
-(This includes L<Mouse::Meta::TypeConstraint> objects.) If the object also
-provides C<has_coercion> and C<coerce> methods, these will be used too.
+=item *
 
-Can also handle coderefs (but not blessed coderefs or objects overloading
-C<< &{} >>). Coderefs are expected to return true iff C<< $_ >> passes the
-constraint. If C<< $_ >> fails the type constraint, they may either return
-false, or die with a helpful error message.
+Moose types (including L<Moose::Meta::TypeConstraint> objects and
+L<MooseX::Types::TypeDecorator> objects).
+
+=item *
+
+Mouse types (including L<Mouse::Meta::TypeConstraint> objects).
+
+=item *
+
+L<Validation::Class> and L<Validation::Class::Simple> objects.
+
+=item *
+
+Types built using L<Type::Library::Compiler>.
+
+=item *
+
+Any object which provides C<check> and C<get_message> methods.
+(This includes L<Specio> and L<Type::Nano> types.) If the object
+provides C<has_coercion> and L<coerce> methods, these will
+be used to handle quoting. If the object provides C<can_be_inlined>
+and C<inline_check> methods, these will be used to handling inlining.
+If the object provides a C<name> method, this will be assumed to
+return the type name.
+
+=item *
+
+Coderefs (but not blessed coderefs or objects overloading C<< &{} >>
+unless they provide the methods described above!) Coderefs are expected
+to return true iff C<< $_ >> passes the constraint. If C<< $_ >> fails
+the type constraint, they may either return false, or die with a helpful
+error message.
+
+=item *
+
+L<Sub::Quote>-enabled coderefs. These are handled the same way as above,
+but Type::Tiny will consult Sub::Quote to determine if they can be inlined.
+
+=back
 
 =back
 
