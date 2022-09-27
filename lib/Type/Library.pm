@@ -272,7 +272,7 @@ sub _remove_type {
 		push @clean, $name;
 		&$_scrub( \@{"$class\::EXPORT_OK"}, $name );
 		for my $t ( @{ $exportable->{tags} } ) {
-			&$_scrub( ${"$class\::EXPORT_TAGS"}{$t} ||= {}, $name );
+			&$_scrub( ${"$class\::EXPORT_TAGS"}{$t} ||= [], $name );
 		}
 		delete $meta->{'functions'}{$name};
 	}
