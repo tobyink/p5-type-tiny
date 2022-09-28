@@ -17,6 +17,65 @@ BEGIN {
 $Type::Tiny::VERSION    =~ tr/_//d;
 $Type::Tiny::XS_VERSION =~ tr/_//d;
 
+our @InternalPackages = qw(
+	Devel::TypeTiny::Perl56Compat
+	Devel::TypeTiny::Perl58Compat
+	Error::TypeTiny
+	Error::TypeTiny::Assertion
+	Error::TypeTiny::Compilation
+	Error::TypeTiny::WrongNumberOfParameters
+	Eval::TypeTiny
+	Eval::TypeTiny::CodeAccumulator
+	Eval::TypeTiny::Sandbox
+	Exporter::Tiny
+	Reply::Plugin::TypeTiny
+	Test::TypeTiny
+	Type::Coercion
+	Type::Coercion::FromMoose
+	Type::Coercion::Union
+	Type::Library
+	Type::Params
+	Type::Params::Alternatives
+	Type::Params::Parameter
+	Type::Params::Signature
+	Type::Parser
+	Type::Parser::AstBuilder
+	Type::Parser::Token
+	Type::Parser::TokenStream
+	Type::Registry
+	Types::Common
+	Types::Common::Numeric
+	Types::Common::String
+	Types::Standard
+	Types::Standard::_Stringable
+	Types::Standard::ArrayRef
+	Types::Standard::CycleTuple
+	Types::Standard::Dict
+	Types::Standard::HashRef
+	Types::Standard::Map
+	Types::Standard::ScalarRef
+	Types::Standard::StrMatch
+	Types::Standard::Tied
+	Types::Standard::Tuple
+	Types::TypeTiny
+	Type::Tie
+	Type::Tie::ARRAY
+	Type::Tie::BASE
+	Type::Tie::HASH
+	Type::Tie::SCALAR
+	Type::Tiny
+	Type::Tiny::_DeclaredType
+	Type::Tiny::_HalfOp
+	Type::Tiny::Class
+	Type::Tiny::ConsrtainedObject
+	Type::Tiny::Duck
+	Type::Tiny::Enum
+	Type::Tiny::Intersection
+	Type::Tiny::Role
+	Type::Tiny::Union
+	Type::Utils
+);
+
 use Scalar::Util qw( blessed );
 use Types::TypeTiny ();
 

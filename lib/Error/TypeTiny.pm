@@ -21,50 +21,7 @@ require Carp;
 *CarpInternal = \%Carp::CarpInternal;
 
 our %CarpInternal;
-$CarpInternal{$_}++ for qw(
-	Types::Standard::_Stringable
-	Exporter::Tiny
-	Eval::TypeTiny::Sandbox
-	
-	Devel::TypeTiny::Perl56Compat
-	Devel::TypeTiny::Perl58Compat
-	Error::TypeTiny
-	Error::TypeTiny::Assertion
-	Error::TypeTiny::Compilation
-	Error::TypeTiny::WrongNumberOfParameters
-	Eval::TypeTiny
-	Reply::Plugin::TypeTiny
-	Test::TypeTiny
-	Type::Coercion
-	Type::Coercion::FromMoose
-	Type::Coercion::Union
-	Type::Library
-	Type::Params
-	Type::Parser
-	Type::Registry
-	Types::Common::Numeric
-	Types::Common::String
-	Types::Standard
-	Types::Standard::ArrayRef
-	Types::Standard::CycleTuple
-	Types::Standard::Dict
-	Types::Standard::HashRef
-	Types::Standard::Map
-	Types::Standard::ScalarRef
-	Types::Standard::StrMatch
-	Types::Standard::Tied
-	Types::Standard::Tuple
-	Types::TypeTiny
-	Type::Tiny
-	Type::Tiny::Class
-	Type::Tiny::Duck
-	Type::Tiny::Enum
-	Type::Tiny::_HalfOp
-	Type::Tiny::Intersection
-	Type::Tiny::Role
-	Type::Tiny::Union
-	Type::Utils
-);
+$CarpInternal{$_}++ for @Type::Tiny::InternalPackages;
 
 sub new {
 	my $class  = shift;
