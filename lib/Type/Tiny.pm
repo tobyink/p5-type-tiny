@@ -303,6 +303,19 @@ sub new {
 		$params{$_} = $params{$_} . '' if defined $params{$_};
 	}
 	
+	my $level = 0;
+	while ( not exists $params{definition_context} and $level < 20 ) {
+		our $_TT_GUTS ||= do {
+			my $g = join '|', map quotemeta, grep !m{^Types::}, @InternalPackages;
+			qr/\A(?:$g)\z/o
+		};
+		my $package = caller $level;
+		if ( $package !~ $_TT_GUTS ) {
+			@{ $params{definition_context} = {} }{ qw/ package file line / } = caller $level;
+		}
+		++$level;
+	}
+	
 	if ( exists $params{parent} ) {
 		$params{parent} =
 			ref( $params{parent} ) =~ /^Type::Tiny\b/
@@ -622,6 +635,14 @@ sub _build_compiled_check {
 		return !!1;
 	};
 } #/ sub _build_compiled_check
+
+sub definition_context {
+	my $self  = shift;
+	my $found = $self->find_parent(sub {
+		ref $_->{definition_context} and exists $_->{definition_context}{file};
+	});
+	$found ? $found->{definition_context} : {};
+}
 
 sub find_constraining_type {
 	my $self = shift;
@@ -2052,6 +2073,16 @@ default lazily-built return values.
 Coderef to validate a value (C<< $_[0] >>) against the type constraint.
 This coderef is expected to also handle all validation for the parent
 type constraints.
+
+=item C<< definition_context >>
+
+Hashref of information indicating where the type constraint was originally
+defined. Type::Tiny will generate this based on C<caller> if you do not
+supply it. The hashref will ordinarily contain keys C<"package">, C<"file">,
+and C<"line">.
+
+For parameterized types and compound types (e.g. unions and intersections),
+this may not be especially meaningful information.
 
 =item C<< complementary_type >>
 

@@ -123,7 +123,8 @@ my $add_core_type = sub {
 		};
 	} #/ if ( defined( $xsubname...))
 	
-	$meta->add_type( $typedef );
+	@_ = ( $meta, $typedef );
+	goto \&Type::Library::add_type;
 };
 
 my $maybe_load_modules = sub {
