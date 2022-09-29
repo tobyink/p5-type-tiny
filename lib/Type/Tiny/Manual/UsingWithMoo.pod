@@ -700,7 +700,7 @@ It is possible to accept a variable number of values using B<Slurpy>:
       
       my ( $self, $year, $races ) = $check->(@_);
       for my $race (@$races) {
-        push @{ $self->wins }, [$year, $win];
+        push @{ $self->wins }, [$year, $race];
       }
       return $self;
     }
