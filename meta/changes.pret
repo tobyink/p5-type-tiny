@@ -4774,3 +4774,67 @@
 			label "Minor fix for Class::Plain-related tests.";
 		];
 	].
+
+`Type-Tiny 2.000001 cpan:TOBYINK`
+	issued  2022-09-29;
+	changeset [
+		dcs:versus `Type-Tiny 2.000000 cpan:TOBYINK`;
+		item [
+			a dcs:Documentation;
+			label "Clearer documentation of Types::TypeTiny::to_TypeTiny.";
+		];
+		item [
+			a dcs:Tests;
+			label "No longer report Type::Tie version at start of test suite, as Type::Tie is now bundled.";
+		];
+		item [
+			a dcs:Bugfix;
+			label "Avoid uninitialized warnings when creating a union between an Enum type and a non-Enum type.";
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/123>;
+			dcs:thanks cpan:DJERIUS;
+		];
+	].
+
+`Type-Tiny 2.001_000 cpan:TOBYINK`
+	issued  2022-09-29;
+	changeset [
+		dcs:versus `Type-Tiny 2.000000 cpan:TOBYINK`;
+		item [
+			a dcs:Documentation;
+			label "Clearer documentation of Types::TypeTiny::to_TypeTiny.";
+		];
+		item [
+			a dcs:Tests;
+			label "No longer report Type::Tie version at start of test suite, as Type::Tie is now bundled.";
+		];
+		item [
+			a dcs:Bugfix;
+			label "Avoid uninitialized warnings when creating a union between an Enum type and a non-Enum type.";
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/123>;
+			dcs:thanks cpan:DJERIUS;
+		];
+		item [
+			a dcs:Addition;
+			label "Type::Library now has an undocumented, but tested and hopefully stable `_remove_type` method.";
+		];
+		item [
+			a dcs:Addition;
+			label "Type::Library now has an undocumented, but tested and hopefully stable `_remove_type` method.";
+		];
+		item [
+			a dcs:Change;
+			label "Type::Tiny will now mark particular parts of its guts as readonly. Currently this is mainly used to prevent people pushing to and popping from type constraints which overload `@{}`.";
+		];
+		item [
+			a dcs:Addition;
+			label "Type::Library now has an undocumented, but tested and hopefully stable `_remove_type` method.";
+		];
+		item [
+			a dcs:Change;
+			label "The list of packages Type::Tiny considers to be 'internal' has been moved from Error::TypeTiny to Type::Tiny.";
+		];
+		item [
+			a dcs:Addition;
+			label "Type::Tiny now has a `definition_context` attribute/method indicating the file and line number where a type constraint was first defined.";
+		];
+	].
