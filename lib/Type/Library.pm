@@ -249,6 +249,46 @@ sub add_type {
 	return $type;
 } #/ sub add_type
 
+# For Type::TinyX::Facets
+# Only use this if you know what you're doing!
+sub _remove_type {
+	my $meta  = shift->meta;
+	my $type  = $meta->get_type( $_[0] );
+	my $class = ref $meta;
+	
+	_croak( 'Type library is immutable' ) if $meta->{immutable};
+	
+	delete $meta->{types}{$type->name};
+	
+	no strict "refs";
+	no warnings "redefine", "prototype";
+	
+	my @clean;
+	my $_scrub = sub {
+		my ( $arr, $name ) = @_;
+		@$arr = grep $_ ne $name, @$arr;
+	};
+	for my $exportable ( @{ $type->exportables } ) {
+		my $name = $exportable->{name};
+		push @clean, $name;
+		&$_scrub( \@{"$class\::EXPORT_OK"}, $name );
+		for my $t ( @{ $exportable->{tags} } ) {
+			&$_scrub( ${"$class\::EXPORT_TAGS"}{$t} ||= [], $name );
+		}
+		delete $meta->{'functions'}{$name};
+	}
+	eval {
+		require namespace::clean;
+		'namespace::clean'->clean_subroutines( $class, @clean );
+	};
+	
+	delete 'Type::Registry'->for_class( $class )->{$type->name}
+		if $INC{'Type/Registry.pm'};
+	delete $Type::Registry::DELAYED{$class}{$type->name};
+	
+	return $type;
+} #/ sub _remove_type
+
 sub get_type {
 	my $meta = shift->meta;
 	$meta->{types}{ $_[0] };
