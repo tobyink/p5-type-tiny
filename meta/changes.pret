@@ -4818,16 +4818,8 @@
 			label "Type::Library now has an undocumented, but tested and hopefully stable `_remove_type` method.";
 		];
 		item [
-			a dcs:Addition;
-			label "Type::Library now has an undocumented, but tested and hopefully stable `_remove_type` method.";
-		];
-		item [
 			a dcs:Change;
 			label "Type::Tiny will now mark particular parts of its guts as readonly. Currently this is mainly used to prevent people pushing to and popping from type constraints which overload `@{}`.";
-		];
-		item [
-			a dcs:Addition;
-			label "Type::Library now has an undocumented, but tested and hopefully stable `_remove_type` method.";
 		];
 		item [
 			a dcs:Change;
