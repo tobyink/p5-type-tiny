@@ -30,7 +30,7 @@ sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 sub _exporter_validate_opts {
 	my ( $class, $opts ) = ( shift, @_ );
 	
-	$class->setup_type_library( @{$opts}{qw/ into utils extends /} )
+	$class->setup_type_library( @{$opts}{qw/ into utils extends /}, $opts )
 		if $_[0]{base} || $_[0]{extends};
 	
 	return $class->SUPER::_exporter_validate_opts( @_ );
@@ -42,8 +42,7 @@ sub _exporter_validate_opts {
 # export. We override it to provide some useful features.
 #
 sub _exporter_expand_sub {
-	my $class = shift;
-	my ( $name, $value, $globals ) = @_;
+	my ( $class, $name, $value, $globals ) = ( shift, @_ );
 	
 	# Handle exporting '+Type'.
 	#
@@ -117,8 +116,7 @@ sub _exporter_expand_sub {
 # a couple of useful behaviours.
 #
 sub _exporter_install_sub {
-	my $class = shift;
-	my ( $name, $value, $globals, $sym ) = @_;
+	my ( $class, $name, $value, $globals, $sym ) = ( shift, @_ );
 	
 	my $into = $globals->{into};
 	my $type = $class->meta->{'functions'}{$name}{'type'};
@@ -155,8 +153,7 @@ sub _exporter_install_sub {
 } #/ sub _exporter_install_sub
 
 sub _exporter_fail {
-	my $class = shift;
-	my ( $name, $value, $globals ) = @_;
+	my ( $class, $name, $value, $globals ) = ( shift, @_ );
 	
 	# Passing the `-declare` flag means that if a type isn't found, then
 	# we export a placeholder function instead of failing.
@@ -179,7 +176,7 @@ sub _exporter_fail {
 ####
 
 sub setup_type_library {
-	my ( $class, $type_library, $install_utils, $extends ) = @_;
+	my ( $class, $type_library, $install_utils, $extends, $opts ) = ( shift, @_ );
 	
 	my @extends = ref( $extends ) ? @$extends : $extends ? $extends : ();
 	unshift @extends, $class if $class ne __PACKAGE__;
@@ -193,7 +190,10 @@ sub setup_type_library {
 	
 	if ( $install_utils ) {
 		require Type::Utils;
-		'Type::Utils'->import( { into => $type_library }, '-default' );
+		'Type::Utils'->import(
+			{ %$opts, into => $type_library },
+			'-default',
+		);
 	}
 	
 	if ( @extends and not ref $type_library ) {
