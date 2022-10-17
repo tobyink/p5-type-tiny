@@ -223,7 +223,12 @@ sub add_type {
 		"Type::Tiny"->new( library => $class, @_ );
 	my $name = $type->{name};
 	
-	_croak( 'Type %s already exists in this library', $name )       if $meta->has_type( $name );
+	if ( $meta->has_type( $name ) ) {
+		my $existing = $meta->get_type( $name );
+		return if $type->{uniq} == $existing->{uniq};
+		_croak( 'Type %s already exists in this library', $name );
+	}
+	
 	_croak( 'Type %s conflicts with coercion of same name', $name ) if $meta->has_coercion( $name );
 	_croak( 'Cannot add anonymous type to a library' )              if $type->is_anon;
 	$meta->{types} ||= {};
@@ -236,6 +241,8 @@ sub add_type {
 		my $name = $exportable->{name};
 		my $code = $exportable->{code};
 		my $tags = $exportable->{tags};
+		_croak( 'Function %s is provided by types %s and %s', $name, $meta->{'functions'}{$name}{'type'}->name, $type->name )
+			if $meta->{'functions'}{$name};
 		*{"$class\::$name"} = set_subname( "$class\::$name", $code );
 		push @{"$class\::EXPORT_OK"}, $name;
 		push @{ ${"$class\::EXPORT_TAGS"}{$_} ||= [] }, $name for @$tags;
