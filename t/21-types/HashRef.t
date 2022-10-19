@@ -243,5 +243,81 @@ do {
 #	isnt($e, undef);
 #};
 
+
+#
+# Tied hashes, and combining them with hash-overloaded objects
+#
+
+{
+	package MaiTai::Hash;
+	use Tie::Hash;
+	our @ISA = 'Tie::Hash';
+	sub TIEHASH   { bless [ {} ], $_[0]; }
+	sub FETCH     { $_[0][0]{$_[1]}; }
+	sub STORE     { $_[0][0]{$_[1]} = $_[2]; }
+	sub FIRSTKEY  { my $a = scalar keys %{$_[0][0]}; each %{$_[0][0]} }
+	sub NEXTKEY   { each %{$_[0][0]} }
+	sub EXISTS    { exists $_[0][0]{$_[1]}; }
+	sub DELETE    { delete $_[0][0]{$_[1]}; }
+	sub CLEAR     { %{$_[0][0]} = () }
+	sub SCALAR    { scalar %{$_[0][0]} }
+	##
+	package MaiObj::Hash;
+	use overload '%{}' => sub {
+		my $obj = shift;
+		my %h;
+		tie( %h, 'MaiTai::Hash' ) if $obj->[0];
+		my @keys   = @{ $obj->[1] };
+		my @values = @{ $obj->[2] };
+		@h{ @keys } = @values;
+		return \%h;
+	};
+	sub new {
+		my ( $class, $do_tie ) = ( shift, shift );
+		my ( @keys, @values );
+		while ( @_ ) {
+			push @keys, shift;
+			push @values, shift;
+		}
+		bless [ $do_tie, \@keys, \@values ], $class;
+	}
+}
+
+{
+	my %h;
+	tie( %h, 'MaiTai::Hash' );
+	$h{foo} = 12;
+	$h{bar} = 34;
+	should_pass( \%h, $HashOfInts, 'tied hash that should pass' );
+}
+
+{
+	my %h;
+	tie( %h, 'MaiTai::Hash' );
+	$h{foo} = 12;
+	$h{bar} = 'xxx';
+	should_fail( \%h, $HashOfInts, 'tied hash that should fail' );
+}
+
+{
+	my $obj = 'MaiObj::Hash'->new( !!0, foo => 12, bar => 34 );
+	should_fail( $obj, $HashOfInts, 'overloaded object yielding regular hash that would pass if it weren\'t for the interleving overloaded object' );
+}
+
+{
+	my $obj = 'MaiObj::Hash'->new( !!0, foo => 12, bar => 'xyz' );
+	should_fail( $obj, $HashOfInts, 'overloaded object yielding regular hash that should fail' );
+}
+
+{
+	my $obj = 'MaiObj::Hash'->new( !!1, foo => 12, bar => 34 );
+	should_fail( $obj, $HashOfInts, 'overloaded object yielding tied hash that would pass if it weren\'t for the interleving overloaded object' );
+}
+
+{
+	my $obj = 'MaiObj::Hash'->new( !!1, foo => 12, bar => 'xyz' );
+	should_fail( $obj, $HashOfInts, 'overloaded object yielding tied hash that should fail' );
+}
+
 done_testing;
 

@@ -178,5 +178,64 @@ ok(
 	Scalar::Util::blessed( $ArrayOfRounded->coerce(bless({ array=>[1.1,undef,3] }, 'Local::OL::Array')) ),
 );
 
-done_testing;
+#
+# Tied arrays, and combining them with array-overloaded objects
+#
 
+{
+	package MaiTai::Array;
+	use Tie::Array;
+	our @ISA = 'Tie::Array';
+	sub TIEARRAY  { bless { data => [] }, $_[0]; }
+	sub FETCH     { $_[0]{data}[$_[1]]; }
+	sub FETCHSIZE { scalar @{ $_[0]{data} } }
+	sub STORE     { $_[0]{data}[$_[1]] = $_[2]; }
+	sub STORESIZE { $#{ $_[0]{data} } = $_[1]-1; }
+	sub EXISTS    { exists $_[0]{data}[$_[1]]; }
+	sub DELETE    { delete $_[0]{data}[$_[1]]; }
+	##
+	package MaiObj::Array;
+	use overload '@{}' => sub {
+		my $obj = shift;
+		my @arr;
+		tie( @arr, 'MaiTai::Array' ) if $obj->{do_tie};
+		push @arr, @{ $obj->{items} };
+		return \@arr;
+	};
+	sub new {
+		my ( $class, $do_tie ) = ( shift, shift );
+		bless { do_tie => $do_tie, items => [ @_ ] }, $class;
+	}
+}
+
+{
+	my @arr; tie( @arr, 'MaiTai::Array' ); @arr = ( 1..10 );
+	should_pass( \@arr, $ArrayOfInt, 'tied array that should pass' );
+}
+
+{
+	my @arr; tie( @arr, 'MaiTai::Array' ); @arr = ( 'foo', 1 .. 10 );
+	should_fail( \@arr, $ArrayOfInt, 'tied array that should fail' );
+}
+
+{
+	my $obj = 'MaiObj::Array'->new( !!0, 1 .. 10 );
+	should_pass( $obj, $ArrayOfInt, 'overloaded object yielding regular array that should pass' );
+}
+
+{
+	my $obj = 'MaiObj::Array'->new( !!0, 'foo', 1 .. 10 );
+	should_fail( $obj, $ArrayOfInt, 'overloaded object yielding regular array that should fail' );
+}
+
+{
+	my $obj = 'MaiObj::Array'->new( !!1, 1 .. 10 );
+	should_pass( $obj, $ArrayOfInt, 'overloaded object yielding tied array that should pass' );
+}
+
+{
+	my $obj = 'MaiObj::Array'->new( !!1, 'foo', 1 .. 10 );
+	should_fail( $obj, $ArrayOfInt, 'overloaded object yielding tied array that should fail' );
+}
+
+done_testing;

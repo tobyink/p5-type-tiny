@@ -213,7 +213,7 @@ sub HashLike (;@) {
 		constraint_generator => sub {
 			my $param = TypeTiny()->assert_coerce( shift );
 			my $check = $param->compiled_check;
-			if ( __XS ge '0.023' ) {
+			if ( __XS ge '0.024' ) {
 				my $paramname = Type::Tiny::XS::is_known( $check );
 				my $xsub = defined($paramname)
 					? Type::Tiny::XS::get_coderef_for( "HashLike[$paramname]" )
@@ -233,7 +233,7 @@ sub HashLike (;@) {
 			return unless $param->can_be_inlined;
 			my $check = $param->compiled_check;
 			my $xsubname;
-			if ( __XS ge '0.023' ) {
+			if ( __XS ge '0.024' ) {
 				my $paramname = Type::Tiny::XS::is_known( $check );
 				$xsubname = defined($paramname)
 					? Type::Tiny::XS::get_subname_for( "HashLike[$paramname]" )
@@ -311,7 +311,7 @@ sub ArrayLike (;@) {
 		constraint_generator => sub {
 			my $param = TypeTiny()->assert_coerce( shift );
 			my $check = $param->compiled_check;
-			if ( __XS ge '0.023' ) {
+			if ( __XS ge '0.024' ) {
 				my $paramname = Type::Tiny::XS::is_known( $check );
 				my $xsub = defined($paramname)
 					? Type::Tiny::XS::get_coderef_for( "ArrayLike[$paramname]" )
@@ -331,7 +331,7 @@ sub ArrayLike (;@) {
 			return unless $param->can_be_inlined;
 			my $check = $param->compiled_check;
 			my $xsubname;
-			if ( __XS ge '0.023' ) {
+			if ( __XS ge '0.024' ) {
 				my $paramname = Type::Tiny::XS::is_known( $check );
 				$xsubname = defined($paramname)
 					? Type::Tiny::XS::get_subname_for( "ArrayLike[$paramname]" )
