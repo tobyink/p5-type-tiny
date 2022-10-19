@@ -56,8 +56,8 @@ L<Types::Common::Numeric> will be accelerated, as will the
 B<NonEmptyStr> type constraint from L<Types::Common::String>.
 
 The B<StringLike>, B<CodeLike>, B<HashLike>, and B<ArrayLike> types
-from L<Types::TypeTiny> will be accelerated, but parameterized
-B<HashLike> and B<ArrayLike> will not.
+from L<Types::TypeTiny> will be accelerated, including the parameterized
+versions of B<HashLike> and B<ArrayLike>.
 
 L<Type::Tiny::Union> and L<Type::Tiny::Intersection> will also be
 accelerated if their constituent type constraints are.
