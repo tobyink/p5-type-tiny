@@ -4830,3 +4830,25 @@
 			label "Type::Tiny now has a `definition_context` attribute/method indicating the file and line number where a type constraint was first defined.";
 		];
 	].
+
+`Type-Tiny 2.001_001 cpan:TOBYINK`
+	issued  2022-10-19;
+	changeset [
+		dcs:versus `Type-Tiny 2.001_001 cpan:TOBYINK`;
+		item [
+			a dcs:Change;
+			label "Type::Tiny::XS will now provide XS implementations of some parameterized ArrayLike/HashLike types.";
+		];
+		item [
+			a dcs:Change;
+			label "Type::Library will better detect if two types result in functions with the same name.";
+		];
+		item [
+			a dcs:Change;
+			label "When importing `use Type::Library -util`, Type::Library will now pass some relevant import options to Type::Utils.";
+		];
+		item [
+			a dcs:Documentation;
+			label "Typo fix in Type::Tiny::Manual::UsingWithMoo.";
+		];
+	].
