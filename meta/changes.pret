@@ -4834,7 +4834,7 @@
 `Type-Tiny 2.001_001 cpan:TOBYINK`
 	issued  2022-10-19;
 	changeset [
-		dcs:versus `Type-Tiny 2.001_001 cpan:TOBYINK`;
+		dcs:versus `Type-Tiny 2.001_000 cpan:TOBYINK`;
 		item [
 			a dcs:Change;
 			label "Type::Tiny::XS will now provide XS implementations of some parameterized ArrayLike/HashLike types.";
