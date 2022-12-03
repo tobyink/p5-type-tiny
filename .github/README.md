@@ -1,7 +1,7 @@
 # Type-Tiny
 
 [![MetaCPAN](https://img.shields.io/cpan/v/Type-Tiny.svg)](https://metacpan.org/release/Type-Tiny)
-![Licence](https://img.shields.io/cpan/l/Type-Tiny)
+[![Licence](https://img.shields.io/cpan/l/Type-Tiny)](https://metacpan.org/dist/Type-Tiny/source/LICENSE)
 [![Issues](https://img.shields.io/github/issues/tobyink/p5-type-tiny)](https://github.com/tobyink/p5-type-tiny/issues)
 [![CI](https://github.com/tobyink/p5-type-tiny/workflows/CI/badge.svg)](https://github.com/tobyink/p5-type-tiny/actions)
 [![Coveralls](https://coveralls.io/repos/tobyink/p5-type-tiny/badge.svg?branch=master&amp;service=github)](https://coveralls.io/github/tobyink/p5-type-tiny)
