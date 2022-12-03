@@ -33,7 +33,7 @@ use Scalar::Util qw(refaddr);
 
 {
 	my $e = exception { compile_named()->(foo => 1) };
-	like($e, qr{^Wrong number of parameters});
+	like($e, qr{^Unrecognized parameter: foo});
 }
 
 {
@@ -148,7 +148,7 @@ sub _simple_test {
 		
 		like(
 			exception { $check->({ foo => 3, bar => 42, xxx => 1, yyy => 2, zzz => 3 }) },
-			qr/^Unrecognized parameters: xxx, yyy, zzz/,
+			qr/^Unrecognized parameters: xxx, yyy, and zzz/,
 			'additional parameters',
 		);
 		

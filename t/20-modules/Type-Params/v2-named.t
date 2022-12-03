@@ -80,14 +80,14 @@ is $o->myfunc2( arr => \@arr, int => 4 ), 'e', 'myfunc2 (happy path)';
 
 {
 	my $e = exception {
-		$o->myfunc( arr => \@arr, int => 6, debug => undef );
+		$o->myfunc( arr => \@arr, int => 6, 'debug' );
 	};
 	like $e, qr/Wrong number of parameters/, 'myfunc (param count exception)'
 }
 
 {
 	my $e = exception {
-		$o->myfunc2( arr => \@arr, int => 8, debug => undef );
+		$o->myfunc2( arr => \@arr, int => 8, 'debug' );
 	};
 	like $e, qr/Wrong number of parameters/, 'myfunc2 (param count exception)'
 }
