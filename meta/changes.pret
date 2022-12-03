@@ -4852,3 +4852,21 @@
 			label "Typo fix in Type::Tiny::Manual::UsingWithMoo.";
 		];
 	].
+
+`Type-Tiny 2.001_002 cpan:TOBYINK`
+	issued  2022-12-03;
+	changeset [
+		dcs:versus `Type-Tiny 2.001_001 cpan:TOBYINK`;
+		item [
+			a dcs:Change;
+			label "Type::Params no longer attempts to figure out the maximum number of expected arguments to functions which take key-value pairs. This allows `yourfunc(y=>1,y=>2)` to behave more intuitively, with the function just seeing the second value for `y`, instead of it throwing an exception complaining about too many arguments.";
+		];
+		item [
+			a dcs:Change;
+			label "If Type::Params signatures receive multiple unrecognized named arguments, the error message now lists them using Type::Utils::english_list() instead of just joining them with commas. This means that the error message will include 'and' before the last unrecognized named argument. If Type::Tiny::AvoidCallbacks is set to true while the signature is compiled, the old behaviour will be retained.";
+		];
+		item [
+			a dcs:Tests;
+			label "Test `t/20-modules/Type-Tiny-Enum/exporter_lexical.t` will now run on older versions of Perl, provided Lexical::Sub is installed.";
+		];
+	].
