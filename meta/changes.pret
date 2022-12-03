@@ -4869,4 +4869,8 @@
 			a dcs:Tests;
 			label "Test `t/20-modules/Type-Tiny-Enum/exporter_lexical.t` will now run on older versions of Perl, provided Lexical::Sub is installed.";
 		];
+		item [
+			a dcs:Packaging;
+			label "Depend on Exporter::Tiny 1.006000 which offers lexical export support for older versions of Perl, provided Lexical::Sub is installed.";
+		];
 	].
