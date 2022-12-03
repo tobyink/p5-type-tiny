@@ -27,7 +27,7 @@ use Test::Requires { 'Exporter::Tiny' => '1.006000' };
 BEGIN {
 	Exporter::Tiny::_HAS_NATIVE_LEXICAL_SUB or
 	Exporter::Tiny::_HAS_MODULE_LEXICAL_SUB or
-	plan skip_all => "This test requires support for exporting lexical subs";
+	plan skip_all => "This test requires Exporter::Tiny support for exporting lexical subs";
 };
 
 use Type::Tiny::Enum -lexical, Status => [ 'alive', 'dead' ];
