@@ -4,6 +4,12 @@
    changes in development releases, see the "Changes" file instead.
 =======================================================================
 
+2023-01-01 Type-Tiny version 2.002000 released!
+
+ - `Type::Tiny` objects have a `definition_context` method.
+ - XS implementations for parameterized ArrayLike/HashLike types.
+ - Improvements to Type::Params's handling of named parameters.
+
 2022-09-23 Type-Tiny version 2.000000 released!
 
  - Improved API for `Type::Params`.

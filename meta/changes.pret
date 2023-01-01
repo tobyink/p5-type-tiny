@@ -4874,3 +4874,18 @@
 			label "Depend on Exporter::Tiny 1.006000 which offers lexical export support for older versions of Perl, provided Lexical::Sub is installed.";
 		];
 	].
+
+`Type-Tiny 2.002000 cpan:TOBYINK`
+	issued  2023-01-01;
+	label   "Happy Fibonacci Day! 1/1/23"
+	changeset [
+		dcs:versus `Type-Tiny 2.001_001 cpan:TOBYINK`;
+		item [
+			a dcs:Packaging;
+			label "Repackage as stable.";
+		];
+		item [
+			a dcs:Documentation;
+			label "Update NEWS.";
+		];
+	].
