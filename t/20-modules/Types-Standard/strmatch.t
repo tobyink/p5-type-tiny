@@ -85,4 +85,12 @@ should_pass('abc', $length_ge_3);
 should_pass('abcd', $length_ge_3);
 #diag( $length_ge_3->inline_check('$x') );
 
+my $Pair = StrMatch[ qr/ \A ([[:alpha:]]+) : ([[:alpha:]]+) \z /x ];
+my @got  = $Pair->compiled_check->( 'foo:bar' );
+is(
+	scalar( @got ),
+	1,
+	'StrMatch->of(...)->compiled_check( $val ) always returns a single value, even in list context',
+);
+
 done_testing;
