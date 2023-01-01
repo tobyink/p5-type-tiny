@@ -4877,7 +4877,7 @@
 
 `Type-Tiny 2.002000 cpan:TOBYINK`
 	issued  2023-01-01;
-	label   "Happy Fibonacci Day! 1/1/23"
+	label   "Happy Fibonacci Day! 1/1/23";
 	changeset [
 		dcs:versus `Type-Tiny 2.001_001 cpan:TOBYINK`;
 		item [
