@@ -4889,6 +4889,10 @@
 			label "Update NEWS.";
 		];
 		item [
+			a dcs:Documentation;
+			label "Update copyright dates to 2023.";
+		];
+		item [
 			a dcs:Bugfix;
 			label "When Foo is a parameterized StrMatch type, ensure is_Foo always returns a single boolean value, even in list context.";
 			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/126>;
