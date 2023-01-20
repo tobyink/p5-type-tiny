@@ -14,8 +14,7 @@
 		item "use Type::Library -base"^^Change;
 		item "use Type::Library -declare"^^Change;
 	].
-
-`Type-Tiny 0.000_03 cpan:TOBYINK`
+Type-Tiny 0.000_03 cpan:TOBYINK`
 	issued  2013-04-03;
 	changeset [
 		dcs:versus `Type-Tiny 0.000_02 cpan:TOBYINK`;
@@ -4903,7 +4902,7 @@
 `Type-Tiny 2.002001 cpan:TOBYINK`
 	issued  2023-01-20;
 	changeset [
-		dcs:versus `Type-Tiny 2.002002 cpan:TOBYINK`;
+		dcs:versus `Type-Tiny 2.002000 cpan:TOBYINK`;
 		item [
 			a dcs:Bugfix;
 			label "Bugfix for Type::Tie+Storable issue affecting 32-bit builds of Perl.";
