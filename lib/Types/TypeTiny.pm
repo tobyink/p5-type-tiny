@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '2.002000';
+our $VERSION   = '2.002001';
 
 $VERSION =~ tr/_//d;
 
