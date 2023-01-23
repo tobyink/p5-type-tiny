@@ -485,7 +485,7 @@ Using Type::Tiny::Enum's export feature:
   package Horse {
     use Moo;
     use Types::Standard qw( Str );
-    use Type::Tiny::Enum Status => [ 'alive', dead' ];
+    use Type::Tiny::Enum Status => [ 'alive', 'dead' ];
     
     has name    => ( is => 'ro', isa => Str );
     has status  => ( is => 'ro', isa => Status, default => STATUS_ALIVE );
@@ -505,7 +505,7 @@ Using Type::Tiny::Enum's object-oriented interface:
     
     my $Status = Type::Tiny::Enum->new(
       name   => 'Status',
-      values => [ 'alive', dead' ],
+      values => [ 'alive', 'dead' ],
     );
     
     has name    => ( is => 'ro', isa => Str );
