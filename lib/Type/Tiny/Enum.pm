@@ -463,6 +463,60 @@ __END__
 
 Type::Tiny::Enum - string enum type constraints
 
+=head1 SYNOPSIS
+
+Using via L<Types::Standard>:
+
+  package Horse {
+    use Moo;
+    use Types::Standard qw( Str Enum );
+    
+    has name    => ( is => 'ro', isa => Str );
+    has status  => ( is => 'ro', isa => Enum[ 'alive', 'dead' ] );
+    
+    sub neigh ( $self ) {
+      return if $self->status eq 'dead';
+      ...;
+    }
+  }
+
+Using Type::Tiny::Enum's export feature:
+
+  package Horse {
+    use Moo;
+    use Types::Standard qw( Str );
+    use Type::Tiny::Enum Status => [ 'alive', dead' ];
+    
+    has name    => ( is => 'ro', isa => Str );
+    has status  => ( is => 'ro', isa => Status, default => STATUS_ALIVE );
+    
+    sub neigh ( $self ) {
+      return if $self->status eq STATUS_DEAD;
+      ...;
+    }
+  }
+
+Using Type::Tiny::Enum's object-oriented interface:
+
+  package Horse {
+    use Moo;
+    use Types::Standard qw( Str );
+    use Type::Tiny::Enum;
+    
+    my $Status = Type::Tiny::Enum->new(
+      name   => 'Status',
+      values => [ 'alive', dead' ],
+    );
+    
+    has name    => ( is => 'ro', isa => Str );
+    has status  => ( is => 'ro', isa => $Status, default => $Status->[0] );
+    
+    sub neigh ( $self ) {
+      return if $self->status eq $Status->[0];
+      ...;
+    }
+  }
+
 =head1 STATUS
 
 This module is covered by the
