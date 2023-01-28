@@ -32,7 +32,7 @@ ok( !is_LineStyle( -4 ) );
 ok(  is_LineStyle( $_ ),  "is_LineStyle($_)" ) for 0, 1, 2, 3, 4, 5, 6, 7, 64, 65, 66, 67, 68, 69, 70, 71;
 ok( !is_LineStyle( $_ ), "!is_LineStyle($_)" ) for 8, 9, 10, 11, 12, 13, 14, 15, 62, 63, 72;
 
-{
+subtest 'Bad bitfield numbering' => sub {
 	local $@;
 	ok !eval q{
 		use Type::Tiny::Bitfield Abcdef => {
@@ -44,6 +44,15 @@ ok( !is_LineStyle( $_ ), "!is_LineStyle($_)" ) for 8, 9, 10, 11, 12, 13, 14, 15,
 		1;
 	};
 	like $@, qr/^Not a positive power of 2/, 'error message';
+};
+
+subtest 'Bad bitfield naming' => sub {
+	local $@;
+	ok !eval q{
+		use Type::Tiny::Bitfield Abcdef => { red => 1 };
+		1;
+	};
+	like $@, qr/^Not an all-caps name in a bitfield/, 'error message';
 };
 
 ok( LineStyle->can_be_inlined, 'can be inlined' );

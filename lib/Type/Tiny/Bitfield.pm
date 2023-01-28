@@ -15,6 +15,8 @@ sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
 use Exporter::Tiny 1.004001 ();
 use Type::Tiny ();
+use Types::Common::Numeric qw( +PositiveOrZeroInt );
+
 our @ISA = qw( Type::Tiny Exporter::Tiny );
 
 sub _is_power_of_two { not $_[0] & $_[0]-1 }
@@ -50,27 +52,29 @@ sub new {
 	_croak "Need to supply hashref of values"
 		unless exists $opts{values};
 	
-	require Types::Common::Numeric;
-	$opts{parent} = Types::Common::Numeric::PositiveOrZeroInt();
+	$opts{parent} = PositiveOrZeroInt;
 	
+	for my $key ( keys %{ $opts{values} } ) {
+		_croak "Not an all-caps name in a bitfield: $key"
+			unless $key =~ /^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*/
+	}
 	my $ALL = 0;
 	my %already = ();
 	for my $value ( values %{ $opts{values} } ) {
 		_croak "Not a positive power of 2 in a bitfield: $value"
-			unless _is_power_of_two $value;
+			unless is_PositiveOrZeroInt( $value ) && _is_power_of_two( $value );
 		_croak "Duplicate value in a bitfield: $value"
 			if $already{$value}++;
 		$ALL |= ( 0 + $value );
 	}
 	$opts{ALL} = $ALL;
 	
-	# TODO: ensure all keys in $opt{values} are caps
-	
 	$opts{constraint} = sub {
 		not shift() & ~$ALL;
 	};
 	
-	# TODO: coercion
+	# TODO: coercion. Should accept strings like 'RED|green|Blue' and
+	# turn it into an integer.
 	
 	return $proto->SUPER::new( %opts );
 } #/ sub new
@@ -107,6 +111,9 @@ sub exportables {
 		};
 	}
 	
+	# TODO: maybe export a `from_LineStyle` function which converts a
+	# linestyle (or whatever bitfield) back into a string?
+	
 	return $exportables;
 }
 
@@ -119,7 +126,7 @@ sub inline_check {
 	
 	return sprintf(
 		'( %s and not %s & ~%d )',
-		Types::Common::Numeric::PositiveOrZeroInt()->inline_check( $var ),
+		PositiveOrZeroInt->inline_check( $var ),
 		$var,
 		$self->{ALL},
 	);
@@ -130,7 +137,7 @@ sub AUTOLOAD {
 	my ( $m ) = ( our $AUTOLOAD =~ /::(\w+)$/ );
 	return if $m eq 'DESTROY';
 	if ( ref $self and exists $self->{values}{$m} ) {
-		return $self->{values}{$m};
+		return 0 + $self->{values}{$m};
 	}
 	return $self->SUPER::AUTOLOAD( @_ );
 }
@@ -138,7 +145,7 @@ sub AUTOLOAD {
 sub can {
 	my ( $self, $m ) = ( shift, @_ );
 	if ( ref $self and exists $self->{values}{$m} ) {
-		return sub () { $self->{values}{$m} };
+		return sub () { 0 + $self->{values}{$m} };
 	}
 	return $self->SUPER::can( @_ );
 }
