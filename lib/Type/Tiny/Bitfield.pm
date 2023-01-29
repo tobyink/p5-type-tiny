@@ -27,7 +27,7 @@ sub _exporter_fail {
 	my $type = $class->new(
 		name      => $type_name,
 		values    => { %$values },
-		#coercion  => 1,
+		coercion  => 1,
 	);
 	$INC{'Type/Registry.pm'}
 		? 'Type::Registry'->for_class( $caller )->add_type( $type, $type_name )
@@ -73,8 +73,20 @@ sub new {
 		not shift() & ~$ALL;
 	};
 	
-	# TODO: coercion. Should accept strings like 'RED|green|Blue' and
-	# turn it into an integer.
+	if ( defined $opts{coercion}
+	and !ref $opts{coercion}
+	and 1 eq $opts{coercion} ) {
+		delete $opts{coercion};
+		$opts{_build_coercion} = sub {
+			require Types::Standard;
+			my $c = shift;
+			my $t = $c->type_constraint;
+			$c->add_type_coercions(
+				Types::Standard::Str(),
+				$t->_stringy_coercion,
+			);
+		};
+	} #/ if ( defined $opts{coercion...})
 	
 	return $proto->SUPER::new( %opts );
 } #/ sub new
@@ -130,6 +142,22 @@ sub inline_check {
 		$var,
 		$self->{ALL},
 	);
+}
+
+sub _stringy_coercion {
+	my $self = shift;
+	my %vals = %{ $self->values };
+	my $pfx  = uc( "$self" );
+	my $pfxl = length $pfx;
+	my $hash = sprintf(
+		'( %s, %s )',
+		join(
+			q{, },
+			map sprintf( '%s => %d', B::perlstring($_), $vals{$_} ),
+			sort keys %vals,
+		),
+	);
+	return qq{do { my \$bits = 0; my \%lookup = $hash; for my \$tok ( grep /\\w/, split /[\\s|+]+/, uc( \$_ ) ) { if ( substr( \$tok, 0, $pfxl) eq "$pfx" ) { \$tok = substr( \$tok, $pfxl ); \$tok =~ s/^_//; } if ( exists \$lookup{\$tok} ) { \$bits |= \$lookup{\$tok}; next; } require Carp; Carp::carp("Unknown token: \$tok"); } \$bits; }};
 }
 
 sub AUTOLOAD {

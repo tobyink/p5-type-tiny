@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 
+use Types::Common qw( Str );
 use Type::Tiny::Bitfield LineStyle => {
 	RED    => 1,
 	BLUE   => 2,
@@ -56,7 +57,16 @@ subtest 'Bad bitfield naming' => sub {
 };
 
 ok( LineStyle->can_be_inlined, 'can be inlined' );
-
 note LineStyle->inline_check( '$VALUE' );
+
+subtest 'Coercion from string' => sub {
+	ok LineStyle->has_coercion;
+	ok LineStyle->coercion->has_coercion_for_type( Str );
+	is( to_LineStyle('reD'), 1 );
+	is( to_LineStyle('GREEN reD'), 5 );
+	is( to_LineStyle('reD | grEEn'), 5 );
+	is( to_LineStyle('green+blue'), 6 );
+	is( to_LineStyle('linestyle_dotted'), 64 );
+};
 
 done_testing;
