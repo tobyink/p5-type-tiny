@@ -16,6 +16,7 @@ sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 use Exporter::Tiny 1.004001 ();
 use Type::Tiny ();
 use Types::Common::Numeric qw( +PositiveOrZeroInt );
+use Eval::TypeTiny qw( eval_closure );
 
 our @ISA = qw( Type::Tiny Exporter::Tiny );
 
@@ -123,8 +124,14 @@ sub exportables {
 		};
 	}
 	
-	# TODO: maybe export a `from_LineStyle` function which converts a
-	# linestyle (or whatever bitfield) back into a string?
+	my $weak = $self;
+	require Scalar::Util;
+	Scalar::Util::weaken( $weak );
+	push @$exportables, {
+		name => sprintf( '%s_to_Str', $base_name ),
+		tags => [ 'from' ],
+		code => sub { $weak->to_string( @_ ) },
+	};
 	
 	return $exportables;
 }
@@ -145,19 +152,42 @@ sub inline_check {
 }
 
 sub _stringy_coercion {
-	my $self = shift;
+	my ( $self, $varname ) = @_;
+	$varname ||= '$_';
 	my %vals = %{ $self->values };
 	my $pfx  = uc( "$self" );
 	my $pfxl = length $pfx;
 	my $hash = sprintf(
-		'( %s, %s )',
+		'( %s )',
 		join(
 			q{, },
 			map sprintf( '%s => %d', B::perlstring($_), $vals{$_} ),
 			sort keys %vals,
 		),
 	);
-	return qq{do { my \$bits = 0; my \%lookup = $hash; for my \$tok ( grep /\\w/, split /[\\s|+]+/, uc( \$_ ) ) { if ( substr( \$tok, 0, $pfxl) eq "$pfx" ) { \$tok = substr( \$tok, $pfxl ); \$tok =~ s/^_//; } if ( exists \$lookup{\$tok} ) { \$bits |= \$lookup{\$tok}; next; } require Carp; Carp::carp("Unknown token: \$tok"); } \$bits; }};
+	return qq{do { my \$bits = 0; my \%lookup = $hash; for my \$tok ( grep /\\w/, split /[\\s|+]+/, uc( $varname ) ) { if ( substr( \$tok, 0, $pfxl) eq "$pfx" ) { \$tok = substr( \$tok, $pfxl ); \$tok =~ s/^_//; } if ( exists \$lookup{\$tok} ) { \$bits |= \$lookup{\$tok}; next; } require Carp; Carp::carp("Unknown token: \$tok"); } \$bits; }};
+}
+
+sub from_string {
+	my ( $self, $str ) = @_;
+	$self->{from_string} ||= eval_closure(
+		environment => {},
+		source      => sprintf( 'sub { my $STR = shift; %s }', $self->_stringy_coercion( '$STR' ) ),
+	);
+	$self->{from_string}->( $str );
+}
+
+sub to_string {
+	my ( $self, $int ) = @_;
+	is_PositiveOrZeroInt( $int ) or return;
+	my %values = %{ $self->values };
+	$self->{all_names} ||= [ sort { $values{$a} <=> $values{$b} } keys %values ];
+	$int += 0;
+	my @names;
+	for my $n ( @{ $self->{all_names} } ) {
+		push @names, $n if $int & $values{$n};
+	}
+	return join q{|}, @names;
 }
 
 sub AUTOLOAD {
@@ -179,7 +209,6 @@ sub can {
 }
 
 1;
-
 
 __END__
 
@@ -317,6 +346,21 @@ to be used as methods.
 
 For example, in the synopsis, C<< LedSet->GREEN >> would return 2.
 
+Other methods it provides:
+
+=over
+
+=item C<< from_string( $str ) >>
+
+Provides the standard coercion from a string, even if this type constraint
+doesn't have a coercion.
+
+=item C<< to_string( $int ) >>
+
+Does the reverse coercion.
+
+=back
+
 =head2 Exports
 
 Type::Tiny::Bitfield can be used as an exporter.
@@ -337,7 +381,9 @@ This will export the following functions into your namespace:
 
 =item C<< assert_LedSet( $value ) >>
 
-=item C<< to_LedSet( $value ) >>
+=item C<< to_LedSet( $string ) >>
+
+=item C<< LedSet_to_Str( $value ) >>
 
 =item C<< LEDSET_RED >>
 

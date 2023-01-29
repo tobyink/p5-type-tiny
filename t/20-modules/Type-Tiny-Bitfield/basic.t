@@ -67,6 +67,13 @@ subtest 'Coercion from string' => sub {
 	is( to_LineStyle('reD | grEEn'), 5 );
 	is( to_LineStyle('green+blue'), 6 );
 	is( to_LineStyle('linestyle_dotted'), 64 );
+	is( LineStyle->from_string('reD | grEEn'), 5 );
+};
+
+subtest 'Coercion to string' => sub {
+	is( LineStyle->to_string( 6 ), 'BLUE|GREEN' );
+	is( LineStyle->to_string( 65 ), 'RED|DOTTED' );
+	is( LineStyle_to_Str( 65 ), 'RED|DOTTED' );
 };
 
 done_testing;
