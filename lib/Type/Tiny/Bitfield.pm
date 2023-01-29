@@ -179,3 +179,205 @@ sub can {
 }
 
 1;
+
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Type::Tiny::Bitfield - bitfield/bitflag type constraints
+
+=head1 SYNOPSIS
+
+Using Type::Tiny::Bitfield's export feature:
+
+  package LightSource {
+    use Moo;
+    
+    use Type::Tiny::Bitfield LedSet => {
+      RED   => 1,
+      GREEN => 2,
+      BLUE  => 4,
+    };
+    
+    has leds => ( is => 'ro', isa => LedSet, default => 0, coerce => 1 );
+    
+    sub new_red {
+      my $class = shift;
+      return $class->new( leds => LEDSET_RED );
+    }
+    
+    sub new_green {
+      my $class = shift;
+      return $class->new( leds => LEDSET_GREEN );
+    }
+    
+    sub new_yellow {
+      my $class = shift;
+      return $class->new( leds => LEDSET_RED | LEDSET_GREEN );
+    }
+  }
+
+Using Type::Tiny::Bitfield's object-oriented interface:
+
+  package LightSource {
+    use Moo;
+    use Type::Tiny::Bitfield;
+    
+    my $LedSet = Type::Tiny::Bitfield->new(
+      name   => 'LedSet',
+      values => {
+        RED   => 1,
+        GREEN => 2,
+        BLUE  => 4,
+      },
+      coercion => 1,
+    );
+    
+    has leds => ( is => 'ro', isa => $LedSet, default => 0, coerce => 1 );
+    
+    sub new_red {
+      my $class = shift;
+      return $class->new( leds => $LedSet->RED );
+    }
+    
+    sub new_green {
+      my $class = shift;
+      return $class->new( leds => $LedSet->GREEN );
+    }
+    
+    sub new_yellow {
+      my $class = shift;
+      return $class->new( leds => $LedSet->coerce('red|green') );
+    }
+  }
+
+=head1 STATUS
+
+This module is covered by the
+L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
+
+=head1 DESCRIPTION
+
+Bitfield type constraints.
+
+This package inherits from L<Type::Tiny>; see that for most documentation.
+Major differences are listed below:
+
+=head2 Attributes
+
+=over
+
+=item C<values>
+
+Hashref of bits allowed in the bitfield. Keys must be UPPER_SNAKE_CASE strings.
+Values must be positive integers which are powers of two. The same number
+cannot be used multiple times.
+
+=item C<constraint>
+
+Unlike Type::Tiny, you I<cannot> pass a constraint coderef to the constructor.
+Instead rely on the default.
+
+=item C<inlined>
+
+Unlike Type::Tiny, you I<cannot> pass an inlining coderef to the constructor.
+Instead rely on the default.
+
+=item C<parent>
+
+Parent is always B<Types::Common::Numeric::PositiveOrZeroInt>, and cannot be
+passed to the constructor.
+
+=item C<coercion>
+
+If C<< coercion => 1 >> is passed to the constructor, the type will have an
+automatic coercion from B<Str>. Types built by the C<import> method will
+always have C<< coercion => 1 >>.
+
+In the SYNOPSIS example, the coercion from B<Str> will accept strings like:
+
+  "RED"
+  "red"
+  "Red Green"
+  "Red+Blue"
+  "blue | GREEN"
+  "LEDSET_RED + LeDsEt_green"
+
+=back
+
+=head2 Methods
+
+This class uses C<AUTOLOAD> to allow the names of each bit in the bitfield
+to be used as methods.
+
+For example, in the synopsis, C<< LedSet->GREEN >> would return 2.
+
+=head2 Exports
+
+Type::Tiny::Bitfield can be used as an exporter.
+
+  use Type::Tiny::Bitfield LedSet => {
+    RED    => 1,
+    GREEN  => 2,
+    BLUE   => 4,
+  };
+
+This will export the following functions into your namespace:
+
+=over
+
+=item C<< LedSet >>
+
+=item C<< is_LedSet( $value ) >>
+
+=item C<< assert_LedSet( $value ) >>
+
+=item C<< to_LedSet( $value ) >>
+
+=item C<< LEDSET_RED >>
+
+=item C<< LEDSET_GREEN >>
+
+=item C<< LEDSET_BLUE >>
+
+=back
+
+Multiple bitfield types can be exported at once:
+
+  use Type::Tiny::Enum (
+    LedSet     => { RED => 1, GREEN => 2, BLUE => 4 },
+    LedPattern => [ FLASHING => 1 ],
+  );
+
+=head1 BUGS
+
+Please report any bugs to
+L<https://github.com/tobyink/p5-type-tiny/issues>.
+
+=head1 SEE ALSO
+
+L<Type::Tiny::Manual>.
+
+L<Type::Tiny>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2023 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
