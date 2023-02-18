@@ -1474,6 +1474,10 @@ confident will exist (perhaps dependent on the version of the parent class).
 C<< signature_for( \@functions, %opts ) >> is a useful shortcut if you have
 multiple functions with the same signature.
 
+ signature_for [ 'add_nums', 'subtract_nums' ] => (
+   positional => [ Num, Num ],
+ );
+
 =head1 LEGACY API
 
 The following functions were the API prior to Type::Params v2. They are
