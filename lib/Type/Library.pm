@@ -533,6 +533,11 @@ Prevents new type constraints and coercions from being added to the
 library, and also calls C<< $type->coercion->freeze >> on every
 type constraint in the library.
 
+(Prior to Type::Library v2, C<make_immutable> would call
+C<< $type->coercion->freeze >> on every constraint in the library,
+but not prevent new type constraints and coercions from being added
+to the library.)
+
 =back
 
 =head2 Type library exported functions
