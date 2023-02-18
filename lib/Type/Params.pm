@@ -1442,7 +1442,9 @@ Or since Perl 5.20:
 The C<signature_for> keyword turns C<signature> inside-out.
 
 The same signature specification options are supported, with the exception
-of C<want_source> and C<want_details> which will not work.
+of C<want_source>, C<want_details>, and C<goto_next> which will not work.
+(If using the C<multiple> option, then C<goto_next> is still supported in
+the I<nested> signatures.)
 
 If you are providing a signature for a sub in another package, then
 C<< signature_for "Some::Package::some_sub" => ( ... ) >> will work,
@@ -1458,12 +1460,11 @@ the consequences and want to override the normal behaviour.
 If the sub being wrapped cannot be found, then C<signature_for> will usually
 throw an error. If you want it to "work" in this situation, use the
 C<fallback> option. C<< fallback => \&alternative_coderef_to_wrap >>
-or C<< fallback => 1 >> will instead wrap a different coderef if the original
-cannot be found. C<< fallback => 1 >> is a shortcut for
-C<< fallback => sub {} >>. An example where this might be useful is if you're
-adding signatures to methods which are inherited from a parent class, but
-you are not 100% confident will exist (perhaps dependent on the version of
-the parent class).
+will instead wrap a different coderef if the original cannot be found.
+C<< fallback => 1 >> is a shortcut for C<< fallback => sub {} >>.
+An example where this might be useful is if you're adding signatures to
+methods which are inherited from a parent class, but you are not 100%
+confident will exist (perhaps dependent on the version of the parent class).
 
  signature_for add_nums => (
    positional => [ Num, Num ],
