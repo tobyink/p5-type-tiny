@@ -179,7 +179,7 @@ sub from_string {
 
 sub to_string {
 	my ( $self, $int ) = @_;
-	is_PositiveOrZeroInt( $int ) or return;
+	$self->check( $int ) or return undef;
 	my %values = %{ $self->values };
 	$self->{all_names} ||= [ sort { $values{$a} <=> $values{$b} } keys %values ];
 	$int += 0;

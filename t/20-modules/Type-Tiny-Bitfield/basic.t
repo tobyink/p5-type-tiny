@@ -91,8 +91,11 @@ subtest 'Coercion from string' => sub {
 };
 
 subtest 'Coercion to string' => sub {
+	is( LineStyle->to_string( 2 ), 'BLUE' );
 	is( LineStyle->to_string( 6 ), 'BLUE|GREEN' );
 	is( LineStyle->to_string( 65 ), 'RED|DOTTED' );
+	is( LineStyle->to_string( [] ), undef );
+	is( LineStyle->to_string( -1 ), undef );
 	is( LineStyle_to_Str( 65 ), 'RED|DOTTED' );
 };
 
