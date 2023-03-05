@@ -191,12 +191,14 @@ sub to_string {
 }
 
 sub AUTOLOAD {
+	our $AUTOLOAD;
 	my $self = shift;
-	my ( $m ) = ( our $AUTOLOAD =~ /::(\w+)$/ );
+	my ( $m ) = ( $AUTOLOAD =~ /::(\w+)$/ );
 	return if $m eq 'DESTROY';
 	if ( ref $self and exists $self->{values}{$m} ) {
 		return 0 + $self->{values}{$m};
 	}
+	local $Type::Tiny::AUTOLOAD = $AUTOLOAD;
 	return $self->SUPER::AUTOLOAD( @_ );
 }
 
@@ -342,7 +344,7 @@ In the SYNOPSIS example, the coercion from B<Str> will accept strings like:
 =head2 Methods
 
 This class uses C<AUTOLOAD> to allow the names of each bit in the bitfield
-to be used as methods.
+to be used as methods. These method names will always be UPPER_SNAKE_CASE.
 
 For example, in the synopsis, C<< LedSet->GREEN >> would return 2.
 
