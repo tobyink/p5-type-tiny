@@ -399,7 +399,7 @@ Multiple bitfield types can be exported at once:
 
   use Type::Tiny::Enum (
     LedSet     => { RED => 1, GREEN => 2, BLUE => 4 },
-    LedPattern => [ FLASHING => 1 ],
+    LedPattern => { FLASHING => 1 },
   );
 
 =head1 BUGS
