@@ -20,14 +20,20 @@ use Eval::TypeTiny qw( eval_closure );
 
 our @ISA = qw( Type::Tiny Exporter::Tiny );
 
+__PACKAGE__->_install_overloads(
+	q[+] => 'new_combined',
+);
+
 sub _is_power_of_two { not $_[0] & $_[0]-1 }
 
 sub _exporter_fail {
-	my ( $class, $type_name, $values, $globals ) = @_;
+	my ( $class, $type_name, $args, $globals ) = @_;
 	my $caller = $globals->{into};
+	my %values = %$args;
+	/^[-]/ && delete( $values{$_} ) for keys %values;
 	my $type = $class->new(
 		name      => $type_name,
-		values    => { %$values },
+		values    => \%values,
 		coercion  => 1,
 	);
 	$INC{'Type/Registry.pm'}
@@ -92,8 +98,34 @@ sub new {
 	return $proto->SUPER::new( %opts );
 } #/ sub new
 
+sub new_combined {
+	my ( $self, $other, $swap ) = @_;
+	
+	Scalar::Util::blessed( $self )
+		&& $self->isa( __PACKAGE__ )
+		&& Scalar::Util::blessed( $other )
+		&& $other->isa( __PACKAGE__ )
+		or _croak( "Bad overloaded operation" );
+	
+	( $other, $self ) = ( $self, $other ) if $swap;
+	
+	for my $k ( keys %{ $self->values } ) {
+		_croak "Conflicting value: $k"
+			if exists $other->values->{$k};
+	}
+	
+	my %all_values = ( %{ $self->values }, %{ $other->values } );
+	return ref( $self )->new(
+		display_name => sprintf( '%s+%s', "$self", "$other" ),
+		values       => \%all_values,
+		( $self->has_coercion || $other->has_coercion )
+			? ( coercion => 1 )
+			: (),
+	);
+}
+
 sub values {
-	$_[0]{values}
+	$_[0]{values};
 }
 
 sub _lockdown {
@@ -401,6 +433,27 @@ Multiple bitfield types can be exported at once:
     LedSet     => { RED => 1, GREEN => 2, BLUE => 4 },
     LedPattern => { FLASHING => 1 },
   );
+
+=head2 Overloading
+
+It is possible to combine two Bitfield types using the C<< + >> operator.
+
+  use Type::Tiny::Enum (
+    LedSet     => { RED => 1, GREEN => 2, BLUE => 4 },
+    LedPattern => { FLASHING => 8 },
+  );
+  
+  has leds => (
+    is      => 'ro',
+    isa     => LedSet + LedPattern,
+    default => 0,
+    coerce  => 1
+  );
+
+This will allow values like "11" (LEDSET_RED|LEDSET_GREEN|LEDPATTERN_FLASHING).
+
+An exception will be thrown if any of the names in the two types being combined
+conflict.
 
 =head1 BUGS
 
