@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Tiny::Intersection::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::Intersection::VERSION   = '2.002001';
+	$Type::Tiny::Intersection::VERSION   = '2.003';
 }
 
 $Type::Tiny::Intersection::VERSION =~ tr/_//d;

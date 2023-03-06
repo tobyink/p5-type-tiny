@@ -4910,3 +4910,31 @@
 			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/128>;
 		];
 	].
+
+`Type-Tiny 2.003_000 cpan:TOBYINK`
+	issued  2023-03-06;
+	changeset [
+		dcs:versus `Type-Tiny 2.002001 cpan:TOBYINK`;
+		item [
+			a dcs:Documentation;
+			label "Add SYNOPSIS for Type::Tiny::Enum.";
+		];
+		item [
+			a dcs:Documentation, dcs:Tests;
+			label "Add documentation and tests for the combination of the `goto_next` and `multiple` options when used with `signature_for`.";
+		];
+		item [
+			a dcs:Documentation;
+			label "Add example of `signature_for` applying a signature to multiple functions at once.";
+		];
+		item [
+			a dcs:Documentation;
+			label "Document changes to `make_immutable` in Type::Library v2.x.";
+			seealso <https://github.com/tobyink/p5-type-tiny/issues/129>;
+		];
+		item [
+			a dcs:Addition;
+			label "Type::Tiny::Bitfield class.";
+			seealso <https://github.com/tobyink/p5-type-tiny/issues/131>;
+		];
+	].
