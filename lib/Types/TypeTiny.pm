@@ -445,10 +445,17 @@ sub BoolLike () {
 		constraint => sub {
 			!defined( $_ )
 				or !ref( $_ ) && ( $_ eq '' || $_ eq '0' || $_ eq '1' )
-				or blessed( $_ ) && _check_overload( $_, q[bool] );
+				or blessed( $_ ) && _check_overload( $_, q[bool] )
+				or blessed( $_ ) && _check_overload( $_, q[0+] ) && do { my $n = 0 + $_; $n==0 or $n==1 };
 		},
 		inlined => sub {
-			qq/do { local \$_ = $_; !defined() or !ref() && ( \$_ eq '' || \$_ eq '0' || \$_ eq '1' ) or Scalar::Util::blessed(\$_) && ${\ +_get_check_overload_sub() }(\$_, q[bool]) }/;
+			qq/do {
+				local \$_ = $_;
+				!defined()
+					or !ref() && ( \$_ eq '' || \$_ eq '0' || \$_ eq '1' )
+					or Scalar::Util::blessed(\$_) && ${\ +_get_check_overload_sub() }(\$_, q[bool])
+					or Scalar::Util::blessed(\$_) && ${\ +_get_check_overload_sub() }(\$_, q[0+]) && do { my \$n = 0 + \$_; \$n==0 or \$n==1 }
+			}/;
 		},
 		type_default => sub { return !!0 },
 		library => __PACKAGE__,
@@ -849,7 +856,9 @@ Accepts strings and objects overloading stringification.
 
 B<< BoolLike >>
 
-Accepts undef, "", 0, 1, and any blessed object overloading "bool".
+Accepts undef, "", 0, 1; accepts any blessed object overloading "bool";
+accepts any blessed object overloading "0+" to return 0 or 1. (Needs to
+actually call the overloaded operation to check that.)
 
 =item *
 
