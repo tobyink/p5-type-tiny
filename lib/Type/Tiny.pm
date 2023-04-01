@@ -638,6 +638,8 @@ sub _build_compiled_check {
 } #/ sub _build_compiled_check
 
 sub _build_exception_class {
+	my $self = shift;
+	return $self->parent->exception_class if $self->has_parent;
 	require Error::TypeTiny::Assertion;
 	return 'Error::TypeTiny::Assertion';
 }
@@ -1059,7 +1061,7 @@ sub _failed_check {
 	$self = $ALL_TYPES{$self} if defined $self && !ref $self;
 	
 	my $exception_class = delete( $attrs{exception_class} )
-		|| ( ref $self ? $self->exception_class : __PACKAGE__->_build_exception_class );
+		|| ( ref $self ? $self->exception_class : 'Error::TypeTiny::Assertion' );
 	my $callback = delete( $attrs{on_die} );
 
 	if ( $self ) {
