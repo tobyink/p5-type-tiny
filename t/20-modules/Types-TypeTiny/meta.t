@@ -33,7 +33,7 @@ my $meta = Types::TypeTiny->meta;
 
 is_deeply(
 	[ sort $meta->type_names ],
-	[ sort qw( CodeLike ArrayLike StringLike HashLike TypeTiny _ForeignTypeConstraint ) ],
+	[ sort qw( BoolLike CodeLike ArrayLike StringLike HashLike TypeTiny _ForeignTypeConstraint ) ],
 	'type_names',
 );
 
