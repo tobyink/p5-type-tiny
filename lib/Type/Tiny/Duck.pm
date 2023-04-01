@@ -181,6 +181,69 @@ __END__
 
 Type::Tiny::Duck - type constraints based on the "can" method
 
+=head1 SYNOPSIS
+
+Using via L<Types::Standard>:
+
+  package Logger {
+    use Moo;
+    use Types::Standard qw( HasMethods Bool );
+    
+    has debugging => ( is => 'rw', isa => Bool, default => 0 );
+    has output    => ( is => 'ro', isa => HasMethods[ 'print' ] );
+    
+    sub warn ( $self, $message ) {
+      $self->output->print( "[WARNING] $message\n" );
+    }
+    
+    sub debug ( $self, $message ) {
+      $self->output->print( "[DEBUG] $message\n" ) if $self->debugging;
+    }
+  }
+
+Using Type::Tiny::Duck's export feature:
+
+  package Logger {
+    use Moo;
+    use Types::Standard qw( Bool );
+    use Type::Type::Duck Printable => [ 'print' ];
+    
+    has debugging => ( is => 'rw', isa => Bool, default => 0 );
+    has output    => ( is => 'ro', isa => Printable );
+    
+    sub warn ( $self, $message ) {
+      $self->output->print( "[WARNING] $message\n" );
+    }
+    
+    sub debug ( $self, $message ) {
+      $self->output->print( "[DEBUG] $message\n" ) if $self->debugging;
+    }
+  }
+
+Using Type::Tiny::Duck's object-oriented interface:
+
+  package Logger {
+    use Moo;
+    use Types::Standard qw( Bool );
+    use Type::Type::Duck;
+    
+    my $Printable = Type::Type::Duck->new(
+      name    => 'Printable',
+      methods => [ 'print' ],
+    );
+    
+    has debugging => ( is => 'rw', isa => Bool, default => 0 );
+    has output    => ( is => 'ro', isa => $Printable );
+    
+    sub warn ( $self, $message ) {
+      $self->output->print( "[WARNING] $message\n" );
+    }
+    
+    sub debug ( $self, $message ) {
+      $self->output->print( "[DEBUG] $message\n" ) if $self->debugging;
+    }
+  }
+
 =head1 STATUS
 
 This module is covered by the
@@ -189,6 +252,11 @@ L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
 =head1 DESCRIPTION
 
 Type constraints of the general form C<< { $_->can("method") } >>.
+
+The name refers to the saying, "If it looks like a duck, swims like a duck,
+and quacks like a duck, then it probably is a duck". Duck typing can be
+a more flexible way of testing objects than relying on C<isa>, as it allows
+people to easily substitute mock objects.
 
 This package inherits from L<Type::Tiny>; see that for most documentation.
 Major differences are listed below:
