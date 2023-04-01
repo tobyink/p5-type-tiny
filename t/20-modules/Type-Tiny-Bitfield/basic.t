@@ -20,6 +20,12 @@ should_fail( $_, LineStyle ) for 8, 9, 10, 11, 12, 13, 14, 15, 62, 63, 72;
 should_fail( 'RED', LineStyle );
 should_fail( -4, LineStyle );
 
+is_deeply(
+	[ sort { $a cmp $b } LineStyle->constant_names ],
+	[ qw/ LINESTYLE_BLUE LINESTYLE_DOTTED LINESTYLE_GREEN LINESTYLE_RED / ],
+	'LineStyle->constant_names',
+);
+
 is( LINESTYLE_RED,  1, 'LINESTYLE_RED' );
 is( LINESTYLE_BLUE,  2, 'LINESTYLE_BLUE' );
 is( LINESTYLE_GREEN,  4, 'LINESTYLE_GREEN' );

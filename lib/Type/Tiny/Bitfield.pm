@@ -168,6 +168,18 @@ sub exportables {
 	return $exportables;
 }
 
+sub constant_names {
+	my $self = shift;
+	return map {
+			$_->{name};
+		}
+		grep {
+			my $tags = $_->{tags};
+			grep $_ eq 'constants', @$tags;
+		}
+		@{ $self->exportables || [] };
+}
+
 sub can_be_inlined {
 	!!1;
 }
@@ -392,6 +404,13 @@ doesn't have a coercion.
 =item C<< to_string( $int ) >>
 
 Does the reverse coercion.
+
+=item C<< constant_names() >>
+
+This is a convenience to allow for:
+
+  use base 'Exporter::Tiny';
+  push our @EXPORT_OK, LineStyle->constant_names;
 
 =back
 
