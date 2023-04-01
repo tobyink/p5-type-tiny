@@ -43,6 +43,13 @@ Booleans; the numbers or strings "0" and "1", the empty string, or undef.
 
 =item *
 
+B<< BoolLike >> in L<Types::TypeTiny>
+
+Similar to B<< Bool >>, but without coercions, and accepts objects
+overloading "bool".
+
+=item *
+
 B<< ClassName >> in L<Types::Standard>
 
 Any loaded package name.

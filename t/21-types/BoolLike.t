@@ -4,7 +4,7 @@
 
 =head1 PURPOSE
 
-Basic tests for B<Int> from L<Types::Standard>.
+Basic tests for B<BoolLike> from L<Types::TypeTiny>.
 
 =head1 AUTHOR
 
@@ -12,7 +12,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2019-2023 by Toby Inkster.
+This software is copyright (c) 2023 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -24,21 +24,21 @@ use warnings;
 use Test::More;
 use Test::Fatal;
 use Test::TypeTiny;
-use Types::Standard qw( Int );
+use Types::TypeTiny qw( BoolLike );
 
-isa_ok(Int, 'Type::Tiny', 'Int');
-is(Int->name, 'Int', 'Int has correct name');
-is(Int->display_name, 'Int', 'Int has correct display_name');
-is(Int->library, 'Types::Standard', 'Int knows it is in the Types::Standard library');
-ok(Types::Standard->has_type('Int'), 'Types::Standard knows it has type Int');
-ok(!Int->deprecated, 'Int is not deprecated');
-ok(!Int->is_anon, 'Int is not anonymous');
-ok(Int->can_be_inlined, 'Int can be inlined');
-is(exception { Int->inline_check(q/$xyz/) }, undef, "Inlining Int doesn't throw an exception");
-ok(!Int->has_coercion, "Int doesn't have a coercion");
-ok(!Int->is_parameterizable, "Int isn't parameterizable");
-isnt(Int->type_default, undef, "Int has a type_default");
-is(Int->type_default->(), 0, "Int type_default is zero");
+isa_ok(BoolLike, 'Type::Tiny', 'BoolLike');
+is(BoolLike->name, 'BoolLike', 'BoolLike has correct name');
+is(BoolLike->display_name, 'BoolLike', 'BoolLike has correct display_name');
+is(BoolLike->library, 'Types::TypeTiny', 'BoolLike knows it is in the Types::TypeTiny library');
+ok(Types::TypeTiny->has_type('BoolLike'), 'Types::TypeTiny knows it has type BoolLike');
+ok(!BoolLike->deprecated, 'BoolLike is not deprecated');
+ok(!BoolLike->is_anon, 'BoolLike is not anonymous');
+ok(BoolLike->can_be_inlined, 'BoolLike can be inlined');
+is(exception { BoolLike->inline_check(q/$xyz/) }, undef, "Inlining BoolLike doesn't throw an exception");
+ok(!BoolLike->has_coercion, "BoolLike has no coercion");
+ok(!BoolLike->is_parameterizable, "BoolLike isn't parameterizable");
+isnt(BoolLike->type_default, undef, "BoolLike has a type_default");
+is(BoolLike->type_default->(), !!0, "BoolLike type_default is false");
 
 #
 # The @tests array is a list of triples:
@@ -49,14 +49,14 @@ is(Int->type_default->(), 0, "Int type_default is zero");
 #
 
 my @tests = (
-	fail => 'undef'                    => undef,
-	xxxx => 'false'                    => !!0,
+	pass => 'undef'                    => undef,
+	pass => 'false'                    => !!0,
 	pass => 'true'                     => !!1,
 	pass => 'zero'                     =>  0,
 	pass => 'one'                      =>  1,
-	pass => 'negative one'             => -1,
+	fail => 'negative one'             => -1,
 	fail => 'non integer'              =>  3.1416,
-	fail => 'empty string'             => '',
+	pass => 'empty string'             => '',
 	fail => 'whitespace'               => ' ',
 	fail => 'line break'               => "\n",
 	fail => 'random string'            => 'abc123',
@@ -99,8 +99,8 @@ my @tests = (
 	fail => 'object overloading arrayref' => do { package Local::OL::Array; use overload q[@{}] => sub { $_[0]{array} }; bless {array=>[]} },
 	fail => 'object overloading hashref' => do { package Local::OL::Hash; use overload q[%{}] => sub { $_[0][0] }; bless [{}] },
 	fail => 'object overloading coderef' => do { package Local::OL::Code; use overload q[&{}] => sub { $_[0][0] }; bless [sub { 1 }] },
-	fail => 'object booling to false'  => do { package Local::OL::BoolFalse; use overload q[bool] => sub { 0 }; bless [] },
-	fail => 'object booling to true'   => do { package Local::OL::BoolTrue;  use overload q[bool] => sub { 1 }; bless [] },
+	pass => 'object booling to false'  => do { package Local::OL::BoolFalse; use overload q[bool] => sub { 0 }; bless [] },
+	pass => 'object booling to true'   => do { package Local::OL::BoolTrue;  use overload q[bool] => sub { 1 }; bless [] },
 #TESTS
 );
 
@@ -110,10 +110,10 @@ while (@tests) {
 		note("UNDEFINED OUTCOME: $label");
 	}
 	elsif ($expect eq 'pass') {
-		should_pass($value, Int, ucfirst("$label should pass Int"));
+		should_pass($value, BoolLike, ucfirst("$label should pass Bool"));
 	}
 	elsif ($expect eq 'fail') {
-		should_fail($value, Int, ucfirst("$label should fail Int"));
+		should_fail($value, BoolLike, ucfirst("$label should fail Bool"));
 	}
 	else {
 		fail("expected '$expect'?!");

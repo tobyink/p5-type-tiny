@@ -84,7 +84,11 @@ sub meta {
 }
 
 sub type_names {
-	qw( CodeLike StringLike TypeTiny HashLike ArrayLike _ForeignTypeConstraint );
+	qw(
+		StringLike BoolLike
+		HashLike ArrayLike CodeLike
+		TypeTiny _ForeignTypeConstraint
+	);
 }
 
 sub has_type {
@@ -432,6 +436,24 @@ sub CodeLike () {
 		$cache{CodeLike} = "Type::Tiny"->new( %common );
 	}
 } #/ sub CodeLike
+
+sub BoolLike () {
+	return $cache{BoolLike} if $cache{BoolLike};
+	require Type::Tiny;
+	$cache{BoolLike} = "Type::Tiny"->new(
+		name       => "BoolLike",
+		constraint => sub {
+			!defined( $_ )
+				or !ref( $_ ) && ( $_ eq '' || $_ eq '0' || $_ eq '1' )
+				or blessed( $_ ) && _check_overload( $_, q[bool] );
+		},
+		inlined => sub {
+			qq/do { local \$_ = $_; !defined() or !ref() && ( \$_ eq '' || \$_ eq '0' || \$_ eq '1' ) or Scalar::Util::blessed(\$_) && ${\ +_get_check_overload_sub() }(\$_, q[bool]) }/;
+		},
+		type_default => sub { return !!0 },
+		library => __PACKAGE__,
+	);
+} #/ sub BoolLike
 
 sub TypeTiny () {
 	return $cache{TypeTiny} if defined $cache{TypeTiny};
@@ -822,6 +844,12 @@ designed for use within Type::Tiny, may be more generally useful.
 B<< StringLike >>
 
 Accepts strings and objects overloading stringification.
+
+=item *
+
+B<< BoolLike >>
+
+Accepts undef, "", 0, 1, and any blessed object overloading "bool".
 
 =item *
 
