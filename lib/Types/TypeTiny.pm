@@ -860,6 +860,11 @@ Accepts undef, "", 0, 1; accepts any blessed object overloading "bool";
 accepts any blessed object overloading "0+" to return 0 or 1. (Needs to
 actually call the overloaded operation to check that.)
 
+Warning: an object which overloads "0+" without also turning on overload
+fallbacks may actually be useless as a practical boolean. But some common
+objects such as JSON::PP's booleans overload "0+" instead of overloading
+"bool" (thankfully with fallbacks enabled!) so we do need to support this.
+
 =item *
 
 B<< HashLike[`a] >>
