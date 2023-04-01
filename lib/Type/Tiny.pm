@@ -1999,6 +1999,9 @@ Defaults to "Error::TypeTiny::Assertion", which is usually good. This class
 is expected to provide a C<throw_cb> method compatible with the method of
 that name in L<Error::TypeTiny>.
 
+If a parent type constraint has a custom C<exception_class>, then this
+will be "inherited" by its children.
+
 =back
 
 =head3 Attributes related to parameterizable and parameterized types
