@@ -1008,6 +1008,8 @@ sub inline_assert {
 	my $self = shift;
 	my ( $varname, $typevarname, %extras ) = @_;
 	
+	$extras{exception_class} ||= $self->exception_class;
+	
 	my $inline_check;
 	if ( $self->can_be_inlined ) {
 		$inline_check = sprintf( '(%s)', $self->inline_check( $varname ) );
@@ -1056,7 +1058,8 @@ sub _failed_check {
 	my ( $self, $name, $value, %attrs ) = @_;
 	$self = $ALL_TYPES{$self} if defined $self && !ref $self;
 	
-	my $exception_class = delete( $attrs{exception_class} ) || $self->exception_class;
+	my $exception_class = delete( $attrs{exception_class} )
+		|| ( ref $self ? $self->exception_class : __PACKAGE__->_build_exception_class );
 	my $callback = delete( $attrs{on_die} );
 
 	if ( $self ) {
