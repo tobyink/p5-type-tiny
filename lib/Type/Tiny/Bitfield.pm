@@ -170,13 +170,8 @@ sub exportables {
 
 sub constant_names {
 	my $self = shift;
-	return map {
-			$_->{name};
-		}
-		grep {
-			my $tags = $_->{tags};
-			grep $_ eq 'constants', @$tags;
-		}
+	return map { $_->{name} }
+		grep { my $tags = $_->{tags}; grep $_ eq 'constants', @$tags; }
 		@{ $self->exportables || [] };
 }
 
