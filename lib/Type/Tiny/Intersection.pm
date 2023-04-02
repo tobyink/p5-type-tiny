@@ -250,6 +250,60 @@ __END__
 
 Type::Tiny::Intersection - intersection type constraints
 
+=head1 SYNOPSIS
+
+Using via the C<< & >> operator overload:
+
+  package Local::Stash {
+    use Moo;
+    use Types::Common qw( LowerCaseStr StrLength );
+    
+    has identifier => (
+      is   => 'ro',
+      isa  => (LowerCaseStr) & (StrLength[4, 8]),
+    );
+  }
+  
+  my $x = Local::Stash->new( data => {} );  # not ok
+  my $y = Local::Stash->new( data => [] );  # not ok
+
+Note that it is a good idea to enclose each type being intersected
+in parentheses to avoid Perl thinking the C<< & >> is the sigil for
+a coderef.
+
+Using Type::Tiny::Intersection's object-oriented interface:
+
+  package Local::Stash {
+    use Moo;
+    use Types::Common qw( LowerCaseStr StrLength );
+    use Type::Tiny::Intersection;
+    
+    my $ShortLcStr = Type::Tiny::Intersection->new(
+      name             => 'AnyData',
+      type_constraints => [ LowerCaseStr, StrLength[4, 8] ],
+    );
+    
+    has identifier => (
+      is   => 'ro',
+      isa  => $ShortLcStr,
+    );
+  }
+
+Using Type::Utils's functional interface:
+
+  package Local::Stash {
+    use Moo;
+    use Types::Common qw( LowerCaseStr StrLength );
+    use Type::Utils;
+    
+    my $ShortLcStr = intersection ShortLcStr => [ LowerCaseStr, StrLength[4, 8] ];
+    
+    has identifier => (
+      is   => 'ro',
+      isa  => $ShortLcStr,
+    );
+  }
+
 =head1 STATUS
 
 This module is covered by the
@@ -258,6 +312,15 @@ L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
 =head1 DESCRIPTION
 
 Intersection type constraints.
+
+Intersection type constraints are not often very useful. Consider the
+intersection of B<HashRef> and B<ArrayRef>. A value will only pass if
+it is both a hashref and an arrayref. Given that neither of those type
+constraints accept C<undef> or overloaded objects, there is no possible
+value that can pass both.
+
+Which is not to say that intersections are never useful, but it happens
+quite rarely.
 
 This package inherits from L<Type::Tiny>; see that for most documentation.
 Major differences are listed below:
