@@ -120,6 +120,91 @@ __END__
 
 Type::Tiny::Role - type constraints based on the "DOES" method
 
+=head1 SYNOPSIS
+
+Using via L<Types::Standard>:
+
+  package Local::Horse {
+    use Moo;
+    use Types::Standard qw( Str ConsumerOf );
+    
+    has name => (
+      is       => 'ro',
+      isa      => Str,
+    );
+    
+    has owner => (
+      is       => 'ro',
+      isa      => ConsumerOf[ 'Local::Traits::DoesOwnership' ],
+      default  => sub { Local::Person->new },
+    );
+  }
+
+Using Type::Tiny::Class's export feature:
+
+  package Local::Horse {
+    use Moo;
+    use Types::Standard qw( Str );
+    use Type::Tiny::Role (
+      Owner => { role => 'Local::Traits::DoesOwnership' },
+    );
+    
+    has name => (
+      is       => 'ro',
+      isa      => Str,
+    );
+    
+    has owner => (
+      is       => 'ro',
+      isa      => Owner,
+      default  => sub { Local::Person->new },
+    );
+  }
+
+Using Type::Tiny::Role's object-oriented interface:
+
+  package Local::Horse {
+    use Moo;
+    use Types::Standard qw( Str );
+    use Type::Tiny::Class;
+    
+    my $Owner = Type::Tiny::Role->new(
+      role => 'Local::Traits::DoesOwnership',
+    );
+    
+    has name => (
+      is       => 'ro',
+      isa      => Str,
+    );
+    
+    has owner => (
+      is       => 'ro',
+      isa      => $Owner,
+      default  => sub { Local::Person->new },
+    );
+  }
+
+Using Type::Utils's functional interface:
+
+  package Local::Horse {
+    use Moo;
+    use Types::Standard qw( Str );
+    use Type::Utils;
+    
+    my $Owner = role_type 'Local::Traits::DoesOwnership';
+    
+    has name => (
+      is       => 'ro',
+      isa      => Str,
+    );
+    
+    has owner => (
+      is       => 'ro',
+      isa      => $Owner,
+      default  => sub { Local::Person->new },
+    );
+  }
+
 =head1 STATUS
 
 This module is covered by the
