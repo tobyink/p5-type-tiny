@@ -4,6 +4,12 @@
    changes in development releases, see the "Changes" file instead.
 =======================================================================
 
+2023-04-XX Type-Tiny version 2.004000 released!
+
+ - `Type::Tiny` objects have a `exception_class` attribute.
+ - Added `Type::Tiny::Bitfield`.
+ - `Types::TypeTiny` now provides a `BoolLike` type.
+
 2023-01-01 Type-Tiny version 2.002000 released!
 
  - `Type::Tiny` objects have a `definition_context` method.

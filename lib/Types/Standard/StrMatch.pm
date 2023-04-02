@@ -8,7 +8,7 @@ use warnings;
 
 BEGIN {
 	$Types::Standard::StrMatch::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::StrMatch::VERSION   = '2.003';
+	$Types::Standard::StrMatch::VERSION   = '2.003_000';
 }
 
 $Types::Standard::StrMatch::VERSION =~ tr/_//d;

@@ -4917,7 +4917,27 @@
 		dcs:versus `Type-Tiny 2.002001 cpan:TOBYINK`;
 		item [
 			a dcs:Documentation;
+			label "Add SYNOPSIS for Type::Tiny::Class.";
+		];
+		item [
+			a dcs:Documentation;
+			label "Add SYNOPSIS for Type::Tiny::Duck.";
+		];
+		item [
+			a dcs:Documentation;
 			label "Add SYNOPSIS for Type::Tiny::Enum.";
+		];
+		item [
+			a dcs:Documentation;
+			label "Add SYNOPSIS for Type::Tiny::Intersection.";
+		];
+		item [
+			a dcs:Documentation;
+			label "Add SYNOPSIS for Type::Tiny::Role.";
+		];
+		item [
+			a dcs:Documentation;
+			label "Add SYNOPSIS for Type::Tiny::Union.";
 		];
 		item [
 			a dcs:Documentation, dcs:Tests;
@@ -4936,5 +4956,15 @@
 			a dcs:Addition;
 			label "Type::Tiny::Bitfield class.";
 			seealso <https://github.com/tobyink/p5-type-tiny/issues/131>;
+		];
+		item [
+			a dcs:Addition;
+			label "Types::TypeTiny::BoolLike type constraint.";
+			seealso <https://github.com/tobyink/p5-type-tiny/issues/137>;
+		];
+		item [
+			a dcs:Addition;
+			label "Type::Tiny now has an `exception_class` attribute, allowing a type to throw exceptions using a custom class. These classes should usually be a subclass of Error::TypeTiny::Assertion.";
+			seealso <https://github.com/tobyink/p5-type-tiny/issues/133>;
 		];
 	].
