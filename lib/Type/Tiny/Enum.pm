@@ -474,7 +474,8 @@ Using via L<Types::Standard>:
     has name    => ( is => 'ro', isa => Str );
     has status  => ( is => 'ro', isa => Enum[ 'alive', 'dead' ] );
     
-    sub neigh ( $self ) {
+    sub neigh {
+      my ( $self ) = @_;
       return if $self->status eq 'dead';
       ...;
     }
@@ -490,7 +491,8 @@ Using Type::Tiny::Enum's export feature:
     has name    => ( is => 'ro', isa => Str );
     has status  => ( is => 'ro', isa => Status, default => STATUS_ALIVE );
     
-    sub neigh ( $self ) {
+    sub neigh {
+      my ( $self ) = @_;
       return if $self->status eq STATUS_DEAD;
       ...;
     }
@@ -511,7 +513,8 @@ Using Type::Tiny::Enum's object-oriented interface:
     has name    => ( is => 'ro', isa => Str );
     has status  => ( is => 'ro', isa => $Status, default => $Status->[0] );
     
-    sub neigh ( $self ) {
+    sub neigh {
+      my ( $self ) = @_;
       return if $self->status eq $Status->[0];
       ...;
     }

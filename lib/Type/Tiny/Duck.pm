@@ -192,11 +192,13 @@ Using via L<Types::Standard>:
     has debugging => ( is => 'rw', isa => Bool, default => 0 );
     has output    => ( is => 'ro', isa => HasMethods[ 'print' ] );
     
-    sub warn ( $self, $message ) {
+    sub warn {
+      my ( $self, $message ) = @_;
       $self->output->print( "[WARNING] $message\n" );
     }
     
-    sub debug ( $self, $message ) {
+    sub debug {
+      my ( $self, $message ) = @_;
       $self->output->print( "[DEBUG] $message\n" ) if $self->debugging;
     }
   }
@@ -206,16 +208,18 @@ Using Type::Tiny::Duck's export feature:
   package Logger {
     use Moo;
     use Types::Standard qw( Bool );
-    use Type::Type::Duck Printable => [ 'print' ];
+    use Type::Tiny::Duck Printable => [ 'print' ];
     
     has debugging => ( is => 'rw', isa => Bool, default => 0 );
     has output    => ( is => 'ro', isa => Printable );
     
-    sub warn ( $self, $message ) {
+    sub warn {
+      my ( $self, $message ) = @_;
       $self->output->print( "[WARNING] $message\n" );
     }
     
-    sub debug ( $self, $message ) {
+    sub debug {
+      my ( $self, $message ) = @_;
       $self->output->print( "[DEBUG] $message\n" ) if $self->debugging;
     }
   }
@@ -225,7 +229,7 @@ Using Type::Tiny::Duck's object-oriented interface:
   package Logger {
     use Moo;
     use Types::Standard qw( Bool );
-    use Type::Type::Duck;
+    use Type::Tiny::Duck;
     
     my $Printable = Type::Type::Duck->new(
       name    => 'Printable',
@@ -235,11 +239,13 @@ Using Type::Tiny::Duck's object-oriented interface:
     has debugging => ( is => 'rw', isa => Bool, default => 0 );
     has output    => ( is => 'ro', isa => $Printable );
     
-    sub warn ( $self, $message ) {
+    sub warn {
+      my ( $self, $message ) = @_;
       $self->output->print( "[WARNING] $message\n" );
     }
     
-    sub debug ( $self, $message ) {
+    sub debug {
+      my ( $self, $message ) = @_;
       $self->output->print( "[DEBUG] $message\n" ) if $self->debugging;
     }
   }
