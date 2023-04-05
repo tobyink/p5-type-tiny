@@ -1229,6 +1229,8 @@ B<< Bool >>
 Values that are reasonable booleans. Accepts 1, 0, the empty string and
 undef.
 
+Other customers also bought: B<< BoolLike >> from L<Types::TypeTiny>.
+
 =item *
 
 B<< Maybe[`a] >>
@@ -1710,7 +1712,7 @@ strings, the 1st, 4th, 7th, etc values are integers, and the 2nd,
 
 =head2 Coercions
 
-Most of the types in this type library have no coercions by default.
+Most of the types in this type library have no coercions.
 The exception is B<Bool> as of Types::Standard 1.003_003, which coerces
 from B<Any> via C<< !!$_ >>.
 
