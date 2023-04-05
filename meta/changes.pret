@@ -4968,3 +4968,13 @@
 			seealso <https://github.com/tobyink/p5-type-tiny/issues/133>;
 		];
 	].
+
+`Type-Tiny 2.004000 cpan:TOBYINK`
+	issued  2023-04-05;
+	changeset [
+		dcs:versus `Type-Tiny 2.003_000 cpan:TOBYINK`;
+		item [
+			a dcs:Documentation;
+			label "Minor pod changes to Types::Standard.";
+		];
+	].
