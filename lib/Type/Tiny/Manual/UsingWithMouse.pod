@@ -8,8 +8,8 @@ Type::Tiny::Manual::UsingWithMouse - how to use Type::Tiny with Mouse
 
 =head1 MANUAL
 
-First read L<Type::Tiny::Manual::Moo>, L<Type::Tiny::Manual::Moo2>, and
-L<Type::Tiny::Manual::Moo3>. Everything in those parts of the manual
+First read L<Type::Tiny::Manual::UsingWithMoo>, L<Type::Tiny::Manual::UsingWithMoo2>, and
+L<Type::Tiny::Manual::UsingWithMoo3>. Everything in those parts of the manual
 should work exactly the same in Mouse.
 
 This part of the manual will focus on Mouse-specifics.
