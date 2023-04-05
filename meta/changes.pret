@@ -1126,6 +1126,10 @@
 			label "Minor pod changes to Types::Standard.";
 		];
 		item [
+			a dcs:Documentation;
+			label "Document that the `BoolLike` type is unstable.";
+		];
+		item [
 			a dcs:Packaging;
 			label "Summarized the change log for versions prior to Type::Tiny 2.000000. If you need more information, see the Changes file included with Type::Tiny 2.002001.";
 			seealso <https://metacpan.org/release/TOBYINK/Type-Tiny-2.002001/source/Changes>;

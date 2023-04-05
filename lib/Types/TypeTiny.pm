@@ -834,6 +834,8 @@ Types::TypeTiny - type constraints used internally by Type::Tiny
 This module is covered by the
 L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
 
+The B<BoolLike> type is currently unstable.
+
 =head1 DESCRIPTION
 
 Dogfooding.
@@ -864,6 +866,11 @@ Warning: an object which overloads "0+" without also turning on overload
 fallbacks may actually be useless as a practical boolean. But some common
 objects such as JSON::PP's booleans overload "0+" instead of overloading
 "bool" (thankfully with fallbacks enabled!) so we do need to support this.
+
+The intention of this type is to be a version of B<Bool> which also
+accepts common boolean objects such as L<JSON::PP::Boolean>. It is currently
+unstable and the exact definition of the type may change to better implement
+that intended functionality.
 
 =item *
 

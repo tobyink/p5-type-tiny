@@ -10,7 +10,7 @@ Type::Tiny::Manual::Policies - Type::Tiny policies
 
 =head2 Type::Tiny Stability Policy
 
-Type::Tiny 1.000000 is considered stable. Any changes to the API that
+Type::Tiny 1.000000+ is considered stable. Any changes to the API that
 are big enough to I<require> changes to the test suite will be preceded
 by a I<< six month >> notice period, with the following exceptions:
 
@@ -74,6 +74,11 @@ stringifies as "1", so is considered an integer.
 
 A glob (not a globref but an actual glob) currently passes the
 B<StringLike> type constraint but not the B<Str> type constraint.
+
+=item *
+
+The  B<BoolLike> type is intended to extend B<Bool> to cover overloaded
+boolean objects, but the exact mechanism it uses may change.
 
 =back
 
