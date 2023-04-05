@@ -5,4761 +5,909 @@
 	label   "Developer preview".
 
 `Type-Tiny 0.000_02 cpan:TOBYINK`
-	issued  2013-04-02;
-	changeset [
-		dcs:versus `Type-Tiny 0.000_01 cpan:TOBYINK`;
-		item "Beginnings of Type::Tiny::Manual."^^Documentation;
-		item "Anchor enum regexps to beginning and end of string."^^Bugfix;
-		item "StrMatch added to Type::Standard."^^Addition;
-		item "use Type::Library -base"^^Change;
-		item "use Type::Library -declare"^^Change;
-	].
+	issued  2013-04-02.
 
 `Type-Tiny 0.000_03 cpan:TOBYINK`
-	issued  2013-04-03;
-	changeset [
-		dcs:versus `Type-Tiny 0.000_02 cpan:TOBYINK`;
-		item "Document Type::Coercion's overloading."^^Documentation;
-		item "Create and use compiled type constraint checks; much faster!"^^Change;
-		item "All of Type::Standard cannow be inlined."^^Change;
-		item "Add test cases for ScalarRef[`a]."^^Tests;
-		item [ label "Fix the crashing t/moo-inflation.t test case."; a dcs:Tests, dcs:Bugfix ];
-		item "Use more unique stringification for %Moo::HandleMoose::TYPE_MAP keys."^^Change;
-		item "Make sure Type::Standard's Moose-like built-ins get inflated to real Moose built-in types."^^Change;
-	].
+	issued  2013-04-03.
 
 `Type-Tiny 0.000_04 cpan:TOBYINK`
-	issued  2013-04-03;
-	changeset [
-		dcs:versus `Type-Tiny 0.000_03 cpan:TOBYINK`;
-		item "Create and use compiled coercions; somewhat faster."^^Change;
-		item "Type::Tiny plus_coercions/minus_coercions/no_coercions methods for creating subtypes with different sets of coercions."^^Addition;
-		item "Type::Tiny equals/is_subtype_of/is_supertype_of/is_a_type_of methods for type constraint comparisons."^^Addition;
-		item "Finally implement Type::Coercion's has_coercion_for_type method."^^Addition;
-		item "Allow coercion code to be expressed as a string; quite a bit faster."^^Change;
-	].
+	issued  2013-04-03.
 
 `Type-Tiny 0.000_05 cpan:TOBYINK`
-	issued  2013-04-04;
-	changeset [
-		dcs:versus `Type-Tiny 0.000_04 cpan:TOBYINK`;
-		item "Factor out some functions from test suite into a new module: Test::TypeTiny."^^Tests;
-		item "Rearrange test suite slightly."^^Tests;
-		item "Rename Type::Standard module to Types::Standard."^^BackCompat;
-		item "Types::TypeTiny bootstrapping library now takes care of vaious internal type checking requirements."^^Change;
-		item "Sanity checks for type constraint names."^^Change;
-		item "Fix is_parameterized method."^^Bugfix;
-		item "Allow null type constraints with no parent type (e.g. 'Any' in Types::Standard) to be inlined."^^Change;
-		item "Don't die with full stack trace."^^Change;
-		item "Get Mouse coercions working."^^Bugfix;
-	].
+	issued  2013-04-04.
 
 `Type-Tiny 0.000_06 cpan:TOBYINK`
-	issued  2013-04-05;
-	changeset [
-		dcs:versus `Type-Tiny 0.000_05 cpan:TOBYINK`;
-		item "Monkey patch Moose::Meta::TypeConstraint to be able to retrieve Type::Tiny constraints from inflated Moose constraints."^^Change;
-		item "More test cases."^^Tests;
-		item "Improved documentation of parameterization attributes."^^Documentation;
-		item "Footprint reduction: Type::Tiny, Type::Library and Type::Coerce no longer automatically load Types::Standard and Type::Utils."^^Change;
-		item "Footprint reduction: Type::Tiny and Type::Coercion no longer use if.pm."^^Change;
-		item "Footprint reduction: Type::Tiny no longer triggers Perl to load its Unicode tables (unless you create a type constraint with a non-ASCII type name)."^^Change;
-		item [
-			a dcs:Change;
-			label "In Moo, type assertions and coercions are now inlined.";
-			dcs:thanks cpan:MSTROUT;
-		];
-		item "Type::Tiny now has an 'inline_assert' function."^^Addition;
-		item "Using Type::Tiny with Moo added to manual."^^Documentation;
-		item "Section in manual comparing Type::Tiny with various other type library frameworks."^^Documentation;
-	].
+	issued  2013-04-05.
 
 `Type-Tiny 0.000_07 cpan:TOBYINK`
-	issued  2013-04-06;
-	changeset [
-		dcs:versus `Type-Tiny 0.000_06 cpan:TOBYINK`;
-		item "More test cases."^^Tests;
-		item "Document constructor for Type::Tiny::Class."^^Documentation;
-		item "Fix inlining for Type::Tiny::Intersection."^^Bugfix;
-		item "Types within libraries, if accessed directly rather than exported, did not accept parameters."^^Bugfix;
-		item "New module Type::Coercion::Union automatically handles coercion to union types."^^Addition;
-		item "Fix inlining of certain conditionals into coercion code."^^Bugfix;
-	].
+	issued  2013-04-06.
 
 `Type-Tiny 0.000_08 cpan:TOBYINK`
-	issued  2013-04-07;
-	changeset [
-		dcs:versus `Type-Tiny 0.000_07 cpan:TOBYINK`;
-		item "Rewrite most of the functions exported by Type::Library-based type libraries to cope better with being used mid-list."^^Change;
-		item "Most parts of the API that accept Type::Tiny objects (e.g. Type::Utils::from()) now also accept Moose::Meta::TypeConstraint objects."^^Change;
-		item "Types::TypeTiny::to_TypeTiny can be used to coerce a Moose type constraint object to Type::Tiny."^^Change;
-	].
+	issued  2013-04-07.
 
 `Type-Tiny 0.000_09 cpan:TOBYINK`
-	issued  2013-04-08;
-	changeset [
-		dcs:versus `Type-Tiny 0.000_08 cpan:TOBYINK`;
-		item "Bundle benchmarking scripts."^^Documentation;
-		item "Tidy up the 'examples' directory."^^Packaging;
-		item "When generating Moose/Mouse constraints from Type::Tiny objects, prefer to generate anonymous ones."^^Change;
-		item "Fill in the Usage with Moose section of the fine manual."^^Documentation;
-	].
+	issued  2013-04-08.
 
 `Type-Tiny 0.000_10 cpan:TOBYINK`
-	issued  2013-04-09;
-	changeset [
-		dcs:versus `Type-Tiny 0.000_09 cpan:TOBYINK`;
-		item "Improvements to has_coercion_for_{type,value} from Type::Coercion."^^Change;
-		item [ label "Fix incorrect Test::Requires line in 'mouse-coercion.t'."; a dcs:Bugfix, dcs:Tests ];
-	].
+	issued  2013-04-09.
 
 `Type-Tiny 0.000_11 cpan:TOBYINK`
-	issued  2013-04-11;
-	changeset [
-		dcs:versus `Type-Tiny 0.000_10 cpan:TOBYINK`;
-		item "Fix prototype for Type::Utils::as."^^Bugfix;
-		item "No longer need to pass '-moose' parameter when importing a library into a Moose class; only Mouse needs that treatment now."^^Change;
-	].
+	issued  2013-04-11.
 
 `Type-Tiny 0.000_12 cpan:TOBYINK`
-	issued  2013-04-12;
-	changeset [
-		dcs:versus `Type-Tiny 0.000_11 cpan:TOBYINK`;
-		item "Fix minor typo."^^Documentation;
-	].
+	issued  2013-04-12.
 
 `Type-Tiny 0.001 cpan:TOBYINK`
 	issued  2013-04-15;
-	label   "First public release";
-	changeset [
-		dcs:versus `Type-Tiny 0.000_12 cpan:TOBYINK`;
-		item "Minor improvements."^^Documentation;
-		item "Some inline code assumed that it would be compiled in a package that had 'blessed' imported."^^Bugfix;
-		item "Some inline code wasn't wrapped in parentheses."^^Bugfix;
-		item "More test cases for Optional[`a] within Dict[`a]."^^Tests;
-		item "Weaken the reference from a Moose::Meta::TypeConstraint object to its Type::Tiny origin."^^Change;
-		item "Parameterized type constraints in Types::Standard now do some sanity checking on their arguments."^^Change;
-		item "Improve test names generated by Test::TypeTiny; allow test scripts to provide test names."^^Change;
-	].
+	label   "First public release".
 
 `Type-Tiny 0.002 cpan:TOBYINK`
-	issued  2013-04-26;
-	changeset [
-		dcs:versus `Type-Tiny 0.001 cpan:TOBYINK`;
-		item "Link from Test::TypeTiny to Test::Deep::Type."^^Documentation;
-		item "Avoid unnecessarily regenerating parameterized type constraints."^^Change;
-		item "Make Type::Tiny's has_coercion method more DWIM."^^Change;
-		item "Chars and Bytes types added to Types::Standard."^^Addition;
-		item "Prevent warnings (about 'my $val' masking a previously declared variable) when several Str checks are being inlined in close proximity, such as Tuple[Str,Str]"^^Bugfix;
-		item [
-			a dcs:Bugfix;
-			label "Fix method conflicts when exporting type constraints to roles.";
-			dcs:thanks cpan:BOWTIE;
-			dcs:fixes [ dbug:reporter cpan:BOWTIE ];
-		];
-	].
+	issued  2013-04-26.
 
 `Type-Tiny 0.003_01 cpan:TOBYINK`
-	issued  2013-04-16;
-	changeset [
-		dcs:versus `Type-Tiny 0.001 cpan:TOBYINK`;
-		item "Link from Test::TypeTiny to Test::Deep::Type."^^Documentation;
-		item "Allow a Type::Tiny object to \"freeze\" its coercions. This prevents a Type::Tiny object from becoming out of sync with its equivalent Mouse or Moose constraint objects."^^Change;
-		item "Type::Library packages can now include \"standalone\" Type::Coercion objects, not attached to a type constraint. These can be exported on request."^^Change;
-		item "Overload \"+\" operator for Type::Coercion and Type::Tiny allows coercions to be added to each other, and added to type constraints."^^Change;
-		item "Build coercions automatically for certain type parameterized constraints. Say there's a Num->Int coercion defined; then we should be able to coerce ArrayRef[Num]->ArrayRef[Int]."^^Change;
-		item "Allow subtypes to inherit coercions from their parent type constraint. (They do not by default.)"^^Change;
-	].
+	issued  2013-04-16.
 
 `Type-Tiny 0.003_02 cpan:TOBYINK`
-	issued  2013-04-16;
-	changeset [
-		dcs:versus `Type-Tiny 0.003_01 cpan:TOBYINK`;
-		item "Document how to process sub parameters with Type::Tiny, and point people towards Type::Params."^^Documentation;
-		item "Avoid unnecessarily regenerating parameterized type constraints."^^Change;
-	].
+	issued  2013-04-16.
 
 `Type-Tiny 0.003_03 cpan:TOBYINK`
-	issued  2013-04-17;
-	changeset [
-		dcs:versus `Type-Tiny 0.003_02 cpan:TOBYINK`;
-		item "When inflating Moo type constraints to Moose, don't unnecessarily call 'moose_type' method."^^Change;
-		item "Make Type::Tiny's has_coercion method more DWIM."^^Change;
-		item "Add OptList data type to Types::Standard, plus MkOpt coercion."^^Addition;
-	].
+	issued  2013-04-17.
 
 `Type-Tiny 0.003_04 cpan:TOBYINK`
-	issued  2013-04-18;
-	changeset [
-		dcs:versus `Type-Tiny 0.003_03 cpan:TOBYINK`;
-		item "Factor out the sub exporting code scattered around (in Type::Utils, Types::TypeTiny and Type::Library) into a single module, Exporter::TypeTiny."^^Change;
-	].
+	issued  2013-04-18.
 
 `Type-Tiny 0.003_05 cpan:TOBYINK`
-	issued  2013-04-19;
-	changeset [
-		dcs:versus `Type-Tiny 0.003_04 cpan:TOBYINK`;
-		item "Chars and Bytes types added to Types::Standard."^^Addition;
-		item "Allow coercions to accept parameters."^^Change;
-		item "Encode, Decode, Join and Split coercions added to Types::Standard."^^Addition;
-		item "Prevent warnings (about 'my $val' masking a previously declared variable) when several Str checks are being inlined in close proximity, such as Tuple[Str,Str]"^^Bugfix;
-		item "Type::Tiny::Class now has a plus_constructors method."^^Addition;
-		item "Create a new manual page Type::Tiny::Manual::Coercions."^^Documentation;
-		item "Document Exporter::TypeTiny."^^Documentation;
-	].
+	issued  2013-04-19.
 
 `Type-Tiny 0.003_06 cpan:TOBYINK`
-	issued  2013-04-25;
-	changeset [
-		dcs:versus `Type-Tiny 0.003_05 cpan:TOBYINK`;
-		item "No longer need to add '-mouse' when importing types into Mouse libraries. (Same change as what we did for Moose in 0.000_11.)"^^Change;
-		item "Add lots of stuff to Type::Tiny::Manual::UsingWithMouse."^^Documentation;
-		item "Document deep coercions (feature added in 0.003_01)."^^Documentation;
-		item "Add a bunch of stub methods to Type::Tiny and Type::Coercion in order to make it less necessary to inflate to Moose/Mouse meta objects."^^Change;
-		item "Various minor changes to Exporter::TypeTiny to make it more Sub::Exporter compatible."^^Change;
-		item "Types::TypeTiny::to_TypeTiny can now coerce from a Mouse::Meta::TypeConstraint."^^Change;
-	].
+	issued  2013-04-25.
 
 `Type-Tiny 0.003_07 cpan:TOBYINK`
-	issued  2013-04-26;
-	changeset [
-		dcs:versus `Type-Tiny 0.003_06 cpan:TOBYINK`;
-		item [
-			a dcs:Bugfix;
-			label "Fix method conflicts when exporting type constraints to roles.";
-			dcs:thanks cpan:BOWTIE;
-			dcs:fixes [ dbug:reporter cpan:BOWTIE ];
-		];
-		item "Document usage with Class::InsideOut."^^Documentation;
-		item "Minor improvements to manual."^^Documentation;
-	].
+	issued  2013-04-26.
 
 `Type-Tiny 0.003_08 cpan:TOBYINK`
-	issued  2013-04-26;
-	changeset [
-		dcs:versus `Type-Tiny 0.003_07 cpan:TOBYINK`;
-		item "ASCII-only strings are now accepted by the Chars constraint in Types::Standard."^^Change;
-		item "More Exporter::TypeTiny docs, including usage with Sub::Exporter::Lexical."^^Documentation;
-		item "Add test case using Exporter::TypeTiny with Sub::Exporter::Lexical."^^Tests;
-		item "Type::Tiny, Type::Coercion and their subclasses no longer call Types::TypeTiny->import method."^^Change;
-		item "Types::TypeTiny lazily loads Exporter::TypeTiny - i.e. it loads Exporter::TypeTiny when Types::TypeTiny->import is first called."^^Change;
-	].
+	issued  2013-04-26.
 
 `Type-Tiny 0.003_09 cpan:TOBYINK`
-	issued  2013-04-28;
-	changeset [
-		dcs:versus `Type-Tiny 0.003_08 cpan:TOBYINK`;
-		item "Document usage with Params::Check and Object::Accessor."^^Documentation;
-		item "'Tied' type constraint added to Types::Standard."^^Addition;
-		item "If Mouse is already in memory, Type::Tiny will use its super-fast XS subs to validate values when possible."^^Change;
-	].
+	issued  2013-04-28.
 
 `Type-Tiny 0.003_10 cpan:TOBYINK`
-	issued  2013-04-29;
-	changeset [
-		dcs:versus `Type-Tiny 0.003_09 cpan:TOBYINK`;
-		item "Improve Exporter::TypeTiny documentation."^^Documentation;
-		item "Improve advice on inlining type constraints and coercions."^^Documentation;
-		item "Bump version of Test::More dependency fom 0.88 to 0.96."^^Packaging;
-		item "General code tidy-up."^^Change;
-		item "Type::Tiny::SUPPORT_SMARTMATCH constant."^^Addition;
-		item "New module, Eval::TypeTiny"^^Addition;
-		item "Much of the stringy eval stuff has been factored out into Eval::TypeTiny."^^Change;
-		item "Bundle Type::Params, which had previously appeared on CPAN in a separate developer release."^^Addition;
-	].
+	issued  2013-04-29.
 
 `Type-Tiny 0.003_11 cpan:TOBYINK`
-	issued  2013-04-30;
-	changeset [
-		dcs:versus `Type-Tiny 0.003_10 cpan:TOBYINK`;
-		item [
-			label "Automatic coercion for parameterized Dict will no longer drop key/value pairs to force a coercion.";
-			seealso <http://play-perl.org/quest/51682ae05efa74c95c00001e>;
-			dcs:thanks cpan:MMCLERIC;
-		];
-		item [
-			label "Automatic coercion for parameterized Tuple will no longer drop values to force a coercion.";
-			seealso <http://play-perl.org/quest/51682ae05efa74c95c00001e>;
-			dcs:thanks cpan:MMCLERIC;
-		];
-		item "Test cases for Eval::TypeTiny."^^Tests;
-	].
+	issued  2013-04-30.
 
 `Type-Tiny 0.003_12 cpan:TOBYINK`
-	issued  2013-05-01;
-	changeset [
-		dcs:versus `Type-Tiny 0.003_11 cpan:TOBYINK`;
-		item [
-			label "Type::Params validators now explicitly check the number of arguments passed to them.";
-			seealso <http://play-perl.org/quest/517efcef53a418983f000012>;
-			dcs:thanks cpan:MMCLERIC;
-		];
-		item "Allow people to use Carp::{confess,cluck,carp} with Type::Params validators; default is still croak."^^Change;
-		item "Improved Type::Params documentation."^^Change;
-		item "Sane behaviour for Types::Standard's 'slurpy' function when it appears mid-list."^^Bugfix;
-	].
+	issued  2013-05-01.
 
 `Type-Tiny 0.003_13 cpan:TOBYINK`
-	issued  2013-05-03;
-	changeset [
-		dcs:versus `Type-Tiny 0.003_12 cpan:TOBYINK`;
-		item [
-			label "Fix typo in Type::Params documentation.";
-			seealso <https://bitbucket.org/tobyink/p5-type-tiny/pull-request/1/fix-typo-in-docs/diff>;
-			dcs:blame cpan:DJERIUS;
-			a dcs:Documentation;
-		];
-		item "Don't crash in old versions of Moose that have no Class::MOP::_definition_context() function."^^Bugfix;
-		item "Better documentation and tests of Moose/Mouse-compatible API."^^Change;
-		item "BAIL_OUT in test suite if 00-compile.t or 01-api.t fail."^^Tests;
-	].
+	issued  2013-05-03.
 
 `Type-Tiny 0.003_14 cpan:TOBYINK`
 	comment "No functional changes.";
 	issued  2013-05-03.
 
 `Type-Tiny 0.003_15 cpan:TOBYINK`
-	issued  2013-05-03;
-	changeset [
-		dcs:versus `Type-Tiny 0.003_13 cpan:TOBYINK`; # !!!
-		item "Improvements to to_TypeTiny function, including accepting Validation::Class::Simple objects."^^Change;
-	].
+	issued  2013-05-03.
 
 `Type-Tiny 0.003_16 cpan:TOBYINK`
-	issued  2013-05-05;
-	changeset [
-		dcs:versus `Type-Tiny 0.003_15 cpan:TOBYINK`;
-		item "Rename Types::Standard::AutomaticCoercion -> Types::Standard::DeepCoercion."^^Change;
-		item "Type::Params produces nicer error messages."^^Change;
-		item "Document that Map[`k,`v] has a deep coercion."^^Documentation;
-		item "Improve Type::Coercion documentation."^^Documentation;
-		item "Minor updates to coderef overloading following Moo 1.002000 release."^^Change;
-	].
+	issued  2013-05-05.
 
 `Type-Tiny 0.004 cpan:TOBYINK`
-	issued  2013-05-06;
-	changeset [
-		dcs:versus `Type-Tiny 0.003_16 cpan:TOBYINK`;
-		item "Minor updates to to_TypeTiny following Validation::Class 7.900048 release."^^Change;
-		item "Eval::Closure now strips line breaks and other unsavoury characters from descriptions."^^Bugfix;
-	].
+	issued  2013-05-06.
 
 `Type-Tiny 0.005_01 cpan:TOBYINK`
-	issued  2013-05-07;
-	changeset [
-		dcs:versus `Type-Tiny 0.004 cpan:TOBYINK`;
-		item "Type::Library should require Perl 5.8.1, not 5.8.3."^^Bugfix;
-		item "ArrayLike type added to Types::TypeTiny."^^Addition;
-		item "Type::Registry."^^Addition;
-	].
+	issued  2013-05-07.
 
 `Type-Tiny 0.005_02 cpan:TOBYINK`
-	issued  2013-05-14;
-	changeset [
-		dcs:versus `Type-Tiny 0.005_01 cpan:TOBYINK`;
-		item [
-			a dcs:Documentation;
-			label "Fix a typo in declare_coercion in Type::Tiny::Manual::Coercions.";
-			dcs:blame cpan:MMCLERIC;
-		];
-		item [
-			a dcs:Documentation;
-			label "Link to Type::Tiny::Manual::Libraries instead of non-existing Type::Tiny::Intro.";
-			dcs:blame cpan:MMCLERIC;
-		];
-	].
+	issued  2013-05-14.
 
 `Type-Tiny 0.005_03 cpan:TOBYINK`
-	issued  2013-05-14;
-	changeset [
-		dcs:versus `Type-Tiny 0.005_02 cpan:TOBYINK`;
-		item "Many error conditions now throw exception objects instead of string error messages."^^Change;
-		item "Bytes and Chars type constraints removed from Types::Standard."^^Removal;
-		item "Decode and Encode coercions removed from Types::Standard."^^Removal;
-	].
+	issued  2013-05-14.
 
 `Type-Tiny 0.005_04 cpan:TOBYINK`
-	issued  2013-05-17;
-	changeset [
-		dcs:versus `Type-Tiny 0.005_03 cpan:TOBYINK`;
-		item "All error conditions now throw exception objects instead of string error messages."^^Change;
-		item "Deep explanations for Types::Standard::{Map,Maybe,Ref,Dict,Tuple} type constraint assertion failures."^^Change;
-		item "Test::TypeTiny performs more thorough testing if EXTENDED_TESTING environment variable is set."^^Change;
-		item "Fixed bug in non-inlined code for Types::Standard::MkOpt."^^Bugfix;
-		item "Improved deep explanations for Types::Standard::{ArrayRef,HashRef,ScalarRef}."^^Change;
-		item "Throw exception if people attempt to set parent types for Type::Tiny::{Class,Role,Duck,Enum,Union,Intersection}."^^Change;
-		item "Type::Exception::Compilation."^^Addition;
-		item "Allow the slurpy tail of a Types::Standard::Tuple to be a treated as a hashref rather than an arrayref."^^Change;
-	].
+	issued  2013-05-17.
 
 `Type-Tiny 0.005_05 cpan:TOBYINK`
-	issued  2013-05-24;
-	changeset [
-		dcs:versus `Type-Tiny 0.005_04 cpan:TOBYINK`;
-		item "Fix warnings under Perl 5.18."^^Change;
-		item "Suggest newer version of Validation::Class."^^Documentation;
-		item "Type::Tiny now has an assert_return method, which is used in most places in preference to assert_valid."^^Addition;
-		item "Removed Type::Registry from the release; it will return at a later date."^^Removal;
-	].
+	issued  2013-05-24.
 
 `Type-Tiny 0.005_06 cpan:TOBYINK`
-	issued  2013-05-26;
-	changeset [
-		dcs:versus `Type-Tiny 0.005_05 cpan:TOBYINK`;
-		item "Fold Types::Standard::DeepCoercion into Types::Standard."^^Change;
-		item "Fix StrMatch to properly support regexps containing slashes."^^Bugfix;
-	].
+	issued  2013-05-26.
 
 `Type-Tiny 0.005_07 cpan:TOBYINK`
-	issued  2013-05-28;
-	changeset [
-		dcs:versus `Type-Tiny 0.005_06 cpan:TOBYINK`;
-		item "Add pure-Perl Mouse to examples/benchmark-constraints.pl."^^Documentation;
-		item "Assertions using the assert_return pattern were triggering FATAL warnings when inlined with Sub::Quote. Inlined assertions are now prefixed with 'no warnings \"void\";'."^^Bugfix;
-	].
+	issued  2013-05-28.
 
 `Type-Tiny 0.005_08 cpan:TOBYINK`
-	issued  2013-05-28;
-	changeset [
-		dcs:versus `Type-Tiny 0.005_07 cpan:TOBYINK`;
-		item "Use JSON::PP instead of JSON in test cases, because JSON::PP is a core module since Perl 5.14."^^Tests;
-		item "Rearrange test cases"^^Tests;
-		item "Add 00-begin.t."^^Tests;
-	].
+	issued  2013-05-28.
 
 `Type-Tiny 0.006 cpan:TOBYINK`
-	issued  2013-05-28;
-	changeset [
-		dcs:versus `Type-Tiny 0.005_08 cpan:TOBYINK`;
-		item "Exporter::TypeTiny::mkopt_hash now works."^^Bugfix;
-	].
+	issued  2013-05-28.
 
 `Type-Tiny 0.007_01 cpan:TOBYINK`
 	issued  2013-06-01;
-	label   "Happy birthday to me...";
-	changeset [
-		dcs:versus `Type-Tiny 0.006 cpan:TOBYINK`;
-		item "Fix $VERSION defined in Type::Library."^^Bugfix;
-		item "Re-introduce Type::Registry, with improved parsing thanks to Type::Parser."^^Change;
-		item "Type::Parser."^^Addition;
-		item "Types::Standard now has LaxNum/StrictNum type constraints."^^Addition;
-		item "Types::Standard's Num constraint is now a subtype of either LaxNum and StrictNum (depending on environment)."^^BackCompat;
-		item "Implemented Types::TypeTiny->meta->get_type."^^Change;
-		item "Generate README from Type::Tiny::Manual instead of Type::Tiny."^^Packaging;
-	].
+	label   "Happy birthday to me...".
 
 `Type-Tiny 0.007_02 cpan:TOBYINK`
-	issued  2013-06-04;
-	changeset [
-		dcs:versus `Type-Tiny 0.007_01 cpan:TOBYINK`;
-		item "Drop use of Carp in Type::Parser."^^Change;
-		item "Improvements to Type::Tiny::Manual."^^Documentation;
-		item "Improvements to Type::Tiny::Manual::Params, including rewritten manual processing section, and processing type constraints in function signatures via Function::Parameters/Attribute::Constract."^^Documentation;
-		item "Test cases for usage with Function::Parameters."^^Tests;
-		item "Allow constraint_generators (for parameterizable type constraints) to return full Type::Tiny objects instead of plain coderefs."^^Change;
-		item "Type::Tiny::Duck types now have a parent type constraint of Types::Standard::Object."^^Change;
-		item "Type::Tiny::Role types now have a parent type constraint of Types::Standard::Object."^^Change;
-		item "Type::Tiny::Enum types now have a parent type constraint of Types::Standard::Str."^^Change;
-		item "Type::Tiny::Class types now have an automatically calculated parent type constraint based on @ISA."^^Change;
-		item "Type::Tiny::Union types now have an automatically calculated parent type constraint based on the most specific common parent type constraint."^^Change;
-		item "Type::Tiny::Intersection types now have an arbitrary parent type constraint."^^Change;
-		item [
-			a dcs:Addition;
-			label "New constraints added to Types::Standard: InstanceOf, ConsumerOf, HasMethods and Enum.";
-			dcs:thanks cpan:HAARG;
-		];
-	].
+	issued  2013-06-04.
 
 `Type-Tiny 0.007_03 cpan:TOBYINK`
-	issued  2013-06-08;
-	changeset [
-		dcs:versus `Type-Tiny 0.007_02 cpan:TOBYINK`;
-		item "Better document Type::Tiny's 'parents' method which differs from the Moose method of the same name."^^Documentation;
-		item [
-			a dcs:Bugfix;
-			dcs:fixes RT#85911;
-			label "Inlining of certain deep Dict, Tuple and Map coercions was broken, but Type::Params attempted to inline them anyway, leading to death.";
-			dcs:thanks cpan:DJERIUS;
-		];
-	].
+	issued  2013-06-08.
 
 `Type-Tiny 0.007_04 cpan:TOBYINK`
-	issued  2013-06-09;
-	changeset [
-		dcs:versus `Type-Tiny 0.007_03 cpan:TOBYINK`;
-		item [
-			a dcs:Bugfix;
-			dcs:fixes RT#86001;
-			label "The combination of Dict, Optional and coercions seems to have been broken in certain circumstances.";
-			dcs:thanks cpan:DJERIUS;
-		];
-		item [
-			a dcs:Bugfix;
-			dcs:fixes RT#85895;
-			label "Overloading of `$type eq $type` now works in Perl 5.8.";
-			dcs:thanks cpan:MMCLERIC;
-		];
-	].
+	issued  2013-06-09.
 
 `Type-Tiny 0.007_05 cpan:TOBYINK`
-	issued  2013-06-12;
-	changeset [
-		dcs:versus `Type-Tiny 0.007_04 cpan:TOBYINK`;
-		item "Add match_on_type and compile_match_on_type to Type::Utils."^^Addition;
-		item "Vastly improved documentation for Type::Utils."^^Documentation;
-		item "Vastly improved documentation for Types::Standard."^^Documentation;
-		item "Mention Scalar::Does and Type::Tie in manual."^^Documentation;
-		item "Added test cases for InstanceOf, ConsumerOf, HasMethods and Enum types defined by Types::Standard."^^Tests;
-		item "Support '0' and '1' as shortcuts for Optional[Any] and Any in Type::Params. (Not documented yet.)"^^Change;
-	].
+	issued  2013-06-12.
 
 `Type-Tiny 0.007_06 cpan:TOBYINK`
-	issued  2013-06-16;
-	changeset [
-		dcs:versus `Type-Tiny 0.007_05 cpan:TOBYINK`;
-		item "Rearranged documentation for Type::Utils, avoiding previous split into Moose-like and non-Moose-like functions."^^Documentation;
-		item "Document the evaluation environment used by Eval::TypeTiny."^^Documentation;
-		item "Type::Exception is now capable of supplying stack traces (requires Devel::StackTrace)."^^Addition;
-		item "Exceptions thrown for Moo isa/coerce now indicate which attribute was involved."^^Change;
-		item "Type::Utils no longer exports 'extends' by default."^^BackCompat;
-		item [
-			label "Better prototypes (was `;@`, now `;$`) for parameterizable type 'constants' exported by type libraries.";
-			dcs:thanks cpan:MSTROUT;
-			a dcs:BackCompat;
-		];
-	].
+	issued  2013-06-16.
 
 `Type-Tiny 0.007_07 cpan:TOBYINK`
-	issued  2013-06-16;
-	changeset [
-		dcs:versus `Type-Tiny 0.007_06 cpan:TOBYINK`;
-		item "Partly roll back prototype changes. Now we use `;$` for Perl since 5.14, but `;@`, for older Perls that don't support `;$` so well."^^Bugfix;
-	].
+	issued  2013-06-16.
 
 `Type-Tiny 0.007_08 cpan:TOBYINK`
-	issued  2013-06-17;
-	changeset [
-		dcs:versus `Type-Tiny 0.007_07 cpan:TOBYINK`;
-		item [
-			a dcs:Bugfix;
-			label "Fix problem with interaction between constraints, coercions, and Moose classes that inherit from Moo classes.";
-			dcs:fixes RT#86172;
-			dcs:thanks cpan:PJFL;
-		];
-		item [
-			a dcs:Tests;
-			label "Bundle test for interaction between constraints, coercions, and Moose classes that inherit from Moo classes.";
-			dcs:blame cpan:PJFL;
-		];
-	].
+	issued  2013-06-17.
 
 `Type-Tiny 0.007_09 cpan:TOBYINK`
-	issued  2013-06-18;
-	changeset [
-		dcs:versus `Type-Tiny 0.007_08 cpan:TOBYINK`;
-		item [
-			a dcs:Bugfix;
-			label "Fix problems inlining Dict deep coercions where the target constraint could not be inlined.";
-			dcs:fixes RT#86233;
-			dcs:thanks cpan:MMCLERIC;
-		];
-		item [
-			a dcs:Bugfix;
-			label "Fix unintuitive Dict deep coercions.";
-			dcs:fixes RT#86239;
-			dcs:thanks cpan:MMCLERIC;
-		];
-		item [
-			a dcs:Tests;
-			label "Bundle various tests for deep Dict coercions.";
-			dcs:blame cpan:MMCLERIC;
-		];
-	].
+	issued  2013-06-18.
 
 `Type-Tiny 0.007_10 cpan:TOBYINK`
-	issued  2013-06-21;
-	changeset [
-		dcs:versus `Type-Tiny 0.007_09 cpan:TOBYINK`;
-		item [
-			a dcs:Bugfix;
-			label "MooseX::Types objects used in Type::Tiny::Union, Type::Tiny::Intersection and parameterized Type::Tiny type constraints would break in some circumstances, as Types::TypeTiny::to_TypeTiny was failing to convert them to native Type::Tiny type constraints.";
-			dcs:fixes RT#86303;
-		];
-		item "Type::Parser now supports parentheses in its DSL."^^Change;
-		item "Type::Parser now exports a _std_eval function useful for testing."^^Addition;
-		item "Fixed many small parsing bugs in Type::Parser."^^Bugfix;
-		item "Improved error messages from Type::Parser."^^Change;
-		item "Add test cases for Type::Parser."^^Tests;
-		item "Better test cases for Type::Registry."^^Tests;
-		item "Document status of Type::Registry."^^Documentation;
-	].
+	issued  2013-06-21.
 
 `Type-Tiny 0.008 cpan:TOBYINK`
-	issued  2013-06-21;
-	changeset [
-		dcs:versus `Type-Tiny 0.007_10 cpan:TOBYINK`;
-		item "Updated NEWS file."^^Documentation;
-	].
+	issued  2013-06-21.
 
 `Type-Tiny 0.009_01 cpan:TOBYINK`
-	issued  2013-06-21;
-	changeset [
-		dcs:versus `Type-Tiny 0.008 cpan:TOBYINK`;
-		item "Fix error messages from type constraints with null constraint coderefs."^^Bugfix;
-		item "Reply::Plugin::TypeTiny."^^Addition;
-	].
+	issued  2013-06-21.
 
 `Type-Tiny 0.009_02 cpan:TOBYINK`
-	issued  2013-06-22;
-	changeset [
-		dcs:versus `Type-Tiny 0.009_01 cpan:TOBYINK`;
-		item [
-			a dcs:Bugfix;
-			label "Fix for compiled_checks for type constraints inheriting from Type::Tiny::Class, etc.";
-			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/1>;
-			dcs:thanks cpan:RSIMOES;
-		];
-		item "Various minor optimizations for Eval::TypeTiny, Type::Tiny, etc."^^Change;
-		item "Types::Standard no longer uses Type::Utils."^^Change;
-		item [
-			a dcs:Regression;
-			label "Types::Standard types no longer have 'library' attribute set; this subtly breaks Moo type inflation, and breaks the MooX::late test suite which relies on type inflation working correctly.";
-		];
-	].
+	issued  2013-06-22.
 
 `Type-Tiny 0.009_03 cpan:TOBYINK`
-	issued  2013-06-22;
-	changeset [
-		dcs:versus `Type-Tiny 0.009_02 cpan:TOBYINK`;
-		item "Fix Types::Standard compilation errors under Perl 5.8.x."^^Bugfix;
-	].
+	issued  2013-06-22.
 
 `Type-Tiny 0.009_04 cpan:TOBYINK`
-	issued  2013-06-23;
-	changeset [
-		dcs:versus `Type-Tiny 0.009_03 cpan:TOBYINK`;
-		item "Type::Tiny::Class shouldn't completely trust @ISA when establishing parent class heirarchies."^^Bugfix;
-		item "Constructors for Type::Tiny subclasses no longer accept the 'constraint' parameter; it doesn't make sense."^^Change;
-		item "Support Type::API interfaces."^^Update;
-	].
+	issued  2013-06-23.
 
 `Type-Tiny 0.009_05 cpan:TOBYINK`
-	issued  2013-06-23;
-	changeset [
-		dcs:versus `Type-Tiny 0.009_04 cpan:TOBYINK`;
-		item "Type::Registry does the AUTOLOAD thing, so ought to provide a DESTROY method."^^Bugfix;
-	].
+	issued  2013-06-23.
 
 `Type-Tiny 0.009_06 cpan:TOBYINK`
-	issued  2013-06-23;
-	changeset [
-		dcs:versus `Type-Tiny 0.009_05 cpan:TOBYINK`;
-		item "Careful calling the DOES method (it doesn't exist in Perl 5.8)."^^Bugfix;
-	].
+	issued  2013-06-23.
 
 `Type-Tiny 0.009_07 cpan:TOBYINK`
-	issued  2013-06-24;
-	changeset [
-		dcs:versus `Type-Tiny 0.009_06 cpan:TOBYINK`;
-		item "Types::Standard::to_TypeTiny now sets 'display_name' instead of 'name' on generated type constraints."^^Change;
-		item "More test cases for interacting with MooseX::Types type constraints."^^Tests;
-		item "Type::Params no longer uses Type::Utils."^^Change;
-		item "Subclasses of Type::Tiny reject 'inlined' coderef, just like they already reject 'constraint' coderef."^^Change;
-		item [
-			a dcs:Tests;
-			label "Make rt86172.t an 'xt' test case because it's causing random CPAN testers failures unrelated to the feature it's supposed to be testing.";
-			seealso RT#86172;
-		];
-		item "If a Type::Tiny object is instantiated with a Sub::Quote quoted constraint coderef, and no inlined coderef, then Type::Tiny will use Sub::Quote to make an inlined coderef."^^Change;
-	].
+	issued  2013-06-24.
 
 `Type-Tiny 0.010 cpan:TOBYINK`
-	issued  2013-06-24;
-	changeset [
-		dcs:versus `Type-Tiny 0.009_07 cpan:TOBYINK`;
-		item "Updated NEWS file."^^Documentation;
-	].
+	issued  2013-06-24.
 
 `Type-Tiny 0.011_01 cpan:TOBYINK`
-	issued  2013-06-25;
-	changeset [
-		dcs:versus `Type-Tiny 0.010 cpan:TOBYINK`;
-		item "Unions of Type::Tiny and Mouse::Meta::TypeConstraints now work properly. This makes Type::Tiny and MouseX::Types play nice together (much like Type::Tiny already plays nice with MooseX::Types)."^^Bugfix;
-		item "Cleanups within Type::Coercion. Necessary because in some places the entire type_coercion_map (including conversion coderefs) was passed through Types::Standard::to_TypeTiny, when really only the type constraints should have been."^^Change;
-		item "Types::Standard::to_TypeTiny now accepts any object implementing the Type::API::Constraint or Type::API::Constraint::Coercion interfaces. As Mouse::Meta::TypeConstraint implements this interface, specific support for importing Mouse types has been dropped; the generic Type::API import 'just works' for Mouse types."^^Change;
-		item "Types::Standard::to_TypeTiny now accepts unblessed coderefs and converts them to type constraints. This allows things like `Int & sub { $_ < 10 }` to work."^^Change;
-		item [
-			a dcs:Bugfix;
-			label "B::SPECIAL-related fix.";
-			dcs:fixes RT#86383;
-			dcs:thanks cpan:PJFL;
-		];
-	].
+	issued  2013-06-25.
 
 `Type-Tiny 0.011_02 cpan:TOBYINK`
-	issued  2013-06-25;
-	changeset [
-		dcs:versus `Type-Tiny 0.011_01 cpan:TOBYINK`;
-		item [
-			a dcs:Bugfix;
-			label "Types::Standard 0.009_02 stopped including 'library' attribute in its types, and thus broke MooX::late. Type::Library modified to make 'library' attribute more automatic, and less reliant on Type::Utils to do the right thing.";
-			dcs:thanks cpan:HAARG;
-		];
-	].
+	issued  2013-06-25.
 
 `Type-Tiny 0.011_03 cpan:TOBYINK`
-	issued  2013-06-25;
-	changeset [
-		dcs:versus `Type-Tiny 0.011_02 cpan:TOBYINK`;
-		item "Type::Tiny now overloads `cmp`. Necessary because Mouse does a sort on type constraints in a union, and overload's fallback doesn't seem to cover `cmp` on Perl prior to 5.12."^^Bugfix;
-	].
+	issued  2013-06-25.
 
 `Type-Tiny 0.012 cpan:TOBYINK`
-	issued  2013-06-25;
-	changeset [
-		dcs:versus `Type-Tiny 0.011_03 cpan:TOBYINK`;
-		item "Updated NEWS file."^^Documentation;
-	].
+	issued  2013-06-25.
 
 `Type-Tiny 0.013_01 cpan:TOBYINK`
-	issued  2013-06-27;
-	changeset [
-		dcs:versus `Type-Tiny 0.012 cpan:TOBYINK`;
-		item "Type::Parser's tokenization is now done on a pull basis, allowing one-pass building of the AST."^^Change;
-		item "Type::Parser no longer provides a `tokens` function as it no longer pre-emptively tokenizes the whole string it is given."^^BackCompat;
-		item "Type::Parser functions no longer accept an arrayref of tokens, as they expect to pull tokens from a stream as required."^^BackCompat;
-		item "Type::Parser now provides a `extract_type` function which parses a type constraint expression from the head of a string and returns a Type::Tiny object, plus the tail of the string. (This is designed to make it easier to use Type::Parser to parse things like function signatures.)"^^Addition;
-	].
+	issued  2013-06-27.
 
 `Type-Tiny 0.014 cpan:TOBYINK`
-	issued  2013-06-28;
-	changeset [
-		dcs:versus `Type-Tiny 0.013_01 cpan:TOBYINK`;
-		item "Updated NEWS file."^^Documentation;
-	].
+	issued  2013-06-28.
 
 `Type-Tiny 0.015_01 cpan:TOBYINK`
-	issued  2013-07-05;
-	changeset [
-		dcs:versus `Type-Tiny 0.014 cpan:TOBYINK`;
-		item "Type::Parser can now pull in types from MooseX::Types libraries properly."^^Change;
-		item "Type::Utils now provides a `dwim_type` function; this is powered by a hidden Type::Registry::DWIM package."^^Addition;
-	].
+	issued  2013-07-05.
 
 `Type-Tiny 0.015_02 cpan:TOBYINK`
-	issued  2013-07-06;
-	changeset [
-		dcs:versus `Type-Tiny 0.015_01 cpan:TOBYINK`;
-		item "Improvements to DWIMness of Type::Parser for the benefit of `dwim_type`."^^Change;
-		item "Better test cases for `dwim_type`."^^Change;
-	].
+	issued  2013-07-06.
 
 `Type-Tiny 0.015_03 cpan:TOBYINK`
-	issued  2013-07-08;
-	changeset [
-		dcs:versus `Type-Tiny 0.015_02 cpan:TOBYINK`;
-		item "The `dwim_type` function now prioritizes lookups within the caller class' type registry over Types::Standard's built-in types."^^Change;
-		item "Slight speed improvements for `compile_match_on_type`."^^Change;
-		item "Implement TIESCALAR, TIEARRAY and TIEHASH methods for Type::Tiny; this improves Type::Tie integration."^^Addition;
-	].
+	issued  2013-07-08.
 
 `Type-Tiny 0.015_04 cpan:TOBYINK`
-	issued  2013-07-13;
-	changeset [
-		dcs:versus `Type-Tiny 0.015_03 cpan:TOBYINK`;
-		item [
-			a dcs:Documentation;
-			label "Mention in Type::Tiny::Manual::Libraries that the `extends` function is no longer exported by default; update example code.";
-			dcs:blame <urn:uuid:382de9f9-3ec0-4aa1-ba60-aa80709e75ac>;
-			dcs:fixes RT#86813, <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/2>;
-			seealso <https://github.com/tobyink/p5-type-tiny/pull/2>;
-		];
-		item [
-			label "Allow an inline_as block to return a list of strings (which are implictly joined with &&); allow the first item on the list to be undef, which is treated as the inlined parent type constraint.";
-			dcs:thanks cpan:TIMB;
-			dcs:fixes RT#86891;
-		];
-		item [
-			a dcs:Documentation;
-			label "Clarify when inlining via Sub::Quote may be less efficient than hand-written inlining.";
-			dcs:thanks cpan:TIMB;
-			dcs:fixes RT#86893;
-		];
-	].
+	issued  2013-07-13.
 
 `Type-Tiny 0.015_05 cpan:TOBYINK`
-	issued  2013-07-15;
-	changeset [
-		dcs:versus `Type-Tiny 0.015_04 cpan:TOBYINK`;
-		item "Experimentally drop required version of Perl from 5.8.1 to 5.6.1. I've not been able to extensively test Type-Tiny on Perl 5.6.x, but I believe it should mostly work. (The only feature that seems unlikely to work is non-ASCII names for type constraints and coercions.)"^^Packaging;
-		item "Stop monkey-patching Moose::Meta::TypeContraint; it's not necessary and has never been documented."^^Change;
-	].
+	issued  2013-07-15.
 
 `Type-Tiny 0.016 cpan:TOBYINK`
-	issued  2013-07-16;
-	changeset [
-		dcs:versus `Type-Tiny 0.015_05 cpan:TOBYINK`;
-		item "Add some pod links."^^Documentation;
-		item "Updated NEWS file."^^Documentation;
-	].
+	issued  2013-07-16.
 
 `Type-Tiny 0.017_01 cpan:TOBYINK`
-	issued  2013-07-19;
-	changeset [
-		dcs:versus `Type-Tiny 0.016 cpan:TOBYINK`;
-		item "Eval::TypeTiny now supports lexical subs under Perl 5.18."^^Update;
-		item [
-			a dcs:Documentation;
-			label "Improve examples of custom type constraint error message in Type::Utils and Type::Tiny::Manual::Libraries.";
-			dcs:thanks cpan:TIMB;
-			dcs:fixes RT#86892;
-		];
-		item "Give an example of the default error messages thrown by Type::Tiny."^^Documentation;
-		item [
-			a dcs:Documentation;
-			label "Fix typo in Types::Standard 'regular exception' -> 'regular expression'.";
-			dcs:blame cpan:MARKSTOS;
-			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/4>;
-			seealso <https://github.com/tobyink/p5-type-tiny/pull/4>;
-		];
-		item "Work around lack of B::perlstring() function in Perl 5.6.x."^^Bugfix;
-	].
+	issued  2013-07-19.
 
 `Type-Tiny 0.017_02 cpan:TOBYINK`
-	issued  2013-07-20;
-	changeset [
-		dcs:versus `Type-Tiny 0.017_01 cpan:TOBYINK`;
-		item [
-			a dcs:Change;
-			label "Hopefully improved workaround for missing B::perlstring() using Data::Dumper instead of quotemeta().";
-			dcs:thanks cpan:RIBASUSHI;
-		];
-		item [
-			a dcs:Bugfix;
-			label "Further changes for Perl 5.6.x support.";
-		];
-	].
+	issued  2013-07-20.
 
 `Type-Tiny 0.018 cpan:TOBYINK`
-	issued  2013-07-21;
-	changeset [
-		dcs:versus `Type-Tiny 0.017_02 cpan:TOBYINK`;
-		item "Updated NEWS file."^^Documentation;
-	].
+	issued  2013-07-21.
 
 `Type-Tiny 0.019_01 cpan:TOBYINK`
-	issued  2013-07-23;
-	changeset [
-		dcs:versus `Type-Tiny 0.018 cpan:TOBYINK`;
-		item "Work around lack of B::perlstring() function in Perl 5.6.x in test suite."^^Bugfix;
-		item "Eval::TypeTiny now closes over variables properly."^^Bugfix;
-	].
+	issued  2013-07-23.
 
 `Type-Tiny 0.020 cpan:TOBYINK`
-	issued  2013-07-23;
-	changeset [
-		dcs:versus `Type-Tiny 0.019_01 cpan:TOBYINK`;
-		item "Updated NEWS file."^^Documentation;
-	].
+	issued  2013-07-23.
 
 `Type-Tiny 0.021_01 cpan:TOBYINK`
-	issued  2013-07-24;
-	changeset [
-		dcs:versus `Type-Tiny 0.020 cpan:TOBYINK`;
-		item "Type::Tiny strictly_equals method."^^Addition;
-		item "Type::Tiny is_strictly_subtype_of method."^^Addition;
-		item "Type::Tiny is_strictly_supertype_of method."^^Addition;
-		item "Type::Tiny is_strictly_a_type_of method."^^Addition;
-	].
+	issued  2013-07-24.
 
 `Type-Tiny 0.021_02 cpan:TOBYINK`
-	issued  2013-07-26;
-	changeset [
-		dcs:versus `Type-Tiny 0.021_01 cpan:TOBYINK`;
-		item "Use real lexicals again for Eval::TypeTiny; this requires Devel::LexAlias, but there's a fallback to using tied variables."^^Change;
-	].
+	issued  2013-07-26.
 
 `Type-Tiny 0.021_03 cpan:TOBYINK`
-	issued  2013-07-30;
-	changeset [
-		dcs:versus `Type-Tiny 0.021_02 cpan:TOBYINK`;
-		item "Restore Eval::TypeTiny's pre-0.019_01 behaviour re closing over lexicals, but enable the 0.021_02 behaviour if alias=>1 option is passed in."^^Change;
-		item "Improve compatibility between Type::Tiny and Moose attribute native traits."^^Change;
-	].
+	issued  2013-07-30.
 
 `Type-Tiny 0.021_04 cpan:TOBYINK`
-	issued  2013-07-30;
-	changeset [
-		dcs:versus `Type-Tiny 0.021_03 cpan:TOBYINK`;
-		item [
-			a dcs:Bugfix;
-			label "Fix Types::Standard::Dict differentiating between undef and not exists.";
-			dcs:thanks cpan:TIMB;
-			dcs:fixes RT#87443;
-		];
-		item "Fix Type::Parser's handling of numeric parameters; they shouldn't need quoting."^^Bugfix;
-		item "Add dependency on Exporter 5.57 for older versions of Perl."^^Packaging;
-	].
+	issued  2013-07-30.
 
 `Type-Tiny 0.022 cpan:TOBYINK`
-	issued  2013-08-06;
-	changeset [
-		dcs:versus `Type-Tiny 0.021_04 cpan:TOBYINK`;
-		item "In Devel::TypeTiny::Perl56Compat, `use strict` and `use warnings`."^^Change;
-		item "Improved implementations of is_subtype_of/is_strictly_subtype_of; better for subclassing."^^Change;
-		item "Updated NEWS file."^^Documentation;
-	].
+	issued  2013-08-06.
 
 `Type-Tiny 0.023_01 cpan:TOBYINK`
-	issued  2013-08-16;
-	changeset [
-		dcs:versus `Type-Tiny 0.022 cpan:TOBYINK`;
-		item [
-			a dcs:Bugfix;
-			label "Fix Moo -> Moose type inflation issue.";
-			dcs:thanks cpan:MATTP;
-		];
-	].
+	issued  2013-08-16.
 
 `Type-Tiny 0.023_02 cpan:TOBYINK`
-	issued  2013-08-23;
-	changeset [
-		dcs:versus `Type-Tiny 0.023_01 cpan:TOBYINK`;
-		item [
-			a dcs:Bugfix;
-			label "Fix quoting in error messages which caused Type::Params to be unable to compile some coderefs.";
-			dcs:thanks cpan:TIMB;
-			dcs:fixes RT#87846;
-		];
-		item [
-			a dcs:Bugfix;
-			label "Improve ugly type assertion failure messages when given structures of nested references.";
-			dcs:thanks cpan:TIMB;
-			dcs:fixes RT#87999;
-		];
-		item "Type::Registry now has an `add_type` method, for adding a single type constraint to a registry."^^Addition;
-		item "Type::Registry's `add_types` method now supports importing MooseX::Types and MouseX::Types libraries."^^Change;
-		item "Type::Utils' `extend` function now supports extending MooseX::Types and MouseX::Types libraries."^^Change;
-	].
+	issued  2013-08-23.
 
 `Type-Tiny 0.023_03 cpan:TOBYINK`
-	issued  2013-08-23;
-	changeset [
-		dcs:versus `Type-Tiny 0.023_02 cpan:TOBYINK`;
-		item [
-			a dcs:Bugfix;
-			label "Constructors for some subclasses of Type::Tiny rejected hashrefs of paramaters.";
-			dcs:thanks cpan:BBYRD;
-			dcs:fixes RT#88064;
-		];
-		item [
-			a dcs:Change;
-			label "Implementation of RegexpRef in Types::Standard is now closer to Moose's implementation (accepts blessed Regexps).";
-		];
-		item [
-			a dcs:Bugfix;
-			label "Stop considering the empty string to be a valid package name.";
-		];
-		item [
-			a dcs:Tests;
-			label "Include additional test cases stolen from Moose.";
-		];
-	].
+	issued  2013-08-23.
 
 `Type-Tiny 0.024 cpan:TOBYINK`
-	issued  2013-08-27;
-	changeset [
-		dcs:versus `Type-Tiny 0.023_03 cpan:TOBYINK`;
-		item "Updated NEWS file."^^Documentation;
-	].
+	issued  2013-08-27.
 
 `Type-Tiny 0.025_01 cpan:TOBYINK`
-	issued  2013-09-02;
-	changeset [
-		dcs:versus `Type-Tiny 0.024 cpan:TOBYINK`;
-		item [
-			a dcs:Bugfix;
-			label "The Tuple structured type was treating arrays with missing required elements as if they were present but undef.";
-			dcs:thanks cpan:STEVENL;
-			dcs:fixes RT#88277;
-		];
-		item [
-			a dcs:Change;
-			label "Make Exporter::TypeTiny support generators with less internals-hacking.";
-		];
-		item [
-			a dcs:Documentation;
-			label "Document the internals of Exporter::TypeTiny.";
-		];
-		item [
-			a dcs:Change;
-			label "Exporter::TypeTiny will now use method-style resolution when searching for a sub to export.";
-		];
-		item [
-			a dcs:Packaging;
-			label "use Dist-Inkt";
-		];
-		item [
-			a dcs:Packaging;
-			label "Take advantage of dynamic_config to ask automated testers to test Type::Tiny with Moose present, but only if the Type::Tiny version number includes an underscore.";
-		];
-	].
+	issued  2013-09-02.
 
 `Type-Tiny 0.025_02 cpan:TOBYINK`
-	issued  2013-09-02;
-	changeset [
-		dcs:versus `Type-Tiny 0.025_01 cpan:TOBYINK`;
-		item [
-			a dcs:Addition;
-			label "Type::Params now provides a multisig() function, allowing you to define multiple function signatures, and attempt to validate @_ against them each in turn.";
-			dcs:thanks cpan:DJERIUS;
-			dcs:fixes RT#88291;
-		];
-		item [
-			a dcs:Tests;
-			a dcs:Bugfix;
-			label "functionparameters.t now requires Moo or Moose and is skipped otherwise.";
-		];
-	].
+	issued  2013-09-02.
 
 `Type-Tiny 0.025_03 cpan:TOBYINK`
-	issued  2013-09-04;
-	changeset [
-		dcs:versus `Type-Tiny 0.025_02 cpan:TOBYINK`;
-		item [
-			a dcs:Documentation;
-			label "Document that multisig() accepts coderefs.";
-		];
-		item [
-			a dcs:Packaging;
-			label "Use a newer version of RDF::DOAP to process this changelog.";
-		];
-	].
+	issued  2013-09-04.
 
 `Type-Tiny 0.026 cpan:TOBYINK`
-	issued  2013-09-05;
-	changeset [
-		dcs:versus `Type-Tiny 0.025_03 cpan:TOBYINK`;
-		item "Updated NEWS file."^^Documentation;
-	].
+	issued  2013-09-05.
 
 `Type-Tiny 0.027_01 cpan:TOBYINK`
-	issued  2013-09-07;
-	changeset [
-		dcs:versus `Type-Tiny 0.026 cpan:TOBYINK`;
-		item "Fixed some memory leaks. Still some work to do in this area."^^Bugfix;
-		item [
-			label "Added `coercibles` method to Type::Tiny.";
-			dcs:thanks cpan:DJERIUS;
-			seealso RT#88452;
-		];
-		item "Weakening various references to fix memory leaks led to breaking Type::Tiny -> Moose -> Type::Tiny round-tripping via Types::TypeTiny::to_TypeTiny. Test cases for this marked TODO."^^Regression;
-	].
+	issued  2013-09-07.
 
 `Type-Tiny 0.027_02 cpan:TOBYINK`
-	issued  2013-09-08;
-	changeset [
-		dcs:versus `Type-Tiny 0.027_01 cpan:TOBYINK`;
-		item "Restore Type::Tiny -> Moose -> Type::Tiny round-tripping broken in previous release."^^Bugfix;
-		item [
-			a dcs:Documentation;
-			label "In Type::Tiny::Manual::Coercions, explain how to chain coercions.";
-			seealso RT#88452;
-		]
-	].
+	issued  2013-09-08.
 
 `Type-Tiny 0.027_03 cpan:TOBYINK`
-	issued  2013-09-09;
-	changeset [
-		dcs:versus `Type-Tiny 0.027_02 cpan:TOBYINK`;
-		item [
-			a dcs:Update, dcs:Tests;
-			label "Fix the ultra-finicky t/02-api.t to cope with changes to Moose::Meta::TypeConstraint API in Moose 2.1100.";
-		];
-		item [
-			a dcs:Bugfix;
-			label "Prevent Eval::TypeTiny from leaking stashes by recycling the sandbox.";
-		];
-	].
+	issued  2013-09-09.
 
 `Type-Tiny 0.027_04 cpan:TOBYINK`
-	issued  2013-09-09;
-	changeset [
-		dcs:versus `Type-Tiny 0.027_03 cpan:TOBYINK`;
-		item [
-			a dcs:Update, dcs:Tests;
-			label "The file t/moose-coercion.t was checking a particular Moose warning message. In Moose 2.1100, this warning has been upgraded to an exception. For now, disable that particular check.";
-		];
-	].
+	issued  2013-09-09.
 
 `Type-Tiny 0.027_05 cpan:TOBYINK`
-	issued  2013-09-15;
-	changeset [
-		dcs:versus `Type-Tiny 0.027_04 cpan:TOBYINK`;
-		item "Include a detailed explanation in the stringification of Type::Exception::Assertion."^^Change;
-		item "Refactor the explanation generation mechanism."^^Change;
-		item "Provide a `validate_explain` method as part of Type::Tiny's public API."^^Addition;
-	].
+	issued  2013-09-15.
 
 `Type-Tiny 0.027_06 cpan:TOBYINK`
-	issued  2013-09-18;
-	changeset [
-		dcs:versus `Type-Tiny 0.027_05 cpan:TOBYINK`;
-		item "Override `validate_explain` in all the bundled subclasses of Type::Tiny."^^Addition;
-		item "Memoize Types::TypeTiny::to_TypeTiny."^^Change;
-		item "Type::Tiny::Union now provides a `find_type_for` method which should be compatible with Moose's equivalent method."^^Addition;
-		item "Type::Tiny::Union's compiled checks no longer close over the type constraints which are in the union."^^Change;
-		item "Type::Utils now provides an `english_list` function like Moose::Util does. This was useful internally for implementing `validate_explain` methods."^^Addition;
-		item "Add a draft Stability Policy to Type::Tiny::Manual."^^Documentation;
-		item "Loosen the rules for Type::Tiny and Type::Coercion name attributes; allow them to begin with one or two leading underscores."^^Change;
-		item "Types::TypeTiny::to_TypeTiny now uses Type::Coercion::FromMoose to ensure Moose type constraints converted to Type::Tiny constraints retain their coercions."^^Change;
-		item "Type::Coercion::FromMoose"^^Addition;
-		item "Stop using base.pm."^^Change;
-	].
+	issued  2013-09-18.
 
 `Type-Tiny 0.027_07 cpan:TOBYINK`
-	issued  2013-09-18;
-	changeset [
-		dcs:versus `Type-Tiny 0.027_06 cpan:TOBYINK`;
-		item "Also ensure Mouse type constraints converted to Type::Tiny constraints retain their coercions."^^Change;
-		item "Fix missing version number in Type::Coercion::FromMoose"^^Bugfix;
-		item "Changes to version numbers reported by 00-begin.t."^^Tests;
-	].
+	issued  2013-09-18.
 
 `Type-Tiny 0.027_08 cpan:TOBYINK`
-	issued  2013-09-19;
-	changeset [
-		dcs:versus `Type-Tiny 0.027_07 cpan:TOBYINK`;
-		item [
-			a dcs:Bugfix, dcs:Documentation;
-			label "Fix typo in changelog for previous developer release.";
-		];
-		item [
-			a dcs:Bugfix, dcs:Documentation;
-			label "Fix typo in Type::Utils for coerce=>1 --> coercion=>1.";
-			dcs:fixes RT#88798;
-			dcs:thanks cpan:DJERIUS;
-		];
-		item "Explicitly overload boolification (always true!) in Type::Exception."^^Change;
-		item "Type::Exception::Assertion changes from 0.027_05 are now conditional upon Perl version; only take effect on Perl 5.8+; they just weren't working on Perl 5.6."^^Bugfix;
-		item "More changes to version numbers reported by 00-begin.t."^^Tests;
-	].
+	issued  2013-09-19.
 
 `Type-Tiny 0.027_09 cpan:TOBYINK`
-	issued  2013-09-20;
-	changeset [
-		dcs:versus `Type-Tiny 0.027_08 cpan:TOBYINK`;
-		item "Fix whitespace in error messages."^^Bugfix;
-		item "Skip leak.t on Perl 5.10.0."^^Tests;
-		item "Inlining of type checks in Moo broken in this release, or hereabouts. Fixed in 0.029_04."^^Regression;
-	].
+	issued  2013-09-20.
 
 `Type-Tiny 0.028 cpan:TOBYINK`
-	issued  2013-09-26;
-	changeset [
-		dcs:versus `Type-Tiny 0.027_09 cpan:TOBYINK`;
-		item [
-			a dcs:Documentation;
-			dcs:fixes RT#88655;
-			dcs:thanks cpan:BBYRD;
-			label "Note in documentation for Type::Tiny::Union, etc that constraint/inlining coderefs not only should not be provided to the constructor, but cannot!";
-		];
-		item "Updated NEWS file."^^Documentation;
-	].
+	issued  2013-09-26.
 
 `Type-Tiny 0.029_01 cpan:TOBYINK`
-	issued  2013-09-26;
-	doap:branch "exporter-tiny";
-	changeset [
-		dcs:versus `Type-Tiny 0.028 cpan:TOBYINK`;
-		item "Replace Exporter::TypeTiny with Exporter::Tiny (an external dependency)."^^Change;
-	].
+	issued  2013-09-26.
 
 `Type-Tiny 0.029_02 cpan:TOBYINK`
-	issued  2013-10-11;
-	doap:branch "master";
-	changeset [
-		dcs:versus `Type-Tiny 0.029_01 cpan:TOBYINK`;
-		item [
-			a dcs:BackCompat;
-			label "Renamed the Type::Exception modules to Error::TypeTiny.";
-			dcs:fixes RT#89280;
-			dcs:thanks cpan:BBYRD;
-		];
-		item [
-			label "Type::Tiny::Enum type constraints are now subtypes of Types::Standard::Str; not Types::Standard::Defined.";
-			dcs:thanks cpan:DAGOLDEN;
-		];
-		item [
-			label "Types::Standard::Item is now a subtype of not Types::Standard::Any.";
-			dcs:thanks cpan:DAGOLDEN;
-		];
-		item [
-			a dcs:Documentation;
-			label "Fix typos in documentation of Error::TypeTiny package variables.";
-		];
-		item [
-			label "$Type::Tiny::DD package variable can now be used for a pluggable data dumper coderef.";
-			dcs:thanks cpan:TIMB;
-			dcs:fixes RT#89251;
-		];
-	].
+	issued  2013-10-11.
 
 `Type-Tiny 0.029_03 cpan:TOBYINK`
-	issued  2013-10-17;
-	changeset [
-		dcs:versus `Type-Tiny 0.029_02 cpan:TOBYINK`;
-		item [
-			a dcs:Bugfix;
-			label "Older versions of Scalar::Util::looks_like_number return true for undef; work around them.";
-		];
-		item [
-			a dcs:Bugfix;
-			label "Fix segfault on Perl 5.8.1 to 5.8.3. (And possibly some other 5.8.x Perls.) Caused by the combination of eval and goto.";
-			dcs:thanks cpan:RIBASUSHI, cpan:HAARG, cpan:ILMARI;
-		];
-	].
+	issued  2013-10-17.
 
 `Type-Tiny 0.029_04 cpan:TOBYINK`
-	issued  2013-10-17;
-	changeset [
-		dcs:versus `Type-Tiny 0.029_03 cpan:TOBYINK`;
-		item [
-			a dcs:Bugfix;
-			label "Fix validate_explain error messages in Type::Tiny::Union.";
-			dcs:thanks cpan:BBYRD;
-			dcs:fixes RT#89279;
-		];
-		item [
-			label "$Type::Tiny::DD can be set numerically.";
-			dcs:thanks cpan:TIMB;
-			dcs:fixes RT#89251;
-		];
-		item [
-			a dcs:Bugfix;
-			label "Fix inlining of type checks in Moo which was broken around about version 0.027_09.";
-		];
-		item [
-			label "Improve error messages under Moo.";
-			dcs:thanks cpan:HAARG;
-			dcs:fixes RT#89234;
-		];
-	].
+	issued  2013-10-17.
 
 `Type-Tiny 0.030 cpan:TOBYINK`
-	issued  2013-10-18;
-	changeset [
-		dcs:versus `Type-Tiny 0.029_04 cpan:TOBYINK`;
-		item [
-			a dcs:Tests;
-			label "Skip leak.t on Perl < 5.10.1. Type-Tiny does have some memory leaks in particular older versions of Perl: 5.8.8 and 5.10.0 are known to be problematic, but 5.8.9 seems fine. Ultimately it would be nice to get these fixed, but in the mean time skipping the test case makes the distribution easier to install.";
-		];
-		item [
-			a dcs:Documentation;
-			label "Updated NEWS file.";
-		];
-	].
+	issued  2013-10-18.
 
 `Type-Tiny 0.031_01 cpan:TOBYINK`
-	issued  2013-10-28;
-	changeset [
-		dcs:versus `Type-Tiny 0.030 cpan:TOBYINK`;
-		item "Adjustments to cope with newer Moose is-class-loaded heuristics."^^Tests;
-		item "Check Moose exception objects with isa rather than regexp matching."^^Tests;
-		item "Improved documentation for Types::TypeTiny."^^Documentation;
-		item [
-			a dcs:Bugfix;
-			label "Differentiate Tuple[] vs Tuple, and Dict[] vs Dict.";
-			dcs:thanks <urn:uuid:580d3dfe-fe45-42ef-9f58-1310ffee7004>;
-			dcs:fixes RT#89696;
-		];
-	].
+	issued  2013-10-28.
 
 `Type-Tiny 0.031_02 cpan:TOBYINK`
-	issued  2013-11-03;
-	changeset [
-		dcs:versus `Type-Tiny 0.031_01 cpan:TOBYINK`;
-		item "Type::Parser now differentiates between Tuple[] and Tuple too."^^Change;
-		item "Type::Parser only treats a comma as an operator within a parameterization now, and is thus now able to parse types from the head of a string which is a comma-separated list of types."^^Change;
-	].
+	issued  2013-11-03.
 
 `Type-Tiny 0.031_03 cpan:TOBYINK`
-	issued  2013-11-03;
-	changeset [
-		dcs:versus `Type-Tiny 0.031_02 cpan:TOBYINK`;
-		item [
-			a dcs:Addition;
-			label "Deep coercions for Maybe[`a].";
-			dcs:fixes RT#89936;
-			dcs:thanks cpan:BBYRD;
-		];
-	].
+	issued  2013-11-03.
 
 `Type-Tiny 0.031_04 cpan:TOBYINK`
-	issued  2013-11-03;
-	changeset [
-		dcs:versus `Type-Tiny 0.031_03 cpan:TOBYINK`;
-		item "Type::Parser 0.031_02 introduced a bug under Perl 5.6.x where we relied on the existence (or not) of a hash item being affected by `local`; this was implemented in Perl 5.8.0. Work around this problem by checking definedness instead."^^Bugfix;
-	].
+	issued  2013-11-03.
 
 `Type-Tiny 0.031_05 cpan:TOBYINK`
-	issued  2013-11-04;
-	changeset [
-		dcs:versus `Type-Tiny 0.031_04 cpan:TOBYINK`;
-		item [
-			a dcs:Documentation;
-			label "Fix minor typo.";
-			dcs:blame <urn:uuid:26bd4917-ff58-4e17-b2ee-4e81abe27f19>;
-		];
-		item [
-			a dcs:Change;
-			label "Allow Dict to take a slurpy parameter - a la Dict[foo => Int, slurpy HashRef[Num]].";
-			comment "This was Matt S Trout's idea.";
-			dcs:thanks cpan:MSTROUT;
-		];
-	].
+	issued  2013-11-04.
 
 `Type-Tiny 0.032 cpan:TOBYINK`
 	issued  2013-11-05;
-	label   "Remember, remember the fifth of November";
-	changeset [
-		dcs:versus `Type-Tiny 0.031_05 cpan:TOBYINK`;
-		item "Updated NEWS file."^^Documentation;
-		item "Eliminate a warning under Perl 5.6.x."^^Bugfix;
-	].
+	label   "Remember, remember the fifth of November".
 
 `Type-Tiny 0.033_01 cpan:TOBYINK`
-	issued  2013-11-07;
-	changeset [
-		dcs:versus `Type-Tiny 0.032 cpan:TOBYINK`;
-		item [
-			a dcs:Tests;
-			label "Test case using a Type::Params compiled check within the scope of a read-only $_ variable.";
-			dcs:blame cpan:SKAUFMAN;
-		];
-		item [
-			a dcs:Bugfix;
-			label "Type::Params now localizes $_ before trying to assign anything to it.";
-			dcs:fixes RT#90096;
-			dcs:thanks cpan:SKAUFMAN;
-		];
-		item "Types::Common::Numeric"^^Addition;
-		item "Types::Common::String"^^Addition;
-	].
+	issued  2013-11-07.
 
 `Type-Tiny 0.033_02 cpan:TOBYINK`
-	doap:branch "ts-optimization";
-	issued  2013-11-26;
-	changeset [
-		dcs:versus `Type-Tiny 0.033_01 cpan:TOBYINK`;
-		item "Split out some of the longer parts of Types::Standard into other modules that will be loaded on demand; this shaves about 20% off the load time of Types::Standard."^^Change;
-	].
+	issued  2013-11-26.
 
 `Type-Tiny 0.033_03 cpan:TOBYINK`
-	issued  2013-11-26;
-	changeset [
-		dcs:versus `Type-Tiny 0.033_02 cpan:TOBYINK`;
-		item [
-			a dcs:Packaging;
-			label "Recommend Sub::Name in META.json.";
-		];
-		item [
-			a dcs:Bugfix;
-			label "Fix bug in Type::Params::multisig with regard to slurpy parameters.";
-			dcs:fixes RT#90865;
-			dcs:thanks cpan:DJERIUS;
-		];
-		item [
-			a dcs:Documentation;
-			label "Make Error::TypeTiny::Assertion's explain method act more according to documentation.";
-			dcs:fixes RT#90867;
-			dcs:thanks cpan:DJERIUS;
-		];
-	].
+	issued  2013-11-26.
 
 `Type-Tiny 0.033_04 cpan:TOBYINK`
-	issued  2013-12-06;
-	changeset [
-		item [
-			label "The `extends` function from Type::Utils now allows inheritance of coercions, not just types.";
-			dcs:fixes RT#91153;
-			dcs:thanks cpan:JRMASH;
-		];
-		item [
-			a dcs:Tests;
-			label "Further tests related to RT#90096.";
-			seealso RT#90096;
-			dcs:thanks cpan:DJERIUS;
-		];
-		item "Implement coercion_names, get_coercion, has_coercion, and has_type methods for Types::TypeTiny, to make it more like a real Type::Library type library."^^Change;
-	].
+	issued  2013-12-06.
 
 `Type-Tiny 0.034 cpan:TOBYINK`
-	issued  2013-12-09;
-	changeset [
-		dcs:versus `Type-Tiny 0.033_04 cpan:TOBYINK`;
-		item "Updated NEWS file."^^Documentation;
-	].
+	issued  2013-12-09.
 
 `Type-Tiny 0.035_01 cpan:TOBYINK`
-	issued  2013-12-17;
-	changeset [
-		dcs:versus `Type-Tiny 0.034 cpan:TOBYINK`;
-		item [
-			label "Make parameterized Dict and Map type constraints work with Moose native hash attribute trait.";
-			dcs:thanks cpan:JRMASH;
-		];
-		item [
-			label "Make Type::Parser work with newer versions of MooseX::Types::Common which uses namespace::autoclean.";
-			dcs:fixes RT#91468;
-			dcs:thanks <urn:uuid:26bd4917-ff58-4e17-b2ee-4e81abe27f19>;
-		];
-	].
+	issued  2013-12-17.
 
 `Type-Tiny 0.036 cpan:TOBYINK`
-	issued  2013-12-21;
-	changeset [
-		dcs:versus `Type-Tiny 0.035_01 cpan:TOBYINK`;
-		item "Updated NEWS file."^^Documentation;
-	].
+	issued  2013-12-21.
 
 `Type-Tiny 0.037_01 cpan:TOBYINK`
-	issued  2013-12-24;
-	changeset [
-		dcs:versus `Type-Tiny 0.036 cpan:TOBYINK`;
-		item "Fix a Type::Params/B problem on Perl 5.6.x."^^Bugfix;
-	].
+	issued  2013-12-24.
 
 `Type-Tiny 0.037_02 cpan:TOBYINK`
-	issued  2013-12-29;
-	changeset [
-		dcs:versus `Type-Tiny 0.037_01 cpan:TOBYINK`;
-		item "Link to the Type::Tiny stability policy from the pod of each module it covers."^^Documentation;
-	].
+	issued  2013-12-29.
 
 `Type-Tiny 0.037_03 cpan:TOBYINK`
-	issued  2013-12-30;
-	changeset [
-		dcs:versus `Type-Tiny 0.037_02 cpan:TOBYINK`;
-		item [
-			a dcs:Bugfix;
-			label "Fix problems with Moo::HandleMoose integration on threaded Perls.";
-			dcs:thanks cpan:BOWTIE, cpan:HAARG, cpan:MSTROUT;
-		];
-		item "Skip leak.t on threaded Perls (for now)."^^Tests;
-	].
+	issued  2013-12-30.
 
 `Type-Tiny 0.038 cpan:TOBYINK`
-	issued  2014-01-01;
-	changeset [
-		dcs:versus `Type-Tiny 0.037_03 cpan:TOBYINK`;
-		item "Updated NEWS file."^^Documentation;
-		item "Copyright 2014."^^Documentation;
-	].
+	issued  2014-01-01.
 
 `Type-Tiny 0.039_01 cpan:TOBYINK`
-	issued  2014-01-21;
-	changeset [
-		dcs:versus `Type-Tiny 0.038 cpan:TOBYINK`;
-		item "The preferred IRC channel for support is now #moops."^^Documentation;
-		item "Exporter::TypeTiny."^^Removal;
-		item "Restructure the 't' directory."^^Tests;
-	].
+	issued  2014-01-21.
 
 `Type-Tiny 0.039_02 cpan:TOBYINK`
-	issued  2014-01-25;
-	changeset [
-		dcs:versus `Type-Tiny 0.039_01 cpan:TOBYINK`;
-		item "Add tests for Test::TypeTiny."^^Tests;
-	].
+	issued  2014-01-25.
 
 `Type-Tiny 0.039_03 cpan:TOBYINK`
-	issued  2014-02-05;
-	changeset [
-		dcs:versus `Type-Tiny 0.039_02 cpan:TOBYINK`;
-		item [
-			a dcs:Bugfix;
-			dcs:fixes RT#92591;
-			label "Make Type::Utils::declare_coercion work outside type libraries.";
-			dcs:thanks cpan:DJERIUS;
-		];
-		item [
-			a dcs:Bugfix;
-			dcs:fixes RT#92571;
-			label "Weak reference from Type::Coercion objects to target type constraint caused bad behaviour in some cases. This has been fixed by retaining enough information within the Type::Coercion to be able to reconstruct its type constraint if it disappears due to the reference count falling to zero.";
-			dcs:thanks cpan:DJERIUS;
-		];
-	].
+	issued  2014-02-05.
 
 `Type-Tiny 0.039_04 cpan:TOBYINK`
-	issued  2014-02-05;
-	changeset [
-		dcs:versus `Type-Tiny 0.039_03 cpan:TOBYINK`;
-		item [
-			label "Make overloaded ops on parameterized type constraints work more consistently between Perl above and below 5.14, reducing the need for parenthesizing complex type constraint expresssions.";
-			dcs:blame cpan:HAARG;
-			seealso <https://github.com/tobyink/p5-type-tiny/pull/8>
-		];
-	].
+	issued  2014-02-05.
 
 `Type-Tiny 0.039_05 cpan:TOBYINK`
-	issued  2014-02-15;
-	changeset [
-		dcs:versus `Type-Tiny 0.039_04 cpan:TOBYINK`;
-		item "Apply the Type::Tiny::_HalfOp trick to overloaded addition too."^^Change;
-	].
+	issued  2014-02-15.
 
 `Type-Tiny 0.039_06 cpan:TOBYINK`
-	issued  2014-02-17;
-	changeset [
-		dcs:versus `Type-Tiny 0.039_05 cpan:TOBYINK`;
-		item [
-			a dcs:Bugfix;
-			label "Type::Tiny's TIEARRAY and TIEHASH methods were broken; fixed now.";
-		];
-		item [
-			a dcs:Bugfix;
-			label "Type::Tiny's SUPPORT_SMARTMATCH constant was broken; fixed now.";
-		];
-		item [
-			a dcs:Tests;
-			label "Test integration with match::simple.";
-		];
-		item [
-			a dcs:Tests;
-			label "Test integration with Type::Tie.";
-		];
-		item [
-			a dcs:Tests;
-			label "Test integration with Return::Type.";
-		];
-		item [
-			a dcs:Tests;
-			label "Enable some old tests that had been disabled as not-yet-implemented for parameterized type constraints; the feature they test was implemented ages ago.";
-		];
-	].
+	issued  2014-02-17.
 
 `Type-Tiny 0.039_07 cpan:TOBYINK`
-	issued  2014-02-17;
-	changeset [
-		dcs:versus `Type-Tiny 0.039_06 cpan:TOBYINK`;
-		item [
-			a dcs:Bugfix, dcs:Tests;
-			label "Fix hash ordering bug in Return::Type integration tests.";
-		];
-	].
+	issued  2014-02-17.
 
 `Type-Tiny 0.039_08 cpan:TOBYINK`
-	issued  2014-02-24;
-	changeset [
-		dcs:versus `Type-Tiny 0.039_07 cpan:TOBYINK`;
-		item "Test integration with Kavorka."^^Tests;
-	].
+	issued  2014-02-24.
 
 `Type-Tiny 0.039_09 cpan:TOBYINK`
-	issued  2014-02-25;
-	changeset [
-		dcs:versus `Type-Tiny 0.039_08 cpan:TOBYINK`;
-		item "Update Type::Tiny::Manual::Params to mention Kavorka, and newer features of Function::Parameters."^^Documentation;
-		item "Test integration with Moops."^^Tests;
-		item "Test integration with Switcheroo."^^Tests;
-		item "Test that coercions attached to Moose type constraints get inherited by Type::Tiny when they are inhaled."^^Tests;
-		item "Unit tests for Devel::TypeTiny::Perl56Compat."^^Tests;
-		item "Unit tests for Devel::TypeTiny::Perl58Compat."^^Tests;
-	].
+	issued  2014-02-25.
 
 `Type-Tiny 0.039_10 cpan:TOBYINK`
-	issued  2014-03-10;
-	changeset [
-		dcs:versus `Type-Tiny 0.039_09 cpan:TOBYINK`;
-		item "Document the benefits of freezing coercions, and of defining coercions either within the type library, or via $type->plus_coercions."^^Documentation;
-		item "$type->plus_coercions and friends now return objects with frozen coercions."^^Change;
-	].
+	issued  2014-03-10.
 
 `Type-Tiny 0.039_11 cpan:TOBYINK`
-	issued  2014-03-11;
-	changeset [
-		dcs:versus `Type-Tiny 0.039_10 cpan:TOBYINK`;
-		item "Because of changes to Data::Dumper in Perl 5.19.x, the test suite was previously skipping some Dumper-based test cases depending on Perl version. However, Dumper is dual-lifed, so older versions of Perl may have shiny, new Dumpers. Skip test cases based on Data::Dumper version instead."^^Tests;
-	].
+	issued  2014-03-11.
 
 `Type-Tiny 0.039_12 cpan:TOBYINK`
-	issued  2014-03-12;
-	changeset [
-		dcs:versus `Type-Tiny 0.039_11 cpan:TOBYINK`;
-		item [
-			a dcs:Bugfix;
-			dcs:thanks cpan:MATTP;
-			label "Various Type::Utils functions were trying to dereference undef as a hash or array in certain circumstances.";
-		];
-		item [
-			a dcs:Change;
-			dcs:thanks cpan:MATTP;
-			label "Type::Utils' class_type and role_type functions will $name =~ s/:://g.";
-		];
-	].
+	issued  2014-03-12.
 
 `Type-Tiny 0.039_13 cpan:TOBYINK`
-	issued  2014-03-15;
-	changeset [
-		dcs:versus `Type-Tiny 0.039_12 cpan:TOBYINK`;
-		item [
-			a dcs:Tests;
-			dcs:blame cpan:HAARG;
-			label "Test for occasional segfaults on threaded Perl 5.18.x.";
-		];
-		item [
-			a dcs:Bugfix;
-			dcs:blame cpan:HAARG;
-			label "Fix occasional segfaults on threaded Perl 5.18.x.";
-		];
-	].
+	issued  2014-03-15.
 
 `Type-Tiny 0.040 cpan:TOBYINK`
-	issued  2014-03-17;
-	changeset [
-		dcs:versus `Type-Tiny 0.039_11 cpan:TOBYINK`;
-		item "Updated NEWS file."^^Documentation;
-		item "Refreshed SEE ALSO section of Type::Tiny::Manual::Libraries."^^Documentation;
-	].
+	issued  2014-03-17.
 
 `Type-Tiny 0.041_01 cpan:TOBYINK`
-	issued  2014-03-17;
-	changeset [
-		dcs:versus `Type-Tiny 0.040 cpan:TOBYINK`;
-		item "Type::Tiny and Type::Coercion no longer overload addition. This feature never really worked very well with regard to precendence, requiring lot of parentheses to use. The overload also made solving the parameterizable type coercion problem very difficult."^^BackCompat;
-		item "Parameterizable coercions are now passed a reference to the type constraint they should target."^^Change;
-	].
+	issued  2014-03-17.
 
 `Type-Tiny 0.041_02 cpan:TOBYINK`
-	issued  2014-03-26;
-	changeset [
-		dcs:versus `Type-Tiny 0.041_01 cpan:TOBYINK`;
-		item "Type::Tiny::Manual links to various parts of the test suite to document concepts. These links had grown stale and have now been updated."^^Documentation;
-		item "Prevent 20-unit/Type-Registry/moosextypes.t from failing due to too old MooseX::Types::Common - just skip the test script if MXTC is older than 0.001004."^^Tests;
-		item [
-			a dcs:Bugfix;
-			dcs:fixes RT#94196;
-			label "Fix Type::Tiny::Duck's inlining of code when given the variable name `$_`.";
-			dcs:thanks cpan:DJERIUS;
-		];
-		item "Updated NEWS file."^^Documentation;
-	].
+	issued  2014-03-26.
 
 `Type-Tiny 0.041_03 cpan:TOBYINK`
-	issued  2014-03-28;
-	changeset [
-		dcs:versus `Type-Tiny 0.041_02 cpan:TOBYINK`;
-		item "Improve documentation for the Type::Tiny class; especially its constructor, attributes and methods."^^Documentation;
-		item "Improve documentation for the Type::Coercion class; especially its constructors, attributes and methods."^^Documentation;
-	].
+	issued  2014-03-28.
 
 `Type-Tiny 0.041_04 cpan:TOBYINK`
-	issued  2014-03-31;
-	changeset [
-		dcs:versus `Type-Tiny 0.041_03 cpan:TOBYINK`;
-		item "Add tests for given/when matching against type constraints."^^Tests;
-	].
+	issued  2014-03-31.
 
 `Type-Tiny 0.042 cpan:TOBYINK`
-	issued  2014-04-02;
-	changeset [
-		dcs:versus `Type-Tiny 0.041_04 cpan:TOBYINK`;
-		item "List currently unstable/experimental parts of the distribution in Type::Tiny::Manual::Policies."^^Documentation;
-		item "Include more recent results in benchmarking example scripts."^^Documentation;
-	].
+	issued  2014-04-02.
 
 `Type-Tiny 0.043_01 cpan:TOBYINK`
-	issued  2014-04-06;
-	changeset [
-		dcs:versus `Type-Tiny 0.042 cpan:TOBYINK`;
-		item "Sub::Quote quoted coderefs passed to to_TypeTiny() now result in inlinable type constraints."^^Change;
-	].
+	issued  2014-04-06.
 
 `Type-Tiny 0.043_02 cpan:TOBYINK`
-	issued  2014-04-11;
-	changeset [
-		dcs:versus `Type-Tiny 0.043_01 cpan:TOBYINK`;
-		item "Experimental my_methods attribute so that type constraints can offer additional methods."^^Addition;
-		item "Type::Tiny now has a find_parent method."^^Addition;
-	].
+	issued  2014-04-11.
 
 `Type-Tiny 0.043_03 cpan:TOBYINK`
-	issued  2014-05-06;
-	changeset [
-		dcs:versus `Type-Tiny 0.043_02 cpan:TOBYINK`;
-		item "Type::Utils::classifier"^^Addition;
-		item [
-			a dcs:Documentation;
-			label "Type::Tiny::Manual::Libraries add example of using the custom types library.";
-			dcs:blame cpan:KARMAN;
-		];
-		item "Rename Types::Datetime to Example::Types because there is now really a Types::DateTime on CPAN."^^Documentation;
-		item "Extremely experimental and mostly undocumented my_method stuff."^^Addition;
-		item "Improve Eval::TypeTiny test cases."^^Tests;
-		item "Updated bundled version of Try::Tiny."^^Packaging;
-		item "Tests for Type::Library error messages."^^Tests;
-		item "Add some test cases for the Error::TypeTiny class."^^Tests;
-	].
+	issued  2014-05-06.
 
 `Type-Tiny 0.043_04 cpan:TOBYINK`
-	issued  2014-05-21;
-	changeset [
-		dcs:versus `Type-Tiny 0.043_03 cpan:TOBYINK`;
-		item "Improve test cases for integration with Moose native attribute traits."^^Tests;
-	].
+	issued  2014-05-21.
 
 `Type-Tiny 0.043_05 cpan:TOBYINK`
-	issued  2014-05-21;
-	changeset [
-		dcs:versus `Type-Tiny 0.043_04 cpan:TOBYINK`;
-		item [
-			a dcs:Tests;
-			label "Integration tests for MooseX::Getopt.";
-			dcs:blame cpan:ABRAXXA;
-		];
-		item [
-			a dcs:Bugfix;
-			label "Fix inflation of Type::Coercion objects to Moose::Meta::TypeCoercion when some of the coercion routines are given as strings.";
-			dcs:fixes [
-				a dbug:Issue;
-				label "Inflation of Type::Coercion objects to Moose::Meta::TypeCoercion is sometimes broken.";
-				dbug:reporter cpan:ABRAXXA;
-			];
-		];
-		item [
-			a dcs:Change;
-			label "No longer need to inflate a Type::Tiny object to Moose::Meta::TypeConstraint in order to give an answer to $type->isa('Moose::Meta::TypeConstraint::Union').";
-			comment "Inflation to Moose::Meta::TypeConstraint is a last resort.";
-		];
-		item [
-			a dcs:Change;
-			label "Detect missing comma in declaration of type constraints using Type::Utils a la `declare Foo as Bar`, and print a warning.";
-			dcs:thanks cpan:TIMB;
-		];
-		item [
-			a dcs:Documentation;
-			label "Document the is_*, to_*, and assert_* functions in Type::Tiny::Manual::Libraries.";
-			comment "They were already mentioned in Type::Library.";
-			dcs:thanks cpan:ABRAXXA;
-		];
-		item [
-			a dcs:Documentation;
-			label "Mention coercion=>1 and why it is useful in Type::Tiny::Manual::Coercions.";
-			comment "It was already mentioned in Type::Tiny.";
-			dcs:thanks cpan:ABRAXXA;
-		];
-	].
+	issued  2014-05-21.
 
 `Type-Tiny 0.044 cpan:TOBYINK`
-	issued  2014-06-03;
-	changeset [
-		dcs:versus `Type-Tiny 0.043_05 cpan:TOBYINK`;
-		item "Updated NEWS file."^^Documentation;
-	].
+	issued  2014-06-03.
 
 `Type-Tiny 0.045_01 cpan:TOBYINK`
-	issued  2014-06-30;
-	changeset [
-		dcs:versus `Type-Tiny 0.044 cpan:TOBYINK`;
-		item [
-			a dcs:Bugfix;
-			label "Ensure that when a Type::Tiny object is inflated into a Moose::Meta::TypeConstraint, inlining still happens via Type::Tiny.";
-			comment "This was causing some obscure problems with MooseX::Getopt.";
-			dcs:thanks [ a foaf:Person; foaf:nick "omega" ];
-		];
-		item [
-			a dcs:Bugfix;
-			label "Workaround strange behaviour of exists() function when applied to @_ on Perl older than 5.20 which caused some uses of Optional[Foo] to accept an explicit undef.";
-			dcs:thanks cpan:XENO;
-		];
-	].
+	issued  2014-06-30.
 
 `Type-Tiny 0.045_02 cpan:TOBYINK`
-	issued  2014-07-10;
-	changeset [
-		dcs:versus `Type-Tiny 0.045_01 cpan:TOBYINK`;
-		item "Include benchmark/example of Type::Params versus Scalar::Validation."^^Documentation;
-		item [
-			a dcs:Bugfix, dcs:Documentation;
-			label "Remove outdated references to the overloaded + operator from Types::Standard documentation.";
-			dcs:fixes RT#96379;
-			dcs:thanks cpan:DJERIUS;
-		];
-	].
+	issued  2014-07-10.
 
 `Type-Tiny 0.045_03 cpan:TOBYINK`
-	issued  2014-07-11;
-	changeset [
-		dcs:versus `Type-Tiny 0.045_02 cpan:TOBYINK`;
-		item "Type::Tiny::XS is now used (if available) to speed up some of the Types::Standard type constraints, plus Type::Tiny::Class and Type::Tiny::Duck."^^Change;
-		item "The Mouse XS stuff introduced in Type-Tiny 0.003_09 has been partially removed. (I do plan on restoring it, and improving it.)"^^Regression;
-		item "When testing equivalence between Types::Standard types and core Moose types, don't test `Num` because Types::Standard provides two different implementations for it."^^Tests;
-		item "Update benchmark scripts, showing results with/without Type::Tiny::XS."^^Documentation;
-	].
+	issued  2014-07-11.
 
 `Type-Tiny 0.045_04 cpan:TOBYINK`
-	issued  2014-07-15;
-	changeset [
-		dcs:versus `Type-Tiny 0.045_03 cpan:TOBYINK`;
-		item "Cope with changes to Type::Tie error messages introduced in Type::Tie 0.008."^^Tests;
-		item "Generally stop testing the contents of error messages produced by external modules!"^^Tests;
-		item [
-			a dcs:Tests;
-			label "Fix warnings in 30-integration/Moose/native-attribute-traits.t when run under perl -w.";
-			dcs:blame cpan:KARMAN;
-		];
-		item "Type::Params was warning about additional arguments passed to sprintf under Perl blead. The additional argument has been removed."^^Bugfix;
-		item "Updated NEWS file."^^Documentation;
-	].
+	issued  2014-07-15.
 
 `Type-Tiny 0.045_05 cpan:TOBYINK`
-	issued  2014-07-18;
-	changeset [
-		dcs:versus `Type-Tiny 0.045_04 cpan:TOBYINK`;
-		item "Type::Tiny now has an `of` method which is a shortcut for `parameterize` which I can never spell properly."^^Addition;
-		item "Type::Tiny now has a `where` method which is a shortcut for creating a child type with a constraint coderef."^^Addition;
-		item "Added a Type::Tiny::Manual::Optimization perldoc page."^^Documentation;
-		item "More sensible use of Sub::Name in Type::Library."^^Bugfix;
-		item "Restore and improve Mouse XS stuff dropped in Type-Tiny 0.045_03."^^Change;
-	].
+	issued  2014-07-18.
 
 `Type-Tiny 0.046 cpan:TOBYINK`
-	issued  2014-07-18;
-	changeset [
-		dcs:versus `Type-Tiny 0.045_05 cpan:TOBYINK`;
-		item "Add test cases for Types::TypeTiny (the library of type constraints used internally by Type::Tiny)."^^Tests;
-		item "Fix for Types::TypeTiny::to_TypeTiny($coderef) when Sub::Quote is loaded but not used."^^Bugfix;
-		item "Undef no longer passes the Types::TypeTiny::StringLike type constraint."^^Bugfix;
-		item "Minor optimizations to Types::TypeTiny::to_TypeTiny."^^Change;
-	].
+	issued  2014-07-18.
 
 `Type-Tiny 0.047_01 cpan:TOBYINK`
 	label   "The 87% Coverage Release";
-	issued  2014-07-21;
-	changeset [
-		dcs:versus `Type-Tiny 0.046 cpan:TOBYINK`;
-		item [
-			label "Types::Standard::Map is now XS-accelerated.";
-			seealso <https://gist.github.com/tobyink/e733f839cecc0dd193a6>;
-		];
-		item [
-			label "Types::Standard::Tuple is now XS-accelerated.";
-			seealso <https://gist.github.com/tobyink/e733f839cecc0dd193a6>;
-		];
-		item [
-			label "Type::Tiny::Enum is now XS-accelerated.";
-			seealso <https://gist.github.com/tobyink/dfdf9bb826a530781e3d>;
-		];
-		item [
-			label "Types::Common::Numeric::PositiveInt is now XS-accelerated.";
-			seealso <https://gist.github.com/tobyink/dcc15cf283c90c749501>;
-		];
-		item [
-			label "Types::Common::Numeric::PositiveOrZeroInt is now XS-accelerated.";
-			seealso <https://gist.github.com/tobyink/dcc15cf283c90c749501>;
-		];
-		item [
-			label "Types::Common::String::NonEmptyStr is now XS-accelerated.";
-			seealso <https://gist.github.com/tobyink/dcc15cf283c90c749501>;
-		];
-		item [
-			label "Unify _USE_XS/_USE_MOUSE logic in Type::Tiny. (It was previously scattered across Types::Standard and various other modules.)";
-		];
-		item [
-			a dcs:Documentation;
-			label "Better document which type constraints will be accelerated by Type::Tiny::XS and Mouse.";
-		];
-		item [
-			a dcs:Tests, dcs:Bugfix;
-			label "Fix a silly test case that was relying on Exporter::Tiny to always load B.pm. (Current versions of Exporter::Tiny do load B.pm, but future versions might not.)";
-		];
-	].
+	issued  2014-07-21.
 
 `Type-Tiny 0.047_02 cpan:TOBYINK`
 	label   "The 92% Coverage Release";
-	issued  2014-07-23;
-	changeset [
-		dcs:versus `Type-Tiny 0.047_01 cpan:TOBYINK`;
-		item "Allow Enums containing hyphens to be accelerated by Type::Tiny::XS."^^Change;
-		item [
-			label "Type::Tiny::Union is now XS-accelerated.";
-			seealso <https://gist.github.com/tobyink/71eab715ac16178cbcfb>;
-		];
-		item [
-			label "Type::Tiny::Intersection is now XS-accelerated.";
-			seealso <https://gist.github.com/tobyink/71eab715ac16178cbcfb>;
-		];
-		item "Test the Error::TypeTiny::Compilation exception class."^^Tests;
-		item "Test exceptions thrown by Type::Tiny::Enum."^^Tests;
-		item "Test the Error::TypeTiny::WrongNumberOfParameters exception class."^^Tests;
-		item [
-			a dcs:Tests;
-			label "Include test case relating to Type::Tiny::XS GitHub issue #1.";
-			seealso <https://github.com/tobyink/p5-type-tiny-xs/issues/1>;
-		];
-		item "Test exceptions thrown by Type::Tiny::Class."^^Tests;
-		item "Test exceptions thrown by Type::Tiny::Role."^^Tests;
-		item "Add tests explicitly testing Type::Tiny objects conversion to Moose::Meta::TypeConstraint and Mouse::Meta::TypeConstraint objects."^^Tests;
-		item "Type::Tiny::Class should stop using Class::ISA. Instead, if mro.pm is not available, use a private sub stolen from MRO::Compat."^^Change;
-		item "Stop using base.pm."^^Tests;
-		item "Type::Tiny::Manual no longer says that Perl 5.6.x support is at risk."^^Documentation;
-	].
+	issued  2014-07-23.
 
 `Type-Tiny 0.047_03 cpan:TOBYINK`
 	label   "The 96% Coverage Release";
-	issued  2014-07-26;
-	changeset [
-		dcs:versus `Type-Tiny 0.047_02 cpan:TOBYINK`;
-		item "Improved type introspection method tests (find_parent/is_supertype_of/is_subtype_of/is_strictly_supertype_of/is_strictly_subtype_of)."^^Tests;
-		item "Improved type constraint constructor tests (exceptions thrown for bad parameters, coercion=>ARRAY|CODE parameter)."^^Tests;
-		item "Checks for more Error::TypeTiny::Assertion explanations (Tuple, Duck, Intersection, Union, Dicts containing slurpy things)."^^Tests;
-		item "Checks non-inlineable deep coercions for Tuple."^^Tests;
-		item "Fix for slurpy Map within a Tuple."^^Bugfix;
-		item "Types::TypeTiny->has_type was incorrectly returning whether Types::TypeTiny contained the named *coercion* instead of a named *type*."^^Bugfix;
-		item "Test the immutability of Type::Coercion::Union."^^Tests;
-		item "Fake a very old Validation::Class::Simple for a certain test by overriding $Validation::Class::Simple::VERSION."^^Tests;
-		item "Check that Type::Registry works in conjunction with MouseX::Types. (There's some TODO stuff there.)"^^Tests;
-		item "Bundle my TODO file."^^Packaging;
-		item "Better `isa` faking - returns true to Class::MOP::Object."^^Change;
-		item "Tests for `isa`."^^Tests;
-		item "Tests for various little methods which were added for Moose/Mouse-compatibility."^^Tests;
-		item "Tests for non-inlineable type constraints in `match_on_type` and `compile_match_on_type`."^^Tests;
-		item "Check Type::Library-based type libraries can extend MouseX::Types-based type libraries."^^Tests;
-	].
+	issued  2014-07-26.
 
 `Type-Tiny 0.047_04 cpan:TOBYINK`
 	label   "The 98% Coverage Release";
-	issued  2014-07-28;
-	changeset [
-		dcs:versus `Type-Tiny 0.047_03 cpan:TOBYINK`;
-		item "Tests for introspection methods of Types::TypeTiny."^^Tests;
-		item "Check that Mouse type converted to Type::Tiny objects keep their original error messages."^^Tests;
-		item "Tests for Test::TypeTiny::matchfor()."^^Tests;
-		item "Improve test coverage for Type::Registry."^^Tests;
-		item "Tests for dynamically delegated Type::Tiny an Type::Coercion methods."^^Tests;
-		item "Type::Utils does not export english_list() and classifier() by default."^^Documentation;
-		item "Test that Sub::Quote-enabled coderefs generated by Type::Tiny and Type::Coercion can actually be retrieved by Sub::Quote."^^Tests;
-		item "Test the Type::Coercion overloading of ~~."^^Tests;
-		item "Straighten out the relationships between Type::Coercion and its subclasses."^^Change;
-		item "Tests for introspection methods of Type::Coercion."^^Tests;
-		item "Test exceptions thrown by Types::Standard::ScalarRef."^^Tests;
-		item "Improve test coverage for Type::Utils' match_on_type and compile_match_on_type."^^Tests;
-		item "Type:Utils::match_on_type no longer automatically loads Types::Standard."^^Change;
-		item "Test warnings raised by Type::Utils::declare()."^^Tests;
-		item "Test code from SYNOPSIS sections (only in xt)."^^Tests;
-	].
+	issued  2014-07-28.
 
 `Type-Tiny 0.047_05 cpan:TOBYINK`
 	label   "Sanity++";
-	issued  2014-07-29;
-	changeset [
-		dcs:versus `Type-Tiny 0.047_04 cpan:TOBYINK`;
-		item "A far saner implementation of Optional[]."^^Change;
-		item "Improve the documentation of Optional[] and slurpy."^^Documentation;
-		item "Optimizations for slurpy Any."^^Change;
-		item "When slurping the tail of a Tuple into a hashref, check it's an even number of elements."^^Change;
-		item "A slightly saner implementation of Types::TypeTiny's meta methods."^^Change;
-		item [
-			a dcs:Regression;
-			label "Introduced bug concerning coercions to parameterized Dicts with a mixture of inlineable and non-inlineable optional values.";
-			seealso RT#98362;
-		];
-	].
+	issued  2014-07-29.
 
 `Type-Tiny 0.047_06 cpan:TOBYINK`
 	label   "What made the Queen go all ice crazy?";
-	issued  2014-07-31;
-	changeset [
-		dcs:versus `Type-Tiny 0.047_05 cpan:TOBYINK`;
-		item "Type::Registry/Type::Parser will now auto-load MouseX::Types libraries."^^Change;
-		item "Type::Registry now has methods for creating union/intersection/class/role type constraints. Type::Parser delegates to these, making it potentially reusable outside Type::Tiny by simply passing it an alternative type registry object."^^Change;
-		item "More Type::Registry test cases."^^Tests;
-		item [
-			label "Parameterized types now have their coercions frozen automatically, so you can no longer add coercions to, say, ArrayRef[Int]. However, you can create a subtype of ArrayRef[Int] and add coercions to that.";
-			seealso RT#97516;
-			dcs:thanks cpan:MSCHWERN;
-		];
-		item "Bugfix in coercion inheritance where the child's type_coercion_map arrayref would end up as a reference to the parent's type_coercion_map. (Which was not good.)"^^Bugfix;
-		item "Coercions for the types defined in Types::Standard are now frozen."^^Change;
-		item "Coercions for the types defined in Types::Common::Numeric are now frozen."^^Change;
-		item "Coercions for the types defined in Types::Common::String are now frozen."^^Change;
-		item "Type::Coercion now has a i_really_want_to_unfreeze method."^^Addition;
-		item "Type::Library now has a make_immutable method."^^Addition;
-	].
+	issued  2014-07-31.
 
 `Type-Tiny 0.047_07 cpan:TOBYINK`
-	issued  2014-08-04;
-	changeset [
-		dcs:versus `Type-Tiny 0.047_06 cpan:TOBYINK`;
-		item "The extract_type function was missing from Type::Parser's @EXPORT_OK list."^^Bugfix;
-		item "Test cases for Type::Parser::extract_type."^^Tests;
-		item "Parameterized Maybe constraints are now XS-accelerated."^^Change;
-	].
+	issued  2014-08-04.
 
 `Type-Tiny 0.047_08 cpan:TOBYINK`
 	label   "Sanity++";
-	issued  2014-08-05;
-	changeset [
-		dcs:versus `Type-Tiny 0.047_07 cpan:TOBYINK`;
-		item [
-			a dcs:Tests;
-			label "Test to avoid the \"too few arguments for type constraint check functions\" error.";
-			dcs:thanks cpan:DJERIUS;
-			seealso RT#97684;
-		];
-		item [
-			label "Prevent inlining of coercions if they've not been frozen.";
-			seealso RT#93345;
-		];
-		item [
-			a dcs:Documentation;
-			label "Document the remaining RT#93345-related issues - see \"Deep Caveat\" in Type::Tiny::Manual::Coercions.";
-			seealso RT#93345;
-		];
-		item [
-			a dcs:Tests;
-			label "Update t/30-integration/Moose/coercion.t to Moose 2.1200 which throws an exception rather than printing a warning when coerce=>1 is used on a type constraint with no coercions.";
-		];
-		item [
-			a dcs:Tests;
-			label "Alter the Types::Common::* test cases to use Test::TypeTiny.";
-		];
-		item [
-			a dcs:Bugfix;
-			label "Fix non-inlined version of NegativeOrZeroInt.";
-		];
-	].
+	issued  2014-08-05.
 
 `Type-Tiny 0.047_09 cpan:TOBYINK`
-	issued  2014-08-12;
-	changeset [
-		dcs:versus `Type-Tiny 0.047_08 cpan:TOBYINK`;
-		item "Improvements and clarifications to Type::Coercion documentation."^^Documentation;
-		item "The to_Foo functions exported by Type::Library-based modules are now significantly faster. (But only if the type's coercion is frozen.)"^^Change;
-		item "Add tests for Error::TypeTiny::Assertion's predicate methods."^^Tests;
-		item "Add tests for Type::Coercion's i_really_want_to_unfreeze method."^^Tests;
-		item "Better integration between Type::Library and Type::Registry. If you import a type constraint from a Type::Library-based module, it will automatically be inserted into your modules' type registry."^^Change;
-		item [
-			a dcs:Bugfix, dcs:Documentation;
-			label "Fix documentation typo.";
-			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/12>;
-			dcs:thanks <urn:uuid:580d3dfe-fe45-42ef-9f58-1310ffee7004>;
-		];
-		item "Type::Utils::dwim_type now takes into account what OO framework the caller is using (Moose or Mouse) if it needs to fall back to asking the OO framework about a type constraint."^^Change;
-	].
+	issued  2014-08-12.
 
 `Type-Tiny 1.000000 cpan:TOBYINK`
 	issued  2014-08-16;
-	label   "Happy CPAN Day!";
-	changeset [
-		dcs:versus `Type-Tiny 0.047_09 cpan:TOBYINK`;
-		item "Updated NEWS file."^^Documentation;
-		item "Updated TODO file."^^Documentation;
-		item "Document the Type::Tiny versioning policy."^^Documentation;
-	].
+	label   "Happy CPAN Day!".
 
 `Type-Tiny 1.000001 cpan:TOBYINK`
-	issued  2014-08-18;
-	changeset [
-		dcs:versus `Type-Tiny 1.000000 cpan:TOBYINK`;
-		item [
-			a dcs:Bugfix;
-			label "Changes to dwim_type() in 0.047_09 broke the fallback to creating class types in some circumstances. This broke the MooX::late test suite, and some usages of MooX::late.";
-			dcs:thanks cpan:SHLOMIF;
-		];
-	].
+	issued  2014-08-18.
 
 `Type-Tiny 1.000002 cpan:TOBYINK`
-	issued  2014-08-18;
-	changeset [
-		dcs:versus `Type-Tiny 1.000001 cpan:TOBYINK`;
-		item [
-			a dcs:Bugfix;
-			label "Fix for overloaded operation fallback on Perl 5.10.x.";
-			dcs:blame cpan:ILMARI;
-			dcs:thanks cpan:PJFL;
-			dcs:fixes RT#98113;
-		];
-	].
+	issued  2014-08-18.
 
 `Type-Tiny 1.000003 cpan:TOBYINK`
-	issued  2014-08-28;
-	changeset [
-		dcs:versus `Type-Tiny 1.000002 cpan:TOBYINK`;
-		item [
-			a dcs:Bugfix;
-			label "Fix for coercions to parameterized Dict including a mixture of inlineable and non-inlineable optional values.";
-			dcs:blame cpan:DAKKAR;
-			dcs:fixes RT#98362;
-		];
-	].
+	issued  2014-08-28.
 
 `Type-Tiny 1.000004 cpan:TOBYINK`
-	issued  2014-09-02;
-	changeset [
-		dcs:versus `Type-Tiny 1.000003 cpan:TOBYINK`;
-		item [
-			a dcs:Bugfix;
-			label "Fix issues with coercions and native attribute traits with some oldish versions of Moose on oldish versions of Perl.";
-			dcs:thanks cpan:PJFL;
-			dcs:fixes RT#98159;
-			comment "Backported fix from 1.001_000.";
-		];
-		item [
-			a dcs:Bugfix;
-			label "Fix for Type::Registry::DWIM.";
-			dcs:thanks cpan:SPICEMAN;
-			dcs:fixes RT#98458;
-			comment "Backported fix from 1.001_000.";
-		];
-	].
+	issued  2014-09-02.
 
 `Type-Tiny 1.001_000 cpan:TOBYINK`
-	issued  2014-09-07;
-	changeset [
-		dcs:versus `Type-Tiny 1.000003 cpan:TOBYINK`;
-		item [
-			a dcs:Bugfix;
-			label "Fix issues with coercions and native attribute traits with some oldish versions of Moose on oldish versions of Perl.";
-			dcs:thanks cpan:PJFL;
-			dcs:fixes RT#98159;
-		];
-		item [
-			a dcs:Tests;
-			label "Make some of the test case skip_all bits more ambitious; test older versions of Moose and Moo than we were testing before.";
-		];
-		item [
-			a dcs:Bugfix;
-			label "Fix for Type::Registry::DWIM.";
-			dcs:thanks cpan:SPICEMAN;
-			dcs:fixes RT#98458;
-		];
-		item [
-			a dcs:Update;
-			label "If Sub::Name is unavailable, but the shiny new core Sub::Util is available, then use it instead.";
-		];
-		item [
-			a dcs:Addition;
-			label "Type::Params now provides `compile_named` and `validate_named` functions which do the same thing as `compile` and `validate` but are better for named arguments.";
-			comment "Several people have requested this.";
-		];
-		item [
-			a dcs:Change;
-			label "`Type::Utils::dwim_type` now allows more control over fallback behaviours.";
-		];
-		item [
-			a dcs:Documentation;
-			label "Updates to Type::Tiny::Manual::UsingWithMoose, Type::Tiny::Manual::UsingWithMoo, and Type::Tiny::Manual::UsingWithMouse.";
-		];
-		item "Updated NEWS file."^^Documentation;
-		item "Updated TODO file."^^Documentation;
-		item "Want Type::Tiny::XS 0.011."^^Update;
-	].
+	issued  2014-09-07.
 
 `Type-Tiny 1.001_001 cpan:TOBYINK`
-	issued  2014-09-19;
-	changeset [
-		dcs:versus `Type-Tiny 1.001_000 cpan:TOBYINK`;
-		item [
-			a dcs:Update;
-			label "Prefer Sub::Util over Sub::Name. (The former is smaller.)";
-		];
-		item [
-			a dcs:Change;
-			label "Lazy-load Text::Balanced in Type::Parser. (Many parses don't even need it.)";
-		];
-		item [
-			a dcs:Change;
-			label "Lazy-load Type::Tiny::Union in Type::Params.";
-		];
-	].
+	issued  2014-09-19.
 
 `Type-Tiny 1.000005 cpan:TOBYINK`
-	issued  2014-10-25;
-	changeset [
-		dcs:versus `Type-Tiny 1.000004 cpan:TOBYINK`;
-		item [
-			a dcs:Bugfix;
-			label "Fix short-circuiting optimizations for parameterized HashRef, ArrayRef, ScalarRef, and Map type constraints.";
-			dcs:thanks cpan:MARTIMM;
-			dcs:fixes RT#99312;
-		];
-		item [
-			a dcs:Tests;
-			label "Fix annoying warning message in test suite with recent versions of Exporter::Tiny.";
-		];
-	].
+	issued  2014-10-25.
 
 `Type-Tiny 1.001_002 cpan:TOBYINK`
-	issued  2014-10-25;
-	changeset [
-		dcs:versus `Type-Tiny 1.001_001 cpan:TOBYINK`;
-		item [
-			a dcs:Bugfix;
-			label "Fix short-circuiting optimizations for parameterized HashRef, ArrayRef, ScalarRef, and Map type constraints.";
-			dcs:thanks cpan:MARTIMM;
-			dcs:fixes RT#99312;
-		];
-		item [
-			a dcs:Tests;
-			label "Fix annoying warning message in test suite with recent versions of Exporter::Tiny.";
-		];
-		item [
-			a dcs:Bugfix;
-			label "Inlined version of Types::Standard::Int should check that the value is not a reference.";
-		];
-		item [
-			a dcs:Change;
-			label "Make equals/is_a_type_of/is_subtype_of/is_supertype_of in Type::Tiny::Union work more like Moose::Meta::TypeConstraint::Union.";
-		];
-	].
+	issued  2014-10-25.
 
 `Type-Tiny 1.000006 cpan:TOBYINK`
-	issued  2017-01-30;
-	changeset [
-		dcs:versus `Type-Tiny 1.000005 cpan:TOBYINK`;
-		item [
-			a dcs:Bugfix;
-			a dcs:Update;
-			a dcs:Tests;
-			label "Fix escaping within q{...} in a test case.";
-			dcs:blame cpan:ETHER;
-			dcs:fixes RT#114386;
-		];
-	].
+	issued  2017-01-30.
 
 `Type-Tiny 1.001_003 cpan:TOBYINK`
-	issued  2017-02-02;
-	changeset [
-		dcs:versus `Type-Tiny 1.001_002 cpan:TOBYINK`;
-		item [
-			a dcs:Update;
-			label "Merge fixes from stable Type-Tiny 1.000006.";
-		];
-	].
+	issued  2017-02-02.
 
 `Type-Tiny 1.001_004 cpan:TOBYINK`
-	issued  2017-02-06;
-	changeset [
-		dcs:versus `Type-Tiny 1.001_003 cpan:TOBYINK`;
-		item [
-			a dcs:Change;
-			label "Attempting ArrayRef[Int, Int] or similar now throws an exception.";
-			dcs:blame cpan:TSIBLEY;
-			dcs:fixes RT#105299;
-		];
-	].
+	issued  2017-02-06.
 
 `Type-Tiny 1.001_005 cpan:TOBYINK`
-	issued  2017-04-19;
-	changeset [
-		dcs:versus `Type-Tiny 1.001_004 cpan:TOBYINK`;
-		item [
-			a dcs:Tests;
-			label "Bundle a test case for GH issue 14.";
-			seealso <https://github.com/tobyink/p5-type-tiny/issues/14>;
-		];
-		item [
-			a dcs:Change;
-			label "Improved error location reporting for Moo";
-			seealso <https://github.com/tobyink/p5-type-tiny/pull/35>;
-			dcs:blame <urn:uuid:6c7beadd-14b0-489a-940c-57ccd2ec90df>;
-		];
-		item [
-			a dcs:Tests, dcs:Bugfix;
-			label "02-api.t should check version of Moose available.";
-			seealso <https://github.com/tobyink/p5-type-tiny/pull/20>;
-		];
-		item [
-			a dcs:Documentation, dcs:Bugfix;
-			label "Fix minor typos in documentation for Types::Standard.";
-			seealso <https://github.com/tobyink/p5-type-tiny/pull/30>;
-			dcs:blame <urn:uuid:b57923e3-29ce-4c55-b480-660e3cd2c429>;
-		];
-		item [
-			a dcs:Update;
-			label "NumericCode now coerces from strings with whitespace in them, like MooseX::Types::Common::Numeric.";
-			seealso <https://github.com/tobyink/p5-type-tiny/pull/22>;
-			dcs:blame <urn:uuid:b678e2c5-cd5a-4509-b2ea-aadc8937d16c>;
-		];
-		item [
-			a dcs:Documentation, dcs:Bugfix;
-			label "Fix variable name typo in documentation for Type::Params.";
-			seealso <https://github.com/tobyink/p5-type-tiny/pull/37>;
-			dcs:blame cpan:LSBUCHALA;
-		];
-		item [
-			a dcs:Tests, dcs:Bugfix;
-			label "20-unit/Type-Utils/warnings.t should check version of Test::Warnings.";
-			seealso <https://github.com/tobyink/p5-type-tiny/pull/21>;
-			dcs:blame <urn:uuid:aae4d20c-4388-4267-9336-f71176b27c75>;
-		];
-		item [
-			a dcs:Documentation;
-			label "Include projected release date for Type::Tiny 1.002000 in NEWS.";
-			comment "It's my birthday!";
-		];
-	].
+	issued  2017-04-19.
 
 `Type-Tiny 1.001_006 cpan:TOBYINK`
-	issued  2017-04-30;
-	changeset [
-		dcs:versus `Type-Tiny 1.001_005 cpan:TOBYINK`;
-		item [
-			a dcs:Change;
-			label "Localize $SIG{__DIE__} in Type::Registry.";
-			dcs:fixes RT#100780;
-		];
-		item [
-			a dcs:Change;
-			label "Allow Type::Tiny's `constraint` parameter to be a string of Perl code.";
-		];
-	].
+	issued  2017-04-30.
 
 `Type-Tiny 1.001_007 cpan:TOBYINK`
 	issued  2017-05-04;
-	label   "May the fourth be with you";
-	changeset [
-		dcs:versus `Type-Tiny 1.001_006 cpan:TOBYINK`;
-		item [
-			a dcs:Change;
-			label "Optimizations for Tuple and StrMatch type constraints from Types::Standard.";
-		];
-		item [
-			a dcs:Change;
-			label "Optimization of Type::Params positional parameter checking for simple cases with no slurpy parameter and no coercions.";
-		];
-		item [
-			a dcs:Addition;
-			label "Type::Params' `multisig` function now sets a variable `${^TYPE_PARAMS_MULTISIG}` to indicate which signature succeeded.";
-		];
-		item [
-			a dcs:Documentation;
-			label "Comparison of Type::Params with new(ish) CPAN module Params::ValidationCompiler.";
-		];
-		item [
-			a dcs:Documentation;
-			label "Show example of how to set defaults for parameters with Type::Params.";
-		];
-	].
+	label   "May the fourth be with you".
 
 `Type-Tiny 1.001_008 cpan:TOBYINK`
-	issued  2017-05-10;
-	changeset [
-		dcs:versus `Type-Tiny 1.001_007 cpan:TOBYINK`;
-		item [
-			a dcs:Documentation;
-			label "Rearrange the examples directory in the distribution.";
-		];
-		item [
-			a dcs:Addition;
-			label "Named parameter validation benchmarking script.";
-		];
-		item [
-			a dcs:Addition;
-			label "Reduce scope of local $SIG{__DIE__} in Type::Registry.";
-			dcs:thanks cpan:HAARG;
-		];
-		item [
-			a dcs:Bugfix;
-			label "Type::Params should make sure Type::Utils is loaded before calling english_list().";
-		];
-	].
+	issued  2017-05-10.
 
 `Type-Tiny 1.001_009 cpan:TOBYINK`
-	issued  2017-05-13;
-	changeset [
-		dcs:versus `Type-Tiny 1.001_008 cpan:TOBYINK`;
-		item [
-			a dcs:Change;
-			label "Use Ref::Util::XS (if it's installed) to speed up certain type checks.";
-		];
-		item [
-			a dcs:Change;
-			label "Rewrite some benchmarking scripts to use Benchmark::Featureset::ParamCheck.";
-		];
-	].
+	issued  2017-05-13.
 
 `Type-Tiny 1.001_010 cpan:TOBYINK`
 	issued  2017-05-16;
-	label   "Puppiversary";
-	changeset [
-		dcs:versus `Type-Tiny 1.001_009 cpan:TOBYINK`;
-		item [
-			a dcs:Tests;
-			label "t/00-begin.t will now work around ANDK's apparently broken XS testing environment.";
-		];
-	].
+	label   "Puppiversary".
 
 `Type-Tiny 1.001_011 cpan:TOBYINK`
-	issued  2017-05-17;
-	changeset [
-		dcs:versus `Type-Tiny 1.001_010 cpan:TOBYINK`;
-		item [
-			a dcs:Bugfix;
-			label "Type constraints like Tuple[Int] shouldn't report they have a coercion if Int doesn't have a coercion.";
-		];
-		item [
-			a dcs:Addition;
-			label "Types::Standard now has a CycleTuple type.";
-		];
-	].
+	issued  2017-05-17.
 
 `Type-Tiny 1.001_012 cpan:TOBYINK`
-	issued  2017-05-17;
-	changeset [
-		dcs:versus `Type-Tiny 1.001_011 cpan:TOBYINK`;
-		item [
-			a dcs:Change, dcs:BackCompat;
-			label "RegexpRef now accepts blessed objects if $object->isa('Regexp') returns true.";
-			comment "For compatibility with re::engine::RE2 and similar modules.";
-		];
-		item [
-			a dcs:Change;
-			label "StrMatch will use Regexp::Util (if available) to inline regular expressions more sensibly.";
-		];
-	].
+	issued  2017-05-17.
 
 `Type-Tiny 1.001_013 cpan:TOBYINK`
 	issued  2017-05-18;
-	label   "Kittiversary";
-	changeset [
-		dcs:versus `Type-Tiny 1.001_012 cpan:TOBYINK`;
-		item [
-			a dcs:Bugfix;
-			label "StrMatch changes in previous release broke the ability to check type equality between two parameterized StrMatch types under some circumstances. Changed how the hash key for stashing regexp references gets built — is now closer to the old way. This doesn't revert the change in 1.001_012 where regexp checks can be inlined better, but only applies to those regexp references that can't easily be inlined.";
-		];
-		item [
-			a dcs:Bugfix;
-			label "Fixed crazy amount of UTF-8 warnings from Type::Params on Perl 5.6.x and Perl 5.8.x.";
-			seealso <https://github.com/tobyink/p5-type-tiny/pull/16>;
-			dcs:thanks <urn:uuid:a96145d2-d9bc-4d1b-a278-be17c831edfd>;
-			dcs:fixes RT#101582;
-		];
-	].
+	label   "Kittiversary".
 
 `Type-Tiny 1.001_014 cpan:TOBYINK`
-	issued  2017-05-19;
-	changeset [
-		dcs:versus `Type-Tiny 1.001_013 cpan:TOBYINK`;
-		item [
-			a dcs:Change;
-			label "Include trailing line break at the end of stringified version of some exceptions.";
-			dcs:thanks <urn:uuid:6c7beadd-14b0-489a-940c-57ccd2ec90df>;
-		];
-	].
+	issued  2017-05-19.
 
 `Type-Tiny 1.001_015 cpan:TOBYINK`
-	issued  2017-05-20;
-	changeset [
-		dcs:versus `Type-Tiny 1.001_014 cpan:TOBYINK`;
-		item [
-			a dcs:Bugfix;
-			label "Fix HashRef[Str]|Undef|Str parsing on Perl < 5.14.";
-			dcs:thanks cpan:HAARG, cpan:BLUEFEET;
-			dcs:fixes RT#121764;
-		];
-	].
+	issued  2017-05-20.
 
 `Type-Tiny 1.001_016 cpan:TOBYINK`
-	issued  2017-05-30;
-	changeset [
-		dcs:versus `Type-Tiny 1.001_015 cpan:TOBYINK`;
-		item [
-			a dcs:Documentation;
-			label "Include page-numbers.pl example";
-		];
-	].
+	issued  2017-05-30.
 
 `Type-Tiny 1.002000 cpan:TOBYINK`
-	issued  2017-06-01;
-	changeset [
-		dcs:versus `Type-Tiny 1.001_016 cpan:TOBYINK`;
-		item [
-			a dcs:Packaging;
-			label "Stable version number.";
-		];
-	].
+	issued  2017-06-01.
 
 `Type-Tiny 1.002001 cpan:TOBYINK`
-	issued  2017-06-08;
-	changeset [
-		dcs:versus `Type-Tiny 1.002000 cpan:TOBYINK`;
-		item [
-			a dcs:Packaging;
-			label "Ref::Util::XS 0.100 should be recommended, not 0.200 (which doesn't exist yet).";
-			dcs:fixes RT#121981;
-		];
-		item [
-			a dcs:Tests;
-			label "Skip t/30-integration/Moose/native-attribute-traits.t on older Moose because Test::Moose is broken.";
-		];
-	].
+	issued  2017-06-08.
 
 `Type-Tiny 1.003_000 cpan:TOBYINK`
-	issued  2018-05-20;
-	changeset [
-		dcs:versus `Type-Tiny 1.002000 cpan:TOBYINK`;
-		# ported from stable branch
-		item [
-			a dcs:Packaging;
-			label "Ref::Util::XS 0.100 should be recommended, not 0.200 (which doesn't exist yet).";
-			dcs:fixes RT#121981;
-		];
-		item [
-			a dcs:Tests;
-			label "Skip t/30-integration/Moose/native-attribute-traits.t on older Moose because Test::Moose is broken.";
-		];
-		item [
-			a dcs:Bugfix;
-			label "Compatibility with constants and with CV-in-stash optimisation.";
-			dcs:fixes RT#123408;
-		];
-		# new to dev branch
-		item [
-			a dcs:Addition;
-			label "Type::Params now exports a compile_named_oo function which returns a parameters object.";
-		];
-		item [
-			a dcs:Documentation;
-			label "Improvements to Type::Params documentation.";
-		];
-		item [
-			a dcs:Addition;
-			label "Type::Params now supports parameter defaults.";
-		];
-		item [
-			a dcs:Addition;
-			label "Type::Params compile_named now supports bless/class/constructor options.";
-		];
-		item [
-			a dcs:Change;
-			label "Don't use Type::Tiny::XS's implementation of PositiveInt in Types::Common::Numeric unless Type::Tiny::XS >= 0.013.";
-		];
-		item [
-			a dcs:Documentation;
-			label "Document Type::Library's :coercion export tag.";
-			dcs:blame cpan:DJERIUS;
-		];
-		item [
-			a dcs:Addition;
-			label "Allow Type::Coercion's add_type_coercion to accept a Type::Coercion object, which was already documented as working.";
-			dcs:blame cpan:DJERIUS;
-		];
-		item [
-			a dcs:Documentation;
-			label "Fix typo.";
-			dcs:blame cpan:BOOK;
-		];
-		item [
-			a dcs:Documentation;
-			label "Add a new CONTRIBUTING.pod file.";
-		];
-	].
+	issued  2018-05-20.
 
 `Type-Tiny 1.003_001 cpan:TOBYINK`
-	issued  2018-05-22;
-	changeset [
-		dcs:versus `Type-Tiny 1.003_000 cpan:TOBYINK`;
-		item [
-			a dcs:Change;
-			label "Don't use Type::Tiny::XS's implementation of Bool in Types::Standard unless Type::Tiny::XS >= 0.014.";
-		];
-		item [
-			a dcs:Change;
-			label "Looser definition of FileHandle in Types::Standard.";
-			dcs:fixes RT#121762;
-		];
-		item [
-			a dcs:Tests;
-			label "Tests for coercions to CycleTuple from Types::Standard with non-inlineable type constraints.";
-		];
-	].
+	issued  2018-05-22.
 
 `Type-Tiny 1.003_002 cpan:TOBYINK`
-	issued  2018-05-28;
-	changeset [
-		dcs:versus `Type-Tiny 1.003_001 cpan:TOBYINK`;
-		item [
-			a dcs:Addition;
-			label "Types::Common::Numeric now has NumRange and IntRange types.";
-		];
-		item [
-			a dcs:Addition;
-			label "Types::Common::String now has a StrLength type.";
-		];
-	].
+	issued  2018-05-28.
 
 
 `Type-Tiny 1.003_003 cpan:TOBYINK`
-	issued  2018-06-10;
-	changeset [
-		dcs:versus `Type-Tiny 1.003_002 cpan:TOBYINK`;
-		item [
-			a dcs:Change, dcs:BackCompat;
-			label "Bool (Types::Standard) is stricter, no longer allowing blessed objects that overload stringification because that's weird.";
-		];
-		item [
-			a dcs:Addition;
-			label "Bool now allows coercion from Any.";
-		];
-	].
+	issued  2018-06-10.
 
 `Type-Tiny 1.003_004 cpan:TOBYINK`
-	issued  2018-06-12;
-	changeset [
-		dcs:versus `Type-Tiny 1.003_003 cpan:TOBYINK`;
-		item [
-			a dcs:Bugfix, dcs:Tests;
-			label "Load modules with `use` instead of `require` in 00-begin.t.";
-			dcs:fixes RT#124067;
-			dcs:thanks cpan:SREZIC, cpan:ANDK;
-		];
-	].
+	issued  2018-06-12.
 
 `Type-Tiny 1.003_005 cpan:TOBYINK`
-	issued  2018-07-05;
-	changeset [
-		dcs:versus `Type-Tiny 1.003_004 cpan:TOBYINK`;
-		item [
-			a dcs:Addition;
-			label "Allow type libraries to mark certain type constraints as deprecated.";
-			dcs:fixes RT#124728;
-		];
-		item [
-			a dcs:Documentation;
-			label "Type::Tiny::Manual::Coercions improvements.";
-			dcs:fixes RT#122305;
-		];
-	].
+	issued  2018-07-05.
 
 `Type-Tiny 1.003_006 cpan:TOBYINK`
-	issued  2018-07-08;
-	changeset [
-		dcs:versus `Type-Tiny 1.003_005 cpan:TOBYINK`;
-		item [
-			a dcs:Tests;
-			label "Improve coverage.";
-		];
-		item [
-			a dcs:Addition;
-			label "Type::Params compile/compile_named now have subname and description options.";
-		];
-		item [
-			a dcs:Documentation;
-			label "Type::Params caller_level option is now documented.";
-		];
-		item [
-			a dcs:Bugfix;
-			label "Workaround for Regexp-based check for Int clobbering $1 sometimes (this will sometimes slow down Int checks a little, but is needed for correctness).";
-			dcs:fixes RT#125132;
-		];
-		item [
-			a dcs:Bugfix;
-			label "Fix issues with arrayref and hashref defaults in Type::Params.";
-		];
-		item [
-			a dcs:Addition;
-			label "PERL_TYPE_PARAMS_XS environment variable.";
-		];
-		item [
-			a dcs:Documentation;
-			label "Better documentation of environment variables.";
-		];
-	].
+	issued  2018-07-08.
 
 `Type-Tiny 1.003_007 cpan:TOBYINK`
-	issued  2018-07-12;
-	changeset [
-		dcs:versus `Type-Tiny 1.003_006 cpan:TOBYINK`;
-		item [
-			a dcs:Tests;
-			label "Improve coverage.";
-		];
-		item [
-			a dcs:Tests;
-			label "Add tests for deep coercions in Tuples.";
-		];
-		item [
-			a dcs:Tests;
-			label "Restructure Types::TypeTiny test cases so more of them run when Moose and Mouse aren't available.";
-		];
-		item [
-			a dcs:Change;
-			label "Improve progressive exporter in Types::TypeTiny to avoid loading Exporter::TypeTiny more often.";
-		];
-		item [
-			a dcs:Change;
-			label "Types::Standard does better at checking the parameters of parameterized types are valid.";
-		];
-		item [
-			a dcs:Tests;
-			label "Better tests for Eval::TypeTiny's implementations of alias=>1.";
-		];
-		item [
-			a dcs:Update;
-			label "Eval::TypeTiny now supports Perl 5.22 refaliasing as the preferred implementation of alias => 1.";
-		];
-		item [
-			a dcs:Addition;
-			label "Eval::TypeTiny now supports PadWalker as a fallback implementation of alias => 1.";
-		];
-		item [
-			a dcs:Change;
-			label "Eval::TypeTiny will now throw errors when it detects a mismatch between sigils and reference types in the environment hashref but only if EXTENDED_TESTING environment variable is true. Perl will probably give you its own error message for this later on anyway.";
-		];
-		item [
-			a dcs:Removal;
-			label "Eval::TypeTiny::HAS_LEXICAL_VARS constant is no longer documented and will be removed at a later date.";
-		];
-		item [
-			a dcs:Addition;
-			label "Eval::TypeTiny provides a collection of constants to indicate the current implementation of alias => 1.";
-		];
-	].
+	issued  2018-07-12.
 
 `Type-Tiny 1.003_008 cpan:TOBYINK`
-	issued  2018-07-16;
-	changeset [
-		dcs:versus `Type-Tiny 1.003_007 cpan:TOBYINK`;
-		item [
-			a dcs:Tests;
-			label "Improve test coverage.";
-		];
-		item [
-			a dcs:Update, dcs:Regression;
-			label "Make Error::TypeTiny aware of some newer internal modules.";
-		];
-		item [
-			label "Improve processing of parameters to Types::Standard's parameterized type constraints";
-		];
-		item [
-			a dcs:Change;
-			label "Types::Common::Numeric's IntRange and NumRange do better checking of parameters.";
-		];
-		item [
-			a dcs:Change;
-			label "Types::Common::String's StrLength does better checking of parameters.";
-		];
-		item [
-			a dcs:Tests;
-			label "Test Type::Utils' match_on_type's support for wantarray on strings of code.";
-		];
-		item [
-			a dcs:Change;
-			label "Simplify how Type::Registry generates the `t()` function.";
-		];
-		item [
-			a dcs:Change;
-			label "Split out some code from Types::Standard into autoloaded modules to speed up loading.";
-		];
-		item [
-			a dcs:Bugfix;
-			label "Fix error messages generating deep explanations of some parameterized types.";
-			dcs:fixes RT#125765;
-			dcs:thanks <urn:uuid:febe859c-fa5c-4abd-8c6c-464643c79e4e>;
-		];
-	].
+	issued  2018-07-16.
 
 `Type-Tiny 1.003_009 cpan:TOBYINK`
-	issued  2018-07-24;
-	changeset [
-		dcs:versus `Type-Tiny 1.003_008 cpan:TOBYINK`;
-		item [
-			a dcs:Tests;
-			label "Improve testing of Test::TypeTiny itself; the matchfor() function in particular.";
-		];
-		item [
-			a dcs:Tests;
-			label "Test bad parameters to NumRange and IntRange.";
-		];
-		item [
-			a dcs:Tests;
-			label "Test late loading of Sub::Quote.";
-		];
-		item [
-			a dcs:Documentation;
-			label "Better documentation of parameterization API.";
-		];
-		item [
-			a dcs:Change;
-			label "Types::Standard::Defined->complementary_type will now return Types::Standard::Undef, and vice versa.";
-		];
-	].
+	issued  2018-07-24.
 
 `Type-Tiny 1.003_010 cpan:TOBYINK`
-	issued  2018-07-25;
-	changeset [
-		dcs:versus `Type-Tiny 1.003_009 cpan:TOBYINK`;
-		item [
-			a dcs:Tests;
-			label "Improve test coverage for Type::Utils, Type::Coercion, Types::Standard::Tuple, Eval::TypeTiny, Type::Registry, Type::Tiny::Class, and Types::Standard::Tied.";
-		];
-	].
+	issued  2018-07-25.
 
 `Type-Tiny 1.004000 cpan:TOBYINK`
-	issued  2018-07-27;
-	changeset [
-		dcs:versus `Type-Tiny 1.003_010 cpan:TOBYINK`;
-		item [
-			a dcs:Packaging;
-			label "Repackage as a stable release. No functional changes since 1.003_010.";
-		];
-		item [
-			a dcs:Documentation;
-			label "Update TODO.";
-		];
-		item [
-			a dcs:Documentation;
-			label "Update NEWS.";
-		];
-	].
+	issued  2018-07-27.
 
 `Type-Tiny 1.004001 cpan:TOBYINK`
-	issued  2018-07-28;
-	changeset [
-		dcs:versus `Type-Tiny 1.004000 cpan:TOBYINK`;
-		item [
-			a dcs:Bugfix;
-			label "Add Eval::TypeTiny::Sandbox to the list of packages which should be skipped as internal by Error::TypeTiny, as it was mistakenly removed in 1.003_008.";
-			dcs:fixes RT#125942;
-		];
-		item [
-			a dcs:Documentation;
-			label "Correct release date of 1.004000 in change log.";
-		];
-	].
+	issued  2018-07-28.
 
 `Type-Tiny 1.004002 cpan:TOBYINK`
-	issued  2018-07-29;
-	changeset [
-		dcs:versus `Type-Tiny 1.004001 cpan:TOBYINK`;
-		item [
-			a dcs:Bugfix, dcs:Tests;
-			label "Skip one particular test on old versions of Moo because it relies on a feature introduced in Moo 1.004000.";
-			dcs:fixes RT#125948;
-		];
-	].
+	issued  2018-07-29.
 
 `Type-Tiny 1.004003 cpan:TOBYINK`
-	issued  2019-01-08;
-	changeset [
-		dcs:versus `Type-Tiny 1.004002 cpan:TOBYINK`;
-		item [
-			a dcs:Bugfix;
-			label "Fix spelling in error message for Types::Common::String LowerCaseSimpleStr.";
-			dcs:blame cpan:RRWO;
-			seealso <https://github.com/tobyink/p5-type-tiny/pull/47>
-		];
-		item [
-			a dcs:Documentation;
-			label "Fix Types::Standard documentation error: incorrect third-party module name.";
-			dcs:blame <urn:uuid:c89062f8-6fb7-425e-a0ee-3dd3a46127cf>;
-			seealso <https://github.com/tobyink/p5-type-tiny/pull/46>
-		];
-		item [
-			a dcs:Documentation;
-			label "Fix Type::Params documentation error.";
-			dcs:blame <urn:uuid:c89062f8-6fb7-425e-a0ee-3dd3a46127cf>;
-			seealso <https://github.com/tobyink/p5-type-tiny/pull/45>
-		];
-	].
+	issued  2019-01-08.
 
 `Type-Tiny 1.004004 cpan:TOBYINK`
-	issued  2019-01-08;
-	changeset [
-		dcs:versus `Type-Tiny 1.004003 cpan:TOBYINK`;
-		item [
-			a dcs:Bugfix, dcs:Packaging;
-			label "Depend on Exporter::Tiny 0.040; older versions don't provide all the functions Type::Library needs.";
-		];
-	].
+	issued  2019-01-08.
 
 `Type-Tiny 1.005_000 cpan:TOBYINK`
-	issued  2019-01-20;
-	changeset [
-		dcs:versus `Type-Tiny 1.004002 cpan:TOBYINK`;
-		# ported from stable branch
-		item [
-			a dcs:Bugfix;
-			label "Fix spelling in error message for Types::Common::String LowerCaseSimpleStr.";
-			dcs:blame cpan:RRWO;
-			seealso <https://github.com/tobyink/p5-type-tiny/pull/47>;
-		];
-		item [
-			a dcs:Documentation;
-			label "Fix Types::Standard documentation error: incorrect third-party module name.";
-			dcs:blame <urn:uuid:c89062f8-6fb7-425e-a0ee-3dd3a46127cf>;
-			seealso <https://github.com/tobyink/p5-type-tiny/pull/46>;
-		];
-		item [
-			a dcs:Documentation;
-			label "Fix Type::Params documentation error.";
-			dcs:blame <urn:uuid:c89062f8-6fb7-425e-a0ee-3dd3a46127cf>;
-			seealso <https://github.com/tobyink/p5-type-tiny/pull/45>;
-		];
-		# new development
-		item [
-			a dcs:Documentation;
-			label "Minor correction to POD header for Type::Params";
-			seealso <https://github.com/tobyink/p5-type-tiny/pull/43>;
-			dcs:blame cpan:JONASBN;
-		];
-		item [
-			a dcs:Addition;
-			label "Types::Standard ArrayRef parameterized type can now take a second parameter, the minimum array length.";
-		];
-		item [
-			label "Tidy up Type::Tiny namespace a little by fully-referencing some functions instead of importing them.";
-		];
-		item [
-			a dcs:Packaging;
-			label "Bump minimum required version of Exporter::Tiny to 1.000000.";
-		];
-		item [
-			label "Eval::TypeTiny's API is now considered to be stable.";
-		];
-		item [
-			label "Tweaks to Type::Tiny and Type::Coercion to avoid unnecessarily loading overload.pm and overloading.pm.";
-		];
-		item [
-			a dcs:Addition;
-			label "Type::Params multisig function now supports custom error messages.";
-			dcs:blame <urn:uuid:580d3dfe-fe45-42ef-9f58-1310ffee7004>;
-			seealso <https://github.com/tobyink/p5-type-tiny/pull/44>;
-		];
-		item [
-			label "Types::TypeTiny::TypeTiny->has_coercion is now true.";
-		];
-		item [
-			label "Type::Params signatures with slurpy hashrefs now allow true hashrefs to be passed to them.";
-		];
-		item [
-			label "Better implementation of is_subtype_of/is_supertype_of and related functions.";
-		];
-	].
+	issued  2019-01-20.
 
 `Type-Tiny 1.005_001 cpan:TOBYINK`
-	issued  2019-01-23;
-	changeset [
-		dcs:versus `Type-Tiny 1.005_000 cpan:TOBYINK`;
-		item [
-			a dcs:Addition;
-			label "Type::Library now supports `of` and `where` options when importing type constraints.";
-		];
-	].
+	issued  2019-01-23.
 
 `Type-Tiny 1.005_002 cpan:TOBYINK`
-	issued  2019-01-29;
-	changeset [
-		dcs:versus `Type-Tiny 1.005_001 cpan:TOBYINK`;
-		item [
-			a dcs:Addition;
-			label "Type::Params named_to_list feature.";
-			seealso <https://rt.cpan.org/Ticket/Display.html?id=128337>;
-		];
-	].
+	issued  2019-01-29.
 
 `Type-Tiny 1.005_003 cpan:TOBYINK`
-	issued  2019-02-26;
-	changeset [
-		dcs:versus `Type-Tiny 1.005_002 cpan:TOBYINK`;
-		item [
-			a dcs:Tests;
-			label "Improve test coverage.";
-		];
-		item [
-			label "Fix Types::Standard's LazyLoad implementation.";
-		];
-	].
+	issued  2019-02-26.
 
 `Type-Tiny 1.005_004 cpan:TOBYINK`
-	issued  2019-11-11;
-	changeset [
-		dcs:versus `Type-Tiny 1.005_003 cpan:TOBYINK`;
-		item [
-			label "Eliminate memory cycles created by coderef overloading in Type::Tiny and Type::Coercion.";
-			dcs:fixes RT#130823;
-			dcs:thanks <urn:uuid:6d23dbc6-4302-4a97-a47c-b44252549040>;
-		];
-		item [
-			a dcs:Addition;
-			label "Type::Tiny::Enum now has a `unique_values` method.";
-			seealso <https://rt.cpan.org/Ticket/Display.html?id=129650>;
-		];
-		item [
-			label "The `values` attribute of Type::Tiny::Enum now preserves order.";
-			dcs:fixes RT#129650;
-			dcs:thanks cpan:SCHROEER;
-		];
-		item [
-			a dcs:Documentation;
-			label "Types::Standard documentation fix.";
-			dcs:blame cpan:LSBUCHALA;
-			seealso <https://github.com/tobyink/p5-type-tiny/pull/48>;
-		];
-		item [
-			seealso <https://rt.cpan.org/Ticket/Display.html?id=130411>;
-			label "Don't use Int from Type::Tiny::XS unless version 0.016 is available.";
-		];
-	].
+	issued  2019-11-11.
 
 `Type-Tiny 1.006000 cpan:TOBYINK`
-	issued  2019-11-12;
-	changeset [
-		dcs:versus `Type-Tiny 1.004004 cpan:TOBYINK`;
-		item [
-			a dcs:Documentation;
-			label "Minor correction to POD header for Type::Params";
-			seealso <https://github.com/tobyink/p5-type-tiny/pull/43>;
-			dcs:blame cpan:JONASBN;
-		];
-		item [
-			a dcs:Addition;
-			label "Types::Standard ArrayRef parameterized type can now take a second parameter, the minimum array length.";
-		];
-		item [
-			label "Tidy up Type::Tiny namespace a little by fully-referencing some functions instead of importing them.";
-		];
-		item [
-			a dcs:Packaging;
-			label "Bump minimum required version of Exporter::Tiny to 1.000000.";
-		];
-		item [
-			label "Eval::TypeTiny's API is now considered to be stable.";
-		];
-		item [
-			label "Tweaks to Type::Tiny and Type::Coercion to avoid unnecessarily loading overload.pm and overloading.pm.";
-		];
-		item [
-			a dcs:Addition;
-			label "Type::Params multisig function now supports custom error messages.";
-			dcs:blame <urn:uuid:580d3dfe-fe45-42ef-9f58-1310ffee7004>;
-			seealso <https://github.com/tobyink/p5-type-tiny/pull/44>;
-		];
-		item [
-			label "Types::TypeTiny::TypeTiny->has_coercion is now true.";
-		];
-		item [
-			a dcs:Addition;
-			label "Type::Params signatures with slurpy hashrefs now allow true hashrefs to be passed to them.";
-		];
-		item [
-			label "Better implementation of is_subtype_of/is_supertype_of and related functions.";
-		];
-		item [
-			a dcs:Addition;
-			label "Type::Library now supports `of` and `where` options when importing type constraints.";
-		];
-		item [
-			a dcs:Addition;
-			label "Type::Params named_to_list feature.";
-			seealso <https://rt.cpan.org/Ticket/Display.html?id=128337>;
-		];
-		item [
-			a dcs:Tests;
-			label "Improve test coverage.";
-		];
-		item [
-			label "Fix Types::Standard's LazyLoad implementation.";
-		];
-		item [
-			label "Eliminate memory cycles created by coderef overloading in Type::Tiny and Type::Coercion.";
-			dcs:fixes RT#130823;
-			dcs:thanks <urn:uuid:6d23dbc6-4302-4a97-a47c-b44252549040>;
-		];
-		item [
-			a dcs:Addition;
-			label "Type::Tiny::Enum now has a `unique_values` method.";
-			seealso <https://rt.cpan.org/Ticket/Display.html?id=129650>;
-		];
-		item [
-			label "The `values` attribute of Type::Tiny::Enum now preserves order.";
-			dcs:fixes RT#129650;
-			dcs:thanks cpan:SCHROEER;
-		];
-		item [
-			a dcs:Documentation;
-			label "Types::Standard documentation fix.";
-			dcs:blame cpan:LSBUCHALA;
-			seealso <https://github.com/tobyink/p5-type-tiny/pull/48>;
-		];
-		item [
-			seealso <https://rt.cpan.org/Ticket/Display.html?id=130411>;
-			label "Don't use Int from Type::Tiny::XS unless version 0.016 is available.";
-		];
-		item [
-			a dcs:Packaging;
-			label "Type::Tiny::XS 0.016 is recommended.";
-		];
-		item [
-			a dcs:Documentation;
-			label "Links to Type::Tiny on GitHub/Travis/AppVeyor/Coveralls in Type::Tiny pod.";
-		];
-	].
+	issued  2019-11-12.
 
 `Type-Tiny 1.007_000 cpan:TOBYINK`
-	issued  2019-11-17;
-	changeset [
-		dcs:versus `Type-Tiny 1.006000 cpan:TOBYINK`;
-		item [
-			a dcs:Tests;
-			label "Bundle some tests for Types::ReadOnly because it does interesting stuff with coercions and parameterizable types.";
-		];
-		item [
-			a dcs:Bugfix;
-			dcs:fixes RT#102748;
-			label "When extending a MooseX::Types library, be more careful checking to see if types have coercions, because a Moose::Meta::TypeCoercion object may be an empty list of coercions.";
-		];
-		item [
-			a dcs:Tests;
-			label "More tests for extending MooseX::Types libraries.";
-		];
-		item [
-			a dcs:Addition;
-			label "When Types::TypesTiny::to_TypeTiny converts a Moose/Mouse type to a Type::Tiny type, the returned type will now be parameterizable if they original type was parameterizable.";
-		];
-		item [
-			a dcs:Addition;
-			label "When importing type constraints from non-Moose/non-Mouse blessed type constraint systems (Specio, Types::Nano, others?), support inlining.";
-		];
-		item [
-			a dcs:Addition;
-			label "Type::Tiny::ConstrainedObject exists as a superclass for Type::Tiny::Class, Type::Tiny::Role, and Type::Tiny::Duck.";
-		];
-		item [
-			a dcs:Addition;
-			label "Many type constraints now support `stringifies_to`, `numifies_to`, and `with_attribute_values` methods. Type::Tiny 1.006000 accidentally included an undocumented early implementation of these with some differences.";
-		];
-		item [
-			a dcs:Tests;
-			label "Add a test that Specio type constraints can be converted to Type::Tiny types, and inlining works.";
-		];
-		item [
-			a dcs:Bugfix;
-			dcs:fixes RT#121763;
-			label "Type::Params will now keep a reference to all type constraints passed to it; this may use more memory in some cases, but will improve exceptions thrown.";
-		];
-		item [
-			a dcs:Tests;
-			label "Bundle test from RT#104154, which turned out to not be a bug.";
-			seealso <https://rt.cpan.org/Ticket/Display.html?id=104154>;			
-		];
-		item [
-			label "Smarter caching and reuse of parameterized types.";
-		];
-		item [
-			a dcs:Bugfix, dcs:Packaging;
-			dcs:fixes RT#125839;
-			label "Strip underscores in version numbers for dev releases.";
-		];
-		item [
-			a dcs:Addition;
-			label "Provide a control over whether types are allowed to make callbacks in inlined code.";
-		];
-		item [
-			a dcs:Bugfix;
-			dcs:fixes RT#129729;
-			label "Type::Tiny::Enum will now avoid triggering a Type::Tiny::XS bug involving hyphens in strings.";
-		];
-		item [
-			a dcs:Bugfix;
-			dcs:fixes RT#114915;
-			label "Type::Tiny better mimics the Moose::Meta::TypeConstraint::Parameterized API, adding `parameterized_from` and `has_parameterized_from` methods.";
-		];
-		item [
-			a dcs:Packaging, dcs:Removal;
-			label "Dropped the TODO file from the repo and distribution because it was mostly out of date. Use RT instead.";
-		];
-	].
+	issued  2019-11-17.
 
 `Type-Tiny 1.007_001 cpan:TOBYINK`
-	issued  2019-11-23;
-	changeset [
-		dcs:versus `Type-Tiny 1.007_000 cpan:TOBYINK`;
-		item [
-			a dcs:Documentation;
-			label "Complete rewrite of the Type::Tiny manual.";
-		];
-		item [
-			a dcs:Tests, dcs:Documentation, dcs:Addition;
-			label "Add a huge amount of tests for the built-in type constraints, intended as documentation as well as tests.";
-		];
-		item [
-			a dcs:Addition;
-			label "The `extends` function is now able to extend Specio::Exporter libraries.";
-		];
-		item [
-			a dcs:Addition;
-			label "Type::Params now has `wrap_subs` and `wrap_methods` functions.";
-		];
-		item [
-			a dcs:Bugfix;
-			label "The `Tied` type no longer assumes that any reference which isn't a HASH or ARRAY must be a SCALAR.";
-		];
-		item [
-			a dcs:Bugfix;
-			label "Fix the 'my variable $base masks earlier declaration' warning caused by IntRange/NumRange.";
-		];
-		item [
-			a dcs:Bugfix;
-			label "ClassName/RoleName no longer accepts a glob.";
-		];
-		item [
-			label "Returning a list of strings from an inlining coderef is now officially supported and no longer experimental.";
-		];
-		item [
-			label "Type::Tiny::XS integration is now officially supported and no longer experimental.";
-		];
-	].
+	issued  2019-11-23.
 
 `Type-Tiny 1.007_002 cpan:TOBYINK`
-	issued  2019-11-26;
-	changeset [
-		dcs:versus `Type-Tiny 1.007_001 cpan:TOBYINK`;
-		item [
-			a dcs:Documentation;
-			label "More work on the Type::Tiny manual.";
-		];
-		item [
-			a dcs:Tests, dcs:Documentation;
-			label "Expand per-type tests of bundled type libraries.";
-		];
-		item [
-			label "Control over whether types are allowed to make callbacks in inlined code is now via a package variable instead of an environment variable and can be toggled at runtime.";
-		];
-		item [
-			a dcs:Documentation;
-			label "Move CONTRIBUTING.pod into the manual.";
-		];
-		item [
-			a dcs:Change;
-			label "(~Types::Standard::Any)->name is now 'None'";
-		];
-		item [
-			a dcs:Documentation;
-			label "Fix various documentation typos.";
-		];
-		item [
-			a dcs:Documentation;
-			label "Improve Type::Tiny SYNOPSIS.";
-		];
-		item [
-			a dcs:Documentation;
-			label "Improve Type::Params SYNOPSIS.";
-		];
-		item [
-			a dcs:Documentation;
-			label "Types::Standard now has a SYNOPSIS.";
-		];
-	].
+	issued  2019-11-26.
 
 `Type-Tiny 1.007_003 cpan:TOBYINK`
-	issued  2019-11-27;
-	changeset [
-		dcs:versus `Type-Tiny 1.007_002 cpan:TOBYINK`;
-		item [
-			a dcs:Documentation;
-			label "More work on the Type::Tiny manual.";
-			dcs:thanks [ foaf:nick "jplindstrom"; foaf:page <https://www.reddit.com/user/jplindstrom/> ];
-		];
-		item [
-			a dcs:Tests, dcs:Documentation;
-			label "Expand per-type tests of bundled type libraries.";
-		]
-	].
+	issued  2019-11-27.
 
 `Type-Tiny 1.007_004 cpan:TOBYINK`
-	issued  2019-11-30;
-	changeset [
-		dcs:versus `Type-Tiny 1.007_003 cpan:TOBYINK`;
-		item [
-			label "Improvements to $AvoidCallbacks support for Types::Standard::Maybe.";
-		];
-		item [
-			a dcs:Bugfix;
-			label "Fixes for some edge cases in the overidden `can` method on old Perl 5.8.x versions for types with the secret `is_object` parameter set to true. (There were problems in 5.8.1 but 5.8.9 was okay; not sure the exact version where the delta was that affected it. Either way, fixed now.)";
-		];
-		item [
-			a dcs:Tests;
-			label "Clean up some warnings and stuff from test output.";
-		];
-		item [
-			a dcs:Tests, dcs:Documentation;
-			label "Expand per-type tests of bundled type libraries.";
-		]
-	].
+	issued  2019-11-30.
 
 `Type-Tiny 1.007_005 cpan:TOBYINK`
-	issued  2019-12-01;
-	changeset [
-		dcs:versus `Type-Tiny 1.007_004 cpan:TOBYINK`;
-		item [
-			a dcs:Bugfix;
-			label "Fixes for inlining Tuples which have a combination of Optional and slurpy slots.";
-		];
-		item [
-			label "Improvements to deep coercions for Tuples.";
-		];
-		item [
-			a dcs:Tests, dcs:Documentation;
-			label "Expand per-type tests of bundled type libraries.";
-		]
-	].
+	issued  2019-12-01.
 
 `Type-Tiny 1.007_006 cpan:TOBYINK`
-	issued  2019-12-02;
-	changeset [
-		dcs:versus `Type-Tiny 1.007_005 cpan:TOBYINK`;
-		item [
-			a dcs:Tests, dcs:Documentation;
-			label "Expand per-type tests of bundled type libraries.";
-		]
-	].
+	issued  2019-12-02.
 
 `Type-Tiny 1.007_007 cpan:TOBYINK`
-	issued  2019-12-03;
-	changeset [
-		dcs:versus `Type-Tiny 1.007_006 cpan:TOBYINK`;
-		item [
-			a dcs:Documentation;
-			label "More work on the Type::Tiny manual.";
-		];
-		item [
-			a dcs:Tests, dcs:Documentation;
-			label "Expand per-type tests of bundled type libraries.";
-		]
-	].
+	issued  2019-12-03.
 
 `Type-Tiny 1.007_008 cpan:TOBYINK`
-	issued  2019-12-05;
-	changeset [
-		dcs:versus `Type-Tiny 1.007_007 cpan:TOBYINK`;
-		item [
-			a dcs:Documentation;
-			label "More work on the Type::Tiny manual.";
-		];
-		item [
-			a dcs:Tests, dcs:Documentation;
-			label "Expand per-type tests of bundled type libraries.";
-		]
-	].
+	issued  2019-12-05.
 
 `Type-Tiny 1.007_009 cpan:TOBYINK`
-	issued  2019-12-06;
-	changeset [
-		dcs:versus `Type-Tiny 1.007_008 cpan:TOBYINK`;
-		item [
-			label "Type::Tiny's inline_assert method has been overhauled.";
-		];
-		item [
-			label "Obscure changes to Error::TypeTiny::Assertion.";
-		];
-		item [
-			a dcs:Tests, dcs:Documentation;
-			label "Document some undocumented files in the test suite.";
-		]
-	].
+	issued  2019-12-06.
 
 `Type-Tiny 1.007_010 cpan:TOBYINK`
-	issued  2019-12-08;
-	changeset [
-		dcs:versus `Type-Tiny 1.007_009 cpan:TOBYINK`;
-		item [
-			a dcs:Bugfix;
-			label "Avoid undef warnings from Type::Tiny::_failed_check when the type has become undefined before the error message can be generated.";
-		];
-		item [
-			a dcs:Tests;
-			label "Minor improvements to the test suite.";
-		]
-	].
+	issued  2019-12-08.
 
 `Type-Tiny 1.007_011 cpan:TOBYINK`
-	issued  2019-12-09;
-	changeset [
-		dcs:versus `Type-Tiny 1.007_010 cpan:TOBYINK`;
-		item [
-			a dcs:Documentation;
-			label "Rewrite Type::Tiny::Manual::Coercions.";
-		];
-		item [
-			a dcs:Documentation;
-			label "Make the Moo parts of the manual use less Moo-specific syntax, so it is more applicable to Moose and Mouse.";
-		]
-	].
+	issued  2019-12-09.
 
 `Type-Tiny 1.007_012 cpan:TOBYINK`
-	issued  2019-12-10;
-	changeset [
-		dcs:versus `Type-Tiny 1.007_011 cpan:TOBYINK`;
-		item [
-			a dcs:Documentation;
-			label "Minor tweaks to Type::Tiny::Manual.";
-		];
-		item [
-			a dcs:Bugfix;
-			label "Fix tr/// stuff on $Type::Tiny::VERSION.";
-		];
-		item [
-			a dcs:Update;
-			label "Type::Tiny will stop trying to use very old versions of Type::Tiny::XS. (It already recommended newer versions in META.json.)";
-		];
-		item [
-			a dcs:Packaging;
-			label "Metadata updates.";
-		]
-	].
+	issued  2019-12-10.
 
 `Type-Tiny 1.007_013 cpan:TOBYINK`
-	issued  2019-12-10;
-	changeset [
-		dcs:versus `Type-Tiny 1.007_012 cpan:TOBYINK`;
-		item [
-			a dcs:Documentation;
-			label "Add links to homepage in pod.";
-		];
-		item [
-			a dcs:Packaging;
-			label "Rebuild with newer RDF::DOAP.";
-		]
-	].
+	issued  2019-12-10.
 
 `Type-Tiny 1.007_014 cpan:TOBYINK`
-	issued  2019-12-10;
-	changeset [
-		dcs:versus `Type-Tiny 1.007_013 cpan:TOBYINK`;
-		item [
-			a dcs:Documentation;
-			label "Mostly formatting changes.";
-		]
-	].
+	issued  2019-12-10.
 
 `Type-Tiny 1.007_015 cpan:TOBYINK`
-	issued  2019-12-10;
-	changeset [
-		dcs:versus `Type-Tiny 1.007_014 cpan:TOBYINK`;
-		item [
-			a dcs:Documentation;
-			label "Minor formatting changes.";
-		];
-		item [
-			a dcs:Documentation;
-			label "No longer suggest that Type::Tiny::Manual needs rewriting in Contributing.pod.";
-		]
-	].
+	issued  2019-12-10.
 
 `Type-Tiny 1.008000 cpan:TOBYINK`
-	issued  2019-12-11;
-	changeset [
-		dcs:versus `Type-Tiny 1.007_015 cpan:TOBYINK`;
-		item [
-			a dcs:Packaging;
-			label "Repackage as stable.";
-		]
-	].
+	issued  2019-12-11.
 
 `Type-Tiny 1.008001 cpan:TOBYINK`
-	issued  2019-12-28;
-	changeset [
-		dcs:versus `Type-Tiny 1.008000 cpan:TOBYINK`;
-		item [
-			a dcs:Change;
-			label "Use improved inline_assert when building the coderef for &{$type} overloading.";
-		];
-		item [
-			a dcs:Change;
-			label "Types::TypeTiny now better mocks Type::Library, offering is_* and assert_* functions for export.";
-		];
-		item [
-			a dcs:Change;
-			label "Types::TypeTiny honours $Type::Tiny::AvoidCallbacks.";
-		]
-	].
+	issued  2019-12-28.
 
 `Type-Tiny 1.008002 cpan:TOBYINK`
-	issued  2020-01-11;
-	changeset [
-		dcs:versus `Type-Tiny 1.008001 cpan:TOBYINK`;
-		item [
-			a dcs:Documentation;
-			label "Fix typos.";
-			dcs:blame cpan:HAUKEX;
-		];
-		item [
-			a dcs:Change;
-			label "Type::Tiny didn't accept string constraints for parameterizable type constraints; this was not a documented restriction and didn't seem to serve any purpose, so the restriction has been lifted.";
-			seealso <https://rt.cpan.org/Ticket/Display.html?id=131238>;
-		];
-		item [
-			a dcs:Bugfix;
-			label "Fix bareword errors if certain Type::Tiny subclasses were loaded prior to Type::Tiny.";
-			dcs:fixes RT#131401;
-		]
-	].
+	issued  2020-01-11.
 
 `Type-Tiny 1.008003 cpan:TOBYINK`
-	issued  2020-01-13;
-	changeset [
-		dcs:versus `Type-Tiny 1.008002 cpan:TOBYINK`;
-		item [
-			a dcs:Packaging;
-			label "Makefile.PL will now bail out on cperl if AUTOMATED_TESTING environment variable is set to true.";
-		];
-		item [
-			a dcs:Documentation;
-			label "Update copyright dates to 2020.";
-		];
-		item [
-			a dcs:Addition;
-			label "Type::Registry can now have a parent registry.";
-		]
-	].
+	issued  2020-01-13.
 
 `Type-Tiny 1.008004 cpan:TOBYINK`
-	issued  2020-01-29;
-	changeset [
-		dcs:versus `Type-Tiny 1.008003 cpan:TOBYINK`;
-		item [
-			a dcs:Bugfix;
-			label "to_TypeTiny will now cowardly refuse to inline Moose types if they have anything in their inline environment.";
-		];
-		item [
-			a dcs:Bugfix;
-			label "When possible, inject `package Type::Tiny` in generated inline code that has an appropriate lexical scope to insert it into. This will (mostly) avoid inline code mistakenly using overridden versions of CORE:: functions.";
-		];
-	].
+	issued  2020-01-29.
 
 `Type-Tiny 1.008005 cpan:TOBYINK`
-	issued  2020-01-30;
-	changeset [
-		dcs:versus `Type-Tiny 1.008004 cpan:TOBYINK`;
-		item [
-			a dcs:Tests;
-			label "Remove some Perl 5.012+ syntax from test suite.";
-		];
-	].
+	issued  2020-01-30.
 
 `Type-Tiny 1.009_000 cpan:TOBYINK`
-	issued  2020-02-04;
-	changeset [
-		dcs:versus `Type-Tiny 1.008005 cpan:TOBYINK`;
-		item [
-			a dcs:Change;
-			label "Subclasses of Moose::Meta::TypeConstraint are now converted to the appropriate subclasses of Type::Tiny by Types::TypeTiny::to_TypeTiny, instead of always being converted to the base class. This improves inlining amongst other things.";
-		];
-		item [
-			a dcs:Change;
-			label "When types are declared by Type::Library's -declare import parameter, the temporary subs installed can now generate placeholder type constraints which allow the types to be used in recursive type definitions.";
-		];
-	].
+	issued  2020-02-04.
 
 `Type-Tiny 1.009_001 cpan:TOBYINK`
-	issued  2020-02-06;
-	changeset [
-		dcs:versus `Type-Tiny 1.009_000 cpan:TOBYINK`;
-		item [
-			a dcs:Tests;
-			label "More tests for recursively defined type constraints.";
-		];
-		item [
-			a dcs:Addition;
-			label "Type::Tiny::Enum now has an `as_regexp` method.";
-		];
-		item [
-			a dcs:Change;
-			label "In some edge cases, the regexps used by Type::Tiny::Enum will now be slightly faster.";
-		];
-	].
+	issued  2020-02-06.
 
 `Type-Tiny 1.009_002 cpan:TOBYINK`
-	issued  2020-02-11;
-	changeset [
-		dcs:versus `Type-Tiny 1.009_001 cpan:TOBYINK`;
-		item [
-			a dcs:Addition;
-			label "Type::Params now supports `head` and `tail` options for `compile`, `compile_named`, and `compile_named_oo`.";
-		];
-		item [
-			a dcs:Change;
-			label "Parameterized `Ref` type constraint in Types::Standard now checks its parameter is a known Perl ref type.";
-		];
-		item [
-			a dcs:Change;
-			label "Type::Params on Perl older than 5.10 now uses its own B::perlstring implementation to quote strings instead of using B::cstring.";
-		];
-		item [
-			a dcs:Documentation;
-			label "Mention MooX::Pression.";
-		];
-	].
+	issued  2020-02-11.
 
 `Type-Tiny 1.009_003 cpan:TOBYINK`
-	issued  2020-02-11;
-	changeset [
-		dcs:versus `Type-Tiny 1.009_002 cpan:TOBYINK`;
-		item [
-			a dcs:Bugfix;
-			label "Fix importing multiple type libraries into a type registry at once.";
-			dcs:fixes RT#131744;
-		];
-		item [
-			a dcs:Documentation;
-			label "Fix typo in documentation of `my_methods`.";
-			dcs:blame cpan:BOOK;
-		];
-	].
+	issued  2020-02-11.
 
 `Type-Tiny 1.010000 cpan:TOBYINK`
-	issued  2020-02-19;
-	changeset [
-		dcs:versus `Type-Tiny 1.009_003 cpan:TOBYINK`;
-		item [
-			a dcs:Documentation;
-			label "Correct documentation of slurpy with compile_named.";
-			dcs:fixes RT#131720;
-		];
-		item [
-			a dcs:Packaging;
-			label "Package as stable.";
-		];
-	].
+	issued  2020-02-19.
 
 `Type-Tiny 1.010001 cpan:TOBYINK`
-	issued  2020-03-16;
-	changeset [
-		dcs:versus `Type-Tiny 1.010000 cpan:TOBYINK`;
-		item [
-			a dcs:Documentation;
-			label "MooX::Pression mentions in documentation now refer to Zydeco.";
-		];
-		item [
-			a dcs:Tests;
-			label "Test suite passes in cperl, albeit with warnings.";
-		];
-	].
+	issued  2020-03-16.
 
 `Type-Tiny 1.010002 cpan:TOBYINK`
 	issued  2020-05-01;
-	label   "Mayday";
-	changeset [
-		dcs:versus `Type-Tiny 1.010001 cpan:TOBYINK`;
-		item [
-			a dcs:Bugfix;
-			label "Better bareword handling on Perl < 5.14.";
-			dcs:fixes RT#132455;
-			dcs:blame cpan:HAARG;
-			dcs:thanks cpan:ETHER;
-		];
-		item [
-			a dcs:Bugfix;
-			label "If Scalar::Util was below 1.18, the LaxNum type from Types::Standard would accept blobs as being numbers. This is now fixed.";
-			dcs:fixes RT#132426;
-			dcs:thanks cpan:HAARG;
-		];
-	].
+	label   "Mayday".
 
 `Type-Tiny 1.010003 cpan:TOBYINK`
 	issued  2020-08-08;
-	label   "The Crazy 88";
-	changeset [
-		dcs:versus `Type-Tiny 1.010002 cpan:TOBYINK`;
-		item [
-			a dcs:Bugfix;
-			label "ClassName type constraint should treat empty @ISA as if no @ISA were defined, like Type::Tiny::XS.";
-			dcs:fixes RT#132583;
-			dcs:thanks cpan:SNEZ;
-		];
-		item [
-			a dcs:Bugfix;
-			label "Fix for Type::Tiny->can called as a class method.";
-			seealso <https://github.com/tobyink/p5-type-tiny/pull/57>;
-			dcs:blame cpan:MHOWARD;
-		];
-		item [
-			a dcs:Bugfix;
-			label "Fix predeclared types in Type::Library.";
-			seealso <https://github.com/tobyink/p5-type-tiny/pull/58>;
-			dcs:blame cpan:MHOWARD;
-		];
-		item [
-			a dcs:Documentation;
-			label "Document some edge cases for Types::Standard Int.";
-			seealso <https://rt.cpan.org/Ticket/Display.html?id=132754>;
-		];
-	].
+	label   "The Crazy 88".
 
 `Type-Tiny 1.010004 cpan:TOBYINK`
-	issued  2020-08-18;
-	changeset [
-		dcs:versus `Type-Tiny 1.010003 cpan:TOBYINK`;
-		item [
-			a dcs:Bugfix;
-			label "Workaround RT#121957 by avoiding attempting to XSify Enum type constraints with more than 50 possible strings.";
-			dcs:fixes RT#121957;
-			dcs:thanks cpan:DJERIUS;
-		];
-		item [
-			a dcs:Bugfix;
-			label "Fix XSifying Enum[] where the strings contain certain non-word characters.";
-			seealso <https://github.com/tobyink/p5-type-tiny-xs/pull/12>;
-			seealso <https://github.com/tobyink/p5-type-tiny/pull/59>;
-			dcs:blame cpan:AERUDER;
-		];
-		item [
-			a dcs:Documentation;
-			label "Link to HTTPS version of Type::Tiny web page.";
-		];
-		item [
-			a dcs:Bugfix;
-			label "Type::Params compile_named using both the head and named_to_list options would cause compilation error.";
-			dcs:fixes RT#132419;
-			dcs:thanks cpan:HAUKEX;
-			dcs:blame cpan:SPATOCS;
-		];
-	].
+	issued  2020-08-18.
 
 `Type-Tiny 1.010005 cpan:TOBYINK`
-	issued  2020-08-26;
-	changeset [
-		dcs:versus `Type-Tiny 1.010004 cpan:TOBYINK`;
-		item [
-			a dcs:Change;
-			label "Improvements to $AvoidCallbacks support for Type::Tiny::{Class,Role,Duck,Enum,Union,Intersection}, and LaxNum, Ref, RegexpRef, FileHandle, Object, Overload, and Tied types from Types::Standard.";
-		];
-	].
+	issued  2020-08-26.
 
 `Type-Tiny 1.010006 cpan:TOBYINK`
-	issued  2020-09-04;
-	changeset [
-		dcs:versus `Type-Tiny 1.010005 cpan:TOBYINK`;
-		item [
-			a dcs:Change;
-			label "Better handling of coercions for pre-declared types in Type::Library. The type objects created before the type was properly defined will now lazily attempt to find coercions from the properly defined type once it becomes available.";
-		];
-		item [
-			a dcs:Bugfix;
-			label "Eliminate recusion warnings when Type::Parser needs to parse complex types.";
-			dcs:fixes RT#121957;
-			dcs:thanks cpan:DJERIUS;
-		];
-	].
+	issued  2020-09-04.
 
 `Type-Tiny 1.011_000 cpan:TOBYINK`
-	issued  2020-09-15;
-	changeset [
-		dcs:versus `Type-Tiny 1.010006 cpan:TOBYINK`;
-		item [
-			a dcs:Documentation;
-			label "Describe deficiencies of is_* functions for parameterized types.";
-			dcs:fixes RT#132918;
-		];
-		item [
-			a dcs:Change;
-			label "Type::Tiny::Enum now generates faster regexps to validate enums. (Code stolen from Regexp::Trie.)";
-		];
-	].
+	issued  2020-09-15.
 
 `Type-Tiny 1.011_001 cpan:TOBYINK`
-	issued  2020-09-21;
-	changeset [
-		dcs:versus `Type-Tiny 1.011_000 cpan:TOBYINK`;
-		item [
-			a dcs:Addition;
-			label "Add new list processing functions to Type::Tiny.";
-		];
-		item [
-			a dcs:Documentation;
-			label "Update the NEWS file.";
-		];
-	].
+	issued  2020-09-21.
 
 `Type-Tiny 1.011_002 cpan:TOBYINK`
-	issued  2020-09-22;
-	changeset [
-		dcs:versus `Type-Tiny 1.011_001 cpan:TOBYINK`;
-		item [
-			a dcs:Addition;
-			label "Type::Utils now exports an `is` function but it needs to be requested explicitly.";
-		];
-	].
+	issued  2020-09-22.
 
 `Type-Tiny 1.011_003 cpan:TOBYINK`
-	issued  2020-09-25;
-	changeset [
-		dcs:versus `Type-Tiny 1.011_002 cpan:TOBYINK`;
-		item "Type::Tiny::Enum better caches regexps."^^Change;
-		item "ArrayLike, HashLike, CodeLike, and StringLike type constraints can use XS if Type::Tiny::XS 0.022 is installed."^^Update;
-		item "ArrayLike and HashLike are now parameterizable, though the implementation for the parameterized version is in pure Perl, not XS."^^Change;
-		item "Types::Standard would sometimes complain about very old versions of Scalar::Util."^^Bugfix;
-		item "Old versions of Data::Dumper would sometimes die when dumping certain overloaded objects. Type::Tiny::_dd() now catches this in an eval {}."^^Bugfix;
-	].
+	issued  2020-09-25.
 
 `Type-Tiny 1.011_004 cpan:TOBYINK`
-	issued  2020-09-30;
-	changeset [
-		dcs:versus `Type-Tiny 1.011_003 cpan:TOBYINK`;
-		item "Document that ArrayLike and HashLike are now parameterizable."^^Documentation;
-		item "Make test suite work better with App::Yath."^^Tests;
-		item "Make predeclared type constraints work better for Zydeco."^^Bugfix;
-	].
+	issued  2020-09-30.
 
 `Type-Tiny 1.011_005 cpan:TOBYINK`
-	issued  2020-09-30;
-	changeset [
-		dcs:versus `Type-Tiny 1.011_004 cpan:TOBYINK`;
-		item "Type::Library import now supports -extends and -utils flags."^^Addition;
-		item "Type::Library -base import flag now marks the caller package as loaded in %INC."^^Change;
-	].
+	issued  2020-09-30.
 
 `Type-Tiny 1.011_006 cpan:TOBYINK`
-	issued  2020-10-02;
-	changeset [
-		dcs:versus `Type-Tiny 1.011_005 cpan:TOBYINK`;
-		item "Improved test coverage for Type::Library."^^Tests;
-		item "Improved test coverage for Type::Params."^^Tests;
-		item "Improved test coverage for Type::Registry."^^Tests;
-		item "Improved test coverage for Type::Tiny::Union."^^Tests;
-		item "Include JSONCapable type example."^^Documentation;
-		item "Improved tests for Type::Utils::is()."^^Tests;
-		item "Test::TypeTiny's should_pass and should_fail exercise type constraints in even more ways in EXTENDED_TESTING mode."^^Change;
-		item "Various tests for garbage collection using Devel::Refcount."^^Tests;
-		item "Type::Params now exports an ArgsObject type constraint."^^Addition;
-	].
+	issued  2020-10-02.
 
 `Type-Tiny 1.011_007 cpan:TOBYINK`
-	issued  2020-10-06;
-	changeset [
-		dcs:versus `Type-Tiny 1.011_006 cpan:TOBYINK`;
-		item "ArgsObject inlining was closing over a coderef in a way that didn't work on archaic versions of Perl. Resolve by calling the coderef outside the closure."^^Bugfix;
-	].
+	issued  2020-10-06.
 
 `Type-Tiny 1.011_008 cpan:TOBYINK`
-	issued  2020-10-07;
-	changeset [
-		dcs:versus `Type-Tiny 1.011_007 cpan:TOBYINK`;
-		item "Some minor tidyups and updates to Type::Tiny::Manual."^^Documentation;
-		item "Type::Utils::assert() function."^^Addition;
-		item "Test that $type->() works with subclasses that override the assert_return method."^^Tests;
-		item "Write tests for some internal undocumented methods."^^Tests;
-		item "Test integration with Type::Nano as an example of a generic non-Type::Tiny type constraint class."^^Tests;
-		item "Better tests for the placeholder type constraints created by Type::Library -declare flag."^^Tests;
-	].
+	issued  2020-10-07.
 
 `Type-Tiny 1.011_009 cpan:TOBYINK`
-	issued  2020-10-09;
-	changeset [
-		dcs:versus `Type-Tiny 1.011_008 cpan:TOBYINK`;
-		item "Improve test coverage by adding tests for various esoteric parts of the distribution and edge cases."^^Tests;
-		item "Add tests for _ForeignTypeConstraint."^^Tests;
-		item "Add _ForeignTypeConstraint to AllTypes.pod."^^Documentation;
-		item "Refactoring of Types::TypeTiny."^^Change;
-		item "Where various parts of Type::Tiny internally use type constraints to check values, prefer is_* and assert_* functions over method calls."^^Change;
-		item "More efficient use of Type::Tiny::XS by Types::TypeTiny."^^Change;
-	].
+	issued  2020-10-09.
 
 `Type-Tiny 1.011_010 cpan:TOBYINK`
-	issued  2020-10-16;
-	changeset [
-		dcs:versus `Type-Tiny 1.011_009 cpan:TOBYINK`;
-		item "Simple useful coercions from Str for Type::Tiny::Enum (and Types::Standard::Enum)."^^Change;
-	].
+	issued  2020-10-16.
 
 `Type-Tiny 1.011_011 cpan:TOBYINK`
-	issued  2020-10-16;
-	changeset [
-		dcs:versus `Type-Tiny 1.011_010 cpan:TOBYINK`;
-		item "If the EXTENDED_TESTING environment variable is true, Perl 5.8.9 or above is being used, and either Type::Tiny's version contains '_' or testing is running on Travis CI, then Makefile.PL will add extra testing dependencies."^^Packaging;
-		item "More tests for Type::Coercion::FromMoose."^^Tests;
-		item "Remove unnecessary BEGIN block in Eval::TypeTiny."^^Change;
-		item "Bugs in old versions of Return::Type prevent integration tests from passing on Perl 5.8.x; those tests now require Return::Type 0.007 or above."^^Tests;
-	].
+	issued  2020-10-16.
 
 `Type-Tiny 1.012000 cpan:TOBYINK`
-	issued  2020-10-28;
-	changeset [
-		dcs:versus `Type-Tiny 1.011_011 cpan:TOBYINK`;
-		item "Update NEWS file."^^Documentation;
-	].
+	issued  2020-10-28.
 
 `Type-Tiny 1.012001 cpan:TOBYINK`
-	issued  2021-01-10;
-	changeset [
-		dcs:versus `Type-Tiny 1.012000 cpan:TOBYINK`;
-		item [
-			a dcs:Tests;
-			label "Hide warnings in Kavorka integration tests.";
-		];
-		item [
-			a dcs:Change;
-			label "Much code tidying using perltidy and manually.";
-		];
-		item [
-			a dcs:Packaging;
-			label "Stop hiding Type::Parser::Token, Type::Parser::TokenStream, and Type::Parser::AstBuilder from the CPAN indexer.";
-		];
-		item [
-			a dcs:Tests;
-			label "Extra test cases to improve coverage. (100% on Coveralls; 90% on Codecov.)";
-		];
-		item [
-			a dcs:Change;
-			label "When generic validation objects (blessed objects with a `check` method) are converted to native Type::Tiny type constraints, no longer require them to provide a `get_message` method. This allows Type::Tiny to adopt Data::Constraint type constraints.";
-		];
-		item [
-			a dcs:Packaging;
-			label "Move issue tracker from RT to Github Issues.";
-		];
-	].
+	issued  2021-01-10.
 
 `Type-Tiny 1.012002 cpan:TOBYINK`
-	issued  2021-05-02;
-	changeset [
-		dcs:versus `Type-Tiny 1.012001 cpan:TOBYINK`;
-		item [
-			a dcs:Tests;
-			label "Type::Tiny is no longer routinely tested on Perl versions older than 5.8.1.";
-			seealso <https://github.com/tobyink/p5-type-tiny/actions>;
-		];
-		item [
-			a dcs:Change;
-			label "Type::Parser now supports hexadecimal integers.";
-			seealso <https://github.com/tobyink/p5-type-tiny/issues/71>;
-			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/71>;
-		];
-		item [
-			a dcs:Tests;
-			dcs:blame cpan:BOOK;
-			label "Fix testcase for Tuples with slurpy HashRef to pass a literal hashref (which should fail) instead of an arrayref (which should also fail, but less subtly).";
-			seealso <https://github.com/tobyink/p5-type-tiny/pull/64>;
-		];
-		item [
-			a dcs:Bugfix;
-			dcs:blame cpan:BOOK;
-			label "Fix precendence error in generated code for Tuples.";
-			seealso <https://github.com/tobyink/p5-type-tiny/pull/64>;
-			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/pull/64>;
-		];
-		item [
-			a dcs:Documentation;
-			dcs:blame <urn:uuid:43559705-9a3a-45fe-b29c-c4aaed234e37>;
-			label "Fixed typo in pod for Type::Tiny::Enum";
-			seealso <https://github.com/tobyink/p5-type-tiny/pull/70>;
-			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/pull/70>;
-		];
-	].
+	issued  2021-05-02.
 
 `Type-Tiny 1.012003 cpan:TOBYINK`
-	issued  2021-05-09;
-	changeset [
-		dcs:versus `Type-Tiny 1.012002 cpan:TOBYINK`;
-		item [
-			a dcs:Change;
-			label "Type::Parser now supports negative hexadecimal integers.";
-		];
-		item [
-			a dcs:Documentation;
-			label "Fixed typo in Type::Tiny::Enum where the `closest_match` method was documented as being called `closet_match`.";
-			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/pull/72>;
-		];
-	].
+	issued  2021-05-09.
 
 `Type-Tiny 1.012004 cpan:TOBYINK`
-	issued  2021-07-29;
-	changeset [
-		dcs:versus `Type-Tiny 1.012003 cpan:TOBYINK`;
-		item [
-			a dcs:Documentation;
-			label "Fixed typo in Types::Standard documentation where StrMatch regexp parameter didn't use qr// properly.";
-			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/pull/74>;
-			dcs:blame cpan:LUCAS;
-		];
-	].
+	issued  2021-07-29.
 
 `Type-Tiny 1.012005 cpan:TOBYINK`
-	issued  2022-06-07;
-	changeset [
-		dcs:versus `Type-Tiny 1.012004 cpan:TOBYINK`;
-		item [
-			a dcs:Bugfix;
-			label "Ensure coderefs returned by overload::Method are called with three parameters, as passing two parameters can break subs imlpemented in XS.";
-			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/pull/87>;
-			dcs:thanks <urn:uuid:3d4e7e7c-a9f5-4f34-915c-6beefd3485a8>;
-		];
-		item [
-			a dcs:Bugfix;
-			label "Fix explanation message for NumRange/IntRange";
-			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/pull/89>;
-		];
-		item [
-			a dcs:Bugfix;
-			label "Prevent stringification of Error::TypeTiny from clobbering $@.";
-			dcs:thanks <urn:uuid:011f6ebf-6818-409c-bc8a-b98011eab9cb>;
-			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/pull/80>;
-		];
-		item [
-			a dcs:Documentation;
-			label "Fix typos in documentation for wrap_methods from Type::Params.";
-		];
-	].
-
+	issued  2022-06-07.
 
 `Type-Tiny 1.013_000 cpan:TOBYINK`
-	issued  2022-06-09;
-	changeset [
-		dcs:versus `Type-Tiny 1.012005 cpan:TOBYINK`;
-		item [
-			a dcs:Documentation;
-			label "Various minor documentation improvements.";
-		];
-		item [
-			a dcs:Documentation;
-			label "Update copyright dates to 2022.";
-		];
-		item [
-			a dcs:Tests;
-			label "Rename some directories in the test suite to better reflect their contents.";
-		];
-		item [
-			a dcs:Tests;
-			label "Eliminate some warnings and other noise from the test suite.";
-		];
-		item [
-			a dcs:Change;
-			label "Eliminate warnings while generating deep explanations for type constraint check fails under some circumstances. (Mostly affects StrMatch when Regexp::Util isn't installed.)";
-			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/60>;
-			dcs:thanks <urn:uuid:af150f96-4213-481a-968b-58b1325e3d0e>;
-		];
-		item [
-			a dcs:Addition;
-			label "Type::Params `compile`, `compile_named`, and `compile_named_oo` functions now support an `on_die` callback.";
-			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/77>;
-			dcs:thanks <urn:uuid:94ef588e-86af-4cf6-aa8f-e9794208341f>;
-		];
-		item [
-			a dcs:Addition;
-			label "Error::TypeTiny now has a `throw_cb` method which acts like `throw` but takes an initial callback parameter.";
-			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/77>;
-			dcs:thanks <urn:uuid:94ef588e-86af-4cf6-aa8f-e9794208341f>;
-		];
-	].
+	issued  2022-06-09.
 
 `Type-Tiny 1.013_001 cpan:TOBYINK`
-	issued  2022-06-23;
-	changeset [
-		dcs:versus `Type-Tiny 1.013_000 cpan:TOBYINK`;
-		item [
-			a dcs:Documentation;
-			label "Various minor documentation improvements.";
-		];
-		item [
-			a dcs:Addition;
-			label "$Type::Tiny::SafePackage variable.";
-		];
-	].
+	issued  2022-06-23.
 
 `Type-Tiny 1.014000 cpan:TOBYINK`
-	issued  2022-06-27;
-	changeset [
-		dcs:versus `Type-Tiny 1.013_001 cpan:TOBYINK`;
-		item [
-			a dcs:Packaging;
-			label "Repackaged as stable version.";
-		];
-	];
-	changeset [
-		dcs:versus `Type-Tiny 1.012005 cpan:TOBYINK`;
-		item [
-			a dcs:Documentation;
-			label "Various minor documentation improvements.";
-		];
-		item [
-			a dcs:Documentation;
-			label "Update copyright dates to 2022.";
-		];
-		item [
-			a dcs:Tests;
-			label "Rename some directories in the test suite to better reflect their contents.";
-		];
-		item [
-			a dcs:Tests;
-			label "Eliminate some warnings and other noise from the test suite.";
-		];
-		item [
-			a dcs:Change;
-			label "Eliminate warnings while generating deep explanations for type constraint check fails under some circumstances. (Mostly affects StrMatch when Regexp::Util isn't installed.)";
-			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/60>;
-			dcs:thanks <urn:uuid:af150f96-4213-481a-968b-58b1325e3d0e>;
-		];
-		item [
-			a dcs:Addition;
-			label "Type::Params `compile`, `compile_named`, and `compile_named_oo` functions now support an `on_die` callback.";
-			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/77>;
-			dcs:thanks <urn:uuid:94ef588e-86af-4cf6-aa8f-e9794208341f>;
-		];
-		item [
-			a dcs:Addition;
-			label "Error::TypeTiny now has a `throw_cb` method which acts like `throw` but takes an initial callback parameter.";
-			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/77>;
-			dcs:thanks <urn:uuid:94ef588e-86af-4cf6-aa8f-e9794208341f>;
-		];
-		item [
-			a dcs:Addition;
-			label "$Type::Tiny::SafePackage variable.";
-		];
-	].
+	issued  2022-06-27.
 
 `Type-Tiny 1.015_000 cpan:TOBYINK`
-	issued  2022-07-16;
-	changeset [
-		dcs:versus `Type-Tiny 1.014000 cpan:TOBYINK`;
-		item [
-			a dcs:Change;
-			label "Major refactoring of Type::Params, splitting out signature compilation into separate backend OO-modules which Type::Params now acts as a frontend for. Compiling signature checks is probably now a little slower, but once they're compiled Type::Params is still the fastest Perl implementation of typed parameter checks. This refactor should make the code easier to work with, add new features to, and tweak the performance of.";
-		];
-		item [
-			a dcs:BackCompat;
-			label "Type::Params is now smarter at calculating the expected $#_ for functions which take named parameters, so it can 'fail early' more often when there are extra parameters or missing required parameters. This means you may get errors indicating the wrong number of parameters when you were previously getting errors indicating particular unrecognized or missing required parameters. This may break test suites which were looking for particular error messages.";
-		];
-	].
+	issued  2022-07-16.
 
 `Type-Tiny 1.015_001 cpan:TOBYINK`
-	issued  2022-07-16;
-	changeset [
-		dcs:versus `Type-Tiny 1.015_000 cpan:TOBYINK`;
-		item [
-			a dcs:Change;
-			label "Type::Params::Signature now avoids using the word `return` in its generated source code, as MooX::Press was using that as a talisman. Also avoid using the `return` keyword to return the final results of the signature check, as falling through performs better on older Perls, plus it enables MooX::Press to convert the coderef into a do{} block.";
-		];
-	].
+	issued  2022-07-16.
 
 `Type-Tiny 1.015_002 cpan:TOBYINK`
-	issued  2022-07-16;
-	changeset [
-		dcs:versus `Type-Tiny 1.015_001 cpan:TOBYINK`;
-		item [
-			a dcs:Change;
-			label "Defaults for Type::Params parameters can now be a reference to a string of Perl code (like Mite).";
-		];
-	].
+	issued  2022-07-16.
 
 `Type-Tiny 1.015_003 cpan:TOBYINK`
-	issued  2022-07-16;
-	changeset [
-		dcs:versus `Type-Tiny 1.015_002 cpan:TOBYINK`;
-		item [
-			a dcs:Change;
-			label "The simple case of compile() with no parameters was broken by refactoring. It should now work.";
-		];
-	].
+	issued  2022-07-16.
 
 `Type-Tiny 1.016000 cpan:TOBYINK`
-	issued  2022-07-16;
-	changeset [
-		dcs:versus `Type-Tiny 1.015_003 cpan:TOBYINK`;
-		item [
-			a dcs:Change;
-			label "Add a clone option to parameters in Type::Params to clone them with Storable::dclone(). This is mostly a test of how much easier improving Type::Params is since it was refactored.";
-		];
-	].
+	issued  2022-07-16.
 
 `Type-Tiny 1.016001 cpan:TOBYINK`
-	issued  2022-07-18;
-	changeset [
-		dcs:versus `Type-Tiny 1.016000 cpan:TOBYINK`;
-		item [
-			a dcs:Change;
-			label "Improved coercion of Type::Library::Compiler's type constraints to Type::Tiny.";
-		];
-		item [
-			a dcs:Change;
-			label "Allow Type::Utils::extends to extend Type::Library::Compiler libraries.";
-		];
-		item [
-			a dcs:Change;
-			label "Allow the add_types method of Type::Registry to consume Type::Library::Compiler libraries.";
-		];
-	].
+	issued  2022-07-18.
 
 `Type-Tiny 1.016002 cpan:TOBYINK`
-	issued  2022-07-19;
-	changeset [
-		dcs:versus `Type-Tiny 1.016001 cpan:TOBYINK`;
-		item [
-			a dcs:BackCompat;
-			label "The slurpy(Foo) function from Types::Standard has been replaced by a new Slurpy parameterized type, so you can use Slurpy[Foo] instead. A slurpy() function is still provided for backwards compatibility, but if you were relying on the internal detail that this used to return an unblessed hashref, this release might break that assumption.";
-		];
-	].
+	issued  2022-07-19.
 
 `Type-Tiny 1.016003 cpan:TOBYINK`
-	issued  2022-07-22;
-	changeset [
-		dcs:versus `Type-Tiny 1.016002 cpan:TOBYINK`;
-		item [
-			a dcs:Change;
-			label "Catalyst was relying on the internals of the old slurpy function. Next release of Catalyst should fix that, but this version of Types::Standard introduces a workaround for the issue without going back to implementing Slurpy the old way. (The Catalyst test suite passes at least!)";
-		];
-		item [
-			a dcs:Change;
-			label "In most places that accept a Slurpy, happily accept a child of a child of a child of Slurpy.";
-		];
-		item [
-			a dcs:Change;
-			label "Rename Type::Params::Coderef to Eval::TypeTiny::CodeAccumulator as it's not really Type::Params-specific. Add test cases for it and make it part of the public API.";
-		];
-		item [
-			a dcs:Change;
-			label "When Type::Tiny's is_subtype_of, etc methods are called passing a string as a parameter, pay attention to calling package's type registry.";
-		];
-		item [
-			a dcs:Change;
-			label "Use Eval::TypeTiny::CodeAccumulator in compile_match_on_type.";
-		];
-	].
+	issued  2022-07-22.
 
 `Type-Tiny 1.016004 cpan:TOBYINK`
-	issued  2022-07-22;
-	changeset [
-		dcs:versus `Type-Tiny 1.016003 cpan:TOBYINK`;
-		item [
-			a dcs:Addition;
-			label "Type::Params now allows named parameters to have aliases.";
-		];
-	].
+	issued  2022-07-22.
 
 `Type-Tiny 1.016005 cpan:TOBYINK`
-	issued  2022-07-23;
-	changeset [
-		dcs:versus `Type-Tiny 1.016004 cpan:TOBYINK`;
-		item [
-			a dcs:Bugfix;
-			label "Minor bugfix in Type::Tiny::cmp where in some cases it was returning '0' instead of '0E0'; unlikely to affect anything.";
-		];
-		item [
-			a dcs:Change;
-			label "When Type::Registry/Type::Parser has to create a class or role type constraint, use Types::Standard InstanceOf/ConsumerOf instead of creating new anonymous Type::Tiny::Class/Type::Tiny::Role constraints.";
-		];
-		item [
-			a dcs:Update;
-			label "Updated Type::Params benchmarking scripts.";
-		];
-	].
+	issued  2022-07-23.
 
 `Type-Tiny 1.016006 cpan:TOBYINK`
-	issued  2022-07-25;
-	changeset [
-		dcs:versus `Type-Tiny 1.016005 cpan:TOBYINK`;
-		item [
-			a dcs:Documentation;
-			label "Added a new page to the manual: Type::Tiny::Manual::UsingWithMite.";
-		];
-		item [
-			a dcs:Change;
-			label "Type::Tiny now overloads 0+ to return a unique number per type constraint.";
-		];
-	].
+	issued  2022-07-25.
 
 `Type-Tiny 1.016007 cpan:TOBYINK`
-	issued  2022-08-04;
-	changeset [
-		dcs:versus `Type-Tiny 1.016006 cpan:TOBYINK`;
-		item [
-			a dcs:Addition;
-			label "Type::Params now has a `strictness` option, which if set to false (or certain strings of Perl code that evaluate to false) will skip type checks apart from when needed for coercions, skip parameter count checks, and skip checks for unknown named parameters. You generally don't want to set it to false or indeed set it at all.";
-		];
-	].
+	issued  2022-08-04.
 
 `Type-Tiny 1.016008 cpan:TOBYINK`
-	issued  2022-08-14;
-	changeset [
-		dcs:versus `Type-Tiny 1.016007 cpan:TOBYINK`;
-		item [
-			a dcs:Addition;
-			label "Type::Params now has a `goto_next` option, which if set to a coderef will generate a signature which on success, instead of returning @_, passes @_ to the coderef. If `goto_next` is set to true, the signature instead expects to be passed such a coderef as its first argument.";
-		];
-		item [
-			a dcs:Change;
-			label "Type::Params `wrap_subs` and `wrap_methods` internally use `goto_next`.";
-		];
-		item [
-			a dcs:Change;
-			label "Eval::TypeTiny::CodeAccumulator now better handles placeholders.";
-		];
-	].
+	issued  2022-08-14.
 
 `Type-Tiny 1.016009 cpan:TOBYINK`
-	issued  2022-08-27;
-	changeset [
-		dcs:versus `Type-Tiny 1.016008 cpan:TOBYINK`;
-		item [
-			a dcs:Bugfix;
-			label "Parameterizable type constraints have a name generator, which is a coderef that generates the names of their parameterized child type constraints. The default name generator now strips ASCII control characters (such as null, tab, and new line) from names it generates.";
-			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/96>;
-			dcs:thanks <urn:uuid:1e423144-9fa1-42b4-86fa-7a4e47a5519e>;
-		];
-	].
+	issued  2022-08-27.
 
 `Type-Tiny 1.016010 cpan:TOBYINK`
-	issued  2022-08-31;
-	changeset [
-		dcs:versus `Type-Tiny 1.016009 cpan:TOBYINK`;
-		item [
-			a dcs:Bugfix;
-			label "Fix an uninitialized warning when calling compile_named_oo outside a sub.";
-			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/91>;
-			dcs:thanks cpan:DJERIUS;
-		];
-		item [
-			a dcs:Documentation;
-			label "List which versions of Perl Type::Tiny requires in Type::Tiny::Manual::Policies.";
-		];
-	].
+	issued  2022-08-31.
 
 `Type-Tiny 1.999_000 cpan:TOBYINK`
 	issued  2022-09-04;
-	label "Type::Tiny 2.0 Preview A";
-	changeset [
-		dcs:versus `Type-Tiny 1.016010 cpan:TOBYINK`;
-		item [
-			a dcs:Change;
-			label "The Type::Params API has had a major overhaul, introducing `signature` and `signature_for` functions. The `compile`, `compile_named`, `compile_named_oo`, `validate`, `validate_named`, `wrap_subs`, and `wrap_methods` functions are now considered the legacy API. There are no plans to drop support for the legacy API in the foreseeable future.";
-		];
-		item [
-			a dcs:Addition;
-			label "Types::Common module.";
-		];
-		item [
-			a dcs:Addition;
-			label "Type::Tiny `type_default` method.";
-		];
-		item [
-			a dcs:Addition;
-			label "Type::Tiny overloads `/`.";
-		];
-		item [
-			a dcs:Update;
-			label "Dropping support for Perl 5.6.1 (which was released in April 2001), 5.6.2 (November 2003), and Perl 5.8.0 (July 2002). Type::Tiny now requires at least Perl 5.8.1.";
-		];
-		item [
-			a dcs:Update;
-			label "Require Exporter::Tiny 1.004000+. (Previously required Exporter::Tiny 1.000000.)";
-		];
-		item [
-			a dcs:Documentation;
-			label "Updated Type::Tiny::Manual to cover new features.";
-		];
-		item [
-			a dcs:Change;
-			label "%Error::TypeTiny::CarpInternal is now an alias for %Carp::CarpInternal.";
-		];
-	].
+	label "Type::Tiny 2.0 Preview A".
 
 `Type-Tiny 1.999_001 cpan:TOBYINK`
 	issued  2022-09-05;
-	label "Type::Tiny 2.0 Preview B";
-	changeset [
-		dcs:versus `Type-Tiny 1.999_000 cpan:TOBYINK`;
-		item [
-			a dcs:Change;
-			label "Types::Common now also extends Types::TypeTiny.";
-		];
-		item [
-			a dcs:Tests;
-			label "Tests for the `type_default` of all builtin types.";
-		];
-		item [
-			a dcs:Change;
-			label "Changes to the `type_default` for a few parameterized types.";
-		];
-		item [
-			a dcs:Documentation;
-			label "Further revisions of Type::Manual.";
-		];
-		item [
-			a dcs:Documentation;
-			label "Update the SYNOPSIS for Types::Standard and Type::Tiny.";
-		];
-		item [
-			a dcs:Documentation;
-			label "Fix misspelling of 'GitHub' in documentation.";
-		];
-	].
+	label "Type::Tiny 2.0 Preview B".
 
 `Type-Tiny 1.999_002 cpan:TOBYINK`
 	issued  2022-09-07;
-	label "Type::Tiny 2.0 Preview C";
-	changeset [
-		dcs:versus `Type-Tiny 1.999_001 cpan:TOBYINK`;
-		item [
-			a dcs:Change;
-			label "Minor bugfixes and improvements to slurpy handling in Type::Params.";
-		];
-		item [
-			a dcs:Tests;
-			label "Improved tests for slurpy handling in Type::Params.";
-		];
-		item [
-			a dcs:Change;
-			label "The type_default method will accept parameters, and sort-of curry them.";
-		];
-		item [
-			a dcs:Tests;
-			label "Better tests for `strictness` option in Type::Params.";
-		];
-		item [
-			a dcs:Documentation;
-			label "Fix up some heading levels in the pod for Type::Params.";
-		];
-		item [
-			a dcs:Bugfix;
-			label "Types::Common was not correctly handling the -sigs export tag.";
-		];
-		item [
-			a dcs:Tests;
-			label "The internal module Type::Params::Signature now has some tests of its own.";
-		];
-		item [
-			a dcs:Documentation;
-			label "Update NEWS.";
-		];
-	].
+	label "Type::Tiny 2.0 Preview C".
 
 `Type-Tiny 1.999_003 cpan:TOBYINK`
 	issued  2022-09-09;
-	label "Type::Tiny 2.0 Preview D";
-	changeset [
-		dcs:versus `Type-Tiny 1.999_002 cpan:TOBYINK`;
-		item [
-			a dcs:Change;
-			label "Type::Params will call default coderefs as a method for signatures where method => 1.";
-		];
-		item [
-			a dcs:Addition;
-			label "Move two helper subs out of Type::Library and into Eval::TypeTiny, clean them up, and document them as part of the API (set_subname and type_to_coderef).";
-		];
-		item [
-			a dcs:Change;
-			label "The NICE_PROTOTYPES constant has been moved from Type::Library to Eval::TypeTiny, though a copy of it is still available in Type::Library for backwards compatibility.";
-		];
-		item [
-			a dcs:Change;
-			label "The union of two Type::Tiny::Enum objects is now a Type::Tiny::Enum instead of a Type::Tiny::Union.";
-		];
-		item [
-			a dcs:Change;
-			label "The intersection of two Type::Tiny::Enum objects is now a Type::Tiny::Enum instead of a Type::Tiny::Intersection.";
-			dcs:thanks cpan:BARNEY;
-		];
-		item [
-			a dcs:Bugfix;
-			label "Setting a default for a slurpy parameter in Type::Params now warns and ignores the default instead of failing to compile because of a syntax error.";
-			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/108>;
-			dcs:thanks <urn:uuid:c98016a1-919d-4e92-a138-1c37a307fe22>;
-		];
-		item [
-			a dcs:Addition;
-			label "Type::Tiny now has an `exportables` method which provides a list of functions that the type can export. Type libraries now defer to this when deciding what they can export.";
-		];
-		item [
-			a dcs:Change;
-			label "Major simplifications of Type::Library internals.";
-		];
-		item [
-			a dcs:Addition;
-			label "Type::Tiny::Enum has an is_word_safe method which indicates whether all values in the enumeration are 'words' (i.e. contain only word characters).";
-		];
-		item [
-			a dcs:Addition;
-			label "Word-safe enumerations export constants for each value.";
-			dcs:thanks cpan:BARNEY;
-		];
-		item [
-			a dcs:Addition;
-			label "Type::Tiny::Enum is now an exporter.";
-		];
-		item [
-			a dcs:Addition;
-			label "Type::Tiny::Duck is now an exporter.";
-		];
-		item [
-			a dcs:Addition;
-			label "Type::Tiny::Class is now an exporter.";
-		];
-		item [
-			a dcs:Addition;
-			label "Type::Tiny::Role is now an exporter.";
-		];
-	].
+	label "Type::Tiny 2.0 Preview D".
 
 `Type-Tiny 1.999_004 cpan:TOBYINK`
 	issued  2022-09-09;
-	label "Type::Tiny 2.0 Preview E";
-	changeset [
-		dcs:versus `Type-Tiny 1.999_003 cpan:TOBYINK`;
-		item [
-			a dcs:Documentation;
-			label "Minor documentation clarifications around new constructor methods for Type::Tiny subclasses.";
-		];
-		item [
-			a dcs:Change;
-			label "Type::Tiny::{Class,Duck,Enum,Role} subclass Exporter::Tiny instead of handling exports manually.";
-		];
-		item [
-			a dcs:Packaging;
-			label "Require Exporter::Tiny 1.004001.";
-		];
-		item [
-			a dcs:Tests;
-			label "More tests for Type::Tiny::{Class,Duck,Enum,Role} exporting.";
-		];
-		item [
-			a dcs:Tests;
-			label "Add versions of tests for the new Type::Params v2 API which don't rely on Perl 5.20 features.";
-		];
-	].
+	label "Type::Tiny 2.0 Preview E".
 
 `Type-Tiny 1.999_005 cpan:TOBYINK`
 	issued  2022-09-11;
-	label "Type::Tiny 2.0 Preview F";
-	changeset [
-		dcs:versus `Type-Tiny 1.999_004 cpan:TOBYINK`;
-		item [
-			a dcs:Change;
-			label "The functionality provided by Type::Params::multisig() is now provided in the Type::Params v2 API. (And is slightly more functional!)";
-		];
-		item [
-			a dcs:Bugfix;
-			label "What was supposed to be a warning for slurpy+default in Type::Params was throwing an exception. Corrected to be a warning.";
-		];
-		item [
-			a dcs:Documentation;
-			label "Minor improvements to Type::Params documentation.";
-		];
-	].
+	label "Type::Tiny 2.0 Preview F".
 
 `Type-Tiny 1.999_006 cpan:TOBYINK`
 	issued  2022-09-12;
-	label "Type::Tiny 2.0 Preview G";
-	changeset [
-		dcs:versus `Type-Tiny 1.999_005 cpan:TOBYINK`;
-		item [
-			a dcs:Change;
-			label "Improved test cases and miscellaneous small bugfixes for slurpy parameters in Type::Params.";
-		];
-		item [
-			a dcs:Change;
-			label "Get the `multiple` option working with the `signature_for` function from Type::Params.";
-		];
-		item [
-			a dcs:BackCompat;
-			label "If none of a multisig's alternative sigs match the parameter list ${^TYPE_PARAMS_MULTISIG} will be explicitly set to undef, instead of being left as-is.";
-		];
-		item [
-			a dcs:BackCompat;
-			label "The Eval::TypeTiny::HAS_LEXICAL_VARS constant no longer exists. It was deprecated in Type-Tiny-1.004000 (2018-07-27).";
-		];
-	].
+	label "Type::Tiny 2.0 Preview G".
 
 `Type-Tiny 1.999_007 cpan:TOBYINK`
 	issued  2022-09-13;
-	label "Type::Tiny 2.0 Preview H";
-	changeset [
-		dcs:versus `Type-Tiny 1.999_006 cpan:TOBYINK`;
-		item [
-			a dcs:Tests;
-			label "Improved test cases; now 100% coverage on coveralls.io.";
-		];
-		item [
-			a dcs:Change;
-			label "Minor refactoring, mostly to make things more easily testable.";
-		];
-		item [
-			a dcs:Documentation;
-			label "Fix pod formatting issue in Type::Params.";
-		];
-	].
+	label "Type::Tiny 2.0 Preview H".
 
 `Type-Tiny 1.999_008 cpan:TOBYINK`
 	issued  2022-09-14;
-	label "Type::Tiny 2.0 Preview I";
-	changeset [
-		dcs:versus `Type-Tiny 1.999_007 cpan:TOBYINK`;
-		item [
-			a dcs:Change;
-			label "If a type library has been made immutable, you can no longer add new types and coercions to it.";
-		];
-		item [
-			a dcs:Addition;
-			label "Type::Tiny now has an exportables_by_tag method.";
-		];
-		item [
-			a dcs:Addition;
-			label "Type::Tiny::_DeclaredType is now a separate module. (It was previously defined inline in Type/Library.pm.)";
-		];
-		item [
-			a dcs:Change;
-			label "Eval::TypeTiny::type_to_coderef() can now handle being passed undef as a type constraint and will create a Type::Tiny::_DeclaredType object to wrap instead.";
-		];
-		item [
-			a dcs:Change;
-			label "Various Type::Library cleanups.";
-		];
-		item [
-			a dcs:Bugfix;
-			label "More sensible error message trying to import a type constraint using -declare outside a type library.";
-			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/119>;
-			dcs:thanks cpan:DJERIUS;
-		];
-		item [
-			a dcs:Change;
-			label "Type::Params `signature_for` will now delay most of the signature compilation until the function is called for the first time, like `wrap_subs`/`wrap_methods` used to do. It still does enough up-front to detect some common errors in signatures.";
-		];
-	].
+	label "Type::Tiny 2.0 Preview I".
 
 `Type-Tiny 1.999_009 cpan:TOBYINK`
 	issued  2022-09-16;
-	label "Type::Tiny 2.0 Preview J";
-	changeset [
-		dcs:versus `Type-Tiny 1.999_008 cpan:TOBYINK`;
-		item [
-			a dcs:Addition;
-			label "Types::Common::String now has a DelimitedStr type.";
-		];
-		item [
-			a dcs:Change;
-			label "Minor improvements to the default name generator, used to generate the display_name for parameterized type constraints.";
-		];
-		item [
-			a dcs:Tests;
-			label "Another test for `-base`.";
-		];
-		item [
-			a dcs:Change;
-			label "Improve cache key generation for parameterized types.";
-		];
-	].
+	label "Type::Tiny 2.0 Preview J".
 
 `Type-Tiny 1.999_010 cpan:TOBYINK`
 	issued  2022-09-18;
-	label "Type::Tiny 2.0 Preview K";
-	changeset [
-		dcs:versus `Type-Tiny 1.999_009 cpan:TOBYINK`;
-		item [
-			a dcs:Change;
-			label "The ${^TYPE_PARAMS_MULTISIG} magic global variable is now called ${^_TYPE_PARAMS_MULTISIG}. The old name will still be supported for at least six months after the next stable release.";
-		];
-		item [
-			a dcs:Tests;
-			label "More tests.";
-		];
-		item [
-			a dcs:Change;
-			label "If the `ws parameter is set to true in parameterized DelimitedStr type constraints, leading and trailing whitespace will now be permitted.";
-		];
-		item [
-			a dcs:Change;
-			label "Non-parameterized DelimitedStr now has a coercion from ArrayRef[Str].";
-		];
-		item [
-			a dcs:Change;
-			label "Eval::TypeTiny::CodeAccumulator now supports $coderef->compile(alias => 1).";
-		];
-	].
+	label "Type::Tiny 2.0 Preview K".
 
 `Type-Tiny 1.999_011 cpan:TOBYINK`
 	issued  2022-09-20;
-	label "Type::Tiny 2.0 Preview L";
-	changeset [
-		dcs:versus `Type-Tiny 1.999_010 cpan:TOBYINK`;
-		item [
-			a dcs:Addition;
-			label "Bundle Type::Tie which was previously in a separate distribution on the CPAN.";
-		];
-	].
+	label "Type::Tiny 2.0 Preview L".
 
 `Type-Tiny 1.999_012 cpan:TOBYINK`
 	issued  2022-09-21;
-	label "Type::Tiny 2.0 Preview M";
-	changeset [
-		dcs:versus `Type-Tiny 1.999_011 cpan:TOBYINK`;
-		item [
-			a dcs:Change;
-			label "Rewrite much of Type::Tie to no longer use inside-out objects and avoid a dependency on Hash::Util::FieldHash or alternative implementations of fieldhashes.";
-		];
-		item [
-			a dcs:Change;
-			label "Using Type::Utils to declare a named type will now automatically add the type to the caller's type registry.";
-		];
-		item [
-			a dcs:Change;
-			label "Adding a type constraint to a type library will now also add it to the library's type registry. (Even though this registry is unlikely to be used.)";
-		];
-		item [
-			a dcs:Documentation;
-			label "Removed stub pod from a bunch of internal modules. They're internal, so nobody should be expecting pod.";
-		];
-		item [
-			a dcs:Documentation;
-			label "Document the Type::Tie::BASE `type` method.";
-		];
-		item [
-			a dcs:Documentation;
-			label "Document in Type::Tie that Type::Tie is implicitly loaded when you tie a variable to a Type::Tiny type constraint. (It was already documented in the manual.)";
-		];
-		item [
-			a dcs:Tests;
-			label "Improved test cases for Type::Tie with an aim at 100% coverage.";
-		];
-		item [
-			a dcs:Tests;
-			label "Bundle a (renamed) copy of Type::Nano in the test suite for some tests combining Type::Nano and Type::Tiny type constraints, and converting Type::Nano to Type::Tiny.";
-		];
-		item [
-			a dcs:Change;
-			label "Type::Tie now supports variables being cloned with Clone::clone(). It already supported Storable::dclone().";
-		];
-		item [
-			a dcs:Change;
-			label "Type::Tie will now try to load Class::XSAccessor::Array for a speed-up.";
-		];
-		item [
-			a dcs:Change;
-			label "Type::Parser's internal packages now have version numbers.";
-		];
-		item [
-			a dcs:Packaging;
-			label "Add Class::XSAccessor to Type::Tiny's recommendations.";
-		];
-	].
+	label "Type::Tiny 2.0 Preview M".
 
 `Type-Tiny 1.999_013 cpan:TOBYINK`
 	issued  2022-09-23;
-	label "Type::Tiny 2.0 Preview N";
-	changeset [
-		dcs:versus `Type-Tiny 1.999_012 cpan:TOBYINK`;
-		item [
-			a dcs:Documentation;
-			label "Document usage with Class::Plain.";
-		];
-		item [
-			a dcs:Tests;
-			label "Test usage with Class::Plain.";
-		];
-		item [
-			a dcs:Documentation;
-			label "Improvements to Type::Params documentation.";
-		];
-		item [
-			a dcs:Change;
-			label "Type::Params signature_for will respect inheritance when looking for methods to wrap, when the `method` option is true.";
-		];
-		item [
-			a dcs:Documentation;
-			label "Fix pod typo in manual.";
-			dcs:blame <urn:uuid:baa9b789-35d5-459d-82da-f04cd91a34c7>;
-		];
-	].
+	label "Type::Tiny 2.0 Preview N".
 
 `Type-Tiny 2.000000 cpan:TOBYINK`
 	issued  2022-09-23;
@@ -4976,5 +1124,10 @@
 		item [
 			a dcs:Documentation;
 			label "Minor pod changes to Types::Standard.";
+		];
+		item [
+			a dcs:Packaging;
+			label "Summarized the change log for versions prior to Type::Tiny 2.000000. If you need more information, see the Changes file included with Type::Tiny 2.002001.";
+			seealso <https://metacpan.org/release/TOBYINK/Type-Tiny-2.002001/source/Changes>;
 		];
 	].
