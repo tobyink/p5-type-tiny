@@ -100,6 +100,9 @@ my $assertion = Eval::TypeTiny::eval_closure(
 	),
 );
 
-$assertion->( [ 'ABC', undef, 'DEF' ] );
+like(
+	exception { $assertion->( [ 'ABC', undef, 'DEF' ] ) },
+	qr/\AReference \[([^]]+)\] did not pass type constraint/ms,
+);
 
 done_testing;
