@@ -29,6 +29,7 @@ the same terms as the Perl 5 programming language system itself.
 
 use Test::More;
 use Test::Requires { Moose => '2.1210' };
+use Test::Requires { 'Test::Moose' => '2.1210' };
 use Test::Fatal;
 use Test::TypeTiny qw( matchfor );
 use Test::Moose qw( with_immutable );
