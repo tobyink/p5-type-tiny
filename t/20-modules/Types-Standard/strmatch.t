@@ -93,4 +93,13 @@ is(
 	'StrMatch->of(...)->compiled_check( $val ) always returns a single value, even in list context',
 );
 
+my $assertion = Eval::TypeTiny::eval_closure(
+	source => sprintf(
+		'sub { use warnings; %s }',
+		ArrayRef->of( StrMatch[qr/[A-D]/] )->inline_assert( '$_[0]' ),
+	),
+);
+
+$assertion->( [ 'ABC', undef, 'DEF' ] );
+
 done_testing;
