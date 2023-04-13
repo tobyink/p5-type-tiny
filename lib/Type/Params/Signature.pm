@@ -160,6 +160,13 @@ sub _rationalize_slurpies {
 		Carp::carp( "Warning: the default for the slurpy parameter will be ignored, continuing anyway" );
 		delete $self->{slurpy}{default};
 	}
+	
+	if ( $self->{slurpy} and $self->{slurpy}->optional ) {
+		require Carp;
+		our @CARP_NOT = ( __PACKAGE__, 'Type::Params' );
+		Carp::carp( "Warning: the optional for the slurpy parameter will be ignored, continuing anyway" );
+		delete $self->{slurpy}{optional};
+	}
 }
 
 sub _parameters_from_list {
