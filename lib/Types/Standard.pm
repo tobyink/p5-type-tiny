@@ -112,6 +112,7 @@ my $add_core_type = sub {
 			# equivalents
 			$name eq 'Str'
 			or $name eq 'Bool'
+			or $name eq 'Int'
 			or $name eq 'ClassName'
 			or $name eq 'RegexpRef'
 			or $name eq 'FileHandle'
