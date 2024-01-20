@@ -7,7 +7,7 @@
 Type library used in several test cases.
 
 Defines types C<SmallInteger>, C<BigInteger> and C<Distance>.
-Defines classes C<Foo::Bar> and C<Foo::Baz> along with correponding
+Defines classes C<Foo::Bar> and C<Foo::Baz> along with corresponding
 C<FooBar> and C<FooBaz> class type constraints; defines role C<Quux>
 and the C<DoesQuux> role type constraint.
 
