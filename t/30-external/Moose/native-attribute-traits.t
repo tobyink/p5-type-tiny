@@ -4,7 +4,7 @@
 
 =head1 PURPOSE
 
-Check type constraints and coercions work with L<Moose> native attibute
+Check type constraints and coercions work with L<Moose> native attribute
 traits.
 
 =head1 DEPENDENCIES

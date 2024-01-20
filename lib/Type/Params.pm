@@ -578,7 +578,7 @@ You can think of C<add_numbers> above as a function which takes named
 parameters from the outside, but receives positional parameters on the
 inside.
 
-You can use an arrayref to specify the order the paramaters will be
+You can use an arrayref to specify the order the parameters will be
 returned in. (By default they are returned in the order they were defined
 in.)
 
@@ -679,7 +679,7 @@ Usually the default will be fine.
 
 =head4 C<< package >> B<Str>
 
-The package of the sub whose paramaters we're supposed to be checking.
+The package of the sub whose parameters we're supposed to be checking.
 As well as showing up in stack traces, it's used by C<dwim_type> if you
 provide any type constraints as strings.
 
@@ -689,7 +689,7 @@ provide it.
 
 =head4 C<< subname >> B<Str>
 
-The name of the sub whose paramaters we're supposed to be checking.
+The name of the sub whose parameters we're supposed to be checking.
 
 The default is probably fine, but if you're wrapping C<signature> so that
 you can check signatures on behalf of another package, you may need to

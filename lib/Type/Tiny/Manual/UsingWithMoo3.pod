@@ -251,7 +251,7 @@ So if you imagine the functions exported by Types::Standard are like this:
   );
   # ... and more
 
-Then "+" exports a horizonal group of those, and "-" exports a vertical group.
+Then "+" exports a horizontal group of those, and "-" exports a vertical group.
 
 =head2 Exporting Parameterized Types
 

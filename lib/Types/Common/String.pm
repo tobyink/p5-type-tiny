@@ -400,7 +400,7 @@ but C<< "Hello,45" >> will fail.
 The ws parameter allows optional whitespace surrounding the delimiters,
 as well as optional leading and trailing whitespace.
 
-The type, min, max, and ws paramaters are optional.
+The type, min, max, and ws parameters are optional.
 
 Parameterized B<DelimitedStr> type constraints will automatically have a
 coercion from B<< ArrayRef[`type] >> which uses C<< join >> to join by the

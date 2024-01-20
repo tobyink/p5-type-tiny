@@ -19,7 +19,7 @@ L<MooX::Types::MooseLike::Base>.
 
 =back
 
-Rather than checking they work directy, we check they are equivalent to
+Rather than checking they work directly, we check they are equivalent to
 known (and well-tested) type constraints generated using L<Type::Utils>.
 
 =head1 AUTHOR

@@ -352,7 +352,7 @@ A string.
 
 B<< StrictNum >> in L<Types::Standard>
 
-A number; strict constaint.
+A number; strict constraint.
 
 =item *
 

@@ -492,7 +492,7 @@ Boolean indicating whether Eval::TypeTiny has support for lexical subs.
 
 Returns a string indicating what implementation of C<< alias => 1 >> is
 being used. Eval::TypeTiny will automatically choose the best implementation.
-This constant can be matched against the C<< IMPLEMENTAION_* >> constants.
+This constant can be matched against the C<< IMPLEMENTATION_* >> constants.
 
 =item C<< IMPLEMENTATION_NATIVE >>
 
