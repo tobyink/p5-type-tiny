@@ -86,7 +86,7 @@ sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 sub _swap { $_[2] ? @_[ 1, 0 ] : @_[ 0, 1 ] }
 
 BEGIN {
-	my $support_smartmatch = 0+ !!( $] >= 5.010001 );
+	my $support_smartmatch = 0+ !!( $] >= 5.010001 && $] <= 5.041002 );
 	eval qq{ sub SUPPORT_SMARTMATCH () { !! $support_smartmatch } };
 	
 	my $fixed_precedence = 0+ !!( $] >= 5.014 );
