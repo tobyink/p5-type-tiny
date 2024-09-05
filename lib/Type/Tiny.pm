@@ -1936,6 +1936,12 @@ You may pass C<< coercion => 1 >> to the constructor to inherit coercions
 from the constraint's parent. (This requires the parent constraint to have
 a coercion.)
 
+If an arrayref is passed to the constructor (C<< coercion => [ ... ] >>),
+then the coercion object will be lazily built and this array will be fed to
+its C<add_type_coercions> method. If a coderef is passed to the constructor
+(C<< coercion => sub { ... } >>), then the coercion object will be lazily built
+and this code will be used as a coercion from B<Any>.
+
 =item C<< sorter >>
 
 A coderef which can be passed two values conforming to this type constraint
