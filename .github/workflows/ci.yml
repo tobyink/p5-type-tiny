@@ -83,8 +83,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os:                 [ 'ubuntu-20.04', 'macos-11', 'windows-2022' ]
-        perl:               [ '5.12', '5.14', '5.16', '5.18', '5.20', '5.22', '5.24', '5.26', '5.28', '5.30', '5.32', '5.34', '5.36' ]
+        os:                 [ 'ubuntu-22.04', 'macos-13', 'windows-2022' ]
+        perl:               [ '5.12', '5.14', '5.16', '5.18', '5.20', '5.22', '5.24', '5.26', '5.28', '5.30', '5.32', '5.34', '5.36', '5.38', '5.40' ]
         coverage:           [ false ]
         threaded:           [ true, false ]
         extra_dependencies: [ true ]
@@ -92,34 +92,31 @@ jobs:
         exclude:
           - { os: 'windows-latest', perl: '5.4' }
         include:
-          - os: 'ubuntu-20.04'
-            perl: '5.36'
+          - os: 'ubuntu-22.04'
+            perl: '5.40'
             threaded: false
             coverage: true
             extra_dependencies: true
             extended_testing: 'both'
             joblabel: '(Coverage)'
-          # Legacy Perl on Ubuntu 20.04
-          - { os: 'ubuntu-20.04', perl: '5.8.1',  threaded: false }
-          - { os: 'ubuntu-20.04', perl: '5.8.2',  threaded: false }
-          - { os: 'ubuntu-20.04', perl: '5.8.3',  threaded: false }
-          - { os: 'ubuntu-20.04', perl: '5.8.4',  threaded: false }
-          - { os: 'ubuntu-20.04', perl: '5.8.5',  threaded: false }
-          - { os: 'ubuntu-20.04', perl: '5.8.6',  threaded: false }
-          - { os: 'ubuntu-20.04', perl: '5.8.7',  threaded: false }
-          - { os: 'ubuntu-20.04', perl: '5.8.8',  threaded: false }
-          - { os: 'ubuntu-20.04', perl: '5.8.9',  threaded: false }
-          - { os: 'ubuntu-20.04', perl: '5.10.0', threaded: false }
-          - { os: 'ubuntu-20.04', perl: '5.10.1', threaded: false }
-          # Modern Perl on Ubuntu 22.04
-          - { os: 'ubuntu-22.04', perl: '5.36',   threaded: true  }
-          - { os: 'ubuntu-22.04', perl: '5.36',   threaded: false }
-          # Modern Perl on Mac OS 12
-          - { os: 'macos-12',   perl: '5.36',   threaded: true  }
-          - { os: 'macos-12',   perl: '5.36',   threaded: false }
-          # Modern Perl on Windows 2019
-          - { os: 'windows-2019', perl: '5.36',   threaded: true  }
-          - { os: 'windows-2019', perl: '5.36',   threaded: false }
+          # Legacy Perl on Ubuntu 22.04
+          - { os: 'ubuntu-22.04', perl: '5.8.1',  threaded: false }
+          - { os: 'ubuntu-22.04', perl: '5.8.2',  threaded: false }
+          - { os: 'ubuntu-22.04', perl: '5.8.3',  threaded: false }
+          - { os: 'ubuntu-22.04', perl: '5.8.4',  threaded: false }
+          - { os: 'ubuntu-22.04', perl: '5.8.5',  threaded: false }
+          - { os: 'ubuntu-22.04', perl: '5.8.6',  threaded: false }
+          - { os: 'ubuntu-22.04', perl: '5.8.7',  threaded: false }
+          - { os: 'ubuntu-22.04', perl: '5.8.8',  threaded: false }
+          - { os: 'ubuntu-22.04', perl: '5.8.9',  threaded: false }
+          - { os: 'ubuntu-22.04', perl: '5.10.0', threaded: false }
+          - { os: 'ubuntu-22.04', perl: '5.10.1', threaded: false }
+          # Modern Perl on Ubuntu 24.04
+          - { os: 'ubuntu-24.04', perl: '5.40',   threaded: true  }
+          - { os: 'ubuntu-24.04', perl: '5.40',   threaded: false }
+          # Modern Perl on Mac OS 14(M1)
+          - { os: 'macos-14',     perl: '5.40',   threaded: true  }
+          - { os: 'macos-14',     perl: '5.40',   threaded: false }
           # Strawberry Perl on Windows
           - { os: 'strawberry',   perl: '5.32',   threaded: true  }
     steps:
