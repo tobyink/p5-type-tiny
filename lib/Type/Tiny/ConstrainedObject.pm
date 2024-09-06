@@ -130,7 +130,7 @@ __END__
 
 =head1 NAME
 
-Type::Tiny::ConstrainedObject - shared behavour for Type::Tiny::Class, etc
+Type::Tiny::ConstrainedObject - shared behaviour for Type::Tiny::Class, etc
 
 =head1 STATUS
 

@@ -1097,7 +1097,7 @@ $meta->add_coercion(
 			my ( $self, $target, $re ) = @_;
 			ref( $re ) eq q(Regexp)
 				or _croak(
-				"Parameter to Split[`a] expected to be a regular expresssion; got $re" );
+				"Parameter to Split[`a] expected to be a regular expression; got $re" );
 			my $regexp_string = "$re";
 			$regexp_string =~ s/\\\//\\\\\//g;    # toothpicks
 			return ( Str(), qq{ [split /$regexp_string/, \$_] } );
@@ -1790,7 +1790,7 @@ C<looks_like_number>.
 
 =item C<PERL_TYPE_TINY_XS>
 
-If set to false, can be used to suppress the loading of XS implementions of
+If set to false, can be used to suppress the loading of XS implementations of
 some type constraints.
 
 =item C<PERL_ONLY>
