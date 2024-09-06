@@ -8,7 +8,7 @@ cpan:TOBYINK
 
 # An early adopter who is sadly no longer with us. He deserves some credit for helping shape Type::Tiny...
 
-cpan:AVENJ :name "Jon Portnoy"; is dcs:thanks of `Type-Tiny`.
+cpan:AVENJ :name "Jon Portnoy" .
 `Type-Tiny` doap:tester cpan:AVENJ .
 `List-Objects-Types` doap:developer cpan:AVENJ .
 `Acme-Types-NonStandard` doap:developer cpan:AVENJ .
