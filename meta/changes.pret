@@ -1135,3 +1135,22 @@
 			seealso <https://metacpan.org/release/TOBYINK/Type-Tiny-2.002001/source/Changes>;
 		];
 	].
+
+`Type-Tiny 2.005_001 cpan:TOBYINK`
+	issued  2024-09-07;
+	changeset [
+		dcs:versus `Type-Tiny 2.004000 cpan:TOBYINK`;
+		item [
+			a dcs:Documentation;
+			label "Improve documentation for the initialization of the `coercion` attribute for `Type::Tiny`.";
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/153>;
+			dcs:thanks cpan:DJERIUS;
+		];
+		item [
+			a dcs:Update;
+			label "Smartmatch discontinued beginning perl-5.41.3; Type::Tiny will no longer attempt to support smartmatch if the Perl version is too high.";
+			seealso <https://github.com/tobyink/p5-type-tiny/pull/161>;
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/160>;
+			dcs:thanks cpan:JKEENAN;
+		];
+	].
