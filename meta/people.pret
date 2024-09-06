@@ -300,6 +300,11 @@ cpan:JKEENAN
 	is doap:developer of `Type-Tiny`;
 	:name "James E Keenan".
 
+<urn:uuid:ad9e89fe-6e7e-402a-8df7-95a0a7a5e830>
+	is doap:developer of `Type-Tiny`;
+	:name "Yoshikazu Sawa";
+	:page <https://github.com/yoshikazusawa>.
+
 # We bundle some files made by these dudes...
 
 cpan:RJBS

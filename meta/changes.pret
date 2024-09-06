@@ -1153,4 +1153,10 @@
 			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/160>;
 			dcs:thanks cpan:JKEENAN;
 		];
+		item [
+			a dcs:Documentation;
+			label "Fixes for various typos.";
+			seealso <https://github.com/tobyink/p5-type-tiny/pull/155>;
+			dcs:thanks <urn:uuid:ad9e89fe-6e7e-402a-8df7-95a0a7a5e830>;
+		];
 	].
