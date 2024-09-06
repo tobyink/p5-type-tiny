@@ -146,6 +146,7 @@ jobs:
           cpanm -n Devel::Cover
           cpanm -n Devel::Cover::Report::Coveralls
           cpanm -n Devel::Cover::Report::Codecov
+          cpanm -n 'https://cpan.metacpan.org/authors/id/T/TO/TOBYINK/Devel-Cover-Report-Codecov-Service-GithubActions-0.001000.tar.gz'
       - name: Configure
         working-directory: ./build/
         run: perl Makefile.PL
