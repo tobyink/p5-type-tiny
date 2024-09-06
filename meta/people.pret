@@ -16,305 +16,305 @@ cpan:AVENJ :name "Jon Portnoy" .
 # Didn't use many of Branislav's suggestions directly, but deserves some credit.
 
 cpan:BARNEY
-	is dcs:thanks of `Type-Tiny`;
+	is doap:helper of `Type-Tiny`;
 	:name "Branislav Zahradník".
 
 # General credits...
 
 cpan:MSTROUT
-	is dcs:thanks of `Type-Tiny`;
+	is doap:helper of `Type-Tiny`;
 	:name  "Matt S Trout".
 
 cpan:BOWTIE
-	is dcs:thanks of `Type-Tiny`;
+	is doap:helper of `Type-Tiny`;
 	:name  "Kevin Dawson".
 
 cpan:MMCLERIC
-	is dcs:blame of `Type-Tiny`;
+	is doap:developer of `Type-Tiny`;
 	:name "Vyacheslav Matyukhin".
 
 cpan:DJERIUS
-	is dcs:blame of `Type-Tiny`;
+	is doap:developer of `Type-Tiny`;
 	:name "Diab Jerius".
 
 cpan:HAARG
-	is dcs:blame of `Type-Tiny`;
+	is doap:developer of `Type-Tiny`;
 	:name "Graham Knop".
 
 cpan:PJFL
-	is dcs:blame of `Type-Tiny`;
+	is doap:developer of `Type-Tiny`;
 	:name "Peter Flanigan".
 
 cpan:RSIMOES
-	is dcs:thanks of `Type-Tiny`;
+	is doap:helper of `Type-Tiny`;
 	:name "Richard Simões".
 
 <urn:uuid:382de9f9-3ec0-4aa1-ba60-aa80709e75ac>
-	is dcs:blame of `Type-Tiny`;
+	is doap:developer of `Type-Tiny`;
 	:name "Pierre Masci";
 	:page <http://www.perlmonks.org/?node_id=946673>.
 
 cpan:TIMB
-	is dcs:thanks of `Type-Tiny`;
+	is doap:helper of `Type-Tiny`;
 	:name "Tim Bunce".
 
 cpan:MARKSTOS
-	is dcs:blame of `Type-Tiny`;
+	is doap:developer of `Type-Tiny`;
 	:name "Mark Stosberg".
 
 cpan:RIBASUSHI
-	is dcs:thanks of `Type-Tiny`;
+	is doap:helper of `Type-Tiny`;
 	:name "Peter Rabbitson".
 
 cpan:MATTP
-	is dcs:thanks of `Type-Tiny`;
+	is doap:helper of `Type-Tiny`;
 	:name "Matt Phillips".
 
 cpan:STEVENL
-	is dcs:thanks of `Type-Tiny`;
+	is doap:helper of `Type-Tiny`;
 	:name "Steven Lee".
 
 cpan:BBYRD
-	is dcs:thanks of `Type-Tiny`;
+	is doap:helper of `Type-Tiny`;
 	:name "Brendan Byrd".
 
 cpan:ILMARI
-	is dcs:blame of `Type-Tiny`;
+	is doap:developer of `Type-Tiny`;
 	:name "Dagfinn Ilmari Mannsåker".
 
 cpan:DAGOLDEN
-	is dcs:thanks of `Type-Tiny`;
+	is doap:helper of `Type-Tiny`;
 	:name "David Golden".
 
 <urn:uuid:580d3dfe-fe45-42ef-9f58-1310ffee7004>
-	is dcs:blame of `Type-Tiny`;
+	is doap:developer of `Type-Tiny`;
 	:name "Benct Philip Jonsson";
 	:mbox <mailto:bpj@melroch.se>.
 
 <urn:uuid:26bd4917-ff58-4e17-b2ee-4e81abe27f19>
-	is dcs:blame of `Type-Tiny`;
+	is doap:developer of `Type-Tiny`;
 	:name "David Steinbrunner";
 	:mbox <mailto:dsteinbrunner@pobox.com>.
 
 cpan:SKAUFMAN
-	is dcs:blame of `Type-Tiny`;
+	is doap:developer of `Type-Tiny`;
 	:name "Samuel Kaufman".
 
 cpan:JRMASH
-	is dcs:thanks of `Type-Tiny`;
+	is doap:helper of `Type-Tiny`;
 	:name "Jason R Mash".
 
 cpan:KARMAN
-	is dcs:blame of `Type-Tiny`;
+	is doap:developer of `Type-Tiny`;
 	:name "Peter Karman".
 
 cpan:ABRAXXA
-	is dcs:blame of `Type-Tiny`;
+	is doap:developer of `Type-Tiny`;
 	:name "Alexander Hartmaier".
 
 cpan:XENO
-	is dcs:thanks of `Type-Tiny`;
+	is doap:helper of `Type-Tiny`;
 	:name "Caleb Cushing".
 
 cpan:MSCHWERN
-	is dcs:thanks of `Type-Tiny`;
+	is doap:helper of `Type-Tiny`;
 	:name "Michael G Schwern".
 
 cpan:SHLOMIF
-	is dcs:thanks of `Type-Tiny`;
+	is doap:helper of `Type-Tiny`;
 	:name "Shlomi Fish".
 
 cpan:DAKKAR
-	is dcs:blame of `Type-Tiny`;
+	is doap:developer of `Type-Tiny`;
 	:name "Gianni Ceccarelli".
 
 cpan:SPICEMAN
-	is dcs:thanks of `Type-Tiny`;
+	is doap:helper of `Type-Tiny`;
 	:name "Marcel Montes".
 
 cpan:MARTIMM
-	is dcs:thanks of `Type-Tiny`;
+	is doap:helper of `Type-Tiny`;
 	:name "Marcel Timmerman".
 
 cpan:TSIBLEY
-	is dcs:blame of `Type-Tiny`;
+	is doap:developer of `Type-Tiny`;
 	:page <https://github.com/tsibley>;
 	:name "Thomas Sibley".
 
 cpan:ETHER
-	is dcs:blame of `Type-Tiny`;
+	is doap:developer of `Type-Tiny`;
 	:name "Karen Etheridge".
 
 cpan:BLUEFEET
-	is dcs:thanks of `Type-Tiny`;
+	is doap:helper of `Type-Tiny`;
 	:name "Aran Clary Deltac".
 	
 cpan:BOOK
-	is dcs:blame of `Type-Tiny`;
+	is doap:developer of `Type-Tiny`;
 	:name "Philippe Bruhat".
 
 cpan:ANDK
-	is dcs:thanks of `Type-Tiny`;
+	is doap:helper of `Type-Tiny`;
 	:name "Andreas J König".
 
 cpan:SREZIC
-	is dcs:thanks of `Type-Tiny`;
+	is doap:helper of `Type-Tiny`;
 	:name "Slaven Rezić".
 
 cpan:RRWO
-	is dcs:blame of `Type-Tiny`;
+	is doap:developer of `Type-Tiny`;
 	:name "Robert Rothenberg".
 
 <urn:uuid:6c7beadd-14b0-489a-940c-57ccd2ec90df>
-	is dcs:blame of `Type-Tiny`;
+	is doap:developer of `Type-Tiny`;
 	:mbox <mailto:peter@morch.com>;
 	:name "Peter Valdemar Mørch".
 
 <urn:uuid:b57923e3-29ce-4c55-b480-660e3cd2c429>
-	is dcs:blame of `Type-Tiny`;
+	is doap:developer of `Type-Tiny`;
 	:mbox <mailto:cpan@zoffix.com>;
 	:name "Zoffix Znet".
 
 <urn:uuid:b678e2c5-cd5a-4509-b2ea-aadc8937d16c>
-	is dcs:blame of `Type-Tiny`;
+	is doap:developer of `Type-Tiny`;
 	:mbox <mailto:dionys@gmail.com>;
 	:page <https://github.com/dionys>;
 	:name "Denis Ibaev".
 
 <urn:uuid:aae4d20c-4388-4267-9336-f71176b27c75>
-	is dcs:blame of `Type-Tiny`;
+	is doap:developer of `Type-Tiny`;
 	:mbox <mailto:alexchorny@gmail.com>;
 	:page <https://github.com/chorny>;
 	:name "Alexandr Ciornii".
 
 <urn:uuid:a96145d2-d9bc-4d1b-a278-be17c831edfd>
-	is dcs:thanks of `Type-Tiny`;
+	is doap:helper of `Type-Tiny`;
 	:page <https://github.com/andrewalker>;
 	:name "André Walker";
 	:homepage <http://www.andrewalker.net>.
 
 cpan:JONASBN
-	is dcs:blame of `Type-Tiny`;
+	is doap:developer of `Type-Tiny`;
 	:name "Jonas B Nielsen".
 
 <urn:uuid:c89062f8-6fb7-425e-a0ee-3dd3a46127cf>
-	is dcs:blame of `Type-Tiny`;
+	is doap:developer of `Type-Tiny`;
 	:name "Nelo Onyiah";
 	:page <https://github.com/j1n3l0>.
 
 cpan:SCHROEER
-	is dcs:thanks of `Type-Tiny`;
+	is doap:helper of `Type-Tiny`;
 	:name "Daniel Schröer".
 
 <urn:uuid:6d23dbc6-4302-4a97-a47c-b44252549040>
-	is dcs:thanks of `Type-Tiny`;
+	is doap:helper of `Type-Tiny`;
 	:name "Ivanov Anton";
 	:mbox <mailto:x86mail@gmail.com>.
 
 cpan:LSBUCHALA
-	is dcs:blame of `Type-Tiny`;
+	is doap:developer of `Type-Tiny`;
 	:page <https://github.com/lucasbuchala>;
 	:name "Lucas Buchala".
 
 cpan:HAUKEX
-	is dcs:blame of `Type-Tiny`;
+	is doap:developer of `Type-Tiny`;
 	:page <https://github.com/haukex>;
 	:name "Hauke D".
 
 cpan:SNEZ
-	is dcs:thanks of `Type-Tiny`;
+	is doap:helper of `Type-Tiny`;
 	:name "Szymon Nieznański".
 
 cpan:MHOWARD
-	is dcs:blame of `Type-Tiny`;
+	is doap:developer of `Type-Tiny`;
 	:name "Meredith Howard";
 	:page <https://github.com/merrilymeredith>.
 
 cpan:AERUDER
-	is dcs:blame of `Type-Tiny`;
+	is doap:developer of `Type-Tiny`;
 	:name "Andrew Ruder".
 
 cpan:SPATOCS
-	is dcs:blame of `Type-Tiny`;
+	is doap:developer of `Type-Tiny`;
 	:name "Sandor Patocs".
 
 <urn:uuid:43559705-9a3a-45fe-b29c-c4aaed234e37>
-	is dcs:blame of `Type-Tiny`;
+	is doap:developer of `Type-Tiny`;
 	:name "Windymelt";
 	:page <https://github.com/windymelt>;
 	:page <https://www.3qe.us/>.
 
 cpan:LUCAS
-	is dcs:blame of `Type-Tiny`;
+	is doap:developer of `Type-Tiny`;
 	:name "Lucas Tiago de Moraes".
 
 <urn:uuid:3d4e7e7c-a9f5-4f34-915c-6beefd3485a8>
-	is dcs:thanks of `Type-Tiny`;
+	is doap:helper of `Type-Tiny`;
 	:name "Hugo van der Sanden";
 	:page <https://github.com/hvds>.
 
 <urn:uuid:011f6ebf-6818-409c-bc8a-b98011eab9cb>
-	is dcs:thanks of `Type-Tiny`;
+	is doap:helper of `Type-Tiny`;
 	:nick "bokutin";
 	:page <https://github.com/bokutin>.
 
 <urn:uuid:af150f96-4213-481a-968b-58b1325e3d0e>
-	is dcs:thanks of `Type-Tiny`;
+	is doap:helper of `Type-Tiny`;
 	:name "James Wright".
 
 <urn:uuid:94ef588e-86af-4cf6-aa8f-e9794208341f>
-	is dcs:thanks of `Type-Tiny`;
+	is doap:helper of `Type-Tiny`;
 	:nick "jsf116";
 	:page <https://github.com/jsf116>.
 
 <urn:uuid:febe859c-fa5c-4abd-8c6c-464643c79e4e>
-	is dcs:thanks of `Type-Tiny`;
+	is doap:helper of `Type-Tiny`;
 	:name "KB Jørgensen".
 
 cpan:CHROMATIC
-	is dcs:thanks of `Type-Tiny`;
+	is doap:helper of `Type-Tiny`;
 	:name  "Chromatic".
 
 cpan:RCLAMP
-	is dcs:thanks of `Type-Tiny`;
+	is doap:helper of `Type-Tiny`;
 	:name  "Richard Clamp".
 
 cpan:MARKF
-	is dcs:thanks of `Type-Tiny`;
+	is doap:helper of `Type-Tiny`;
 	:name  "Mark Fowler".
 
 <urn:uuid:1e423144-9fa1-42b4-86fa-7a4e47a5519e>
-	is dcs:thanks of `Type-Tiny`;
+	is doap:helper of `Type-Tiny`;
 	:nick "sbuggles".
 
 <urn:uuid:c98016a1-919d-4e92-a138-1c37a307fe22>
-	is dcs:thanks of `Type-Tiny`;
+	is doap:helper of `Type-Tiny`;
 	:nick "Zhtwn".
 
 <urn:uuid:baa9b789-35d5-459d-82da-f04cd91a34c7>
-	is dcs:blame of `Type-Tiny`;
+	is doap:developer of `Type-Tiny`;
 	:name "Florian Schlichting";
 	:page <https://github.com/fschlich>.
 
 cpan:JKEENAN
-	is dcs:blame of `Type-Tiny`;
+	is doap:developer of `Type-Tiny`;
 	:name "James E Keenan".
 
 # We bundle some files made by these dudes...
 
 cpan:RJBS
-	is dcs:thanks of `Type-Tiny`;
+	is doap:helper of `Type-Tiny`;
 	:name  "Ricardo Signes".
 
 cpan:TOKUHIROM
-	is dcs:thanks of `Type-Tiny`;
+	is doap:helper of `Type-Tiny`;
 	:name  "MATSUNO Tokuhiro".
 
 cpan:NUFFIN
-	is dcs:thanks of `Type-Tiny`;
+	is doap:helper of `Type-Tiny`;
 	:name  "Yuval Kogman".
 
 cpan:INGY
-	is dcs:thanks of `Type-Tiny`;
+	is doap:helper of `Type-Tiny`;
 	:name  "Ingy döt Net".
 
