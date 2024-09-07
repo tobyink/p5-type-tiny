@@ -937,8 +937,8 @@ So C<< signature( multi => [...] ) >> can be used instead of the longer
 C<< signature( multiple => [...] ) >>. Three whole keystrokes saved!
 
 (B<Note:> in older releases of Type::Params, C<< ${^_TYPE_PARAMS_MULTISIG} >>
-was called C<< ${^TYPE_PARAMS_MULTISIG} >>. The latter name is deprecated,
-and support for it will be removed in a future release of Type::Params.)
+was called C<< ${^TYPE_PARAMS_MULTISIG} >>. The latter name is no longer
+supported.)
 
 =head4 C<< message >> B<Str>
 

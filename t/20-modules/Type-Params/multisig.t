@@ -46,9 +46,9 @@ is_deeply(
 );
 
 is(
-	${^TYPE_PARAMS_MULTISIG},
+	${^_TYPE_PARAMS_MULTISIG},
 	0,
-	'...${^TYPE_PARAMS_MULTISIG}',
+	'...${^_TYPE_PARAMS_MULTISIG}',
 );
 
 is_deeply(
@@ -58,9 +58,9 @@ is_deeply(
 );
 
 is(
-	${^TYPE_PARAMS_MULTISIG},
+	${^_TYPE_PARAMS_MULTISIG},
 	0,
-	'...${^TYPE_PARAMS_MULTISIG}',
+	'...${^_TYPE_PARAMS_MULTISIG}',
 );
 
 like(
@@ -76,9 +76,9 @@ is_deeply(
 );
 
 is(
-	${^TYPE_PARAMS_MULTISIG},
+	${^_TYPE_PARAMS_MULTISIG},
 	1,
-	'...${^TYPE_PARAMS_MULTISIG}',
+	'...${^_TYPE_PARAMS_MULTISIG}',
 );
 
 is_deeply(
@@ -88,9 +88,9 @@ is_deeply(
 );
 
 is(
-	${^TYPE_PARAMS_MULTISIG},
+	${^_TYPE_PARAMS_MULTISIG},
 	1,
-	'...${^TYPE_PARAMS_MULTISIG}',
+	'...${^_TYPE_PARAMS_MULTISIG}',
 );
 
 like(
@@ -106,9 +106,9 @@ is_deeply(
 );
 
 is(
-	${^TYPE_PARAMS_MULTISIG},
+	${^_TYPE_PARAMS_MULTISIG},
 	2,
-	'...${^TYPE_PARAMS_MULTISIG}',
+	'...${^_TYPE_PARAMS_MULTISIG}',
 );
 
 like(
