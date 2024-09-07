@@ -446,12 +446,6 @@ object which other methods can get called on. For example:
 
    Types::Mine->meta->add_type($foo);
 
-=begin trustme
-
-=item meta
-
-=end trustme
-
 =over
 
 =item C<< add_type($type) >> or C<< add_type(%opts) >>
@@ -651,3 +645,9 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+=begin trustme
+
+=item meta
+
+=end trustme
