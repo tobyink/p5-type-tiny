@@ -516,7 +516,7 @@ coderef as a list:
 =head4 C<< named >> B<ArrayRef>
 
 This is conceptually a list of pairs of names and type constraints, one
-name+type pair for each positional parameter. For example, a signature for
+name+type pair for each named parameter. For example, a signature for
 a function which accepts two integers:
 
  signature( named => [ foo => Int, bar => Int ] )
