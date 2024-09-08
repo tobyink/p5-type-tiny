@@ -1160,3 +1160,37 @@
 			dcs:thanks <urn:uuid:ad9e89fe-6e7e-402a-8df7-95a0a7a5e830>;
 		];
 	].
+
+`Type-Tiny 2.005_002 cpan:TOBYINK`
+	issued  2024-09-08;
+	changeset [
+		dcs:versus `Type-Tiny 2.005_001 cpan:TOBYINK`;
+		item [
+			a dcs:Change;
+			label "Improved initialization of variables when they are tied to a type constraint; initialization to explicit values will work even when not tied via the `ttie` wrapper function; if no explicit values are provided, tied scalars will be initialized to the type's `type_default`. So for example, `tie( my $title, Str )` will initialize `$title` to the empty string instead of undef, and `tie( my $title, Str, 'Foo' )` will initialize the variable to 'Foo' as was already implied by documentation.";
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/143>;
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/152>;
+			dcs:thanks <urn:uuid:eb4b400b-0384-4b2c-bb90-22710313814f>;
+			dcs:thanks <urn:uuid:3252eff0-4dbd-4de1-b5ac-068d985875c3>;
+		];
+		item [
+			a dcs:Change;
+			label "Inlining `Int` now calls the XS implementation when available. (The speed improvement is negligible, but it also may result in small memory savings.)";
+			seealso <https://github.com/tobyink/p5-type-tiny/pull/145>;
+			dcs:blame <urn:uuid:1f579dab-c7ff-4a7b-97bd-59b9c785a1a8>;
+		];
+		item [
+			a dcs:Documentation;
+			label "Fix minor typo in documentation for named parameters in `Type::Params`.";
+		];
+		item [
+			a dcs:Bugfix;
+			label "Fix uninitialized warning messages from Error::TypeTiny when processing very shallow stack traces.";
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/158>;
+			dcs:thanks cpan:DJERIUS;
+		];
+		item [
+			a dcs:Removal;
+			label "Support for the ${^TYPE_PARAMS_MULTISIG} global variable has been dropped. Using this global variable was deprecated in trial version 1.999_010 and stable version 2.000000, both of which are nearly two years old. Use ${^_TYPE_PARAMS_MULTISIG} instead.";
+		];
+	].

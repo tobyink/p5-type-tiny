@@ -305,6 +305,21 @@ cpan:JKEENAN
 	:name "Yoshikazu Sawa";
 	:page <https://github.com/yoshikazusawa>.
 
+<urn:uuid:eb4b400b-0384-4b2c-bb90-22710313814f>
+	is doap:helper of `Type-Tiny`;
+	:page <https://github.com/XSven>;
+	:nick "XSven".
+
+<urn:uuid:3252eff0-4dbd-4de1-b5ac-068d985875c3>
+	is doap:helper of `Type-Tiny`;
+	:page <https://github.com/m-dango>;
+	:nick "Daniel Mita".
+
+<urn:uuid:1f579dab-c7ff-4a7b-97bd-59b9c785a1a8>
+	is doap:developer of `Type-Tiny`;
+	:page <https://github.com/zmughal>;
+	:nick "Zaki Mughal".
+
 # We bundle some files made by these dudes...
 
 cpan:RJBS
