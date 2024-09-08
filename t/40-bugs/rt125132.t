@@ -18,7 +18,7 @@ Some modifications by Toby Inkster <tobyink@cpan.org>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2018-2023 by Marc Ballarin.
+This software is copyright (c) 2018-2024 by Marc Ballarin.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

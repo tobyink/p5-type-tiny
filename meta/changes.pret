@@ -1193,4 +1193,8 @@
 			a dcs:Removal;
 			label "Support for the ${^TYPE_PARAMS_MULTISIG} global variable has been dropped. Using this global variable was deprecated in trial version 1.999_010 and stable version 2.000000, both of which are nearly two years old. Use ${^_TYPE_PARAMS_MULTISIG} instead.";
 		];
+		item [
+			a dcs:Update, dcs:Documentation;
+			label "Update copyright notices in files to 2024.";
+		];
 	].
