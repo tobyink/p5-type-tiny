@@ -56,14 +56,17 @@ sub throw_cb {
 		$level++ if caller( $level ) eq ( $pkg || "" );
 	}
 	
-	# Moo's Method::Generate::Constructor puts an eval in the stack trace,
-	# that is useless for debugging, so show the stack frame one above.
-	$level++
-		if (
-		( caller( $level ) )[1] =~ /^\(eval \d+\)$/
-		and ( caller( $level ) )[3] eq '(eval)'    # (caller())[3] is $subroutine
-		);
-	@ctxt{qw/ package file line /} = caller( $level );
+	{
+		no warnings 'uninitialized';
+		# Moo's Method::Generate::Constructor puts an eval in the stack trace,
+		# that is useless for debugging, so show the stack frame one above.
+		$level++
+			if (
+			( caller( $level ) )[1] =~ /^\(eval \d+\)$/
+			and ( caller( $level ) )[3] eq '(eval)'    # (caller())[3] is $subroutine
+			);
+		@ctxt{qw/ package file line /} = caller( $level );
+	}
 	
 	my $stack = undef;
 	if ( our $StackTrace ) {
