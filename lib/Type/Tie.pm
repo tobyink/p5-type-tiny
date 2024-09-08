@@ -22,16 +22,13 @@ use Scalar::Util ();
 		my ( $ref, $type, @vals ) = @_;
 		
 		if ( 'HASH' eq ref $ref ) {
-			tie %$ref, "Type::Tie::HASH", $type;
-			%$ref = @vals if @vals;
+			tie %$ref, "Type::Tie::HASH", $type, @vals;
 		}
 		elsif ( 'ARRAY' eq ref $ref ) {
-			tie @$ref, "Type::Tie::ARRAY", $type;
-			@$ref = @vals if @vals;
+			tie @$ref, "Type::Tie::ARRAY", $type, @vals;
 		}
 		else {
-			tie $$ref, "Type::Tie::SCALAR", $type;
-			$$ref = $vals[-1] if @vals;
+			tie $$ref, "Type::Tie::SCALAR", $type, @vals;
 		}
 		return $ref;
 	}
@@ -171,8 +168,13 @@ use Scalar::Util ();
 	
 	sub TIEARRAY   {
 		my $class = shift;
+		my $type  = shift;
 		my $self  = bless( [ $class->_DEFAULT ], $class );
-		$self->_set_type( $_[0] );
+		$self->_set_type( $type );
+		if ( @_ ) {
+			my $R = $self->_REF;
+			@$R = map { $self->coerce_and_check_value( $_ ) } @_;
+		}
 		$self;
 	}
 	sub _DEFAULT   { [] }
@@ -209,8 +211,17 @@ use Scalar::Util ();
 	
 	sub TIEHASH    {
 		my $class = shift;
+		my $type  = shift;
 		my $self  = bless( [ $class->_DEFAULT ], $class );
-		$self->_set_type( $_[0] );
+		$self->_set_type( $type );
+		if ( @_ ) {
+			my $R = $self->_REF;
+			my %H = @_;
+			%$R = ();
+			while ( my ( $K, $V ) = each %H ) {
+				$R->{$K} = $self->coerce_and_check_value( $V );
+			}
+		}
 		$self;
 	}
 	sub _DEFAULT   { +{} }
@@ -235,8 +246,16 @@ use Scalar::Util ();
 	
 	sub TIESCALAR  {
 		my $class = shift;
+		my $type  = shift;
 		my $self  = bless( [ $class->_DEFAULT ], $class );
-		$self->_set_type($_[0]);
+		$self->_set_type($type);
+		if ( @_ ) {
+			Carp::croak( 'Too many initial values provided for SCALAR' ) if @_ > 1;
+			${ $self->_REF } = $self->coerce_and_check_value( $_[0] );
+		}
+		elsif ( $type->can('type_default') and my $d = $type->type_default ) {
+			${ $self->_REF } = $d->();
+		}
 		$self;
 	}
 	sub _DEFAULT   { my $x; \$x }
