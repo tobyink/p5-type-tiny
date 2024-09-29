@@ -4,6 +4,11 @@
    changes in development releases, see the "Changes" file instead.
 =======================================================================
 
+2024-09-29 Type-Tiny version 2.006000 released!
+
+ - Improvements to `tie( VAR, TYPE)`.
+ - Fixed compatibility with Perl 5.41.x.
+
 2023-04-05 Type-Tiny version 2.004000 released!
 
  - `Type::Tiny` objects have a `exception_class` attribute.
