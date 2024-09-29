@@ -10,7 +10,7 @@ BEGIN {
 
 BEGIN {
 	$Eval::TypeTiny::CodeAccumulator::AUTHORITY  = 'cpan:TOBYINK';
-	$Eval::TypeTiny::CodeAccumulator::VERSION    = '2.005_002';
+	$Eval::TypeTiny::CodeAccumulator::VERSION    = '2.006000';
 }
 
 $Eval::TypeTiny::CodeAccumulator::VERSION =~ tr/_//d;

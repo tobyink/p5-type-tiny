@@ -1198,3 +1198,17 @@
 			label "Update copyright notices in files to 2024.";
 		];
 	].
+
+`Type-Tiny 2.006000 cpan:TOBYINK`
+	issued  2024-09-24;
+	changeset [
+		dcs:versus `Type-Tiny 2.005_002 cpan:TOBYINK`;
+		item [
+			a dcs:Packaging;
+			label "Repackage as stable. (See also the changelog for 2.005_001 and 2.005_002.)";
+		];
+		item [
+			a dcs:Documentation;
+			label "Update NEWS.";
+		];
+	].
