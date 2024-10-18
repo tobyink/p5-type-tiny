@@ -40,7 +40,7 @@ sub _new_code_accumulator {
 
 sub new {
 	my $class = shift;
-	my %self  = @_ == 1 ? %{$_[0]} : @_;
+	my %self = @_ == 1 ? %{$_[0]} : @_;
 	my $self = bless \%self, $class;
 	$self->{parameters}   ||= [];
 	$self->{class_prefix} ||= 'Type::Params::OO::Klass';
@@ -72,6 +72,21 @@ sub new {
 				name    => 'invocant',
 				type    => $type,
 			);
+		}
+
+		if ( my $r = delete $self->{returns} ) {
+			$self->{returns_scalar} ||= $r;
+			$self->{returns_list}   ||= ArrayRef->of( $r );
+		}
+
+		for my $attr ( qw/ returns_scalar returns_list / ) {
+			if ( is_Str $self->{$attr} ) {
+				require Type::Utils;
+				$self->{$attr} = Type::Utils::dwim_type( $self->{$attr}, $self->{package} ? ( for => $self->{package} ) : () );
+			}
+			elsif ( exists $self->{$attr} ) {
+				$self->{$attr} = to_TypeTiny( $self->{$attr} );
+			}
 		}
 
 		if ( defined $self->{bless} and $self->{bless} eq 1 and not $self->{named_to_list} ) {
@@ -279,6 +294,8 @@ sub class         { $_[0]{class} }
 sub constructor   { $_[0]{constructor} }
 sub named_to_list { $_[0]{named_to_list} }
 sub oo_trace      { $_[0]{oo_trace} }
+sub returns_scalar{ $_[0]{returns_scalar} }  sub has_returns_scalar{ exists $_[0]{returns_scalar} }
+sub returns_list  { $_[0]{returns_list} }    sub has_returns_list  { exists $_[0]{returns_list} }
 
 sub method_invocant { $_[0]{method_invocant} = defined( $_[0]{method_invocant} ) ? $_[0]{method_invocant} : 'undef' }
 
@@ -703,6 +720,13 @@ sub _coderef_extra_names {
 sub _coderef_end {
 	my ( $self, $coderef ) = ( shift, @_ );
 
+	if ( $self->{_is_signature_for} and $self->goto_next ) {
+		$coderef->add_variable( '$return_check_for_scalar', \ $self->returns_scalar->compiled_check )
+			if $self->has_returns_scalar;
+		$coderef->add_variable( '$return_check_for_list', \ $self->returns_list->compiled_check )
+			if $self->has_returns_list;
+	}
+
 	if ( $self->bless and $self->oo_trace ) {
 		my $package = $self->package;
 		my $subname = $self->subname;
@@ -772,7 +796,11 @@ sub _make_return_expression {
 	my $list = join q{, }, $self->_make_return_list;
 
 	if ( $self->goto_next ) {
-		if ( $list eq '@_' ) {
+		if ( $self->{_is_signature_for} and ( $self->has_returns_list or $self->has_returns_scalar ) ) {
+			my $call = sprintf '$__NEXT__->( %s )', $list;
+			return $self->_make_typed_return_expression( $call );
+		}
+		elsif ( $list eq '@_' ) {
 			return sprintf 'goto( $__NEXT__ )';
 		}
 		else {
@@ -785,6 +813,62 @@ sub _make_return_expression {
 	}
 	else {
 		return sprintf '( %s )', $list;
+	}
+}
+
+sub _make_typed_return_expression {
+	my ( $self, $expr ) = @_;
+
+	return sprintf 'wantarray ? %s : defined( wantarray ) ? %s : do { %s; undef; }',
+		$self->has_returns_list ? $self->_make_typed_list_return_expression( $expr, $self->returns_list ) : $expr,
+		$self->has_returns_scalar ? $self->_make_typed_scalar_return_expression( $expr, $self->returns_scalar ) : $expr,
+		$expr;
+}
+
+sub _make_typed_scalar_return_expression {
+	my ( $self, $expr, $constraint ) = @_;
+
+	if ( $constraint->{uniq} == Any->{uniq} ) {
+		return $expr;
+	}
+	elsif ( $constraint->can_be_inlined ) {
+		return sprintf 'do { my $__RETURN__ = %s; ( %s ) ? $__RETURN__ : %s }',
+			$expr,
+			$constraint->inline_check( '$__RETURN__' ),
+			$self->_make_constraint_fail( constraint => $constraint, varname => '$__RETURN__' );
+	}
+	else {
+		return sprintf 'do { my $__RETURN__ = %s; $return_check_for_scalar->( $__RETURN__ ) ? $__RETURN__ : %s }',
+			$expr,
+			$self->_make_constraint_fail( constraint => $constraint, varname => '$__RETURN__' );
+	}
+}
+
+sub _make_typed_list_return_expression {
+	my ( $self, $expr, $constraint ) = @_;
+
+	my $slurp_into = Slurpy->of( $constraint )->my_slurp_into;
+	my $varname = $slurp_into eq 'HASH' ? '%__RETURN__' : '@__RETURN__';
+
+	if ( $constraint->{uniq} == Any->{uniq} ) {
+		return $expr;
+	}
+	elsif ( $constraint->can_be_inlined ) {
+		return sprintf 'do { my %s = %s; my $__RETURN__ = \ %s; ( %s ) ? %s : %s }',
+			$varname,
+			$expr,
+			$varname,
+			$constraint->inline_check( '$__RETURN__' ),
+			$varname,
+			$self->_make_constraint_fail( constraint => $constraint, varname => '$__RETURN__', display_var => "\\$varname" );
+	}
+	else {
+		return sprintf 'do { my %s = %s; my $__RETURN__ = \ %s; $return_check_for_list->( $__RETURN__ ) ? %s : %s }',
+			$varname,
+			$expr,
+			$varname,
+			$varname,
+			$self->_make_constraint_fail( constraint => $constraint, varname => '$__RETURN__', display_var => "\\$varname" );
 	}
 }
 

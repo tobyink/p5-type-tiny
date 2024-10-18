@@ -131,6 +131,8 @@ sub signature_for {
 		signature_for( $_, %opts ) for @$function;
 		return;
 	}
+	
+	$opts{_is_signature_for} = 1;
 
 	my $fullname = ( $function =~ /::/ ) ? $function : "$package\::$function";
 	$opts{package}   ||= $package;
@@ -1053,6 +1055,39 @@ Or as a shortcut:
 It is doubtful you want to use any of these options, except
 C<< bless => false >>.
 
+=head4 C<< returns >> B<TypeTiny>, C<< returns_scalar >> B<TypeTiny>, and C<< returns_list >> B<TypeTiny>
+
+These can be used to specify the type returned by your function.
+
+ sub round_number {
+   state $sig = signature(
+     pos          => [ Num ],
+     returns      => Int,
+   );
+   my ( $num ) = $sig->( @_ );
+   return int( $num );
+ }
+
+If your function returns different types in scalar and list context,
+you can use C<returns_scalar> and C<returns_list> to indicate separate
+return types in different contexts.
+
+ state $sig = signature(
+   pos             => [ Int, Int ],
+   returns_scalar  => Int,
+   returns_list    => Tuple[ Int, Int, Int ],
+ );
+
+The C<returns_list> constraint is defined using an B<ArrayRef>-like or
+B<HashRef>-like type constraint even though it's returning a list, not
+a single reference.
+
+B<Note:> because signature checks happen early before the rest of your
+function executes, the C<returns>, C<returns_scalar>, and C<returns_list>
+options are considered I<advisorary> and I<for documentation> and are
+not actually checked! However, the C<signature_for> keyword, which wraps
+your entire sub, is able to check them.
+
 =head3 Parameter Options
 
 In the parameter lists for the C<positional> and C<named> signature
@@ -1445,6 +1480,12 @@ The same signature specification options are supported, with the exception
 of C<want_source>, C<want_details>, and C<goto_next> which will not work.
 (If using the C<multiple> option, then C<goto_next> is still supported in
 the I<nested> signatures.)
+
+The C<returns>, C<returns_scalar>, and C<returns_list> options
+are actually checked instead of just being advisorary. (Because this
+means that the signature will need to run code *after* your original
+function has run, it means the signature will be visible on the caller
+stack from within your function.)
 
 If you are providing a signature for a sub in another package, then
 C<< signature_for "Some::Package::some_sub" => ( ... ) >> will work,
