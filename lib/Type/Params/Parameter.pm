@@ -1,5 +1,3 @@
-# INTERNAL MODULE: a parameter within a Type::Params::Signature.
-
 package Type::Params::Parameter;
 
 use 5.008001;
@@ -365,3 +363,143 @@ sub _make_code {
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Type::Params::Parameter - internal representation of a parameter in a function signature
+
+=head1 STATUS
+
+This module is not covered by the
+L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
+
+=head1 DESCRIPTION
+
+This is mostly internal code, but can be used to provide basic introspection
+for signatures.
+
+=head2 Constructor
+
+=over
+
+=item C<< new(%attributes) >>
+
+=back
+
+=head2 Attributes
+
+All attributes are read-only.
+
+=over
+
+=item C<< type >> B<TypeTiny>
+
+Type constraint for the parameter.
+
+=item C<< default >> B<< CodeRef|ScalarRef|Ref|Str|Undef >>
+
+A default for the parameter: either a coderef to generate a value,
+a reference to a string of Perl code to generate the value, an
+a reference to an empty array or empty hash, a literal string
+to use as a default, or a literal undef to use as a default.
+
+=item C<< strictness >> B<< Bool|ScalarRef >>
+
+A boolean indicating whether to be stricter with type checks,
+or a reference to a string of Perl code naming a Perl variable
+or constant which controls strict behaviour.
+
+=item C<< clone >> B<< Bool >>
+
+The method for accessing this is called C<should_clone> for no
+particular reason.
+
+=item C<< coerce >> B<< Bool >>
+
+Defaults to true if C<type> has a coercion.
+
+=item C<< optional >> B<< Bool >>
+
+Defaults to true if there is a C<default> or if C<type> is a subtype of
+B<Optional>.
+
+=back
+
+=head3 Attributes related to named parameters
+
+=over
+
+=item C<< name >> B<Str>
+
+=item C<< alias >> B<< ArrayRef[Str] >>
+
+=item C<< getter >> B<Str>
+
+=item C<< predicate >> B<< Str >>
+
+=back
+
+=head2 Methods
+
+=head3 Predicates
+
+Predicate methods return true/false to indicate the presence or absence of
+attributes.
+
+=over
+
+=item C<< has_type >>
+
+=item C<< has_default >>
+
+=item C<< has_strictness >>
+
+=item C<< has_name >>
+
+=item C<< has_alias >>
+
+=back
+
+=head3 Other methods
+
+=over
+
+=item C<< might_supply_new_value >>
+
+Indicates that the parameter can't simply be referenced within C<< @_ >>
+because a default value might be used, the given value might be coerced,
+or the given value might be cloned using L<Storable>.
+
+=back
+
+=head1 BUGS
+
+Please report any bugs to
+L<https://github.com/tobyink/p5-type-tiny/issues>.
+
+=head1 SEE ALSO
+
+L<Type::Params>, L<Type::Params::Signature>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2023-2024 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.

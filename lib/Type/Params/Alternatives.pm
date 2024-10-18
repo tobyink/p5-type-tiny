@@ -1,5 +1,3 @@
-# INTERNAL MODULE: OO backend for Type::Params multisig-type signatures.
-
 package Type::Params::Alternatives;
 
 use 5.008001;
@@ -183,3 +181,86 @@ sub make_class_pp_code {
 
 1;
 
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Type::Params::Alternatives - subclass of Type::Params::Signature for C<multi> signatures
+
+=head1 STATUS
+
+This module is not covered by the
+L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
+
+=head1 DESCRIPTION
+
+This is mostly internal code, but can be used to provide basic introspection
+for signatures.
+
+This module is a subclass of L<Type::Parameters::Signature>, so inherits
+attributes and methods from that.
+
+=head2 Constructor
+
+=over
+
+=item C<< new(%attributes) >>
+
+=back
+
+=head2 Attributes
+
+All attributes are read-only.
+
+=over
+
+=item C<< base_options >> B<HashRef>
+
+=item C<< alternatives >> B<< ArrayRef[HashRef|ArrayRef|CodeRef] >>
+
+=item C<< sig_class >> B<ClassName>
+
+=item C<< meta_alternatives >> B<ArrayRef[HashRef]>
+
+Automatically built from C<alternatives>; do not set this yourself.
+
+=item C<< parameters >> B<ArrayRef>
+
+Overridden from parent class to always return the empty arrayref.
+
+=item C<< message >> B<Str>
+
+Error message to be thrown when none of the alternatives match.
+This is a bare attribute with no accessor method.
+
+=back
+
+=head1 BUGS
+
+Please report any bugs to
+L<https://github.com/tobyink/p5-type-tiny/issues>.
+
+=head1 SEE ALSO
+
+L<Type::Params>, L<Type::Params::Signature>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2023-2024 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.

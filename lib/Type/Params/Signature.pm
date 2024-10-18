@@ -1,5 +1,3 @@
-# INTERNAL MODULE: OO backend for Type::Params signatures.
-
 package Type::Params::Signature;
 
 use 5.008001;
@@ -1065,3 +1063,250 @@ sub return_wanted {
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Type::Params::Signature - internal representation of a function signature
+
+=head1 STATUS
+
+This module is not covered by the
+L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
+
+=head1 DESCRIPTION
+
+This is mostly internal code, but can be used to provide basic introspection
+for signatures.
+
+=head2 Constructors
+
+=over
+
+=item C<< new(%attributes) >>
+
+=item C<< new_from_compile($style, %attributes) >>
+
+=item C<< new_from_v2api(\%attributes) >>
+
+=back
+
+=head2 Attributes
+
+All attributes are read-only.
+
+=over
+
+=item C<< package >> B<ClassName>
+
+The package we're providing a signature for. Will be used to look up any
+stringy type names.
+
+=item C<< subname >> B<Str>
+
+The sub we're providing a signature for.
+
+=item C<< description >> B<Str>
+
+=item C<< method >> B<< ArrayRef[InstanceOf['Type::Params::Parameter']] >>
+
+=item C<< head >> B<< ArrayRef[InstanceOf['Type::Params::Parameter']] >>
+
+=item C<< tail >> B<< ArrayRef[InstanceOf['Type::Params::Parameter']] >>
+
+=item C<< parameters >> B<< ArrayRef[InstanceOf['Type::Params::Parameter']] >>
+
+=item C<< slurpy >> B<< InstanceOf['Type::Params::Parameter'] >>
+
+=item C<< on_die >> B<CodeRef>
+
+=item C<< strictness >> B<< Bool|ScalarRef >>
+
+=item C<< goto_next >> B<CodeRef>
+
+=item C<< can_shortcut >> B<Bool>
+
+Indicates whether the signature has no potential to alter C<< @_ >> allowing
+it to be returned without being copied if type checks pass. Generally speaking,
+you should not provide this to the constructor and rely on
+Type::Params::Signature to figure it out.
+
+=item C<< coderef >> B<< InstanceOf['Eval::TypeTiny::CodeAccumulator'] >>
+
+You probably don't want to provide this to the constructor. The whole point
+of this module is to build it for you!
+
+=back
+
+=head3 Attributes related to named parameters
+
+=over
+
+=item C<< is_named >> B<Bool>
+
+=item C<< bless >> B<Bool|ClassName>
+
+=item C<< class >> B<ClassName>
+
+=item C<< constructor >> B<Str>
+
+=item C<< class_attributes >> B<HashRef>
+
+HashRef suitable for passing to the C<import> method of
+L<Class::XSAccessor>. A default will be generated based
+on C<parameters>
+
+=item C<< named_to_list >> B<< ArrayRef >>
+
+Can be coerced from a bool based on C<parameters>.
+
+=item C<< oo_trace >> B<Bool>
+
+Defaults to true. Indicates whether blessed C<< $arg >> hashrefs created by
+the signature will include a C<< '~~caller' >> key.
+
+=back
+
+=head3 Bare attributes
+
+These attributes may be passed to the constructors and may do something,
+but no methods are provided to access the values later.
+
+=over
+
+=item C<< positional >> or C<< pos >> B<ArrayRef>
+
+=item C<< named >> B<ArrayRef>
+
+=item C<< multiple >> or C<< multi >> B<ArrayRef>
+
+=item C<< returns >> B<Bool>
+
+Shortcut for setting C<returns_scalar> and C<returns_list> simultaneously.
+
+=item C<< want_source >> B<Bool>
+
+=item C<< want_details >> B<Bool>
+
+=item C<< want_object >> B<Bool>
+
+=item C<< rationalize_slurpies >> B<Bool>
+
+=back
+
+=head2 Methods
+
+=head3 Predicates
+
+Predicate methods return true/false to indicate the presence or absence of
+attributes.
+
+=over
+
+=item C<< has_description >>
+
+=item C<< has_head >>
+
+=item C<< has_tail >>
+
+=item C<< has_parameters >>
+
+=item C<< has_slurpy >>
+
+=item C<< has_on_die >>
+
+=item C<< has_strictness >>
+
+=item C<< has_returns_scalar >>
+
+=item C<< has_returns_list >>
+
+=back
+
+=head3 Class making methods
+
+These methods will be called automatically during object construction
+and should not typically be called. They are public methods in case
+it is desired to subclass Type::Params::Signature.
+
+=over
+
+=item C<< make_class_pp >>
+
+Builds the class specified in C<bless> by evaluating Perl code.
+
+=item C<< make_class_xs >>
+
+Builds the class specified in C<bless> using L<Class::XSAccessor>.
+
+=item C<< make_class >>
+
+Calls either C<make_class_pp> or C<make_class_xs>.
+
+=item C<< make_class_pp_code >>
+
+Generates the code for C<make_class_pp>.
+
+=back
+
+=head3 Other methods
+
+=over
+
+=item C<< BUILD >>
+
+Called by the constructors. You should not call this.
+
+=item C<< return_wanted >>
+
+Normally returns the signature coderef, unless C<want_source>, C<want_details>,
+or C<want_object> were provided to the constructor, in which case it will
+return the source code for the coderef, a hashref of details, or C<< $self >>.
+
+=back
+
+=head1 ENVIRONMENT
+
+=over
+
+=item C<PERL_TYPE_PARAMS_XS>
+
+Affects the building of accessors for C<< $arg >> objects. If set to true,
+will use L<Class::XSAccessor>. If set to false, will use pure Perl. If this
+environment variable does not exist, will use Class::XSAccessor.
+
+If Class::XSAccessor is not installed or is too old, pure Perl will always
+be used as a fallback.
+
+=back
+
+=head1 BUGS
+
+Please report any bugs to
+L<https://github.com/tobyink/p5-type-tiny/issues>.
+
+=head1 SEE ALSO
+
+L<Type::Params>, L<Type::Params::Parameter>, L<Type::Params::Alternatives>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2023-2024 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.

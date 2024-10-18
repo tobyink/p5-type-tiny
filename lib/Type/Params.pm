@@ -128,8 +128,7 @@ sub signature_for {
 
 	if ( ref($function) eq 'ARRAY' ) {
 		$opts{package} = $package;
-		signature_for( $_, %opts ) for @$function;
-		return;
+		return map { signature_for( $_, %opts ) } @$function;
 	}
 	
 	$opts{_is_signature_for} = 1;
@@ -167,7 +166,7 @@ sub signature_for {
 	no warnings 'redefine';
 	*$fullname = set_subname( $fullname, $coderef );
 
-	return;
+	return $sig;
 }
 
 sub compile {
@@ -1518,6 +1517,23 @@ multiple functions with the same signature.
  signature_for [ 'add_nums', 'subtract_nums' ] => (
    positional => [ Num, Num ],
  );
+
+C<signature_for> does return a value.
+
+ my $meta = signature_for add_nums => (
+   positional => [ Num, Num ],
+ );
+ 
+ sub add_nums ( $x, $y ) {
+   return $x + $y;
+ }
+
+Or when used with multiple functions:
+
+ my @metas = signature_for [ 'add_nums', 'subtract_nums' ] => (...);
+
+This is a blessed L<Type::Params::Signature> object which provides some
+introspection possibilities.
 
 =head1 LEGACY API
 
