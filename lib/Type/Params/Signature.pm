@@ -300,8 +300,8 @@ sub class         { $_[0]{class} }
 sub constructor   { $_[0]{constructor} }
 sub named_to_list { $_[0]{named_to_list} }
 sub oo_trace      { $_[0]{oo_trace} }
-sub returns_scalar{ $_[0]{returns_scalar} }  sub has_returns_scalar{ exists $_[0]{returns_scalar} }
-sub returns_list  { $_[0]{returns_list} }    sub has_returns_list  { exists $_[0]{returns_list} }
+sub returns_scalar{ $_[0]{returns_scalar} }  sub has_returns_scalar{ defined $_[0]{returns_scalar} }
+sub returns_list  { $_[0]{returns_list} }    sub has_returns_list  { defined $_[0]{returns_list} }
 
 sub method_invocant { $_[0]{method_invocant} = defined( $_[0]{method_invocant} ) ? $_[0]{method_invocant} : 'undef' }
 
