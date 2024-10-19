@@ -31,6 +31,8 @@ sub new {
 		for keys %{ $self->{base_options} };
 	$self->{sig_class} ||= 'Type::Params::Signature';
 	$self->{message}   ||= 'Parameter validation failed';
+	delete $self->{base_options}{$_} for qw/ returns returns_list returns_scalar /;
+	$self->_rationalize_returns;
 	return $self;
 }
 
@@ -65,11 +67,14 @@ sub _build_meta_alternative {
 	elsif ( is_HashRef $alt ) {
 		my %opts = (
 			%{ $self->base_options },
-			goto_next    => !!0, # don't propagate
+			goto_next       => !!0, # don't propagate these next few
+			returns         => undef,
+			returns_scalar  => undef,
+			returns_list    => undef,
 			%$alt,
-			want_source  => !!0,
-			want_object  => !!0,
-			want_details => !!1,
+			want_source     => !!0,
+			want_object     => !!0,
+			want_details    => !!1,
 		);
 		my $sig = $self->sig_class->new_from_v2api( \%opts );
 		return $sig->return_wanted;
@@ -77,11 +82,14 @@ sub _build_meta_alternative {
 	elsif ( is_ArrayRef $alt ) {
 		my %opts = (
 			%{ $self->base_options },
-			goto_next    => !!0, # don't propagate
-			positional   => $alt,
-			want_source  => !!0,
-			want_object  => !!0,
-			want_details => !!1,
+			goto_next       => !!0, # don't propagate these next few
+			returns         => undef,
+			returns_scalar  => undef,
+			returns_list    => undef,
+			positional      => $alt,
+			want_source     => !!0,
+			want_object     => !!0,
+			want_details    => !!1,
 		);
 		my $sig = $self->sig_class->new_from_v2api( \%opts );
 		return $sig->return_wanted;

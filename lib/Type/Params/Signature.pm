@@ -72,20 +72,7 @@ sub new {
 			);
 		}
 
-		if ( my $r = delete $self->{returns} ) {
-			$self->{returns_scalar} ||= $r;
-			$self->{returns_list}   ||= ArrayRef->of( $r );
-		}
-
-		for my $attr ( qw/ returns_scalar returns_list / ) {
-			if ( is_Str $self->{$attr} ) {
-				require Type::Utils;
-				$self->{$attr} = Type::Utils::dwim_type( $self->{$attr}, $self->{package} ? ( for => $self->{package} ) : () );
-			}
-			elsif ( exists $self->{$attr} ) {
-				$self->{$attr} = to_TypeTiny( $self->{$attr} );
-			}
-		}
+		$self->_rationalize_returns;
 
 		if ( defined $self->{bless} and $self->{bless} eq 1 and not $self->{named_to_list} ) {
 			my $klass_key     = $self->_klass_key;
@@ -180,6 +167,27 @@ sub _rationalize_slurpies {
 		Carp::carp( "Warning: the optional for the slurpy parameter will be ignored, continuing anyway" );
 		delete $self->{slurpy}{optional};
 	}
+}
+
+sub _rationalize_returns {
+	my $self = shift;
+	
+	if ( my $r = delete $self->{returns} ) {
+		$self->{returns_scalar} ||= $r;
+		$self->{returns_list}   ||= ArrayRef->of( $r );
+	}
+
+	for my $attr ( qw/ returns_scalar returns_list / ) {
+		if ( is_Str $self->{$attr} ) {
+			require Type::Utils;
+			$self->{$attr} = Type::Utils::dwim_type( $self->{$attr}, $self->{package} ? ( for => $self->{package} ) : () );
+		}
+		elsif ( exists $self->{$attr} ) {
+			$self->{$attr} = to_TypeTiny( $self->{$attr} );
+		}
+	}
+	
+	return $self;
 }
 
 sub _parameters_from_list {
