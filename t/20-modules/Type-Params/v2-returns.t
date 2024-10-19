@@ -89,7 +89,7 @@ subtest "Per-context return types" => sub {
 	ok( !exception { do { test3( 5.1 ); 1 } }, 'bad path, void context' );
 };
 
-subtest "Per-context return types" => sub {
+subtest "Multi + return types" => sub {
 	my $T = signature_for test4 => (
 		multi   => [ [Int], [Num] ],
 		returns => Int,
@@ -99,8 +99,9 @@ subtest "Per-context return types" => sub {
 		shift;
 	}
 
-	ok( !exception { my $z = test4( 1  ) } );
-	ok(  exception { my $z = test4( 1.1) } );
+	ok( !exception { my $z = test4( 1   ) } );
+	ok(  exception { my $z = test4( 1.1 ) } );
+	ok( !exception { test4( 1.1 ); undef; } );
 };
 
 done_testing;

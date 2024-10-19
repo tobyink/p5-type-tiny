@@ -1081,11 +1081,14 @@ The C<returns_list> constraint is defined using an B<ArrayRef>-like or
 B<HashRef>-like type constraint even though it's returning a list, not
 a single reference.
 
+If your function is called in void context, then its return value is
+unimportant and should not be type checked.
+
 B<Note:> because signature checks happen early before the rest of your
 function executes, the C<returns>, C<returns_scalar>, and C<returns_list>
 options are considered I<advisorary> and I<for documentation> and are
 not actually checked! However, the C<signature_for> keyword, which wraps
-your entire sub, is able to check them.
+your entire sub, I<is> able to check them.
 
 =head3 Parameter Options
 
