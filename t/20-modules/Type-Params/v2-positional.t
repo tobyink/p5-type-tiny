@@ -38,10 +38,12 @@ BEGIN {
 	use Types::Standard -types;
 	use Type::Params -sigs;
 	
-	signature_for myfunc => (
+	my $meta = signature_for myfunc => (
 		method => Object | Str,
 		pos    => [ ArrayRef, Int ],
 	);
+	
+	sub get_meta { $meta }
 	
 	sub myfunc ( $self, $arr, $int ) {
 		return $arr->[$int];
@@ -60,6 +62,8 @@ BEGIN {
 
 my $o   = bless {} => 'Local::MyPackage';
 my @arr = ( 'a' .. 'z' );
+
+ok( Local::MyPackage->get_meta->isa('Type::Params::Signature'), 'return value of signature_for' );
 
 is $o->myfunc( \@arr, 2 ),  'c', 'myfunc (happy path)';
 is $o->myfunc2( \@arr, 4 ), 'e', 'myfunc2 (happy path)';
