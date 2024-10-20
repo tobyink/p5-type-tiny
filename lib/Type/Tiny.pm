@@ -10,7 +10,7 @@ BEGIN {
 
 BEGIN {
 	$Type::Tiny::AUTHORITY  = 'cpan:TOBYINK';
-	$Type::Tiny::VERSION    = '2.006000';
+	$Type::Tiny::VERSION    = '2.007_000';
 	$Type::Tiny::XS_VERSION = '0.016';
 }
 

@@ -1212,3 +1212,17 @@
 			label "Update NEWS.";
 		];
 	].
+
+`Type-Tiny 2.007_000 cpan:TOBYINK`
+	issued  2024-10-20;
+	changeset [
+		dcs:versus `Type-Tiny 2.006000 cpan:TOBYINK`;
+		item [
+			a dcs:Addition;
+			label "The `signature_for` function in Type::Params now returns a value, though in most contexts you'll probably want to call it in void context anyway.";
+		];
+		item [
+			a dcs:Addition;
+			label "The `signature_for` function in Type::Params now includes most of the functionality of Return::Type (a separate CPAN distribution not bundled with Type::Tiny).";
+		];
+	].
