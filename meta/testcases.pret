@@ -108,6 +108,7 @@ m`Type::Params Type-Tiny`
 	:test [ a :AutomatedTest; :test_script f`t/20-modules/Type-Params/v2-positional-backcompat.t Type-Tiny`; :purpose "Positional parameter tests for modern Type::Params v2 API on Perl 5.8." ];
 	:test [ a :AutomatedTest; :test_script f`t/20-modules/Type-Params/v2-positional-plus-slurpy.t Type-Tiny`; :purpose "Named slurpy parameter tests for modern Type::Params v2 API." ];
 	:test [ a :AutomatedTest; :test_script f`t/20-modules/Type-Params/v2-positional.t Type-Tiny`; :purpose "Positional parameter tests for modern Type::Params v2 API." ];
+	:test [ a :AutomatedTest; :test_script f`t/20-modules/Type-Params/v2-returns.t Type-Tiny`; :purpose "Check that Type::Params v2 supports return typrs." ];
 	:test [ a :AutomatedTest; :test_script f`t/20-modules/Type-Params/v2-warnings.t Type-Tiny`; :purpose "Tests warnings from Type::Params." ];
 	:test [ a :AutomatedTest; :test_script f`t/20-modules/Type-Params/v2-wrap-inherited-method.t Type-Tiny`; :purpose "Check that Type::Params v2 'signature_for' can find methods to wrap using inheritance." ];
 	:test [ a :AutomatedTest; :test_script f`t/20-modules/Type-Params/wrap.t Type-Tiny`; :purpose "Test 'wrap_subs' and 'wrap_methods' from Type::Params." ];
@@ -250,7 +251,7 @@ m`Types::Standard Type-Tiny`
 	:test [ a :AutomatedTest; :test_script f`t/20-modules/Types-Standard/filehandle.t Type-Tiny`; :purpose "Checks various values against 'FileHandle' from Types::Standard." ];
 	:test [ a :AutomatedTest; :test_script f`t/20-modules/Types-Standard/immutable.t Type-Tiny`; :purpose "Tests Types::Standard cannot be added to!" ];
 	:test [ a :AutomatedTest; :test_script f`t/20-modules/Types-Standard/lockdown.t Type-Tiny`; :purpose "OK, we need to bite the bullet and lock down coercions on core type constraints and parameterized type constraints." ];
-	:test [ a :AutomatedTest; :test_script f`t/20-modules/Types-Standard/mxtmlb-alike.t Type-Tiny`; :purpose "Test the following types from Types::Standard which were inspired by MooX::Types::MooseLike::Base. * 'InstanceOf' * 'ConsumerOf' * 'HasMethods' * 'Enum' Rather than checking they work directy, we check they are equivalent to known (and well-tested) type constraints generated using Type::Utils." ];
+	:test [ a :AutomatedTest; :test_script f`t/20-modules/Types-Standard/mxtmlb-alike.t Type-Tiny`; :purpose "Test the following types from Types::Standard which were inspired by MooX::Types::MooseLike::Base. * 'InstanceOf' * 'ConsumerOf' * 'HasMethods' * 'Enum' Rather than checking they work directly, we check they are equivalent to known (and well-tested) type constraints generated using Type::Utils." ];
 	:test [ a :AutomatedTest; :test_script f`t/20-modules/Types-Standard/optlist.t Type-Tiny`; :purpose "Checks various values against 'OptList' from Types::Standard. Checks the standalone 'MkOpt' coercion." ];
 	:test [ a :AutomatedTest; :test_script f`t/20-modules/Types-Standard/overload.t Type-Tiny`; :purpose "Checks various values against 'Overload' from Types::Standard." ];
 	:test [ a :AutomatedTest; :test_script f`t/20-modules/Types-Standard/strmatch-allow-callbacks.t Type-Tiny`; :purpose "Checks various values against 'StrMatch' from Types::Standard when '$Type::Tiny::AvoidCallbacks' is false." ];
@@ -291,7 +292,7 @@ m`Types::TypeTiny Type-Tiny`
 [] a :AutomatedTest; :test_script f`t/30-external/Moose/coercion-more.t Type-Tiny`; :purpose "Test for the good old \"You cannot coerce an attribute unless its type has a coercion\" error.".
 [] a :AutomatedTest; :test_script f`t/30-external/Moose/coercion.t Type-Tiny`; :purpose "Check coercions work with Moose; both mutable and immutable classes.".
 [] a :AutomatedTest; :test_script f`t/30-external/Moose/inflate-then-inline.t Type-Tiny`; :purpose "Check type constraint inlining works with Moose in strange edge cases where we need to inflate Type::Tiny constraints into full Moose::Meta::TypeConstraint objects.".
-[] a :AutomatedTest; :test_script f`t/30-external/Moose/native-attribute-traits.t Type-Tiny`; :purpose "Check type constraints and coercions work with Moose native attibute traits.".
+[] a :AutomatedTest; :test_script f`t/30-external/Moose/native-attribute-traits.t Type-Tiny`; :purpose "Check type constraints and coercions work with Moose native attribute traits.".
 [] a :AutomatedTest; :test_script f`t/30-external/Moose/parameterized.t Type-Tiny`; :purpose "Test that parameterizable Moose types are still parameterizable when they are converted to Type::Tiny.".
 [] a :AutomatedTest; :test_script f`t/30-external/MooseX-Getopt/coercion.t Type-Tiny`; :purpose "Check coercions work with MooseX::Getopt; both mutable and immutable classes.".
 [] a :AutomatedTest; :test_script f`t/30-external/MooseX-Types/basic.t Type-Tiny`; :purpose "Complex checks between Type::Tiny and MooseX::Types.".
@@ -394,4 +395,10 @@ RT#133141
 	.
 <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/140>
 	:regression_test [ a :RegressionTest; :test_script f`t/40-bugs/gh140.t Type-Tiny`; :purpose "Type::Params's 'optional' and 'slurpy' together."];
+	.
+<tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/143>
+	:regression_test [ a :RegressionTest; :test_script f`t/40-bugs/gh143.t Type-Tiny`; :purpose "Test initializing tied variables."];
+	.
+<tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/158>
+	:regression_test [ a :RegressionTest; :test_script f`t/40-bugs/gh158.t Type-Tiny`; :purpose "Ensure no warning on certain shallow stack traces."];
 	.
