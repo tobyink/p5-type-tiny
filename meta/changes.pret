@@ -1230,7 +1230,7 @@
 `Type-Tiny 2.007_001 cpan:TOBYINK`
 	issued  2024-11-24;
 	changeset [
-		dcs:versus `Type-Tiny 2.007_001 cpan:TOBYINK`;
+		dcs:versus `Type-Tiny 2.007_000 cpan:TOBYINK`;
 		item [
 			a dcs:Bugfix;
 			label "If Perl has been built with -Dusequadmath then cowardly refuse to use Type::Tiny::XS's implementation of is_Int.";
