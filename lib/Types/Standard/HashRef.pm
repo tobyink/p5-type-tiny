@@ -8,7 +8,7 @@ use warnings;
 
 BEGIN {
 	$Types::Standard::HashRef::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::HashRef::VERSION   = '2.007_000';
+	$Types::Standard::HashRef::VERSION   = '2.007_001';
 }
 
 $Types::Standard::HashRef::VERSION =~ tr/_//d;

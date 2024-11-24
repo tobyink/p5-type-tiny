@@ -1226,3 +1226,15 @@
 			label "The `signature_for` function in Type::Params now includes most of the functionality of Return::Type (a separate CPAN distribution not bundled with Type::Tiny).";
 		];
 	].
+
+`Type-Tiny 2.007_001 cpan:TOBYINK`
+	issued  2024-11-24;
+	changeset [
+		dcs:versus `Type-Tiny 2.007_001 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix;
+			label "If Perl has been built with -Dusequadmath then cowardly refuse to use Type::Tiny::XS's implementation of is_Int.";
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/157>;
+			dcs:thanks cpan:ANDK;
+		];
+	].
