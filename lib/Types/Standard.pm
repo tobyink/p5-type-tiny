@@ -101,6 +101,14 @@ my $add_core_type = sub {
 		# Broken implementation of Int
 		$xsub = $xsubname = undef;
 	}
+
+	if ( Type::Tiny::_USE_XS
+		and $name eq 'Int'
+		and do { use Config (); $Config::Config{usequadmath} } )
+	{
+		# Broken implementation of Int
+		$xsub = $xsubname = undef;
+	}
 	
 	$typedef->{compiled_type_constraint} = $xsub if $xsub;
 	
