@@ -317,14 +317,14 @@ each from a few different modules:
   use Types::Common::Numeric qw( PositiveInt );
   use Types::Common::String qw( NonEmptyStr );
   use Types::Standard qw( ArrayRef Slurpy );
-  use Type::Params qw( signature );
+  use Type::Params qw( signature_for );
 
 A module called L<Types::Common> exists which acts as a single place you
 can use for importing most of Type::Tiny's commonly used types and functions.
 
   use Types::Common qw(
     PositiveInt NonEmptyStr ArrayRef Slurpy
-    signature
+    signature_for
   );
 
 Types::Common provides:

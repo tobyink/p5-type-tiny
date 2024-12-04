@@ -30,75 +30,74 @@ modules. If you don't understand it all, that's fine; that's what the rest
 of the manual is for. Although the example uses Moo, the C<use Moo> could
 be changed to C<use Moose> or C<use Mouse> and it would still work.
 
- use v5.12;
- use strict;
- use warnings;
- 
- package Horse {
-   use Moo;
-   use Types::Standard qw( Str Int Enum ArrayRef InstanceOf );
-   use Type::Params qw( signature );
-   use namespace::autoclean;
-   
-   has name => (
-     is       => 'ro',
-     isa      => Str,
-     required => 1,
-   );
-   has gender => (
-     is       => 'ro',
-     isa      => Enum[qw( f m )],
-   );
-   has age => (
-     is       => 'rw',
-     isa      => Int->where( '$_ >= 0' ),
-   );
-   has children => (
-     is       => 'ro',
-     isa      => ArrayRef[ InstanceOf['Horse'] ],
-     default  => sub { return [] },
-   );
-   
-   sub add_child {
-     state $check = signature(
-       method     => Object,
-       positional => [ InstanceOf['Horse'] ]
-     );
-     
-     my ( $self, $child ) = $check->(@_);   # unpack @_
-     push @{ $self->children }, $child;
-     
-     return $self;
-   }
- }
- 
- package main;
- 
- my $boldruler = Horse->new(
-   name    => "Bold Ruler",
-   gender  => 'm',
-   age     => 16,
- );
- 
- my $secretariat = Horse->new(
-   name    => "Secretariat",
-   gender  => 'm',
-   age     => 0,
- );
- 
- $boldruler->add_child( $secretariat );
- 
- use Types::Standard qw( is_Object assert_Object );
- 
- # is_Object will return a boolean
- #
- if ( is_Object($boldruler) ) {
-   say $boldruler->name;
- }
- 
- # assert_Object will return $secretariat or die
- #
- say assert_Object( $secretariat )->name;
+  use v5.36;
+  
+  package Horse {
+    use Moo;
+    use Types::Standard qw( Str Int Enum ArrayRef InstanceOf );
+    use Type::Params qw( signature_for );
+    use namespace::autoclean;
+    
+    has name => (
+      is       => 'ro',
+      isa      => Str,
+      required => 1,
+    );
+    
+    has gender => (
+      is       => 'ro',
+      isa      => Enum[qw( f m )],
+    );
+    
+    has age => (
+      is       => 'rw',
+      isa      => Int->where( '$_ >= 0' ),
+    );
+    
+    has children => (
+      is       => 'ro',
+      isa      => ArrayRef[ InstanceOf['Horse'] ],
+      default  => sub { return [] },
+    );
+    
+    signature_for add_child => (
+      method     => Object,
+      positional => [ InstanceOf['Horse'] ],
+    );
+    
+    sub add_child ( $self, $child ) {
+      push $self->children->@*, $child;
+      return $self;
+    }
+  }
+  
+  package main;
+  
+  my $boldruler = Horse->new(
+    name    => "Bold Ruler",
+    gender  => 'm',
+    age     => 16,
+  );
+  
+  my $secretariat = Horse->new(
+    name    => "Secretariat",
+    gender  => 'm',
+    age     => 0,
+  );
+  
+  $boldruler->add_child( $secretariat );
+  
+  use Types::Standard qw( is_Object assert_Object );
+  
+  # is_Object will return a boolean
+  #
+  if ( is_Object $boldruler ) {
+    say $boldruler->name;
+  }
+  
+  # assert_Object will return $secretariat or die
+  #
+  say assert_Object( $secretariat )->name;
 
 =head1 MANUAL
 
@@ -108,12 +107,13 @@ of the manual. Most of the information is directly transferrable and the
 Moose and Mouse sections of the manual list the minor differences between
 using Type::Tiny with Moo and with them.
 
-In general, this manual assumes you use Perl 5.12 or above and may use
+In general, this manual assumes you use Perl 5.36 or above and may use
 examples that do not work on older versions of Perl. Type::Tiny does work
 on earlier versions of Perl, but not all the examples and features in
 the manual will run without adjustment. (For instance, you may need to
 replace C<state> variables with lexical variables, avoid the
-C<< package NAME { BLOCK } >> syntax, etc.)
+C<< package NAME { BLOCK } >> syntax, unpack C<< @_ >> instead of
+using subroutine signatures, etc.)
 
 =over
 

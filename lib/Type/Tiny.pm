@@ -1731,62 +1731,63 @@ Type::Tiny - tiny, yet Moo(se)-compatible type constraint
 
 =head1 SYNOPSIS
 
- use v5.12;
- use strict;
- use warnings;
- 
- package Horse {
-   use Moo;
-   use Types::Standard qw( Str Int Enum ArrayRef Object );
-   use Type::Params qw( signature );
-   use namespace::autoclean;
-   
-   has name => (
-     is       => 'ro',
-     isa      => Str,
-     required => 1,
-   );
-   has gender => (
-     is       => 'ro',
-     isa      => Enum[qw( f m )],
-   );
-   has age => (
-     is       => 'rw',
-     isa      => Int->where( '$_ >= 0' ),
-   );
-   has children => (
-     is       => 'ro',
-     isa      => ArrayRef[Object],
-     default  => sub { return [] },
-   );
-   
-   sub add_child {
-     state $check = signature(
-       method     => Object,
-       positional => [ Object ],
-     );                                         # method signature
-     my ( $self, $child ) = $check->( @_ );     # unpack @_
-     
-     push @{ $self->children }, $child;
-     return $self;
-   }
- }
- 
- package main;
- 
- my $boldruler = Horse->new(
-   name    => "Bold Ruler",
-   gender  => 'm',
-   age     => 16,
- );
- 
- my $secretariat = Horse->new(
-   name    => "Secretariat",
-   gender  => 'm',
-   age     => 0,
- );
- 
- $boldruler->add_child( $secretariat );
+  use v5.36;
+  
+  package Horse {
+    use Moo;
+    use Types::Standard qw( Str Int Enum ArrayRef Object );
+    use Type::Params qw( signature_for );
+    use namespace::autoclean;
+    
+    has name => (
+      is       => 'ro',
+      isa      => Str,
+      required => 1,
+    );
+    
+    has gender => (
+      is       => 'ro',
+      isa      => Enum[qw( f m )],
+    );
+    
+    has age => (
+      is       => 'rw',
+      isa      => Int->where( '$_ >= 0' ),
+    );
+    
+    has children => (
+      is       => 'ro',
+      isa      => ArrayRef[Object],
+      default  => sub { return [] },
+    );
+    
+    # method signature
+    signature_for add_child => (
+      method     => Object,
+      positional => [ Object ],
+    );
+    
+    sub add_child ( $self, $child ) {
+      push $self->children->@*, $child;
+      return $self;
+    }
+  }
+  
+  package main;
+  
+  my $boldruler = Horse->new(
+    name    => "Bold Ruler",
+    gender  => 'm',
+    age     => 16,
+  );
+  
+  my $secretariat = Horse->new(
+    name    => "Secretariat",
+    gender  => 'm',
+    age     => 0,
+  );
+  
+  $boldruler->add_child( $secretariat );
 
 =head1 STATUS
 

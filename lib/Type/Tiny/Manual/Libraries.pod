@@ -387,16 +387,15 @@ checks that an integer is a multiple of $i.
     parent     => Int,
     
     # This coderef gets passed the contents of the square brackets.
-    constraint_generator => sub {
-      my $i = assert_Int(shift);
+    constraint_generator => sub ( $i ) {
+      assert_Int $i;
       # needs to return a coderef to use as a constraint for the
       # parameterized type
       return sub { $_ % $i == 0 };
     },
     
     # optional but recommended
-    inline_generator => sub {
-      my $i = shift;
+    inline_generator => sub ( $i ) {
       return sub {
         my $varname = pop;
         return (undef, "$varname % $i == 0");
@@ -404,8 +403,7 @@ checks that an integer is a multiple of $i.
     },
     
     # probably the most complex bit
-    coercion_generator => sub {
-      my $i = $_[2];
+    coercion_generator => sub ( $parent_type, $child_type, $i ) {
       require Type::Coercion;
       return Type::Coercion->new(
         type_coercion_map => [

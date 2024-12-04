@@ -297,18 +297,18 @@ And hashes:
 Earlier in the manual, it was mentioned that there is a problem with code
 like this:
 
-  push @{ $horse->children }, $non_horse;
+  push $horse->children->@*, $non_horse;
 
 This can be solved using tied variables.
 
-  tie @{ $horse->children }, InstanceOf["Horse"];
+  tie $horse->children->@*, InstanceOf["Horse"];
 
 Here is a longer example using builders and triggers.
 
   package Horse {
     use Moo;
     use Types::Standard qw( Str Num ArrayRef InstanceOf );
-    use Type::Params qw( signature );
+    use Type::Params qw( signature_for );
     use namespace::autoclean;
     
     my $ThisClass = InstanceOf[ __PACKAGE__ ];
@@ -324,26 +324,23 @@ Here is a longer example using builders and triggers.
     );
     
     # tie a default arrayref 
-    sub _build_children {
-      my $self = shift;
+    sub _build_children ( $self ) {
       tie my @kids, $ThisClass;
       \@kids;
     }
     
     # this method will tie an arrayref provided by the caller
-    sub _trigger_children {
-      my $self = shift;
-      my ($new) = @_;
-      tie @$new, $ThisClass;
+    sub _trigger_children ( $self, $new ) {
+      tie $new->@*, $ThisClass;
     }
     
-    sub add_child {
-      state $check = signature(
-        method     => $ThisClass,
-        positional => [ $ThisClass ],
-      );
-      my ( $self, $kid ) = &$check;
-      push @{ $self->children }, $kid;
+    signature_for add_child => (
+      method     => $ThisClass,
+      positional => [ $ThisClass ],
+    );
+    
+    sub add_child ( $self, $kid ) {
+      push $self->children->@*, $kid;
       return $self;
     }
   }

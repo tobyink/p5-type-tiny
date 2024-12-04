@@ -17,98 +17,93 @@ even if you're not using Moo.
 The C<multiple> option allows you to specify multiple ways of calling
 a sub.
 
- sub repeat_string {
-   state $check = signature(
-     multiple => [
-       { positional => [ Str, Int ] },
-       { named => [ string => Str, count => Int ], named_to_list => 1 },
-     ],
-   );
-   
-   my ( $string, $count ) = $check->( @_ );
-   return $string x $count;
- }
- 
- repeat_string(            "Hello",          42  );    # works
- repeat_string(  string => "Hello", count => 42  );    # works
- repeat_string({ string => "Hello", count => 42 });    # works
- repeat_string( qr/hiya/ );                            # dies
+  signature_for repeat_string => (
+    multiple => [
+      { positional => [ Str, Int ] },
+      { named => [ string => Str, count => Int ], named_to_list => 1 },
+    ],
+  );
+  
+  sub repeat_string ( $string, $count ) {
+    return $string x $count;
+  }
+  
+  repeat_string(            "Hello",          42  );    # works
+  repeat_string(  string => "Hello", count => 42  );    # works
+  repeat_string({ string => "Hello", count => 42 });    # works
+  repeat_string( qr/hiya/ );                            # dies
 
 It combines multiple checks and tries each until one works.
 
-=head2 C<signature_for>
+=head2 C<signature>
 
-C<signature_for> turns C<signature> inside out.
+C<signature> allows the signature to be defined within the sub itself,
+potentially on-the-fly, which is occasionally useful.
 
 Instead of this:
 
- sub foobar {
-   state $check = signature( positional => [ Int, Str ] );
-   my ( $foo, $bar ) = $check->( @_ );
-   ...;
- }
+  signature_for foobar => (
+    positional => [ Int, Str ],
+  );
+  
+  sub foobar ( $foo, $bar ) {
+    ...;
+  }
 
 You do this:
 
- signature_for foobar => (
-   positional => [ Int, Str ],
- );
- 
- sub foobar {
-   my ( $foo, $bar ) = @_;
-   ...;
- }
+  sub foobar {
+    my $check = signature( positional => [ Int, Str ] );
+    my ( $foo, $bar ) = $check->( @_ );
+    ...;
+  }
 
-Or in Perl 5.20+, you can even do this:
-
- signature_for foobar => (
-   positional => [ Int, Str ],
- );
- 
- sub foobar ( $foo, $bar ) {
-   ...;
- }
+Or use C<< state $check >> if you know the check will be the same every time.
 
 =head2 Functions versus Methods
 
 For subs which are intended to be called as functions:
 
- signature( method => 0, ... );
- signature( ... );                       # this is the default anyway
+  signature_for my_sub => ( method => 0, ... );
+  
+  signature_for my_sub => ( ... ); # this is the default anyway
 
 For subs which are intended to be called as methods on a blessed object:
 
- signature( method => Object, ... );
+  signature_for my_method => ( method => Object, ... );
 
 And for subs which are intended to be called as methods on a class:
 
- signature( method => ClassName, ... );
- signature( method => Str, ... );        # less readable, but faster check!
+  signature_for my_method => ( method => ClassName, ... );
+  
+  signature_for my_method => ( method => Str, ... );  # faster, less readable
 
 The following is also allowed, which indicates that the sub is intended
 to be called as a method, but you don't want to do type checks on the
 invocant:
 
- signature( method => 1, ... );
+  signature_for my_method => ( method => builtin::true, ... );
+  
+  signature_for my_method => ( method => 1, ... );
 
 =head2 Mixed Named and Positional Parameters
 
 The C<head> and C<tail> options allow required positional parameters at the
 start or end of a named parameter list:
 
- state $check = signature(
-   head  => [ Int ],
-   named => [
-     foo => Int,
-     bar => Optional[Int],
-     baz => Optional[Int],
-   ],
- );
- 
- $check->( 42, foo => 21 );                 # ok
- $check->( 42, foo => 21, bar  => 84 );     # ok
- $check->( 42, foo => 21, bar  => 10.5 );   # not ok
- $check->( 42, foo => 21, quux => 84 );     # not ok
+  signature_for my_func => (
+    head  => [ Int ],
+    named => [
+      foo => Int,
+      bar => Optional[Int],
+      baz => Optional[Int],
+    ],
+  );
+  
+  my_func( 42, foo => 21 );                 # ok
+  my_func( 42, foo => 21, bar  => 84 );     # ok
+  my_func( 42, foo => 21, bar  => 10.5 );   # not ok
+  my_func( 42, foo => 21, quux => 84 );     # not ok
 
 =head2 Proper Signatures
 
@@ -265,23 +260,23 @@ choosing between them.
 
 Type::Params's syntax is more compact:
 
-   state $check = signature(
-     pos => [
-       Object,
-       Optional[Int],
-       Slurpy[ArrayRef],
-     ],
-   );
+  state $check = signature(
+    pos => [
+      Object,
+      Optional[Int],
+      Slurpy[ArrayRef],
+    ],
+  );
 
 Versus:
 
-   state $check = validation_for(
-      params => [
-         { type => Object },
-         { type => Int,      optional => 1 },
-         { type => ArrayRef, slurpy => 1 },
-      ],
-   );
+  state $check = validation_for(
+    params => [
+      { type => Object },
+      { type => Int,      optional => 1 },
+      { type => ArrayRef, slurpy => 1 },
+    ],
+  );
 
 =item *
 

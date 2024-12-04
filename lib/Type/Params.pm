@@ -320,10 +320,7 @@ Type::Params - sub signature validation using Type::Tiny type constraints and co
 
 =head1 SYNOPSIS
 
- use v5.20;
- use strict;
- use warnings;
- use experimental 'signatures';
+ use v5.36;
  
  package Horse {
    use Moo;
@@ -339,9 +336,7 @@ Type::Params - sub signature validation using Type::Tiny type constraints and co
    );
    
    sub add_child ( $self, $child ) {
-     
-     push @{ $self->children }, $child;
-     
+     push $self->children->@*, $child;
      return $self;
    }
  }
@@ -1477,6 +1472,9 @@ Or since Perl 5.20:
  }
 
 The C<signature_for> keyword turns C<signature> inside-out.
+
+As of 2024, you probably want to be using C<signature_for> instead of
+C<signature>.
 
 The same signature specification options are supported, with the exception
 of C<want_source>, C<want_details>, and C<goto_next> which will not work.

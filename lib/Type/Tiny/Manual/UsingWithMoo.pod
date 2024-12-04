@@ -565,15 +565,13 @@ let's define a method in our class to do it.
   package Horse {
     ...;
     
-    sub add_win {
-      my $self = shift;
-      my ($year, $race, $jockey) = @_;
+    sub add_win ( $self, $year, $race, $jockey ) {
       my $win = [
         $year,
         $race,
         $jockey ? $jockey : (),
       ];
-      push @{ $self->wins }, $win;
+      push $self->wins->@*, $win;
       return $self;
     }
   }
@@ -585,26 +583,25 @@ for that:
   package Horse {
     use Types::Common::Numeric qw( PositiveInt );
     use Types::Common::String qw( NonEmptyStr );
-    use Type::Params qw( signature );
+    use Type::Params qw( signature_for );
     ...;
     
-    sub add_win {
-      state $check = signature(
-        method     => 1,              # allow for $self
-        positional => [
-          PositiveInt,
-          NonEmptyStr,
-          NonEmptyStr, { optional => 1 },
-        ],
-      );
-      
-      my ( $self, $year, $race, $jockey ) = $check->(@_);
+    signature_for add_win => (
+      method     => 1,    # it's a method, so has $self
+      positional => [
+        PositiveInt,
+        NonEmptyStr,
+        NonEmptyStr, { optional => 1 },
+      ],
+    );
+    
+    sub add_win ( $self, $year, $race, $jockey ) {
       my $win = [
         $year,
         $race,
         $jockey ? $jockey : (),
       ];
-      push @{ $self->wins }, $win;
+      push $self->wins->@*, $win;
       return $self;
     }
   }
@@ -616,7 +613,7 @@ fail. C<< $check >> will also perform coercions if types have them
 (and you don't even need to remember C<< coerce => 1 >>; it's automatic)
 and can even add in defaults:
 
-  state $check = signature(
+  signature_for add_win => (
     method     => 1,
     positional => [
       PositiveInt,
@@ -625,34 +622,9 @@ and can even add in defaults:
     ],
   );
 
-On older versions of Perl (prior to 5.10), C<state> variables are not
-available. A workaround is to replace this:
+The generalized syntax for positional parameters in C<signature_for> is:
 
-  sub foo {
-    state $x = bar();
-    ...;
-  }
-
-With this:
-
-  {         # outer braces prevent other subs seeing $x
-    my $x;  # declare $x before sub foo()
-    sub foo {
-      $x = bar();
-      ...;
-    }
-  }
-
-(While we're having a general Perl syntax lesson, I'll note that
-C<< &$check >> with an ampersand and no parentheses is a shortcut for
-C<< $check->(@_) >> and actually runs slightly faster because it reuses
-the C<< @_ >> array for the called coderef. A lot of people dislike calling
-subs with an ampersand, so we will stick to the C<< $check->(@_) >> syntax
-in these examples. But do consider using the shortcut!)
-
-The generalized syntax for positional parameters in C<signature> is:
-
-  state $check = signature(
+  signature_for $method_name => (
     %general_options,
     positional => [
       TypeForFirstParam,  \%options_for_first_param,
@@ -664,7 +636,7 @@ The generalized syntax for positional parameters in C<signature> is:
 As a shortcut for the C<< { optional => 1 } >> option, you can just use
 B<Optional> like in B<Tuple>.
 
-  state $check = signature(
+  signature_for add_win => (
     method     => 1,
     positional => [
       PositiveInt,
@@ -673,12 +645,13 @@ B<Optional> like in B<Tuple>.
     ],
   );
 
-You can also use C<0> and C<1> as shortcuts for B<< Optional[Any] >> and
+You can also use C<0> (or C<<builtin::false>> if your Perl is new enough)
+and C<1> (or C<< builtin::true >>) as shortcuts for B<< Optional[Any] >> and
 B<< Any >>. The following checks that the first parameter is a positive
 integer, the second parameter is required (but doesn't care what value
 it is) and the third parameter is allowed but not required.
 
-  state $check = signature positional => [ PositiveInt, 1, 0 ];
+  signature_for thingy => ( positional => [ PositiveInt, 1, 0 ] );
 
 It is possible to accept a variable number of values using B<Slurpy>:
 
@@ -686,21 +659,20 @@ It is possible to accept a variable number of values using B<Slurpy>:
     use Types::Common::Numeric qw( PositiveInt );
     use Types::Common::String qw( NonEmptyStr );
     use Types::Standard qw( ArrayRef Slurpy );
-    use Type::Params qw( signature );
+    use Type::Params qw( signature_for );
     ...;
     
-    sub add_wins_for_year {
-      state $check = signature(
-        method     => 1,
-        positional => [
-          PositiveInt,
-          Slurpy[ ArrayRef[NonEmptyStr] ],
-        ],
-      );
-      
-      my ( $self, $year, $races ) = $check->(@_);
-      for my $race (@$races) {
-        push @{ $self->wins }, [$year, $race];
+    signature_for add_wins_for_year => (
+      method     => 1,
+      positional => [
+        PositiveInt,
+        Slurpy[ ArrayRef[NonEmptyStr] ],
+      ],
+    );
+    
+    sub add_wins_for_year ( $self, $year, $races ) {
+      for my $race ( $races->@* ) {
+        push $self->wins->@*, [ $year, $race ];
       }
       return $self;
     }
@@ -737,26 +709,25 @@ To accept named parameters, use the C<named> option instead of C<positional>.
   package Horse {
     use Types::Common::Numeric qw( PositiveInt );
     use Types::Common::String qw( NonEmptyStr );
-    use Type::Params qw( signature );
+    use Type::Params qw( signature_for );
     ...;
     
-    sub add_win {
-      state $check = signature(
-        method     => 1,
-        named      => [
-          year    => PositiveInt,
-          race    => NonEmptyStr,
-          jockey  => NonEmptyStr, { optional => 1 },
-        ],
-      );
-      
-      my ( $self, $arg ) = $check->(@_);
+    signature_for add_win => (
+      method     => 1,
+      named      => [
+        year    => PositiveInt,
+        race    => NonEmptyStr,
+        jockey  => NonEmptyStr, { optional => 1 },
+      ],
+    );
+    
+    sub add_win ( $self, $arg ) {
       my $win = [
         $arg->year,
         $arg->race,
         $arg->has_jockey ? $arg->jockey : (),
       ];
-      push @{ $self->wins }, $win;
+      push $self->wins->@*, $win;
       return $self;
     }
   }
@@ -782,30 +753,37 @@ I<return> a positional list of parameters, using C<named_to_list>.
   package Horse {
     use Types::Common::Numeric qw( PositiveInt );
     use Types::Common::String qw( NonEmptyStr );
-    use Type::Params qw( signature );
+    use Type::Params qw( signature_for );
     ...;
     
-    sub add_win {
-      state $check = signature(
-        method     => 1,
-        named      => [
-          year    => PositiveInt,
-          race    => NonEmptyStr,
-          jockey  => NonEmptyStr, { optional => 1 },
-        ],
-        named_to_list => 1,
-      );
-      
-      my ( $self, $year, $race, $jockey ) = $check->(@_);
+    signature_for add_win => (
+      method     => 1,
+      named      => [
+        year    => PositiveInt,
+        race    => NonEmptyStr,
+        jockey  => NonEmptyStr, { optional => 1 },
+      ],
+      named_to_list => 1,
+    );
+    
+    sub add_win ( $self, $year, $race, $jockey ) {
       my $win = [
         $year,
         $race,
         $jockey ? $jockey : (),
       ];
-      push @{ $self->wins }, $win;
+      push $self->wins->@*, $win;
       return $self;
     }
   }
+  
+  ...;
+  
+  $horse->add_win(
+    year    => 1956,
+    race    => "Futurity Stakes",
+    jockey  => "Eddie",
+  );
 
 Optional and Slurpy named parameters are supported as you'd expect.
 

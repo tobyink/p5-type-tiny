@@ -60,18 +60,18 @@ This will not do what you want it to do:
 
   use Types::Standard qw( Str Int );
   
-  given ($value) {
-    when (Int) { ... }
-    when (Str) { ... }
+  given ( $value ) {
+    when ( Int ) { ... }
+    when ( Str ) { ... }
   }
 
 This will do what you wanted:
 
   use Types::Standard qw( is_Str is_Int );
   
-  given ($value) {
-    when (\&is_Int) { ... }
-    when (\&is_Str) { ... }
+  given ( $value ) {
+    when ( \&is_Int ) { ... }
+    when ( \&is_Str ) { ... }
   }
 
 Sorry, that's just how Perl be.

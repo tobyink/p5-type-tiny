@@ -88,7 +88,7 @@ L<Type::Tiny::Duck> objects.
 
 In the case of a type constraint like this:
 
- my $type = Int->where( sub { $_ >= 0 } );
+  my $type = Int->where( sub { $_ >= 0 } );
 
 Type::Tiny will need to call one sub to verify a value meets the B<Int>
 type constraint, and your coderef to check that the value is above zero.
@@ -100,15 +100,15 @@ The B<Int> type constraint knows how to create a string of Perl code
 that checks an integer. It's something like the following. (It's actually
 more complicated, but this is close enough as an example.)
 
- $_ =~ /^-?[0-9]+$/
+  $_ =~ /^-?[0-9]+$/
 
 If you provide your check as a string instead of a coderef, like this:
 
- my $type = Int->where( q{ $_ >= 0 } );
+  my $type = Int->where( q{ $_ >= 0 } );
 
 Then Type::Tiny will be able to combine them into one string:
 
- ( $_ =~ /^-?[0-9]+$/ ) && ( $_ >= 0 )
+  ( $_ =~ /^-?[0-9]+$/ ) && ( $_ >= 0 )
 
 So Type::Tiny will be able to check values in one sub call. Providing
 constraints as strings is a really simple and easy way of optimizing
@@ -120,22 +120,21 @@ checking B<< ArrayRef[$type] >> this will be done for each element of
 the array. Things could be made more efficient if Type::Tiny were able
 to directly check:
 
- ( $arrayref->[$i] =~ /^-?[0-9]+$/ ) && ( $arrayref->[$i] >= 0 )
+  ( $arrayref->[$i] =~ /^-?[0-9]+$/ ) && ( $arrayref->[$i] >= 0 )
 
 This can be done by providing an inlining sub. The sub is given a
 variable name and can use that in the string of code it generates.
 
- my $type = Type::Tiny->new(
-   parent  => Int,
-   inlined => sub {
-     my ( $self, $varname ) = @_;
-     return sprintf(
-       '(%s) && ( %s >= 0 )',
-       $self->parent->inline_check( $varname ),
-       $varname,
-     );
-   }
- );
+  my $type = Type::Tiny->new(
+    parent  => Int,
+    inlined => sub ( $self, $varname ) {
+      return sprintf(
+        '(%s) && ( %s >= 0 )',
+        $self->parent->inline_check( $varname ),
+        $varname,
+      );
+    }
+  );
 
 Because it's pretty common to want to call your parent's inline check and
 C<< && >> your own string with it, Type::Tiny provides a shortcut for this.
@@ -143,16 +142,12 @@ Just return a list of strings to smush together with C<< && >>, and if the
 first one is C<undef>, Type::Tiny will fill in the blank with the parent
 type check.
 
- my $type = Type::Tiny->new(
-   parent  => Int,
-   inlined => sub {
-     my ( $self, $varname ) = @_;
-     return (
-       undef,
-       sprintf( '%s >= 0', $varname ),
-     );
-   }
- );
+  my $type = Type::Tiny->new(
+    parent  => Int,
+    inlined => sub ( $self, $varname ) {
+      return ( undef, sprintf( '%s >= 0', $varname ) );
+    },
+  );
 
 There is one further optimization which can be applied to this particular
 case. You'll note that we're checking the string matches C<< /^-?[0-9+]$/ >>
@@ -160,18 +155,17 @@ and then checking it's greater than or equal to zero. But a non-negative
 integer won't ever start with a minus sign, so we could inline the check to
 something like:
 
- $_ =~ /^[0-9]+$/
+  $_ =~ /^[0-9]+$/
 
 While an inlined check I<can> call its parent type check, it is not required
 to.
 
- my $type = Type::Tiny->new(
-   parent  => Int,
-   inlined => sub {
-     my ( $self, $varname ) = @_;
-     return sprintf( '%s =~ /^[0-9]+$/', $varname );
-   }
- );
+  my $type = Type::Tiny->new(
+    parent  => Int,
+    inlined => sub ( $self, $varname ) {
+      return sprintf( '%s =~ /^[0-9]+$/', $varname );
+    }
+  );
 
 If you opt not to call the parent type check, then you need to ensure your
 own check is at least as rigorous.
@@ -209,14 +203,14 @@ operating in "strict mode" based on certain environment variables.
 
 =head3 Attributes
 
- use Types::Standard qw( ArrayRef Num );
- use Devel::StrictMode qw( STRICT );
- 
- has numbers => (
-   is      => 'ro',
-   isa     => STRICT ? ArrayRef[Num] : ArrayRef,
-   default => sub { [] },
- );
+  use Types::Standard qw( ArrayRef Num );
+  use Devel::StrictMode qw( STRICT );
+  
+  has numbers => (
+    is      => 'ro',
+    isa     => STRICT ? ArrayRef[Num] : ArrayRef,
+    default => sub { [] },
+  );
 
 It is inadvisible to do this on attributes that have coercions because
 it can lead to inconsistent and unpredictable behaviour.
@@ -226,22 +220,22 @@ it can lead to inconsistent and unpredictable behaviour.
 Very efficient way which avoids compiling the signature at all if
 C<STRICT> is false:
 
- use Types::Standard qw( Num Object );
- use Type::Params qw( signature );
- use Devel::StrictMode qw( STRICT );
- 
- sub add_number {
-   state $check;
-   STRICT and $check //= signature(
-     method     => 1,
-     positional => [ Num ],
-   );
+  use Types::Standard qw( Num Object );
+  use Type::Params qw( signature );
+  use Devel::StrictMode qw( STRICT );
+  
+  sub add_number {
+    state $check;
+    STRICT and $check //= signature(
+      method     => 1,
+      positional => [ Num ],
+    );
    
-   my ( $self, $num ) = STRICT ? &$check : @_;
+    my ( $self, $num ) = STRICT ? &$check : @_;
    
-   push @{ $self->numbers }, $num;
-   return $self;
- }
+    push @{ $self->numbers }, $num;
+    return $self;
+  }
 
 Again, you need to be careful to ensure consistent behaviour if you're
 using coercions, defaults, slurpies, etc.
@@ -251,29 +245,27 @@ checks which are safe(ish) to disable, while coercions, defaults, and
 slurpies will continue to work:
 
  use Types::Standard qw( Num Object );
- use Type::Params qw( signature );
+ use Type::Params qw( signature_for );
  use Devel::StrictMode qw( STRICT );
  
- sub add_number {
-   state $check = signature(
-     strictness => STRICT,
-     method     => 1,
-     positional => [ Num ],
-   );
-   
-   my ( $self, $num ) = &$check;
-   
-   push @{ $self->numbers }, $num;
-   return $self;
- }
+  signature_for add_number => (
+    strictness => STRICT,
+    method     => 1,
+    positional => [ Num ],
+  );
+  
+  sub add_number ( $self, $num ) {
+    push @{ $self->numbers }, $num;
+    return $self;
+  }
 
 =head3 Ad-Hoc Type Checks
 
- ...;
- my $x = get_some_number();
- assert_Int($x) if STRICT;
- return $x + 1;
- ...;
+  ...;
+  my $x = get_some_number();
+  assert_Int $x if STRICT;
+  return $x + 1;
+  ...;
 
 =head2 The Slash Operator
 
@@ -284,13 +276,13 @@ in strict mode.
 
 An example using this feature:
 
- use Types::Standard -types;
- 
- has numbers => (
-   is      => 'ro',
-   isa     => ArrayRef[ Num / Any ],
-   default => sub { [] },
- );
+  use Types::Standard -types;
+  
+  has numbers => (
+    is      => 'ro',
+    isa     => ArrayRef[ Num / Any ],
+    default => sub { [] },
+  );
 
 In strict mode, this attribute would check that its value is an arrayref
 of numbers (which may be slow if it contains a lot of numbers). Normally

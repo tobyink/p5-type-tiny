@@ -177,14 +177,14 @@ automatically coerce a parameter if there is a coercion for that type.
 
   use Types::Standard qw( Object );
   use Types::Common::String qw( UpperCaseStr );
-  use Type::Params;
+  use Type::Params qw( signature_for );
   
-  sub set_account_name {
-    state $check = signature(
-      method     => Object,
-      positional => [ UpperCaseStr->no_coercions ],
-    );
-    my ( $self, $name ) = $check->( @_ );
+  signature_for set_account_name => (
+    method     => Object,
+    positional => [ UpperCaseStr->no_coercions ],
+  );
+  
+  sub set_account_name ( $self, $name ) {
     $self->_account_name( $name );
     $self->db->update( $self );
     return $self;
