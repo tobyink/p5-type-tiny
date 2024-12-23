@@ -685,7 +685,9 @@ It would be called like this:
   );
 
 The additional parameters are slurped into an arrayref and checked against
-B<< ArrayRef[NonEmptyStr] >>.
+B<< ArrayRef[NonEmptyStr] >>. Note that with a slurpy arrayref like this, 
+the method receives the values as an arrayref even though they were passed
+as a list.
 
 Optional parameters are only allowed after required parameters, and B<Slurpy>
 parameters are only allowed at the end. (And there can only be a at most
@@ -746,7 +748,7 @@ pairs or a hashref:
   } );
 
 It is also possible for your check to I<accept> named parameters but
-I<return> a positional list of parameters, using C<named_to_list>.
+I<receive> a positional list of parameters, using C<named_to_list>.
 
   package Horse {
     use Types::Common::Numeric qw( PositiveInt );
