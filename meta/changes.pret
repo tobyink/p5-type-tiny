@@ -1238,3 +1238,13 @@
 			dcs:thanks cpan:ANDK;
 		];
 	].
+
+`Type-Tiny 2.007_002 cpan:TOBYINK`
+	issued  2024-12-23;
+	changeset [
+		dcs:versus `Type-Tiny 2.007_001 cpan:TOBYINK`;
+		item [
+			a dcs:Documentation;
+			label "Update most examples to use features (postfix derefs, sub signatures) from more modern versions of Perl that allow for cleaner, tidier code.";
+		];
+	].
