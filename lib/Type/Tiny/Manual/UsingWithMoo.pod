@@ -606,12 +606,10 @@ for that:
     }
   }
 
-The first time this method is called, it will compile a coderef called
-C<< $check >>. Then every time it is run, C<< $check >> will be called
-to check the method's parameters. It will throw an exception if they
-fail. C<< $check >> will also perform coercions if types have them
-(and you don't even need to remember C<< coerce => 1 >>; it's automatic)
-and can even add in defaults:
+The C<add_win> method will be wrapped with code that checks incoming arguments,
+throwing an exception if they fail to meet requirements. It will also perform
+coercions if types have them (and you don't even need to remember
+C<< coerce => 1 >>; it's automatic) and can even add in defaults:
 
   signature_for add_win => (
     method     => 1,
@@ -645,11 +643,11 @@ B<Optional> like in B<Tuple>.
     ],
   );
 
-You can also use C<0> (or C<<builtin::false>> if your Perl is new enough)
+You can also use C<0> (or C<< builtin::false >> if your Perl is new enough)
 and C<1> (or C<< builtin::true >>) as shortcuts for B<< Optional[Any] >> and
 B<< Any >>. The following checks that the first parameter is a positive
 integer, the second parameter is required (but doesn't care what value
-it is) and the third parameter is allowed but not required.
+it is) and a third parameter is allowed but not required.
 
   signature_for thingy => ( positional => [ PositiveInt, 1, 0 ] );
 
