@@ -1248,3 +1248,29 @@
 			label "Update most examples to use features (postfix derefs, sub signatures) from more modern versions of Perl that allow for cleaner, tidier code.";
 		];
 	].
+
+`Type-Tiny 2.007_003 cpan:TOBYINK`
+	issued  2025-03-06;
+	changeset [
+		dcs:versus `Type-Tiny 2.007_002 cpan:TOBYINK`;
+		item [
+			a dcs:Documentation;
+			label "Minor pod fixed and improvements.";
+		];
+		item [
+			a dcs:Documentation;
+			label "Update copyright dates to 2025.";
+		];
+		item [
+			a dcs:Addition;
+			label "New Type::Params feature allow_dash automatically supports `-foo` as an alias for `foo`.";
+		];
+		item [
+			a dcs:Addition;
+			label "New Type::Params feature list_to_named automatically extracts named parameters from a list of positional arguments.";
+		];
+		item [
+			a dcs:Addition;
+			label "Type::Params optionally exports two shortcut functions: `signature_for_func` and `signature_for_method`.";
+		];
+	].
