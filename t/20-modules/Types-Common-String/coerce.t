@@ -28,7 +28,7 @@ Guillermo Roditi <groditi@gmail.com>
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017-2024 by Matt S Trout - mst (at) shadowcatsystems.co.uk (L<http://www.shadowcatsystems.co.uk/>).
+This software is copyright (c) 2013-2014, 2017-2025 by Matt S Trout - mst (at) shadowcatsystems.co.uk (L<http://www.shadowcatsystems.co.uk/>).
  
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

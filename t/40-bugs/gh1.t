@@ -19,7 +19,7 @@ Richard Simões E<lt>rsimoes@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017-2024 by Richard Simões.
+This software is copyright (c) 2013-2014, 2017-2025 by Richard Simões.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

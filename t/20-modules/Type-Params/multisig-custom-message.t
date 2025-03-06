@@ -12,7 +12,7 @@ Benct Philip Jonsson E<lt>bpjonsson@gmail.comE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2018-2024 by Benct Philip Jonsson.
+This software is copyright (c) 2018-2025 by Benct Philip Jonsson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

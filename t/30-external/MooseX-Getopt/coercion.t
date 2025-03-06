@@ -18,7 +18,7 @@ Alexander Hartmaier E<lt>abraxxa@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2014, 2017-2024 by Alexander Hartmaier.
+This software is copyright (c) 2014, 2017-2025 by Alexander Hartmaier.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
