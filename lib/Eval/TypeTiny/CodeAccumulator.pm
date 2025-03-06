@@ -40,6 +40,12 @@ sub add_line {
 	$self;
 }
 
+sub addf {
+	my $self = shift;
+	my $fmt  = shift;
+	$self->add_line( sprintf $fmt, @_ );
+}
+
 sub increase_indent {
 	$_[0]{indent} .= "\t";
 	$_[0];
@@ -189,6 +195,10 @@ Returns the same description given to the constructor, if any.
 =item C<< add_line( @lines_of_code ) >>
 
 Adds the next line of code.
+
+=item C<< addf( $fmt, @args ) >>
+
+Shortcut for C<< add_line( sprintf $fmt, @args ) >>.
 
 =item C<< add_gap() >>
 

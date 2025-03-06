@@ -588,6 +588,65 @@ in.)
    return $num1 + $num2;
  }
 
+=head4 C<< list_to_named >> B<< Bool >>
+
+For a function that accepts named parameters, allows them to alternatively
+be supplied as a list in a hopefully do-what-you-mean manner.
+
+ sub add_numbers {
+   state $sig = signature(
+     named         => [ num1 => Num, num2 => Num ],
+     list_to_named => !!1,
+   );
+   my ( $arg ) = $sig->( @_ );
+   
+   return $arg->num1 + $arg->num2;
+ }
+ 
+ say add_numbers( num1 => 5, num2 => 10 );         # says 15
+ say add_numbers( { num1 => 5, num2 => 10 } );     # also says 15
+ say add_numbers( 5, num2 => 10 );                 # says 15 yet again
+ say add_numbers( 5, { num2 => 10 } );             # guess what? says 15
+ say add_numbers( 10, num1 => 5 );                 # 14... just kidding... 15
+ say add_numbers( 10, { num1 => 5 } );             # another 15
+ say add_numbers( 5, 10 );                         # surprise, it says 15
+ 
+ say add_numbers( { num1 => 5 }, 10 );             # error! positional first
+ say add_numbers( 5, 10, { num1 => 3 } );          # error! duplicate argument
+
+Where a hash or hashref of named parameters are expected, any parameter
+which doesn't look like it fits that pattern will be treated as a sneaky
+positional parameter, and will be tried the first time a named parameter
+is "missing".
+
+This feature is normally only applied to required parameters. It can be
+manually controlled on a per-parameter basis using the C<in_list> option.
+
+Type::Params attempts to be intelligent at figuring out what order
+the sneaky positional parameters were given in.
+
+ sub add_to_ref {
+   state $sig = signature(
+     named         => [ ref => ScalarRef[Num], add => Num ],
+     list_to_named => !!1,
+   );
+   my ( $arg ) = $sig->( @_ );
+   
+   $arg->ref->$* += $arg->num;
+ }
+ 
+ my $sum = 0;
+ add_to_ref( ref => \$sum, add => 1 );
+ add_to_ref( \$sum, add => 2 );
+ add_to_ref( \$sum, 3 );
+ add_to_ref( 4, \$sum );
+ add_to_ref( 5, sum => \$sum );
+ add_to_ref( add => 5, sum => \$sum );
+ say $sum; # 21
+
+This approach is somewhat slower, but has the potential for very
+do-what-I-mean functions.
+
 =head4 C<< head >> B<< Int|ArrayRef >>
 
 C<head> provides an additional list of non-optional, positional parameters
@@ -1447,6 +1506,15 @@ name.
  say add_numbers( first_number => 40, x => 1, y => 2 );      # dies!
 
 Ignored by signatures with positional parameters.
+
+=head4 C<< in_list >> B<Bool>
+
+In conjunction with C<list_to_named>, determines if this parameter can
+be provided as part of the list of "sneaky" positional parameters.
+If C<list_to_named> isn't being used, C<in_list> is ignored.
+
+Defaults to false if the parameter is optional or has a default.
+Defaults to true if the parameter is required.
 
 =head4 C<< strictness >> B<Bool|Str>
 

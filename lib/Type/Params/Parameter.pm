@@ -44,6 +44,11 @@ sub strictness { $_[0]{strictness} }  sub has_strictness { exists $_[0]{strictne
 
 sub should_clone { $_[0]{clone} }
 
+sub in_list {
+	return $_[0]{in_list} if exists $_[0]{in_list};
+	$_[0]{in_list} = !$_[0]->optional;
+}
+
 sub coerce  {
 	exists( $_[0]{coerce} )
 		? $_[0]{coerce}
@@ -75,6 +80,22 @@ sub predicate  {
 
 sub might_supply_new_value {
 	$_[0]->has_default or $_[0]->coerce or $_[0]->should_clone;
+}
+
+sub _all_aliases {
+	my ( $self, $signature ) = @_;
+	my $allow_dash = $self->{allow_dash} // $signature->allow_dash;
+	my @aliases;
+	if ( $allow_dash and $self->name =~ $RE_WORDLIKE ) {
+		push @aliases, sprintf( '-%s', $self->name );
+	}
+	for my $name ( @{ $self->alias } ) {
+		push @aliases, $name;
+		if ( $allow_dash and $name =~ $RE_WORDLIKE ) {
+			push @aliases, sprintf( '-%s', $name );
+		}
+	}
+	return @aliases;
 }
 
 sub _code_for_default {
@@ -169,21 +190,7 @@ sub _make_code {
 		$constraint->display_name,
 	) );
 
-	my @aliases;
-	if ( $args{is_named} ) {
-		my $allow_dash = $self->{allow_dash} // $signature->allow_dash;
-		if ( $allow_dash and $self->name =~ $RE_WORDLIKE ) {
-			push @aliases, sprintf( '-%s', $self->name );
-		}
-		for my $name ( @{ $self->alias } ) {
-			push @aliases, $name;
-			if ( $allow_dash and $name =~ $RE_WORDLIKE ) {
-				push @aliases, sprintf( '-%s', $name );
-			}
-		}
-	}
-	
-	if ( @aliases ) {
+	if ( $args{is_named} and my @aliases = $self->_all_aliases($signature) ) {
 		$coderef->add_line( sprintf(
 			'for my $alias ( %s ) {',
 			join( q{, }, map B::perlstring($_), @aliases ),
@@ -214,6 +221,20 @@ sub _make_code {
 		$coderef->add_line( '}' );
 		$coderef->decrease_indent;
 		$coderef->add_line( '}' );
+	}
+
+	if ( $args{is_named} and $signature->list_to_named and $self->in_list ) {
+		$coderef->addf( 'if ( not exists %s ) {', $varname );
+		$coderef->increase_indent;
+		$coderef->addf( 'for my $ix ( 0 .. $#positional ) {' );
+		$coderef->increase_indent;
+		$coderef->addf( '%s or next;', ( $really_optional or $constraint )->coercibles->inline_check( '$positional[$ix]' ) );
+		$coderef->addf( '( %s ) = splice( @positional, $ix, 1 );', $varname );
+		$coderef->addf( 'last;' );
+		$coderef->decrease_indent;
+		$coderef->addf( '}' );
+		$coderef->decrease_indent;
+		$coderef->addf( '}' );
 	}
 
 	if ( $self->has_default ) {
@@ -444,6 +465,11 @@ Defaults to true if C<type> has a coercion.
 
 Defaults to true if there is a C<default> or if C<type> is a subtype of
 B<Optional>.
+
+=item C<< in_list >> B<< Bool >>
+
+Boolean that is only used when the signature has the C<list_to_named>
+feature enabled.
 
 =back
 

@@ -300,6 +300,7 @@ sub bless         { $_[0]{bless} }
 sub class         { $_[0]{class} }
 sub constructor   { $_[0]{constructor} }
 sub named_to_list { $_[0]{named_to_list} }
+sub list_to_named { $_[0]{list_to_named} }
 sub oo_trace      { $_[0]{oo_trace} }
 sub returns_scalar{ $_[0]{returns_scalar} }  sub has_returns_scalar{ defined $_[0]{returns_scalar} }
 sub returns_list  { $_[0]{returns_list} }    sub has_returns_list  { defined $_[0]{returns_list} }
@@ -444,7 +445,22 @@ sub _coderef_check_count {
 	#   your_func( %opts, y => 2 ); # override y
 	#
 
-	if ( $is_named ) {
+	if ( $is_named and $self->list_to_named ) {
+		require List::Util;
+		my $args_if_hashref  = $headtail + 1;
+		my $min_args_if_list = $headtail + List::Util::sum0( map { $_->optional ? 0 : $_->in_list ? 1 : 2 } @{ $self->parameters } );
+		$self->{min_args} = List::Util::min( $args_if_hashref, $min_args_if_list );
+		
+		$coderef->add_line( $strictness_test . sprintf(
+			"\@_ >= %d\n\tor %s;",
+			$self->{min_args},
+			$self->_make_count_fail(
+				coderef   => $coderef,
+				got       => 'scalar( @_ )',
+			),
+		) );
+	}
+	elsif ( $is_named ) {
 		my $args_if_hashref  = $headtail + 1;
 		my $hashref_index    = @{ $self->head || [] };
 		my $arity_if_hash    = $headtail % 2;
@@ -595,12 +611,27 @@ sub _coderef_parameters {
 	my ( $self, $coderef ) = ( shift, @_ );
 
 	if ( $self->is_named ) {
+		
+		if ( $self->list_to_named ) {
+			require Type::Tiny::Enum;
+			my $Keys = Type::Tiny::Enum->new( values => [ map { $_->name, $_->_all_aliases($self) } @{ $self->parameters } ] );
+			$coderef->addf( 'my @positional;' );
+			$coderef->addf( '{' );
+			$coderef->increase_indent;
+			$coderef->addf( 'last if ( @_ == 0 );' );
+			$coderef->addf( 'last if ( @_ == 1 and %s );', HashRef->inline_check( '$_[0]' ) );
+			$coderef->addf( 'last if ( @_ %% 2 == 0 and %s );', $Keys->inline_check( '$_[0]' ) );
+			$coderef->addf( 'push @positional, shift @_;' );
+			$coderef->addf( 'redo;' );
+			$coderef->decrease_indent;
+			$coderef->addf( '}' );
+			$coderef->add_gap;
+		}
 
 		$coderef->add_line( sprintf(
 			'%%in = ( @_ == 1 and %s ) ? %%{ $_[0] } : @_;',
 			HashRef->inline_check( '$_[0]' ),
 		) );
-
 		$coderef->add_gap;
 
 		for my $parameter ( @{ $self->parameters } ) {
@@ -615,6 +646,16 @@ sub _coderef_parameters {
 				key         => $parameter->name,
 				type        => 'named_arg',
 			);
+		}
+		
+		if ( $self->list_to_named ) {
+			$coderef->add_line( sprintf(
+				'@positional and %s;',
+				$self->_make_general_fail(
+					coderef  => $coderef,
+					message  => q{'Superfluous positional arguments'},
+				),
+			) );
 		}
 	}
 	else {
@@ -1175,6 +1216,8 @@ on C<parameters>
 =item C<< named_to_list >> B<< ArrayRef >>
 
 Can be coerced from a bool based on C<parameters>.
+
+=item C<< list_to_named >> B<< Bool >>
 
 =item C<< oo_trace >> B<Bool>
 
