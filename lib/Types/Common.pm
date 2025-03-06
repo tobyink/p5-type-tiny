@@ -25,8 +25,9 @@ use Type::Library
 	) ];
 
 use Type::Params -sigs;
-$EXPORT_TAGS{sigs} = $Type::Params::EXPORT_TAGS{sigs};
-push @EXPORT_OK, @{ $EXPORT_TAGS{sigs} };
+$EXPORT_TAGS{sigs}    = $Type::Params::EXPORT_TAGS{sigs};
+$EXPORT_TAGS{sigplus} = $Type::Params::EXPORT_TAGS{sigplus};
+push @EXPORT_OK, @{ $EXPORT_TAGS{sigplus} };
 
 sub _generate_t {
 	my $package = shift;
@@ -77,7 +78,7 @@ All the types from L<Types::TypeTiny>.
 
 =item *
 
-The C<< -sigs >> tag from L<Type::Params>.
+The C<< -sigs >> and C<< -sigplus >> tags from L<Type::Params>.
 
 =item *
 

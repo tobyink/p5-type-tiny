@@ -33,7 +33,7 @@ our @EXPORT_OK = qw(
 	multisig
 	Invocant ArgsObject
 	wrap_subs wrap_methods
-	signature signature_for
+	signature signature_for signature_for_func signature_for_method
 );
 
 our %EXPORT_TAGS = (
@@ -41,9 +41,10 @@ our %EXPORT_TAGS = (
 	wrap     => [ qw( wrap_subs wrap_methods ) ],
 	sigs     => [ qw( signature signature_for ) ],
 	validate => [ qw( validate validate_named ) ],
+	sigplus  => [ qw( signature signature_for signature_for_func signature_for_method ) ],
 	
-	v1       => [ qw( compile compile_named ) ],   # Old default
-	v2       => [ qw( signature signature_for ) ], # New recommendation
+	v1       => [ qw( compile compile_named ) ],      # Old default
+	v2       => [ qw( signature signature_for ) ],    # New recommendation
 );
 
 {
@@ -167,6 +168,28 @@ sub signature_for {
 	*$fullname = set_subname( $fullname, $coderef );
 
 	return $sig;
+}
+
+sub signature_for_func {
+	if ( not @_ % 2 ) {
+		require Error::TypeTiny;
+		Error::TypeTiny::croak( "Expected odd-sized list of arguments; did you forget the function name?" );
+	}
+	my ( $function, %opts ) = @_;
+	my $N = !!$opts{named};
+	@_ = ( $function, method => 0, allow_dash => $N, list_to_named => $N, %opts );
+	goto \&signature_for;
+}
+
+sub signature_for_method {
+	if ( not @_ % 2 ) {
+		require Error::TypeTiny;
+		Error::TypeTiny::croak( "Expected odd-sized list of arguments; did you forget the function name?" );
+	}
+	my ( $function, %opts ) = @_;
+	my $N = !!$opts{named};
+	@_ = ( $function, method => 1, allow_dash => $N, list_to_named => $N, %opts );
+	goto \&signature_for;
 }
 
 sub compile {
@@ -394,6 +417,14 @@ Or by requesting functions by name:
 
  use Type::Params qw( signature signature_for );
 
+Two optional shortcuts can be exported:
+
+ use Type::Params qw( signature_for_func signature_for_method );
+
+Or:
+
+ use Type::Params -sigplus;
+
 =head2 C<< signature( %spec ) >>
 
 The C<signature> function takes a specification for your function's
@@ -611,7 +642,7 @@ be supplied as a list in a hopefully do-what-you-mean manner.
  say add_numbers( 10, { num1 => 5 } );             # another 15
  say add_numbers( 5, 10 );                         # surprise, it says 15
  
- say add_numbers( { num1 => 5 }, 10 );             # error! positional first
+ say add_numbers( { num1 => 5 }, 10 );             # error! positional at end
  say add_numbers( 5, 10, { num1 => 3 } );          # error! duplicate argument
 
 Where a hash or hashref of named parameters are expected, any parameter
@@ -646,6 +677,20 @@ the sneaky positional parameters were given in.
 
 This approach is somewhat slower, but has the potential for very
 do-what-I-mean functions.
+
+Note that C<list_to_named> and C<named_to_list> can both be used in
+the same signature as their meanings are not contradictory.
+
+ sub add_to_ref {
+   state $sig = signature(
+     named         => [ ref => ScalarRef[Num], add => Num ],
+     list_to_named => !!1,
+     named_to_list => !!1,
+   );
+   my ( $ref, $num ) = $sig->( @_ );
+   
+   $ref->$* += $arg->num;
+ }
 
 =head4 C<< head >> B<< Int|ArrayRef >>
 
@@ -1623,6 +1668,55 @@ Or when used with multiple functions:
 
 This is a blessed L<Type::Params::Signature> object which provides some
 introspection possibilities.
+
+=head2 C<< signature_for_func $function_name => ( %spec ) >>
+
+Like C<signature_for> but for signatures with named parameters
+will default C<list_to_named> and C<allow_dash> to true.
+
+ signature_for_func add_to_ref => (
+   named         => [ ref => ScalarRef[Num], add => Num ],
+   named_to_list => 1,
+ );
+ 
+ sub add_to_ref ( $ref, $add ) {
+   $ref->$* += $add;
+ }
+ 
+ my $sum = 0;
+ add_to_ref( ref => \$sum, add => 1 );
+ add_to_ref( \$sum, 2 );
+ add_to_ref( 3, \$sum );
+ add_to_ref( 4, { -ref => \$sum } );
+ say $sum; # 10
+
+=head2 C<< signature_for_method $function_name => ( %spec ) >>
+
+Like C<signature_for_func> but will default C<method> to true.
+
+ package Calculator {
+   use Types::Standard qw( Num ScalarRef );
+   use Type::Params qw( signature_for_method );
+   
+   ...;
+   
+   signature_for_method add_to_ref => (
+     named         => [ ref => ScalarRef[Num], add => Num ],
+     named_to_list => 1,
+   );
+   
+   sub add_to_ref ( $self, $ref, $add ) {
+     $ref->$* += $add;
+   }
+ }
+ 
+ my $calc = Calculator->new;
+ my $sum = 0;
+ $calc->add_to_ref( ref => \$sum, add => 1 );
+ $calc->add_to_ref( \$sum, 2 );
+ $calc->add_to_ref( 3, \$sum );
+ $calc->add_to_ref( 4, { -ref => \$sum } );
+ say $sum; # 10
 
 =head1 LEGACY API
 
