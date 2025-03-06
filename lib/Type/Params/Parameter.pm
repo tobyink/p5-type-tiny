@@ -17,6 +17,8 @@ $Type::Params::Parameter::VERSION =~ tr/_//d;
 
 use Types::Standard qw( -is -types );
 
+my $RE_WORDLIKE = qr/\A[^\W0-9]\w*\z/;
+
 sub _croak {
 	require Carp;
 	Carp::croak( pop );
@@ -167,10 +169,24 @@ sub _make_code {
 		$constraint->display_name,
 	) );
 
-	if ( $args{is_named} and $self->has_alias ) {
+	my @aliases;
+	if ( $args{is_named} ) {
+		my $allow_dash = $self->{allow_dash} // $signature->allow_dash;
+		if ( $allow_dash and $self->name =~ $RE_WORDLIKE ) {
+			push @aliases, sprintf( '-%s', $self->name );
+		}
+		for my $name ( @{ $self->alias } ) {
+			push @aliases, $name;
+			if ( $allow_dash and $name =~ $RE_WORDLIKE ) {
+				push @aliases, sprintf( '-%s', $name );
+			}
+		}
+	}
+	
+	if ( @aliases ) {
 		$coderef->add_line( sprintf(
 			'for my $alias ( %s ) {',
-			join( q{, }, map B::perlstring($_), @{ $self->alias } ),
+			join( q{, }, map B::perlstring($_), @aliases ),
 		) );
 		$coderef->increase_indent;
 		$coderef->add_line( 'exists $in{$alias} or next;' );

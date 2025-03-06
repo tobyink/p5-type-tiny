@@ -295,6 +295,7 @@ sub on_die        { $_[0]{on_die} }          sub has_on_die        { exists $_[0
 sub strictness    { $_[0]{strictness} }      sub has_strictness    { exists $_[0]{strictness} }
 sub goto_next     { $_[0]{goto_next} }
 sub is_named      { $_[0]{is_named} }
+sub allow_dash    { $_[0]{allow_dash} }
 sub bless         { $_[0]{bless} }
 sub class         { $_[0]{class} }
 sub constructor   { $_[0]{constructor} }
@@ -1156,6 +1157,8 @@ of this module is to build it for you!
 =over
 
 =item C<< is_named >> B<Bool>
+
+=item C<< allow_dash >> B<Bool>
 
 =item C<< bless >> B<Bool|ClassName>
 

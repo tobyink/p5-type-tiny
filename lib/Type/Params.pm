@@ -1085,6 +1085,26 @@ options are considered I<advisorary> and I<for documentation> and are
 not actually checked! However, the C<signature_for> keyword, which wraps
 your entire sub, I<is> able to check them.
 
+=head4 C<< allow_dash >> B<Bool>
+
+For any "word-like" named parameters or aliases, automatically creates an
+alias with a leading hyphen.
+
+ sub withdraw_funds {
+   state $sig = signature(
+     named      => [ amount => Num, account => Str ],
+     allow_dash => 1,
+   );
+   ...;
+ }
+ 
+ withdraw_funds(  amount => 11.99,  account => 'ABC123' );
+ withdraw_funds( -amount => 11.99,  account => 'ABC123' );
+ withdraw_funds(  amount => 11.99, -account => 'ABC123' );
+ withdraw_funds( -amount => 11.99, -account => 'ABC123' );
+
+Has no effect on names that are not word-like.
+
 =head3 Parameter Options
 
 In the parameter lists for the C<positional> and C<named> signature
