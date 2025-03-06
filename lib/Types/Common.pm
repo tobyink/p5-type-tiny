@@ -56,6 +56,11 @@ Types::Common - the one stop shop
 This module is covered by the
 L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
 
+=head1 PLANNED FUTURE CHANGES
+
+In the future, this module may also export C<signature_for_func>
+and C<signature_for_method>.
+
 =head1 DESCRIPTION
 
 Types::Common doesn't provide any types or functions of its own.

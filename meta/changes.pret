@@ -1271,6 +1271,6 @@
 		];
 		item [
 			a dcs:Addition;
-			label "Type::Params optionally exports two shortcut functions: `signature_for_func` and `signature_for_method`.";
+			label "Type::Params optionally exports two shortcut keywords: `signature_for_func` and `signature_for_method`. The exact behaviour of these may change in the future.";
 		];
 	].

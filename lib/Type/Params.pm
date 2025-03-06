@@ -1690,6 +1690,9 @@ will default C<list_to_named> and C<allow_dash> to true.
  add_to_ref( 4, { -ref => \$sum } );
  say $sum; # 10
 
+The exact behaviour of C<signature_for_func> is unstable and may change
+in future versions of Type::Params.
+
 =head2 C<< signature_for_method $function_name => ( %spec ) >>
 
 Like C<signature_for_func> but will default C<method> to true.
@@ -1717,6 +1720,9 @@ Like C<signature_for_func> but will default C<method> to true.
  $calc->add_to_ref( 3, \$sum );
  $calc->add_to_ref( 4, { -ref => \$sum } );
  say $sum; # 10
+
+The exact behaviour of C<signature_for_method> is unstable and may change
+in future versions of Type::Params.
 
 =head1 LEGACY API
 
