@@ -35,6 +35,47 @@ a sub.
 
 It combines multiple checks and tries each until one works.
 
+=head2 C<list_to_named>
+
+In many cases, the multiple call conventions offered by C<multiple>
+can be implemented more easily using C<list_to_named>.
+
+  signature_for repeat_string => (
+    list_to_named => 1,
+    named         => [ string => Str, count => Int ],
+    named_to_list => 1,
+  );
+  
+  sub repeat_string ( $string, $count ) {
+    return $string x $count;
+  }
+  
+  # Standard ways to call the function:
+  repeat_string(  string => "Hello", count => 42  );
+  repeat_string({ string => "Hello", count => 42 });
+  
+  # These should also work:
+  repeat_string( "Hello", count => 42 );
+  repeat_string( "Hello", { count => 42 } );
+  repeat_string( 42, string => "Hello" );
+  repeat_string( 42, { string => "Hello" } );
+  repeat_string( "Hello", 42 );
+  
+  # This currently won't work though, because "42" appears first so is taken
+  # to be the string, but "Hello" isn't a valid integer!
+  repeat_string( 42, "Hello" );
+
+The C<list_to_named> option works in three stages. When looking for the hash
+or hashref of named parameters, if there are other parameters first, these
+are kept to one side in a list of "sneaky" positional parameters.
+
+Later when validating the named parameters, if any of them seem to be missing,
+the list of sneaky positional parameters is examined and if possible the
+parameter is taken from there.
+
+Finally after all the named parameters have been processed, if there are still
+any positional parameters which weren't needed, an error is thrown.
+
 =head2 C<signature>
 
 C<signature> allows the signature to be defined within the sub itself,
@@ -104,6 +145,8 @@ start or end of a named parameter list:
   my_func( 42, foo => 21, bar  => 84 );     # ok
   my_func( 42, foo => 21, bar  => 10.5 );   # not ok
   my_func( 42, foo => 21, quux => 84 );     # not ok
+
+Alternatively, C<list_to_named> (see above) may be of use.
 
 =head2 Proper Signatures
 
