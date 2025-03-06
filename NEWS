@@ -4,6 +4,11 @@
    changes in development releases, see the "Changes" file instead.
 =======================================================================
 
+2025-??-?? Type-Tiny version 2.008000 released!
+
+ - `Type::Params` now supports `returns`, `allow_dash`, and `list_to_named`.
+ - Update examples in pod to use more features of modern Perl.
+
 2024-09-29 Type-Tiny version 2.006000 released!
 
  - Improvements to `tie( VAR, TYPE)`.
