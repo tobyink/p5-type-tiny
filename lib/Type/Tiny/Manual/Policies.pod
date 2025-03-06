@@ -103,6 +103,12 @@ type libraries is experimental.
 
 =item *
 
+The C<signature_for_func> and C<signature_for_method> keywords provided by
+L<Type::Params> may change their behaviour slightly in the future. Once
+stable, they are expected to be added to L<Types::Common>'s exports.
+
+=item *
+
 These modules are considered part of Type::Tiny's internals, and not
 covered by the stability policy:
 L<Devel::TypeTiny::Perl58Compat>,
