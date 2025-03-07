@@ -72,12 +72,6 @@ L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
 This is a small plugin to improve error messages in L<Reply>.
 Not massively tested.
 
-=begin trustme
-
-=item mangle_error
-
-=end trustme
-
 =head1 BUGS
 
 Please report any bugs to
@@ -103,3 +97,9 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+=begin trustme
+
+=item mangle_error
+
+=end trustme

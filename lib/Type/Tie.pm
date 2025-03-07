@@ -375,12 +375,6 @@ If you clone tied variables with C<dclone> from L<Storable>, the clone
 will also be tied. The L<Clone> module is also able to successfully clone
 tied variables. With other cloning techniques, your level of success may vary.
 
-=begin trustme
-
-=item ttie
-
-=end trustme
-
 =head1 BUGS
 
 Please report any bugs to
@@ -410,4 +404,10 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+=begin trustme
+
+=item ttie
+
+=end trustme
 

@@ -1495,12 +1495,6 @@ how slurpy types were created.
 Outside of B<Dict> and B<Tuple>, B<< Slurpy[Foo] >> should just act the
 same as B<Foo>. But don't do that.
 
-=begin trustme
-
-=item slurpy
-
-=end trustme
-
 =head2 Objects
 
 Okay, so I stole some ideas from L<MooX::Types::MooseLike::Base>.
@@ -1862,3 +1856,9 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+=begin trustme
+
+=item slurpy
+
+=end trustme
