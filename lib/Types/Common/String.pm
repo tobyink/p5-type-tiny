@@ -7,7 +7,7 @@ use utf8;
 
 BEGIN {
 	$Types::Common::String::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Common::String::VERSION   = '2.007_004';
+	$Types::Common::String::VERSION   = '2.007_005';
 }
 
 $Types::Common::String::VERSION =~ tr/_//d;

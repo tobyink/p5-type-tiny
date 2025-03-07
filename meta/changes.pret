@@ -1296,3 +1296,13 @@
 			label "The `goto_next` option in `Type::Params` is now just called `next`. The original name is still supported for backwards compatibility.";
 		];
 	].
+
+`Type-Tiny 2.007_005 cpan:TOBYINK`
+	issued  2025-03-07;
+	changeset [
+		dcs:versus `Type-Tiny 2.007_004 cpan:TOBYINK`;
+		item [
+			a dcs:Documentation;
+			label "Minor fixes and improvements for `Type::Params` documentation.";
+		];
+	].
