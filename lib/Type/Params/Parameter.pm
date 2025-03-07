@@ -84,7 +84,8 @@ sub might_supply_new_value {
 
 sub _all_aliases {
 	my ( $self, $signature ) = @_;
-	my $allow_dash = $self->{allow_dash} // $signature->allow_dash;
+	my $allow_dash = $self->{allow_dash};
+	$allow_dash = $signature->allow_dash if !defined $allow_dash;
 	my @aliases;
 	if ( $allow_dash and $self->name =~ $RE_WORDLIKE ) {
 		push @aliases, sprintf( '-%s', $self->name );
