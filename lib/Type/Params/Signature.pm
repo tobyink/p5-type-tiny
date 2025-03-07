@@ -448,7 +448,7 @@ sub _coderef_check_count {
 	if ( $is_named and $self->list_to_named ) {
 		require List::Util;
 		my $args_if_hashref  = $headtail + 1;
-		my $min_args_if_list = $headtail + List::Util::sum0( map { $_->optional ? 0 : $_->in_list ? 1 : 2 } @{ $self->parameters } );
+		my $min_args_if_list = $headtail + List::Util::sum( 0, map { $_->optional ? 0 : $_->in_list ? 1 : 2 } @{ $self->parameters } );
 		$self->{min_args} = List::Util::min( $args_if_hashref, $min_args_if_list );
 		
 		$coderef->add_line( $strictness_test . sprintf(
