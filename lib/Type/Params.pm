@@ -1560,7 +1560,7 @@ in future versions of Type::Params.
 
 =head2 C<< signature_for_method $function_name => ( %spec ) >>
 
-Like C<signature_for> but will default C<< method => true >.
+Like C<signature_for> but will default C<< method => true >>.
 
 If the signature has named parameters, it will additionally default
 C<list_to_named> and C<allow_dash> to true.
@@ -1872,13 +1872,12 @@ constraint which accepts classnames I<and> blessed objects.
 
  use Type::Params qw( compile Invocant );
  
- sub my_method {
-   state $check = signature(
-     method     => Invocant,
-     positional => [ ArrayRef, Int ],
-   );
-   my ($self_or_class, $arr, $ix) = $check->(@_);
-   
+ signature_for my_method => (
+   method     => Invocant,
+   positional => [ ArrayRef, Int ],
+ );
+ 
+ sub my_method ($self_or_class, $arr, $ix) {
    return $arr->[ $ix ];
  }
 
@@ -1892,6 +1891,8 @@ Type::Params exports a parameterizable type constraint B<ArgsObject>.
 It accepts the kinds of objects returned by signature checks for named
 parameters.
 
+  use v5.36;
+  
   package Foo {
     use Moo;
     use Type::Params 'ArgsObject';
@@ -1904,17 +1905,11 @@ parameters.
   
   package Bar {
     use Types::Standard -types;
-    use Type::Params 'signature';
+    use Type::Params 'signature_for';
     
-    sub bar {
-      state $check = signature(
-        named => [
-          xxx => Int,
-          yyy => ArrayRef,
-        ],
-      );
-      my ( $got ) = $check->( @_ );
-      
+    signature_for bar => ( named => [ xxx => Int, yyy => ArrayRef ] );
+    
+    sub bar ( $got ) {
       return 'Foo'->new( args => $got );
     }
   }
