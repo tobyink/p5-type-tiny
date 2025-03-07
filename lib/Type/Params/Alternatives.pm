@@ -10,7 +10,7 @@ BEGIN {
 
 BEGIN {
 	$Type::Params::Alternatives::AUTHORITY  = 'cpan:TOBYINK';
-	$Type::Params::Alternatives::VERSION    = '2.007_003';
+	$Type::Params::Alternatives::VERSION    = '2.007_004';
 }
 
 $Type::Params::Alternatives::VERSION =~ tr/_//d;
@@ -27,6 +27,7 @@ sub new {
 	my $class = shift;
 	my %self  = @_ == 1 ? %{$_[0]} : @_;
 	my $self = bless \%self, $class;
+	$self->{next} ||= delete $self->{goto_next} if exists $self->{goto_next};
 	exists( $self->{$_} ) || ( $self->{$_} = $self->{base_options}{$_} )
 		for keys %{ $self->{base_options} };
 	$self->{sig_class} ||= 'Type::Params::Signature';
@@ -41,7 +42,8 @@ sub alternatives      { $_[0]{alternatives}      ||= [] }
 sub sig_class         { $_[0]{sig_class} }
 sub meta_alternatives { $_[0]{meta_alternatives} ||= $_[0]->_build_meta_alternatives }
 sub parameters        { [] }
-sub goto_next         { $_[0]{base_options}{goto_next} }
+sub next              { $_[0]{base_options}{next} }
+sub goto_next         { $_[0]{base_options}{next} }
 sub package           { $_[0]{base_options}{package}   }
 sub subname           { $_[0]{base_options}{subname}   }
 
@@ -67,7 +69,7 @@ sub _build_meta_alternative {
 	elsif ( is_HashRef $alt ) {
 		my %opts = (
 			%{ $self->base_options },
-			goto_next       => !!0, # don't propagate these next few
+			next            => !!0, # don't propagate these next few
 			returns         => undef,
 			returns_scalar  => undef,
 			returns_list    => undef,
@@ -82,7 +84,7 @@ sub _build_meta_alternative {
 	elsif ( is_ArrayRef $alt ) {
 		my %opts = (
 			%{ $self->base_options },
-			goto_next       => !!0, # don't propagate these next few
+			next            => !!0, # don't propagate these next few
 			returns         => undef,
 			returns_scalar  => undef,
 			returns_list    => undef,

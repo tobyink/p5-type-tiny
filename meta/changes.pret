@@ -1274,3 +1274,25 @@
 			label "Type::Params optionally exports two shortcut keywords: `signature_for_func` and `signature_for_method`. The exact behaviour of these may change in the future.";
 		];
 	].
+
+`Type-Tiny 2.007_004 cpan:TOBYINK`
+	issued  2025-03-07;
+	changeset [
+		dcs:versus `Type-Tiny 2.007_003 cpan:TOBYINK`;
+		item [
+			a dcs:Documentation;
+			label "Major rewrite of `Type::Params` documentation to prioritize `signature_for` and modern Perl, and some corresponding adjustments to `Type::Tiny::Manual`.";
+		];
+		item [
+			a dcs:Bugfix;
+			label "Use `List::Util::sum` instead of `List::Util::sum0` which doesn't exist in some older versions of List::Util. Fixes bug introduced in 2.007_003.";
+		];
+		item [
+			a dcs:Bugfix;
+			label "Avoid the `//` operator in `Type::Params::Parameter` as it isn't supported in Perl 5.8. Fixes bug introduced in 2.007_003.";
+		];
+		item [
+			a dcs:Change;
+			label "The `goto_next` option in `Type::Params` is now just called `next`. The original name is still supported for backwards compatibility.";
+		];
+	].

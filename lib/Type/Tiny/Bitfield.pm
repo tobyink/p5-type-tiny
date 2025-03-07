@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Tiny::Bitfield::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::Bitfield::VERSION   = '2.007_003';
+	$Type::Tiny::Bitfield::VERSION   = '2.007_004';
 }
 
 $Type::Tiny::Bitfield::VERSION =~ tr/_//d;

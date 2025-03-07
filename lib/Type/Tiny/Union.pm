@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Tiny::Union::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::Union::VERSION   = '2.007_003';
+	$Type::Tiny::Union::VERSION   = '2.007_004';
 }
 
 $Type::Tiny::Union::VERSION =~ tr/_//d;

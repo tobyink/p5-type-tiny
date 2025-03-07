@@ -34,11 +34,11 @@ use Types::Common -sigs, -types;
 			multi  => [
 				{ multi => [
 					{ pos   => [ ArrayRef, Int ] },
-					{ pos   => [ Int, ArrayRef ], goto_next => sub { @_[0, 2, 1] } },
+					{ pos   => [ Int, ArrayRef ], next => sub { @_[0, 2, 1] } },
 				] },
 				{ named => [ array => ArrayRef, index => Int, { alias => 'ix' } ], named_to_list => 1 },
-				{ pos   => [ ArrayRef, Int ], method => 0, goto_next => sub { ( undef, @_ ) } },
-				{ named => [ LIST => ArrayRef, INDEX => Int ], goto_next => sub { my $arg = pop; ( undef, $arg->LIST, $arg->INDEX ) } },
+				{ pos   => [ ArrayRef, Int ], method => 0, next => sub { ( undef, @_ ) } },
+				{ named => [ LIST => ArrayRef, INDEX => Int ], next => sub { my $arg = pop; ( undef, $arg->LIST, $arg->INDEX ) } },
 				sub { return ( undef, ['helloworld'], 0 ) if ( $_[0] and $_[0] eq 'HELLOWORLD' ); die },
 			],
 		);
@@ -53,10 +53,10 @@ use Types::Common -sigs, -types;
 			multi  => [
 				{ multi => [
 					{ pos   => [ ArrayRef, Int ] },
-					{ pos   => [ Int, ArrayRef ], goto_next => sub { @_[0, 2, 1] } },
+					{ pos   => [ Int, ArrayRef ], next => sub { @_[0, 2, 1] } },
 				] },
 				{ named => [ array => ArrayRef, index => Int, { alias => 'ix' } ], named_to_list => 1 },
-				{ pos   => [ ArrayRef, Int ], method => 0, goto_next => sub { ( undef, @_ ) } },
+				{ pos   => [ ArrayRef, Int ], method => 0, next => sub { ( undef, @_ ) } },
 				{ named => [ ARRAY => ArrayRef, INDEX => Int ], named_to_list => 1 },
 				sub { return ( undef, ['helloworld'], 0 ) if ( $_[0] and $_[0] eq 'HELLOWORLD' ); die },
 			],
@@ -68,11 +68,11 @@ use Types::Common -sigs, -types;
 			multi  => [
 				{ multi => [
 					{ pos   => [ ArrayRef, Int ] },
-					{ pos   => [ Int, ArrayRef ], goto_next => sub { @_[0, 2, 1] } },
+					{ pos   => [ Int, ArrayRef ], next => sub { @_[0, 2, 1] } },
 				] },
 				{ named => [ array => ArrayRef, index => Int, { alias => 'ix' } ], named_to_list => 1 },
-				{ pos   => [ ArrayRef, Int ], method => 0, goto_next => sub { ( undef, @_ ) } },
-				{ named => [ LIST => ArrayRef, INDEX => Int ], goto_next => sub { my $arg = pop; ( undef, $arg->LIST, $arg->INDEX ) } },
+				{ pos   => [ ArrayRef, Int ], method => 0, next => sub { ( undef, @_ ) } },
+				{ named => [ LIST => ArrayRef, INDEX => Int ], next => sub { my $arg = pop; ( undef, $arg->LIST, $arg->INDEX ) } },
 				sub { return ( undef, ['helloworld'], 0 ) if ( $_[0] and $_[0] eq 'HELLOWORLD' ); die },
 			],
 			want_object => 1,
@@ -149,11 +149,11 @@ use Types::Common -sigs, -types;
 		multi  => [
 			{ multi => [
 				{ ID=>'first', pos   => [ ArrayRef, Int ] },
-				{ ID=>'second', pos   => [ Int, ArrayRef ], goto_next => sub { @_[0, 2, 1] } },
+				{ ID=>'second', pos   => [ Int, ArrayRef ], next => sub { @_[0, 2, 1] } },
 			] },
 			{ ID=>'third', named => [ array => ArrayRef, index => Int, { alias => 'ix' } ], named_to_list => 1 },
-			{ ID=>'fourth', pos   => [ ArrayRef, Int ], method => 0, goto_next => sub { ( undef, @_ ) } },
-			{ ID=>'fifth', named => [ LIST => ArrayRef, INDEX => Int ], goto_next => sub { my $arg = pop; ( undef, $arg->LIST, $arg->INDEX ) } },
+			{ ID=>'fourth', pos   => [ ArrayRef, Int ], method => 0, next => sub { ( undef, @_ ) } },
+			{ ID=>'fifth', named => [ LIST => ArrayRef, INDEX => Int ], next => sub { my $arg = pop; ( undef, $arg->LIST, $arg->INDEX ) } },
 			sub { return ( undef, ['helloworld'], 0 ) if ( $_[0] and $_[0] eq 'HELLOWORLD' ); die },
 		],
 	);
@@ -252,7 +252,7 @@ use Types::Common -sigs, -types;
 	my $sig;
 	sub xyz {
 		$sig ||= signature(
-			named => [ { goto_next => sub { shift->foo } }, foo => Int, { alias => 'foolish' } ],
+			named => [ { next => sub { shift->foo } }, foo => Int, { alias => 'foolish' } ],
 			pos   => [ Int ],
 			multi => 1,
 		);
@@ -261,7 +261,7 @@ use Types::Common -sigs, -types;
 	}
 	subtest "signature( named => ..., pos => ..., multi => 1 )" => sub {
 		note signature(
-			named => [ { goto_next => sub { shift->foo } }, foo => Int, { alias => 'foolish' } ],
+			named => [ { next => sub { shift->foo } }, foo => Int, { alias => 'foolish' } ],
 			pos   => [ Int ],
 			multi => 1,
 			want_source => 1,

@@ -10,7 +10,7 @@ BEGIN {
 
 BEGIN {
 	$Type::Params::Signature::AUTHORITY  = 'cpan:TOBYINK';
-	$Type::Params::Signature::VERSION    = '2.007_003';
+	$Type::Params::Signature::VERSION    = '2.007_004';
 }
 
 $Type::Params::Signature::VERSION =~ tr/_//d;
@@ -42,6 +42,7 @@ sub new {
 	my $self = bless \%self, $class;
 	$self->{parameters}   ||= [];
 	$self->{class_prefix} ||= 'Type::Params::OO::Klass';
+	$self->{next}         ||= delete $self->{goto_next} if exists $self->{goto_next};
 	$self->BUILD;
 	return $self;
 }
@@ -293,7 +294,8 @@ sub parameters    { $_[0]{parameters} }      sub has_parameters    { exists $_[0
 sub slurpy        { $_[0]{slurpy} }          sub has_slurpy        { exists $_[0]{slurpy} }
 sub on_die        { $_[0]{on_die} }          sub has_on_die        { exists $_[0]{on_die} }
 sub strictness    { $_[0]{strictness} }      sub has_strictness    { exists $_[0]{strictness} }
-sub goto_next     { $_[0]{goto_next} }
+sub next          { $_[0]{next} }
+sub goto_next     { $_[0]{next} }
 sub is_named      { $_[0]{is_named} }
 sub allow_dash    { $_[0]{allow_dash} }
 sub bless         { $_[0]{bless} }
@@ -348,7 +350,7 @@ sub _coderef_start {
 	$coderef->add_line( 'sub {' );
 	$coderef->{indent} .= "\t";
 
-	if ( my $next = $self->goto_next ) {
+	if ( my $next = $self->next ) {
 		if ( is_CodeLike $next ) {
 			$coderef->add_variable( '$__NEXT__', \$next );
 		}
@@ -768,7 +770,7 @@ sub _coderef_extra_names {
 sub _coderef_end {
 	my ( $self, $coderef ) = ( shift, @_ );
 
-	if ( $self->{_is_signature_for} and $self->goto_next ) {
+	if ( $self->{_is_signature_for} and $self->next ) {
 		$coderef->add_variable( '$return_check_for_scalar', \ $self->returns_scalar->compiled_check )
 			if $self->has_returns_scalar;
 		$coderef->add_variable( '$return_check_for_list', \ $self->returns_list->compiled_check )
@@ -843,7 +845,7 @@ sub _make_return_expression {
 
 	my $list = join q{, }, $self->_make_return_list;
 
-	if ( $self->goto_next ) {
+	if ( $self->next ) {
 		if ( $self->{_is_signature_for} and ( $self->has_returns_list or $self->has_returns_scalar ) ) {
 			my $call = sprintf '$__NEXT__->( %s )', $list;
 			return $self->_make_typed_return_expression( $call );
@@ -1177,7 +1179,11 @@ The sub we're providing a signature for.
 
 =item C<< strictness >> B<< Bool|ScalarRef >>
 
+=item C<< next >> B<CodeRef>
+
 =item C<< goto_next >> B<CodeRef>
+
+Alias for C<next>.
 
 =item C<< can_shortcut >> B<Bool>
 

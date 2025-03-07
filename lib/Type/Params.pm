@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Params::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Params::VERSION   = '2.007_003';
+	$Type::Params::VERSION   = '2.007_004';
 }
 
 $Type::Params::VERSION =~ tr/_//d;
@@ -109,6 +109,7 @@ sub signature {
 		Error::TypeTiny::croak( "Expected even-sized list of arguments" );
 	}
 	my ( %opts ) = @_;
+	$opts{next} ||= delete $opts{goto_next} if exists $opts{goto_next};
 
 	my $for = [ caller( 1 + ( $opts{caller_level} || 0 ) ) ]->[3] || ( ( $opts{package} || '__ANON__' ) . '::__ANON__' );
 	my ( $pkg, $sub ) = ( $for =~ /^(.+)::(\w+)$/ );
@@ -126,6 +127,7 @@ sub signature_for {
 	}
 	my ( $function, %opts ) = @_;
 	my $package = $opts{package} || caller( $opts{caller_level} || 0 );
+	$opts{next} ||= delete $opts{goto_next} if exists $opts{goto_next};
 
 	if ( ref($function) eq 'ARRAY' ) {
 		$opts{package} = $package;
@@ -137,14 +139,14 @@ sub signature_for {
 	my $fullname = ( $function =~ /::/ ) ? $function : "$package\::$function";
 	$opts{package}   ||= $package;
 	$opts{subname}   ||= ( $function =~ /::(\w+)$/ ) ? $1 : $function;
-	$opts{goto_next} ||= do { no strict 'refs'; exists(&$fullname) ? \&$fullname : undef; };
+	$opts{next}      ||= do { no strict 'refs'; exists(&$fullname) ? \&$fullname : undef; };
 	if ( $opts{method} ) {
-		$opts{goto_next} ||= eval { $package->can( $opts{subname} ) };
+		$opts{next} ||= eval { $package->can( $opts{subname} ) };
 	}
-	if ( $opts{fallback} and not $opts{goto_next} ) {
-		$opts{goto_next} = ref( $opts{fallback} ) ? $opts{fallback} : sub {};
+	if ( $opts{fallback} and not $opts{next} ) {
+		$opts{next} = ref( $opts{fallback} ) ? $opts{fallback} : sub {};
 	}
-	if ( not $opts{goto_next} ) {
+	if ( not $opts{next} ) {
 		require Error::TypeTiny;
 		return Error::TypeTiny::croak( "Function '$function' not found to wrap!" );
 	}
@@ -314,7 +316,7 @@ sub _wrap_subs {
 				{
 					'package'   => $opts->{caller},
 					'subname'   => $name,
-					'goto_next' => $orig,
+					'next'      => $orig,
 					'head'      => $opts->{skip_invocant} ? 1 : 0,
 				},
 				@$proto,
@@ -962,13 +964,13 @@ index of the signature which was used:
    ...;
  }
 
-A neater solution is to use a C<goto_next> coderef to re-order alternative
+A neater solution is to use a C<next> coderef to re-order alternative
 signature results into your preferred order:
 
  signature_for my_func => (
    multiple => [
      { positional => [ ArrayRef, Int ] },
-     { positional => [ Int, ArrayRef ], goto_next => sub { reverse @_ } },
+     { positional => [ Int, ArrayRef ], next => sub { reverse @_ } },
    ],
  );
  
@@ -992,7 +994,7 @@ Coderefs may additionally be used:
  signature_for my_func => (
    multiple => [
      [ ArrayRef, Int ],
-     { positional => [ Int, ArrayRef ], goto_next => sub { reverse @_ } },
+     { positional => [ Int, ArrayRef ], next => sub { reverse @_ } },
      sub { ... },
      sub { ... },
    ],
@@ -1673,7 +1675,7 @@ of another package, then setting C<caller_level> to 1 (or more, depending on
 the level of wrapping!) may be an alternative to manually setting the
 C<package> and C<subname>.
 
-=head4 C<< goto_next >> B<< Bool|CodeLike >>
+=head4 C<< next >> B<< Bool|CodeLike >>
 
 This can be used for chaining coderefs. If you understand C<on_die>, this
 acts like an "on_live".
@@ -1681,7 +1683,7 @@ acts like an "on_live".
  sub add_numbers {
    state $sig = signature(
      positional => [ Num, Num ],
-     goto_next  => sub {
+     next => sub {
        my ( $num1, $num2 ) = @_;
        
        return $num1 + $num2;
@@ -1699,7 +1701,7 @@ If set to true instead of a coderef, has a slightly different behaviour:
  sub add_numbers {
    state $sig = signature(
      positional => [ Num, Num ],
-     goto_next  => true,
+     next       => true,
    );
    
    my $sum = $sig->(
@@ -1721,7 +1723,7 @@ Moose's C<around> keyword.
  around add_numbers => signature(
    method     => true,
    positional => [ Num, Num ],
-   goto_next  => true,
+   next       => true,
    package    => __PACKAGE__,
    subname    => 'add_numbers',
  );
@@ -1738,13 +1740,15 @@ a method defined in a class.
 This is kind of complex, and you're unlikely to use it, but it's been proven
 useful for tools that integrate Type::Params with Moose-like method modifiers.
 
-Note that C<goto_next> is the mechanism that C<signature_for> internally
-uses to connect the signature with the wrapped sub, so using C<goto_next>
+Note that C<next> is the mechanism that C<signature_for> internally
+uses to connect the signature with the wrapped sub, so using C<next>
 with C<signature_for> is a good recipe for headaches.
 
-If using C<multiple> signatures, C<goto_next> is useful for each "inner"
+If using C<multiple> signatures, C<next> is useful for each "inner"
 signature to massage parameters into the correct order. This use of
-C<goto_next> I<is> supported for C<signature_for>.
+C<next> I<is> supported for C<signature_for>.
+
+The option C<goto_next> is supported as a historical alias for C<next>.
 
 =head4 C<< want_source >> B<Bool>
 
