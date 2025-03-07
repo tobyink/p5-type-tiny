@@ -20,7 +20,7 @@ a sub.
   signature_for repeat_string => (
     multiple => [
       { positional => [ Str, Int ] },
-      { named => [ string => Str, count => Int ], named_to_list => 1 },
+      { named => [ string => Str, count => Int ], named_to_list => true },
     ],
   );
   
@@ -41,9 +41,9 @@ In many cases, the multiple call conventions offered by C<multiple>
 can be implemented more easily using C<list_to_named>.
 
   signature_for repeat_string => (
-    list_to_named => 1,
+    list_to_named => true,
     named         => [ string => Str, count => Int ],
-    named_to_list => 1,
+    named_to_list => true,
   );
   
   sub repeat_string ( $string, $count ) {
@@ -105,7 +105,7 @@ Or use C<< state $check >> if you know the check will be the same every time.
 
 For subs which are intended to be called as functions:
 
-  signature_for my_sub => ( method => 0, ... );
+  signature_for my_sub => ( method => false, ... );
   
   signature_for my_sub => ( ... ); # this is the default anyway
 
@@ -119,13 +119,21 @@ And for subs which are intended to be called as methods on a class:
   
   signature_for my_method => ( method => Str, ... );  # faster, less readable
 
-The following is also allowed, which indicates that the sub is intended
+The following are also allowed, which indicates that the sub is intended
 to be called as a method, but you don't want to do type checks on the
 invocant:
 
   signature_for my_method => ( method => builtin::true, ... );
   
   signature_for my_method => ( method => 1, ... );
+
+Shortcuts are available:
+
+  use Type::Params qw( signature_for_func signature_for_method );
+  
+  signature_for_func my_function => ( ... );
+  
+  signature_for_method my_method => ( ... );
 
 =head2 Mixed Named and Positional Parameters
 
