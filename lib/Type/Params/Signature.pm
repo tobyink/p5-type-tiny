@@ -201,7 +201,7 @@ sub _parameters_from_list {
 		if ( $is_named ) {
 			$param_opts{name} = assert_Str( shift( @$list ) );
 		}
-		if ( is_HashRef $list->[0] and exists $list->[0]{slurpy} and not is_BoolLike $list->[0]{slurpy} ) {
+		if ( is_HashRef $list->[0] and exists $list->[0]{slurpy} and not is_Bool $list->[0]{slurpy} ) {
 			my %new_opts = %{ shift( @$list ) };
 			$type = delete $new_opts{slurpy};
 			%param_opts = ( %param_opts, %new_opts, slurpy => 1 );
@@ -210,7 +210,7 @@ sub _parameters_from_list {
 			$type = shift( @$list );
 		}
 		if ( is_HashRef( $list->[0] ) ) {
-			unless ( exists $list->[0]{slurpy} and not is_BoolLike $list->[0]{slurpy} ) {
+			unless ( exists $list->[0]{slurpy} and not is_Bool $list->[0]{slurpy} ) {
 				%param_opts = ( %param_opts, %{ +shift( @$list ) } );
 			}
 		}
