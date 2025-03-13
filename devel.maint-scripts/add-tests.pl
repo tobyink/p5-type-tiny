@@ -6,8 +6,10 @@ use Path::Tiny qw( path );
 
 #	bleh => 'regexp'                   => qr/./,
 my $new = <<'NEW_LINES';
-	fail => 'object booling to false'  => do { package Local::OL::BoolFalse; use overload q[bool] => sub { 0 }; bless [] },
-	fail => 'object booling to true'   => do { package Local::OL::BoolTrue;  use overload q[bool] => sub { 1 }; bless [] },
+	fail => 'boolean::false'           => boolean::false,
+	fail => 'boolean::true'            => boolean::true,
+	fail => 'builtin::false'           => do { builtin->can('false') ? builtin::false() : !!0 },
+	fail => 'builtin::true'            => do { builtin->can('true') ? builtin::true() : !!1 },
 NEW_LINES
 
 my $dir = path('t/21-types/');

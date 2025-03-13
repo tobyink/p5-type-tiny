@@ -110,6 +110,10 @@ f`t/mk-test-manifest.pl`
 	dc:license <http://dev.perl.org/licenses/>;
 	dc:rightsHolder cpan:TOBYINK.
 
+f`inc/boolean.pm`
+	dc:license <http://dev.perl.org/licenses/>;
+	dc:rightsHolder cpan:INGY.
+
 f`inc/Test/Fatal.pm`
 	dc:license <http://dev.perl.org/licenses/>;
 	dc:rightsHolder cpan:RJBS.
