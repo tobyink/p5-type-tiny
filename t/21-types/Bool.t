@@ -24,6 +24,7 @@ use warnings;
 use Test::More;
 use Test::Fatal;
 use Test::TypeTiny;
+use Test::Requires qw(boolean);
 use Types::Standard qw( Bool );
 
 isa_ok(Bool, 'Type::Tiny', 'Bool');
@@ -101,6 +102,10 @@ my @tests = (
 	fail => 'object overloading coderef' => do { package Local::OL::Code; use overload q[&{}] => sub { $_[0][0] }; bless [sub { 1 }] },
 	fail => 'object booling to false'  => do { package Local::OL::BoolFalse; use overload q[bool] => sub { 0 }; bless [] },
 	fail => 'object booling to true'   => do { package Local::OL::BoolTrue;  use overload q[bool] => sub { 1 }; bless [] },
+	fail => 'boolean::false'           => boolean::false,
+	fail => 'boolean::true'            => boolean::true,
+	pass => 'builtin::false'           => do { no warnings; builtin->can('false') ? builtin::false() : !!0 },
+	pass => 'builtin::true'            => do { no warnings; builtin->can('true') ? builtin::true() : !!1 },
 #TESTS
 );
 

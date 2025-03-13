@@ -12,7 +12,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2019-2025 by Toby Inkster.
+This software is copyright (c) 20192025 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -24,6 +24,7 @@ use warnings;
 use Test::More;
 use Test::Fatal;
 use Test::TypeTiny;
+use Test::Requires qw(boolean);
 use Types::TypeTiny qw( StringLike );
 
 isa_ok(StringLike, 'Type::Tiny', 'StringLike');
@@ -101,6 +102,10 @@ my @tests = (
 	fail => 'object overloading coderef' => do { package Local::OL::Code; use overload q[&{}] => sub { $_[0][0] }; bless [sub { 1 }] },
 	fail => 'object booling to false'  => do { package Local::OL::BoolFalse; use overload q[bool] => sub { 0 }; bless [] },
 	fail => 'object booling to true'   => do { package Local::OL::BoolTrue;  use overload q[bool] => sub { 1 }; bless [] },
+	pass => 'boolean::false'           => boolean::false,
+	pass => 'boolean::true'            => boolean::true,
+	pass => 'builtin::false'           => do { no warnings; builtin->can('false') ? builtin::false() : !!0 },
+	pass => 'builtin::true'            => do { no warnings; builtin->can('true') ? builtin::true() : !!1 },
 #TESTS
 );
 

@@ -25,6 +25,7 @@ use Test::More;
 use Test::Requires '5.020';
 use Test::Fatal;
 use Test::TypeTiny;
+use Test::Requires qw(boolean);
 use Types::Standard qw( StrMatch );
 use Test::Requires { 'Test::Warnings' => 0.005 };
 use Test::Warnings ':all';
