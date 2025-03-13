@@ -53,7 +53,7 @@ sub new {
 	sub BUILD {
 		my $self = shift;
 
-		if ( $self->{named_to_list} and not ref $self->{named_to_list} ) {
+		if ( $self->{named_to_list} and not is_ArrayRef $self->{named_to_list} ) {
 			$self->{named_to_list} = [ map $_->name, @{ $self->{parameters} } ];
 		}
 
@@ -75,7 +75,7 @@ sub new {
 
 		$self->_rationalize_returns;
 
-		if ( defined $self->{bless} and $self->{bless} eq 1 and not $self->{named_to_list} ) {
+		if ( defined $self->{bless} and is_BoolLike $self->{bless} and $self->{bless} and not $self->{named_to_list} ) {
 			my $klass_key     = $self->_klass_key;
 			$self->{bless}    = ( $klass_cache{$klass_key} ||= sprintf( '%s%d', $self->{class_prefix}, ++$klass_id ) );
 			$self->{oo_trace} = 1 unless exists $self->{oo_trace};
@@ -201,7 +201,7 @@ sub _parameters_from_list {
 		if ( $is_named ) {
 			$param_opts{name} = assert_Str( shift( @$list ) );
 		}
-		if ( is_HashRef $list->[0] and exists $list->[0]{slurpy} and not is_Bool $list->[0]{slurpy} ) {
+		if ( is_HashRef $list->[0] and exists $list->[0]{slurpy} and not is_BoolLike $list->[0]{slurpy} ) {
 			my %new_opts = %{ shift( @$list ) };
 			$type = delete $new_opts{slurpy};
 			%param_opts = ( %param_opts, %new_opts, slurpy => 1 );
@@ -210,7 +210,7 @@ sub _parameters_from_list {
 			$type = shift( @$list );
 		}
 		if ( is_HashRef( $list->[0] ) ) {
-			unless ( exists $list->[0]{slurpy} and not is_Bool $list->[0]{slurpy} ) {
+			unless ( exists $list->[0]{slurpy} and not is_BoolLike $list->[0]{slurpy} ) {
 				%param_opts = ( %param_opts, %{ +shift( @$list ) } );
 			}
 		}

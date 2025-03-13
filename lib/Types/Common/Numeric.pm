@@ -21,7 +21,8 @@ use Type::Library -base, -declare => qw(
 );
 
 use Type::Tiny ();
-use Types::Standard qw( Num Int Bool );
+use Types::Standard qw( Num Int );
+use Types::TypeTiny qw( BoolLike ); 
 
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
@@ -148,10 +149,10 @@ for my $base ( qw/Num Int/ ) {
 				$max
 				);
 			!defined( $min_excl )
-				or Bool->check( $min_excl )
+				or BoolLike->check( $min_excl )
 				or _croak( "${base}Range minexcl must be a boolean; got $min_excl" );
 			!defined( $max_excl )
-				or Bool->check( $max_excl )
+				or BoolLike->check( $max_excl )
 				or _croak( "${base}Range maxexcl must be a boolean; got $max_excl" );
 				
 			# this is complicated so defer to the inline generator
