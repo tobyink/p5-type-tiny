@@ -22,7 +22,7 @@ use Type::Library -base, -declare => qw(
 
 use Type::Tiny ();
 use Types::Standard qw( Num Int );
-use Types::TypeTiny qw( BoolLike ); 
+use Types::TypeTiny qw( BoolLike );
 
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
