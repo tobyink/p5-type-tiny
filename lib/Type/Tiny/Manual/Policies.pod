@@ -109,6 +109,10 @@ stable, they are expected to be added to L<Types::Common>'s exports.
 
 =item *
 
+The C<Types::Standard::Dict::combine> function.
+
+=item *
+
 These modules are considered part of Type::Tiny's internals, and not
 covered by the stability policy:
 L<Devel::TypeTiny::Perl58Compat>,

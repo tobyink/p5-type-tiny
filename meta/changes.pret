@@ -1306,3 +1306,27 @@
 			label "Minor fixes and improvements for `Type::Params` documentation.";
 		];
 	].
+
+`Type-Tiny 2.007_006 cpan:TOBYINK`
+	issued  2025-03-14;
+	changeset [
+		dcs:versus `Type-Tiny 2.007_005 cpan:TOBYINK`;
+		item [
+			a dcs:Change;
+			label "Types::TypeTiny::BoolLike now accepts boolean.pm's bools.";
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/144>;
+			dcs:thanks <urn:uuid:580d3dfe-fe45-42ef-9f58-1310ffee7004>;
+		];
+		item [
+			a dcs:Change;
+			label "Type::Params named_to_list option now accepts blessed boolean objects. Certain other options should be more permissive accepting them too.";
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/162>;
+			dcs:thanks <urn:uuid:eb4b400b-0384-4b2c-bb90-22710313814f>;
+		];
+		item [
+			a dcs:Addition;
+			label "Types::Standard::Dict::combine() function.";
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/112>;
+			dcs:thanks cpan:BARNEY;
+		];
+	].
