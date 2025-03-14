@@ -474,4 +474,130 @@ sub __hashref_allows_value {
 	return !!0;
 } #/ sub __hashref_allows_value
 
+sub combine {
+	require Type::Tiny::Union;
+	my @key_order;
+	my %keys;
+	my @slurpy;
+	
+	for my $dict ( @_ ) {
+		Types::TypeTiny::is_TypeTiny( $dict ) && $dict->is_a_type_of( Types::Standard::Dict() )
+			or _croak "Unexpected non-Dict argument: $dict";
+		
+		my @args;
+		if ( my $s = $dict->my_dict_is_slurpy ) {
+			@args = @{ $dict->parameters };
+			pop @args;
+			push @slurpy, $s->my_unslurpy;
+		}
+		else {
+			@args = @{ $dict->parameters };
+		}
+		
+		while ( @args ) {
+			my ( $key, $type ) = splice @args, 0, 2;
+			if ( not exists $keys{ $key } ) {
+				push @key_order, $key;
+				$keys{$key} = [];
+			}
+			push @{ $keys{$key} }, $type;
+		}
+	}
+	
+	my @args;
+	for my $key ( @key_order ) {
+		if ( @{ $keys{$key} } == 1 ) {
+			push @args, $key => $keys{$key}[0];
+		}
+		else {
+			my %seen;
+			my @uniq = grep { not $seen{$_->{uniq}}++ } @{ $keys{$key} };
+			my $union = 'Type::Tiny::Union'->new( type_constraints => \@uniq );
+			push @args, $key => $union;
+		}
+	}
+	
+	if ( @slurpy ) {
+		my %seen;
+		my @uniq = grep { not $seen{$_->{uniq}}++ } @slurpy;
+		my $union = 'Type::Tiny::Union'->new( type_constraints => \@uniq );
+		push @args, Types::Standard::Slurpy->of( $union );
+	}
+	
+	return Types::Standard::Dict->of( @args );
+}
+
 1;
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Types::Standard::Dict - utility functions for the B<Dict> type constraint
+
+=head1 STATUS
+
+This module is not covered by the
+L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
+
+=head1 DESCRIPTION
+
+This is mostly internal code, but has one public-facing function.
+
+=head2 Function
+
+=over
+
+=item C<< Types::Standard::Dict::combine(@dicts) >>
+
+Creates a combined type constraint, attempting to be permissive.
+
+The following two types should be equivalent:
+
+  my $type1 = Types::Standard::Dict::combine(
+    Dict[ name => Str ],
+    Dict[ age => Int, Slurpy[HashRef[Int]] ],
+    Dict[ id => Str, name => ArrayRef, Slurpy[ArrayRef] ],
+  );
+  
+  my $type2 = Dict[
+    name => Str|ArrayRef,
+    age => Int,
+    id => Str,
+    Slurpy[ HashRef[Int] | ArrayRef ],
+  ];
+
+Note that a hashref satisfying the combined type wouldn't satisfy any of
+the individual B<Dict> constraints, nor vice versa!
+
+=back
+
+=head1 BUGS
+
+Please report any bugs to
+L<https://github.com/tobyink/p5-type-tiny/issues>.
+
+=head1 SEE ALSO
+
+L<Types::Standard>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013-2025 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.

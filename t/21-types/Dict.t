@@ -365,5 +365,33 @@ is_deeply(
 	'cowardly refuses to drop keys to allow coercion to work',
 );
 
+# Combine Dicts
+
+my $combined = Types::Standard::Dict::combine(
+	Dict[ name => Types::Standard::Str ],
+	Dict[ age => Types::Standard::Int, Types::Standard::Slurpy[Types::Standard::HashRef[Types::Standard::Int]] ],
+	Dict[ id => Types::Standard::Str, name => Types::Standard::ArrayRef, Types::Standard::Slurpy[Types::Standard::ArrayRef] ],
+	Dict[],
+)->create_child_type( display_name => 'CombinedDetails' );
+
+ok( $combined->is_a_type_of( Dict ) );
+should_pass( { name => 'X', age => 1, id => 'ABC', foo => 1 }, $combined );
+should_pass( { name => [ 'X' ], age => 1, id => 'ABC', foo => 1 }, $combined );
+should_fail( { name => 'X', age => [ 1 ], id => 'ABC', foo => 1 }, $combined );
+
+my $combined2 = Types::Standard::Dict::combine(
+	Dict[ name => Types::Standard::Str ],
+	Dict[ name => Types::Standard::Str ],
+);
+
+is( $combined2->display_name, 'Dict[name=>Str]' );
+
+my $combined3 = Types::Standard::Dict::combine(
+	Dict[ name => Types::Standard::Str ],
+	Dict[ name => Types::Standard::Int ],
+);
+
+is( $combined3->display_name, 'Dict[name=>Str|Int]' );
+
 done_testing;
 

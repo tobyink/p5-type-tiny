@@ -430,6 +430,7 @@ sub new {
 	if ( $params{my_methods} ) {
 		require Eval::TypeTiny;
 		Scalar::Util::reftype( $params{my_methods}{$_} ) eq 'CODE'
+			and /\A[^0-9\W]\w+\z/
 			and Eval::TypeTiny::set_subname(
 				sprintf( "%s::my_%s", $self->qualified_name, $_ ),
 				$params{my_methods}{$_},
