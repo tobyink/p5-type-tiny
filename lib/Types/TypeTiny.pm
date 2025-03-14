@@ -446,9 +446,10 @@ sub BoolLike () {
 			!defined( $_ )
 				or !ref( $_ ) && ( $_ eq '' || $_ eq '0' || $_ eq '1' )
 				or blessed( $_ ) && (
-			    _check_overload( $_, q[bool] )
-				  or _check_overload( $_, q[0+] ) && do { my $n = sprintf('%d', $_); $n==0 or $n==1 }
-				  or do { my $d = $_->can('DOES') || $_->can('isa'); $_->$d('boolean') } )
+					_check_overload( $_, q[bool] )
+					or _check_overload( $_, q[0+] ) && do { my $n = sprintf('%d', $_); $n==0 or $n==1 }
+					or do { my $d = $_->can('DOES') || $_->can('isa'); $_->$d('boolean') }
+				)
 		},
 		inlined => sub {
 			qq/do {
@@ -456,9 +457,10 @@ sub BoolLike () {
 				!defined()
 					or !ref() && ( \$_ eq '' || \$_ eq '0' || \$_ eq '1' )
 					or Scalar::Util::blessed(\$_) && (
-					  ${\ +_get_check_overload_sub() }(\$_, q[bool])
-					  or ${\ +_get_check_overload_sub() }(\$_, q[0+]) && do { my \$n = sprintf('%d', $_); \$n==0 or \$n==1 }
-					  or do { my \$d = \$_->can('DOES') || \$_->can('isa'); \$_->\$d('boolean') } )
+						${\ +_get_check_overload_sub() }(\$_, q[bool])
+						or ${\ +_get_check_overload_sub() }(\$_, q[0+]) && do { my \$n = sprintf('%d', $_); \$n==0 or \$n==1 }
+						or do { my \$d = \$_->can('DOES') || \$_->can('isa'); \$_->\$d('boolean') }
+					)
 			}/;
 		},
 		type_default => sub { return !!0 },
