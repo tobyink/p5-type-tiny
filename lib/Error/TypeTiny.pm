@@ -13,7 +13,7 @@ $Error::TypeTiny::VERSION =~ tr/_//d;
 
 require Type::Tiny;
 __PACKAGE__->Type::Tiny::_install_overloads(
-	q[""]   => sub { $_[0]->to_string },
+	q[""]   => sub { local $@; $_[0]->to_string },
 	q[bool] => sub { 1 },
 );
 
@@ -93,7 +93,7 @@ sub to_string {
 	my $e = shift;
 	my $c = $e->context;
 	my $m = $e->message;
-	
+
 	$m =~ /\n\z/s
 		? $m
 		: $c ? sprintf(
