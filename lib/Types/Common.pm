@@ -11,7 +11,7 @@ BEGIN {
 
 BEGIN {
 	$Types::Common::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Common::VERSION   = '2.007_006';
+	$Types::Common::VERSION   = '2.007_007';
 }
 
 our ( @EXPORT, @EXPORT_OK, %EXPORT_TAGS );

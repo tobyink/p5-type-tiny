@@ -1330,3 +1330,15 @@
 			dcs:thanks cpan:BARNEY;
 		];
 	].
+
+`Type-Tiny 2.007_007 cpan:TOBYINK`
+	issued  2025-03-18;
+	changeset [
+		dcs:versus `Type-Tiny 2.007_006 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix;
+			label "Localize $@ before stringifying Error::TypeTiny objects.";
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/166>;
+			dcs:thanks cpan:ETHER;
+		];
+	].
