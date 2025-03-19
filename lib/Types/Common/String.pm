@@ -160,6 +160,7 @@ $meta->add_type(
 	constraint_generator => sub {
 		return $meta->get_type( 'StrLength' ) unless @_;
 		
+		Type::Tiny::check_parameter_count_for_parameterized_type( 'Types::Common::String', "StrLength", \@_, 2 );
 		my ( $min, $max ) = @_;
 		Types::Standard::is_Int( $_ )
 			|| Types::Standard::_croak(
@@ -220,6 +221,8 @@ $meta->add_type(
 	type_default         => undef,
 	constraint_generator => sub {
 		return $meta->get_type( 'DelimitedStr' ) unless @_;
+		
+		Type::Tiny::check_parameter_count_for_parameterized_type( 'Types::Common::String', "DelimitedStr", \@_, 5 );
 		my ( $delimiter, $part_constraint, $min_parts, $max_parts, $ws ) = @_;
 		
 		Types::Standard::assert_Str( $delimiter );

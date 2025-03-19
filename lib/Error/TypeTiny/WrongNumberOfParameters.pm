@@ -56,6 +56,14 @@ sub _build_message {
 			$e->minimum,
 		);
 	}
+	elsif ( $e->has_maximum ) {
+		return sprintf(
+			"%s; got %d; expected at most %d",
+			$base,
+			$e->got,
+			$e->maximum,
+		);
+	}
 	else {
 		return sprintf(
 			"%s; got %d",

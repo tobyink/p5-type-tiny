@@ -1185,6 +1185,22 @@ sub is_parameterized {
 	} #/ sub parameterize
 }
 
+sub check_parameter_count_for_parameterized_type {
+	my ( $library, $type_name, $args, $max_args ) = @_;
+	$args = @$args if ref $args;
+	
+	if ( $args > $max_args ) {
+		require Error::TypeTiny::WrongNumberOfParameters;
+		Error::TypeTiny::WrongNumberOfParameters->throw(
+			target => "$library\::$type_name\[]",
+			maximum => $max_args,
+			got => $args,
+		);
+	}
+	
+	return;
+}
+
 sub child_type_class {
 	__PACKAGE__;
 }
@@ -2587,6 +2603,16 @@ anything useful.
 =item C<< meta >>
 
 =back
+
+=head2 Functions
+
+=over
+
+=item *
+
+C<< check_parameter_count_for_parameterized_type( $lib, $typename, $args, $max ) >>
+
+Utility function used by some types from Types::Standard, etc.
 
 =head2 Overloading
 

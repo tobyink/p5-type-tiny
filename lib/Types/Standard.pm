@@ -395,6 +395,7 @@ my $_ref = $meta->$add_core_type(
 		constraint_generator => sub {
 			return $meta->get_type( 'Ref' ) unless @_;
 			
+			Type::Tiny::check_parameter_count_for_parameterized_type( 'Types::Standard', 'Ref', \@_, 1 );
 			my $reftype = shift;
 			$reftype =~
 				/^(SCALAR|ARRAY|HASH|CODE|REF|GLOB|LVALUE|FORMAT|IO|VSTRING|REGEXP|Regexp)$/i
@@ -585,6 +586,7 @@ $meta->$add_core_type(
 		constraint_generator => sub {
 			return $meta->get_type( 'Maybe' ) unless @_;
 			
+			Type::Tiny::check_parameter_count_for_parameterized_type( 'Types::Standard', 'Maybe', \@_, 1 );
 			my $param = Types::TypeTiny::to_TypeTiny( shift );
 			Types::TypeTiny::is_TypeTiny( $param )
 				or _croak(
@@ -679,6 +681,7 @@ my $_Optional = $meta->add_type(
 		constraint_generator => sub {
 			return $meta->get_type( 'Optional' ) unless @_;
 			
+			Type::Tiny::check_parameter_count_for_parameterized_type( 'Types::Standard', 'Optional', \@_, 1 );
 			my $param = Types::TypeTiny::to_TypeTiny( shift );
 			Types::TypeTiny::is_TypeTiny( $param )
 				or _croak(
@@ -723,6 +726,8 @@ $_slurpy = $meta->add_type(
 		parent               => $_item,
 		constraint_generator => sub {
 			my $self  = $_slurpy;
+			
+			Type::Tiny::check_parameter_count_for_parameterized_type( 'Types::Standard', 'Slurpy', \@_, 1 );
 			my $param = @_ ? Types::TypeTiny::to_TypeTiny(shift) : $_any;
 			Types::TypeTiny::is_TypeTiny( $param )
 				or _croak(

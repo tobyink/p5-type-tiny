@@ -24,6 +24,8 @@ no warnings;
 sub __constraint_generator {
 	return Types::Standard::HashRef unless @_;
 	
+	require Error::TypeTiny::WrongNumberOfParameters;
+	Type::Tiny::check_parameter_count_for_parameterized_type( 'Types::Standard', 'HashRef', \@_, 1 );
 	my $param = shift;
 	Types::TypeTiny::is_TypeTiny( $param )
 		or _croak(

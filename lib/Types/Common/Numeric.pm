@@ -135,6 +135,7 @@ for my $base ( qw/Num Int/ ) {
 			
 			my $base_obj = Types::Standard->get_type( $base );
 			
+			Type::Tiny::check_parameter_count_for_parameterized_type( 'Types::Common::Numeric', "${base}Range", \@_, 4 );
 			my ( $min, $max, $min_excl, $max_excl ) = @_;
 			!defined( $min )
 				or $base_obj->check( $min )

@@ -26,6 +26,7 @@ no warnings;
 sub __constraint_generator {
 	return $meta->get_type( 'Map' ) unless @_;
 	
+	Type::Tiny::check_parameter_count_for_parameterized_type( 'Types::Standard', 'Map', \@_, 2 );
 	my ( $keys, $values ) = @_;
 	Types::TypeTiny::is_TypeTiny( $keys )
 		or _croak(

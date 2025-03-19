@@ -24,6 +24,7 @@ no warnings;
 sub __constraint_generator {
 	return Types::Standard::ArrayRef unless @_;
 	
+	Type::Tiny::check_parameter_count_for_parameterized_type( 'Types::Standard', 'ArrayRef', \@_, 3 );
 	my $param = shift;
 	Types::TypeTiny::is_TypeTiny( $param )
 		or _croak(
