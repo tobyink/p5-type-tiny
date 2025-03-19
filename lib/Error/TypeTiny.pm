@@ -130,19 +130,18 @@ Error::TypeTiny - exceptions for Type::Tiny and friends
 
 =head1 SYNOPSIS
 
+   use feature 'try';
    use Data::Dumper;
-   use Try::Tiny;
-   use Types::Standard qw(Str);
+   use Types::Standard qw( Str );
    
    try {
-      Str->assert_valid(undef);
+      Str->assert_valid( undef );
    }
-   catch {
-      my $exception = shift;
+   catch ( $exception ) {
       warn "Encountered Error: $exception";
-      warn Dumper($exception->explain)
-         if $exception->isa("Error::TypeTiny::Assertion");
-   };
+      warn Dumper( $exception->explain )
+         if $exception->isa( "Error::TypeTiny::Assertion" );
+   }
 
 =head1 STATUS
 
