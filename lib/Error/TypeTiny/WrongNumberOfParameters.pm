@@ -17,22 +17,32 @@ our @ISA = 'Error::TypeTiny';
 sub minimum { $_[0]{minimum} }
 sub maximum { $_[0]{maximum} }
 sub got     { $_[0]{got} }
+sub target  { $_[0]{target} }
 
 sub has_minimum { exists $_[0]{minimum} }
 sub has_maximum { exists $_[0]{maximum} }
+sub has_target  { exists $_[0]{target} }
 
 sub _build_message {
 	my $e = shift;
+	
+	my $base = 'Wrong number of parameters';
+	if ( $e->has_target ) {
+		$base .= sprintf( ' to %s', $e->target );
+	}
+	
 	if ( $e->has_minimum and $e->has_maximum and $e->minimum == $e->maximum ) {
 		return sprintf(
-			"Wrong number of parameters; got %d; expected %d",
+			"%s; got %d; expected %d",
+			$base,
 			$e->got,
 			$e->minimum,
 		);
 	}
 	elsif ( $e->has_minimum and $e->has_maximum and $e->minimum < $e->maximum ) {
 		return sprintf(
-			"Wrong number of parameters; got %d; expected %d to %d",
+			"%s; got %d; expected %d to %d",
+			$base,
 			$e->got,
 			$e->minimum,
 			$e->maximum,
@@ -40,14 +50,16 @@ sub _build_message {
 	}
 	elsif ( $e->has_minimum ) {
 		return sprintf(
-			"Wrong number of parameters; got %d; expected at least %d",
+			"%s; got %d; expected at least %d",
+			$base,
 			$e->got,
 			$e->minimum,
 		);
 	}
 	else {
 		return sprintf(
-			"Wrong number of parameters; got %d",
+			"%s; got %d",
+			$base,
 			$e->got,
 		);
 	}
@@ -94,13 +106,17 @@ The maximum expected number of parameters.
 
 The number of parameters actually passed to the compiled check.
 
+=item C<target>
+
+A short string describing what there was the wrong number of parameters for.
+
 =back
 
 =head2 Methods
 
 =over
 
-=item C<has_minimum>, C<has_maximum>
+=item C<has_minimum>, C<has_maximum>, C<has_target>
 
 Predicate methods.
 

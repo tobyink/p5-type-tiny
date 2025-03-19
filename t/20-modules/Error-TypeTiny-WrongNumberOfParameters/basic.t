@@ -43,7 +43,7 @@ subtest "nth_root()" => sub {
 	ok($e->has_maximum);
 	is($e->maximum, 2);
 	is($e->got, 0);
-	like($e, qr{^Wrong number of parameters; got 0; expected 2});
+	like($e, qr{^Wrong number of parameters to main::nth_root; got 0; expected 2});
 };
 
 subtest "nth_root(1)" => sub {
@@ -53,7 +53,7 @@ subtest "nth_root(1)" => sub {
 	ok($e->has_maximum);
 	is($e->maximum, 2);
 	is($e->got, 1);
-	like($e, qr{^Wrong number of parameters; got 1; expected 2});
+	like($e, qr{^Wrong number of parameters to main::nth_root; got 1; expected 2});
 };
 
 subtest "nth_root(1, 2, 3)" => sub {
@@ -63,7 +63,7 @@ subtest "nth_root(1, 2, 3)" => sub {
 	ok($e->has_maximum);
 	is($e->maximum, 2);
 	is($e->got, 3);
-	like($e, qr{^Wrong number of parameters; got 3; expected 2});
+	like($e, qr{^Wrong number of parameters to main::nth_root; got 3; expected 2});
 };
 
 my $check2;
@@ -80,7 +80,7 @@ subtest "nth_root_opt()" => sub {
 	ok($e->has_maximum);
 	is($e->maximum, 2);
 	is($e->got, 0);
-	like($e, qr{^Wrong number of parameters; got 0; expected 1 to 2});
+	like($e, qr{^Wrong number of parameters to main::nth_root_opt; got 0; expected 1 to 2});
 };
 
 my $check3;
@@ -97,7 +97,7 @@ subtest "nth_root_slurp()" => sub {
 	ok(!$e->has_maximum);
 	is($e->maximum, undef);
 	is($e->got, 0);
-	like($e, qr{^Wrong number of parameters; got 0; expected at least 1});
+	like($e, qr{^Wrong number of parameters to main::nth_root_slurp; got 0; expected at least 1});
 };
 
 my $silly = exception {

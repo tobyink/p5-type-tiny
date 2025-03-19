@@ -53,12 +53,12 @@ is_deeply(
 
 {
 	my $e = exception { nth_root() };
-	like($e, qr{^Wrong number of parameters; got 0; expected 2}, '()');
+	like($e, qr{^Wrong number of parameters to main::nth_root; got 0; expected 2}, '()');
 }
 
 {
 	my $e = exception { nth_root(1) };
-	like($e, qr{^Wrong number of parameters; got 1; expected 2}, '(1)');
+	like($e, qr{^Wrong number of parameters to main::nth_root; got 1; expected 2}, '(1)');
 }
 
 {

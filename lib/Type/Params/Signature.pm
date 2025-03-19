@@ -966,6 +966,13 @@ sub _make_count_fail {
 		);
 	}
 
+	if ( my $package = $self->package and my $subname = $self->subname ) {
+		push @counts, sprintf(
+			'target => %s',
+			B::perlstring( "$package\::$subname" ),
+		) if $package ne '__ANON__' && $subname ne '__ANON__';
+	}
+
 	return sprintf(
 		$self->has_on_die
 			? q{return( "Error::TypeTiny::WrongNumberOfParameters"->throw_cb( $__ON_DIE__, %s ) )}
