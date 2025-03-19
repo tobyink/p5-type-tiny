@@ -95,6 +95,10 @@ L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
 Thrown when a Type::Params compiled check is called with the wrong number
 of parameters.
 
+Also thrown by various parameterizable type constraints under similar
+circumstances. For example, the C<< HashRef[Int] >> makes sense, but
+C<< HashRef[Int, {}] >> does not.
+
 This package inherits from L<Error::TypeTiny>; see that for most
 documentation. Major differences are listed below:
 
