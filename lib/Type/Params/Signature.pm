@@ -173,20 +173,25 @@ sub _rationalize_slurpies {
 sub _rationalize_returns {
 	my $self = shift;
 	
+	my $typify = sub {
+		my $ref = shift;
+		if ( is_Str $$ref ) {
+			require Type::Utils;
+			$$ref = Type::Utils::dwim_type( $$ref, $self->{package} ? ( for => $self->{package} ) : () );
+		}
+		else {
+			$$ref = to_TypeTiny( $$ref );
+		}
+	};
+	
 	if ( my $r = delete $self->{returns} ) {
+		$typify->( \ $r );
 		$self->{returns_scalar} ||= $r;
 		$self->{returns_list}   ||= ArrayRef->of( $r );
 	}
 
-	for my $attr ( qw/ returns_scalar returns_list / ) {
-		if ( is_Str $self->{$attr} ) {
-			require Type::Utils;
-			$self->{$attr} = Type::Utils::dwim_type( $self->{$attr}, $self->{package} ? ( for => $self->{package} ) : () );
-		}
-		elsif ( exists $self->{$attr} ) {
-			$self->{$attr} = to_TypeTiny( $self->{$attr} );
-		}
-	}
+	exists $self->{$_} && $typify->( \ $self->{$_} )
+		for qw/ returns_scalar returns_list /;
 	
 	return $self;
 }

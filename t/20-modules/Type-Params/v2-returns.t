@@ -104,4 +104,25 @@ subtest "Multi + return types" => sub {
 	ok( !exception { test4( 1.1 ); undef; } );
 };
 
+subtest "Simple return type, but stringy types" => sub {
+	signature_for test5 => (
+		pos     => [ 'Num', 'Num' ],
+		returns => 'Int',
+	);
+
+	sub test5 {
+		my ( $x, $y ) = @_;
+		return $x + $y;
+	}
+
+	is( scalar( test5( 2, 3 ) ), 5, 'happy path, scalar context' );
+	is_deeply( [ test5( 2, 3 ) ], [ 5 ], 'happy path, list context' );
+	is( do { test5( 2, 3 ); 1 }, 1, 'happy path, void context' );
+
+	ok(  exception { scalar( test5( 2.1, 3 ) ) }, 'bad path, scalar context' );
+	ok(  exception { [ test5( 2.1, 3 ) ] }, 'bad path, list context' );
+	ok( !exception { do { test5( 2.1, 3 ); 1 } }, 'bad path, void context' );
+};
+
+
 done_testing;
