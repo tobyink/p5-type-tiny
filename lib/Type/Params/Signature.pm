@@ -21,6 +21,17 @@ use Types::Standard qw( -is -types -assert );
 use Types::TypeTiny qw( -is -types to_TypeTiny );
 use Type::Params::Parameter;
 
+my $Attrs = Enum[ qw/
+	caller_level package subname description _is_signature_for ID
+	method head tail parameters slurpy
+	message on_die next fallback strictness is_named allow_dash method_invocant
+	bless class constructor named_to_list list_to_named oo_trace
+	class_prefix class_attributes
+	returns_scalar returns_list
+	want_details want_object want_source can_shortcut coderef
+	quux
+/ ]; # quux for reasons
+
 sub _croak {
 	require Error::TypeTiny;
 	return Error::TypeTiny::croak( pop );
@@ -44,6 +55,16 @@ sub new {
 	$self->{class_prefix} ||= 'Type::Params::OO::Klass';
 	$self->{next}         ||= delete $self->{goto_next} if exists $self->{goto_next};
 	$self->BUILD;
+	$Attrs->all( sort keys %$self ) or do {
+		require Carp;
+		require Type::Utils;
+		my @bad = ( ~ $Attrs )->grep( sort keys %$self );
+		Carp::carp( sprintf(
+			"Warning: unrecognized signature %s: %s, continuing anyway",
+			@bad == 1 ? 'option' : 'options',
+			Type::Utils::english_list( @bad ),
+		) );
+	};
 	return $self;
 }
 

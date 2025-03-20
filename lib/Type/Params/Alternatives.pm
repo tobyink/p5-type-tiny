@@ -20,6 +20,20 @@ use Eval::TypeTiny::CodeAccumulator;
 use Types::Standard qw( -is -types -assert );
 use Types::TypeTiny qw( -is -types to_TypeTiny );
 
+my $Attrs = Enum[ qw/
+	caller_level package subname description _is_signature_for ID
+	method head tail parameters slurpy
+	message on_die next fallback strictness is_named allow_dash method_invocant
+	bless class constructor named_to_list list_to_named oo_trace
+	class_prefix class_attributes
+	returns_scalar returns_list
+	want_details want_object want_source can_shortcut coderef
+	
+	sig_class base_options alternatives meta_alternatives
+	
+	quux
+/ ]; # quux for reasons
+
 require Type::Params::Signature;
 our @ISA = 'Type::Params::Signature';
 
@@ -34,6 +48,16 @@ sub new {
 	$self->{message}   ||= 'Parameter validation failed';
 	delete $self->{base_options}{$_} for qw/ returns returns_list returns_scalar /;
 	$self->_rationalize_returns;
+	$Attrs->all( sort keys %$self ) or do {
+		require Carp;
+		require Type::Utils;
+		my @bad = ( ~ $Attrs )->grep( sort keys %$self );
+		Carp::carp( sprintf(
+			"Warning: unrecognized signature %s: %s, continuing anyway",
+			@bad == 1 ? 'option' : 'options',
+			Type::Utils::english_list( @bad ),
+		) );
+	};
 	return $self;
 }
 

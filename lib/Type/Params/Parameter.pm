@@ -19,6 +19,12 @@ use Types::Standard qw( -is -types );
 
 my $RE_WORDLIKE = qr/\A[^\W0-9]\w*\z/;
 
+my $Attrs = Enum[ qw/
+	name type slurpy default alias strictness coerce clone in_list optional
+	getter predicate allow_dash vartail
+	quux
+/ ];
+
 sub _croak {
 	require Carp;
 	Carp::croak( pop );
@@ -33,7 +39,20 @@ sub new {
 		$self{alias} = [ $self{alias} ];
 	}
 
-	bless \%self, $class;
+	my $self = bless \%self, $class;
+	
+	$Attrs->all( sort keys %$self ) or do {
+		require Carp;
+		require Type::Utils;
+		my @bad = ( ~ $Attrs )->grep( sort keys %$self );
+		Carp::carp( sprintf(
+			"Warning: unrecognized parameter %s: %s, continuing anyway",
+			@bad == 1 ? 'option' : 'options',
+			Type::Utils::english_list( @bad ),
+		) );
+	};
+
+	return $self;
 }
 
 sub name       { $_[0]{name} }        sub has_name       { exists $_[0]{name} }
