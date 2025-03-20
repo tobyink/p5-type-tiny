@@ -1186,14 +1186,15 @@ sub is_parameterized {
 }
 
 sub check_parameter_count_for_parameterized_type {
-	my ( $library, $type_name, $args, $max_args ) = @_;
+	my ( $library, $type_name, $args, $max_args, $min_args ) = @_;
 	$args = @$args if ref $args;
 	
-	if ( $args > $max_args ) {
+	if ( ( defined $max_args and $args > $max_args ) or ( defined $min_args and $args < $min_args ) ) {
 		require Error::TypeTiny::WrongNumberOfParameters;
 		Error::TypeTiny::WrongNumberOfParameters->throw(
 			target => "$library\::$type_name\[]",
-			maximum => $max_args,
+			( defined $min_args ) ? ( minimum => $min_args ) : (),
+			( defined $max_args ) ? ( maximum => $max_args ) : (),
 			got => $args,
 		);
 	}
@@ -2610,9 +2611,14 @@ anything useful.
 
 =item *
 
-C<< check_parameter_count_for_parameterized_type( $lib, $typename, $args, $max ) >>
+C<< check_parameter_count_for_parameterized_type( $lib, $typename, $args, $max, $min ) >>
 
 Utility function used by some types from Types::Standard, etc.
+
+Will throw a L<Error::TypeTiny::WrongNumberOfParameters> exception referencing
+C<< "$lib::\$typename\[]" >> if C<< $args >> is greater than C<< $max >> or
+less than C<< $min >>, if they're defined. If C<< $args >> is an arrayref,
+will use the length of the array.
 
 =head2 Overloading
 

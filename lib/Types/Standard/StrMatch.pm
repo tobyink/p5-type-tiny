@@ -51,7 +51,7 @@ my $serialize_regexp = sub {
 sub __constraint_generator {
 	return Types::Standard->meta->get_type( 'StrMatch' ) unless @_;
 	
-	Type::Tiny::check_parameter_count_for_parameterized_type( 'Types::Standard', 'StrMatch', \@_, 2 );
+	Type::Tiny::check_parameter_count_for_parameterized_type( 'Types::Standard', 'StrMatch', \@_, 2, 1 );
 	my ( $regexp, $checker ) = @_;
 	
 	Types::Standard::is_RegexpRef( $regexp )

@@ -72,6 +72,7 @@ our %EXPORT_TAGS = (
 				parent               => Types::Standard::Object(),
 				constraint           => q{ ref($_) =~ qr/^Type::Params::OO::/ },
 				constraint_generator => sub {
+					Type::Tiny::check_parameter_count_for_parameterized_type( 'Type::Params', 'ArgsObject', \@_, 1, 1 );
 					my $param = Types::Standard::assert_Str( shift );
 					sub { defined( $_->{'~~caller'} ) and $_->{'~~caller'} eq $param };
 				},

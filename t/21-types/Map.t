@@ -264,6 +264,15 @@ do {
 	like($e, qr/expected to be a type constraint/, 'bad parameters');
 };
 
+do {
+	my $e = exception { Map[Types::Standard::Int] };
+	like($e, qr/got 1; expected 2/, 'bad parameters');
+};
+
+do {
+	my $e = exception { Map[Types::Standard::Int, Types::Standard::Int, Types::Standard::Int] };
+	like($e, qr/got 3; expected 2/, 'bad parameters');
+};
 
 done_testing;
 

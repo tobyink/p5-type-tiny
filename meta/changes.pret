@@ -1357,7 +1357,7 @@
 		];
 		item [
 			a dcs:Change;
-			label "Parameterizable types defined by Types::Standard, Types::Common::String, and Types::Common::Numeric will throw an Error::TypeTiny::WrongNumberOfParameters exception if parameterized with too many parameters.";
+			label "Parameterizable types defined by Types::Standard, Types::Common::String, Types::Common::Numeric, and Type::Params will throw an Error::TypeTiny::WrongNumberOfParameters exception if parameterized with the wrong number of parameters.";
 		];
 		item [
 			a dcs:Addition;
