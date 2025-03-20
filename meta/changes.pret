@@ -1342,3 +1342,41 @@
 			dcs:thanks cpan:ETHER;
 		];
 	].
+
+`Type-Tiny 2.007_008 cpan:TOBYINK`
+	issued  2025-03-20;
+	changeset [
+		dcs:versus `Type-Tiny 2.007_007 cpan:TOBYINK`;
+		item [
+			a dcs:Documentation;
+			label "Use Perl's new `try` feature instead of Try::Tiny in SYNOPSIS for Error::TypeTiny.";
+		];
+		item [
+			a dcs:Addition;
+			label "Error::TypeTiny::WrongNumberOfParameters now has a `target` attribute indicating what thing you provided the wrong number of parameters for.";
+		];
+		item [
+			a dcs:Change;
+			label "Parameterizable types defined by Types::Standard, Types::Common::String, and Types::Common::Numeric will throw an Error::TypeTiny::WrongNumberOfParameters exception if parameterized with too many parameters.";
+		];
+		item [
+			a dcs:Addition;
+			label "There's now a Type::Tiny::check_parameter_count_for_parameterized_type utility function intended to be used for parameterizable types to throw an error when parameterized with the wrong number of parameters.";
+		];
+		item [
+			a dcs:Tests;
+			label "Improved tests for the `ArgsObject` type constraint which is optionally exported by Type::Params.";
+		];
+		item [
+			a dcs:Tests;
+			label "Improved tests for the `goto_next` feature of Type::Params.";
+		];
+		item [
+			a dcs:Bugfix;
+			label "Expressing return types for Type::Params as strings now works as documented.";
+		];
+		item [
+			a dcs:Change;
+			label "Passing unknown options to Type::Params functions will now result in warnings.";
+		];
+	].

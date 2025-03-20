@@ -8,7 +8,7 @@ use warnings;
 
 BEGIN {
 	$Types::Standard::Dict::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::Dict::VERSION   = '2.007_007';
+	$Types::Standard::Dict::VERSION   = '2.007_008';
 }
 
 $Types::Standard::Dict::VERSION =~ tr/_//d;
