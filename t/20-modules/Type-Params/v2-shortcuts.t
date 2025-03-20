@@ -38,6 +38,8 @@ sub add_to_ref {
 	$$ref += $add;
 }
 
+ok( exception { signature_for_func( 'zzz', {} ) }, 'wrong number of parameters' );
+
 {
 	my $sum = 0;
 	add_to_ref( ref => \$sum, add => 1 );
@@ -66,6 +68,8 @@ sub add_to_ref {
 		my ( $self, $ref, $add ) = @_;
 		$$ref += $add;
 	}
+	
+	::ok( ::exception { signature_for_method( 'zzz', {} ) }, 'wrong number of parameters' );
 }
 
 {
