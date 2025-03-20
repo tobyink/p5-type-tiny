@@ -25,9 +25,14 @@ use warnings;
 use Test::More;
 use Test::Requires '5.020';
 use Test::Fatal;
+use Test::TypeTiny;
+use Type::Params qw( ArgsObject );
+use Types::Common qw( HashRef );
 
 BEGIN {
 	package Local::MyPackage;
+	
+	our $LAST;
 	
 	use strict;
 	use warnings;
@@ -44,6 +49,7 @@ BEGIN {
 	);
 	
 	sub myfunc ( $self, $arg ) {
+		$LAST = $arg;
 		return $arg->arr->[ $arg->int ];
 	}
 	
@@ -54,6 +60,7 @@ BEGIN {
 		);
 		my ( $self, $arg ) = &$signature;
 		
+		$LAST = $arg;
 		return $arg->arr->[ $arg->int ];
 	}
 };
@@ -61,8 +68,19 @@ BEGIN {
 my $o   = bless {} => 'Local::MyPackage';
 my @arr = ( 'a' .. 'z' );
 
-is $o->myfunc( arr => \@arr, int => 2 ),  'c', 'myfunc (happy path)';
-is $o->myfunc2( arr => \@arr, int => 4 ), 'e', 'myfunc2 (happy path)';
+{
+	local $Local::MyPackage::LAST;
+	is $o->myfunc( arr => \@arr, int => 2 ),  'c', 'myfunc (happy path)';
+	should_pass $Local::MyPackage::LAST, $_ for ArgsObject, ArgsObject['Local::MyPackage::myfunc'];
+	should_fail $Local::MyPackage::LAST, $_ for HashRef, ArgsObject['Local::MyPackage::myfunc2'];
+}
+
+{
+	local $Local::MyPackage::LAST;
+	is $o->myfunc2( arr => \@arr, int => 4 ), 'e', 'myfunc2 (happy path)';
+	should_pass $Local::MyPackage::LAST, $_ for ArgsObject, ArgsObject['Local::MyPackage::myfunc2'];
+	should_fail $Local::MyPackage::LAST, $_ for HashRef, ArgsObject['Local::MyPackage::myfunc'];
+}
 
 {
 	my $e = exception {
