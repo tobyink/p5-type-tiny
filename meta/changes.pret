@@ -1423,6 +1423,14 @@
 			label "Types::Standard::Dict can now export shortcuts for parameterized versions of the Dict type constraint.";
 		];
 		item [
+			a dcs:Addition;
+			label "Types::Standard::Tuple can now export shortcuts for parameterized versions of the Tuple type constraint.";
+		];
+		item [
+			a dcs:Addition;
+			label "Types::Standard::CycleTuple can now export shortcuts for parameterized versions of the CycleTuple type constraint.";
+		];
+		item [
 			a dcs:Documentation;
 			label "Fix documentation for the coercion_generator attribute of Type::Tiny.";
 		];

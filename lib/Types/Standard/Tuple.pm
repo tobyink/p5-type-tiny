@@ -43,7 +43,11 @@ sub _exporter_fail {
 	}
 	
 	my $type = Types::Standard::Tuple->of( @final );
-	$type = $type->create_child_type( name => $type_name, $type->has_coercion ? ( coercion => 1 ) : () );
+	$type = $type->create_child_type(
+		name => $type_name,
+		$type->has_coercion ? ( coercion => 1 ) : (),
+		exists( $values->{where} ) ? ( constraint => $values->{where} ) : (),
+	);
 	
 	$INC{'Type/Registry.pm'}
 		? 'Type::Registry'->for_class( $caller )->add_type( $type, $type_name )
@@ -386,7 +390,6 @@ sub __coercion_generator {
 
 1;
 
-
 =pod
 
 =encoding utf-8
@@ -448,6 +451,10 @@ Multiple types can be exported at once:
   );
   
   assert_StrInt [ two => 2 ];   # should not die
+
+It's possible to further constrain the tuple using C<where>:
+
+  use Types::Standard::Tuple MyThing => { of => [ ... ], where => sub { ... } };
 
 =head1 BUGS
 

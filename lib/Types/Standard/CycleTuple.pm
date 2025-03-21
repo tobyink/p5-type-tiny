@@ -44,7 +44,11 @@ sub _exporter_fail {
 	}
 	
 	my $type = Types::Standard::CycleTuple->of( @final );
-	$type = $type->create_child_type( name => $type_name, $type->has_coercion ? ( coercion => 1 ) : () );
+	$type = $type->create_child_type(
+		name => $type_name,
+		$type->has_coercion ? ( coercion => 1 ) : (),
+		exists( $values->{where} ) ? ( constraint => $values->{where} ) : (),
+	);
 	
 	$INC{'Type/Registry.pm'}
 		? 'Type::Registry'->for_class( $caller )->add_type( $type, $type_name )
@@ -250,3 +254,95 @@ sub __coercion_generator {
 } #/ sub __coercion_generator
 
 1;
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Types::Standard::CycleTuple - exporter utility for the B<CycleTuple> type constraint
+
+=head1 SYNOPSIS
+
+  use Types::Standard -types;
+  
+  # Normal way to validate a list of pairs of integers.
+  #
+  CycleTuple->of( Int, Int )->assert_valid( [ 7, 49, 8, 64 ] );
+  
+  use Types::Standard::CycleTuple IntPairs => { of => [ Int, Int ] },
+  
+  # Exported shortcut
+  #
+  assert_IntPairs [ 7, 49, 8, 64 ];
+
+=head1 STATUS
+
+This module is not covered by the
+L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
+
+=head1 DESCRIPTION
+
+This is mostly internal code, but can also act as an exporter utility.
+
+=head2 Exports
+
+Types::Standard::CycleTuple can be used experimentally as an exporter.
+
+  use Types::Standard 'Int';
+  use Types::Standard::CycleTuple IntPairs => { of => [ Int, Int ] };
+
+This will export the following functions into your namespace:
+
+=over
+
+=item C<< IntPairs >>
+
+=item C<< is_IntPairs( $value ) >>
+
+=item C<< assert_IntPairs( $value ) >>
+
+=item C<< to_IntPairs( $value ) >>
+
+=back
+
+Multiple types can be exported at once:
+
+  use Types::Standard -types;
+  use Types::Standard::CycleTuple (
+    IntIntPairs   => { of => [ Int, Int ] },
+    StrIntPairs   => { of => [ Str, Int ] },
+  );
+  
+  assert_StrIntPairs [ one => 1, two => 2 ];   # should not die
+
+It's possible to further constrain the cycletuple using C<where>:
+
+  use Types::Standard::CycleTuple MyThing => { of => [ ... ], where => sub { ... } };
+
+=head1 BUGS
+
+Please report any bugs to
+L<https://github.com/tobyink/p5-type-tiny/issues>.
+
+=head1 SEE ALSO
+
+L<Types::Standard>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013-2025 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.

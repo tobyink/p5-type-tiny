@@ -30,7 +30,11 @@ sub _exporter_fail {
 	Types::Standard::RegexpRef->assert_valid( $of );
 	
 	my $type = Types::Standard::StrMatch->of( $of );
-	$type = $type->create_child_type( name => $type_name, $type->has_coercion ? ( coercion => 1 ) : () );
+	$type = $type->create_child_type(
+		name => $type_name,
+		$type->has_coercion ? ( coercion => 1 ) : (),
+		exists( $values->{where} ) ? ( constraint => $values->{where} ) : (),
+	);
 	
 	$INC{'Type/Registry.pm'}
 		? 'Type::Registry'->for_class( $caller )->add_type( $type, $type_name )
@@ -213,6 +217,10 @@ Multiple types can be exported at once:
   );
   
   assert_Email 'tobyink@example.net';   # should not die
+
+It's possible to further constrain the string using C<where>:
+
+  use Types::Standard::StrMatch MyThing => { re => qr/.../, where => sub { ... } };
 
 =head1 BUGS
 

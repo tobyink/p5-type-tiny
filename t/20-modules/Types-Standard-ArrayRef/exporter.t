@@ -41,4 +41,13 @@ require Type::Registry;
 is( 'Type::Registry'->for_me->{'Ints'}, Ints );
 is( 'Type::Registry'->for_me->{'Nums'}, Nums );
 
+use Types::Standard::ArrayRef TwoInts => {
+	of    => Int->where( q{ $_ > 0 } ),
+	where => q{ @$_ == 2 },
+};
+
+ok is_TwoInts [ 1, 5 ];
+ok !is_TwoInts [ 1 .. 5 ];
+ok !is_TwoInts [ -1, 0 ];
+
 done_testing;
