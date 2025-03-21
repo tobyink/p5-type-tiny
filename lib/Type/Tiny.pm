@@ -2086,8 +2086,9 @@ Optional.
 =item C<< coercion_generator >>
 
 A coderef which generates a new L<Type::Coercion> object based on parameters.
-Called with the same parameters and package variables as the
-C<constraint_generator>. Expected to return a blessed object.
+It is passed the parent type, child type, and list of parameters. It should
+have access to the same package variables as the C<constraint_generator>.
+Expected to return a blessed object.
 
 Optional.
 
