@@ -965,7 +965,7 @@ index of the signature which was used:
    ...;
  }
 
-If you'd prefer to use identifying names instead of a numberic index, you
+If you'd prefer to use identifying names instead of a numeric index, you
 can specify these using C<ID>:
 
  signature_for my_func => (
