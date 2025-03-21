@@ -288,7 +288,20 @@ sub new_from_v2api {
 		unless $positional || $named || $multiple;
 
 	if ( $multiple ) {
-		$multiple = [] unless is_ArrayRef $multiple;
+		if ( is_HashRef $multiple ) {
+			my @tmp;
+			while ( my ( $name, $alt ) = each %$multiple ) {
+				push @tmp,
+					is_HashRef($alt)  ? { ID => $name, %$alt } :
+					is_ArrayRef($alt) ? { ID => $name, pos => $alt } :
+					is_CodeRef($alt)  ? { ID => $name, closure => $alt } :
+					$class->_croak( "Bad alternative in multiple signature" );
+			}
+			$multiple = \@tmp;
+		}
+		elsif ( not is_ArrayRef $multiple ) {
+			$multiple = [];
+		}
 		unshift @$multiple, { positional => $positional } if $positional;
 		unshift @$multiple, { named      => $named      } if $named;
 		require Type::Params::Alternatives;

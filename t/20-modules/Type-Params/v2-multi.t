@@ -148,12 +148,12 @@ use Types::Common -sigs, -types;
 		method => 1,
 		multi  => [
 			{ multi => [
-				{ ID=>'first', pos   => [ ArrayRef, Int ] },
-				{ ID=>'second', pos   => [ Int, ArrayRef ], next => sub { @_[0, 2, 1] } },
+				{ ID =>'foo', pos   => [ ArrayRef, Int ] },
+				{ ID =>'bar', pos   => [ Int, ArrayRef ], next => sub { @_[0, 2, 1] } },
 			] },
-			{ ID=>'third', named => [ array => ArrayRef, index => Int, { alias => 'ix' } ], named_to_list => 1 },
-			{ ID=>'fourth', pos   => [ ArrayRef, Int ], method => 0, next => sub { ( undef, @_ ) } },
-			{ ID=>'fifth', named => [ LIST => ArrayRef, INDEX => Int ], next => sub { my $arg = pop; ( undef, $arg->LIST, $arg->INDEX ) } },
+			{ ID =>'third', named => [ array => ArrayRef, index => Int, { alias => 'ix' } ], named_to_list => 1 },
+			{ ID =>'fourth', pos   => [ ArrayRef, Int ], method => 0, next => sub { ( undef, @_ ) } },
+			{ ID =>'fifth', named => [ LIST => ArrayRef, INDEX => Int ], next => sub { my $arg = pop; ( undef, $arg->LIST, $arg->INDEX ) } },
 			sub { return ( undef, ['helloworld'], 0 ) if ( $_[0] and $_[0] eq 'HELLOWORLD' ); die },
 		],
 	);
@@ -191,7 +191,7 @@ use Types::Common -sigs, -types;
 			'third alternative (hash)',
 		);
 		
-		is ${^_TYPE_PARAMS_MULTISIG}, 1;
+		is ${^_TYPE_PARAMS_MULTISIG}, 'third';
 		
 		is(
 			__PACKAGE__->array_lookup2( { array => \@arr, index => $ix } ),
@@ -199,7 +199,7 @@ use Types::Common -sigs, -types;
 			'third alternative (hashref)',
 		);
 		
-		is ${^_TYPE_PARAMS_MULTISIG}, 1;
+		is ${^_TYPE_PARAMS_MULTISIG}, 'third';
 		
 		is(
 			__PACKAGE__->array_lookup2( array => \@arr, ix => $ix ),
@@ -207,7 +207,7 @@ use Types::Common -sigs, -types;
 			'third alternative (hash, alias)',
 		);
 		
-		is ${^_TYPE_PARAMS_MULTISIG}, 1;
+		is ${^_TYPE_PARAMS_MULTISIG}, 'third';
 		
 		is(
 			__PACKAGE__->array_lookup2( { array => \@arr, ix => $ix } ),
@@ -215,7 +215,7 @@ use Types::Common -sigs, -types;
 			'third alternative (hashref, alias)',
 		);
 		
-		is ${^_TYPE_PARAMS_MULTISIG}, 1;
+		is ${^_TYPE_PARAMS_MULTISIG}, 'third';
 		
 		is(
 			array_lookup2( \@arr, $ix ),
@@ -223,7 +223,7 @@ use Types::Common -sigs, -types;
 			'fourth alternative',
 		);
 		
-		is ${^_TYPE_PARAMS_MULTISIG}, 2;
+		is ${^_TYPE_PARAMS_MULTISIG}, 'fourth';
 		
 		is(
 			__PACKAGE__->array_lookup2( LIST => \@arr, INDEX => $ix ),
@@ -231,7 +231,7 @@ use Types::Common -sigs, -types;
 			'fifth alternative',
 		);
 		
-		is ${^_TYPE_PARAMS_MULTISIG}, 3;
+		is ${^_TYPE_PARAMS_MULTISIG}, 'fifth';
 		
 		is(
 			array_lookup2( 'HELLOWORLD' ),
@@ -241,7 +241,110 @@ use Types::Common -sigs, -types;
 		
 		is ${^_TYPE_PARAMS_MULTISIG}, 4;
 		
-		my $e = exception { array_lookup() };
+		my $e = exception { array_lookup2() };
+		like $e, qr/Parameter validation failed/;
+		
+		is ${^_TYPE_PARAMS_MULTISIG}, undef;
+	};
+}
+
+{
+	signature_for array_lookup3 => (
+		method => 1,
+		multi  => {
+			first   => { pos   => [ ArrayRef, Int ] },
+			second  => { pos   => [ Int, ArrayRef ], next => sub { @_[0, 2, 1] } },
+			third   => { named => [ array => ArrayRef, index => Int, { alias => 'ix' } ], named_to_list => 1 },
+			fourth  => { pos   => [ ArrayRef, Int ], method => 0, next => sub { ( undef, @_ ) } },
+			fifth   => { named => [ LIST => ArrayRef, INDEX => Int ], next => sub { my $arg = pop; ( undef, $arg->LIST, $arg->INDEX ) } },
+			sixth   => sub { return ( undef, ['helloworld'], 0 ) if ( $_[0] and $_[0] eq 'HELLOWORLD' ); die },
+		},
+	);
+	
+	sub array_lookup3 {
+		my ( $self, $arr, $ix ) = @_;
+		return $arr->[$ix];
+	}
+	
+	subtest "signature_for function => ( multi => {...} )" => sub {
+		
+		my @arr    = qw( foo bar baz quux );
+		my $ix     = 2;
+		my $expect = 'baz';
+		
+		is(
+			__PACKAGE__->array_lookup3( \@arr, $ix ),
+			$expect,
+			'first alternative',
+		);
+		
+		is ${^_TYPE_PARAMS_MULTISIG}, 'first';
+		
+		is(
+			__PACKAGE__->array_lookup3( $ix, \@arr ),
+			$expect,
+			'second alternative',
+		);
+		
+		is ${^_TYPE_PARAMS_MULTISIG}, 'second';
+		
+		is(
+			__PACKAGE__->array_lookup3( array => \@arr, index => $ix ),
+			$expect,
+			'third alternative (hash)',
+		);
+		
+		is ${^_TYPE_PARAMS_MULTISIG}, 'third';
+		
+		is(
+			__PACKAGE__->array_lookup3( { array => \@arr, index => $ix } ),
+			$expect,
+			'third alternative (hashref)',
+		);
+		
+		is ${^_TYPE_PARAMS_MULTISIG}, 'third';
+		
+		is(
+			__PACKAGE__->array_lookup3( array => \@arr, ix => $ix ),
+			$expect,
+			'third alternative (hash, alias)',
+		);
+		
+		is ${^_TYPE_PARAMS_MULTISIG}, 'third';
+		
+		is(
+			__PACKAGE__->array_lookup3( { array => \@arr, ix => $ix } ),
+			$expect,
+			'third alternative (hashref, alias)',
+		);
+		
+		is ${^_TYPE_PARAMS_MULTISIG}, 'third';
+		
+		is(
+			array_lookup3( \@arr, $ix ),
+			$expect,
+			'fourth alternative',
+		);
+		
+		is ${^_TYPE_PARAMS_MULTISIG}, 'fourth';
+		
+		is(
+			__PACKAGE__->array_lookup3( LIST => \@arr, INDEX => $ix ),
+			$expect,
+			'fifth alternative',
+		);
+		
+		is ${^_TYPE_PARAMS_MULTISIG}, 'fifth';
+		
+		is(
+			array_lookup3( 'HELLOWORLD' ),
+			'helloworld',
+			'final alternative',
+		);
+		
+		is ${^_TYPE_PARAMS_MULTISIG}, 'sixth';
+		
+		my $e = exception { array_lookup3() };
 		like $e, qr/Parameter validation failed/;
 		
 		is ${^_TYPE_PARAMS_MULTISIG}, undef;

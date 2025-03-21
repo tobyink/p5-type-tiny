@@ -920,7 +920,7 @@ A recommended use of C<strictness> is with L<Devel::StrictMode>.
    positional => [ Int, ArrayRef ],
  );
 
-=head4 C<< multiple >> B<< ArrayRef >>
+=head4 C<< multiple >> B<< ArrayRef|HashRef >>
 
 This option allows your signature to support multiple calling conventions.
 Each entry in the array is an alternative signature, as a hashref:
@@ -964,6 +964,25 @@ index of the signature which was used:
    my ( $arr, $ix ) = ${^_TYPE_PARAMS_MULTISIG} == 1 ? reverse( @_ ) : @_;
    ...;
  }
+
+If you'd prefer to use identifying names instead of a numberic index, you
+can specify these using C<ID>:
+
+ signature_for my_func => (
+   multiple => [
+     { ID => 'one', positional => [ ArrayRef, Int ] },
+     { ID => 'two', positional => [ Int, ArrayRef ] },
+   ],
+ );
+
+Or by using a hashref:
+
+ signature_for my_func => (
+   multiple => {
+     one => { positional => [ ArrayRef, Int ] },
+     two => { positional => [ Int, ArrayRef ] },
+   },
+ );
 
 A neater solution is to use a C<next> coderef to re-order alternative
 signature results into your preferred order:

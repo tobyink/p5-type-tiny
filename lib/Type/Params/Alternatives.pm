@@ -77,18 +77,20 @@ sub _build_meta_alternatives {
 	my $index = 0;
 	return [
 		map {
-			my $meta = $self->_build_meta_alternative( $_ );
-			$meta->{_index} = $index++;
-			$meta;
+			$self->_build_meta_alternative( $_, $index++ )
 		} @{ $self->alternatives }
 	];
 }
 
 sub _build_meta_alternative {
-	my ( $self, $alt ) = @_;
+	my ( $self, $alt, $index ) = @_;
 
+	my $meta;
 	if ( is_CodeRef $alt ) {
-		return { closure => $alt };
+		$meta = { closure => $alt };
+	}
+	elsif ( is_HashRef $alt and exists $alt->{closure} ) {
+		$meta = { %$alt };
 	}
 	elsif ( is_HashRef $alt ) {
 		my %opts = (
@@ -102,8 +104,8 @@ sub _build_meta_alternative {
 			want_object     => !!0,
 			want_details    => !!1,
 		);
-		my $sig = $self->sig_class->new_from_v2api( \%opts );
-		return $sig->return_wanted;
+		$meta = $self->sig_class->new_from_v2api( \%opts )->return_wanted;
+		$meta->{ID} = $alt->{ID} if exists $alt->{ID};
 	}
 	elsif ( is_ArrayRef $alt ) {
 		my %opts = (
@@ -117,12 +119,14 @@ sub _build_meta_alternative {
 			want_object     => !!0,
 			want_details    => !!1,
 		);
-		my $sig = $self->sig_class->new_from_v2api( \%opts );
-		return $sig->return_wanted;
+		$meta = $self->sig_class->new_from_v2api( \%opts )->return_wanted;
 	}
 	else {
 		$self->_croak( 'Alternative signatures must be CODE, HASH, or ARRAY refs' );
 	}
+	
+	$meta->{_index} = $index;
+	return $meta;
 }
 
 sub _coderef_start_extra {
@@ -158,9 +162,11 @@ sub _coderef_meta_alternative {
 		my $alt_code = $meta->{source};
 		$alt_code =~ s/^sub [{]/do {/;
 		$coderef->add_line( sprintf(
-			'eval { local @_ = @_; $r = [ %s ]; ${^_TYPE_PARAMS_MULTISIG} = %d }%sif ( %s );',
+			'eval { local @_ = @_; $r = [ %s ]; ${^_TYPE_PARAMS_MULTISIG} = %s }%sif ( %s );',
 			$alt_code,
-			$meta->{_index},
+			defined( $meta->{ID} )
+				? B::perlstring( $meta->{ID} )
+				: ( 0 + $meta->{_index} ),
 			"\n\t",
 			join( ' and ', @cond ),
 		) );
@@ -170,9 +176,11 @@ sub _coderef_meta_alternative {
 		
 		my $callback_var = $coderef->add_variable( '$signature', \$meta->{closure} );
 		$coderef->add_line( sprintf(
-			'eval { $r = [ %s->(@_) ]; ${^_TYPE_PARAMS_MULTISIG} = %d }%sif ( %s );',
+			'eval { $r = [ %s->(@_) ]; ${^_TYPE_PARAMS_MULTISIG} = %s }%sif ( %s );',
 			$callback_var,
-			$meta->{_index},
+			defined( $meta->{ID} )
+				? B::perlstring( $meta->{ID} )
+				: ( 0 + $meta->{_index} ),
 			"\n\t",
 			join( ' and ', @cond ),
 		) );
