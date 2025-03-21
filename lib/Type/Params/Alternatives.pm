@@ -31,7 +31,7 @@ my $Attrs = Enum[ qw/
 	
 	sig_class base_options alternatives meta_alternatives
 	
-	quux mite_signature
+	quux mite_signature is_wrapper
 / ]; # quux for reasons
 
 require Type::Params::Signature;

@@ -29,7 +29,7 @@ my $Attrs = Enum[ qw/
 	class_prefix class_attributes
 	returns_scalar returns_list
 	want_details want_object want_source can_shortcut coderef
-	quux mite_signature
+	quux mite_signature is_wrapper
 / ]; # quux for reasons
 
 sub _croak {
