@@ -272,6 +272,38 @@ This trick only works for parameterized types that have a single
 parameter, like B<ArrayRef>, B<HashRef>, B<InstanceOf>, etc.
 (Sorry, C<Dict> and C<Tuple>!)
 
+Since Type::Tiny 2.8.0 there has been experimental support for a
+different way of exporting parameterized versions of certain parameterizable
+type constraints.
+
+  use Types::Standard -types;
+  use Types::Standard::ArrayRef (
+    IntList         => { of => Int },
+    StrList         => { of => Str },
+    NonEmptyStrList => { of => Str->where( sub { length($_) > 0 } ) },
+    StrNonEmptyList => { of => Str, where => sub { @$_ > 0 } },
+    NEStrNEList     => {
+      of    => Str->where( sub { length($_) > 0 } ),
+      where => sub { @$_ > 0 },
+    },
+  );
+  
+  assert_IntList [ 1.. 5 ];                      # doesn't die
+  
+  is_NonEmptyStrList [ "foo", "bar" ];           # ==> true
+  is_NonEmptyStrList [ "foo", "" ];              # ==> false
+  is_NonEmptyStrList [];                         # ==> true
+  
+  is_StrNonEmptyList [ "foo", "bar" ];           # ==> true
+  is_StrNonEmptyList [ "foo", "" ];              # ==> true
+  is_StrNonEmptyList [];                         # ==> false
+  
+  is_NEStrNEList [ "foo", "bar" ];               # ==> true
+  is_NEStrNEList [ "foo", "" ];                  # ==> false
+  is_NEStrNEList [];                             # ==> false
+
+And of course C<where> also accepts a string of Perl code.
+
 =head2 Lexical imports
 
 Type::Tiny 2.0 combined with Perl 5.37.2+ allows lexically scoped imports.
@@ -288,7 +320,7 @@ So:
 
   use Type::Utils qw( dwim_type );
   
-  dwim_type("ArrayRef[Int]")
+  my $type = dwim_type("ArrayRef[Int]");
 
 C<dwim_type> will look up a type constraint from a string and attempt to
 guess what you meant.
