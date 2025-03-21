@@ -133,6 +133,11 @@ L<Types::Standard::Tuple>.
 
 =item *
 
+The use of some of the modules in the previous list item as exporters of
+shortcuts for parameterized types is not stable yet.
+
+=item *
+
 L<Reply::Plugin::TypeTiny> is not covered by the stability policy.
 
 =back

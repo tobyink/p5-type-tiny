@@ -8,9 +8,8 @@
 
  - Better sanity checking.
  - `Type::Params` now supports `returns` for return types.
- - `Type::Params` now supports `allow_dash` and `list_to_named` for DWIM sigs.
- - `Type::Params` now supports `default_on_undef`.
- - `Type::Params` now exports `signature_for_method` and `signature_for_func`.
+ - `Type::Params` has some quality of life improvements.
+ - `Types::Standard::HashRef` and friends can export shortcuts.
  - Update examples in pod to use more features of modern Perl.
 
 2024-09-29 Type-Tiny version 2.006000 released!
