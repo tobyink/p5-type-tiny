@@ -1380,6 +1380,16 @@ Note that having I<any> defaults in a signature (even if they never
 end up getting used) can slow it down, as Type::Params will need to
 build a new array instead of just returning C<< @_ >>.
 
+=head4 C<< default_on_undef >> B<Bool>
+
+Normally defaults are only applied when a parameter is I<missing> (think
+C<exists> for hashes or the array being too short). Setting
+C<default_on_undef> to true will also trigger the default if a parameter
+is provided but undefined.
+
+If the caller might legitimately want to supply undef as a value, it is
+not recommended you uswe this.
+
 =head4 C<< coerce >> B<Bool>
 
 Speaking of coercion, the C<coerce> option allows you to indicate that a

@@ -21,7 +21,7 @@ my $RE_WORDLIKE = qr/\A[^\W0-9]\w*\z/;
 
 my $Attrs = Enum[ qw/
 	name type slurpy default alias strictness coerce clone in_list optional
-	getter predicate allow_dash vartail
+	getter predicate allow_dash vartail default_on_undef
 	quux
 / ];
 
@@ -61,7 +61,8 @@ sub default    { $_[0]{default} }     sub has_default    { exists $_[0]{default}
 sub alias      { $_[0]{alias} }       sub has_alias      { @{ $_[0]{alias} } }
 sub strictness { $_[0]{strictness} }  sub has_strictness { exists $_[0]{strictness} }
 
-sub should_clone { $_[0]{clone} }
+sub should_clone     { $_[0]{clone} }
+sub default_on_undef { $_[0]{default_on_undef} }
 
 sub in_list {
 	return $_[0]{in_list} if exists $_[0]{in_list};
@@ -258,10 +259,14 @@ sub _make_code {
 	}
 
 	if ( $self->has_default ) {
+		my $check = $exists_check;
+		if ( $self->default_on_undef ) {
+			$check = "( $check and defined $varname )";
+		}
 		$self->{vartail} = $vartail; # hack
 		$coderef->add_line( sprintf(
 			'$dtmp = %s ? %s : %s;',
-			$exists_check,
+			$check,
 			$self->_maybe_clone( $varname ),
 			$self->_code_for_default( $signature, $coderef ),
 		) );
@@ -490,6 +495,10 @@ B<Optional>.
 
 Boolean that is only used when the signature has the C<list_to_named>
 feature enabled.
+
+=item C<< default_on_undef >> B<< Bool >>
+
+Should the default be triggered if the caller passes an explicit undef?
 
 =back
 
