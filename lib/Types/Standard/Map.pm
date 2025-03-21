@@ -256,6 +256,8 @@ sub __hashref_allows_value {
 
 1;
 
+__END__
+
 =pod
 
 =encoding utf-8

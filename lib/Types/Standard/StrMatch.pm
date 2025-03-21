@@ -156,6 +156,8 @@ sub __inline_generator {
 
 1;
 
+__END__
+
 =pod
 
 =encoding utf-8
