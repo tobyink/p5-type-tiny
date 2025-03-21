@@ -574,7 +574,7 @@ __END__
 
 =head1 NAME
 
-Types::Standard::Dict - utility functions for the B<Dict> type constraint
+Types::Standard::Dict - exporter utility and utility functions for the B<Dict> type constraint
 
 =head1 STATUS
 

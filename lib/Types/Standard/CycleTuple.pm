@@ -23,6 +23,36 @@ my $_Optional = Types::Standard::Optional;
 my $_arr      = Types::Standard::ArrayRef;
 my $_Slurpy   = Types::Standard::Slurpy;
 
+use Exporter::Tiny 1.004001 ();
+our @ISA = qw( Exporter::Tiny );
+
+sub _exporter_fail {
+	my ( $class, $type_name, $values, $globals ) = @_;
+	my $caller = $globals->{into};
+	
+	my @final;
+	{
+		my $to_type = sub {
+			return $_[0] if Types::TypeTiny::is_TypeTiny($_[0]);
+			require Type::Utils;
+			Type::Utils::dwim_type( $_[0], for => 'caller' );
+		};
+		my $of = $values->{of};
+		Types::TypeTiny::is_ArrayLike($of)
+			or _croak( qq{Expected arrayref option "of" for type "$type_name"} );
+		@final = map { $to_type->($_) } @$of;
+	}
+	
+	my $type = Types::Standard::CycleTuple->of( @final );
+	$type = $type->create_child_type( name => $type_name, $type->has_coercion ? ( coercion => 1 ) : () );
+	
+	$INC{'Type/Registry.pm'}
+		? 'Type::Registry'->for_class( $caller )->add_type( $type, $type_name )
+		: ( $Type::Registry::DELAYED{$caller}{$type_name} = $type )
+		unless( ref($caller) or $caller eq '-lexical' or $globals->{'lexical'} );
+	return map +( $_->{name} => $_->{code} ), @{ $type->exportables };
+}
+
 no warnings;
 
 my $cycleuniq = 0;
