@@ -1398,4 +1398,28 @@
 			label "Warnings for unknown Type::Params signature options introduced in 2.007_008 broke Mite, which passes it a `mite_signature` option and checks no warnings are thrown in its test suite. That option is now silently allowed, even though Type::Params makes no use of it.";
 			seealso <https://metacpan.org/dist/Mite>;
 		];
+		item [
+			a dcs:Addition;
+			label "Types::Standard::ArrayRef can now export shortcuts for parameterized versions of the ArrayRef type constraint.";
+		];
+		item [
+			a dcs:Addition;
+			label "Types::Standard::HashRef can now export shortcuts for parameterized versions of the HashRef type constraint.";
+		];
+		item [
+			a dcs:Addition;
+			label "Types::Standard::ScalarRef can now export shortcuts for parameterized versions of the ScalarRef type constraint.";
+		];
+		item [
+			a dcs:Addition;
+			label "Types::Standard::StrMatch can now export shortcuts for parameterized versions of the StrMatch type constraint.";
+		];
+		item [
+			a dcs:Addition;
+			label "Types::Standard::Map can now export shortcuts for parameterized versions of the Map type constraint.";
+		];
+		item [
+			a dcs:Documentation;
+			label "Fix documentation for the coercion_generator attribute of Type::Tiny.";
+		];
 	].
