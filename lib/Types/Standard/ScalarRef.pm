@@ -20,6 +20,30 @@ sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
 no warnings;
 
+use Exporter::Tiny 1.004001 ();
+our @ISA = qw( Exporter::Tiny );
+
+sub _exporter_fail {
+	my ( $class, $type_name, $values, $globals ) = @_;
+	my $caller = $globals->{into};
+	
+	my $of = exists( $values->{of} ) ? $values->{of} : $values->{type};
+	defined $of or _croak( qq{Expected option "of" for type "$type_name"} );
+	if ( not Types::TypeTiny::is_TypeTiny($of) ) {
+		require Type::Utils;
+		$of = Type::Utils::dwim_type( $of, for => $caller );
+	}
+	
+	my $type = Types::Standard::ScalarRef->of( $of );
+	$type = $type->create_child_type( name => $type_name, $type->has_coercion ? ( coercion => 1 ) : () );
+	
+	$INC{'Type/Registry.pm'}
+		? 'Type::Registry'->for_class( $caller )->add_type( $type, $type_name )
+		: ( $Type::Registry::DELAYED{$caller}{$type_name} = $type )
+		unless( ref($caller) or $caller eq '-lexical' or $globals->{'lexical'} );
+	return map +( $_->{name} => $_->{code} ), @{ $type->exportables };
+}
+
 sub __constraint_generator {
 	return Types::Standard::ScalarRef unless @_;
 	
@@ -112,3 +136,91 @@ sub __coercion_generator {
 } #/ sub __coercion_generator
 
 1;
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Types::Standard::ScalarRef - exporter utility for the B<ScalarRef> type constraint
+
+=head1 SYNOPSIS
+
+  use Types::Standard -types;
+  
+  # Normal way to validate a reference to a string.
+  #
+  ScalarRef->of( Str )->assert_valid( \ "foo" );
+  
+  use Types::Standard::ScalarRef StrRef => { of => Str },
+  
+  # Exported shortcut
+  #
+  assert_StrRef \ "foo";
+
+=head1 STATUS
+
+This module is not covered by the
+L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
+
+=head1 DESCRIPTION
+
+This is mostly internal code, but can also act as an exporter utility.
+
+=head2 Exports
+
+Types::Standard::ScalarRef can be used experimentally as an exporter.
+
+  use Types::Standard 'Str';
+  use Types::Standard::ScalarRef StrRef => { of => Str };
+
+This will export the following functions into your namespace:
+
+=over
+
+=item C<< StrRef >>
+
+=item C<< is_StrRef( $value ) >>
+
+=item C<< assert_StrRef( $value ) >>
+
+=item C<< to_StrRef( $value ) >>
+
+=back
+
+Multiple types can be exported at once:
+
+  use Types::Standard -types;
+  use Types::Standard::ScalarRef (
+    IntRef  => { of => Int },
+    StrRef  => { of => Str },
+  );
+  
+  assert_IntRef \42;   # should not die
+
+=head1 BUGS
+
+Please report any bugs to
+L<https://github.com/tobyink/p5-type-tiny/issues>.
+
+=head1 SEE ALSO
+
+L<Types::Standard>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013-2025 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.

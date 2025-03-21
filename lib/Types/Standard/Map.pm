@@ -19,6 +19,37 @@ use Types::TypeTiny ();
 
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
+use Exporter::Tiny 1.004001 ();
+our @ISA = qw( Exporter::Tiny );
+
+sub _exporter_fail {
+	my ( $class, $type_name, $values, $globals ) = @_;
+	my $caller = $globals->{into};
+	
+	my ( $keys, $vals ) = exists( $values->{of} ) ? @{ $values->{of} } : ( $values->{keys}, $values->{values} );
+	defined $keys or _croak( qq{Expected option "keys" for type "$type_name"} );
+	defined $vals or _croak( qq{Expected option "values" for type "$type_name"} );
+	
+	if ( not Types::TypeTiny::is_TypeTiny($keys) ) {
+		require Type::Utils;
+		$keys = Type::Utils::dwim_type( $keys, for => $caller );
+	}
+
+	if ( not Types::TypeTiny::is_TypeTiny($vals) ) {
+		require Type::Utils;
+		$vals = Type::Utils::dwim_type( $vals, for => $caller );
+	}
+	
+	my $type = Types::Standard::Map->of( $keys, $vals );
+	$type = $type->create_child_type( name => $type_name, $type->has_coercion ? ( coercion => 1 ) : () );
+	
+	$INC{'Type/Registry.pm'}
+		? 'Type::Registry'->for_class( $caller )->add_type( $type, $type_name )
+		: ( $Type::Registry::DELAYED{$caller}{$type_name} = $type )
+		unless( ref($caller) or $caller eq '-lexical' or $globals->{'lexical'} );
+	return map +( $_->{name} => $_->{code} ), @{ $type->exportables };
+}
+
 my $meta = Types::Standard->meta;
 
 no warnings;
@@ -220,3 +251,91 @@ sub __hashref_allows_value {
 } #/ sub __hashref_allows_value
 
 1;
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Types::Standard::Map - exporter utility for the B<Map> type constraint
+
+=head1 SYNOPSIS
+
+  use Types::Standard -types;
+  
+  # Normal way to validate map.
+  #
+  Map->of( Int, Str )->assert_valid( { 1 => "one" } );
+  
+  use Types::Standard::Map IntsToStrs => { keys => Int, values => Str },
+  
+  # Exported shortcut
+  #
+  assert_IntsToStrs { 1 => "one" };
+
+=head1 STATUS
+
+This module is not covered by the
+L<Type-Tiny stability policy|Type::Tiny::Manual::Policies/"STABILITY">.
+
+=head1 DESCRIPTION
+
+This is mostly internal code, but can also act as an exporter utility.
+
+=head2 Exports
+
+Types::Standard::Map can be used experimentally as an exporter.
+
+  use Types::Standard 'Int';
+  use Types::Standard::Map IntsToStrs => { keys => Int, values => Str },
+
+This will export the following functions into your namespace:
+
+=over
+
+=item C<< IntsToStrs >>
+
+=item C<< is_IntsToStrs( $value ) >>
+
+=item C<< assert_IntsToStrs( $value ) >>
+
+=item C<< to_IntsToStrs( $value ) >>
+
+=back
+
+Multiple types can be exported at once:
+
+  use Types::Standard -types;
+  use Types::Standard::Map (
+    IntsToStrs  => { keys => Int, values => Str },
+    StrsToInts  => { keys => Str, values => Int },
+  );
+  
+  assert_StrsToInts { two => 2 };   # should not die
+
+=head1 BUGS
+
+Please report any bugs to
+L<https://github.com/tobyink/p5-type-tiny/issues>.
+
+=head1 SEE ALSO
+
+L<Types::Standard>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013-2025 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
