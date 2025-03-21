@@ -29,6 +29,43 @@ my $_hash     = Types::Standard::HashRef;
 my $_map      = Types::Standard::Map;
 my $_any      = Types::Standard::Any;
 
+use Exporter::Tiny 1.004001 ();
+our @ISA = qw( Exporter::Tiny );
+our @EXPORT_OK = qw( combine );
+
+sub _exporter_fail {
+	my ( $class, $type_name, $values, $globals ) = @_;
+	my $caller = $globals->{into};
+	
+	my @final;
+	{
+		my $to_type = sub {
+			return $_[0] if Types::TypeTiny::is_TypeTiny($_[0]);
+			require Type::Utils;
+			Type::Utils::dwim_type( $_[0], for => 'caller' );
+		};
+		my $of = $values->{of};
+		Types::TypeTiny::is_ArrayLike($of)
+			or _croak( qq{Expected arrayref option "of" for type "$type_name"} );
+		my @of_copy = @$of;
+		my $slurpy = @of_copy % 2 ? pop( @of_copy ) : undef;
+		my $iter = pair_iterator( @of_copy );
+		while ( my ( $name, $type ) = $iter->() ) {
+			push @final, $name, $to_type->( $type );
+		}
+		push @final, $to_type->( $slurpy ) if defined $slurpy;
+	}
+	
+	my $type = Types::Standard::Dict->of( @final );
+	$type = $type->create_child_type( name => $type_name, $type->has_coercion ? ( coercion => 1 ) : () );
+	
+	$INC{'Type/Registry.pm'}
+		? 'Type::Registry'->for_class( $caller )->add_type( $type, $type_name )
+		: ( $Type::Registry::DELAYED{$caller}{$type_name} = $type )
+		unless( ref($caller) or $caller eq '-lexical' or $globals->{'lexical'} );
+	return map +( $_->{name} => $_->{code} ), @{ $type->exportables };
+}
+
 no warnings;
 
 sub pair_iterator {
@@ -574,7 +611,76 @@ The following two types should be equivalent:
 Note that a hashref satisfying the combined type wouldn't satisfy any of
 the individual B<Dict> constraints, nor vice versa!
 
+This function can be exported:
+
+  use Types::Standard -types;
+  use Types::Standard::Dict combine => { -as => 'combine_dicts' };
+  
+  my $type1 = combine_dicts(
+    Dict[ name => Str ],
+    Dict[ age => Int, Slurpy[HashRef[Int]] ],
+    Dict[ id => Str, name => ArrayRef, Slurpy[ArrayRef] ],
+  );
+
 =back
+
+=head2 Exports
+
+Types::Standard::Dict can be used experimentally as an exporter.
+
+  use Types::Standard 'Str';
+  use Types::Standard::Dict Credentials => { of => [
+    username => Str,
+    password => Str,
+  ] };
+
+This will export the following functions into your namespace:
+
+=over
+
+=item C<< Credentials >>
+
+=item C<< is_Credentials( $value ) >>
+
+=item C<< assert_Credentials( $value ) >>
+
+=item C<< to_Credentials( $value ) >>
+
+=back
+
+Multiple types can be exported at once:
+
+  use Types::Standard -types;
+  
+  use Types::Standard::Dict (
+    Credentials => { of => [
+      username => Str,
+      password => Str,
+    ] },
+    Headers => { of => [
+      'Content-Type' => Optional[Str],
+      'Accept'       => Optional[Str],
+      'User-Agent'   => Optional[Str],
+    ] },
+  );
+  
+  # Exporting this separately so it can use the types defined by
+  # the first export.
+  use Types::Standard::Dict (
+    HttpRequestData => { of => [
+      credentials => Credentials,
+      headers     => Headers,
+      url         => Str,
+      method      => Enum[ qw( OPTIONS HEAD GET POST PUT DELETE PATCH ) ],
+    ] },
+  );
+  
+  assert_HttpRequestData( {
+    credentials => { username => 'bob', password => 's3cr3t' },
+    headers     => { 'Accept' => 'application/json' },
+    url         => 'http://example.net/api/v1/stuff',
+    method      => 'GET',
+  } );
 
 =head1 BUGS
 

@@ -1691,7 +1691,7 @@ Similar to B<Tuple>, but cyclical.
    CycleTuple[Int, HashRef]
 
 will allow C<< [1,{}] >> and C<< [1,{},2,{}] >> but disallow
-C<< [1,{},2] >> and C<< [1,{},2,[]] >>.
+C<< [1,{},2] >> and C<< [1,{},2,"not a hashref"] >>.
 
 I think you understand B<CycleTuple> already.
 

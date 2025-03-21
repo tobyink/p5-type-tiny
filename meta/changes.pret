@@ -1419,6 +1419,10 @@
 			label "Types::Standard::Map can now export shortcuts for parameterized versions of the Map type constraint.";
 		];
 		item [
+			a dcs:Addition;
+			label "Types::Standard::Dict can now export shortcuts for parameterized versions of the Dict type constraint.";
+		];
+		item [
 			a dcs:Documentation;
 			label "Fix documentation for the coercion_generator attribute of Type::Tiny.";
 		];
