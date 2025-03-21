@@ -1380,3 +1380,22 @@
 			label "Passing unknown options to Type::Params functions will now result in warnings.";
 		];
 	].
+
+`Type-Tiny 2.007_009 cpan:TOBYINK`
+	issued  2025-03-21;
+	changeset [
+		dcs:versus `Type-Tiny 2.007_008 cpan:TOBYINK`;
+		item [
+			a dcs:Addition;
+			label "When creating 'multi' signatures with Type::Params, the different alternatives can now be given a string identifier.";
+		];
+		item [
+			a dcs:Addition;
+			label "Type::Params now has a per-parameter `default_on_undef` option.";
+		];
+		item [
+			a dcs:Bugfix;
+			label "Warnings for unknown Type::Params signature options introduced in 2.007_008 broke Mite, which passes it a `mite_signature` option and checks no warnings are thrown in its test suite. That option is now silently allowed, even though Type::Params makes no use of it.";
+			seealso <https://metacpan.org/dist/Mite>;
+		];
+	].

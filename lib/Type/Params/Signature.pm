@@ -10,7 +10,7 @@ BEGIN {
 
 BEGIN {
 	$Type::Params::Signature::AUTHORITY  = 'cpan:TOBYINK';
-	$Type::Params::Signature::VERSION    = '2.007_008';
+	$Type::Params::Signature::VERSION    = '2.007_009';
 }
 
 $Type::Params::Signature::VERSION =~ tr/_//d;
@@ -29,7 +29,7 @@ my $Attrs = Enum[ qw/
 	class_prefix class_attributes
 	returns_scalar returns_list
 	want_details want_object want_source can_shortcut coderef
-	quux
+	quux mite_signature
 / ]; # quux for reasons
 
 sub _croak {

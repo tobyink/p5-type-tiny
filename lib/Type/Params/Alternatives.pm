@@ -10,7 +10,7 @@ BEGIN {
 
 BEGIN {
 	$Type::Params::Alternatives::AUTHORITY  = 'cpan:TOBYINK';
-	$Type::Params::Alternatives::VERSION    = '2.007_008';
+	$Type::Params::Alternatives::VERSION    = '2.007_009';
 }
 
 $Type::Params::Alternatives::VERSION =~ tr/_//d;
@@ -31,7 +31,7 @@ my $Attrs = Enum[ qw/
 	
 	sig_class base_options alternatives meta_alternatives
 	
-	quux
+	quux mite_signature
 / ]; # quux for reasons
 
 require Type::Params::Signature;
