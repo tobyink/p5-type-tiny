@@ -1435,3 +1435,14 @@
 			label "Fix documentation for the coercion_generator attribute of Type::Tiny.";
 		];
 	].
+
+`Type-Tiny 2.007_010 cpan:TOBYINK`
+	issued  2025-03-23;
+	changeset [
+		dcs:versus `Type-Tiny 2.007_009 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix;
+			label "Warnings for unknown Type::Params signature options introduced in 2.007_008 broke Mite, which passes it a `is_wrapper` option and checks no warnings are thrown in its test suite. That option is now silently allowed, even though Type::Params makes no use of it.";
+			seealso <https://metacpan.org/dist/Mite>;
+		];
+	].
