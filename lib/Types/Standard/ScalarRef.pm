@@ -8,7 +8,7 @@ use warnings;
 
 BEGIN {
 	$Types::Standard::ScalarRef::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::ScalarRef::VERSION   = '2.007_010';
+	$Types::Standard::ScalarRef::VERSION   = '2.008000';
 }
 
 $Types::Standard::ScalarRef::VERSION =~ tr/_//d;

@@ -1446,3 +1446,13 @@
 			seealso <https://metacpan.org/dist/Mite>;
 		];
 	].
+
+`Type-Tiny 2.008000 cpan:TOBYINK`
+	issued  2025-03-31;
+	changeset [
+		dcs:versus `Type-Tiny 2.007_010 cpan:TOBYINK`;
+		item [
+			a dcs:Packaging;
+			label "Repackaged with a stable version number.";
+		];
+	].
