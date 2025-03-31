@@ -97,10 +97,13 @@ m`Type::Params Type-Tiny`
 	:test [ a :AutomatedTest; :test_script f`t/20-modules/Type-Params/positional.t Type-Tiny`; :purpose "Test Type::Params positional parameters, a la the example in the documentation: sub nth_root { state $check = compile( Num, Num ); my ($x, $n) = $check->(@_); return $x ** (1 / $n); }" ];
 	:test [ a :AutomatedTest; :test_script f`t/20-modules/Type-Params/slurpy.t Type-Tiny`; :purpose "Test Type::Params usage with slurpy parameters." ];
 	:test [ a :AutomatedTest; :test_script f`t/20-modules/Type-Params/strictness.t Type-Tiny`; :purpose "Test Type::Params 'strictness' option." ];
+	:test [ a :AutomatedTest; :test_script f`t/20-modules/Type-Params/v2-allowdash.t Type-Tiny`; :purpose "Test allow_dash option for Type::Params." ];
+	:test [ a :AutomatedTest; :test_script f`t/20-modules/Type-Params/v2-default-on-undef.t Type-Tiny`; :purpose "Tests that Type::Params supports 'default_on_undef'." ];
 	:test [ a :AutomatedTest; :test_script f`t/20-modules/Type-Params/v2-defaults.t Type-Tiny`; :purpose "Check that Type::Params v2 default coderefs get passed an invocant." ];
 	:test [ a :AutomatedTest; :test_script f`t/20-modules/Type-Params/v2-delayed-compilation.t Type-Tiny`; :purpose "Tests that Type::Params v2 'signature_for' delays signature compilation." ];
 	:test [ a :AutomatedTest; :test_script f`t/20-modules/Type-Params/v2-exceptions.t Type-Tiny`; :purpose "Test a few Type::Params v2 exceptions." ];
 	:test [ a :AutomatedTest; :test_script f`t/20-modules/Type-Params/v2-fallback.t Type-Tiny`; :purpose "Test the 'fallback' option for modern Type::Params v2 API." ];
+	:test [ a :AutomatedTest; :test_script f`t/20-modules/Type-Params/v2-listtonamed.t Type-Tiny`; :purpose "Test list_to_named option for Type::Params." ];
 	:test [ a :AutomatedTest; :test_script f`t/20-modules/Type-Params/v2-multi.t Type-Tiny`; :purpose "Tests new 'multi' option in Type::Params." ];
 	:test [ a :AutomatedTest; :test_script f`t/20-modules/Type-Params/v2-named-backcompat.t Type-Tiny`; :purpose "Named parameter tests for modern Type::Params v2 API on Perl 5.8." ];
 	:test [ a :AutomatedTest; :test_script f`t/20-modules/Type-Params/v2-named-plus-slurpy.t Type-Tiny`; :purpose "Named slurpy parameter tests for modern Type::Params v2 API." ];
@@ -109,6 +112,7 @@ m`Type::Params Type-Tiny`
 	:test [ a :AutomatedTest; :test_script f`t/20-modules/Type-Params/v2-positional-plus-slurpy.t Type-Tiny`; :purpose "Named slurpy parameter tests for modern Type::Params v2 API." ];
 	:test [ a :AutomatedTest; :test_script f`t/20-modules/Type-Params/v2-positional.t Type-Tiny`; :purpose "Positional parameter tests for modern Type::Params v2 API." ];
 	:test [ a :AutomatedTest; :test_script f`t/20-modules/Type-Params/v2-returns.t Type-Tiny`; :purpose "Check that Type::Params v2 supports return typrs." ];
+	:test [ a :AutomatedTest; :test_script f`t/20-modules/Type-Params/v2-shortcuts.t Type-Tiny`; :purpose "Test 'signature_for_func' and 'signature_for_method' shortcuts." ];
 	:test [ a :AutomatedTest; :test_script f`t/20-modules/Type-Params/v2-warnings.t Type-Tiny`; :purpose "Tests warnings from Type::Params." ];
 	:test [ a :AutomatedTest; :test_script f`t/20-modules/Type-Params/v2-wrap-inherited-method.t Type-Tiny`; :purpose "Check that Type::Params v2 'signature_for' can find methods to wrap using inheritance." ];
 	:test [ a :AutomatedTest; :test_script f`t/20-modules/Type-Params/wrap.t Type-Tiny`; :purpose "Test 'wrap_subs' and 'wrap_methods' from Type::Params." ];
@@ -260,6 +264,30 @@ m`Types::Standard Type-Tiny`
 	:test [ a :AutomatedTest; :test_script f`t/20-modules/Types-Standard/structured.t Type-Tiny`; :purpose "Checks various values against structured types from Types::Standard." ];
 	:test [ a :AutomatedTest; :test_script f`t/20-modules/Types-Standard/tied.t Type-Tiny`; :purpose "Checks various values against 'Tied' from Types::Standard." ];
 	.
+m`Types::Standard::ArrayRef Type-Tiny`
+	:test [ a :AutomatedTest; :test_script f`t/20-modules/Types-Standard-ArrayRef/exporter.t Type-Tiny`; :purpose "Checks Types::Standard::ArrayRef can export." ];
+	.
+m`Types::Standard::CycleTuple Type-Tiny`
+	:test [ a :AutomatedTest; :test_script f`t/20-modules/Types-Standard-CycleTuple/exporter.t Type-Tiny`; :purpose "Checks Types::Standard::CycleTuple can export." ];
+	.
+m`Types::Standard::Dict Type-Tiny`
+	:test [ a :AutomatedTest; :test_script f`t/20-modules/Types-Standard-Dict/exporter.t Type-Tiny`; :purpose "Checks Types::Standard::Dict can export." ];
+	.
+m`Types::Standard::HashRef Type-Tiny`
+	:test [ a :AutomatedTest; :test_script f`t/20-modules/Types-Standard-HashRef/exporter.t Type-Tiny`; :purpose "Checks Types::Standard::HashRef can export." ];
+	.
+m`Types::Standard::Map Type-Tiny`
+	:test [ a :AutomatedTest; :test_script f`t/20-modules/Types-Standard-Map/exporter.t Type-Tiny`; :purpose "Checks Types::Standard::Map can export." ];
+	.
+m`Types::Standard::ScalarRef Type-Tiny`
+	:test [ a :AutomatedTest; :test_script f`t/20-modules/Types-Standard-ScalarRef/exporter.t Type-Tiny`; :purpose "Checks Types::Standard::ScalarRef can export." ];
+	.
+m`Types::Standard::StrMatch Type-Tiny`
+	:test [ a :AutomatedTest; :test_script f`t/20-modules/Types-Standard-StrMatch/exporter.t Type-Tiny`; :purpose "Checks Types::Standard::StrMatch can export." ];
+	.
+m`Types::Standard::Tuple Type-Tiny`
+	:test [ a :AutomatedTest; :test_script f`t/20-modules/Types-Standard-Tuple/exporter.t Type-Tiny`; :purpose "Checks Types::Standard::Tuple can export." ];
+	.
 m`Types::TypeTiny Type-Tiny`
 	:test [ a :AutomatedTest; :test_script f`t/20-modules/Types-TypeTiny/basic.t Type-Tiny`; :purpose "Test the Types::TypeTiny bootstrap library. (That is, type constraints used by Type::Tiny internally.)" ];
 	:test [ a :AutomatedTest; :test_script f`t/20-modules/Types-TypeTiny/coercion.t Type-Tiny`; :purpose "Test Types::TypeTiny::to_TypeTiny pseudo-coercion and the Types::TypeTiny::_ForeignTypeConstraint type." ];
@@ -318,6 +346,7 @@ m`Types::TypeTiny Type-Tiny`
 [] a :AutomatedTest; :test_script f`t/30-external/Validation-Class-Simple/basic.t Type-Tiny`; :purpose "Check type constraints Validation::Class::Simple objects can be used as type constraints.".
 [] a :AutomatedTest; :test_script f`t/30-external/match-simple/basic.t Type-Tiny`; :purpose "Checks Type::Tiny works with match::simple.".
 [] a :RegressionTest; :test_script f`t/40-bugs/73f51e2d.t Type-Tiny`; :purpose "Possible issue causing segfaults on threaded Perl 5.18.x.".
+[] a :RegressionTest; :test_script f`t/40-bugs/hg166.t Type-Tiny`; :purpose "Ensure that stringifying Error::TypeTiny doesn't clobber '$@'.".
 [] a :RegressionTest; :test_script f`t/40-bugs/ttxs-gh1.t Type-Tiny`; :purpose "Test that was failing with Type::Tiny::XS prior to 0.009.".
 RT#85911
 	:regression_test [ a :RegressionTest; :test_script f`t/40-bugs/rt85911.t Type-Tiny`; :purpose "Test Type::Params with deep Dict coercion."];
