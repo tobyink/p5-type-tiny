@@ -81,7 +81,7 @@ sub optional  {
 		: do {
 			$_[0]{optional} = $_[0]->has_default || grep(
 				$_->{uniq} == Optional->{uniq},
-				$_[0]->type->parents,
+				$_[0]->type, $_[0]->type->parents,
 			);
 		}
 }
@@ -173,6 +173,10 @@ sub _make_code {
 		&& $constraint->parent
 		&& $constraint->parent->{uniq} eq Optional->{uniq}
 		&& $constraint->type_parameter;
+	
+	# Allow Optional itself, without any parameter.
+	$really_optional = Types::Standard::Any
+		if $constraint && $constraint->{uniq} eq Optional->{uniq};
 
 	my $strictness;
 	if ( $self->has_strictness ) {

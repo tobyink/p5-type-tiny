@@ -110,4 +110,39 @@ my @arr = ( 'a' .. 'z' );
 	like $e, qr/Wrong number of parameters/, 'myfunc2 (param count exception)'
 }
 
+BEGIN {
+	package Local::MyPackage2;
+	
+	use strict;
+	use warnings;
+	
+	use experimental 'signatures';
+	
+	use Types::Standard -types;
+	use Type::Params -sigs;
+	
+	signature_for test => (
+		method => !!1,
+		named  => [ foo => Optional, bar => Optional[Any] ],
+	);
+	
+	sub test ( $self, $arg ) {
+		my $sum;
+		$sum += $arg->foo if $arg->has_foo;
+		$sum += $arg->bar if $arg->has_bar;
+		return $sum;
+	}
+}
+
+subtest 'Optional and Optional[Any] treated the same' => sub {
+	my $o = bless {}, 'Local::MyPackage2';
+	my $e = exception {
+		is $o->test( foo => 2, bar => 5 ),      7;
+		is $o->test(           bar => 5 ),      5;
+		is $o->test( foo => 2           ),      2;
+		is $o->test(                    ),  undef;
+	};
+	is $e, undef, 'No exception';
+};
+
 done_testing;
