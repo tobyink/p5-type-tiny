@@ -1456,3 +1456,13 @@
 			label "Repackaged with a stable version number.";
 		];
 	].
+
+`Type-Tiny 2.008001 cpan:TOBYINK`
+	issued  2025-04-15;
+	changeset [
+		dcs:versus `Type-Tiny 2.008000 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix;
+			label "The Optional type constraint on its own, will now be treated the same as Optional[Any]. Previously when used for named parameters, it would fail to generate predicate methods.";
+		];
+	].
