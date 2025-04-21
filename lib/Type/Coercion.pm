@@ -469,14 +469,14 @@ sub _reparameterize {
 sub isa {
 	my $self = shift;
 	
-	if ( $INC{"Moose.pm"}
+	if ( $INC{"Moose/Meta/TypeCoercion.pm"}
 		and blessed( $self )
 		and $_[0] eq 'Moose::Meta::TypeCoercion' )
 	{
 		return !!1;
 	}
 	
-	if ( $INC{"Moose.pm"}
+	if ( $INC{"Moose/Meta/TypeCoercion.pm"}
 		and blessed( $self )
 		and $_[0] =~ /^(Class::MOP|MooseX?)::/ )
 	{
@@ -493,7 +493,7 @@ sub can {
 	my $can = $self->SUPER::can( @_ );
 	return $can if $can;
 	
-	if ( $INC{"Moose.pm"}
+	if ( $INC{"Moose/Meta/TypeCoercion.pm"}
 		and blessed( $self )
 		and my $method = $self->moose_coercion->can( @_ ) )
 	{
@@ -508,7 +508,7 @@ sub AUTOLOAD {
 	my ( $m ) = ( our $AUTOLOAD =~ /::(\w+)$/ );
 	return if $m eq 'DESTROY';
 	
-	if ( $INC{"Moose.pm"}
+	if ( $INC{"Moose/Meta/TypeCoercion.pm"}
 		and blessed( $self )
 		and my $method = $self->moose_coercion->can( $m ) )
 	{

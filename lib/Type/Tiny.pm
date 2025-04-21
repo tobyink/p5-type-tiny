@@ -1446,7 +1446,7 @@ sub coercibles {
 sub isa {
 	my $self = shift;
 	
-	if ( $INC{"Moose.pm"}
+	if ( $INC{"Moose/Meta/TypeConstraint.pm"}
 		and ref( $self )
 		and $_[0] =~ /^(?:Class::MOP|MooseX?::Meta)::(.+)$/ )
 	{
@@ -1459,7 +1459,7 @@ sub isa {
 		
 		my $inflate = $self->moose_type;
 		return $inflate->isa( @_ );
-	} #/ if ( $INC{"Moose.pm"} ...)
+	} #/ if ( $INC{"Moose/Meta/TypeConstraint.pm"} ...)
 	
 	if ( $INC{"Mouse.pm"}
 		and ref( $self )
@@ -1507,7 +1507,7 @@ sub can {
 	return $can if $can;
 	
 	if ( ref( $self ) ) {
-		if ( $INC{"Moose.pm"} ) {
+		if ( $INC{"Moose/Meta/TypeConstraint.pm"} ) {
 			my $method = $self->moose_type->can( @_ );
 			return sub { shift->moose_type->$method( @_ ) }
 				if $method;
@@ -1538,7 +1538,7 @@ sub AUTOLOAD {
 	return if $m eq 'DESTROY';
 	
 	if ( ref( $self ) ) {
-		if ( $INC{"Moose.pm"} ) {
+		if ( $INC{"Moose/Meta/TypeConstraint.pm"} ) {
 			my $method = $self->moose_type->can( $m );
 			return $self->moose_type->$method( @_ ) if $method;
 		}

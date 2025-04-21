@@ -503,7 +503,7 @@ sub classifier {
 	sub lookup_via_moose {
 		my $self = shift;
 		
-		if ( $INC{'Moose.pm'} ) {
+		if ( $INC{'Moose/Meta/TypeConstraint.pm'} ) {
 			require Moose::Util::TypeConstraints;
 			require Types::TypeTiny;
 			my $r = Moose::Util::TypeConstraints::find_type_constraint( $_[0] );
@@ -549,7 +549,7 @@ sub classifier {
 		
 		my $meta;
 		if ( defined $self->{"~~chained"} ) {
-			$meta ||= Moose::Util::find_meta( $self->{"~~chained"} ) if $INC{'Moose.pm'};
+			$meta ||= Moose::Util::find_meta( $self->{"~~chained"} ) if $INC{'Moose/Util.pm'};
 			$meta ||= Mouse::Util::find_meta( $self->{"~~chained"} ) if $INC{'Mouse.pm'};
 		}
 		
