@@ -11,7 +11,7 @@ use Scalar::Util ();
 {
 	package Type::Tie;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '2.008001';
+	our $VERSION   = '2.008002';
 	our @ISA       = qw( Exporter::Tiny );
 	our @EXPORT    = qw( ttie );
 	
@@ -37,7 +37,7 @@ use Scalar::Util ();
 {
 	package Type::Tie::BASE;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '2.008001';
+	our $VERSION   = '2.008002';
 	
 	$VERSION =~ tr/_//d;
 	
@@ -161,7 +161,7 @@ use Scalar::Util ();
 {
 	package Type::Tie::ARRAY;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '2.008001';
+	our $VERSION   = '2.008002';
 	our @ISA       = qw( Type::Tie::BASE );
 	
 	$VERSION =~ tr/_//d;
@@ -204,7 +204,7 @@ use Scalar::Util ();
 {
 	package Type::Tie::HASH;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '2.008001';
+	our $VERSION   = '2.008002';
 	our @ISA       = qw( Type::Tie::BASE );
 	
 	$VERSION =~ tr/_//d;
@@ -239,7 +239,7 @@ use Scalar::Util ();
 {
 	package Type::Tie::SCALAR;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '2.008001';
+	our $VERSION   = '2.008002';
 	our @ISA       = qw( Type::Tie::BASE );
 	
 	$VERSION =~ tr/_//d;

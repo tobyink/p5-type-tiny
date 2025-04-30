@@ -1466,3 +1466,14 @@
 			label "The Optional type constraint on its own, will now be treated the same as Optional[Any]. Previously when used for named parameters, it would fail to generate predicate methods.";
 		];
 	].
+
+`Type-Tiny 2.008002 cpan:TOBYINK`
+	issued  2025-04-30;
+	changeset [
+		dcs:versus `Type-Tiny 2.008001 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix;
+			label "MooseX-Types 0.51 broke Type::Tiny's ability to reliably detect if Moose types were being used. This release fixes that.";
+			dcs:thanks cpan:HAARG;
+		];
+	].
