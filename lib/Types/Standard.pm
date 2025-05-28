@@ -1355,6 +1355,10 @@ length can be given:
 
 Other customers also bought: B<< ArrayLike >> from L<Types::TypeTiny>.
 
+Notice: future versions of Types::Standard are likely to introduce
+coercions to B<ArrayRef> from B<< HasMethods['__TO_ARRAYREF__'] >> and
+from B<ArrayLike>.
+
 =item *
 
 B<< HashRef[`a] >>
@@ -1369,6 +1373,10 @@ constrain the hash values.
 
 Other customers also bought: B<< HashLike >> from L<Types::TypeTiny>.
 
+Notice: future versions of Types::Standard are likely to introduce
+coercions to B<HashRef> from B<< HasMethods['__TO_HASHREF__'] >> and
+from B<HashLike>.
+
 =item *
 
 B<< CodeRef >>
@@ -1376,6 +1384,10 @@ B<< CodeRef >>
 A value where C<< ref($value) eq "CODE" >>.
 
 Other customers also bought: B<< CodeLike >> from L<Types::TypeTiny>.
+
+Notice: future versions of Types::Standard are likely to introduce
+coercions to B<CodeRef> from B<< HasMethods['__TO_CODEREF__'] >> and
+from B<CodeLike>.
 
 =item *
 

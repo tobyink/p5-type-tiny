@@ -586,6 +586,44 @@ function as a single parameter object:
  say add_numbers(   num1 => 2, num2 => 3   );   # says 5
  say add_numbers( { num1 => 2, num2 => 3 } );   # also says 5
 
+Since Type::Params 2.009_000 the C<< $arg >> object has methods called
+C<< __TO_LIST__ >>, C<< __TO_ARRAYREF__ >>, and C<< __TO_HASHREF__ >>.
+
+ signature_for add_numbers => ( named => [ num1 => Num, num2 => Num ] );
+ sub add_numbers ( $arg ) {
+   my ( $num1, $num2 ) = $arg->__TO_LIST__;
+   return $num1 + $num2;
+ }
+
+ signature_for add_numbers => ( named => [ num1 => Num, num2 => Num ] );
+ sub add_numbers ( $arg ) {
+   my $nums = $arg->__TO_ARRAYREF__;
+   return $nums[0] + $nums[1];
+ }
+
+ signature_for add_numbers => ( named => [ num1 => Num, num2 => Num ] );
+ sub add_numbers ( $arg ) {
+   my $nums = $arg->__TO_HASHREF__;
+   return $nums->{num1} + $nums->{num2};
+ }
+
+Each of these can be given an optional arrayref indicating which fields to
+return.
+
+ signature_for add_numbers => ( named => [ num1 => Num, num2 => Num ] );
+ sub add_numbers ( $arg ) {
+   my ( $num2, $num1 ) = $arg->__TO_LIST__( [ qw/ num2 num1 / ] );
+   return $num1 + $num2;
+ }
+
+The arrayref accepts aliases (see C<alias>) but methods may throw an
+exception if the arrayref contains unknown field names. (See
+C<strictness> to control whether an exception is thrown.)
+
+These methods start and end with double underscores to reduce the chance
+that they'll conflict with the name of a named parameter, however they are
+considered part of the public, supported API.
+
 =head4 C<< named_to_list >> B<< ArrayRef|Bool >>
 
 The C<named_to_list> option is ignored for signatures using positional

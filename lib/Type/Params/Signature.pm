@@ -1083,6 +1083,8 @@ sub make_class_xs {
 		replace => 1,
 		%$attr,
 	);
+	
+	$self->make_extra_methods;
 }
 
 sub make_class_pp {
@@ -1093,6 +1095,8 @@ sub make_class_pp {
 		local $@;
 		eval( $code ) or die( $@ );
 	};
+	
+	$self->make_extra_methods;
 }
 
 sub make_class_pp_code {
@@ -1133,6 +1137,84 @@ sub make_class_pp_code {
 	$coderef->add_line( '}' );
 
 	return $coderef->code;
+}
+
+sub make_extra_methods {
+	my $self = shift;
+
+	my @parameters = @{ $self->parameters };
+	if ( $self->has_slurpy ) {
+		push @parameters, $self->slurpy;
+	}
+
+	my $coderef = $self->_new_code_accumulator;
+	$coderef->add_line( '{' );
+	$coderef->{indent} = "\t";
+	$coderef->add_line( sprintf( 'package %s;', $self->bless ) );
+	$coderef->add_line( 'use strict;' );
+	$coderef->add_line( 'no warnings;' );
+	
+	$coderef->add_line( 'my @FIELDS = (' );
+	for my $p ( @parameters ) {
+		$coderef->add_line( "\t" . B::perlstring( $p->name ) . "," )
+	}
+	$coderef->add_line( ');' );
+	
+	my @enum;
+	$coderef->add_line( 'my %FIELDS = (' );
+	for my $p ( @parameters ) {
+		$coderef->add_line( "\t" . B::perlstring( $p->name ) . " => "  . B::perlstring( $p->name ) . "," );
+		for my $p2 ( $p->_all_aliases($self) ) {
+			$coderef->add_line( "\t" . B::perlstring( $p2 ) . " => "  . B::perlstring( $p->name ) . "," );
+		}
+		push @enum, $p->name, $p->_all_aliases($self);
+	}
+	$coderef->add_line( ');' );
+	my $enum = ArrayRef[ Enum[ @enum ] ];
+	
+	$coderef->add_line( 'sub __TO_LIST__ {' );
+	$coderef->add_line( "\t" . 'my ( $arg, $fields ) = @_;' );
+	$coderef->add_line( "\t" . 'return map $arg->{$_}, @FIELDS if not defined $fields;' );
+	if ( ( defined $self->strictness and $self->strictness eq 1 ) or not $self->has_strictness ){
+		$coderef->add_line( "\t" . $enum->inline_assert( '$fields' ) );
+	}
+	elsif ( $self->strictness ) {
+		$coderef->add_line( "\t" . sprintf( 'if ( %s ) { %s }', $self->strictness, $enum->inline_assert( '$fields' ) ) );
+	}
+	$coderef->add_line( "\t" . 'return map $arg->{$FIELDS{$_}}, @$fields;' );
+	$coderef->add_line( '}' );
+
+	$coderef->add_line( 'sub __TO_ARRAYREF__ {' );
+	$coderef->add_line( "\t" . 'my ( $arg, $fields ) = @_;' );
+	$coderef->add_line( "\t" . 'return [ map $arg->{$_}, @FIELDS ] if not defined $fields;' );
+	if ( ( defined $self->strictness and $self->strictness eq 1 ) or not $self->has_strictness ){
+		$coderef->add_line( "\t" . $enum->inline_assert( '$fields' ) );
+	}
+	elsif ( $self->strictness ) {
+		$coderef->add_line( "\t" . sprintf( 'if ( %s ) { %s }', $self->strictness, $enum->inline_assert( '$fields' ) ) );
+	}
+	$coderef->add_line( "\t" . 'return [ map $arg->{$FIELDS{$_}}, @$fields ];' );
+	$coderef->add_line( '}' );
+
+	$coderef->add_line( 'sub __TO_HASHREF__ {' );
+	$coderef->add_line( "\t" . 'my ( $arg, $fields ) = @_;' );
+	$coderef->add_line( "\t" . 'return +{ map { ; $_ => $arg->{$_} } @FIELDS } if not defined $fields;' );
+	if ( ( defined $self->strictness and $self->strictness eq 1 ) or not $self->has_strictness ){
+		$coderef->add_line( "\t" . $enum->inline_assert( '$fields' ) );
+	}
+	elsif ( $self->strictness ) {
+		$coderef->add_line( "\t" . sprintf( 'if ( %s ) { %s }', $self->strictness, $enum->inline_assert( '$fields' ) ) );
+	}
+	$coderef->add_line( "\t" . 'return +{ map { ; $_ => $arg->{$FIELDS{$_}} } @$fields };' );
+	$coderef->add_line( '}' );
+	
+	$coderef->add_line( '1;' );
+	$coderef->{indent} = "";
+	$coderef->add_line( '}' );
+
+	my $code = $coderef->code;
+	local $@;
+	eval( $code ) or die( $@ );
 }
 
 sub return_wanted {
