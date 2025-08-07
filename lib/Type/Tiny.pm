@@ -76,7 +76,7 @@ our @InternalPackages = qw(
 	Type::Utils
 );
 
-use Scalar::Util qw( blessed );
+use Scalar::Util qw( blessed reftype blessed );
 use Types::TypeTiny ();
 
 our $SafePackage = sprintf 'package %s;', __PACKAGE__;
@@ -484,6 +484,7 @@ sub _dd {
 	
 	!defined $value  ? 'Undef'
 		: !ref $value ? sprintf( 'Value %s', B::perlstring( $value ) )
+                : reftype($value) eq 'OBJECT' ? sprintf( 'Object %s' . blessed( $value ) )
 		: do {
 		my $N = 0+ ( defined( $DD ) ? $DD : 72 );
 		require Data::Dumper;
