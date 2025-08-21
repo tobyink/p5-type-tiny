@@ -494,7 +494,7 @@ sub _dd {
 		local $Data::Dumper::Maxdepth = 2;
 		my $str;
 		eval {
-                        local $SIG{__WARN__} = sub { };
+            local $SIG{__WARN__} = sub {};
 			$str = Data::Dumper::Dumper( $value );
 			$str = substr( $str, 0, $N - 12 ) . '...' . substr( $str, -1, 1 )
 				if length( $str ) >= $N;
