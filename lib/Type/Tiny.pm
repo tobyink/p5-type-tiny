@@ -66,8 +66,9 @@ our @InternalPackages = qw(
 	Type::Tiny
 	Type::Tiny::_DeclaredType
 	Type::Tiny::_HalfOp
+	Type::Tiny::Bitfield
 	Type::Tiny::Class
-	Type::Tiny::ConsrtainedObject
+	Type::Tiny::ConstrainedObject
 	Type::Tiny::Duck
 	Type::Tiny::Enum
 	Type::Tiny::Intersection
