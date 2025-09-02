@@ -1511,11 +1511,6 @@ sub can {
 	return $can if $can;
 	
 	if ( ref( $self ) ) {
-		if ( $INC{"Moose/Meta/TypeConstraint.pm"} ) {
-			my $method = $self->moose_type->can( @_ );
-			return sub { shift->moose_type->$method( @_ ) }
-				if $method;
-		}
 		if ( $_[0] =~ /\Amy_(.+)\z/ ) {
 			my $method = $self->_lookup_my_method( $1 );
 			return $method if $method;
@@ -1530,6 +1525,11 @@ sub can {
 			return unless $self->{'_util'}{$util};
 			return sub { my $s = shift; $s->{'_util'}{$util}( @_ ) };
 		}
+		if ( $INC{"Moose/Meta/TypeConstraint.pm"} ) {
+			my $method = $self->moose_type->can( @_ );
+			return sub { shift->moose_type->$method( @_ ) }
+				if $method;
+		}
 	} #/ if ( ref( $self ) )
 	
 	return;
@@ -1541,10 +1541,6 @@ sub AUTOLOAD {
 	return if $m eq 'DESTROY';
 	
 	if ( ref( $self ) ) {
-		if ( $INC{"Moose/Meta/TypeConstraint.pm"} ) {
-			my $method = $self->moose_type->can( $m );
-			return $self->moose_type->$method( @_ ) if $method;
-		}
 		if ( $m =~ /\Amy_(.+)\z/ ) {
 			my $method = $self->_lookup_my_method( $1 );
 			return &$method( $self, @_ ) if $method;
@@ -1558,6 +1554,10 @@ sub AUTOLOAD {
 		if ( $_[0] =~ $re_list_methods ) {
 			my $util = $_[0];
 			return ( $self->{'_util'}{$util} ||= $self->_build_util( $util ) )->( @_ );
+		}
+		if ( $INC{"Moose/Meta/TypeConstraint.pm"} ) {
+			my $method = $self->moose_type->can( $m );
+			return $self->moose_type->$method( @_ ) if $method;
 		}
 	} #/ if ( ref( $self ) )
 	
