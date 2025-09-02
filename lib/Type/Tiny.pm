@@ -1551,9 +1551,8 @@ sub AUTOLOAD {
 			no strict 'refs';
 			goto \&{"Type::Tiny::ConstrainedObject::$m"};
 		}
-		if ( $_[0] =~ $re_list_methods ) {
-			my $util = $_[0];
-			return ( $self->{'_util'}{$util} ||= $self->_build_util( $util ) )->( @_ );
+		if ( $m =~ $re_list_methods ) {
+			return ( $self->{'_util'}{$m} ||= $self->_build_util( $m ) )->( @_ );
 		}
 		if ( $INC{"Moose/Meta/TypeConstraint.pm"} ) {
 			my $method = $self->moose_type->can( $m );
