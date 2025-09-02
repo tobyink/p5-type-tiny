@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Tiny::Role::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::Role::VERSION   = '2.008002';
+	$Type::Tiny::Role::VERSION   = '2.008003';
 }
 
 $Type::Tiny::Role::VERSION =~ tr/_//d;

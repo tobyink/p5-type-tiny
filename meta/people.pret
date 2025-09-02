@@ -320,6 +320,10 @@ cpan:JKEENAN
 	:page <https://github.com/zmughal>;
 	:nick "Zaki Mughal".
 
+cpan:RMOORE
+	is doap:helper of `Type-Tiny`;
+	:name "Robert Moore".
+
 # We bundle some files made by these dudes...
 
 cpan:RJBS

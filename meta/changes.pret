@@ -1477,3 +1477,24 @@
 			dcs:thanks cpan:HAARG;
 		];
 	].
+
+`Type-Tiny 2.008003 cpan:TOBYINK`
+	issued  2025-09-02;
+	changeset [
+		dcs:versus `Type-Tiny 2.008002 cpan:TOBYINK`;
+		item [
+			a dcs:Change;
+			label "When dumping structures via Data::Dumper (mostly in error messages) suppress any warnings Data::Dumper would emit.";
+			dcs:blame cpan:DJERIUS;
+		];
+		item [
+			a dcs:Change;
+			label "Slightly streamlined `Type::Tiny::can` and `Type::Tiny::AUTOLOAD`.";
+		];
+		item [
+			a dcs:Bugfix;
+			label "Make sure methods fake-inherited from Moose (if it's loaded) are a last resort.";
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/180>;
+			dcs:thanks cpan:RMOORE;
+		];
+	].
