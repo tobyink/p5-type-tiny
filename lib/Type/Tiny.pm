@@ -1497,6 +1497,8 @@ my %object_methods = (
 	numifies_to           => 1
 );
 
+my $re_list_methods = qr/\A(?:(?:a(?:ll|ny|ssert_a(?:ll|ny))|first|grep|map|rsort|sort))\z/;
+
 sub can {
 	my $self = shift;
 	
@@ -1522,12 +1524,11 @@ sub can {
 			require Type::Tiny::ConstrainedObject;
 			return Type::Tiny::ConstrainedObject->can( $_[0] );
 		}
-		for my $util ( qw/ grep map sort rsort first any all assert_any assert_all / ) {
-			if ( $_[0] eq $util ) {
-				$self->{'_util'}{$util} ||= eval { $self->_build_util( $util ) };
-				return unless $self->{'_util'}{$util};
-				return sub { my $s = shift; $s->{'_util'}{$util}( @_ ) };
-			}
+		if ( $_[0] =~ $re_list_methods ) {
+			my $util = $_[0];
+			$self->{'_util'}{$util} ||= eval { $self->_build_util( $util ) };
+			return unless $self->{'_util'}{$util};
+			return sub { my $s = shift; $s->{'_util'}{$util}( @_ ) };
 		}
 	} #/ if ( ref( $self ) )
 	
@@ -1554,10 +1555,9 @@ sub AUTOLOAD {
 			no strict 'refs';
 			goto \&{"Type::Tiny::ConstrainedObject::$m"};
 		}
-		for my $util ( qw/ grep map sort rsort first any all assert_any assert_all / ) {
-			if ( $m eq $util ) {
-				return ( $self->{'_util'}{$util} ||= $self->_build_util( $util ) )->( @_ );
-			}
+		if ( $_[0] =~ $re_list_methods ) {
+			my $util = $_[0];
+			return ( $self->{'_util'}{$util} ||= $self->_build_util( $util ) )->( @_ );
 		}
 	} #/ if ( ref( $self ) )
 	
