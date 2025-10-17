@@ -2622,6 +2622,8 @@ C<< "$lib::\$typename\[]" >> if C<< $args >> is greater than C<< $max >> or
 less than C<< $min >>, if they're defined. If C<< $args >> is an arrayref,
 will use the length of the array.
 
+=back
+
 =head2 Overloading
 
 =over

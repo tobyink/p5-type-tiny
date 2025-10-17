@@ -1507,4 +1507,8 @@
 			a dcs:Addition;
 			label "Type::Tiny::Duck (used by HasMethods) now includes a new_intersection constructor.";
 		];
+		item [
+			a dcs:Documentation;
+			label "Type::Tiny pod syntax fix.";
+		];
 	].
