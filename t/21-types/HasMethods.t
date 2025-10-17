@@ -204,5 +204,16 @@ should_fail(
 	"HasMethods does't work on class names, even if they can do a method."
 );
 
+#
+# Intersections
+#
+
+my $foo      = HasMethods['foo'];
+my $bar      = HasMethods['bar'];
+my $foo_bar  = ($foo) & ($bar);
+
+ok( $foo_bar->isa( 'Type::Tiny::Duck' ) );
+is_deeply( [ sort @{ $foo_bar->methods } ], [qw/bar foo/] );
+
 done_testing;
 

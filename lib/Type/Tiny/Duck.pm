@@ -57,6 +57,18 @@ sub new {
 	return $proto->SUPER::new( %opts );
 } #/ sub new
 
+sub new_intersection {
+	my $proto  = shift;
+	my %opts   = ( @_ == 1 ) ? %{ $_[0] } : @_;
+	my @types  = @{ delete $opts{type_constraints} };
+	my %values; ++$values{$_} for map @{$_->methods}, @types;
+	my @values = sort keys %values;
+	if ( $INC{'Types/Standard.pm'} and not keys %opts ) {
+		return Types::Standard::HasMethods->of( @values );
+	}
+	return $proto->new( %opts, methods => \@values );
+}
+
 sub _lockdown {
 	my ( $self, $callback ) = @_;
 	$callback->( $self->{methods} );
@@ -266,6 +278,23 @@ people to easily substitute mock objects.
 
 This package inherits from L<Type::Tiny>; see that for most documentation.
 Major differences are listed below:
+
+=head2 Constructors
+
+The C<new> constructor from L<Type::Tiny> still works, of course. But there
+is also:
+
+=over
+
+=item C<< new_intersection( type_constraints => \@ducklings, %opts ) >>
+
+Creates a new duck type constraint which is the intersection of existing duck
+type constraints. This allows the intersection of C<< HasMethods['read'] >>
+and C<< HasMethods['write'] >> to be simply C<< HasMethods['read', 'write'] >>
+instead of a complex union type constraint with two duck type constraints
+as its children.
+
+=back
 
 =head2 Attributes
 
