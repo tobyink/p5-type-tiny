@@ -1498,3 +1498,13 @@
 			dcs:thanks cpan:RMOORE;
 		];
 	].
+
+`Type-Tiny 2.008004 cpan:TOBYINK`
+	issued  2025-10-17;
+	changeset [
+		dcs:versus `Type-Tiny 2.008003 cpan:TOBYINK`;
+		item [
+			a dcs:Addition;
+			label "Type::Tiny::Duck (used by HasMethods) now includes a new_intersection constructor.";
+		];
+	].
