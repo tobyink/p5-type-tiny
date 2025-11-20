@@ -7,7 +7,7 @@ use warnings;
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '2.008004';
+our $VERSION   = '2.008005';
 
 $VERSION =~ tr/_//d;
 
@@ -200,7 +200,7 @@ Evaluate: {
 	package Type::Parser::AstBuilder;
 	
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '2.008004';
+	our $VERSION   = '2.008005';
 	
 	$VERSION =~ tr/_//d;
 	
@@ -349,7 +349,7 @@ Evaluate: {
 	package Type::Parser::Token;
 	
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '2.008004';
+	our $VERSION   = '2.008005';
 	
 	$VERSION =~ tr/_//d;
 	
@@ -361,7 +361,7 @@ Evaluate: {
 	package Type::Parser::TokenStream;
 	
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '2.008004';
+	our $VERSION   = '2.008005';
 	
 	$VERSION =~ tr/_//d;
 	
