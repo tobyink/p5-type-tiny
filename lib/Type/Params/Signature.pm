@@ -775,6 +775,7 @@ sub _coderef_slurpy {
 		input_slot  => '$SLURPY',
 		display_var => '$SLURPY',
 		index       => 0,
+		is_slurpy   => 1,
 		$self->is_named
 			? ( output_slot => sprintf( '$out{%s}', B::perlstring( $parameter->name ) ) )
 			: ( output_var  => '@out' )
@@ -829,7 +830,7 @@ sub _coderef_end {
 	}
 
 	$self->_coderef_end_extra( $coderef );
-	$coderef->add_line( $self->_make_return_expression( is_early => 0 ) . ';' );
+	$coderef->add_line( $self->_make_return_expression( is_early => 0, allow_full_statements => 1 ) . ';' );
 	$coderef->{indent} =~ s/\t$//;
 	$coderef->add_line( '}' );
 
@@ -892,9 +893,13 @@ sub _make_return_expression {
 		elsif ( $list eq '@_' ) {
 			return sprintf 'goto( $__NEXT__ )';
 		}
+		elsif ( $args{allow_full_statements} and not ( $args{is_early} or not exists $args{is_early} ) ) {
+			# We are allowed to return full statements, not
+			# forced to use do {...} to make an expression.
+			return sprintf '@_ = ( %s ); goto $__NEXT__', $list;
+		}
 		else {
-			return sprintf 'do { @_ = ( %s ); goto $__NEXT__ }',
-				$list;
+			return sprintf 'do { @_ = ( %s ); goto $__NEXT__ }', $list;
 		}
 	}
 	elsif ( $args{is_early} or not exists $args{is_early} ) {

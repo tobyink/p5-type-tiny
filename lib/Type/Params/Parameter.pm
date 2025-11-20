@@ -354,6 +354,9 @@ sub _make_code {
 	elsif ( $constraint->{uniq} == Any->{uniq} ) {
 		$coderef->add_line( '1; # ... nothing to do' );
 	}
+	elsif ( $args{is_slurpy} and $self->_dont_validate_slurpy ) {
+		$coderef->add_line( '1; # ... nothing to do' );
+	}
 	elsif ( $constraint->can_be_inlined ) {
 		$coderef->add_line( $strictness_test . sprintf(
 			"%s\n\tor %s;",
@@ -426,6 +429,28 @@ sub _make_code {
 	$coderef->add_gap;
 
 	$self;
+}
+
+# This list can be reused safely.
+my @uniqs;
+
+# If $SLURPY is one of a handful of very loose type constraints, there is
+# no need to validate it because we built it as a hashref or arrayref ourself,
+# so there's no way it couldn't be a hashref or arrayref.
+sub _dont_validate_slurpy {
+	my $self = shift;
+	my $type = $self->type or return 1;
+	if ( not @uniqs ) {
+		@uniqs = map { $_->{uniq} }
+			Slurpy,
+			Slurpy[Any],      Any,
+			Slurpy[Item],     Item,
+			Slurpy[Ref],      Ref,
+			Slurpy[HashRef],  HashRef,
+			Slurpy[ArrayRef], ArrayRef;
+	}
+	( $_ == $type->{uniq} and return 1 ) for @uniqs;
+	return 0;
 }
 
 1;
