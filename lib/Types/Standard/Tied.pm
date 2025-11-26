@@ -8,7 +8,7 @@ use warnings;
 
 BEGIN {
 	$Types::Standard::Tied::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::Tied::VERSION   = '2.008005';
+	$Types::Standard::Tied::VERSION   = '2.008006';
 }
 
 $Types::Standard::Tied::VERSION =~ tr/_//d;

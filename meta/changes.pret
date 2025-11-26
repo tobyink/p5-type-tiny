@@ -1526,3 +1526,13 @@
 			label "Minor optimization for Type::Params: sometimes it would wrap a `goto` in a `do` block for no reason. That could potentially slow down the call as Perl might create a new lexical context unnecessarily. It is unlikely to make a measurable difference.";
 		];
 	].
+
+`Type-Tiny 2.008006 cpan:TOBYINK`
+	issued  2025-11-26;
+	changeset [
+		dcs:versus `Type-Tiny 2.008005 cpan:TOBYINK`;
+		item [
+			a dcs:Change;
+			label "Minor optimization for non-XS type check code for Enum types: if there are only a small number of valid strings (five or under), check using `eq` and `or` operators instead of compiling a regexp to check against them all at once. This can be controlled by passing the `use_eq` attribute to the Type::Tiny::Enum constructor, but is otherwise automatic.";
+		];
+	].

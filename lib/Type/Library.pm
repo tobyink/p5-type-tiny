@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Library::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Library::VERSION   = '2.008005';
+	$Type::Library::VERSION   = '2.008006';
 }
 
 $Type::Library::VERSION =~ tr/_//d;
