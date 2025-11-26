@@ -109,12 +109,18 @@ sub new_intersection {
 sub values        { $_[0]{values} }
 sub unique_values { $_[0]{unique_values} }
 sub constraint    { $_[0]{constraint} ||= $_[0]->_build_constraint }
+sub use_eq        { return $_[0]{use_eq} if exists $_[0]{use_eq}; $_[0]{use_eq} = $_[0]->_build_use_eq }
 
 sub _is_null_constraint { 0 }
 
 sub _build_display_name {
 	my $self = shift;
 	sprintf( "Enum[%s]", join q[,], @{ $self->unique_values } );
+}
+
+sub _build_use_eq {
+	my $self = shift;
+	!Type::Tiny::_USE_XS and @{ $self->unique_values } <= 5;
 }
 
 sub is_word_safe {
@@ -231,17 +237,30 @@ sub can_be_inlined {
 sub inline_check {
 	my $self = shift;
 	
-	my $xsub;
 	if ( my $xs_encoding = _xs_encoding( $self->unique_values ) ) {
-		$xsub = Type::Tiny::XS::get_subname_for( $xs_encoding );
+		my $xsub = Type::Tiny::XS::get_subname_for( $xs_encoding );
 		return "$xsub\($_[0]\)" if $xsub && !$Type::Tiny::AvoidCallbacks;
 	}
 	
-	my $regexp = $self->_regexp;
-	my $code =
-		$_[0] eq '$_'
-		? "(defined and !ref and m{\\A(?:$regexp)\\z})"
-		: "(defined($_[0]) and !ref($_[0]) and $_[0] =~ m{\\A(?:$regexp)\\z})";
+	my $code;
+	if ( $self->use_eq ) {
+		use B ();
+		my %seen;
+		my @vals = grep { not $seen{$_}++ } @{ $self->values };
+		if ( @vals == 1 ) {
+			$code = sprintf( '(defined %s and !ref %s and %s eq %s)', $_[0], $_[0], $_[0], B::perlstring($vals[0]) );
+		}
+		else {
+			$code = sprintf( '(defined %s and !ref %s and (%s))', $_[0], $_[0], join q{ or } => map { sprintf '(%s eq %s)', $_[0], B::perlstring($_) } @vals );
+		}
+	}
+	else {
+		my $regexp = $self->_regexp;
+		$code =
+			$_[0] eq '$_'
+			? "(defined and !ref and m{\\A(?:$regexp)\\z})"
+			: "(defined($_[0]) and !ref($_[0]) and $_[0] =~ m{\\A(?:$regexp)\\z})";
+	}
 		
 	return "do { $Type::Tiny::SafePackage $code }"
 		if $Type::Tiny::AvoidCallbacks;
@@ -584,6 +603,46 @@ be passed to the constructor.
 
 If C<< coercion => 1 >> is passed to the constructor, the type will have a
 coercion using the C<closest_match> method.
+
+=item C<use_eq>
+
+When generating Perl type checking code, Type::Tiny::Enum will traditionally
+test incoming strings for being valid using a single regular expression,
+unless L<Type::Tiny::XS> is available and a faster XS check is possible.
+
+From version 2.008006 onwards, if L<Type::Tiny::XS> is unavailable, and the
+enum is "small" (five possible values or less), Type::Tiny::Enum will instead
+generate code like:
+
+  ( $_ eq "foo" or $_ eq "bar" or $_ eq "baz" )
+
+... which benchmarks around 5% to 20% faster than C<< /(?:ba[rz]|foo)/ >>.
+
+However, it is possible to manually indicate whether you prefer it to
+generate code using C<eq> or regexps by setting C<use_eq> to a boolean
+value in the constructor. (If C<use_eq> is not passed to the constructor
+at all, Type::Tiny::Enum will try to guess the most efficient technique.)
+
+If you know that certain values in your enumeration are more common than
+others, you can "front load" your enumeration with the most common values
+so that C<eq> checks those I<first>. This may allow you to speed up certain
+checks.
+
+  has car_colour => (
+    is  => 'rw',
+    isa => Type::Tiny::Enum->new( use_eq => 1, values => [qw/
+      blue
+      red
+      grey
+      white
+      black
+      green
+      yellow
+      orange
+      purple
+      pink
+    /] );
+  );
 
 =back
 
