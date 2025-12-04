@@ -184,9 +184,20 @@ sub signature_for {
 		goto( $compiled );
 	};
 
+	our ( %PRE_INSTALL, %POST_INSTALL );
+	if ( my $cb = $PRE_INSTALL{$package} ) {
+		Types::Standard::assert_ArrayRef( $cb );
+		$_->( $sig ) for @$cb;
+	}
+
 	no strict 'refs';
 	no warnings 'redefine';
 	*$fullname = set_subname( SIGNATURE_SUBNAME_PREFIX . $fullname . SIGNATURE_SUBNAME_SUFFIX, $coderef );
+
+	if ( my $cb = $POST_INSTALL{$package} ) {
+		Types::Standard::assert_ArrayRef( $cb );
+		$_->( $sig ) for @$cb;
+	}
 
 	return $sig;
 }
@@ -2035,6 +2046,27 @@ Example usage:
 =for highlighter language=Perl
 
 =back
+
+=head1 HOOKS
+
+You can install coderefs which will be called whenever C<signature_for>,
+C<signature_for_func>, or C<signature_for_method> are used to wrap a
+function or method. They are ignored by C<signature> and by the pre-v2 API.
+
+  push @{ $Type::Params::POST_INSTALL{'My::Package'} ||= [] }, sub {
+    my $signature = shift;
+    ...;
+  };
+
+  push @{ $Type::Params::PRE_INSTALL{'My::Package'} ||= [] }, sub {
+    my $signature = shift;
+    ...;
+  };
+
+The C<< $signature >> will be a blessed L<Type::Params::Signature> object.
+
+The intention for this is to allow for future extensions to expose signature
+data as metadata. 
 
 =head1 BUGS
 
