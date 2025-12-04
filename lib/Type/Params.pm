@@ -47,6 +47,24 @@ our %EXPORT_TAGS = (
 	v2       => [ qw( signature signature_for ) ],    # New recommendation
 );
 
+BEGIN {
+	my $pfx = $ENV{'PERL_TYPE_PARAMS_SUBNAME_PREFIX'};
+	eval sprintf(
+		'sub SIGNATURE_SUBNAME_PREFIX () { %s }',
+		B::perlstring(
+			( defined $pfx and $pfx =~ /::\z/ ) ? $pfx : $pfx ? 'SIGNATURE_FOR::' : '',
+		)
+	);
+
+	my $sfx = $ENV{'PERL_TYPE_PARAMS_SUBNAME_SUFFIX'};
+	eval sprintf(
+		'sub SIGNATURE_SUBNAME_SUFFIX () { %s }',
+		B::perlstring(
+			( defined $sfx and $sfx =~ /\A_/ ) ? $sfx : $sfx ? '_SIGNATURE' : '',
+		)
+	);
+};
+
 {
 	my $Invocant;
 	
@@ -161,14 +179,14 @@ sub signature_for {
 		
 		no strict 'refs';
 		no warnings 'redefine';
-		*$fullname = set_subname( $fullname, $compiled );
+		*$fullname = set_subname( SIGNATURE_SUBNAME_PREFIX . $fullname . SIGNATURE_SUBNAME_SUFFIX, $compiled );
 		
 		goto( $compiled );
 	};
 
 	no strict 'refs';
 	no warnings 'redefine';
-	*$fullname = set_subname( $fullname, $coderef );
+	*$fullname = set_subname( SIGNATURE_SUBNAME_PREFIX . $fullname . SIGNATURE_SUBNAME_SUFFIX, $coderef );
 
 	return $sig;
 }
@@ -1953,6 +1971,12 @@ C<ArgsObject> is not exported unless requested by name.
 
 Recommendation: use B<Object> from L<Types::Standard> instead.
 
+=head1 CONSTANTS
+
+The constants C<SIGNATURE_SUBNAME_PREFIX> and C<SIGNATURE_SUBNAME_SUFFIX>
+exist. They normally return the empty string, but can be influenced by
+environment variables. (See below.) They are not exportable.
+
 =head1 ENVIRONMENT
 
 =over
@@ -1965,6 +1989,50 @@ environment variable does not exist, will use Class::XSAccessor.
 
 If Class::XSAccessor is not installed or is too old, pure Perl will always
 be used as a fallback.
+
+=item C<PERL_TYPE_PARAMS_SUBNAME_PREFIX> and C<PERL_TYPE_PARAMS_SUBNAME_SUFFIX>
+
+Each Perl subroutines has an idea of its fully-qualified subname, which is
+distinct from how it is actually called. For example:
+
+  package Foo;
+  *bar = sub { return "foobar" };
+
+The subroutine can be called as C<< Foo::bar() >>, however the subroutine
+still "thinks" it is an anonymous coderef because that is how it was
+initially created. That is how it will show up in stack traces, profiling
+tools, etc. These names can be manipulated with L<Sub::Util>.
+
+By default, if you use C<signature_for> to define a signature for
+C<< YourModule::yourfunc() >>, then the wrapper function it creates
+will also give itself the subname of C<< YourModule::yourfunc() >>.
+This is normally helpful.
+
+However, if you are debugging or profiling and wish to give the wrapper subs
+a different subname in stack traces or profiling reports, these environment
+variables allow you to control that. They have will have a global effect on
+your application.
+
+C<PERL_TYPE_PARAMS_SUBNAME_PREFIX> can be set to true to tell Type::Params
+to add "SIGNATURE_FOR::" to the start of the wrapper function's subname.
+Or it can be set to any string ending "::" to specify an alternative prefix.
+
+C<PERL_TYPE_PARAMS_SUBNAME_SUFFIX> can be set to true to tell Type::Params
+to add "_SIGNATURE" to the end of the wrapper function's subname.
+Or it can be set to any string starting "_" to specify an alternative suffix.
+
+There's usually no reason to apply both a prefix I<and> a suffix.
+
+Suffixes may play nicer with utilities like L<namespace::autoclean>.
+
+=for highlighter language=Bash
+
+Example usage:
+
+  export PERL_TYPE_PARAMS_SUBNAME_SUFFIX=1
+  perl -d:NYTProf some_perl.pl
+
+=for highlighter language=Perl
 
 =back
 
