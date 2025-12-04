@@ -1001,9 +1001,9 @@ sub inline_check {
 		$r[0] = $self->parent->inline_check( @_ );
 	}
 	my $r = join " && " => map {
-		/[;{}]/ && !/\Ado \{.+\}\z/
-			? "do { $SafePackage $_ }"
-			: "($_)"
+		/\A(?:[A-Z](?:\w)*::[A-Z](?:\w|::)*)\(\$\w+(?:\[\d+\]|\{[^}]+\})?\)\z/i ? $_ :
+		/[;{}]/ && !/\Ado \{.+\}\z/ ? "do { $SafePackage $_ }" :
+		"($_)"
 	} @r;
 	return @r == 1 ? $r : "($r)";
 } #/ sub inline_check
