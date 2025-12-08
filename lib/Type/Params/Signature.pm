@@ -1220,6 +1220,13 @@ sub make_extra_methods {
 	my $code = $coderef->code;
 	local $@;
 	eval( $code ) or die( $@ );
+	
+	Type::Tiny::_install_overloads(
+		$self->bless,
+		'bool'          => sub { 1 },
+		'@{}'           => '__TO_ARRAYREF__',
+		'fallback'      => !!1,
+	);
 }
 
 sub return_wanted {

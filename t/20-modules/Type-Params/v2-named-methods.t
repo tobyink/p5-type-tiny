@@ -30,7 +30,7 @@ use Types::Common -all;
 
 our @ARGS;
 
-signature_for [ qw/ get_list get_arrayref get_hashref / ] => (
+signature_for [ qw/ get_list get_arrayref get_hashref be_arraylike / ] => (
 	named => [
 		foo => Int, { alias => 'fool' },
 		bar => Optional[Int],
@@ -148,6 +148,23 @@ subtest '__TO_HASHREF__' => sub {
 	isnt(
 		exception { get_hashref( foo => 66, bar => 99 ) },
 		undef,
+	);
+};
+
+sub be_arraylike {
+	my $args = shift;
+	[ @{$args} ];
+}
+
+subtest '@{}' => sub {
+	is_deeply(
+		be_arraylike( foo => 66, bar => 99 ),
+		[ 66, 99 ],
+	);
+
+	is_deeply(
+		be_arraylike( fool => 66 ),
+		[ 66, undef ],
 	);
 };
 

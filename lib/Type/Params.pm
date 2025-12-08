@@ -653,6 +653,8 @@ These methods start and end with double underscores to reduce the chance
 that they'll conflict with the name of a named parameter, however they are
 considered part of the public, supported API.
 
+The object overloads C<< @{} >> to call C<< __TO_ARRAYREF__ >>.
+
 =head4 C<< named_to_list >> B<< ArrayRef|Bool >>
 
 The C<named_to_list> option is ignored for signatures using positional

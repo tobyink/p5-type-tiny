@@ -1553,4 +1553,8 @@
 			a dcs:Addition;
 			label "Type::Params now provides hooks for the event of wrapping a sub in a signature.";
 		];
+		item [
+			a dcs:Addition;
+			label "Type::Params args objects now provide __TO_LIST__, __TO_ARRAYREF__, and __TO_HASHREF__ methods.";
+		];
 	].
