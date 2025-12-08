@@ -1536,3 +1536,21 @@
 			label "Minor optimization for non-XS type check code for Enum types: if there are only a small number of valid strings (five or under), check using `eq` and `or` operators instead of compiling a regexp to check against them all at once. This can be controlled by passing the `use_eq` attribute to the Type::Tiny::Enum constructor, but is otherwise automatic.";
 		];
 	].
+
+`Type-Tiny 2.009_000 cpan:TOBYINK`
+	issued  2025-12-08;
+	changeset [
+		dcs:versus `Type-Tiny 2.008006 cpan:TOBYINK`;
+		item [
+			a dcs:Change;
+			label "Minor optimization to avoid wrapping certain inlined checks in do {...} blocks.";
+		];
+		item [
+			a dcs:Addition;
+			label "Add environment variables to affect how `signature_for` checks appear in stack traces, debugging, and profiling.";
+		];
+		item [
+			a dcs:Addition;
+			label "Type::Params now provides hooks for the event of wrapping a sub in a signature.";
+		];
+	].
