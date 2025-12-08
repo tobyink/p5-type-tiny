@@ -598,7 +598,7 @@ C<< __TO_LIST__ >>, C<< __TO_ARRAYREF__ >>, and C<< __TO_HASHREF__ >>.
  signature_for add_numbers => ( named => [ num1 => Num, num2 => Num ] );
  sub add_numbers ( $arg ) {
    my $nums = $arg->__TO_ARRAYREF__;
-   return $nums[0] + $nums[1];
+   return $nums->[0] + $nums->[1];
  }
 
  signature_for add_numbers => ( named => [ num1 => Num, num2 => Num ] );
