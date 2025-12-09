@@ -1558,3 +1558,17 @@
 			label "Type::Params args objects now provide __TO_LIST__, __TO_ARRAYREF__, and __TO_HASHREF__ methods.";
 		];
 	].
+
+`Type-Tiny 2.009_001 cpan:TOBYINK`
+	issued  2025-12-09;
+	changeset [
+		dcs:versus `Type-Tiny 2.009_000 cpan:TOBYINK`;
+		item [
+			a dcs:Addition;
+			label "Add `check_coerce` method to Type::Coercion.";
+		];
+		item [
+			a dcs:Addition;
+			label "Add `check_coerce` method to Type::Tiny.";
+		];
+	].
