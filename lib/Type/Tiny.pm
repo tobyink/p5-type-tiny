@@ -1091,6 +1091,16 @@ sub coerce {
 	$self->_assert_coercion->coerce( @_ );
 }
 
+sub check_coerce {
+	my $self = shift;
+	if ( $self->has_coercion ) {
+		$self->_assert_coercion->check_coerce( @_ ) ;
+	}
+	else {
+		$self->check( @_ ) ? $_[0] : undef;
+	}
+}
+
 sub assert_coerce {
 	my $self = shift;
 	$self->_assert_coercion->assert_coerce( @_ );
@@ -2231,7 +2241,12 @@ name of the variable being checked.
 
 =item C<< coerce($value) >>
 
-Attempt to coerce C<< $value >> to this type.
+Attempt to coerce C<< $value >> to this type, returning the original value
+otherwise.
+
+=item C<< check_coerce($value) >>
+
+Attempt to coerce C<< $value >> to this type, returning undef otherwise.
 
 =item C<< assert_coerce($value) >>
 
@@ -2607,7 +2622,7 @@ anything useful.
 
 =back
 
-=head2 Functions
+=head2 Other Functions
 
 =over
 

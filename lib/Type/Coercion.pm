@@ -104,6 +104,15 @@ sub has_type_constraint    { defined $_[0]->type_constraint }     # sic
 sub has_coercion_generator { exists $_[0]{coercion_generator} }
 sub has_parameters         { exists $_[0]{parameters} }
 
+# It is possible for the target type constraint to have been garbage collected
+# but the type coercion object to still exist, as we only keep a weak
+# reference to the target type constraint to prevent cyclical references.
+# For this reason, we also keep a copy of the type's compiled check which
+# will just be a simple coderef that unlikely has any references to anything.
+# We preserve it during the constructor, then in the getter for the type
+# constraint, we can quickly rebuild a dummy type constraint using the same
+# compiled check we preserved, which will usually be sufficient for our needs.
+
 sub _preserve_type_constraint {
 	my $self = shift;
 	$self->{_compiled_type_constraint_check} =
@@ -187,6 +196,19 @@ sub i_really_want_to_unfreeze { $_[0]{frozen} = 0; $_[0] }
 sub coerce {
 	my $self = shift;
 	return $self->compiled_coercion->( @_ );
+}
+
+sub check_coerce {
+	my $self = shift;
+	my $r = $self->coerce( @_ );
+	
+	if ( $self->has_type_constraint ) {
+		my $tc = $self->type_constraint;
+		return $tc->check( $r ) ? $r : undef;
+	}
+	else {
+		return $r;
+	}
 }
 
 sub assert_coerce {
@@ -710,12 +732,24 @@ Coerce the value to the target type.
 Returns the coerced value, or the original value if no coercion was
 possible.
 
+=item C<< check_coerce($value) >>
+
+Coerce the value to the target type, and checks that the coerced value
+passes the target type constraint.
+
+Returns the coerced value if it passes the target type constraint,
+or undef if it does not.
+
 =item C<< assert_coerce($value) >>
 
 Coerce the value to the target type, and throw an exception if the result
 does not validate against the target type constraint.
 
 Returns the coerced value.
+
+If this type coercion does not have an associated target type constraint,
+then will not attempt to validate against it, and will always return the
+coerced value, never throwing an exception (in theory).
 
 =back
 
