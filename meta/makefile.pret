@@ -53,6 +53,12 @@
 	deps:test-suggestion [
 		deps:on "Test::Memory::Cycle"^^deps:CpanId;
 	];
+	deps:test-suggestion [
+		deps:on "Devel::Hide"^^deps:CpanId;
+	];
+	deps:test-suggestion [
+		deps:on "namespace::clean"^^deps:CpanId;
+	];
 	deps:develop-recommendation [
 		deps:on "Test::Memory::Cycle"^^deps:CpanId;
 	];

@@ -142,6 +142,28 @@ L<Reply::Plugin::TypeTiny> is not covered by the stability policy.
 
 =back
 
+=head2 Type::Tiny Security Policy
+
+The L<latest stable release on CPAN|https://metacpan.org/release/Type-Tiny>
+is supported for security updates. (By convention, releases with an underscore
+in their version number are not considered to be stable releases.)
+
+If you are using an older release, you are advised to upgrade.
+
+A list of changes between versions can be found in
+L<the Changes file on CPAN|https://metacpan.org/changes/distribution/Type-Tiny>
+with security-related changes tagged "SECURITY" in capital letters.
+
+=head3 Reporting a Vulnerability
+
+Please report any issues via
+L<GitHub Issues|https://github.com/tobyink/p5-type-tiny/issues>.
+
+If you are concerned that some of the details of your report may lead to an
+exploit being made public, then keep your issue report vague, and email the
+details to me directly. My email address can be found on my
+L<GitHub profile|https://github.com/tobyink>.
+
 =head2 Type::Tiny Versioning Policy
 
 As of 1.000000, this distribution follows a versioning scheme similar

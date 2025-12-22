@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Tiny::Enum::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::Enum::VERSION   = '2.009_001';
+	$Type::Tiny::Enum::VERSION   = '2.009_002';
 }
 
 $Type::Tiny::Enum::VERSION =~ tr/_//d;
@@ -46,6 +46,9 @@ sub new {
 	_croak
 		"Enum type constraints cannot have a constraint coderef passed to the constructor"
 		if exists $opts{constraint};
+	_croak
+		"Enum type constraints cannot have a sorter coderef passed to the constructor"
+		if exists $opts{sorter};
 	_croak
 		"Enum type constraints cannot have a inlining coderef passed to the constructor"
 		if exists $opts{inlined};
@@ -593,6 +596,11 @@ Instead rely on the default.
 
 Parent is always B<Types::Standard::Str>, and cannot be passed to the
 constructor.
+
+=item C<sorter>
+
+Sorters passed to the constructor. Instead, enum types can sort values based
+on the order the enum was originally defined in.
 
 =item C<unique_values>
 

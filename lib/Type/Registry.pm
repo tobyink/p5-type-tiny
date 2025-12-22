@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Registry::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Registry::VERSION   = '2.009_001';
+	$Type::Registry::VERSION   = '2.009_002';
 }
 
 $Type::Registry::VERSION =~ tr/_//d;
@@ -25,10 +25,19 @@ sub _generate_t {
 	my $class = shift;
 	my ( $name, $value, $globals ) = @_;
 	
-	my $caller = $globals->{into};
-	my $reg    = $class->for_class(
-		ref( $caller ) ? sprintf( 'HASH(0x%08X)', refaddr( $caller ) ) : $caller );
-		
+	my $reg;
+	if ( $globals->{lexical} ) {
+		if ( ref($value) eq 'HASH' and exists $value->{for_class} ) {
+			$reg = $class->for_class( $value->{for_class} );
+		}
+		else {
+			$reg = $class->new;
+		}
+	}
+	else {
+		$reg = $class->_for_class_or_ref( $globals->{into} );
+	}
+	
 	sub (;$) { @_ ? $reg->lookup( @_ ) : $reg };
 } #/ sub _generate_t
 
@@ -44,13 +53,20 @@ sub new {
 	sub for_class {
 		my $class = shift;
 		my ( $for ) = @_;
-		$registries{$for} ||= $class->new;
+		my $reg = ( $registries{$for} ||= $class->new );
 	}
 	
 	sub for_me {
 		my $class = shift;
 		my $for   = caller;
 		$registries{$for} ||= $class->new;
+	}
+	
+	sub _for_class_or_ref {
+		my $class = shift;
+		my ( $for ) = @_;
+		$for = sprintf( 'HASH(0x%08X)', refaddr( $for ) ) if ref $for;
+		my $reg = ( $registries{$for} ||= $class->new );
 	}
 }
 

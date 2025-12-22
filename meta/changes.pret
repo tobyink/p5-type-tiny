@@ -1566,9 +1566,38 @@
 		item [
 			a dcs:Addition;
 			label "Add `check_coerce` method to Type::Coercion.";
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/62>;
 		];
 		item [
 			a dcs:Addition;
 			label "Add `check_coerce` method to Type::Tiny.";
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/62>;
+		];
+	].
+
+`Type-Tiny 2.009_002 cpan:TOBYINK`
+	issued  2025-12-22;
+	changeset [
+		dcs:versus `Type-Tiny 2.009_001 cpan:TOBYINK`;
+		item [
+			a dcs:Change;
+			label "If you lexically import `t` from Type::Registry, then it will no longer be tied to the caller's per-package type registry.";
+		];
+		item [
+			a dcs:Packaging;
+			label "Add test suggestion dependencies on Devel::Hide and namespace::clean.";
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/171>;
+		];
+		item [
+			a dcs:Documentation;
+			label "Document that Type::Tiny::Enum defines its own sorter.";
+		];
+		item [
+			a dcs:Documentation;
+			label "Add security policy to Type::Tiny::Manual::Policies.";
+		];
+		item [
+			a dcs:Change;
+			label "Type::Tiny::Enum now throws an exception if you try to pass a sorter coderef to the constructor.";
 		];
 	].
