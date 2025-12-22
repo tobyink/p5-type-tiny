@@ -1601,3 +1601,17 @@
 			label "Type::Tiny::Enum now throws an exception if you try to pass a sorter coderef to the constructor.";
 		];
 	].
+
+`Type-Tiny 2.009_003 cpan:TOBYINK`
+	issued  2025-12-22;
+	changeset [
+		dcs:versus `Type-Tiny 2.009_002 cpan:TOBYINK`;
+		item [
+			a dcs:Documentation;
+			label "Fix syntax in some of the documentation for Type::Params.";
+		];
+		item [
+			a dcs:Documentation;
+			label "Update documentation to potential future changes to coercions in Types::Standard.";
+		];
+	].
