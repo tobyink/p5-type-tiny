@@ -876,7 +876,7 @@ the default will be fine.
 
 This allows you to add signatures to functions in other packages:
 
- signature_for foo => ( package "Some::Package", ... );
+ signature_for foo => ( package => "Some::Package", ... );
 
 If C<method> is true and Some::Package doesn't contain a sub called "foo",
 then Type::Params will traverse the inheritance heirarchy, looking for "foo".
@@ -885,7 +885,7 @@ If any type constraints are specified as strings, Type::Params will look
 for types imported by this package.
 
  # Expects the MyInt type to be known by Some::Package.
- signature_for foo => ( package "Some::Package", pos => [ 'MyInt' ] );
+ signature_for foo => ( package => "Some::Package", pos => [ 'MyInt' ] );
 
 This is also supported:
 
