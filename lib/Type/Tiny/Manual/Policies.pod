@@ -42,6 +42,14 @@ Improvements to the text of error messages.
 
 =back
 
+=head2 Notice: Planned Changes in Type::Tiny 3
+
+Type::Tiny 3 is expected to be released in the second half of 2026. It is likely
+to introduce coercions to some common type constraints such as B<HashRef>,
+B<ArrayRef>, and B<Str>. If your code specifically relies on these types
+not having coercions, you may need to change your code. (The C<no_coercions>
+method can give you a copy of any type minus all coercions.)
+
 =head2 Experimental and Unstable Type::Tiny Features
 
 The following list is currently non-exhaustive.
