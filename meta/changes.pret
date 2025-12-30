@@ -1615,3 +1615,21 @@
 			label "Update documentation to potential future changes to coercions in Types::Standard.";
 		];
 	].
+
+`Type-Tiny 2.010000 cpan:TOBYINK`
+	issued  2025-12-30;
+	changeset [
+		dcs:versus `Type-Tiny 2.009_003 cpan:TOBYINK`;
+		item [
+			a dcs:Documentation;
+			label "Update Type::Tiny::Manual::Policies with planned changes for Type::Tiny 3.";
+		];
+		item [
+			a dcs:Documentation;
+			label "Update NEWS file.";
+		];
+		item [
+			a dcs:Tests;
+			label "Skip t/20-modules/Type-Tie/06clone.t on very old Perls.";
+		];
+	].
