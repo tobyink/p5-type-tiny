@@ -17,7 +17,6 @@ This software is copyright (c) 2022-2025 by Toby Inkster.
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
-
 =cut
 
 use strict;
@@ -25,6 +24,7 @@ use warnings;
 
 use Test::More;
 use Test::Requires 'Clone';
+use Test::Requires '5.012';
 use Test::Fatal;
 
 use Type::Tie;
