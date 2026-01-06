@@ -400,7 +400,7 @@ sub inline_coercion {
 	
 	push @sub, "$varname";
 	
-	"@sub";
+	return join q[ ], @sub;
 } #/ sub inline_coercion
 
 sub _build_moose_coercion {
