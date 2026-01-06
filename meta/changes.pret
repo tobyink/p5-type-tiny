@@ -1633,3 +1633,14 @@
 			label "Skip t/20-modules/Type-Tie/06clone.t on very old Perls.";
 		];
 	].
+
+`Type-Tiny 2.010001 cpan:TOBYINK`
+	issued  2026-01-06;
+	changeset [
+		dcs:versus `Type-Tiny 2.010000 cpan:TOBYINK`;
+		item [
+			a dcs:Bugfix;
+			label "Fix for $LIST_SEPARATOR changes breaking Type::Coercion, Types::Common, Types::Standard.";
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-type-tiny/issues/190>;
+		];
+	].

@@ -63,7 +63,7 @@ BEGIN {
 }
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '2.010000';
+our $VERSION   = '2.010001';
 our @EXPORT    = qw( eval_closure );
 our @EXPORT_OK = qw(
 	HAS_LEXICAL_SUBS HAS_LEXICAL_VARS ALIAS_IMPLEMENTATION
