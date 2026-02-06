@@ -14,6 +14,10 @@
 		deps:on "Exporter::Tiny 1.006000"^^deps:CpanId;
 		comment "This module was spun off from the Type-Tiny distribution."@en;
 	];
+	deps:runtime-requirement [
+		deps:on "Scalar::Util 1.26"^^deps:CpanId;
+		comment "Needed for Types::Common::Values."@en;
+	];
 	deps:runtime-recommendation [
 		deps:on "Type::Tiny::XS 0.025"^^deps:CpanId;
 		comment "Makes a lot of stuff faster."@en;
