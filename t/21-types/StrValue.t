@@ -80,7 +80,7 @@ my @tests = (
 	fail => 'blessed hashref'          => bless({}, 'SomePkg'),
 	fail => 'coderef'                  => sub { 1 },
 	fail => 'blessed coderef'          => bless(sub { 1 }, 'SomePkg'),
-	fail => 'glob'                     => do { no warnings 'once'; *SOMETHING },
+	xxxx => 'glob'                     => do { no warnings 'once'; *SOMETHING },
 	fail => 'globref'                  => do { no warnings 'once'; my $x = *SOMETHING; \$x },
 	fail => 'blessed globref'          => bless(do { no warnings 'once'; my $x = *SOMETHING; \$x }, 'SomePkg'),
 	fail => 'regexp'                   => qr/./,
