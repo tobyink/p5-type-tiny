@@ -50,6 +50,9 @@ B<ArrayRef>, and B<Str>. If your code specifically relies on these types
 not having coercions, you may need to change your code. (The C<no_coercions>
 method can give you a copy of any type minus all coercions.)
 
+Additional type constraints from L<Types::Common::Values> will be added to
+L<Types::Common>.
+
 =head2 Experimental and Unstable Type::Tiny Features
 
 The following list is currently non-exhaustive.

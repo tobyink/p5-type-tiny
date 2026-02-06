@@ -50,6 +50,17 @@ overloading "bool".
 
 =item *
 
+B<< BoolValue >> I<< [has coercion] >> in L<Types::Common::Values>
+
+A more pedantic version of B<Bool>, only accepting Perl's special built-in
+boolean values. It accepts C<< !!1 >> (or C<< builtin::true >> on newer Perls)
+as true, and C<< !!0 >> (or C<< builtin::false >> on newer Perls) as false,
+and no other values.
+
+Can coerce from B<Bool> and B<BoolLike>.
+
+=item *
+
 B<< ClassName >> in L<Types::Standard>
 
 Any loaded package name.
@@ -158,6 +169,16 @@ An integer within a particular numeric range.
 
 =item *
 
+B<< IntValue >> I<< [has coercion] >> in L<Types::Common::Values>
+
+A more pedantic version of B<Int>, which will reject strings that look
+like integers. While B<Int> will accept C<< "1" >> and C<< 1 >> equally,
+B<IntValue> will only accept the latter.
+
+Can coerce from B<Int> and B<< Overload['0+'] >>.
+
+=item *
+
 B<< Item >> in L<Types::Standard>
 
 Any single item; effectively the same as B<Any>.
@@ -245,6 +266,16 @@ A string containing only digits.
 B<< NumRange >> I<< [parameterizable] >> in L<Types::Common::Numeric>
 
 A number within a particular numeric range.
+
+=item *
+
+B<< NumValue >> I<< [has coercion] >> in L<Types::Common::Values>
+
+A more pedantic version of B<Num>, which will reject strings that look
+like numbers. While B<Num> will accept C<< "1.1" >> and C<< 1.1 >> equally,
+B<NumValue> will only accept the latter.
+
+Can coerce from B<Num> and B<< Overload['0+'] >>.
 
 =item *
 
@@ -377,6 +408,16 @@ A string matching a particular regular expression.
 B<< StrongPassword >> in L<Types::Common::String>
 
 A string at least 4 characters long and less than 256 characters long with no line breaks and at least one non-alphabetic character.
+
+=item *
+
+B<< StrValue >> I<< [has coercion] >> in L<Types::Common::Values>
+
+A more pedantic version of B<Str>, which will reject numbers that were
+not created as strings. While B<Str> will accept C<< "1.1" >> and C<< 1.1 >>
+equally, B<StrValue> will only accept the former.
+
+Can coerce from B<Str> and B<StringLike>.
 
 =item *
 
