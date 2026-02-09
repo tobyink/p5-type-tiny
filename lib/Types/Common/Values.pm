@@ -18,10 +18,27 @@ BEGIN {
 		*PRAGMATA = sub () { '' };
 		eval sprintf q{sub FUNCTION_PREFIX () { '%s::_' }}, __PACKAGE__;
 	}
+	
+	if ( eval 'use Scalar::Util 1.26; 1' ) {
+		*_is_dual = \&Scalar::Util::isdual;
+	}
+	else {
+		eval q{
+			use B;
+			sub _is_dual {
+				my $f = B::svref_2object(\$_[0])->FLAGS;
+				my $SVp_POK = eval { B::SVp_POK() } || 0;
+				my $SVp_IOK = eval { B::SVp_IOK() } || 0;
+				my $SVp_NOK = eval { B::SVp_NOK() } || 0;
+				my $pok  = $f & ( B::SVf_POK | $SVp_POK );
+				my $niok = $f & ( B::SVf_IOK | B::SVf_NOK | $SVp_IOK | $SVp_NOK );
+				!!( $pok and $niok );
+			}
+		};
+	}
 };
 
 use B                qw();
-use Scalar::Util     qw();
 use Type::Library    qw( -base -declare BoolValue NumValue IntValue StrValue );
 use Types::Standard  qw( Value Bool Str Num Int Overload );
 use Types::TypeTiny  qw( BoolLike StringLike );
@@ -31,7 +48,7 @@ sub _is_bool ($) {
 	my $value = shift;
 	return !!0 unless defined $value;
 	return !!0 if ref $value;
-	return !!0 unless Scalar::Util::isdual( $value );
+	return !!0 unless _is_dual( $value );
 	return !!1 if  $value && "$value" eq '1' && $value+0 == 1;
 	return !!1 if !$value && "$value" eq q'' && $value+0 == 0;
 	return !!0;
